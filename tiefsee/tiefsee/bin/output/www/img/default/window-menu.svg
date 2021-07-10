@@ -1,0 +1,9 @@
+<svg viewBox="0 0 25 25">
+<style type="text/css">
+	.st0{fill:#040000;}
+</style>
+
+<rect x="1.1" y="2" style="fill:var(--color-white)" width="22.8" height="1.5"/>
+<rect x="1.1" y="8.8" style="fill:var(--color-white)" width="22.8" height="1.5"/>
+<path style="fill:var(--color-white)" d="M12.5,23c-0.2,0-0.4-0.1-0.5-0.2l-5.7-5.7L7.4,16l5.1,5.1l5.1-5.1l1.1,1.1L13,22.7C12.9,22.9,12.7,23,12.5,23 z"/>
+</svg>

@@ -1,0 +1,4 @@
+<svg viewBox="0 0 25 25">
+	<rect x="2.6" y="22.6" style="fill:var(--color-white);" width="19.7" height="1.5"/>
+	<path style="fill:var(--color-white)" d="M11.7,3.5v15.1h1.5V3.5l7.5,7.5l1.1-1.1L13,1.1c-0.3-0.3-0.8-0.3-1.1,0L3.2,9.9L4.3,11L11.7,3.5z"/>
+</svg>
