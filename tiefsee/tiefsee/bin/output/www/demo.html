@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TiefseeView Demo</title>
 
-    <script src="js/hammer.min.js"></script>
-    <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/jquery.easing.js"></script>
+    <script src="js/library/hammer.min.js"></script>
+    <script src="js/library/jquery-3.6.0.min.js"></script>
+    <script src="js/library/jquery.easing.js"></script>
 
     <script src="js/tiefseeview.js"></script>
     <link rel="stylesheet" href="css/tiefseeview.css">
@@ -82,8 +82,7 @@
 
     <div id="dd"> </div>
 
-
-
+   
     <script>
 
         var tv;
@@ -93,6 +92,7 @@
             let _url = $('#imgurl').val();
 
             await tv.loadImg(_url);
+            //await tv.loadBigimg(_url); 
             tv.transformRefresh(false)
             tv.zoomFull(TieefseeviewZoomType['full-100%']);
             $('#output-size').html(`${tv.getOriginalWidth()} , ${tv.getOriginalHeight()}`);

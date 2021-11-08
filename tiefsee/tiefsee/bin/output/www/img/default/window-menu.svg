@@ -1,9 +1,10 @@
-<svg viewBox="0 0 25 25">
-<style type="text/css">
-	.st0{fill:#040000;}
-</style>
+<svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 25 25" style="enable-background:new 0 0 25 25;" xml:space="preserve">
 
-<rect x="1.1" y="2" style="fill:var(--color-white)" width="22.8" height="1.5"/>
-<rect x="1.1" y="8.8" style="fill:var(--color-white)" width="22.8" height="1.5"/>
-<path style="fill:var(--color-white)" d="M12.5,23c-0.2,0-0.4-0.1-0.5-0.2l-5.7-5.7L7.4,16l5.1,5.1l5.1-5.1l1.1,1.1L13,22.7C12.9,22.9,12.7,23,12.5,23 z"/>
+	<g style="fill:var(--color-white);">
+			<rect x="6" y="7"  width="13" height="1"/>	
+			<rect x="6" y="11" width="13" height="1"/>
+			<path  d="M12.5,18.4c-0.1,0-0.2,0-0.3-0.1L9,15.7L9.6,15l2.9,2.3l2.9-2.3l0.6,0.8l-3.2,2.6
+				C12.7,18.4,12.6,18.4,12.5,18.4z"/>
+	</g>
 </svg>

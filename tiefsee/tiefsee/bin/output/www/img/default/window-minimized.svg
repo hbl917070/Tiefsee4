@@ -1,3 +1,5 @@
-<svg viewBox="0 0 25 25">
-	<rect style="fill:var(--color-white)" x="1.1" y="11.8" class="st0" width="22.7" height="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:none; stroke:var(--color-white); stroke-linejoin:bevel;">
+		<line x1="18" y1="12.5" x2="7" y2="12.5"/>
+	</g>
 </svg>

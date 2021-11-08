@@ -1,0 +1,69 @@
+#tiefseeview {
+  height: 100%;
+  width: 100%;
+}
+
+/*--------------*/
+
+.main-tools {
+  /* background-color: rgba(165, 42, 42, 0.411); */
+  height: 35px;
+  
+}
+.main-tools-group{
+  display: flex;
+}
+
+.main-tools-btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-tools-btn:hover {
+  cursor: pointer;
+  background-color: var(--color-white20);
+  outline: 1px solid var(--color-white40);
+  outline-offset: -1px;
+}
+
+.main-tools-btn svg,
+.main-tools-btn img {
+  width: 25px;
+  height: 25px;
+}
+
+/*開啟選單時*/
+.main-tools-btn.menuActive{
+  background-color: var(--color-blue40) !important;
+}
+/*--------------*/
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.main-T {
+}
+
+.main-C {
+  display: flex;
+  flex: 1;
+}
+
+.main-B {
+}
+
+.main-L {
+}
+
+.main-V {
+  flex: 1;
+}
+
+.main-R {
+}

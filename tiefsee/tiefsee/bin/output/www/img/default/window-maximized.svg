@@ -1,3 +1,5 @@
-<svg viewBox="0 0 25 25">
-	<path style="fill:var(--color-white)" d="M22.4,2.6v19.8H2.6V2.6H22.4 M23.9,1.1H1.1v22.8h22.8V1.1L23.9,1.1z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white);">
+		<path  d="M17,8v9H8V8H17 M18,7H7v11h11V7L18,7z"/>
+	</g>
 </svg>
