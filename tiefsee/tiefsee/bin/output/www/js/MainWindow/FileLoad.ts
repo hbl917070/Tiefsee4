@@ -11,6 +11,9 @@ class FileLoad {
     public next;
     public prev;
     public getFilePath;
+    public getGroupType;
+    public setGroupType;
+
 
     constructor(M: MainWindow) {
 
@@ -19,12 +22,19 @@ class FileLoad {
         var flag: number;//目前在哪一張圖片
         var sortType = FileSortType.name;//排序方式
 
+        //img=圖片  pdf=pdf、ai  movie=影片  frames=多幀圖片  txt=文字
+        var groupType: string = "img";
+
+
+
         this.getArray = () => { return arWaitingList; };
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
         this.next = next;
         this.prev = prev;
         this.getFilePath = getFilePath;
+        this.getGroupType = getGroupType;
+        this.setGroupType = setGroupType;
 
         async function loadFiles(DirPath: string, ar: string[] = []) {
 
@@ -71,6 +81,8 @@ class FileLoad {
 
 
 
+
+
         async function loadFile(path: string) {
 
             arWaitingList = [];
@@ -79,16 +91,23 @@ class FileLoad {
 
                 arWaitingList = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
 
+
+                arWaitingList = await sort(sortType);
+                groupType = await fileToGroupType(arWaitingList[0])
+                arWaitingList = await filter();
+
             } else if (await WV_File.Exists(path) === true) {//如果是檔案
 
                 let p: string = await WV_Path.GetDirectoryName(path);//取得檔案所在的資料夾路徑
                 arWaitingList = await WV_Directory.GetFiles(p, "*.*");
 
+                groupType = await fileToGroupType(path)
+
+                arWaitingList = await filter();
+                arWaitingList = await sort(sortType);
             }
 
 
-            arWaitingList = await filter();
-            arWaitingList = await sort(sortType);
 
             //目前檔案位置
             flag = 0;
@@ -115,9 +134,15 @@ class FileLoad {
             if (_flag !== undefined) { flag = _flag; }
 
             // M.fileShow.loadurl()
+            if (groupType == GroupType.img) {
+                M.fileShow.openImage(getFilePath())
 
-            let imgurl = "/api/getimg/" + encodeURIComponent(getFilePath())
-            M.fileShow.loadurl(imgurl)
+            }
+
+            if (groupType == GroupType.pdf) {
+                let imgurl = "/api/getpdf/" + encodeURIComponent(getFilePath())
+                M.fileShow.openPdf(imgurl)
+            }
 
             let title = `「${flag + 1}/${arWaitingList.length}」 ${await WV_Path.GetFileName(getFilePath())}`;
             baseWindow.setTitle(title);
@@ -147,6 +172,41 @@ class FileLoad {
         }
 
 
+
+
+
+
+        /**
+         * 
+         * @returns 
+         */
+        async function fileToGroupType(path: string) {
+
+            let fileExt = (await WV_Path.GetExtension(path)).toLocaleLowerCase();
+
+            for (var type in GroupType) {
+                for (let j = 0; j < allowFileType(type).length; j++) {
+                    const fileType = allowFileType(type)[j];
+                    if (fileExt == "." + fileType["ext"]) {
+                        return type;
+                    }
+                }
+            }
+
+            return ""
+        }
+
+        function getGroupType() {
+            return groupType;
+        }
+        function setGroupType(type: string) {
+            groupType = type;
+        }
+
+        /**
+         * 篩選檔案
+         * @returns 
+         */
         async function filter() {
 
             let ar = [];
@@ -156,8 +216,8 @@ class FileLoad {
                 let path = arWaitingList[i];
                 let fileExt = (await WV_Path.GetExtension(path)).toLocaleLowerCase();
 
-                for (let j = 0; j < allowFileType["img"].length; j++) {
-                    const fileType = allowFileType["img"][j];
+                for (let j = 0; j < allowFileType(groupType).length; j++) {
+                    const fileType = allowFileType(groupType)[j];
                     if (fileExt == "." + fileType["ext"]) {
                         ar.push(path);
                         break;
@@ -180,7 +240,7 @@ class FileLoad {
             //檔名自然排序
             if (_type === FileSortType.name) {
                 return arWaitingList.sort(function (a, b) {
-                    return  a.localeCompare(b, undefined, {
+                    return a.localeCompare(b, undefined, {
                         numeric: true,
                         sensitivity: 'base'
                     });
@@ -207,24 +267,48 @@ class FileLoad {
 
 }
 
+const GroupType = {
+    img: "img",
+    pdf: "pdf",
+    movie: "movie",
+    frames: "frames",
+    txt: "txt"
+}
 
-var allowFileType = {
-    "img": [
-        { ext: "jpg", type: ["image"] },
-        { ext: "png", type: ["image"] },
-        { ext: "gif", type: ["image"] },
-        { ext: "bmp", type: ["image"] },
-        { ext: "webp", type: ["image"] },
-        { ext: "jpeg", type: ["image"] },
-        { ext: "tif", type: ["image"] },
-        { ext: "svg", type: ["image"] },
-        { ext: "", type: ["image"] },
-        { ext: "", type: ["image"] },
-        { ext: "", type: ["image"] },
-        { ext: "", type: ["image"] },
-    ]
 
-};
+
+function allowFileType(type: string) {
+
+    if (type === GroupType.img) {
+        return [
+            { ext: "jpg", type: ["image"] },
+            { ext: "png", type: ["image"] },
+            { ext: "gif", type: ["image"] },
+            { ext: "bmp", type: ["image"] },
+            { ext: "webp", type: ["image"] },
+            { ext: "jpeg", type: ["image"] },
+            { ext: "tif", type: ["image"] },
+            { ext: "svg", type: ["image"] },
+            { ext: "", type: ["image"] },
+            { ext: "", type: ["image"] },
+            { ext: "", type: ["image"] },
+            { ext: "", type: ["image"] },
+        ]
+    }
+
+    if (type === GroupType.pdf) {
+        return [
+            { ext: "pdf", type: ["pdf"] },
+            { ext: "ai", type: ["pdf"] },
+        ]
+    }
+
+    return []
+}
+
+
+
+
 
 
 /**

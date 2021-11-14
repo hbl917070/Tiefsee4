@@ -98,12 +98,24 @@ namespace tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public long GetCreationTimeUtc(string path) {
+            if (Directory.Exists(path) == false) { return 0; }
             var time = Directory.GetCreationTimeUtc(path);
             long unixTimestamp = toUnix(time);
             return unixTimestamp;
         }
 
 
+        /// <summary>
+        /// 傳回指定檔案或目錄上次被寫入的日期和時間
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public long GetLastWriteTimeUtc(string path) {
+            if (Directory.Exists(path) == false) { return 0; }
+            var time = Directory.GetLastWriteTimeUtc(path);
+            long unixTimestamp = toUnix(time);
+            return unixTimestamp;
+        }
 
         /// <summary>
         /// 取得資料夾的建立時間(於js使用的話，必須在加上時區)

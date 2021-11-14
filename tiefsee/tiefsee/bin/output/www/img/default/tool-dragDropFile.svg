@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white);">
+		<polygon points="17.3,13.7 17.3,14.7 17.8,14.7 18.3,14.7 18.3,13.7 17.8,13.7 	" />
+		<polygon points="10.4,4.6 10.4,4.1 9.4,4.1 9.4,4.6 9.4,5.1 10.4,5.1 	" />
+		<rect x="9.4" y="2.1" width="1" height="1" />
+		<rect x="9.4" y="0.1" width="1" height="1" />
+		<rect x="19.1" y="0.1" width="1" height="1" />
+		<rect x="11.4" y="0.1" width="1" height="1" />
+		<rect x="21" y="0.1" width="1" height="1" />
+		<rect x="13.3" y="0.1" width="1" height="1" />
+		<rect x="15.2" y="0.1" width="1" height="1" />
+		<rect x="17.2" y="0.1" width="1" height="1" />
+		<rect x="23" y="0.1" width="1" height="1" />
+		<rect x="23" y="5.9" width="1" height="1" />
+		<rect x="23" y="7.9" width="1" height="1" />
+		<rect x="23" y="4" width="1" height="1" />
+		<rect x="23" y="2.1" width="1" height="1" />
+		<rect x="23" y="11.7" width="1" height="1" />
+		<rect x="23" y="9.8" width="1" height="1" />
+		<rect x="23" y="13.7" width="1" height="1" />
+		<rect x="19.2" y="13.7" width="0.9" height="1" />
+		<rect x="21.1" y="13.7" width="0.9" height="1" />
+		<polygon points="8.3,14.2 11.9,19.5 15.4,24.9 16.4,19.4 21,16.2 14.7,15.2" />
+		<polygon points="2,20.5 2,7.9 14.6,7.9 14.6,13.2 14.7,13.2 15.6,13.3 15.6,6.9 1,6.9 1,21.5 11.2,21.5 10.5,20.5" />
+	</g>
+</svg>

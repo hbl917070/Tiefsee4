@@ -134,6 +134,7 @@ namespace tiefsee {
 
             if (get400(_url, context)) {
             } else if (api_getimg(_url, context)) {
+            } else if (api_getpdf(_url, context)) {
             } else if (getwww(_url, context)) {
             } else {
                 get404(_url, context);
@@ -153,8 +154,6 @@ namespace tiefsee {
 
         private bool api_getimg(String _url, HttpListenerContext context) {
 
-
-
             if (_url.IndexOf("api/getimg/") != 0) {
                 return false;
             }
@@ -170,6 +169,57 @@ namespace tiefsee {
                 using (Stream input = new FileStream(_path, FileMode.Open)) {
 
                     context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
+                    context.Response.ContentLength64 = input.Length;
+
+                    if (context.Request.HttpMethod != "HEAD") {
+                        byte[] buffer = new byte[1024 * 16];
+                        int nbytes;
+                        while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                            //context.Response.SendChunked = input.Length > 1024 * 16;
+                            context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        }
+                    }
+                    //context.Response.StatusCode = (int)HttpStatusCode.OK;
+                    //context.Response.OutputStream.Flush();
+                }
+                return true;
+                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read)) {
+                    byte[] _responseArray = new byte[fs.Length];
+                    fs.Read(_responseArray, 0, _responseArray.Length);
+                    fs.Close();
+                    context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+
+                }*/
+
+            } else {
+                return false;
+            }
+
+
+
+        }
+
+
+
+
+        private bool api_getpdf(String _url, HttpListenerContext context) {
+
+            if (_url.IndexOf("api/getpdf/") != 0) {
+                return false;
+            }
+
+            String _path = _url.Substring(11);
+            _path = _path.Split('?')[0];//去掉?後面的文字
+            _path = Uri.UnescapeDataString(_path);
+
+            Console.WriteLine("api/getpdf/  " + _path);
+
+            if (File.Exists(_path)) {
+
+                using (Stream input = new FileStream(_path, FileMode.Open)) {
+
+                    //context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
+                    context.Response.ContentType = "application/pdf";
                     context.Response.ContentLength64 = input.Length;
 
                     if (context.Request.HttpMethod != "HEAD") {
@@ -231,6 +281,7 @@ namespace tiefsee {
 
             return false;
         }
+
 
         /// <summary>
         /// 找不到檔案
@@ -297,6 +348,7 @@ namespace tiefsee {
 
             return false;
         }
+
 
         /// <summary>
         /// 判斷port是否有被佔用

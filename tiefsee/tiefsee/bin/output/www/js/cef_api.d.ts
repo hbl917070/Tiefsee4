@@ -61,19 +61,46 @@ interface WV_Directory {
 
     /** 取得資料夾的建立時間 */
     GetCreationTimeUtc(path: string): number;
+
+    /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
+    GetLastWriteTimeUtc(path: string): number;
 }
 
 
 interface WV_File {
 
+    /** 在檔案總管顯示檔案 */
+    ShowOnExplorer(path: string): void;
+
+    /**
+     *  開啟 選擇檔案 的視窗
+     * @param Multiselect 是否允許多選，false表示單選 
+     * @param Filter 檔案類型。 abc(*.png)|*.png|All files (*.*)|*.*
+     * @param Title 視窗標題
+     */
+    OpenFileDialog(Multiselect: boolean, Filter: string, Title: string): string[];
+
+    /** 取得檔案的開頭byte，用於判斷檔案類型 */
+    GetFIleType(path: string): string;
+
+    /**
+     * 顯示檔案原生右鍵選單
+     * @param path 檔案路徑
+     * @param followMouse true=顯示於游標旁邊、false=顯示於視窗左上角
+     */
+    ShowContextMenu(path: string, followMouse: boolean): void;
+
+    /** 列印文件 */
+    PrintFile(path: string): void;
+
     /** 快速拖曳(拖出檔案) */
-    DragDropFile(psth: string);
+    DragDropFile(path: string);
 
     /** 取得文字資料 */
-    GetText(psth: string): string;
+    GetText(path: string): string;
 
     /** 儲存文字資料 */
-    SetText(psth: string, txt: string);
+    SetText(path: string, txt: string);
 
     /** new FileInfo */
     GetFileInfo(path: string): WV_FileInfo;
@@ -90,6 +117,8 @@ interface WV_File {
     /** 取得檔案的建立時間 */
     GetCreationTimeUtc(path: string): number;
 
+    /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
+    GetLastWriteTimeUtc(path: string): number;
 }
 
 
@@ -160,6 +189,83 @@ interface WV_Path {
 
     /** 取得值，該值指出指定的路徑字串是否包含根目錄 */
     IsPathRooted(path: string): bool;
+}
+
+
+interface WV_System {
+
+    /** 存入剪貼簿 */
+    SetClipboard_txt(path: string): bool;
+
+    /** 取得作業系統所在的槽，例如 「C:\」 */
+    GetSystemRoot(): string;
+
+    /** 取得滑鼠的坐標 */
+    GetMousePosition(): number[];
+
+    /** 設定桌布 */
+    SetWallpaper(path: string): void;
+
+    /** 是否為win10 */
+    IsWindows10(): boolean;
+
+    /** 是否為win7 */
+    IsWindows10(): boolean;
+
+    /**
+     * lnk 轉 exe路徑
+     * @param path lnk捷徑
+     */
+    LnkToExePath(path: string): string;
+
+    /** 回傳程式目前記憶體使用量（MB */
+    GetMemory_mb(): number;
+
+    /** 回收記憶體 */
+    Collect(): void;
+}
+
+
+interface WV_UseOtherAppOpen {
+
+    /** 以其他程式開啟(系統原生選單) */
+    ShowMenu(path: string): void;
+
+    /**取得開始選單裡面的所有lnk */
+    GetStartMenuList(): string[]
+
+    /** 以3D小畫家開啟 */
+    Open3DMSPaint(path: string): void;
+
+
+    /**
+     * 執行其他程式
+     * @param FileName 執行檔路徑
+     * @param Arguments 命令參數
+     * @param CreateNoWindow 是否使用新視窗
+     * @param UseShellExecute false=新視窗個體 
+     */
+    ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean); void
+}
+
+
+interface WV_Image {
+
+    /**
+     * 取得任何檔案的圖示
+     * @param path 
+     * @returns base64
+     */
+    GetFileIcon(path: string, size: (16 | 32 | 64 | 128 | 256)): string;
+
+    /**
+     * 取得任何檔案的圖示
+     * @param path 
+     * @returns base64
+     */
+    GetExeIcon_32(path: string): string;
+
+
 }
 
  //declare let cef_window: cef_window;

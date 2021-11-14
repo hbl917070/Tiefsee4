@@ -66,10 +66,16 @@
   <ItemGroup>
     <Compile Include="Adapter.cs" />
     <Compile Include="BaseServer.cs" />
+    <Compile Include="IconHandler.cs" />
+    <Compile Include="LnkToExe.cs" />
+    <Compile Include="ShellContextMenu.cs" />
     <Compile Include="TouchInjector.cs" />
+    <Compile Include="VW\WV_Image.cs" />
+    <Compile Include="VW\WV_UseOtherAppOpen.cs" />
     <Compile Include="VW\WV_Path.cs" />
     <Compile Include="VW\WV_File.cs" />
     <Compile Include="VW\WV_Directory.cs" />
+    <Compile Include="VW\WV_System.cs" />
     <Compile Include="VW\WV_T.cs" />
     <Compile Include="VW\WV_Window.cs" />
     <Compile Include="WebStart.cs">
@@ -78,6 +84,7 @@
     <Compile Include="WebWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="WindowsThumbnailProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

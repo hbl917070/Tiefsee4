@@ -20,7 +20,102 @@ class MainWindow {
         this.fileShow = fileShow;
         this.menu = menu;
         new MainTools(this);
-        loadSvg();
+        initDomImport();
+        var OtherAppOpenList = {
+            absolute: [
+                { name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
+                { name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
+                { name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: "img" },
+            ],
+            startMenu: [
+                { name: "photoshop", type: ["img"] },
+                { name: "illustrator", type: ["img"] },
+                { name: "Lightroom", type: ["img"] },
+                { name: "Paint", type: ["img"] },
+                { name: "photo", type: ["img"] },
+                { name: "gimp", type: ["img"] },
+                { name: "FireAlpaca", type: ["img"] },
+                { name: "openCanvas", type: ["img"] },
+                { name: "SAI", type: ["img"] },
+                { name: "Pixia", type: ["img"] },
+                { name: "AzPainter2", type: ["img"] },
+                { name: "CorelDRAW", type: ["img"] },
+                { name: "Krita", type: ["img"] },
+                { name: "Artweaver", type: ["img"] },
+                { name: "Lightroom", type: ["img"] },
+                { name: "Perfect Effects", type: ["img"] },
+                { name: "Artweaver ", type: ["img"] },
+                { name: "Honeyview", type: ["img"] },
+                { name: "ACDSee", type: ["img"] },
+                { name: "IrfanView", type: ["img"] },
+                { name: "XnView", type: ["img"] },
+                { name: "FastStone", type: ["img"] },
+                { name: "Hamana", type: ["img"] },
+                { name: "Vieas", type: ["img"] },
+                { name: "FreeVimager", type: ["img"] },
+                { name: "Imagine", type: ["img"] },
+                { name: "XnConvert", type: ["img"] },
+                { name: "FotoSketcher", type: ["img"] },
+                { name: "PhoXo", type: ["img"] },
+            ]
+        };
+        function initOtherAppOpen() {
+            return __awaiter(this, void 0, void 0, function* () {
+                var dom_Open3DMSPaint = document.getElementById("menu-Open3DMSPaint");
+                if (dom_Open3DMSPaint !== null) {
+                    dom_Open3DMSPaint.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                        let filePath = fileLoad.getFilePath(); //目前顯示的檔案
+                        if ((yield WV_File.Exists(filePath)) === false) {
+                            return;
+                        }
+                        menu.close(); //關閉menu
+                        WV_UseOtherAppOpen.Open3DMSPaint(filePath); //開啟檔案
+                    });
+                }
+                var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
+                let ar_lnk = yield WV_UseOtherAppOpen.GetStartMenuList();
+                for (let i = 0; i < ar_lnk.length; i++) {
+                    const lnk = ar_lnk[i];
+                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
+                    name = name.substr(0, name.length - 4);
+                    if (yield OtherAppOpenCheck(lnk, name)) {
+                        let exePath = yield WV_System.LnkToExePath(lnk);
+                        //let imgBase64 = await WV_Image.GetExeIcon_32(exePath);
+                        let imgBase64 = yield WV_Image.GetFileIcon(exePath, 32);
+                        let dom = newDiv(`
+                        <div class="menu-hor-item">
+                            <div class="menu-hor-icon">
+                                <img src="${imgBase64}">
+                            </div>
+                            <div class="menu-hor-txt" i18n="">${name}</div>
+                        </div>
+                    `);
+                        dom.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                            let filePath = fileLoad.getFilePath(); //目前顯示的檔案
+                            if ((yield WV_File.Exists(filePath)) === false) {
+                                return;
+                            }
+                            menu.close(); //關閉menu
+                            WV_UseOtherAppOpen.ProcessStart(exePath, filePath, true, false); //開啟檔案
+                        });
+                        dom_menuOtherAppOpen === null || dom_menuOtherAppOpen === void 0 ? void 0 : dom_menuOtherAppOpen.append(dom);
+                    }
+                }
+            });
+        }
+        initOtherAppOpen();
+        function OtherAppOpenCheck(lnk, name) {
+            return __awaiter(this, void 0, void 0, function* () {
+                //let name = await WV_Path.GetFileNameWithoutExtension(lnk);
+                for (let i = 0; i < OtherAppOpenList.startMenu.length; i++) {
+                    const item = OtherAppOpenList.startMenu[i];
+                    if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) > -1) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
         window.addEventListener("dragenter", dragenter, false);
         window.addEventListener("dragover", dragover, false);
         window.addEventListener('drop', drop, false);
@@ -58,31 +153,6 @@ class MainWindow {
                 }
                 e.stopPropagation();
                 e.preventDefault();
-                //console.log(await WV_File.GetFileInfo(_dropPath).Length)
-                //console.log(await WV_File.GetCreationTimeUtc(_dropPath))
-                //console.log(await WV_Directory.GetFiles(_dropPath, "*.*"))
-            });
-        }
-        /**
-         * 載入svg
-         */
-        function loadSvg() {
-            return __awaiter(this, void 0, void 0, function* () {
-                let ar_domSvg = document.querySelectorAll("[to_dom]");
-                for (let i = 0; i < ar_domSvg.length; i++) {
-                    const _dom = ar_domSvg[i];
-                    let src = _dom.getAttribute("src");
-                    if (src != null)
-                        yield fetch(src, {
-                            "method": "get",
-                        }).then((response) => {
-                            return response.text();
-                        }).then((html) => {
-                            _dom.outerHTML = html;
-                        }).catch((err) => {
-                            console.log("error: ", err);
-                        });
-                }
             });
         }
     }

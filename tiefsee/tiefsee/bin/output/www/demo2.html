@@ -92,8 +92,16 @@
 
             let _url = $('#imgurl').val();
 
-            //await tv.loadImg(_url);
-            await tv.loadBigimg(_url); 
+
+            await tv.getIsLoaded(_url);
+            if (tv.getOriginalWidth() * tv.getOriginalHeight() > 500 * 500) {
+                await tv.loadBigimg(_url);
+            } else {
+                await tv.loadImg(_url);
+            }
+
+
+
             tv.transformRefresh(false)
             tv.zoomFull(TieefseeviewZoomType['full-100%']);
             $('#output-size').html(`${tv.getOriginalWidth()} , ${tv.getOriginalHeight()}`);

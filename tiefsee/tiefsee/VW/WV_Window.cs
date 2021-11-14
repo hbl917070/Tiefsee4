@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace tiefsee {
 
 
-    //[ClassInterface(ClassInterfaceType.AutoDual)]
+    [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     /// <summary>
@@ -25,20 +25,9 @@ namespace tiefsee {
 
         public WV_Window(WebWindow m) {
             this.M = m;        
-           
-
-            System.Windows.Input.Touch.FrameReported += (dermder, e) => {
-              
-                if (e.GetTouchPoints(null).Count > 0) {
-                    ax = (int)e.GetTouchPoints(null)[0].Position.X;
-                    ay = (int)e.GetTouchPoints(null)[0].Position.Y;
-                    System.Console.WriteLine($"x:{ax}   y:{ay}");
-
-                }
-            };
+             
         }
-        int ax;
-        int ay;
+
 
         public WebWindow newWindow(String _url) {
             //String _url = $"http://localhost:{55444}/www/MainWindow.html";
@@ -178,65 +167,7 @@ namespace tiefsee {
 
         }
 
-
-
-        [DllImport("User32")]
-        internal extern static bool GetCursorPos(out MousePoint point);
-        internal struct MousePoint {
-            public int X;
-            public int Y;
-        };
-
-        int dragX = 0;
-        int dragY = 0;
-        MousePoint curr;
-        bool isWndMove = false;
-
-        public void WindowDrag_touchStart() {
-            //if (e.Button == MouseButtons.Left) {
-            Adapter.UIThread(() => {
-                dragX = M.Left;
-                dragY = M.Top;
-
-                GetCursorPos(out curr);
-
-                this.isWndMove = true;
-
-            });
-
-            //}
-        }
-
-        public int[] GetMousePoint() {
-           
-            return new int[] { ax, ay }; ;
-
-
-            MousePoint now_curr;
-            GetCursorPos(out now_curr);
-            int[] c = new int[] { now_curr.X, now_curr.Y };
-            return c;
-        }
-
-        public void WindowDrag_touchMove() {
-
-            // Adapter.UIThread(() => {
-            if (this.isWndMove) {
-                MousePoint now_curr;
-                GetCursorPos(out now_curr);
-
-                M.Left = dragX + now_curr.X - curr.X;
-                M.Top = dragY + now_curr.Y - curr.Y;
-                System.Console.WriteLine(now_curr.X);
-            }
-            //});
-        }
-
-        public void WindowDrag_touchEnd() {
-            this.isWndMove = false;
-        }
-
-
+          
 
 
 

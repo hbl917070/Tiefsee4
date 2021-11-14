@@ -1,69 +1,203 @@
-#tiefseeview {
-  height: 100%;
-  width: 100%;
+:root {
+  --window-border: 8px;
+  --window-border-corner: 20px;
+  --color-window-bac: #fff;
+  --color-window-border: #fff;
+  --color-window-shadow: #fff;
+
+  --color-black: rgba(0, 0, 0, 1);
+  --color-black80: rgba(0, 0, 0, 0.8);
+  --color-black60: rgba(0, 0, 0, 0.6);
+  --color-black40: rgba(0, 0, 0, 0.4);
+  --color-black20: rgba(0, 0, 0, 0.2);
+
+  --color-grey: rgba(30, 30, 30, 1);
+  --color-grey80: rgba(30, 30, 30, 0.8);
+  --color-grey60: rgba(30, 30, 30, 0.6);
+  --color-grey40: rgba(30, 30, 30, 0.4);
+  --color-grey20: rgba(30, 30, 30, 0.2);
+
+  --color-white: rgb(255, 255, 255);
+  --color-white80: rgba(255, 255, 255, 0.8);
+  --color-white60: rgba(255, 255, 255, 0.6);
+  --color-white40: rgba(255, 255, 255, 0.4);
+  --color-white30: rgba(255, 255, 255, 0.3);
+  --color-white20: rgba(255, 255, 255, 0.2);
+  --color-white10: rgba(255, 255, 255, 0.1);
+
+  --color-blue: rgb(0, 200, 255);
+  --color-blue80: rgba(0, 200, 255, 0.8);
+  --color-blue60: rgba(0, 200, 255, 0.6);
+  --color-blue40: rgba(0, 200, 255, 0.4);
+  --color-blue20: rgba(0, 200, 255, 0.2);
 }
 
-/*--------------*/
+* {
+  box-sizing: content-box;
+}
 
-.main-tools {
-  /* background-color: rgba(165, 42, 42, 0.411); */
-  height: 35px;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Sans", "微軟正黑體", "Microsoft JhengHei", "黑體-繁",
+    "蘋果儷中黑", sans-serif;
+  height: 100%;
+}
+
+body {
+  display: flex;
+}
+
+/* 視窗本體 */
+.window {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(31, 39, 43, 0.95);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  display: flex;
+  flex-direction: column;
   
 }
-.main-tools-group{
-  display: flex;
+
+/*視窗最大化時*/
+.window.maximized {
+  margin: 0px;
+  box-shadow: none;
+  border: none;
+  border-radius: 0px;
+}
+.window.maximized .window-border {
+  display: none;
 }
 
-.main-tools-btn {
-  width: 35px;
-  height: 35px;
+/*---------------------------*/
+
+/* #region window-titlebar 標題列*/
+
+/*標題列*/
+.window-titlebar {
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: space-between;
+}
+
+.titlebar-txt {
+  height: 100%;
+  font-size: 14px;
+  color: var(--color-white);
   display: flex;
   align-items: center;
+  padding: 0 8px;
+  flex: 1;
+  user-select: none;
+  overflow: hidden;
+}
+.titlebar-txt span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar-tools {
+  display: flex;
+}
+.titlebar-tools-btn {
+  height: 100%;
+  width: 38px;
+  margin-left: 1px;
+  /* background-color: antiquewhite; */
+  display: flex;
   justify-content: center;
+  align-items: center;
+  /* border-radius: 4px; */
 }
-
-.main-tools-btn:hover {
-  cursor: pointer;
+.titlebar-tools-btn:hover {
   background-color: var(--color-white20);
-  outline: 1px solid var(--color-white40);
-  outline-offset: -1px;
+  cursor: pointer;
+  /* outline: 1px solid var(--color-white60); */
 }
-
-.main-tools-btn svg,
-.main-tools-btn img {
+.titlebar-tools-btn svg {
   width: 25px;
   height: 25px;
 }
 
-/*開啟選單時*/
-.main-tools-btn.menuActive{
-  background-color: var(--color-blue40) !important;
-}
-/*--------------*/
+/* #endregion */
 
-.main-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
+/*---------------------------*/
 
-.main-T {
-}
+/* #region window-border 改變視窗大小的框 */
 
-.main-C {
-  display: flex;
-  flex: 1;
+.window-border {
+  position: fixed;
+  z-index: 9999;
+}
+.window-CT {
+  height: var(--window-border);
+  top: 0;
+  left: var(--window-border-corner);
+  right: var(--window-border);
+  cursor: n-resize;
 }
 
-.main-B {
+.window-RC {
+  width: var(--window-border);
+  top: var(--window-border);
+  right: 0;
+  bottom: var(--window-border-corner);
+  cursor: w-resize;
 }
 
-.main-L {
+.window-CB {
+  height: var(--window-border);
+  bottom: 0;
+  left: var(--window-border-corner);
+  right: var(--window-border-corner);
+  cursor: n-resize;
 }
 
-.main-V {
-  flex: 1;
+.window-LC {
+  width: var(--window-border);
+  top: var(--window-border-corner);
+  left: 0;
+  bottom: var(--window-border-corner);
+  cursor: w-resize;
 }
 
-.main-R {
+.window-LT {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  left: 0;
+  top: 0;
+  cursor: nw-resize;
 }
+
+.window-RT {
+  width: var(--window-border);
+  height: var(--window-border);
+  right: 0;
+  top: 0;
+  cursor: ne-resize;
+}
+
+.window-LB {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  left: 0;
+  bottom: 0;
+  cursor: ne-resize;
+}
+
+.window-RB {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  right: 0;
+  bottom: 0;
+  cursor: nw-resize;
+}
+
+/* #endregion */

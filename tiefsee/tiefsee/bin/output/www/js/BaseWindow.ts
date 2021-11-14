@@ -4,6 +4,11 @@ var WV_Window: WV_Window = cef.WV_Window;
 var WV_Directory: WV_Directory = cef.WV_Directory;
 var WV_File: WV_File = cef.WV_File;
 var WV_Path: WV_Path = cef.WV_Path;
+var WV_System: WV_System = cef.WV_System;
+var WV_UseOtherAppOpen: WV_UseOtherAppOpen = cef.WV_UseOtherAppOpen;
+var WV_Image: WV_Image = cef.WV_Image;
+
+
 var baseWindow: BaseWindow;
 
 var temp_dropPath = "";//暫存。取得拖曳進視窗的檔案路徑
@@ -237,6 +242,42 @@ class BaseWindow {
 
 
 //---------------
+
+
+/**
+ * 匯入外部檔案
+ */
+async function initDomImport() {
+
+    let ar_dom = document.querySelectorAll("import");
+    for (let i = 0; i < ar_dom.length; i++) {
+        const _dom = ar_dom[i];
+        let src = _dom.getAttribute("src");
+        if (src != null)
+            await fetch(src, {
+                "method": "get",
+            }).then((response) => {
+                return response.text();
+            }).then((html) => {
+                _dom.outerHTML = html;
+            }).catch((err) => {
+                console.log("error: ", err);
+            });
+    }
+}
+
+/**
+ * html字串 轉 dom物件
+ * @param html 
+ * @returns 
+ */
+function newDiv(html: string): HTMLDivElement {
+    let div = document.createElement("div");
+    div.innerHTML = html
+
+    return <HTMLDivElement>div.getElementsByTagName("div")[0];
+}
+
 
 /**
  * 等待

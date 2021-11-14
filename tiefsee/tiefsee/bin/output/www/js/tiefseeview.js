@@ -10,18 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 class Tieefseeview {
     constructor(_dom) {
-        _dom.innerHTML = `  
-        <div style="
-    border: 2px solid #FF0000;
-    height: calc(100% - 200px );
-    width: calc(100% - 200px);
-    margin: 100px;
-    box-sizing: inherit;
-    /* flex: 1; */
-    position: absolute;
-    z-index: 10;
-    pointer-events: none;
-"></div>   
+        _dom.innerHTML = `
             <div class="tiefseeview-loading" ></div>   
             <div class="tiefseeview-container">
                 <div class="tiefseeview-data" style="width:400px;">
@@ -77,6 +66,8 @@ class Tieefseeview {
         var temp_pinchZoom = 1; //雙指捏合縮放的上一個值
         var temp_pinchCenterX = 0;
         var temp_pinchCenterY = 0;
+        var temp_originalWidth = 1; //用於記錄圖片size 的暫存
+        var temp_originalHeight = 1;
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type, offsetX, offsetY) => {
             if (_type === "up") {
@@ -102,8 +93,10 @@ class Tieefseeview {
         this.dom_img = dom_img;
         this.scrollX = scrollX;
         this.scrollY = scrollY;
+        this.getIsLoaded = getIsLoaded;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
+        this.setLoading = setLoading;
         this.getRendering = getRendering;
         this.setRendering = setRendering;
         this.getIsOverflowX = getIsOverflowX;
@@ -437,6 +430,11 @@ class Tieefseeview {
          * @param _url
          */
         function setErrerUrl(_url) { errerUrl = _url; }
+        /**
+         *
+         * @param _type
+         * @returns
+         */
         function setDataType(_type) {
             dataType = _type;
             if (dataType === "img") {
@@ -451,6 +449,7 @@ class Tieefseeview {
             }
         }
         var tmp_img;
+        var tmp_can;
         /**
          * 載入圖片資源
          * @param _url 網址
@@ -462,9 +461,13 @@ class Tieefseeview {
                 img.src = _url;
                 let p = yield new Promise((resolve, reject) => {
                     img.addEventListener("load", (e) => {
+                        temp_originalWidth = img.naturalWidth; //初始化圖片size
+                        temp_originalHeight = img.naturalHeight;
                         resolve(true); //繼續往下執行
                     });
                     img.addEventListener("error", (e) => {
+                        temp_originalWidth = 1;
+                        temp_originalHeight = 1;
                         resolve(false); //繼續往下執行
                     });
                 });
@@ -482,9 +485,9 @@ class Tieefseeview {
          */
         function loadImg(_url) {
             return __awaiter(this, void 0, void 0, function* () {
-                setLoading(true);
+                //setLoading(true);
                 let p = yield getIsLoaded(_url);
-                setLoading(false);
+                //setLoading(false);
                 setDataType("img");
                 if (p === false) {
                     yield getIsLoaded(errerUrl);
@@ -503,15 +506,9 @@ class Tieefseeview {
          */
         function loadBigimg(_url) {
             return __awaiter(this, void 0, void 0, function* () {
-                /*setDataType("bigimg");
-                let _html = "";
-                for (let i = 1; i <= 25; i++) {
-                    _html += `<img src="file:///C:/Users/wen/Desktop/ttt/images/a_${i}.jpg">`;
-                }
-                dom_bigimg.innerHTML = _html;*/
-                setLoading(true);
+                //setLoading(true);
                 let p = yield getIsLoaded(_url);
-                setLoading(false);
+                //setLoading(false);
                 setDataType("bigimg");
                 if (p === false) {
                     yield getIsLoaded(errerUrl);
@@ -520,6 +517,12 @@ class Tieefseeview {
                     return false;
                 }
                 dom_img.src = _url;
+                tmp_can = document.createElement("canvas");
+                tmp_can.width = dom_img.width;
+                tmp_can.height = dom_img.height;
+                let context0 = tmp_can.getContext("2d");
+                context0 === null || context0 === void 0 ? void 0 : context0.drawImage(dom_img, 0, 0, dom_img.width, dom_img.height);
+                setDataSize(getOriginalWidth());
                 return true;
             });
         }
@@ -666,9 +669,11 @@ class Tieefseeview {
                     return true;
                 }
             }
-            //縮小下限為10px
-            if (dom_data.offsetWidth <= 10 || dom_data.offsetHeight <= 10) {
-                return true;
+            else {
+                //縮小下限為10px
+                if (dom_data.offsetWidth <= 10 || dom_data.offsetHeight <= 10) {
+                    return true;
+                }
             }
             return false;
         }
@@ -766,13 +771,9 @@ class Tieefseeview {
          * @returns
          */
         function getOriginalWidth() {
-            if (dataType === "img") {
-                return dom_img.naturalWidth;
-            }
-            if (dataType === "bigimg") {
-                return dom_img.naturalWidth;
-            }
-            //if (dataType === "bigimg") { return 8150; }
+            return temp_originalWidth;
+            //if (dataType === "img") { return dom_img.naturalWidth; }
+            //if (dataType === "bigimg") { return dom_img.naturalWidth; }
             return 1;
         }
         /**
@@ -780,13 +781,9 @@ class Tieefseeview {
          * @returns
          */
         function getOriginalHeight() {
-            if (dataType === "img") {
-                return dom_img.naturalHeight;
-            }
-            if (dataType === "bigimg") {
-                return dom_img.naturalHeight;
-            }
-            //if (dataType === "bigimg") { return 13086; }
+            return temp_originalHeight;
+            //if (dataType === "img") { return dom_img.naturalHeight; }
+            //if (dataType === "bigimg") { return dom_img.naturalHeight; }
             return 1;
         }
         /**
@@ -821,141 +818,215 @@ class Tieefseeview {
          * @returns
          */
         function bigimgDraw() {
-            if (dataType !== "bigimg") {
-                return;
-            }
-            if (getOriginalWidth() === 0) {
-                return;
-            } //避免圖片尚未載入完成就渲染
-            let _w = toInt(dom_data.style.width); //原始圖片大小(旋轉前的大小)
-            let _h = toInt(dom_data.style.height);
-            let _margin = -100; //多繪製的區域
-            let _scale = _w / getOriginalWidth(); //目前的 圖片縮放比例
-            let radio_can = 1;
-            if (_w > getOriginalWidth()) { //如果圖片大於1倍，則用用原始大小
-                radio_can = _w / getOriginalWidth();
-            }
-            dom_bigimg.style.width = _w + "px";
-            dom_bigimg.style.height = _h + "px";
-            //取得顯示範圍左上角的坐標
-            let img_left = -toInt(dom_con.style.left);
-            let img_top = -toInt(dom_con.style.top);
-            //計算顯示範圍的四個角落在圖片旋轉前的位置
-            let origPoint1 = getOrigPoint(img_left, img_top, _w, _h, degNow);
-            let origPoint2 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top, _w, _h, degNow);
-            let origPoint3 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
-            let origPoint4 = getOrigPoint(img_left, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
-            //轉換鏡像前的坐標
-            function calc(_p) {
-                if (mirrorVertical) {
-                    _p.y = toInt(dom_data.style.height) - _p.y;
+            return __awaiter(this, void 0, void 0, function* () {
+                if (dataType !== "bigimg") {
+                    return;
                 }
-                if (mirrorHorizontal) {
-                    _p.x = toInt(dom_data.style.width) - _p.x;
+                if (getOriginalWidth() === 0) {
+                    return;
+                } //避免圖片尚未載入完成就渲染
+                let _w = toInt(dom_data.style.width); //原始圖片大小(旋轉前的大小)
+                let _h = toInt(dom_data.style.height);
+                let _margin = 100; //多繪製的區域
+                let _scale = _w / getOriginalWidth(); //目前的 圖片縮放比例
+                let radio_can = 1;
+                if (_w > getOriginalWidth()) { //如果圖片大於1倍，則用用原始大小
+                    radio_can = _w / getOriginalWidth();
                 }
-                return _p;
-            }
-            origPoint1 = calc(origPoint1);
-            origPoint2 = calc(origPoint2);
-            origPoint3 = calc(origPoint3);
-            origPoint4 = calc(origPoint4);
-            //取得圖片旋轉前的left、top
-            img_left = origPoint1.x;
-            img_top = origPoint1.y;
-            if (img_left > (origPoint1.x)) {
-                img_left = (origPoint1.x);
-            }
-            if (img_left > (origPoint2.x)) {
-                img_left = (origPoint2.x);
-            }
-            if (img_left > (origPoint3.x)) {
-                img_left = (origPoint3.x);
-            }
-            if (img_left > (origPoint4.x)) {
-                img_left = (origPoint4.x);
-            }
-            if (img_top > (origPoint1.y)) {
-                img_top = (origPoint1.y);
-            }
-            if (img_top > (origPoint2.y)) {
-                img_top = (origPoint2.y);
-            }
-            if (img_top > (origPoint3.y)) {
-                img_top = (origPoint3.y);
-            }
-            if (img_top > (origPoint4.y)) {
-                img_top = (origPoint4.y);
-            }
-            //取得圖片旋轉後的width、height
-            let viewWidth = 1;
-            let viewHeight = 1;
-            if (viewWidth < (origPoint1.x)) {
-                viewWidth = (origPoint1.x);
-            }
-            if (viewWidth < (origPoint2.x)) {
-                viewWidth = (origPoint2.x);
-            }
-            if (viewWidth < (origPoint3.x)) {
-                viewWidth = (origPoint3.x);
-            }
-            if (viewWidth < (origPoint4.x)) {
-                viewWidth = (origPoint4.x);
-            }
-            if (viewHeight < (origPoint1.y)) {
-                viewHeight = (origPoint1.y);
-            }
-            if (viewHeight < (origPoint2.y)) {
-                viewHeight = (origPoint2.y);
-            }
-            if (viewHeight < (origPoint3.y)) {
-                viewHeight = (origPoint3.y);
-            }
-            if (viewHeight < (origPoint4.y)) {
-                viewHeight = (origPoint4.y);
-            }
-            viewWidth = viewWidth - img_left;
-            viewHeight = viewHeight - img_top;
-            let sx = (img_left - _margin) / _scale;
-            let sy = (img_top - _margin) / _scale;
-            let sWidth = (viewWidth + _margin * 2) / _scale * radio_can;
-            let sHeight = (viewHeight + _margin * 2) / _scale * radio_can;
-            let dx = img_left - _margin;
-            let dy = img_top - _margin;
-            let dWidth = viewWidth + _margin * 2;
-            let dHeight = viewHeight + _margin * 2;
-            //避免以浮點數進行運算
-            //sx = Math.floor(sx);
-            //sy = Math.floor(sy);
-            //sWidth = Math.floor(sWidth);
-            //sHeight = Math.floor(sHeight);
-            //圖片如果有旋轉，或是移動超過多餘渲染區塊的1/2，才會再次渲染
-            if (_scale != temp_drawImage.scale
-                || Math.abs(dx - temp_drawImage.dx) > _margin / 2
-                || Math.abs(dy - temp_drawImage.dy) > _margin / 2
-            //|| Math.abs(sWidth - temp_drawImage.sWidth) > 3
-            //|| Math.abs(sHeight - temp_drawImage.sHeight) > 3
-            ) {
-                temp_drawImage = {
-                    scale: _scale,
-                    sx: sx, sy: sy,
-                    sWidth: sWidth, sHeight: sHeight,
-                    dx: dx, dy: dy,
-                    dWidth: dWidth, dHeight: dHeight
-                };
-                // if (sx < 0) { sx = 0 }
-                // if (sy < 0) { sy = 0 }
-                //if (sWidth > getOriginalWidth()) { sWidth = getOriginalWidth() }
-                //if (sHeight > getOriginalHeight()) { sWidth = getOriginalHeight() }
-                dom_bigimg_canvas.width = (viewWidth + _margin * 2) / radio_can;
-                dom_bigimg_canvas.height = (viewHeight + _margin * 2) / radio_can;
-                dom_bigimg_canvas.style.width = viewWidth + _margin * 2 + "px";
-                dom_bigimg_canvas.style.height = viewHeight + _margin * 2 + "px";
-                dom_bigimg_canvas.style.left = dx + "px";
-                dom_bigimg_canvas.style.top = dy + "px";
-                let context = dom_bigimg_canvas.getContext("2d");
-                context.drawImage(tmp_img, sx, sy, sWidth, sHeight, 0, 0, dWidth, dHeight);
-            }
+                dom_bigimg.style.width = _w + "px";
+                dom_bigimg.style.height = _h + "px";
+                //取得顯示範圍左上角的坐標
+                let img_left = -toInt(dom_con.style.left);
+                let img_top = -toInt(dom_con.style.top);
+                //計算顯示範圍的四個角落在圖片旋轉前的位置
+                let origPoint1 = getOrigPoint(img_left, img_top, _w, _h, degNow);
+                let origPoint2 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top, _w, _h, degNow);
+                let origPoint3 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
+                let origPoint4 = getOrigPoint(img_left, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
+                //轉換鏡像前的坐標
+                function calc(_p) {
+                    if (mirrorVertical) {
+                        _p.y = toInt(dom_data.style.height) - _p.y;
+                    }
+                    if (mirrorHorizontal) {
+                        _p.x = toInt(dom_data.style.width) - _p.x;
+                    }
+                    return _p;
+                }
+                origPoint1 = calc(origPoint1);
+                origPoint2 = calc(origPoint2);
+                origPoint3 = calc(origPoint3);
+                origPoint4 = calc(origPoint4);
+                //取得圖片旋轉前的left、top
+                img_left = origPoint1.x;
+                img_top = origPoint1.y;
+                if (img_left > (origPoint1.x)) {
+                    img_left = (origPoint1.x);
+                }
+                if (img_left > (origPoint2.x)) {
+                    img_left = (origPoint2.x);
+                }
+                if (img_left > (origPoint3.x)) {
+                    img_left = (origPoint3.x);
+                }
+                if (img_left > (origPoint4.x)) {
+                    img_left = (origPoint4.x);
+                }
+                if (img_top > (origPoint1.y)) {
+                    img_top = (origPoint1.y);
+                }
+                if (img_top > (origPoint2.y)) {
+                    img_top = (origPoint2.y);
+                }
+                if (img_top > (origPoint3.y)) {
+                    img_top = (origPoint3.y);
+                }
+                if (img_top > (origPoint4.y)) {
+                    img_top = (origPoint4.y);
+                }
+                //取得圖片旋轉後的width、height
+                let viewWidth = 1;
+                let viewHeight = 1;
+                if (viewWidth < (origPoint1.x)) {
+                    viewWidth = (origPoint1.x);
+                }
+                if (viewWidth < (origPoint2.x)) {
+                    viewWidth = (origPoint2.x);
+                }
+                if (viewWidth < (origPoint3.x)) {
+                    viewWidth = (origPoint3.x);
+                }
+                if (viewWidth < (origPoint4.x)) {
+                    viewWidth = (origPoint4.x);
+                }
+                if (viewHeight < (origPoint1.y)) {
+                    viewHeight = (origPoint1.y);
+                }
+                if (viewHeight < (origPoint2.y)) {
+                    viewHeight = (origPoint2.y);
+                }
+                if (viewHeight < (origPoint3.y)) {
+                    viewHeight = (origPoint3.y);
+                }
+                if (viewHeight < (origPoint4.y)) {
+                    viewHeight = (origPoint4.y);
+                }
+                viewWidth = viewWidth - img_left;
+                viewHeight = viewHeight - img_top;
+                let sx = (img_left - _margin) / _scale;
+                let sy = (img_top - _margin) / _scale;
+                let sWidth = (viewWidth + _margin * 2) / _scale * radio_can;
+                let sHeight = (viewHeight + _margin * 2) / _scale * radio_can;
+                let dx = img_left - _margin;
+                let dy = img_top - _margin;
+                let dWidth = viewWidth + _margin * 2;
+                let dHeight = viewHeight + _margin * 2;
+                //避免以浮點數進行運算
+                //sx = Math.floor(sx);
+                //sy = Math.floor(sy);
+                //sWidth = Math.floor(sWidth);
+                //sHeight = Math.floor(sHeight);
+                //圖片如果有旋轉，或是移動超過多餘渲染區塊的1/2，才會再次渲染
+                if (_scale != temp_drawImage.scale
+                    || Math.abs(dx - temp_drawImage.dx) > _margin / 2
+                    || Math.abs(dy - temp_drawImage.dy) > _margin / 2
+                    || Math.abs(sWidth - temp_drawImage.sWidth) > _margin / 2
+                    || Math.abs(sHeight - temp_drawImage.sHeight) > _margin / 2) {
+                    temp_drawImage = {
+                        scale: _scale,
+                        sx: sx, sy: sy,
+                        sWidth: sWidth, sHeight: sHeight,
+                        dx: dx, dy: dy,
+                        dWidth: dWidth, dHeight: dHeight
+                    };
+                    // if (sx < 0) { sx = 0 }
+                    // if (sy < 0) { sy = 0 }
+                    //if (sWidth > getOriginalWidth()) { sWidth = getOriginalWidth() }
+                    //if (sHeight > getOriginalHeight()) { sWidth = getOriginalHeight() }
+                    dom_bigimg_canvas.width = (viewWidth + _margin * 2) / radio_can;
+                    dom_bigimg_canvas.height = (viewHeight + _margin * 2) / radio_can;
+                    dom_bigimg_canvas.style.width = viewWidth + _margin * 2 + "px";
+                    dom_bigimg_canvas.style.height = viewHeight + _margin * 2 + "px";
+                    dom_bigimg_canvas.style.left = dx + "px";
+                    dom_bigimg_canvas.style.top = dy + "px";
+                    let context = dom_bigimg_canvas.getContext("2d");
+                    //context.imageSmoothingEnabled = false;
+                    /*context.drawImage(tmp_can,
+                        sx, sy, sWidth, sHeight,
+                        0, 0, dWidth, dHeight
+                    );*/
+                    temp_count += 1;
+                    let tc = temp_count;
+                    var time = new Date();
+                    context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
+                    console.log([sx, sy, sWidth, sHeight, dWidth, dHeight]);
+                    if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
+                        //寬高跟高度全部渲染
+                        sWidth = getOriginalWidth();
+                        sHeight = getOriginalHeight();
+                        sx = dx * -1;
+                        sy = dy * -1;
+                        dWidth = getOriginalWidth() * _scale;
+                        dHeight = getOriginalHeight() * _scale;
+                        yield createImageBitmap(tmp_can, 0, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                            .then(function (sprites) {
+                            if (tc !== temp_count) {
+                                return;
+                            }
+                            context.drawImage(sprites, sx, sy, dWidth, dHeight);
+                        });
+                    }
+                    else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
+                        //高度全部渲染
+                        //sWidth = getOriginalWidth();
+                        sHeight = getOriginalHeight();
+                        //sx = dx * -1
+                        sy = dy * -1;
+                        //dWidth = getOriginalWidth() * _scale
+                        dHeight = getOriginalHeight() * _scale;
+                        yield createImageBitmap(tmp_can, sx, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                            .then(function (sprites) {
+                            if (tc !== temp_count) {
+                                return;
+                            }
+                            context.drawImage(sprites, 0, sy, dWidth, dHeight);
+                        });
+                    }
+                    else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
+                        //寬度全部渲染
+                        sWidth = getOriginalWidth();
+                        //sHeight = getOriginalHeight();
+                        sx = dx * -1;
+                        //sy = dy * -1
+                        dWidth = getOriginalWidth() * _scale;
+                        //dHeight = getOriginalHeight() * _scale
+                        yield createImageBitmap(tmp_can, 0, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                            .then(function (sprites) {
+                            if (tc !== temp_count) {
+                                return;
+                            }
+                            context.drawImage(sprites, sx, 0, dWidth, dHeight);
+                        });
+                    }
+                    else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
+                        //局部渲染
+                        yield createImageBitmap(tmp_can, sx, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                            .then(function (sprites) {
+                            if (tc !== temp_count) {
+                                return;
+                            }
+                            context.drawImage(sprites, 0, 0, dWidth, dHeight);
+                        });
+                    }
+                    //
+                    var int_毫秒 = (new Date()).getTime() - time.getTime();
+                    var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
+                    console.log(s_輸出時間差);
+                    //#######/
+                }
+            });
         }
+        var temp_count = 0;
         /**
          * 縮放圖片
          * @param _type 縮放類型
@@ -1029,6 +1100,7 @@ class Tieefseeview {
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight; //旋轉後圖片長寬的比例
                 setDataSize(toInt(_val) * ratio * ratio_xy);
             }
+            setXY((toInt(dom_con.style.left)), (toInt(dom_con.style.top)), 0);
             init_point(false);
             eventChangeZoom(getZoomRatio());
             setRendering(rendering);
@@ -1191,6 +1263,7 @@ class Tieefseeview {
                 else {
                     setXY(left, top, 0);
                 }
+                //bigimgDraw()
             });
         }
         /**

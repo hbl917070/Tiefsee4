@@ -1,54 +1,11 @@
 "use strict";
 class MainTools {
     constructor(M) {
+        //快速拖曳
         addToolsBtn({
             group: "img",
-            name: "file",
-            icon: "/img/default/file.svg",
-            func: (btn) => {
-                btn.addEventListener("click", () => {
-                    M.menu.openDropDown(document.getElementById("menu01"), document.querySelector("[data-name=file]"), "menuActive");
-                });
-            },
-            type: MainToolsType.button,
-        });
-        addToolsBtn({
-            group: "img",
-            name: "prev",
-            icon: "/img/default/prev.svg",
-            func: (btn) => {
-                btn.addEventListener("click", () => {
-                    M.fileLoad.prev();
-                });
-            },
-            type: MainToolsType.button,
-        });
-        addToolsBtn({
-            group: "img",
-            name: "next",
-            icon: "/img/default/next.svg",
-            func: (btn) => {
-                btn.addEventListener("click", () => {
-                    M.fileLoad.next();
-                });
-            },
-            type: MainToolsType.button,
-        });
-        addToolsBtn({
-            group: "img",
-            name: "file2",
-            icon: "/img/default/file.svg",
-            func: (btn) => {
-                btn.addEventListener("click", () => {
-                    M.menu.openDropDown(document.getElementById("menu01"), document.querySelector("[data-name=file2]"), "menuActive");
-                });
-            },
-            type: MainToolsType.button,
-        });
-        addToolsBtn({
-            group: "img",
-            name: "DragDropFile",
-            icon: "/img/default/DragDropFile.svg",
+            name: "dragDropFile",
+            icon: "/img/default/tool-dragDropFile.svg",
             func: (btn) => {
                 btn.addEventListener("mousedown", () => {
                     setTimeout(() => {
@@ -56,38 +13,194 @@ class MainTools {
                     }, 50);
                 });
             },
-            type: MainToolsType.button,
         });
+        // 開啟檔案
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-open.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                    M.menu.open_Button(document.getElementById("menu-open"), btn, "menuActive");
+                });
+            },
+        });
+        //上一張
+        addToolsBtn({
+            group: "img",
+            name: "prev",
+            icon: "/img/default/tool-prev.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                    M.fileLoad.prev();
+                });
+            },
+        });
+        //下一張
+        addToolsBtn({
+            group: "img",
+            name: "next",
+            icon: "/img/default/tool-next.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                    M.fileLoad.next();
+                });
+            },
+        });
+        //複製
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-copy.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                    M.menu.open_Button(document.getElementById("menu01"), btn, "menuActive");
+                });
+            },
+        });
+        //刪除
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-delete.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                });
+            },
+        });
+        //搜圖
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-search.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                });
+            },
+        });
+        //大量瀏覽模式
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-allBrowse.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                });
+            },
+        });
+        //全滿
+        addToolsBtn({
+            group: "img",
+            name: "file",
+            icon: "/img/default/tool-full.svg",
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                });
+            },
+        });
+        //縮放比例
+        addToolsHtml({
+            group: "img",
+            html: `
+                <div class="main-tools-btn" >
+                    <div style="margin:0 3px" data-name="btnScale">1%</div>
+                </div>
+            `,
+            func: (btn) => {
+                btn.addEventListener("click", () => {
+                    M.fileShow.view_image.zoomFull(TieefseeviewZoomType['100%']);
+                });
+            },
+        });
+        addToolsHr({ group: "img", });
+        //圖片size
+        addToolsHtml({
+            group: "img",
+            html: `
+                <div class="main-tools-txt" data-name="infoSize">
+                   100<br>200
+                </div>
+            `,
+            func: (btn) => { },
+        });
+        addToolsHr({ group: "img", });
+        // 檔案類型、檔案大小
+        addToolsHtml({
+            group: "img",
+            html: `
+                <div class="main-tools-txt" data-name="infoType">
+                    JPG<br>123.4MB
+                </div>
+            `,
+            func: (btn) => { },
+        });
+        addToolsHr({ group: "img", });
+        // 檔案修改時間
+        addToolsHtml({
+            group: "img",
+            html: `
+                <div class="main-tools-txt" data-name="infoWriteTime">
+                    2021
+                </div>
+            `,
+            func: (btn) => { },
+        });
+        /**
+         * 新增 html
+         * @param item
+         */
+        function addToolsHtml(item) {
+            addToolsDom({
+                group: item.group,
+                dom: newDiv(item.html),
+                func: item.func,
+            });
+        }
+        /**
+         * 新增 垂直線
+         * @param item
+         */
+        function addToolsHr(item) {
+            let div = newDiv(`<div class="main-tools-hr"> </div>`);
+            addToolsDom({
+                group: item.group,
+                dom: div,
+                func: () => { },
+            });
+        }
+        /**
+         * 新增 button
+         * @param item
+         */
         function addToolsBtn(item) {
-            //如果群組不存在，就先產生群組
-            let dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
-            if (dom_group === null) {
-                let div = newDiv(`<div class="main-tools-group" data-name="${item.group}">  </dib>`);
-                M.dom_tools.appendChild(div);
-                dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
-            }
             //產生按鈕
             let div = newDiv(`
                 <div class="main-tools-btn" data-name="${item.name}">
-                    <div to_dom="svg" src="${item.icon}"></div>
-                </dib>`);
-            //div.addEventListener("click", item.click);
-            item.func(div);
-            if (dom_group !== null) {
-                dom_group.appendChild(div);
-            }
+                    <import type="svg" src="${item.icon}"> </import>
+                </div>`);
+            addToolsDom({
+                group: item.group,
+                dom: div,
+                func: item.func,
+            });
         }
-        function newDiv(html) {
-            let div = document.createElement("div");
-            div.innerHTML = html;
-            return div.getElementsByTagName("div")[0];
+        /**
+         *
+         * @param item
+         */
+        function addToolsDom(item) {
+            //如果群組不存在，就先產生群組
+            let dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
+            if (dom_group === null) {
+                let div = newDiv(`<div class="main-tools-group" data-name="${item.group}">  </div>`);
+                M.dom_tools.appendChild(div);
+                dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
+            }
+            item.func(item.dom);
+            if (dom_group !== null) {
+                dom_group.appendChild(item.dom);
+            }
         }
     }
 }
-var MainToolsType;
-(function (MainToolsType) {
-    MainToolsType[MainToolsType["button"] = 0] = "button";
-    MainToolsType[MainToolsType["html"] = 1] = "html";
-    MainToolsType[MainToolsType["fastDrag"] = 2] = "fastDrag";
-})(MainToolsType || (MainToolsType = {}));
 //export { MainTools };

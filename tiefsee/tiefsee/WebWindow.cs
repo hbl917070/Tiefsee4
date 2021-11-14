@@ -19,7 +19,6 @@ namespace tiefsee {
 
 
 
-
         #region 防止窗體閃屏
         private void InitializeStyles() {
             SetStyle(
@@ -51,16 +50,7 @@ namespace tiefsee {
                 return style;
             }
         }
-        /*protected override CreateParams CreateParams {
-            get {
-                CreateParams p = base.CreateParams;
-                p.Style = (int)Win32.WS_CHILD;
-                p.Style |= (int)Win32.WS_CLIPSIBLINGS;
-                p.ExStyle &= (int)Win32.WS_EX_LAYERED;
-                p.Parent = Win32.GetDesktopWindow();
-                return p;
-            }
-        }*/
+
     }
 
 
@@ -81,7 +71,7 @@ namespace tiefsee {
 
         public FormNone parentForm;
         public Microsoft.Web.WebView2.WinForms.WebView2 wv2;
-        public System.Windows.Window win;
+        
 
         public WebWindow(String _url) {
 
@@ -97,7 +87,11 @@ namespace tiefsee {
                 wv2.CoreWebView2.AddHostObjectToScript("WV_Directory", new WV_Directory(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_File", new WV_File(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_Path", new WV_Path(this));
+                wv2.CoreWebView2.AddHostObjectToScript("WV_System", new WV_System(this));
+                wv2.CoreWebView2.AddHostObjectToScript("WV_UseOtherAppOpen", new WV_UseOtherAppOpen(this));
+                wv2.CoreWebView2.AddHostObjectToScript("WV_Image", new WV_Image(this));
 
+                
                 // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
                 wv2.CoreWebView2.NewWindowRequested += (sender2, e2) => {
@@ -208,9 +202,6 @@ namespace tiefsee {
 
 
     }
-
-
-
 
 
 

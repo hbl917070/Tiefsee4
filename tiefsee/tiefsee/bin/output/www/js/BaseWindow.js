@@ -14,6 +14,9 @@ var WV_Window = cef.WV_Window;
 var WV_Directory = cef.WV_Directory;
 var WV_File = cef.WV_File;
 var WV_Path = cef.WV_Path;
+var WV_System = cef.WV_System;
+var WV_UseOtherAppOpen = cef.WV_UseOtherAppOpen;
+var WV_Image = cef.WV_Image;
 var baseWindow;
 var temp_dropPath = ""; //暫存。取得拖曳進視窗的檔案路徑
 class BaseWindow {
@@ -195,6 +198,38 @@ class BaseWindow {
     }
 }
 //---------------
+/**
+ * 匯入外部檔案
+ */
+function initDomImport() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ar_dom = document.querySelectorAll("import");
+        for (let i = 0; i < ar_dom.length; i++) {
+            const _dom = ar_dom[i];
+            let src = _dom.getAttribute("src");
+            if (src != null)
+                yield fetch(src, {
+                    "method": "get",
+                }).then((response) => {
+                    return response.text();
+                }).then((html) => {
+                    _dom.outerHTML = html;
+                }).catch((err) => {
+                    console.log("error: ", err);
+                });
+        }
+    });
+}
+/**
+ * html字串 轉 dom物件
+ * @param html
+ * @returns
+ */
+function newDiv(html) {
+    let div = document.createElement("div");
+    div.innerHTML = html;
+    return div.getElementsByTagName("div")[0];
+}
 /**
  * 等待
  * @param ms 毫秒
