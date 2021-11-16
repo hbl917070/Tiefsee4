@@ -33,20 +33,26 @@
 }
 
 * {
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  font-family: "Noto Sans", "微軟正黑體", "Microsoft JhengHei", "黑體-繁",
-    "蘋果儷中黑", sans-serif;
   height: 100%;
 }
 
 body {
   display: flex;
+}
+
+body,
+input,
+textarea,
+button {
+  font-family: "Noto Sans", "微軟正黑體", "Microsoft JhengHei", "黑體-繁",
+    "蘋果儷中黑", sans-serif;
 }
 
 /* 視窗本體 */
@@ -60,7 +66,6 @@ body {
 
   display: flex;
   flex-direction: column;
-  
 }
 
 /*視窗最大化時*/
@@ -116,6 +121,10 @@ body {
   align-items: center;
   /* border-radius: 4px; */
 }
+/*選取時*/
+.titlebar-tools-btn[active="true"] {
+  background-color: var(--color-white20);
+}
 .titlebar-tools-btn:hover {
   background-color: var(--color-white20);
   cursor: pointer;
@@ -124,6 +133,7 @@ body {
 .titlebar-tools-btn svg {
   width: 25px;
   height: 25px;
+  pointer-events: none;
 }
 
 /* #endregion */

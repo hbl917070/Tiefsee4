@@ -71,11 +71,13 @@ namespace tiefsee {
 
         public FormNone parentForm;
         public Microsoft.Web.WebView2.WinForms.WebView2 wv2;
-        
+        public string[] args;
 
-        public WebWindow(String _url) {
+        public WebWindow(String _url,string[] _args) {
 
             Adapter.Initialize();
+
+            this.args = _args;
 
             wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             wv2.Dock = DockStyle.Fill;
@@ -88,7 +90,7 @@ namespace tiefsee {
                 wv2.CoreWebView2.AddHostObjectToScript("WV_File", new WV_File(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_Path", new WV_Path(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_System", new WV_System(this));
-                wv2.CoreWebView2.AddHostObjectToScript("WV_UseOtherAppOpen", new WV_UseOtherAppOpen(this));
+                wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", new WV_RunApp(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_Image", new WV_Image(this));
 
                 
@@ -132,14 +134,22 @@ namespace tiefsee {
                 parentForm.Focus();//避免移動視窗後，焦點被父視窗搶走
             };
 
+            string windowState = this.WindowState.ToString();
+            runScript($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{windowState}')");
 
-            this.SizeChanged += (sender, e) => { runScript("baseWindow.SizeChanged()"); };
-            this.Move += (sender, e) => { runScript("baseWindow.Move()"); };
-            //this.Resize += (sender, e) => { runScript("baseWindow.Resize()"); };
+            this.SizeChanged += (sender, e) => {
+                string s = this.WindowState.ToString();
+                runScript($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{s}')");
+            };
+            this.Move += (sender, e) => {
+                string s = this.WindowState.ToString();
+                runScript($"baseWindow.Move({this.Left},{this.Top},{this.Width},{this.Height},'{s}')"); 
+            };
+
             this.VisibleChanged += (sender, e) => { runScript("baseWindow.VisibleChanged()"); };
             this.FormClosing += (sender, e) => { runScript("baseWindow.FormClosing()"); };
-            this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };
-            this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
+            //this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };//無效
+            //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };//無效
 
         }
 

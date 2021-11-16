@@ -22,15 +22,149 @@ namespace tiefsee {
             this.M = m;
         }
 
-
         /// <summary>
-        /// 存入剪貼簿
+        /// 存入剪貼簿 - 
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public bool SetClipboard_txt(string txt) {
+        public bool SetClipboard_FileToPng(string path) {
+
+            try {
+
+                if (File.Exists(path) == false) { return false; }
+
+                System.Drawing.Bitmap bm_transparent = null;
+                MemoryStream ms = new MemoryStream();
+                bm_transparent = new System.Drawing.Bitmap(path);
+                bm_transparent.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+                System.Windows.Forms.Clipboard.Clear();//先清理剪貼簿
+                System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
+                data_object.SetData("PNG", false, ms);
+                System.Windows.Forms.Clipboard.SetDataObject(data_object, false);
+                return true;
+            } catch (Exception e2) {
+                MessageBox.Show(e2.ToString());
+                return false;
+            }
+
+        }
+
+
+        /// <summary>
+        /// 存入剪貼簿 - 
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public bool SetClipboard_FileToTxt(string path) {
+            try {
+                if (File.Exists(path) == false) { return false; }
+                using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
+                    System.Windows.Forms.Clipboard.SetDataObject(sr.ReadToEnd(), false, 5, 200);
+                }
+                return true;
+            } catch (Exception) {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 存入剪貼簿 - 
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public bool SetClipboard_FileToBase64(string path) {
+            
+            try {
+
+                if (File.Exists(path) == false) { return false; }
+
+                byte[] temp = File.ReadAllBytes(path);
+                string base64String = "";
+
+                String ext = Path.GetExtension(path).ToUpper();
+
+                if (ext == ".PNG") {
+                    base64String = "data:image/png;base64," + Convert.ToBase64String(temp);
+
+                } else if (ext == ".GIF") {
+                    base64String = "data:image/gif;base64," + Convert.ToBase64String(temp);
+
+                } else if (ext == ".SVG") {
+                    base64String = "data:image/svg+xml;base64," + Convert.ToBase64String(temp);
+
+                } else if (ext == ".BMP") {
+                    base64String = "data:image/bmp;base64," + Convert.ToBase64String(temp);
+
+                } else if (ext == ".WEBP") {
+                    base64String = "data:image/webp;base64," + Convert.ToBase64String(temp);
+
+                } else {
+                    base64String = "data:image/jpeg;base64," + Convert.ToBase64String(temp);
+                }
+
+                System.Windows.Forms.Clipboard.SetDataObject(base64String, false, 5, 200);//存入剪貼簿
+                return true;
+
+            } catch (Exception e) {
+                MessageBox.Show(e.ToString());
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// 存入剪貼簿 - 圖片
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public bool SetClipboard_FileToImg(string path) {
+            try {
+                using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
+                    System.Windows.Forms.Clipboard.SetImage(bm_transparent);
+                    bm_transparent.Dispose();
+                }
+                return true;
+            } catch (Exception) {
+
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// 存入剪貼簿 - 字串
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public bool SetClipboard_Txt(string txt) {
             try {
                 System.Windows.Forms.Clipboard.SetDataObject(txt, false, 5, 200);//存入剪貼簿
+                return true;
+            } catch (Exception) {
+
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// 存入剪貼簿 - 檔案
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool SetClipboard_File(string path) {
+            try {
+
+                //檔案或資料夾存在才複製
+                if (File.Exists(path) || Directory.Exists(path)) {
+                    var f = new System.Collections.Specialized.StringCollection();
+                    f.Add(path);
+                    Clipboard.SetFileDropList(f);
+                } else {
+                    return false;
+                }
+
                 return true;
             } catch (Exception) {
 

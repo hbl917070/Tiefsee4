@@ -22,7 +22,32 @@ namespace tiefsee {
             this.M = m;
         }
 
-    
+        /// <summary>
+        /// 檔名陣列 轉 路徑陣列 (用於載入複數檔案
+        /// </summary>
+        /// <param name="dirPath"> 資料夾路徑 </param>
+        /// <param name="arName"> 檔名陣列 </param>
+        /// <returns></returns>
+        public string[] GetFiles2(string dirPath, object[] arName) {
+
+            List<string> arWaitingList = new List<string>();
+
+            for (int i = 0; i < arName.Length; i++) {
+                string item = arName[i].ToString();
+                string filePath = Path.Combine(dirPath, item);
+                if (File.Exists(filePath)) {//如果是檔案
+                    arWaitingList.Add(filePath);
+
+                } else if (Directory.Exists(filePath)) {//如果是資料夾
+                    string[] arFile = Directory.GetFiles(filePath, "*.*");//取得資料夾內所有檔案
+                    for (int j = 0; j < arFile.Length; j++) {
+                        arWaitingList.Add(arFile[j]);
+                    }
+                }
+            }
+
+            return arWaitingList.ToArray();
+        }
 
         /// <summary>
         /// 判斷指定路徑是否參考磁碟上的現有目錄

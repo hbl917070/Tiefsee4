@@ -37,6 +37,16 @@
 
 /*---------------------------*/
 
+.main-welcomeview {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: var(--color-white);
+}
+
 .main-tiefseeview {
   height: 100%;
   width: 100%;
@@ -45,8 +55,30 @@
 .main-pdfview {
   height: 100%;
   width: 100%;
-  display: none;
   border: none;
+}
+
+.main-txtview {
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 16px;
+  color: var(--color-white);
+  background-color: rgba(0, 0, 0, 0);
+  padding: 10px;
+  outline: none;
+}
+
+/*---------------------------*/
+.welcomeview-logo {
+  max-width: 150px;
+  margin: auto;
+  margin-bottom: 30px;
+  display: block;
+}
+.welcomeview-txt {
+  text-align: center;
+  font-size: 20px;
 }
 
 /*---------------------------*/
@@ -67,7 +99,7 @@
 }
 .main-tools::-webkit-scrollbar {
   /* background-color: var(--color-black40); */
-  height: 5px;
+  height: 3px;
   /* border-radius: 5px; */
 }
 
@@ -135,6 +167,7 @@
 .main-tools-btn img {
   width: 25px;
   height: 25px;
+  pointer-events: none;
 }
 
 /*開啟選單時*/

@@ -35,10 +35,10 @@ class Tieefseeview {
         var dom_img = dom_tiefseeview.querySelector(".view-img");
         var dom_bigimg = dom_tiefseeview.querySelector(".view-bigimg");
         var dom_bigimg_canvas = dom_tiefseeview.querySelector(".view-bigimg-canvas");
-        var dom_bigimg_bg = dom_tiefseeview.querySelector(".view-bigimg-bg");
         var dom_loading = dom_tiefseeview.querySelector(".tiefseeview-loading");
         var scrollX = new TieefseeviewScroll(dom_tiefseeview.querySelector(".scroll-x"), "x"); //水平捲動軸
         var scrollY = new TieefseeviewScroll(dom_tiefseeview.querySelector(".scroll-y"), "y"); //垂直捲動軸
+        var url; //目前的圖片網址
         var dataType = "img"; //資料類型
         var degNow = 0; //目前的角度 0~359
         var zoomRatio = 1.1; //縮放比率(必須大於1)
@@ -68,6 +68,9 @@ class Tieefseeview {
         var temp_pinchCenterY = 0;
         var temp_originalWidth = 1; //用於記錄圖片size 的暫存
         var temp_originalHeight = 1;
+        var temp_img; //圖片暫存
+        var temp_can; //canvas暫存
+        var temp_canvasSN = 0; //用於判斷canvas是否重複繪製
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type, offsetX, offsetY) => {
             if (_type === "up") {
@@ -96,6 +99,7 @@ class Tieefseeview {
         this.getIsLoaded = getIsLoaded;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
+        this.loadNone = loadNone;
         this.setLoading = setLoading;
         this.getRendering = getRendering;
         this.setRendering = setRendering;
@@ -138,6 +142,7 @@ class Tieefseeview {
         this.setLoadingUrl = setLoadingUrl;
         this.getErrerUrl = getErrerUrl;
         this.setErrerUrl = setErrerUrl;
+        this.getUrl = getUrl;
         setLoadingUrl(loadingUrl); //初始化 loading 圖片
         setLoading(false); //預設為隱藏
         $(dom_tiefseeview).addClass("tiefseeview");
@@ -448,10 +453,12 @@ class Tieefseeview {
                 return;
             }
         }
-        var tmp_img;
-        var tmp_can;
         /**
-         * 載入圖片資源
+         * 取得目前的圖片網址
+         */
+        function getUrl() { return url; }
+        /**
+         * 預載入圖片資源
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
@@ -471,11 +478,19 @@ class Tieefseeview {
                         resolve(false); //繼續往下執行
                     });
                 });
-                tmp_img = img;
+                temp_img = img;
                 //img.src = "";
                 //@ts-ignore
                 //img = null;
                 return p;
+            });
+        }
+        /**
+         * 載入空白圖片
+         */
+        function loadNone() {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield loadImg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
             });
         }
         /**
@@ -486,6 +501,7 @@ class Tieefseeview {
         function loadImg(_url) {
             return __awaiter(this, void 0, void 0, function* () {
                 //setLoading(true);
+                url = _url;
                 let p = yield getIsLoaded(_url);
                 //setLoading(false);
                 setDataType("img");
@@ -507,6 +523,7 @@ class Tieefseeview {
         function loadBigimg(_url) {
             return __awaiter(this, void 0, void 0, function* () {
                 //setLoading(true);
+                url = _url;
                 let p = yield getIsLoaded(_url);
                 //setLoading(false);
                 setDataType("bigimg");
@@ -517,10 +534,10 @@ class Tieefseeview {
                     return false;
                 }
                 dom_img.src = _url;
-                tmp_can = document.createElement("canvas");
-                tmp_can.width = dom_img.width;
-                tmp_can.height = dom_img.height;
-                let context0 = tmp_can.getContext("2d");
+                temp_can = document.createElement("canvas");
+                temp_can.width = dom_img.width;
+                temp_can.height = dom_img.height;
+                let context0 = temp_can.getContext("2d");
                 context0 === null || context0 === void 0 ? void 0 : context0.drawImage(dom_img, 0, 0, dom_img.width, dom_img.height);
                 setDataSize(getOriginalWidth());
                 return true;
@@ -954,12 +971,13 @@ class Tieefseeview {
                     /*context.drawImage(tmp_can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
-                    );*/
-                    temp_count += 1;
-                    let tc = temp_count;
+                    );
+                    return;*/
+                    temp_canvasSN += 1;
+                    let tc = temp_canvasSN;
                     var time = new Date();
-                    context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
-                    console.log([sx, sy, sWidth, sHeight, dWidth, dHeight]);
+                    //context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
+                    let resizeQuality = "medium";
                     if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
                         //寬高跟高度全部渲染
                         sWidth = getOriginalWidth();
@@ -968,12 +986,12 @@ class Tieefseeview {
                         sy = dy * -1;
                         dWidth = getOriginalWidth() * _scale;
                         dHeight = getOriginalHeight() * _scale;
-                        yield createImageBitmap(tmp_can, 0, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                        yield createImageBitmap(temp_can, 0, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                             .then(function (sprites) {
-                            if (tc !== temp_count) {
+                            if (tc !== temp_canvasSN) {
                                 return;
                             }
-                            context.drawImage(sprites, sx, sy, dWidth, dHeight);
+                            context.drawImage(sprites, sx, sy);
                         });
                     }
                     else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
@@ -984,12 +1002,12 @@ class Tieefseeview {
                         sy = dy * -1;
                         //dWidth = getOriginalWidth() * _scale
                         dHeight = getOriginalHeight() * _scale;
-                        yield createImageBitmap(tmp_can, sx, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                        yield createImageBitmap(temp_can, sx, 0, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                             .then(function (sprites) {
-                            if (tc !== temp_count) {
+                            if (tc !== temp_canvasSN) {
                                 return;
                             }
-                            context.drawImage(sprites, 0, sy, dWidth, dHeight);
+                            context.drawImage(sprites, 0, sy);
                         });
                     }
                     else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
@@ -1000,24 +1018,25 @@ class Tieefseeview {
                         //sy = dy * -1
                         dWidth = getOriginalWidth() * _scale;
                         //dHeight = getOriginalHeight() * _scale
-                        yield createImageBitmap(tmp_can, 0, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                        yield createImageBitmap(temp_can, 0, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                             .then(function (sprites) {
-                            if (tc !== temp_count) {
+                            if (tc !== temp_canvasSN) {
                                 return;
                             }
-                            context.drawImage(sprites, sx, 0, dWidth, dHeight);
+                            context.drawImage(sprites, sx, 0);
                         });
                     }
                     else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
                         //局部渲染
-                        yield createImageBitmap(tmp_can, sx, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                        yield createImageBitmap(temp_can, sx, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                             .then(function (sprites) {
-                            if (tc !== temp_count) {
+                            if (tc !== temp_canvasSN) {
                                 return;
                             }
-                            context.drawImage(sprites, 0, 0, dWidth, dHeight);
+                            context.drawImage(sprites, 0, 0);
                         });
                     }
+                    console.log([sx, sy, sWidth, sHeight, dWidth, dHeight]);
                     //
                     var int_毫秒 = (new Date()).getTime() - time.getTime();
                     var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
@@ -1026,7 +1045,6 @@ class Tieefseeview {
                 }
             });
         }
-        var temp_count = 0;
         /**
          * 縮放圖片
          * @param _type 縮放類型

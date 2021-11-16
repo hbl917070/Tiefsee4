@@ -5,7 +5,7 @@ var WV_Directory: WV_Directory = cef.WV_Directory;
 var WV_File: WV_File = cef.WV_File;
 var WV_Path: WV_Path = cef.WV_Path;
 var WV_System: WV_System = cef.WV_System;
-var WV_UseOtherAppOpen: WV_UseOtherAppOpen = cef.WV_UseOtherAppOpen;
+var WV_RunApp: WV_RunApp = cef.WV_RunApp;
 var WV_Image: WV_Image = cef.WV_Image;
 
 
@@ -24,37 +24,76 @@ class BaseWindow {
     public btn_close: HTMLDivElement;
     public dom_titlebarTxt: HTMLDivElement;
 
-    public maximized;
-    public minimized;
-    public normal;
+    public topMost: boolean = false;
+    public left: number = 0;
+    public top: number = 0;
+    public width: number = 0;
+    public height: number = 0;
+    public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
 
 
-    private initWindowState;
 
-    async SizeChanged() {
-        //console.log("SizeChanged:"+ await WV_Window.WindowState);
+    SizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+        console.log("SizeChanged  " + windowState)
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+
         this.initWindowState();
     }
 
-    Move() {
-        this.dom_window.classList.remove("maximized");
-        this.btn_normal.style.display = "none";
-        this.btn_maximized.style.display = "flex";
+    public Move(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+console.log("move  " + windowState)
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+
+        this.initWindowState();
     }
 
-    VisibleChanged() {
+    public VisibleChanged() {
         console.log("VisibleChanged");
     }
-    FormClosing() {
+    public FormClosing() {
         console.log("FormClosing");
     }
-    GotFocus() {
-        console.log("GotFocus");
+
+    /** 最大化 */
+    public maximized() {
+        WV_Window.WindowState = "Maximized";
+        this.initWindowState();
     }
-    LostFocus() {
-        console.log("LostFocus");
+
+    /** 最小化 */
+    public minimized() {
+        WV_Window.WindowState = "Minimized";
     }
+
+    /** 視窗化 */
+    public normal() {
+        WV_Window.WindowState = "Normal";
+        this.initWindowState();
+    }
+
+
+
+    private initWindowState() {
+        if (this.windowState === "Maximized") {
+            this.dom_window.classList.add("maximized");
+            this.btn_normal.style.display = "flex";
+            this.btn_maximized.style.display = "none";
+        } else {
+            this.dom_window.classList.remove("maximized");
+            this.btn_normal.style.display = "none";
+            this.btn_maximized.style.display = "flex";
+        }
+    }
+
 
     /**
      * 取得拖曳進來的檔案路徑
@@ -83,10 +122,15 @@ class BaseWindow {
     }
 
 
+    /**
+     * 設定視窗標題
+     * @param txt 
+     */
     async setTitle(txt: string) {
         WV_Window.Text = txt;
         this.dom_titlebarTxt.innerHTML = `<span>${txt}</span>`;
     }
+
 
     constructor() {
 
@@ -99,7 +143,6 @@ class BaseWindow {
         var btn_close = <HTMLDivElement>document.querySelector(".titlebar-tools-close");
         var dom_titlebarTxt = <HTMLDivElement>document.querySelector(".titlebar-txt");
 
-
         this.dom_window = dom_window;
         this.btn_menu = btn_menu;
         this.btn_topmost = btn_topmost;
@@ -109,33 +152,33 @@ class BaseWindow {
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
 
-        this.maximized = maximized;
-        this.minimized = minimized;
-        this.normal = normal;
-        this.initWindowState = initWindowState;
-
-        initWindowState();
 
         btn_menu.addEventListener("click", e => {
             //alert()
         });
         btn_topmost.addEventListener("click", async e => {
-            WV_Window.TopMost = ! await WV_Window.TopMost;
+            this.topMost = await WV_Window.TopMost;
+            if (this.topMost === true) {
+                btn_topmost.setAttribute("active", "");
+            } else {
+                btn_topmost.setAttribute("active", "true");
+            }
+            WV_Window.TopMost = !this.topMost;
         });
         btn_normal.addEventListener("click", async e => {
-            normal()
+            this.normal()
         });
         btn_minimized.addEventListener("click", async e => {
-            minimized()
+            this.minimized()
         });
         btn_maximized.addEventListener("click", async e => {
-            maximized()
+            this.maximized()
         });
         btn_close.addEventListener("click", async e => {
             WV_Window.Close()
         });
 
-
+        //註冊視窗邊框拖曳
         windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");
         windowBorder(<HTMLDivElement>document.querySelector(".window-RC"), "RC");
         windowBorder(<HTMLDivElement>document.querySelector(".window-CB"), "CB");
@@ -146,12 +189,6 @@ class BaseWindow {
         windowBorder(<HTMLDivElement>document.querySelector(".window-RB"), "RB");
         windowBorder(<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-txt"), "move");
 
-        (<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-txt"))
-            .addEventListener("touchend", (e) => {
-                console.log('touchend--')
-                //WV_Window.WindowDragUp();
-            });
-
         function windowBorder(_dom: HTMLDivElement, _type: ("CT" | "RC" | "CB" | "LC" | "LT" | "RT" | "LB" | "RB" | "move")) {
             _dom.addEventListener("mousedown", async (e) => {
                 if (e.button === 0) {//滑鼠左鍵
@@ -160,88 +197,15 @@ class BaseWindow {
             });
 
             _dom.addEventListener("touchstart", async (e) => {
-                //  e.preventDefault();
-                //WV_Window.WindowDrag(_type);
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag(_type);
-
             });
-
-            _dom.addEventListener("touchend", async (e) => {
-
-            });
-
-
-            //----------
-
-            var cx = 0;
-            var cy = 0;
-            var tcx = 0;
-            var tcy = 0;
-            _dom.addEventListener("touchstart", async (e) => {
-                //  e.preventDefault();
-                cx = await WV_Window.Left;
-                cy = await WV_Window.Top;
-                tcx = e.changedTouches[0]["clientX"]
-                tcy = e.changedTouches[0]["clientY"]
-                console.log("start")
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag_touchStart();
-            });
-            _dom.addEventListener("touchmove", async (e) => {
-                //  e.preventDefault();
-                //WV_Window.Left = cx + e.changedTouches[0]["clientX"]-tcx
-                //WV_Window.Top = cy + e.changedTouches[0]["clientY"]-tcy
-
-                WV_Window.Text = await WV_Window.GetMousePoint()[0];
-
-                console.log(e)
-                //@ts-ignore
-                //chrome.webview.hostObjects.WV_Window.WindowDrag_touchMove();
-            });
-            _dom.addEventListener("touchend", async (e) => {
-                // e.preventDefault();
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag_touchEnd();
-            });
-
-
-        }
-
-
-        function maximized() {
-            WV_Window.WindowState = "Maximized";
-            initWindowState();
-        }
-        function minimized() {
-            WV_Window.WindowState = "Minimized";
-        }
-        function normal() {
-            WV_Window.WindowState = "Normal";
-            initWindowState();
-        }
-
-
-
-        async function initWindowState() {
-            if (await WV_Window.WindowState === "Maximized") {
-                dom_window.classList.add("maximized");
-                btn_normal.style.display = "flex";
-                btn_maximized.style.display = "none";
-            } else {
-                dom_window.classList.remove("maximized");
-                btn_normal.style.display = "none";
-                btn_maximized.style.display = "flex";
-            }
         }
 
     }
 
 }
 
-
-
 //---------------
+
 
 
 /**

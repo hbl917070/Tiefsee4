@@ -13,29 +13,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet">
 
     <link rel="stylesheet" href="css/BaseWindow.css">
-    <script src="js/BaseWindow.js"></script>
+    <script src="/js/BaseWindow.js"></script>
+    <script src="/js/Lib.js"></script>
 
 
-    <script src="js/library/hammer.min.js"></script>
-    <script src="js/library/jquery-3.6.0.min.js"></script>
-    <script src="js/library/jquery.easing.js"></script>
+    <script src="/js/library/hammer.min.js"></script>
+    <script src="/js/library/jquery-3.6.0.min.js"></script>
+    <script src="/js/library/jquery.easing.js"></script>
 
-    <script src="js/tiefseeview.js"></script>
+    <script src="/js/tiefseeview.js"></script>
     <link rel="stylesheet" href="css/tiefseeview.css">
     <link rel="stylesheet" href="css/MainWindow.css">
     <link rel="stylesheet" href="css/menu.css">
 
+    <script src="/js/MainWindow/Config.js"></script>
     <script src="/js/MainWindow/MainTools.js"></script>
-    <script src="js/MainWindow/FileLoad.js"></script>
-    <script src="js/MainWindow/FileShow.js"></script>
-    <script src="js/MainWindow/Menu.js"></script>
-    <script src="js/MainWindow/MainWindow.js"></script>
+    <script src="/js/MainWindow/FileLoad.js"></script>
+    <script src="/js/MainWindow/FileShow.js"></script>
+    <script src="/js/MainWindow/Menu.js"></script>
+    <script src="/js/MainWindow/InitMenu.js"></script>
+    <script src="/js/MainWindow/MainWindow.js"></script>
 
     <script>
         var mainWindow;
         document.addEventListener("DOMContentLoaded", async () => {
             mainWindow = new MainWindow();
         });
+
 
     </script>
 </head>
@@ -44,43 +48,37 @@
 
 
 
-    <div class="menu" active="true+">
+    <div class="menu" active="">
         <div class="menu-content" id="menu-open">
             <div class="menu-box">
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-OpenFile">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">載入檔案</div>
                 </div>
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-newWindow">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">另開視窗</div>
                 </div>
 
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-ShowOnExplorer">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
                 </div>
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-ShowSystemMenu">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
                 </div>
 
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-PrintFile">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">列印</div>
                 </div>
-                <div class="menu-hor-item">
-                    <div class="menu-hor-icon">
-                    </div>
+                <div class="menu-hor-item" id="menuitem-SetWallpaper">
+                    <div class="menu-hor-icon"></div>
                     <div class="menu-hor-txt" i18n="">設成桌布</div>
                 </div>
 
@@ -88,14 +86,14 @@
             </div>
 
             <div class="menu-box">
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-RunApp">
                     <div class="menu-hor-icon">
                     </div>
                     <div class="menu-hor-txt" i18n="">選擇其他應用程式</div>
                 </div>
 
 
-                <div class="menu-hor-item" id="menu-Open3DMSPaint">
+                <div class="menu-hor-item" id="menuitem-Open3DMSPaint">
                     <div class="menu-hor-icon">
                         <img src="/img/icon-Paint3D.png">
                     </div>
@@ -113,39 +111,39 @@
         </div>
     </div>
 
-    <div class="menu" active="true+">
+    <div class="menu" active="">
         <div class="menu-content" id="menu-copy">
             <div class="menu-box">
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyFile">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 檔案</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyName">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 檔名</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyPath">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 完整路徑</div>
                 </div>
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyImg">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 影像</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyBase64">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 base64</div>
                 </div>
 
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyPng">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 影像(含透明色)</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-copyTxt">
                     <div class="menu-hor-icon"> </div>
                     <div class="menu-hor-txt" i18n="">複製 SVG 文字</div>
                 </div>
@@ -154,16 +152,16 @@
         </div>
     </div>
 
-    <div class="menu" active="true+">
+    <div class="menu" active="">
         <div class="menu-content" id="menu-rotate">
             <div class="menu-box">
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-rotateCw">
                     <div class="menu-hor-icon">
                         <import type="svg" src="/img/default/tool-rotateCw.svg"> </import>
                     </div>
                     <div class="menu-hor-txt" i18n="">順時針90°</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-rotateCcw">
                     <div class="menu-hor-icon">
                         <import type="svg" src="/img/default/tool-rotateCcw.svg"> </import>
                     </div>
@@ -172,13 +170,13 @@
 
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-mirroringH">
                     <div class="menu-hor-icon">
                         <import type="svg" src="/img/default/tool-mirroringH.svg"> </import>
                     </div>
                     <div class="menu-hor-txt" i18n="">水平鏡像</div>
                 </div>
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-mirroringV">
                     <div class="menu-hor-icon">
                         <import type="svg" src="/img/default/tool-mirroringV.svg"> </import>
                     </div>
@@ -187,7 +185,7 @@
 
                 <div class="menu-hor-hr"></div>
 
-                <div class="menu-hor-item">
+                <div class="menu-hor-item" id="menuitem-img-initRotate">
                     <div class="menu-hor-icon">
                         <import type="svg" src="/img/default/tool-initRotate.svg"> </import>
                     </div>
@@ -248,9 +246,19 @@
 
                     </div>
                     <div class="main-V">
+
+                        <div id="main-welcomeview" class="main-welcomeview">
+                            <div>
+                                <img class="welcomeview-logo" src="/img/logo.svg">
+                                <div class="welcomeview-txt">Tiefsee beta 001</div>
+
+                            </div>
+
+                        </div>
+                        <textarea id="main-txtview" class="main-txtview"></textarea>
                         <div id="main-tiefseeview" class="main-tiefseeview"></div>
-                        <iframe id="main-pdfview" class="main-pdfview"
-                            src="file:///C:/Users/wen/Desktop/dd.html"></iframe>
+                        <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
+
                         <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
                     </div>
                     <div class="main-R">

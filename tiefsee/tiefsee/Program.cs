@@ -12,7 +12,7 @@ namespace tiefsee {
         /// 應用程式的主要進入點。
         /// </summary>
         [STAThread]
-        static void Main() {
+        static void Main(string[] args) {
 
           
 
@@ -27,7 +27,7 @@ namespace tiefsee {
             
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WebWindow(_url));
+            Application.Run(new WebWindow(_url, args));
             //Application.Run(new WebStart(_url));
 
 

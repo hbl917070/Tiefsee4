@@ -58,7 +58,7 @@ class Menu {
                 }
             };
             window.onblur = function () {
-                //func_close();//關閉menu
+                func_close(); //關閉menu
             };
         }
         /**

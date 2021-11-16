@@ -12,16 +12,68 @@ class FileShow {
     constructor(M) {
         var view_image = new Tieefseeview(document.querySelector("#main-tiefseeview"));
         var dom_image = document.querySelector("#main-tiefseeview");
-        var dom_pdf = document.querySelector("#main-pdfview");
+        var dom_pdfview = document.querySelector("#main-pdfview");
+        var dom_txtview = document.querySelector("#main-txtview");
+        var dom_welcomeview = document.querySelector("#main-welcomeview");
         this.openImage = openImage;
         this.openPdf = openPdf;
+        this.openTxt = openTxt;
+        this.openWelcome = openWelcome;
+        this.dom_image = dom_image;
         this.view_image = view_image;
-        openImage("https://wall.bahamut.com.tw/B/40/5328257e8d00594e61f8b815d505cab3_4080425.JPG");
+        //openImage("https://wall.bahamut.com.tw/B/40/5328257e8d00594e61f8b815d505cab3_4080425.JPG")
+        function setShowType(groupType) {
+            if (groupType === GroupType.img) {
+                dom_image.style.display = "block";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "none";
+                dom_welcomeview.style.display = "none";
+                dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                //view_image.loadNone();
+                return;
+            }
+            if (groupType === GroupType.imgs) {
+                return;
+            }
+            if (groupType === GroupType.txt) {
+                dom_image.style.display = "none";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "block";
+                dom_welcomeview.style.display = "none";
+                dom_pdfview.setAttribute("src", "");
+                //dom_txtview.value = "";
+                view_image.loadNone();
+                return;
+            }
+            if (groupType === GroupType.pdf) {
+                dom_image.style.display = "none";
+                dom_pdfview.style.display = "block";
+                dom_txtview.style.display = "none";
+                dom_welcomeview.style.display = "none";
+                //dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                view_image.loadNone();
+                return;
+            }
+            if (groupType === GroupType.welcome) {
+                dom_image.style.display = "none";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "none";
+                dom_welcomeview.style.display = "flex";
+                dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                view_image.loadNone();
+                return;
+            }
+        }
+        /**
+         *
+         * @param _path
+         */
         function openImage(_path) {
             return __awaiter(this, void 0, void 0, function* () {
-                //let _url = ;
-                dom_image.style.display = "block";
-                dom_pdf.style.display = "none";
+                setShowType(GroupType.img); //改變顯示類型
                 let imgurl = _path; //圖片網址
                 if ((yield WV_File.Exists(_path)) === true) {
                     imgurl = "/api/getimg/" + encodeURIComponent(_path);
@@ -47,7 +99,7 @@ class FileShow {
                     //檔案類型
                     let dom_type = M.dom_tools.querySelector(`[data-name="infoType"]`);
                     if (dom_type != null) {
-                        let fileType = (yield getFileType(_path)).toLocaleUpperCase();
+                        let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
                         let fileLength = yield getFileLength(_path);
                         dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                     }
@@ -68,6 +120,39 @@ class FileShow {
                 }));
             });
         }
+        /**
+         *
+         * @param _url
+         */
+        function openPdf(_url) {
+            return __awaiter(this, void 0, void 0, function* () {
+                setShowType(GroupType.pdf); //改變顯示類型
+                dom_pdfview.setAttribute("src", _url);
+            });
+        }
+        /**
+         *
+         * @param path
+         */
+        function openTxt(path) {
+            return __awaiter(this, void 0, void 0, function* () {
+                setShowType(GroupType.txt); //改變顯示類型
+                dom_txtview.value = yield WV_File.GetText(path);
+            });
+        }
+        /**
+         *
+         */
+        function openWelcome() {
+            return __awaiter(this, void 0, void 0, function* () {
+                setShowType(GroupType.welcome); //改變顯示類型
+            });
+        }
+        /**
+         * 取得檔案的大小的文字
+         * @param path
+         * @returns
+         */
         function getFileLength(path) {
             return __awaiter(this, void 0, void 0, function* () {
                 let len = yield WV_File.GetFileInfo(path).Length;
@@ -81,88 +166,6 @@ class FileShow {
                     return (len / (1024 * 1024)).toFixed(1) + " MB";
                 }
                 return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
-            });
-        }
-        function openPdf(_url) {
-            return __awaiter(this, void 0, void 0, function* () {
-                dom_image.style.display = "none";
-                dom_pdf.style.display = "block";
-                dom_pdf.setAttribute("src", _url);
-                //dom_pdf.setAttribute("src", "file:///C:/Users/wen/Desktop/dd.html");
-            });
-        }
-        function getFileType(path) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let fileType = yield WV_File.GetFIleType(path); //取得檔案類型
-                let fileExt = yield WV_Path.GetExtension(path); //取得附檔名
-                fileExt = fileExt.replace(".", "").toLocaleLowerCase();
-                if (fileType == "255216") {
-                    return "jpg";
-                }
-                if (fileType == "7173") {
-                    return "gif";
-                }
-                if (fileType == "13780") {
-                    return "png";
-                }
-                if (fileType == "6787") {
-                    return "swf";
-                }
-                if (fileType == "6677") {
-                    return "bmp";
-                }
-                if (fileType == "5666") {
-                    return "psd";
-                }
-                if (fileType == "4838") {
-                    return "wmv";
-                }
-                if (fileType == "2669") {
-                    return "mkv";
-                }
-                if (fileType == "7076") {
-                    return "flv";
-                }
-                if (fileType == "1") {
-                    return "ttf";
-                }
-                if (fileType == "8297") {
-                    return "rar";
-                }
-                if (fileType == "55122") {
-                    return "7z";
-                }
-                if (fileType == "8075") {
-                    if (fileExt == "docx") {
-                        return "docx";
-                    }
-                    if (fileExt == "pptx") {
-                        return "pptx";
-                    }
-                    if (fileExt == "apk") {
-                        return "apk";
-                    }
-                    if (fileExt == "xd") {
-                        return "xd";
-                    }
-                    return "zip";
-                }
-                if (fileType == "3780") {
-                    if (fileExt == "ai") {
-                        return "ai";
-                    }
-                    return "pdf";
-                }
-                if (fileType == "8273") {
-                    if (fileExt == "avi") {
-                        return "avi";
-                    }
-                    if (fileExt == "wav") {
-                        return "wav";
-                    }
-                    return "webp";
-                }
-                return fileExt; //無法辨識，則直接回傳附檔名
             });
         }
     }

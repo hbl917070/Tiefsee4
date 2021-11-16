@@ -12,6 +12,7 @@ class Tieefseeview {
     public getIsLoaded;//預載入
     public loadImg;//載入圖片
     public loadBigimg;
+    public loadNone;//載入空白圖片
     public setLoading;//顯示或隱藏 loading
     public getMargin;//取得 外距
     public setMargin;
@@ -40,7 +41,7 @@ class Tieefseeview {
     public setAlign;//圖片對齊
     public getRendering;//取得渲染模式
     public setRendering;
-
+    public getUrl;//取得當前圖片網址
 
     public getEventMouseWheel;//滑鼠滾輪捲動時
     public setEventMouseWheel;
@@ -85,11 +86,11 @@ class Tieefseeview {
         var dom_img = <HTMLImageElement>dom_tiefseeview.querySelector(".view-img");
         var dom_bigimg = <HTMLDivElement>dom_tiefseeview.querySelector(".view-bigimg");
         var dom_bigimg_canvas = <HTMLCanvasElement>dom_tiefseeview.querySelector(".view-bigimg-canvas");
-        var dom_bigimg_bg = <HTMLDivElement>dom_tiefseeview.querySelector(".view-bigimg-bg");
         var dom_loading = <HTMLImageElement>dom_tiefseeview.querySelector(".tiefseeview-loading");
         var scrollX = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
         var scrollY = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
 
+        var url: string;//目前的圖片網址
         var dataType: ("img" | "movie" | "imgs" | "bigimg") = "img";//資料類型
         var degNow: number = 0;//目前的角度 0~359
         var zoomRatio: number = 1.1;//縮放比率(必須大於1)
@@ -122,6 +123,10 @@ class Tieefseeview {
 
         var temp_originalWidth: number = 1;//用於記錄圖片size 的暫存
         var temp_originalHeight: number = 1;
+        var temp_img: HTMLImageElement;//圖片暫存
+        var temp_can: HTMLCanvasElement;//canvas暫存
+        var temp_canvasSN = 0;//用於判斷canvas是否重複繪製
+
 
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
@@ -151,6 +156,7 @@ class Tieefseeview {
         this.getIsLoaded = getIsLoaded;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
+        this.loadNone = loadNone;
         this.setLoading = setLoading;
         this.getRendering = getRendering;
         this.setRendering = setRendering;
@@ -193,6 +199,7 @@ class Tieefseeview {
         this.setLoadingUrl = setLoadingUrl;
         this.getErrerUrl = getErrerUrl;
         this.setErrerUrl = setErrerUrl;
+        this.getUrl = getUrl;
 
         setLoadingUrl(loadingUrl);//初始化 loading 圖片
         setLoading(false);//預設為隱藏
@@ -541,11 +548,15 @@ class Tieefseeview {
             }
         }
 
-        var tmp_img: HTMLImageElement;
-        var tmp_can: HTMLCanvasElement;
+
+
+        /** 
+         * 取得目前的圖片網址
+         */
+        function getUrl() { return url; }
 
         /**
-         * 載入圖片資源
+         * 預載入圖片資源
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
@@ -565,15 +576,22 @@ class Tieefseeview {
                     resolve(false);//繼續往下執行
                 });
             })
-            tmp_img = img;
-
-
+            temp_img = img;
 
             //img.src = "";
             //@ts-ignore
             //img = null;
             return <boolean>p;
         }
+
+
+        /**
+         * 載入空白圖片
+         */
+        async function loadNone() {
+            await loadImg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+        }
+
 
         /**
          * 載入並顯示圖片
@@ -583,7 +601,7 @@ class Tieefseeview {
         async function loadImg(_url: string): Promise<boolean> {
 
             //setLoading(true);
-
+            url = _url;
             let p = await getIsLoaded(_url);
 
             //setLoading(false);
@@ -609,7 +627,7 @@ class Tieefseeview {
         async function loadBigimg(_url: string): Promise<boolean> {
 
             //setLoading(true);
-
+            url = _url;
             let p = await getIsLoaded(_url);
 
             //setLoading(false);
@@ -624,10 +642,10 @@ class Tieefseeview {
 
             dom_img.src = _url;
 
-            tmp_can = document.createElement("canvas");
-            tmp_can.width = dom_img.width;
-            tmp_can.height = dom_img.height;
-            let context0 = tmp_can.getContext("2d");
+            temp_can = document.createElement("canvas");
+            temp_can.width = dom_img.width;
+            temp_can.height = dom_img.height;
+            let context0 = temp_can.getContext("2d");
             context0?.drawImage(dom_img, 0, 0, dom_img.width, dom_img.height);
 
             setDataSize(getOriginalWidth());
@@ -1080,16 +1098,21 @@ class Tieefseeview {
                 /*context.drawImage(tmp_can,
                     sx, sy, sWidth, sHeight,
                     0, 0, dWidth, dHeight
-                );*/
+                );
+                return;*/
 
-                temp_count += 1;
+                temp_canvasSN += 1;
 
-                let tc = temp_count;
+                let tc = temp_canvasSN;
 
                 var time = new Date();
-                context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
 
-                console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
+                //context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
+
+
+
+                let resizeQuality: ResizeQuality = "medium";
+
 
                 if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
 
@@ -1100,11 +1123,11 @@ class Tieefseeview {
                     sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     dHeight = getOriginalHeight() * _scale
-                    await createImageBitmap(tmp_can, 0, 0, sWidth, sHeight,
-                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                    await createImageBitmap(temp_can, 0, 0, sWidth, sHeight,
+                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_count) { return; }
-                            context.drawImage(sprites, sx, sy, dWidth, dHeight,);
+                            if (tc !== temp_canvasSN) { return; }
+                            context.drawImage(sprites, sx, sy,);
                         });
 
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
@@ -1116,11 +1139,11 @@ class Tieefseeview {
                     sy = dy * -1
                     //dWidth = getOriginalWidth() * _scale
                     dHeight = getOriginalHeight() * _scale
-                    await createImageBitmap(tmp_can, sx, 0, sWidth, sHeight,
-                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                    await createImageBitmap(temp_can, sx, 0, sWidth, sHeight,
+                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_count) { return; }
-                            context.drawImage(sprites, 0, sy, dWidth, dHeight,);
+                            if (tc !== temp_canvasSN) { return; }
+                            context.drawImage(sprites, 0, sy,);
                         });
 
                 } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
@@ -1132,25 +1155,25 @@ class Tieefseeview {
                     //sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     //dHeight = getOriginalHeight() * _scale
-                    await createImageBitmap(tmp_can, 0, sy, sWidth, sHeight,
-                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                    await createImageBitmap(temp_can, 0, sy, sWidth, sHeight,
+                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_count) { return; }
-                            context.drawImage(sprites, sx, 0, dWidth, dHeight,);
+                            if (tc !== temp_canvasSN) { return; }
+                            context.drawImage(sprites, sx, 0,);
                         });
 
 
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
 
                     //局部渲染
-                    await createImageBitmap(tmp_can, sx, sy, sWidth, sHeight,
-                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: "medium" })
+                    await createImageBitmap(temp_can, sx, sy, sWidth, sHeight,
+                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_count) { return; }
-                            context.drawImage(sprites, 0, 0, dWidth, dHeight,);
+                            if (tc !== temp_canvasSN) { return; }
+                            context.drawImage(sprites, 0, 0,);
                         });
                 }
-
+                console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
 
                 //
                 var int_毫秒 = (new Date()).getTime() - time.getTime();
@@ -1164,7 +1187,6 @@ class Tieefseeview {
 
         }
 
-        var temp_count = 0;
 
         /**
          * 縮放圖片
@@ -1244,7 +1266,6 @@ class Tieefseeview {
             init_point(false);
             eventChangeZoom(getZoomRatio());
             setRendering(rendering);
-
 
         }
 
@@ -1601,7 +1622,6 @@ class Tieefseeview {
                         },
                         {
                             step: function (now: any, fx: any) {
-
                                 // @ts-ignore
                                 let data: { left: number, top: number } = $(dom_data).animate()[0];//取得記錄所有動畫變數的物件
                                 dom_con.style.top = data.top + "px";
@@ -1665,7 +1685,6 @@ class Tieefseeview {
             if (mirrorHorizontal === true) { scaleX = -1 }
             let scaleY = 1;
             if (mirrorVertical === true) { scaleY = -1 }
-
 
             await new Promise((resolve, reject) => {
 

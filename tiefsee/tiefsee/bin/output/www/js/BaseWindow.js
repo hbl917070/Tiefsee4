@@ -15,12 +15,18 @@ var WV_Directory = cef.WV_Directory;
 var WV_File = cef.WV_File;
 var WV_Path = cef.WV_Path;
 var WV_System = cef.WV_System;
-var WV_UseOtherAppOpen = cef.WV_UseOtherAppOpen;
+var WV_RunApp = cef.WV_RunApp;
 var WV_Image = cef.WV_Image;
 var baseWindow;
 var temp_dropPath = ""; //暫存。取得拖曳進視窗的檔案路徑
 class BaseWindow {
     constructor() {
+        this.topMost = false;
+        this.left = 0;
+        this.top = 0;
+        this.width = 0;
+        this.height = 0;
+        this.windowState = "Normal";
         var dom_window = document.querySelector('.window');
         var btn_menu = document.querySelector(".titlebar-tools-menu");
         var btn_topmost = document.querySelector(".titlebar-tools-topmost");
@@ -37,29 +43,32 @@ class BaseWindow {
         this.btn_maximized = btn_maximized;
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
-        this.maximized = maximized;
-        this.minimized = minimized;
-        this.normal = normal;
-        this.initWindowState = initWindowState;
-        initWindowState();
         btn_menu.addEventListener("click", e => {
             //alert()
         });
         btn_topmost.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
-            WV_Window.TopMost = !(yield WV_Window.TopMost);
+            this.topMost = yield WV_Window.TopMost;
+            if (this.topMost === true) {
+                btn_topmost.setAttribute("active", "");
+            }
+            else {
+                btn_topmost.setAttribute("active", "true");
+            }
+            WV_Window.TopMost = !this.topMost;
         }));
         btn_normal.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
-            normal();
+            this.normal();
         }));
         btn_minimized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
-            minimized();
+            this.minimized();
         }));
         btn_maximized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
-            maximized();
+            this.maximized();
         }));
         btn_close.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             WV_Window.Close();
         }));
+        //註冊視窗邊框拖曳
         windowBorder(document.querySelector(".window-CT"), "CT");
         windowBorder(document.querySelector(".window-RC"), "RC");
         windowBorder(document.querySelector(".window-CB"), "CB");
@@ -69,11 +78,6 @@ class BaseWindow {
         windowBorder(document.querySelector(".window-LB"), "LB");
         windowBorder(document.querySelector(".window-RB"), "RB");
         windowBorder(document.querySelector(".window-titlebar .titlebar-txt"), "move");
-        document.querySelector(".window-titlebar .titlebar-txt")
-            .addEventListener("touchend", (e) => {
-            console.log('touchend--');
-            //WV_Window.WindowDragUp();
-        });
         function windowBorder(_dom, _type) {
             _dom.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
                 if (e.button === 0) { //滑鼠左鍵
@@ -81,79 +85,26 @@ class BaseWindow {
                 }
             }));
             _dom.addEventListener("touchstart", (e) => __awaiter(this, void 0, void 0, function* () {
-                //  e.preventDefault();
-                //WV_Window.WindowDrag(_type);
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag(_type);
             }));
-            _dom.addEventListener("touchend", (e) => __awaiter(this, void 0, void 0, function* () {
-            }));
-            //----------
-            var cx = 0;
-            var cy = 0;
-            var tcx = 0;
-            var tcy = 0;
-            _dom.addEventListener("touchstart", (e) => __awaiter(this, void 0, void 0, function* () {
-                //  e.preventDefault();
-                cx = yield WV_Window.Left;
-                cy = yield WV_Window.Top;
-                tcx = e.changedTouches[0]["clientX"];
-                tcy = e.changedTouches[0]["clientY"];
-                console.log("start");
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag_touchStart();
-            }));
-            _dom.addEventListener("touchmove", (e) => __awaiter(this, void 0, void 0, function* () {
-                //  e.preventDefault();
-                //WV_Window.Left = cx + e.changedTouches[0]["clientX"]-tcx
-                //WV_Window.Top = cy + e.changedTouches[0]["clientY"]-tcy
-                WV_Window.Text = yield WV_Window.GetMousePoint()[0];
-                console.log(e);
-                //@ts-ignore
-                //chrome.webview.hostObjects.WV_Window.WindowDrag_touchMove();
-            }));
-            _dom.addEventListener("touchend", (e) => __awaiter(this, void 0, void 0, function* () {
-                // e.preventDefault();
-                //@ts-ignore
-                //chrome.webview.hostObjects.sync.WV_Window.WindowDrag_touchEnd();
-            }));
-        }
-        function maximized() {
-            WV_Window.WindowState = "Maximized";
-            initWindowState();
-        }
-        function minimized() {
-            WV_Window.WindowState = "Minimized";
-        }
-        function normal() {
-            WV_Window.WindowState = "Normal";
-            initWindowState();
-        }
-        function initWindowState() {
-            return __awaiter(this, void 0, void 0, function* () {
-                if ((yield WV_Window.WindowState) === "Maximized") {
-                    dom_window.classList.add("maximized");
-                    btn_normal.style.display = "flex";
-                    btn_maximized.style.display = "none";
-                }
-                else {
-                    dom_window.classList.remove("maximized");
-                    btn_normal.style.display = "none";
-                    btn_maximized.style.display = "flex";
-                }
-            });
         }
     }
-    SizeChanged() {
-        return __awaiter(this, void 0, void 0, function* () {
-            //console.log("SizeChanged:"+ await WV_Window.WindowState);
-            this.initWindowState();
-        });
+    SizeChanged(left, top, width, height, windowState) {
+        console.log("SizeChanged  " + windowState);
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+        this.initWindowState();
     }
-    Move() {
-        this.dom_window.classList.remove("maximized");
-        this.btn_normal.style.display = "none";
-        this.btn_maximized.style.display = "flex";
+    Move(left, top, width, height, windowState) {
+        console.log("move  " + windowState);
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+        this.initWindowState();
     }
     VisibleChanged() {
         console.log("VisibleChanged");
@@ -161,11 +112,31 @@ class BaseWindow {
     FormClosing() {
         console.log("FormClosing");
     }
-    GotFocus() {
-        console.log("GotFocus");
+    /** 最大化 */
+    maximized() {
+        WV_Window.WindowState = "Maximized";
+        this.initWindowState();
     }
-    LostFocus() {
-        console.log("LostFocus");
+    /** 最小化 */
+    minimized() {
+        WV_Window.WindowState = "Minimized";
+    }
+    /** 視窗化 */
+    normal() {
+        WV_Window.WindowState = "Normal";
+        this.initWindowState();
+    }
+    initWindowState() {
+        if (this.windowState === "Maximized") {
+            this.dom_window.classList.add("maximized");
+            this.btn_normal.style.display = "flex";
+            this.btn_maximized.style.display = "none";
+        }
+        else {
+            this.dom_window.classList.remove("maximized");
+            this.btn_normal.style.display = "none";
+            this.btn_maximized.style.display = "flex";
+        }
     }
     /**
      * 取得拖曳進來的檔案路徑
@@ -190,6 +161,10 @@ class BaseWindow {
             return _dropPath;
         });
     }
+    /**
+     * 設定視窗標題
+     * @param txt
+     */
     setTitle(txt) {
         return __awaiter(this, void 0, void 0, function* () {
             WV_Window.Text = txt;

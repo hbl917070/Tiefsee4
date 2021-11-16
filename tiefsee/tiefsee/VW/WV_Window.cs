@@ -21,33 +21,56 @@ namespace tiefsee {
         public WebWindow M;
 
 
-  
+
 
         public WV_Window(WebWindow m) {
-            this.M = m;        
-             
+            this.M = m;
+
         }
 
 
-        public WebWindow newWindow(String _url) {
+        /*public WebWindow newWindow(String _url) {
             //String _url = $"http://localhost:{55444}/www/MainWindow.html";
 
-            var w = new WebWindow(_url);
+            var w = new WebWindow(_url, new string[0]);
             w.Show();
             //w.Left
             //w.Owner
             return w;
+        }*/
+
+        /// <summary>
+        /// 取得執行檔目錄
+        /// </summary>
+        /// <returns></returns>
+        public string GetAppDirPath() {
+            return System.AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        /// <summary>
+        /// 取得執行檔路徑
+        /// </summary>
+        /// <returns></returns>
+        public string GetAppPath() {
+            return M.GetType().Assembly.Location;
+        }
+
+        /// <summary>
+        /// 取得命令列參數
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetArguments() {
+            return M.args;
         }
 
 
-
-
+        /// <summary>
+        /// 返回 WebWindow
+        /// </summary>
+        /// <returns></returns>
         public WebWindow This() {
             return M;
         }
-
-
-
 
 
         /// <summary>
@@ -167,7 +190,7 @@ namespace tiefsee {
 
         }
 
-          
+
 
 
 

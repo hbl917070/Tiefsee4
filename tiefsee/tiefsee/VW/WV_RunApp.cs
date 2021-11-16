@@ -15,12 +15,12 @@ namespace tiefsee {
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
-    public class WV_UseOtherAppOpen {
+    public class WV_RunApp {
 
 
         WebWindow M;
 
-        public WV_UseOtherAppOpen(WebWindow m) {
+        public WV_RunApp(WebWindow m) {
             this.M = m;
         }
 
@@ -50,12 +50,12 @@ namespace tiefsee {
         public string[] GetStartMenuList() {
 
             string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
-            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs");
+            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs");//開始選單的路徑
 
             List<String> arFile = new List<string>();//
 
             if (Directory.Exists(path)) {
-                fun_遍歷開始選單資料夾(path, arFile);//windows的開始
+                GetDirForeachFiles(path, arFile);//windows的開始
             }
 
             return arFile.ToArray();
@@ -63,10 +63,10 @@ namespace tiefsee {
 
 
         /// <summary>
-        /// 
+        /// 取得資料夾內所有檔案
         /// </summary>
         /// <param name="s_資料夾"></param>
-        private void fun_遍歷開始選單資料夾(String sDir, List<String> arFile) {
+        private void GetDirForeachFiles(String sDir, List<String> arFile) {
 
             var arDir = Directory.EnumerateFileSystemEntries(sDir);
 
@@ -74,12 +74,11 @@ namespace tiefsee {
                 if (File.Exists(item)) {
                     arFile.Add(item);
                 } else if (Directory.Exists(item)) {
-                    fun_遍歷開始選單資料夾(item, arFile);
+                    GetDirForeachFiles(item, arFile);
                 }
             }
 
         }
-
 
 
         /// <summary>
@@ -93,12 +92,6 @@ namespace tiefsee {
 
             return path;
         }
-
-
-
-
-
-
 
 
 

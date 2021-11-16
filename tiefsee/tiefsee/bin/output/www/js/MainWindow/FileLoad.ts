@@ -22,7 +22,7 @@ class FileLoad {
         var flag: number;//目前在哪一張圖片
         var sortType = FileSortType.name;//排序方式
 
-        //img=圖片  pdf=pdf、ai  movie=影片  frames=多幀圖片  txt=文字
+        /** unknown=未知 img=圖片  pdf=pdf、ai  movie=影片  imgs=多幀圖片  txt=文字 */
         var groupType: string = "img";
 
 
@@ -36,18 +36,24 @@ class FileLoad {
         this.getGroupType = getGroupType;
         this.setGroupType = setGroupType;
 
-        async function loadFiles(DirPath: string, ar: string[] = []) {
 
-            arWaitingList = [];
+        /**
+         * 載入檔案陣列
+         * @param dirPath 
+         * @param arName 
+         */
+        async function loadFiles(dirPath: string, arName: string[] = []) {
+
+            //改用C#處理，增加執行效率
+            arWaitingList = await WV_Directory.GetFiles2(dirPath, arName);
 
             /*if (await WV_File.Exists(DirPath) === true) {
                 DirPath = await WV_Path.GetDirectoryName(DirPath);
             }*/
-
-            if (ar.length > 0) {
-                for (let i = 0; i < ar.length; i++) {
-                    let item = ar[i];
-                    let filePath = await WV_Path.Combine([DirPath, item]);
+            /*if (arName.length > 0) {
+                for (let i = 0; i < arName.length; i++) {
+                    let item = arName[i];
+                    let filePath =  WV_Path.Combine([dirPath, item]);
                     if (await WV_File.Exists(filePath)) {//如果是檔案
                         arWaitingList.push(filePath);
 
@@ -58,13 +64,12 @@ class FileLoad {
                         }
                     }
                 }
-            }
+            }*/
 
             let path = arWaitingList[0];//以拖曳進來的第一個檔案為開啟對象
 
             //arWaitingList = await filter();
             arWaitingList = await sort(sortType);
-
 
             //目前檔案位置
             flag = 0;
@@ -80,9 +85,10 @@ class FileLoad {
         }
 
 
-
-
-
+        /**
+         * 載入單一檔案
+         * @param path 
+         */
         async function loadFile(path: string) {
 
             arWaitingList = [];
@@ -91,9 +97,9 @@ class FileLoad {
 
                 arWaitingList = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
 
-
                 arWaitingList = await sort(sortType);
-                groupType = await fileToGroupType(arWaitingList[0])
+                groupType = GroupType.img;
+                //groupType = await fileToGroupType(arWaitingList[0])
                 arWaitingList = await filter();
 
             } else if (await WV_File.Exists(path) === true) {//如果是檔案
@@ -102,12 +108,17 @@ class FileLoad {
                 arWaitingList = await WV_Directory.GetFiles(p, "*.*");
 
                 groupType = await fileToGroupType(path)
-
                 arWaitingList = await filter();
+                if (arWaitingList.indexOf(path) === -1) {
+                    arWaitingList.splice(0, 0, path);
+                }
                 arWaitingList = await sort(sortType);
             }
 
-
+            /*var time = new Date();
+            var int_毫秒 = (new Date()).getTime() - time.getTime();
+            var s_輸出時間差 = (int_毫秒) + "ms";
+            console.log(s_輸出時間差)*/
 
             //目前檔案位置
             flag = 0;
@@ -123,12 +134,20 @@ class FileLoad {
 
 
 
-
+        /**
+         * 取得目前檔案的路徑
+         * @returns 
+         */
         function getFilePath() {
             var p = arWaitingList[flag];
             return p;
         }
 
+
+        /**
+         * 
+         * @param _flag 
+         */
         async function show(_flag?: number) {
 
             if (_flag !== undefined) { flag = _flag; }
@@ -136,23 +155,30 @@ class FileLoad {
             // M.fileShow.loadurl()
             if (groupType == GroupType.img) {
                 M.fileShow.openImage(getFilePath())
-
             }
-
             if (groupType == GroupType.pdf) {
                 let imgurl = "/api/getpdf/" + encodeURIComponent(getFilePath())
                 M.fileShow.openPdf(imgurl)
             }
+            if (groupType == GroupType.txt) {
+                let imgurl = getFilePath()
+                M.fileShow.openTxt(imgurl)
+            }
 
-            let title = `「${flag + 1}/${arWaitingList.length}」 ${await WV_Path.GetFileName(getFilePath())}`;
+            if (groupType == GroupType.unknown) {
+                let base64 = await WV_Image.GetFileIcon(getFilePath(), 256);
+                M.fileShow.openImage(base64)
+            }
+
+            let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;
             baseWindow.setTitle(title);
         }
+
 
         /**
          * 載入下一個檔案
          */
         async function next() {
-
             flag += 1;
             if (flag >= arWaitingList.length) { flag = 0; }
             show();
@@ -163,12 +189,9 @@ class FileLoad {
          * 載入上一個檔案
          */
         async function prev() {
-
             flag -= 1;
             if (flag < 0) { flag = arWaitingList.length - 1; }
-
             show();
-
         }
 
 
@@ -182,18 +205,18 @@ class FileLoad {
          */
         async function fileToGroupType(path: string) {
 
-            let fileExt = (await WV_Path.GetExtension(path)).toLocaleLowerCase();
+            let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
 
             for (var type in GroupType) {
-                for (let j = 0; j < allowFileType(type).length; j++) {
-                    const fileType = allowFileType(type)[j];
+                for (let j = 0; j < M.config.allowFileType(type).length; j++) {
+                    const fileType = M.config.allowFileType(type)[j];
                     if (fileExt == "." + fileType["ext"]) {
                         return type;
                     }
                 }
             }
 
-            return ""
+            return GroupType.unknown;
         }
 
         function getGroupType() {
@@ -214,10 +237,10 @@ class FileLoad {
             for (let i = 0; i < arWaitingList.length; i++) {
 
                 let path = arWaitingList[i];
-                let fileExt = (await WV_Path.GetExtension(path)).toLocaleLowerCase();
+                let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
 
-                for (let j = 0; j < allowFileType(groupType).length; j++) {
-                    const fileType = allowFileType(groupType)[j];
+                for (let j = 0; j < M.config.allowFileType(groupType).length; j++) {
+                    const fileType = M.config.allowFileType(groupType)[j];
                     if (fileExt == "." + fileType["ext"]) {
                         ar.push(path);
                         break;
@@ -228,6 +251,7 @@ class FileLoad {
             return ar;
 
         }
+
 
 
         /**
@@ -265,45 +289,6 @@ class FileLoad {
 
     }
 
-}
-
-const GroupType = {
-    img: "img",
-    pdf: "pdf",
-    movie: "movie",
-    frames: "frames",
-    txt: "txt"
-}
-
-
-
-function allowFileType(type: string) {
-
-    if (type === GroupType.img) {
-        return [
-            { ext: "jpg", type: ["image"] },
-            { ext: "png", type: ["image"] },
-            { ext: "gif", type: ["image"] },
-            { ext: "bmp", type: ["image"] },
-            { ext: "webp", type: ["image"] },
-            { ext: "jpeg", type: ["image"] },
-            { ext: "tif", type: ["image"] },
-            { ext: "svg", type: ["image"] },
-            { ext: "", type: ["image"] },
-            { ext: "", type: ["image"] },
-            { ext: "", type: ["image"] },
-            { ext: "", type: ["image"] },
-        ]
-    }
-
-    if (type === GroupType.pdf) {
-        return [
-            { ext: "pdf", type: ["pdf"] },
-            { ext: "ai", type: ["pdf"] },
-        ]
-    }
-
-    return []
 }
 
 

@@ -12,147 +12,148 @@ class MainWindow {
     constructor() {
         baseWindow = new BaseWindow(); //初始化視窗
         var dom_tools = document.getElementById("main-tools");
+        var config = new Config(this);
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
+        new InitMenu(this);
         this.dom_tools = dom_tools;
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.menu = menu;
+        this.config = config;
         new MainTools(this);
-        initDomImport();
-        var OtherAppOpenList = {
-            absolute: [
-                { name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
-                { name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
-                { name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: "img" },
-            ],
-            startMenu: [
-                { name: "photoshop", type: ["img"] },
-                { name: "illustrator", type: ["img"] },
-                { name: "Lightroom", type: ["img"] },
-                { name: "Paint", type: ["img"] },
-                { name: "photo", type: ["img"] },
-                { name: "gimp", type: ["img"] },
-                { name: "FireAlpaca", type: ["img"] },
-                { name: "openCanvas", type: ["img"] },
-                { name: "SAI", type: ["img"] },
-                { name: "Pixia", type: ["img"] },
-                { name: "AzPainter2", type: ["img"] },
-                { name: "CorelDRAW", type: ["img"] },
-                { name: "Krita", type: ["img"] },
-                { name: "Artweaver", type: ["img"] },
-                { name: "Lightroom", type: ["img"] },
-                { name: "Perfect Effects", type: ["img"] },
-                { name: "Artweaver ", type: ["img"] },
-                { name: "Honeyview", type: ["img"] },
-                { name: "ACDSee", type: ["img"] },
-                { name: "IrfanView", type: ["img"] },
-                { name: "XnView", type: ["img"] },
-                { name: "FastStone", type: ["img"] },
-                { name: "Hamana", type: ["img"] },
-                { name: "Vieas", type: ["img"] },
-                { name: "FreeVimager", type: ["img"] },
-                { name: "Imagine", type: ["img"] },
-                { name: "XnConvert", type: ["img"] },
-                { name: "FotoSketcher", type: ["img"] },
-                { name: "PhoXo", type: ["img"] },
-            ]
-        };
-        function initOtherAppOpen() {
+        init();
+        function init() {
             return __awaiter(this, void 0, void 0, function* () {
-                var dom_Open3DMSPaint = document.getElementById("menu-Open3DMSPaint");
-                if (dom_Open3DMSPaint !== null) {
-                    dom_Open3DMSPaint.onclick = () => __awaiter(this, void 0, void 0, function* () {
-                        let filePath = fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        menu.close(); //關閉menu
-                        WV_UseOtherAppOpen.Open3DMSPaint(filePath); //開啟檔案
-                    });
+                initDomImport();
+                //取得命令列參數
+                let args = yield WV_Window.GetArguments();
+                if (args.length === 0) {
+                    fileShow.openWelcome();
                 }
-                var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
-                let ar_lnk = yield WV_UseOtherAppOpen.GetStartMenuList();
-                for (let i = 0; i < ar_lnk.length; i++) {
-                    const lnk = ar_lnk[i];
-                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
-                    name = name.substr(0, name.length - 4);
-                    if (yield OtherAppOpenCheck(lnk, name)) {
-                        let exePath = yield WV_System.LnkToExePath(lnk);
-                        //let imgBase64 = await WV_Image.GetExeIcon_32(exePath);
-                        let imgBase64 = yield WV_Image.GetFileIcon(exePath, 32);
-                        let dom = newDiv(`
-                        <div class="menu-hor-item">
-                            <div class="menu-hor-icon">
-                                <img src="${imgBase64}">
-                            </div>
-                            <div class="menu-hor-txt" i18n="">${name}</div>
-                        </div>
-                    `);
-                        dom.onclick = () => __awaiter(this, void 0, void 0, function* () {
-                            let filePath = fileLoad.getFilePath(); //目前顯示的檔案
-                            if ((yield WV_File.Exists(filePath)) === false) {
-                                return;
-                            }
-                            menu.close(); //關閉menu
-                            WV_UseOtherAppOpen.ProcessStart(exePath, filePath, true, false); //開啟檔案
-                        });
-                        dom_menuOtherAppOpen === null || dom_menuOtherAppOpen === void 0 ? void 0 : dom_menuOtherAppOpen.append(dom);
-                    }
-                }
-            });
-        }
-        initOtherAppOpen();
-        function OtherAppOpenCheck(lnk, name) {
-            return __awaiter(this, void 0, void 0, function* () {
-                //let name = await WV_Path.GetFileNameWithoutExtension(lnk);
-                for (let i = 0; i < OtherAppOpenList.startMenu.length; i++) {
-                    const item = OtherAppOpenList.startMenu[i];
-                    if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) > -1) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
-        window.addEventListener("dragenter", dragenter, false);
-        window.addEventListener("dragover", dragover, false);
-        window.addEventListener('drop', drop, false);
-        function dragenter(e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-        function dragover(e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-        function drop(e) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (e.dataTransfer === null) {
-                    return;
-                }
-                let files = e.dataTransfer.files;
-                console.log(files);
-                //取得拖曳進來的檔案路徑
-                let _dropPath = yield baseWindow.GetDropPath();
-                if (_dropPath === "") {
-                    return;
-                }
-                if (files.length > 1) {
-                    let arFile = [];
-                    for (let i = 0; i < files.length; i++) {
-                        const item = files[i];
-                        arFile.push(item.name);
-                    }
-                    _dropPath = yield WV_Path.GetDirectoryName(_dropPath);
-                    yield fileLoad.loadFiles(_dropPath, arFile);
+                else if (args.length === 1) {
+                    fileLoad.loadFile(args[0]);
                 }
                 else {
-                    yield fileLoad.loadFile(_dropPath);
+                    fileLoad.loadFiles(args[0], args);
                 }
-                e.stopPropagation();
-                e.preventDefault();
+                //封鎖原生右鍵選單
+                document.addEventListener('contextmenu', function (e) {
+                    e.preventDefault();
+                });
+                //圖片區域也允許拖曳視窗
+                fileShow.dom_image.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
+                    //圖片沒有出現捲動軸
+                    if (fileShow.view_image.getIsOverflowX() === false && fileShow.view_image.getIsOverflowY() === false) {
+                        if (e.button === 0) { //滑鼠左鍵
+                            let WindowState = baseWindow.windowState;
+                            if (WindowState === "Normal") {
+                                WV_Window.WindowDrag("move");
+                            }
+                        }
+                    }
+                }));
+                //double click 最大化或視窗化
+                Lib.AddEventDblclick(baseWindow.dom_titlebarTxt, () => __awaiter(this, void 0, void 0, function* () {
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Maximized") {
+                        baseWindow.normal();
+                    }
+                    else {
+                        baseWindow.maximized();
+                    }
+                }));
+                Lib.AddEventDblclick(dom_tools, (e) => __awaiter(this, void 0, void 0, function* () {
+                    //如果是按鈕就不雙擊全螢幕
+                    let _dom = e.target;
+                    if (_dom) {
+                        if (_dom.classList.contains("js-noDrag")) {
+                            return;
+                        }
+                    }
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Maximized") {
+                        baseWindow.normal();
+                    }
+                    else {
+                        baseWindow.maximized();
+                    }
+                }));
+                Lib.AddEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Maximized") {
+                        baseWindow.normal();
+                    }
+                    else {
+                        baseWindow.maximized();
+                    }
+                }));
+                //讓工具列允許拖曳視窗
+                dom_tools.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
+                    let _dom = e.target;
+                    if (_dom) {
+                        if (_dom.classList.contains("js-noDrag")) {
+                            return;
+                        }
+                    }
+                    if (e.button === 0) { //滑鼠左鍵
+                        yield WV_Window.WindowDrag("move");
+                    }
+                }));
+                //在工具列滾動時，進行水平移動
+                dom_tools.addEventListener("mousewheel", (e) => {
+                    let scrollLeft = dom_tools.scrollLeft;
+                    let deltaY = 0; //上下滾動的量
+                    if (e.deltaY) {
+                        deltaY = e.deltaY;
+                    }
+                    if (deltaY > 0) { //往右
+                        dom_tools.scroll(scrollLeft + 20, 0);
+                    }
+                    if (deltaY < 0) { //往左
+                        dom_tools.scroll(scrollLeft - 20, 0);
+                    }
+                }, false);
+                window.addEventListener("dragenter", dragenter, false);
+                window.addEventListener("dragover", dragover, false);
+                window.addEventListener('drop', drop, false);
+                function dragenter(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                function dragover(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                function drop(e) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        if (e.dataTransfer === null) {
+                            return;
+                        }
+                        let files = e.dataTransfer.files;
+                        //console.log(files);
+                        //取得拖曳進來的檔案路徑
+                        let _dropPath = yield baseWindow.GetDropPath();
+                        if (_dropPath === "") {
+                            return;
+                        }
+                        if (files.length > 1) {
+                            let arFile = [];
+                            for (let i = 0; i < files.length; i++) {
+                                const item = files[i];
+                                arFile.push(item.name);
+                            }
+                            _dropPath = yield WV_Path.GetDirectoryName(_dropPath);
+                            yield fileLoad.loadFiles(_dropPath, arFile);
+                        }
+                        else {
+                            yield fileLoad.loadFile(_dropPath);
+                        }
+                        e.stopPropagation();
+                        e.preventDefault();
+                    });
+                }
             });
         }
     }

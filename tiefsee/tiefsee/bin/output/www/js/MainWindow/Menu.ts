@@ -74,7 +74,7 @@ class Menu {
             }
 
             window.onblur = function () { //視窗失去焦點
-                //func_close();//關閉menu
+                func_close();//關閉menu
             };
 
         }

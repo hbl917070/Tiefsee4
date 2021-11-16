@@ -1,6 +1,15 @@
 
 interface WV_Window {
 
+    /** 取得執行檔目錄 */
+    GetAppDirPath(): string;
+
+    /** 取得執行檔路徑 */
+    GetAppPath(): string;
+
+    /** 取得命令列參數 */
+    GetArguments(): string[];
+
     /**關閉視窗 */
     Close(): void;
 
@@ -31,21 +40,22 @@ interface WV_Window {
     /**拖曳視窗 */
     WindowDrag(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move')): void;
 
-    WindowDragUp();
-    WindowDragDown(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move'));
 
-    WindowDrag_touchStart();
-    WindowDrag_touchMove();
-    WindowDrag_touchEnd();
-    GetMousePoint();
 }
 
 
 
 interface WV_Directory {
 
+    /**
+     * 檔名陣列 轉 路徑陣列 (用於載入複數檔案
+     * @param dirPath 資料夾路徑
+     * @param arName 檔名陣列
+     */
+    GetFiles2(dirPath: string, arName: string[] = []): string[];
+
     /** 回傳資料夾裡面的檔案 */
-    GetFiles(path: string, searchPattern: string): [];
+    GetFiles(path: string, searchPattern: string): string[];
 
     /** 判斷指定路徑是否參考磁碟上的現有目錄 */
     Exists(path: string): bool;
@@ -194,8 +204,18 @@ interface WV_Path {
 
 interface WV_System {
 
+    SetClipboard_FileToPng(path: string): bool;
+
+    SetClipboard_FileToTxt(path: string): bool;
+
+    SetClipboard_FileToBase64(path: string): bool;
+
+    SetClipboard_FileToImg(path: string): bool;
+
+    SetClipboard_File(path: string): bool;
+
     /** 存入剪貼簿 */
-    SetClipboard_txt(path: string): bool;
+    SetClipboard_Txt(txt: string): bool;
 
     /** 取得作業系統所在的槽，例如 「C:\」 */
     GetSystemRoot(): string;
@@ -226,7 +246,7 @@ interface WV_System {
 }
 
 
-interface WV_UseOtherAppOpen {
+interface WV_RunApp {
 
     /** 以其他程式開啟(系統原生選單) */
     ShowMenu(path: string): void;
