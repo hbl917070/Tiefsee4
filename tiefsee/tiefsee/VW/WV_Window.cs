@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,7 +26,6 @@ namespace tiefsee {
 
         public WV_Window(WebWindow m) {
             this.M = m;
-
         }
 
 
@@ -38,6 +38,16 @@ namespace tiefsee {
             //w.Owner
             return w;
         }*/
+
+        /// <summary>
+        /// 設定視窗的 icon
+        /// </summary>
+        /// <param name="path"></param>
+        public void SetIcon(string path) {
+            if (File.Exists(path)) {
+                M.Icon = new System.Drawing.Icon(path);
+            }
+        }
 
         /// <summary>
         /// 取得執行檔目錄

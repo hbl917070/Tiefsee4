@@ -106,12 +106,12 @@ class Config {
     /**
      * 取得檔案類型
      * @param path 
-     * @returns 
+     * @returns 小寫附檔名，例如「jpg」
      */
     public async getFileType(path: string) {
 
         let fileType = await WV_File.GetFIleType(path);//取得檔案類型
-
+//console.log("fileType  " + fileType)
         let fileExt = Lib.GetExtension(path);//取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
 
@@ -130,6 +130,8 @@ class Config {
         if (fileType == "8075") {
             if (fileExt == "docx") { return "docx"; }
             if (fileExt == "pptx") { return "pptx"; }
+            if (fileExt == "xlsx") { return "xlsx"; }
+            if (fileExt == "xlsm") { return "xlsm"; }
             if (fileExt == "apk") { return "apk"; }
             if (fileExt == "xd") { return "xd"; }
             return "zip";

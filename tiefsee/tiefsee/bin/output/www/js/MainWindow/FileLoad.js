@@ -18,6 +18,7 @@ class FileLoad {
         var sortType = FileSortType.name; //排序方式
         /** unknown=未知 img=圖片  pdf=pdf、ai  movie=影片  imgs=多幀圖片  txt=文字 */
         var groupType = "img";
+        var fileLoadType; //資料夾或自定名單
         this.getArray = () => { return arWaitingList; };
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
@@ -26,6 +27,7 @@ class FileLoad {
         this.getFilePath = getFilePath;
         this.getGroupType = getGroupType;
         this.setGroupType = setGroupType;
+        this.getFileLoadType = getFileLoadType;
         /**
          * 載入檔案陣列
          * @param dirPath
@@ -33,6 +35,7 @@ class FileLoad {
          */
         function loadFiles(dirPath, arName = []) {
             return __awaiter(this, void 0, void 0, function* () {
+                fileLoadType = FileLoadType.userDefined; //名單類型，自定義
                 //改用C#處理，增加執行效率
                 arWaitingList = yield WV_Directory.GetFiles2(dirPath, arName);
                 /*if (await WV_File.Exists(DirPath) === true) {
@@ -73,6 +76,7 @@ class FileLoad {
          */
         function loadFile(path) {
             return __awaiter(this, void 0, void 0, function* () {
+                fileLoadType = FileLoadType.dir; //名單類型，資料夾內所有檔案
                 arWaitingList = [];
                 if ((yield WV_Directory.Exists(path)) === true) { //如果是資料夾
                     arWaitingList = yield WV_Directory.GetFiles(path, "*.*"); //取得資料夾內所有檔案
@@ -115,6 +119,13 @@ class FileLoad {
             return p;
         }
         /**
+         * 取得名單類型
+         * @returns
+         */
+        function getFileLoadType() {
+            return fileLoadType;
+        }
+        /**
          *
          * @param _flag
          */
@@ -123,23 +134,22 @@ class FileLoad {
                 if (_flag !== undefined) {
                     flag = _flag;
                 }
-                // M.fileShow.loadurl()
-                if (groupType == GroupType.img) {
-                    M.fileShow.openImage(getFilePath());
+                let path = getFilePath();
+                //如果是自定名單，就根據檔案類型判斷要用什麼方式顯示檔案
+                if (fileLoadType === FileLoadType.userDefined) {
+                    groupType = yield fileToGroupType(path);
                 }
-                if (groupType == GroupType.pdf) {
-                    let imgurl = "/api/getpdf/" + encodeURIComponent(getFilePath());
-                    M.fileShow.openPdf(imgurl);
+                if (groupType === GroupType.img || groupType === GroupType.unknown) {
+                    M.fileShow.openImage(path);
                 }
-                if (groupType == GroupType.txt) {
-                    let imgurl = getFilePath();
-                    M.fileShow.openTxt(imgurl);
+                if (groupType === GroupType.pdf) {
+                    M.fileShow.openPdf(path);
                 }
-                if (groupType == GroupType.unknown) {
-                    let base64 = yield WV_Image.GetFileIcon(getFilePath(), 256);
-                    M.fileShow.openImage(base64);
+                if (groupType === GroupType.txt) {
+                    M.fileShow.openTxt(path);
                 }
-                let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;
+                //修改視窗標題
+                let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(path)}`;
                 baseWindow.setTitle(title);
             });
         }
@@ -168,16 +178,17 @@ class FileLoad {
             });
         }
         /**
-         *
+         * 從檔案類型判斷，要使用什麼用什麼類型來顯示
          * @returns
          */
         function fileToGroupType(path) {
             return __awaiter(this, void 0, void 0, function* () {
-                let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
+                //let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
+                let fileExt = yield M.config.getFileType(path);
                 for (var type in GroupType) {
                     for (let j = 0; j < M.config.allowFileType(type).length; j++) {
                         const fileType = M.config.allowFileType(type)[j];
-                        if (fileExt == "." + fileType["ext"]) {
+                        if (fileExt == fileType["ext"]) {
                             return type;
                         }
                     }
@@ -242,6 +253,16 @@ class FileLoad {
         }
     }
 }
+/**
+ * 名單類型
+ */
+var FileLoadType;
+(function (FileLoadType) {
+    /** 資料夾內的全部檔案 */
+    FileLoadType[FileLoadType["dir"] = 0] = "dir";
+    /** 自定名單 */
+    FileLoadType[FileLoadType["userDefined"] = 1] = "userDefined";
+})(FileLoadType || (FileLoadType = {}));
 /**
  * 排序類型
  */

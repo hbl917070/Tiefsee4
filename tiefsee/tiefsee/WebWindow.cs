@@ -92,7 +92,6 @@ namespace tiefsee {
                 wv2.CoreWebView2.AddHostObjectToScript("WV_System", new WV_System(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", new WV_RunApp(this));
                 wv2.CoreWebView2.AddHostObjectToScript("WV_Image", new WV_Image(this));
-
                 
                 // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
@@ -110,7 +109,9 @@ namespace tiefsee {
 
             this.Opacity = 0;
             this.Show();
-
+            this.Width = 550;
+            this.Height = 400;
+            
             //
 
             parentForm = new FormNone();

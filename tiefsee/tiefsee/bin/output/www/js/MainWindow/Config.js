@@ -102,11 +102,12 @@ class Config {
     /**
      * 取得檔案類型
      * @param path
-     * @returns
+     * @returns 小寫附檔名，例如「jpg」
      */
     getFileType(path) {
         return __awaiter(this, void 0, void 0, function* () {
             let fileType = yield WV_File.GetFIleType(path); //取得檔案類型
+            //console.log("fileType  " + fileType)
             let fileExt = Lib.GetExtension(path); //取得附檔名
             fileExt = fileExt.replace(".", "").toLocaleLowerCase();
             if (fileType == "255216") {
@@ -151,6 +152,12 @@ class Config {
                 }
                 if (fileExt == "pptx") {
                     return "pptx";
+                }
+                if (fileExt == "xlsx") {
+                    return "xlsx";
+                }
+                if (fileExt == "xlsm") {
+                    return "xlsm";
                 }
                 if (fileExt == "apk") {
                     return "apk";

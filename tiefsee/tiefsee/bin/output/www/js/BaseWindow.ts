@@ -35,7 +35,6 @@ class BaseWindow {
 
 
     SizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
-        console.log("SizeChanged  " + windowState)
         this.left = left;
         this.top = top;
         this.width = width;
@@ -46,14 +45,13 @@ class BaseWindow {
     }
 
     public Move(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
-console.log("move  " + windowState)
         this.left = left;
         this.top = top;
         this.width = width;
         this.height = height;
         this.windowState = windowState;
 
-        this.initWindowState();
+        //this.initWindowState();
     }
 
     public VisibleChanged() {

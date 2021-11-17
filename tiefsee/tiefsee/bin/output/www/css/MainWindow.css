@@ -113,11 +113,13 @@
 }
 
 .main-tools-group {
-  display: flex;
+  display: none;
   margin-left: 3px;
   margin-bottom: 3px;
 }
-
+.main-tools-group[active="true"] {
+  display: flex ;
+}
 /*垂直線*/
 .main-tools-hr {
   width: 1px;

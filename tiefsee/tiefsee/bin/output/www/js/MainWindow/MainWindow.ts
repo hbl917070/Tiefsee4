@@ -12,6 +12,7 @@ class MainWindow {
     public fileLoad;
     public fileShow;
     public menu;
+    public script;
 
     constructor() {
 
@@ -23,6 +24,7 @@ class MainWindow {
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
+        var script = new Script(this);
         new InitMenu(this);
 
         this.dom_tools = dom_tools;
@@ -30,7 +32,7 @@ class MainWindow {
         this.fileShow = fileShow;
         this.menu = menu;
         this.config = config;
-
+        this.script = script;
 
         new MainTools(this);
         init();
@@ -57,6 +59,12 @@ class MainWindow {
                 e.preventDefault();
             })
 
+            //設定icon
+            async function initIcon() {
+                let path = Lib.Combine([ await WV_Window.GetAppDirPath(),"www\\img\\logo.ico" ]);
+                WV_Window.SetIcon(path);
+            }
+            initIcon();
 
             //圖片區域也允許拖曳視窗
             fileShow.dom_image.addEventListener("mousedown", async (e) => {

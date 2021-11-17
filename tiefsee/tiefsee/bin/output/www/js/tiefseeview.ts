@@ -311,6 +311,11 @@ class Tieefseeview {
         dom_tiefseeview.addEventListener("mousedown", (ev) => {
             ev.preventDefault();
 
+            //沒有出現捲動條就不要執行拖曳
+            if (getIsOverflowX() === false && getIsOverflowY() === false) {
+                return;
+            }
+
             //避免在捲動軸上面也觸發
             if (ev.target !== dom_tiefseeview) {
                 isMoving = false;
@@ -355,6 +360,11 @@ class Tieefseeview {
             if (ev.maxPointers > 1) {
                 isMoving = false;
                 isPaning = false;
+                return;
+            }
+
+            //沒有出現捲動條就不要執行拖曳
+            if (getIsOverflowX() === false && getIsOverflowY() === false) {
                 return;
             }
 
@@ -1173,12 +1183,13 @@ class Tieefseeview {
                             context.drawImage(sprites, 0, 0,);
                         });
                 }
+                /*
                 console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
 
                 //
                 var int_毫秒 = (new Date()).getTime() - time.getTime();
                 var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
-                console.log(s_輸出時間差);
+                console.log(s_輸出時間差);*/
 
 
                 //#######/

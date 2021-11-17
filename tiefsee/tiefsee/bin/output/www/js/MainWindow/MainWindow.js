@@ -16,12 +16,14 @@ class MainWindow {
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
+        var script = new Script(this);
         new InitMenu(this);
         this.dom_tools = dom_tools;
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.menu = menu;
         this.config = config;
+        this.script = script;
         new MainTools(this);
         init();
         function init() {
@@ -42,6 +44,14 @@ class MainWindow {
                 document.addEventListener('contextmenu', function (e) {
                     e.preventDefault();
                 });
+                //設定icon
+                function initIcon() {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
+                        WV_Window.SetIcon(path);
+                    });
+                }
+                initIcon();
                 //圖片區域也允許拖曳視窗
                 fileShow.dom_image.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
                     //圖片沒有出現捲動軸

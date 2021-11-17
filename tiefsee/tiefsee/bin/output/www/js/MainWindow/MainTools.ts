@@ -5,96 +5,95 @@ class MainTools {
 
     constructor(M: MainWindow) {
 
-        initTools();
-
+        initToolsImg();
+        initToolsPdf();
+        initToolsTxt();
+        initToolsWelcome();
 
         //-----------------
 
 
 
         /**
-         * 初始化 工具列
+         * 初始化 工具列 圖片
          */
-        function initTools() {
+        function initToolsImg() {
 
-            //快速拖曳
+
+            //上一張
             addToolsBtn({
-                group: "img",
-                name: "dragDropFile",
-                icon: "/img/default/tool-dragDropFile.svg",
+                group: GroupType.img,
+                name: "prev",
+                icon: "/img/default/tool-prev.svg",
                 func: (btn) => {
-
-                    btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) {//滑鼠左鍵
-                            setTimeout(() => {
-                                WV_File.DragDropFile(M.fileLoad.getFilePath())
-                            }, 50);
-                        }
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.prev()
                     });
+                },
+            });
 
-                    btn.addEventListener("mousedown", (e) => {
-                        console.log(e.button )
-                        if (e.button === 2) {//滑鼠左鍵
-                           WV_File.ShowContextMenu(M.fileLoad.getFilePath(),true);
-                        }
+            //下一張
+            addToolsBtn({
+                group: GroupType.img,
+                name: "next",
+                icon: "/img/default/tool-next.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.next()
                     });
                 },
             });
 
             // 開啟檔案
             addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.menu.open_Button(document.getElementById("menu-open"), btn, "menuActive");
+                        M.script.menu.showOpen(btn);
+
                     });
                 },
-            });
-
-
-            //上一張
-            addToolsBtn({
-                group: "img",
-                name: "prev",
-                icon: "/img/default/tool-prev.svg",
-                func: (btn) => {
-                    btn.addEventListener("click", () => {
-                        M.fileLoad.prev()
-                    });
-                },
-
-            });
-
-            //下一張
-            addToolsBtn({
-                group: "img",
-                name: "next",
-                icon: "/img/default/tool-next.svg",
-                func: (btn) => {
-                    btn.addEventListener("click", () => {
-                        M.fileLoad.next()
-                    });
-                },
-
             });
 
             //複製
             addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.menu.open_Button(document.getElementById("menu-copy"), btn, "menuActive");
+                        M.script.menu.showCopy(btn);
                     });
                 },
             });
 
+
+            //快速拖曳
+            addToolsBtn({
+                group: GroupType.img,
+                name: "dragDropFile",
+                icon: "/img/default/tool-dragDropFile.svg",
+                func: (btn) => {
+                    btn.addEventListener("mousedown", (e) => {
+                        if (e.button === 0) {//滑鼠左鍵
+                            M.script.file.DragDropFile();
+                        }
+                    });
+                    btn.addEventListener("mousedown", (e) => {
+                        console.log(e.button)
+                        if (e.button === 2) {//滑鼠左鍵
+                            M.script.file.ShowContextMenu();
+                        }
+                    });
+                },
+            });
+
+
             //刪除
             /*addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-delete.svg",
                 func: (btn) => {
@@ -106,7 +105,7 @@ class MainTools {
 
             //搜圖
             /*addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-search.svg",
                 func: (btn) => {
@@ -118,7 +117,7 @@ class MainTools {
 
             //大量瀏覽模式
             /*addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-allBrowse.svg",
                 func: (btn) => {
@@ -130,25 +129,24 @@ class MainTools {
 
             //旋轉與鏡像
             addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-rotate.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
-
+                        M.script.menu.showRotate(btn);
                     });
                 },
             });
 
             //全滿
             addToolsBtn({
-                group: "img",
+                group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-full.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-100%']);
+                        M.script.img.zoomFull();
                     });
                 },
             });
@@ -157,7 +155,7 @@ class MainTools {
 
             //縮放比例
             addToolsHtml({
-                group: "img",
+                group: GroupType.img,
                 html: `
                 <div class="main-tools-btn js-noDrag">
                     <div style="margin:0 3px; pointer-events:none;" data-name="btnScale">1%</div>
@@ -165,17 +163,17 @@ class MainTools {
             `,
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.fileShow.view_image.zoomFull(TieefseeviewZoomType['100%']);
+                        M.script.img.zoom100();
                     });
                 },
             });
 
 
-            addToolsHr({ group: "img", });
+            addToolsHr({ group: GroupType.img, });
 
             //圖片size
             addToolsHtml({
-                group: "img",
+                group: GroupType.img,
                 html: `
                 <div class="main-tools-txt" data-name="infoSize">
                    100<br>200
@@ -184,11 +182,11 @@ class MainTools {
                 func: (btn) => { },
             });
 
-            addToolsHr({ group: "img", });
+            addToolsHr({ group: GroupType.img, });
 
             // 檔案類型、檔案大小
             addToolsHtml({
-                group: "img",
+                group: GroupType.img,
                 html: `
                 <div class="main-tools-txt" data-name="infoType">
                     JPG<br>123.4MB
@@ -197,11 +195,11 @@ class MainTools {
                 func: (btn) => { },
             });
 
-            addToolsHr({ group: "img", });
+            addToolsHr({ group: GroupType.img, });
 
             // 檔案修改時間
             addToolsHtml({
-                group: "img",
+                group: GroupType.img,
                 html: `
                 <div class="main-tools-txt" data-name="infoWriteTime">
                     2021
@@ -213,6 +211,233 @@ class MainTools {
         }
 
 
+        /**
+        * 初始化 工具列 pdf
+        */
+        function initToolsPdf() {
+
+            //上一張
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "prev",
+                icon: "/img/default/tool-prev.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.prev()
+                    });
+                },
+            });
+
+            //下一張
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "next",
+                icon: "/img/default/tool-next.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.next()
+                    });
+                },
+            });
+
+            // 開啟檔案
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "file",
+                icon: "/img/default/tool-open.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.menu.showOpen(btn);
+                    });
+                },
+            });
+
+            //複製
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "file",
+                icon: "/img/default/tool-copy.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.menu.showCopy(btn);
+                    });
+                },
+            });
+
+
+            //快速拖曳
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "dragDropFile",
+                icon: "/img/default/tool-dragDropFile.svg",
+                func: (btn) => {
+                    btn.addEventListener("mousedown", (e) => {
+                        if (e.button === 0) {//滑鼠左鍵
+                            M.script.file.DragDropFile();
+                        }
+                    });
+                    btn.addEventListener("mousedown", (e) => {
+                        console.log(e.button)
+                        if (e.button === 2) {//滑鼠左鍵
+                            M.script.file.ShowContextMenu();
+                        }
+                    });
+                },
+            });
+
+            addToolsHr({ group: GroupType.pdf, });
+
+            // 檔案類型、檔案大小
+            addToolsHtml({
+                group: GroupType.pdf,
+                html: `
+                <div class="main-tools-txt" data-name="infoType">
+                    JPG<br>123.4MB
+                </div>
+            `,
+                func: (btn) => { },
+            });
+
+            addToolsHr({ group: GroupType.pdf, });
+
+            // 檔案修改時間
+            addToolsHtml({
+                group: GroupType.pdf,
+                html: `
+                <div class="main-tools-txt" data-name="infoWriteTime">
+                    2021
+                </div>
+            `,
+                func: (btn) => { },
+            });
+
+        }
+
+ 
+        /**
+        * 初始化 工具列 txt
+        */
+        function initToolsTxt() {
+
+            //上一張
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "prev",
+                icon: "/img/default/tool-prev.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.prev()
+                    });
+                },
+            });
+
+            //下一張
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "next",
+                icon: "/img/default/tool-next.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.fileLoad.next()
+                    });
+                },
+            });
+
+            // 開啟檔案
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "file",
+                icon: "/img/default/tool-open.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.menu.showOpen(btn);
+                    });
+                },
+            });
+
+            //複製
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "file",
+                icon: "/img/default/tool-copy.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.menu.showCopy(btn);
+                    });
+                },
+            });
+
+
+            //快速拖曳
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "dragDropFile",
+                icon: "/img/default/tool-dragDropFile.svg",
+                func: (btn) => {
+                    btn.addEventListener("mousedown", (e) => {
+                        if (e.button === 0) {//滑鼠左鍵
+                            M.script.file.DragDropFile();
+                        }
+                    });
+                    btn.addEventListener("mousedown", (e) => {
+                        console.log(e.button)
+                        if (e.button === 2) {//滑鼠左鍵
+                            M.script.file.ShowContextMenu();
+                        }
+                    });
+                },
+            });
+
+            addToolsHr({ group: GroupType.txt, });
+
+            // 檔案類型、檔案大小
+            addToolsHtml({
+                group: GroupType.txt,
+                html: `
+                <div class="main-tools-txt" data-name="infoType">
+                    JPG<br>123.4MB
+                </div>
+            `,
+                func: (btn) => { },
+            });
+
+            addToolsHr({ group: GroupType.txt, });
+
+            // 檔案修改時間
+            addToolsHtml({
+                group: GroupType.txt,
+                html: `
+                <div class="main-tools-txt" data-name="infoWriteTime">
+                    2021
+                </div>
+            `,
+                func: (btn) => { },
+            });
+
+        }
+
+
+        /**
+        * 初始化 工具列 welcome
+        */
+        function initToolsWelcome() {
+
+            // 開啟檔案
+            addToolsBtn({
+                group: GroupType.welcome,
+                name: "file",
+                icon: "/img/default/tool-open.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.open.openFile();
+                    });
+                },
+            });
+
+
+        }
+
+        //---------------------
 
         /**
          * 新增 html
@@ -222,7 +447,6 @@ class MainTools {
             group: string, html: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-
             addToolsDom({
                 group: item.group,
                 dom: newDiv(item.html),
@@ -300,7 +524,3 @@ class MainTools {
 }
 
 
-
-
-
-//export { MainTools };

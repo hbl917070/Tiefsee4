@@ -21,14 +21,7 @@ class InitMenu {
             if (dom_OpenFile !== null) {
                 dom_OpenFile.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*", "開啟檔案")
-                    if (arFile.length === 0) { return; }
-                    if (arFile.length === 1) {
-                        M.fileLoad.loadFile(arFile[0]);
-                    }
-                    if (arFile.length > 1) {
-                        M.fileLoad.loadFiles(arFile[0], arFile);
-                    }
+                    M.script.open.openFile();
                 }
             }
 
@@ -38,15 +31,7 @@ class InitMenu {
             if (dom_newWindow !== null) {
                 dom_newWindow.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    let exePath = await WV_Window.GetAppPath();
-
-                    if (await WV_File.Exists(filePath)) {
-                        WV_RunApp.ProcessStart(exePath, filePath, true, false);
-                    } else {
-                        WV_RunApp.ProcessStart(exePath, "", true, false);
-                    }
+                    M.script.open.newWindow();
                 }
             }
 
@@ -55,22 +40,16 @@ class InitMenu {
             if (dom_ShowOnExplorer !== null) {
                 dom_ShowOnExplorer.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_File.ShowOnExplorer(filePath);
+                    M.script.open.showOnExplorer();
                 }
             }
 
-            //檔案右鍵選單
+            //顯示檔案右鍵選單
             var dom_ShowSystemMenu = document.getElementById("menuitem-ShowSystemMenu");
             if (dom_ShowSystemMenu !== null) {
                 dom_ShowSystemMenu.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_File.ShowContextMenu(filePath, true);
+                    M.script.open.ShowContextMenu();
                 }
             }
 
@@ -79,10 +58,7 @@ class InitMenu {
             if (dom_PrintFile !== null) {
                 dom_PrintFile.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_File.PrintFile(filePath);
+                    M.script.open.PrintFile();
                 }
             }
 
@@ -91,10 +67,7 @@ class InitMenu {
             if (dom_SetWallpaper !== null) {
                 dom_SetWallpaper.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetWallpaper(filePath);
+                    M.script.open.SetWallpaper();
                 }
             }
 
@@ -103,10 +76,7 @@ class InitMenu {
             if (dom_RunApp !== null) {
                 dom_RunApp.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_RunApp.ShowMenu(filePath);
+                    M.script.open.RunApp();
                 }
             }
 
@@ -114,10 +84,8 @@ class InitMenu {
             var dom_Open3DMSPaint = document.getElementById("menuitem-Open3DMSPaint");
             if (dom_Open3DMSPaint !== null) {
                 dom_Open3DMSPaint.onclick = async () => {
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
                     M.menu.close();//關閉menu
-                    WV_RunApp.Open3DMSPaint(filePath);//開啟檔案
+                    M.script.open.Open3DMSPaint();
                 }
             }
 
@@ -277,7 +245,7 @@ class InitMenu {
                 dom_rotateCw.onclick = async () => {
                     M.menu.close();//關閉menu
 
-                    M.fileShow.view_image.setDegReverse(undefined, undefined);
+                    M.fileShow.view_image.setDegForward(undefined, undefined);
                 }
             }
 
@@ -287,7 +255,7 @@ class InitMenu {
                 dom_rotateCcw.onclick = async () => {
                     M.menu.close();//關閉menu
 
-                    M.fileShow.view_image.setDegForward(undefined, undefined);
+                    M.fileShow.view_image.setDegReverse(undefined, undefined);
                 }
             }
 

@@ -9,10 +9,10 @@
     <title>Tiefsee 4</title>
 
     <!--google字體-->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/BaseWindow.css">
+    <link rel="stylesheet" href="/css/BaseWindow.css">
     <script src="/js/BaseWindow.js"></script>
     <script src="/js/Lib.js"></script>
 
@@ -21,10 +21,10 @@
     <script src="/js/library/jquery-3.6.0.min.js"></script>
     <script src="/js/library/jquery.easing.js"></script>
 
-    <script src="/js/tiefseeview.js"></script>
-    <link rel="stylesheet" href="css/tiefseeview.css">
-    <link rel="stylesheet" href="css/MainWindow.css">
-    <link rel="stylesheet" href="css/menu.css">
+    <script src="/js/Tiefseeview.js"></script>
+    <link rel="stylesheet" href="/css/tiefseeview.css">
+    <link rel="stylesheet" href="/css/MainWindow.css">
+    <link rel="stylesheet" href="/css/menu.css">
 
     <script src="/js/MainWindow/Config.js"></script>
     <script src="/js/MainWindow/MainTools.js"></script>
@@ -32,6 +32,7 @@
     <script src="/js/MainWindow/FileShow.js"></script>
     <script src="/js/MainWindow/Menu.js"></script>
     <script src="/js/MainWindow/InitMenu.js"></script>
+    <script src="/js/MainWindow/Script.js"></script>
     <script src="/js/MainWindow/MainWindow.js"></script>
 
     <script>
@@ -201,11 +202,13 @@
         <!-- 標題列 -->
         <div class="window-titlebar">
 
-            <div class="titlebar-txt"> <span>tiefsee 4</span></div>
+            <div class="titlebar-txt">
+                <span>tiefsee 4</span>
+            </div>
 
             <div class="titlebar-tools">
 
-                <div class="titlebar-tools-btn titlebar-tools-menu">
+                <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
                     <import type="svg" src="/img/default/window-menu.svg"> </import>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-topmost">
@@ -251,9 +254,7 @@
                             <div>
                                 <img class="welcomeview-logo" src="/img/logo.svg">
                                 <div class="welcomeview-txt">Tiefsee beta 001</div>
-
                             </div>
-
                         </div>
                         <textarea id="main-txtview" class="main-txtview"></textarea>
                         <div id="main-tiefseeview" class="main-tiefseeview"></div>

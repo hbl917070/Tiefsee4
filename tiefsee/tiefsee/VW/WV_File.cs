@@ -94,17 +94,32 @@ namespace tiefsee {
             if (Directory.Exists(fileName)) { return ""; }
             if (File.Exists(fileName) == false) { return ""; }
 
+            string fileType = string.Empty;
+
             try {
 
                 using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
                     using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
 
-                        string fileType = string.Empty;
+                        /*var ar = br.ReadSingle(300);
+                        for (int i = 0; i < ar.Length; i++) {
+                            fileType += ar[i];
+                        }*/
 
-                        byte data = br.ReadByte();
+                       
+                        for (int i = 0; i < 2; i++) {
+                            fileType += br.ReadByte();
+                        }
+
+                        /*byte data = br.ReadByte();
                         fileType += data.ToString();
                         data = br.ReadByte();
                         fileType += data.ToString();
+
+                        for (int i = 0; i < 30; i++) {
+                            data = br.ReadByte();
+                            fileType += data.ToString();
+                        }*/
 
                         if (fs != null) {
                             fs.Close();

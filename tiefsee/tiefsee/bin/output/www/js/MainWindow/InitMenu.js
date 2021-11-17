@@ -24,16 +24,7 @@ class InitMenu {
                 if (dom_OpenFile !== null) {
                     dom_OpenFile.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let arFile = yield WV_File.OpenFileDialog(true, "All files (*.*)|*.*", "開啟檔案");
-                        if (arFile.length === 0) {
-                            return;
-                        }
-                        if (arFile.length === 1) {
-                            M.fileLoad.loadFile(arFile[0]);
-                        }
-                        if (arFile.length > 1) {
-                            M.fileLoad.loadFiles(arFile[0], arFile);
-                        }
+                        M.script.open.openFile();
                     });
                 }
                 //另開視窗
@@ -41,14 +32,7 @@ class InitMenu {
                 if (dom_newWindow !== null) {
                     dom_newWindow.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        let exePath = yield WV_Window.GetAppPath();
-                        if (yield WV_File.Exists(filePath)) {
-                            WV_RunApp.ProcessStart(exePath, filePath, true, false);
-                        }
-                        else {
-                            WV_RunApp.ProcessStart(exePath, "", true, false);
-                        }
+                        M.script.open.newWindow();
                     });
                 }
                 //開啟檔案位置
@@ -56,23 +40,15 @@ class InitMenu {
                 if (dom_ShowOnExplorer !== null) {
                     dom_ShowOnExplorer.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_File.ShowOnExplorer(filePath);
+                        M.script.open.showOnExplorer();
                     });
                 }
-                //檔案右鍵選單
+                //顯示檔案右鍵選單
                 var dom_ShowSystemMenu = document.getElementById("menuitem-ShowSystemMenu");
                 if (dom_ShowSystemMenu !== null) {
                     dom_ShowSystemMenu.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_File.ShowContextMenu(filePath, true);
+                        M.script.open.ShowContextMenu();
                     });
                 }
                 //列印
@@ -80,11 +56,7 @@ class InitMenu {
                 if (dom_PrintFile !== null) {
                     dom_PrintFile.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_File.PrintFile(filePath);
+                        M.script.open.PrintFile();
                     });
                 }
                 //設成桌布
@@ -92,11 +64,7 @@ class InitMenu {
                 if (dom_SetWallpaper !== null) {
                     dom_SetWallpaper.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetWallpaper(filePath);
+                        M.script.open.SetWallpaper();
                     });
                 }
                 //選擇其他應用程式
@@ -104,23 +72,15 @@ class InitMenu {
                 if (dom_RunApp !== null) {
                     dom_RunApp.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_RunApp.ShowMenu(filePath);
+                        M.script.open.RunApp();
                     });
                 }
                 //以3D小畫家開啟
                 var dom_Open3DMSPaint = document.getElementById("menuitem-Open3DMSPaint");
                 if (dom_Open3DMSPaint !== null) {
                     dom_Open3DMSPaint.onclick = () => __awaiter(this, void 0, void 0, function* () {
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
                         M.menu.close(); //關閉menu
-                        WV_RunApp.Open3DMSPaint(filePath); //開啟檔案
+                        M.script.open.Open3DMSPaint();
                     });
                 }
                 //以第三方程式開啟
@@ -269,7 +229,7 @@ class InitMenu {
                 if (dom_rotateCw !== null) {
                     dom_rotateCw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setDegReverse(undefined, undefined);
+                        M.fileShow.view_image.setDegForward(undefined, undefined);
                     });
                 }
                 //逆時針90°
@@ -277,7 +237,7 @@ class InitMenu {
                 if (dom_rotateCcw !== null) {
                     dom_rotateCcw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setDegForward(undefined, undefined);
+                        M.fileShow.view_image.setDegReverse(undefined, undefined);
                     });
                 }
                 //水平鏡像

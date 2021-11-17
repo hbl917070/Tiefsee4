@@ -1,6 +1,7 @@
 
 interface WV_Window {
 
+
     /** 取得執行檔目錄 */
     GetAppDirPath(): string;
 
@@ -12,6 +13,9 @@ interface WV_Window {
 
     /**關閉視窗 */
     Close(): void;
+
+    /** 設定視窗的 icon */
+    SetIcon(psth:string);
 
     /** 標題 */
     Text: string;

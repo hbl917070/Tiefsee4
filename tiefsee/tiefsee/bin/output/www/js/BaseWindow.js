@@ -89,7 +89,6 @@ class BaseWindow {
         }
     }
     SizeChanged(left, top, width, height, windowState) {
-        console.log("SizeChanged  " + windowState);
         this.left = left;
         this.top = top;
         this.width = width;
@@ -98,13 +97,12 @@ class BaseWindow {
         this.initWindowState();
     }
     Move(left, top, width, height, windowState) {
-        console.log("move  " + windowState);
         this.left = left;
         this.top = top;
         this.width = width;
         this.height = height;
         this.windowState = windowState;
-        this.initWindowState();
+        //this.initWindowState();
     }
     VisibleChanged() {
         console.log("VisibleChanged");

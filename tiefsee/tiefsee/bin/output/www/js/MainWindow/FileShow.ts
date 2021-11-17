@@ -34,7 +34,17 @@ class FileShow {
 
         function setShowType(groupType: string) {
 
+            let arToolsGroup = document.querySelectorAll(".main-tools-group");
+            for (let i = 0; i < arToolsGroup.length; i++) {
+                const item = arToolsGroup[i];
+                item.setAttribute("active", "");
+            }
+
             if (groupType === GroupType.img) {
+
+                //更換工具列
+                getToolsDom(GroupType.img)?.setAttribute("active", "true");
+
                 dom_image.style.display = "block";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -51,6 +61,10 @@ class FileShow {
             }
 
             if (groupType === GroupType.txt) {
+
+                //更換工具列
+                getToolsDom(GroupType.txt)?.setAttribute("active", "true");
+
                 dom_image.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "block";
@@ -63,6 +77,10 @@ class FileShow {
             }
 
             if (groupType === GroupType.pdf) {
+
+                //更換工具列
+                getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
+
                 dom_image.style.display = "none";
                 dom_pdfview.style.display = "block";
                 dom_txtview.style.display = "none";
@@ -75,6 +93,10 @@ class FileShow {
             }
 
             if (groupType === GroupType.welcome) {
+
+                //更換工具列
+                getToolsDom(GroupType.welcome)?.setAttribute("active", "true");
+
                 dom_image.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -88,6 +110,11 @@ class FileShow {
         }
 
 
+        function getToolsDom(type: string): HTMLElement | null {
+            return M.dom_tools.querySelector(`.main-tools-group[data-name="${type}"]`);
+
+        }
+
         /**
          * 
          * @param _path 
@@ -97,9 +124,17 @@ class FileShow {
             setShowType(GroupType.img);//改變顯示類型
 
             let imgurl = _path;//圖片網址
-            if (await WV_File.Exists(_path) === true) {
+
+            if (M.fileLoad.getGroupType() === GroupType.unknown) {
+                imgurl = await WV_Image.GetFileIcon(_path, 256);
+
+            } else {
                 imgurl = "/api/getimg/" + encodeURIComponent(_path);
+
             }
+
+
+            //if (await WV_File.Exists(_path) === true) { }
 
             //await view_image.loadImg(imgurl);
             view_image.setLoading(true);
@@ -114,32 +149,6 @@ class FileShow {
             view_image.setLoading(false);
 
             view_image.transformRefresh(false)
-            view_image.zoomFull(TieefseeviewZoomType['full-100%']);
-
-
-            //圖片長寬
-            let dom_size = M.dom_tools.querySelector(`[data-name="infoSize"]`);
-            if (dom_size != null) {
-                dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
-            }
-
-            if (await WV_File.Exists(_path) === true) {
-                //檔案類型
-                let dom_type = M.dom_tools.querySelector(`[data-name="infoType"]`);
-                if (dom_type != null) {
-                    let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
-                    let fileLength = await getFileLength(_path);
-                    dom_type.innerHTML = `${fileType}<br>${fileLength}`;
-                }
-
-                //檔案修改時間
-                let dom_writeTime = M.dom_tools.querySelector(`[data-name="infoWriteTime"]`);
-                if (dom_writeTime != null) {
-                    let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
-                    let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
-                    dom_writeTime.innerHTML = time;
-                }
-            }
 
             view_image.setEventChangeZoom(((ratio: number) => {
 
@@ -147,10 +156,36 @@ class FileShow {
                 if (dom_btnScale != null) {
                     dom_btnScale.innerHTML = (ratio * 100).toFixed(0) + "%";
                 }
-
                 //$('#output-overflow').html(`水平：${view_image.getIsOverflowX()}  垂直：${view_image.getIsOverflowY()}`);
-
             }))
+
+
+            view_image.zoomFull(TieefseeviewZoomType['full-100%']);
+
+
+            //圖片長寬
+            let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
+            if (dom_size != null) {
+                dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
+            }
+
+            if (await WV_File.Exists(_path) === true) {
+                //檔案類型
+                let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
+                if (dom_type != null) {
+                    let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                    let fileLength = await getFileLength(_path);
+                    dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+                }
+
+                //檔案修改時間
+                let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
+                if (dom_writeTime != null) {
+                    let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
+                    let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                    dom_writeTime.innerHTML = time;
+                }
+            }
 
         }
 
@@ -160,25 +195,60 @@ class FileShow {
          * 
          * @param _url 
          */
-        async function openPdf(_url: string) {
+        async function openPdf(_path: string) {
             setShowType(GroupType.pdf);//改變顯示類型
+
+            let _url = "/api/getpdf/" + encodeURIComponent(_path)
             dom_pdfview.setAttribute("src", _url);
+
+            //檔案類型
+            let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
+            if (dom_type != null) {
+                let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                let fileLength = await getFileLength(_path);
+                dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+            }
+
+            //檔案修改時間
+            let dom_writeTime = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
+            if (dom_writeTime != null) {
+                let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
+                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                dom_writeTime.innerHTML = time;
+            }
         }
 
 
         /**
          * 
-         * @param path 
+         * @param _path 
          */
-        async function openTxt(path: string) {
+        async function openTxt(_path: string) {
             setShowType(GroupType.txt);//改變顯示類型
-            dom_txtview.value = await WV_File.GetText(path);
+            dom_txtview.value = await WV_File.GetText(_path);
+
+            //檔案類型
+            let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
+            if (dom_type != null) {
+                let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                let fileLength = await getFileLength(_path);
+                dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+            }
+
+            //檔案修改時間
+            let dom_writeTime = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoWriteTime"]`);
+            if (dom_writeTime != null) {
+                let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
+                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                dom_writeTime.innerHTML = time;
+            }
         }
 
         /**
          * 
          */
         async function openWelcome() {
+            baseWindow.setTitle("TiefSee 4");
             setShowType(GroupType.welcome);//改變顯示類型
         }
 
@@ -205,7 +275,7 @@ class FileShow {
         }
 
 
-       
+
 
     }
 
