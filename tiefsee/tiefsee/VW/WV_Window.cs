@@ -4,14 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace tiefsee {
 
 
-    [ClassInterface(ClassInterfaceType.AutoDual)]
+    //[ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     /// <summary>
@@ -29,15 +28,86 @@ namespace tiefsee {
         }
 
 
-        /*public WebWindow newWindow(String _url) {
-            //String _url = $"http://localhost:{55444}/www/MainWindow.html";
+        /// <summary>
+        /// 新開視窗
+        /// </summary>
+        /// <param name="_url"></param>
+        /// <param name="_args"></param>
+        /// <returns></returns>
+        public WebWindow NewWindow(string _url, object[] _args) {
 
-            var w = new WebWindow(_url, new string[0]);
-            w.Show();
-            //w.Left
-            //w.Owner
+            // _url = $"http://localhost:{55444}/www/MainWindow.html";
+
+            string[] args = new string[_args.Length];
+            for (int i = 0; i < args.Length; i++) {
+                args[i] = _args[i].ToString();
+            }
+
+            var w = new WebWindow(_url, args, M);
+            //w.StartPosition = FormStartPosition.CenterParent;
+            //w.Show();
+
+            //var x = new WebStart(_url);
+            //x.Show();
+            //x.Owner = M.parentForm;
             return w;
+
+        }
+
+
+        /// <summary>
+        /// 設定視窗最小size
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
+        public void SetMinimumSize(int w, int h) {
+            M.MinimumSize = new System.Drawing.Size(w, h);
+        }
+
+
+        /// <summary>
+        /// 視窗使用毛玻璃特效
+        /// </summary>
+        public void SetAERO() {
+
+            EnableBlur(M.Handle);
+        }
+
+        /// <summary>
+        /// 傳入 webWindow，將其設為目前視窗的子視窗
+        /// </summary>
+        /// <param name="_window"></param>
+        public void SetOwner(object _window) {
+            if (_window != null) {
+                WebWindow webwindow = (WebWindow)_window;
+                //webwindow.Owner = M.parentForm;
+                //webwindow.ShowInTaskbar = true;
+                webwindow.Owner = M;
+                //M.StartPosition = FormStartPosition.CenterParent;
+            }
+        }
+
+        /// <summary>
+        /// 在父親視窗運行js
+        /// </summary>
+        /// <param name="js"></param>
+        /// <returns></returns>
+        public async Task<string> RunJsOfParent(string js) {
+            if (M.parentWindow == null) { return ""; }
+            if (M.parentWindow.wv2.CoreWebView2 == null) { return ""; }
+            string txt = await M.parentWindow.wv2.CoreWebView2.ExecuteScriptAsync(js);
+            //System.Console.WriteLine(AsyncContext);
+            return txt;
+        }
+
+
+        /*public async Task<string> RunJs(string js) {
+            if (M.wv2.CoreWebView2 == null) { return ""; }
+            string f = await M.wv2.CoreWebView2.ExecuteScriptAsync(js);
+            return f;
         }*/
+
+
 
         /// <summary>
         /// 設定視窗的 icon
@@ -238,13 +308,59 @@ namespace tiefsee {
 
 
 
+        #region 毛玻璃
 
-        [System.Runtime.CompilerServices.IndexerName("Items")]
-        public string this[int index] {
-            get { return m_dictionary[index]; }
-            set { m_dictionary[index] = value; }
+
+        [DllImport("user32.dll")]
+        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct WindowCompositionAttributeData {
+            public WindowCompositionAttribute Attribute;
+            public IntPtr Data;
+            public int SizeOfData;
         }
-        private Dictionary<int, string> m_dictionary = new Dictionary<int, string>();
+
+        internal enum WindowCompositionAttribute {
+            WCA_ACCENT_POLICY = 19
+        }
+
+        internal enum AccentState {
+            ACCENT_DISABLED = 0,
+            ACCENT_ENABLE_GRADIENT = 1,
+            ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+            ACCENT_ENABLE_BLURBEHIND = 3,
+            ACCENT_INVALID_STATE = 4
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct AccentPolicy {
+            public AccentState AccentState;
+            public int AccentFlags;
+            public int GradientColor;
+            public int AnimationId;
+        }
+
+        internal void EnableBlur(IntPtr hwnd) {
+            var accent = new AccentPolicy();
+            var accentStructSize = Marshal.SizeOf(accent);
+            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
+
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            Marshal.StructureToPtr(accent, accentPtr, false);
+
+            var data = new WindowCompositionAttributeData();
+            data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+            data.SizeOfData = accentStructSize;
+            data.Data = accentPtr;
+
+            SetWindowCompositionAttribute(hwnd, ref data);
+
+            Marshal.FreeHGlobal(accentPtr);
+        }
+
+        #endregion
+
     }
 
 

@@ -11,16 +11,17 @@ class MainTools {
          */
         function initToolsImg() {
             //上一張
-            addToolsBtn({
+            /*addToolsBtn({
                 group: GroupType.img,
                 name: "prev",
                 icon: "/img/default/tool-prev.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.fileLoad.prev();
+                        M.script.fileLoad.prev()
                     });
                 },
             });
+
             //下一張
             addToolsBtn({
                 group: GroupType.img,
@@ -28,10 +29,10 @@ class MainTools {
                 icon: "/img/default/tool-next.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.fileLoad.next();
+                        M.script.fileLoad.next()
                     });
                 },
-            });
+            });*/
             // 開啟檔案
             addToolsBtn({
                 group: GroupType.img,
@@ -106,6 +107,17 @@ class MainTools {
                     });
                 },
             });*/
+            //設定
+            addToolsBtn({
+                group: GroupType.img,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
             //旋轉與鏡像
             addToolsBtn({
                 group: GroupType.img,
@@ -243,6 +255,17 @@ class MainTools {
                     });
                 },
             });
+            //設定
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
             addToolsHr({ group: GroupType.pdf, });
             // 檔案類型、檔案大小
             addToolsHtml({
@@ -333,6 +356,17 @@ class MainTools {
                     });
                 },
             });
+            //設定
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
             addToolsHr({ group: GroupType.txt, });
             // 檔案類型、檔案大小
             addToolsHtml({
@@ -368,6 +402,17 @@ class MainTools {
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.open.openFile();
+                    });
+                },
+            });
+            //設定
+            addToolsBtn({
+                group: GroupType.welcome,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
                     });
                 },
             });

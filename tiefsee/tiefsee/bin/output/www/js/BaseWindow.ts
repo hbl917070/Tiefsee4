@@ -31,34 +31,73 @@ class BaseWindow {
     public height: number = 0;
     public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
+    public closingEvents: (() => void)[] = [];//關閉視窗時執行的function
 
 
 
-    SizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.windowState = windowState;
 
-        this.initWindowState();
+
+
+    /**
+     * 取得拖曳進來的檔案路徑
+     * @returns 
+     */
+    public async getDropPath(): Promise<string> {
+
+        //觸發拖曳檔案後，C#會修改全域變數temp_dropPath
+
+        let _dropPath: string = "";
+        for (let i = 0; i < 100; i++) {
+         
+
+            if (temp_dropPath !== "") {
+                _dropPath = temp_dropPath;
+                _dropPath = decodeURIComponent(temp_dropPath)
+                if (_dropPath.indexOf("file:///") === 0) {
+                    _dropPath = _dropPath.substr(8);
+                }
+                break;
+            }
+            await sleep(10);
+        }
+        temp_dropPath = "";
+        _dropPath = _dropPath.replace(/[/]/g, "\\");
+        return _dropPath;
     }
 
-    public Move(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.windowState = windowState;
 
-        //this.initWindowState();
+    /**
+     * 設定視窗標題
+     * @param txt 
+     */
+    public async setTitle(txt: string) {
+        WV_Window.Text = txt;
+        this.dom_titlebarTxt.innerHTML = `<span>${txt}</span>`;
     }
 
-    public VisibleChanged() {
-        console.log("VisibleChanged");
+
+    /**
+     * 開啟新的子視窗
+     * @param _name 
+     * @returns 
+     */
+    public async newWindow(_name: string) {
+        let url = location.protocol + '//' + location.host + "/www/" + _name
+        var w = await WV_Window.NewWindow(url, []);
+        WV_Window.SetOwner(w);//設為子視窗
+        //w.Focus();//取得焦點
+        return w;
     }
-    public FormClosing() {
-        console.log("FormClosing");
+
+
+    /**
+     * 關閉視窗
+     */
+    public async close() {
+        for (let i = 0; i < this.closingEvents.length; i++) {
+            await this.closingEvents[i]();
+        }
+        WV_Window.Close()
     }
 
     /** 最大化 */
@@ -79,7 +118,6 @@ class BaseWindow {
     }
 
 
-
     private initWindowState() {
         if (this.windowState === "Maximized") {
             this.dom_window.classList.add("maximized");
@@ -91,44 +129,6 @@ class BaseWindow {
             this.btn_maximized.style.display = "flex";
         }
     }
-
-
-    /**
-     * 取得拖曳進來的檔案路徑
-     * @returns 
-     */
-    async GetDropPath(): Promise<string> {
-
-        //觸發拖曳檔案後，C#會修改全域變數temp_dropPath
-
-        let _dropPath: string = "";
-        for (let i = 0; i < 100; i++) {
-            await sleep(10);
-
-            if (temp_dropPath !== "") {
-                _dropPath = temp_dropPath;
-                _dropPath = decodeURIComponent(temp_dropPath)
-                if (_dropPath.indexOf("file:///") === 0) {
-                    _dropPath = _dropPath.substr(8);
-                }
-                break;
-            }
-        }
-
-        _dropPath = _dropPath.replace(/[/]/g, "\\");
-        return _dropPath;
-    }
-
-
-    /**
-     * 設定視窗標題
-     * @param txt 
-     */
-    async setTitle(txt: string) {
-        WV_Window.Text = txt;
-        this.dom_titlebarTxt.innerHTML = `<span>${txt}</span>`;
-    }
-
 
     constructor() {
 
@@ -150,11 +150,17 @@ class BaseWindow {
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
 
+        //判斷目前的狀態是視窗化還是最大化
+        (async () => {
+            this.windowState = await WV_Window.WindowState;
+            this.initWindowState();
+        })()
 
-        btn_menu.addEventListener("click", e => {
+
+        btn_menu?.addEventListener("click", e => {
             //alert()
         });
-        btn_topmost.addEventListener("click", async e => {
+        btn_topmost?.addEventListener("click", async e => {
             this.topMost = await WV_Window.TopMost;
             if (this.topMost === true) {
                 btn_topmost.setAttribute("active", "");
@@ -163,18 +169,20 @@ class BaseWindow {
             }
             WV_Window.TopMost = !this.topMost;
         });
-        btn_normal.addEventListener("click", async e => {
+        btn_normal?.addEventListener("click", async e => {
             this.normal()
         });
-        btn_minimized.addEventListener("click", async e => {
+        btn_minimized?.addEventListener("click", async e => {
             this.minimized()
         });
-        btn_maximized.addEventListener("click", async e => {
+        btn_maximized?.addEventListener("click", async e => {
             this.maximized()
         });
-        btn_close.addEventListener("click", async e => {
-            WV_Window.Close()
+        btn_close?.addEventListener("click", async e => {
+            this.close();
         });
+
+
 
         //註冊視窗邊框拖曳
         windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");
@@ -200,99 +208,38 @@ class BaseWindow {
 
     }
 
+
+
+
+    //由C#主動呼叫
+    SizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+
+        this.initWindowState();
+    }
+
+    //由C#主動呼叫
+    public Move(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+        //this.initWindowState();
+    }
+
+    /*public VisibleChanged() {
+        console.log("VisibleChanged");
+    }
+    public FormClosing() {
+         console.log("FormClosing");
+    }*/
 }
 
 //---------------
 
-
-
-/**
- * 匯入外部檔案
- */
-async function initDomImport() {
-
-    let ar_dom = document.querySelectorAll("import");
-    for (let i = 0; i < ar_dom.length; i++) {
-        const _dom = ar_dom[i];
-        let src = _dom.getAttribute("src");
-        if (src != null)
-            await fetch(src, {
-                "method": "get",
-            }).then((response) => {
-                return response.text();
-            }).then((html) => {
-                _dom.outerHTML = html;
-            }).catch((err) => {
-                console.log("error: ", err);
-            });
-    }
-}
-
-/**
- * html字串 轉 dom物件
- * @param html 
- * @returns 
- */
-function newDiv(html: string): HTMLDivElement {
-    let div = document.createElement("div");
-    div.innerHTML = html
-
-    return <HTMLDivElement>div.getElementsByTagName("div")[0];
-}
-
-
-/**
- * 等待
- * @param ms 毫秒
- */
-async function sleep(ms: number) {
-    await new Promise((resolve, reject) => {
-        setTimeout(function () {
-            resolve(0);//繼續往下執行
-        }, ms);
-    })
-}
-
-/**
- * 轉 number
- */
-function toNumber(t: string | number): number {
-    if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳     
-    if (typeof t === 'string') { return Number(t.replace('px', '')); } //如果是string，去掉px後轉型成數字
-    return 0;
-}
-
-
-interface Date {
-    format(format: string): string;
-}
-
-
-/**
- * 對Date的擴充套件，將 Date 轉化為指定格式的String
- * 月(M)、日(d)、小時(h)、分(m)、秒(s)、季度(q) 可以用 1-2 個佔位符，
- * 年(y)可以用 1-4 個佔位符，毫秒(S)只能用 1 個佔位符(是 1-3 位的數字)
- * 例子：
- * (new Date()).format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
- * (new Date()).format("yyyy-M-d h:m:s.S")   ==> 2006-7-2 8:9:4.18
- */
-Date.prototype.format = function (format: string) {
-    var o: any = {
-        "M+": this.getMonth() + 1,//month
-        "d+": this.getDate(),//day
-        "h+": this.getHours(),//hour
-        "m+": this.getMinutes(),//minute
-        "s+": this.getSeconds(),//second
-        "q+": Math.floor((this.getMonth() + 3) / 3),//quarter
-        "S": this.getMilliseconds()//millisecond
-    }
-
-    if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-        (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o) if (new RegExp("(" + k + ")").test(format))
-        format = format.replace(RegExp.$1,
-            RegExp.$1.length == 1 ? o[k] :
-                ("00" + o[k]).substr(("" + o[k]).length));
-    return format;
-}
 

@@ -21,7 +21,7 @@ class MainTools {
 
 
             //上一張
-            addToolsBtn({
+            /*addToolsBtn({
                 group: GroupType.img,
                 name: "prev",
                 icon: "/img/default/tool-prev.svg",
@@ -42,7 +42,7 @@ class MainTools {
                         M.script.fileLoad.next()
                     });
                 },
-            });
+            });*/
 
             // 開啟檔案
             addToolsBtn({
@@ -126,6 +126,18 @@ class MainTools {
                     });
                 },
             });*/
+
+            //設定
+            addToolsBtn({
+                group: GroupType.img,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
 
             //旋轉與鏡像
             addToolsBtn({
@@ -285,6 +297,18 @@ class MainTools {
                 },
             });
 
+            //設定
+            addToolsBtn({
+                group: GroupType.pdf,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
+
             addToolsHr({ group: GroupType.pdf, });
 
             // 檔案類型、檔案大小
@@ -313,7 +337,7 @@ class MainTools {
 
         }
 
- 
+
         /**
         * 初始化 工具列 txt
         */
@@ -388,6 +412,18 @@ class MainTools {
                 },
             });
 
+            //設定
+            addToolsBtn({
+                group: GroupType.txt,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
+
             addToolsHr({ group: GroupType.txt, });
 
             // 檔案類型、檔案大小
@@ -435,6 +471,17 @@ class MainTools {
             });
 
 
+            //設定
+            addToolsBtn({
+                group: GroupType.welcome,
+                name: "file",
+                icon: "/img/default/tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M.script.scriptSteting.OpenSetting();
+                    });
+                },
+            });
         }
 
         //---------------------
@@ -515,7 +562,6 @@ class MainTools {
                 dom_group.appendChild(item.dom);
             }
         }
-
 
 
 

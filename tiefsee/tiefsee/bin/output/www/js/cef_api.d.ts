@@ -1,6 +1,54 @@
+interface WebWindow {
+    /** 運行js */
+    RunJs(js: string): string;
+
+    Show(): void;
+    Focus(): void;
+
+    StartPosition: number;
+
+    /** 標題 */
+    Text: string;
+
+    /**視窗 x坐標 */
+    Left: number;
+
+    /**視窗 y坐標 */
+    Top: number;
+
+    /**視窗寬度 */
+    Width: number;
+
+    /**視窗高度 */
+    Height: number;
+
+    /**顯示或隱藏視窗 */
+    Visible: boolean;
+
+    /**關閉視窗 */
+    Close(): void;
+
+    /** 視窗狀態。 0=視窗化 1=最小化 2=最大化 */
+    WindowState: (0 | 1 | 2);
+}
 
 interface WV_Window {
 
+    /**
+     * 新開視窗
+     * @param url 完整網址
+     * @param args 命令列參數
+     */
+    NewWindow(url: string, args: string[]): WebWindow;
+
+    /** 傳入 webWindow，將其設為目前視窗的子視窗*/
+    SetOwner(webwindow: WebWindow);
+
+    /** 在父親視窗運行js */
+    RunJsOfParent(js: string): string;
+
+    /** 設定視窗最小size */
+    SetMinimumSize(width: number, height: number):void;
 
     /** 取得執行檔目錄 */
     GetAppDirPath(): string;
@@ -15,7 +63,9 @@ interface WV_Window {
     Close(): void;
 
     /** 設定視窗的 icon */
-    SetIcon(psth:string);
+    SetIcon(psth: string);
+
+    This: WebWindow;
 
     /** 標題 */
     Text: string;
@@ -64,6 +114,9 @@ interface WV_Directory {
     /** 判斷指定路徑是否參考磁碟上的現有目錄 */
     Exists(path: string): bool;
 
+    /** 新建目錄 */
+    CreateDirectory(path: string): void;
+
     /** 擷取指定路徑的父目錄 */
     GetParent(path: string);
 
@@ -85,6 +138,9 @@ interface WV_File {
 
     /** 在檔案總管顯示檔案 */
     ShowOnExplorer(path: string): void;
+
+    /** 取得 Type、Lenght、CreationTimeUtc、LastWriteTimeUtc、HexValue */
+    GetFileInfo2(path: string): string;
 
     /**
      *  開啟 選擇檔案 的視窗
@@ -155,6 +211,26 @@ interface WV_FileInfo {
 
     /** 移動指定的檔案至新的位置，提供指定新檔名的選項 */
     MoveTo(destFileName: string);
+}
+
+interface FileInfo2 {
+    /** file=檔案、dir=資料夾、none=檔案不存在 */
+    Type: ("file" | "dir" | "none"),
+
+    /** 檔案路徑 */
+    Path:string;
+
+    /** 檔案大小 */
+    Lenght: number,
+
+    /** 建立時間 */
+    CreationTimeUtc: number,
+
+    /** 修改時間 */
+    LastWriteTimeUtc: number,
+    
+    /** 讀取前50個byte，用於辨識檔案類型 */
+    HexValue: string
 }
 
 interface WV_Path {

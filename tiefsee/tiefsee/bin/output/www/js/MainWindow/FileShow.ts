@@ -119,7 +119,13 @@ class FileShow {
          * 
          * @param _path 
          */
-        async function openImage(_path: string) {
+        async function openImage(fileInfo2: FileInfo2) {
+
+            let _path = fileInfo2.Path;
+
+            console.log(fileInfo2.HexValue)
+
+
 
             setShowType(GroupType.img);//改變顯示類型
 
@@ -134,17 +140,22 @@ class FileShow {
             }
 
 
-            //if (await WV_File.Exists(_path) === true) { }
-
-            //await view_image.loadImg(imgurl);
+            
             view_image.setLoading(true);
 
             await view_image.getIsLoaded(imgurl);//預載入
-            if (view_image.getOriginalWidth() * view_image.getOriginalHeight() > 2000 * 2000) {
+            if (Lib.IsAnimation(fileInfo2) === true) {//動圖
+                await view_image.loadImg(imgurl);//使用<img>渲染
+            } else {
+                await view_image.loadBigimg(imgurl);//使用canvas渲染
+            }
+            //await view_image.loadImg(imgurl);
+            /*if (view_image.getOriginalWidth() * view_image.getOriginalHeight() > 2000 * 2000) {
                 await view_image.loadBigimg(imgurl);
             } else {
                 await view_image.loadImg(imgurl);
-            }
+            }*/
+
 
             view_image.setLoading(false);
 
@@ -169,23 +180,23 @@ class FileShow {
                 dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
             }
 
-            if (await WV_File.Exists(_path) === true) {
-                //檔案類型
-                let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
-                if (dom_type != null) {
-                    let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
-                    let fileLength = await getFileLength(_path);
-                    dom_type.innerHTML = `${fileType}<br>${fileLength}`;
-                }
 
-                //檔案修改時間
-                let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
-                if (dom_writeTime != null) {
-                    let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
-                    let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
-                    dom_writeTime.innerHTML = time;
-                }
+            //檔案類型
+            let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
+            if (dom_type != null) {
+                let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                let fileLength = getFileLength(fileInfo2.Lenght);
+                dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
+
+            //檔案修改時間
+            let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
+            if (dom_writeTime != null) {
+                let timeUtc = fileInfo2.LastWriteTimeUtc;
+                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                dom_writeTime.innerHTML = time;
+            }
+
 
         }
 
@@ -195,7 +206,10 @@ class FileShow {
          * 
          * @param _url 
          */
-        async function openPdf(_path: string) {
+        async function openPdf(fileInfo2: FileInfo2) {
+
+            let _path = fileInfo2.Path;
+
             setShowType(GroupType.pdf);//改變顯示類型
 
             let _url = "/api/getpdf/" + encodeURIComponent(_path)
@@ -205,14 +219,14 @@ class FileShow {
             let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
-                let fileLength = await getFileLength(_path);
+                let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
 
             //檔案修改時間
             let dom_writeTime = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
-                let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
+                let timeUtc = fileInfo2.LastWriteTimeUtc;
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
                 dom_writeTime.innerHTML = time;
             }
@@ -223,7 +237,10 @@ class FileShow {
          * 
          * @param _path 
          */
-        async function openTxt(_path: string) {
+        async function openTxt(fileInfo2: FileInfo2) {
+
+            let _path = fileInfo2.Path;
+
             setShowType(GroupType.txt);//改變顯示類型
             dom_txtview.value = await WV_File.GetText(_path);
 
@@ -231,14 +248,14 @@ class FileShow {
             let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
-                let fileLength = await getFileLength(_path);
+                let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
 
             //檔案修改時間
             let dom_writeTime = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
-                let timeUtc = await WV_File.GetLastWriteTimeUtc(_path);
+                let timeUtc = fileInfo2.LastWriteTimeUtc;
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
                 dom_writeTime.innerHTML = time;
             }
@@ -258,9 +275,9 @@ class FileShow {
          * @param path 
          * @returns 
          */
-        async function getFileLength(path: string) {
+        function getFileLength(len: number) {
 
-            let len = await WV_File.GetFileInfo(path).Length;
+            //let len = await WV_File.GetFileInfo(path).Length;
 
             if (len / 1024 < 1) {
                 return len.toFixed(1) + " B";

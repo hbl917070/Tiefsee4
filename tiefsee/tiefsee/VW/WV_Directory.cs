@@ -58,6 +58,15 @@ namespace tiefsee {
             return Directory.Exists(path);
         }
 
+
+        /// <summary>
+        /// 新建目錄
+        /// </summary>
+        /// <param name="path"></param>
+        public void CreateDirectory(string path) {
+            Directory.CreateDirectory(path);
+        }
+
         /// <summary>
         /// 擷取指定路徑的父目錄
         /// </summary>

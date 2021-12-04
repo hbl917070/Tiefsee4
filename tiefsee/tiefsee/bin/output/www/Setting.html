@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tiefsee 4</title>
+
+    <!--google字體-->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/BaseWindow.css">
+    <script src="/js/BaseWindow.js"></script>
+    <script src="/js/Lib.js"></script>
+
+    <!-- <script src="/vender/jquery-3.6.0.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <script src="/vender/jquery.easing.js"></script>
+
+    <link rel="stylesheet" href="/css/Setting.css">
+    <link rel="stylesheet" href="/css/Menu.css">
+
+    <script src="/js/MainWindow/Config.js"></script>
+    <script src="/js/MainWindow/Menu.js"></script>
+    <script src="/js/Setting.js"></script>
+
+    <!-- MiniColors -->
+    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+
+    <script>
+        var setting;
+        document.addEventListener("DOMContentLoaded", async () => {
+            setting = new Setting();
+        });
+
+
+    </script>
+</head>
+
+<body>
+
+
+
+
+    <div class="window">
+
+        <div class="window-left" id="window-left">
+
+            <!-- <img src="/img/logo.svg" style="width:35px;display:block;margin:10px;margin-top:10px"> -->
+
+            <div class="pagetab">
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 主題</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
+            </div>
+
+
+        </div>
+
+        <div class="window-right">
+
+            <!-- 標題列 -->
+            <div class="window-titlebar">
+
+                <div class="titlebar-txt"></div>
+
+                <div class="titlebar-tools">
+
+                    <!-- <div class="titlebar-tools-btn titlebar-tools-topmost">
+                        <import type="svg" src="/img/default/window-topmost.svg"> </import>
+                    </div> -->
+                    <div class="titlebar-tools-btn titlebar-tools-minimized">
+                        <import type="svg" src="/img/default/window-minimized.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                        <import type="svg" src="/img/default/window-normal.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-maximized">
+                        <import type="svg" src="/img/default/window-maximized.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-close">
+                        <import type="svg" src="/img/default/window-close.svg"> </import>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="window-body base-scrollbar">
+
+                <!-- 主題 -->
+                <div class="page-tabsPage" id="tabsPage-theme">
+
+                    <div class="page-title" i18b=""> 主題 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 套用 </div>
+                        <div id="applyTheme-btns"></div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 顏色詳細自定 </div>
+                     
+                        <div class="text-box">
+                            <div class="text-title"> 視窗背景色</div>
+                            <div class="text-content">
+                                <input class="text-input" type="text" data-format="rgba"
+                                    id="text-theme-colorWindowBackground">
+                            </div>
+                        </div>
+                        <div class="text-box">
+                            <div class="text-title"> 視窗邊框色</div>
+                            <div class="text-content">
+                                <input class="text-input" type="text" data-format="rgba"
+                                    id="text-theme-colorWindowBorder">
+                            </div>
+                        </div>
+                        <div class="text-box">
+                            <div class="text-title"> 文字顏色</div>
+                            <div class="text-content">
+                                <input class="text-input" data-format="rgb" type="text" id="text-theme-colorWhite">
+                            </div>
+                        </div>
+                        <div class="text-box">
+                            <div class="text-title"> 區塊底色</div>
+                            <div class="text-content">
+                                <input class="text-input" data-format="rgb" type="text" id="text-theme-colorBlack">
+                            </div>
+                        </div>
+                        <div class="text-box">
+                            <div class="text-title"> 主顏色</div>
+                            <div class="text-content">
+                                <input class="text-input" data-format="rgb" type="text" id="text-theme-colorBlue">
+                            </div>
+                        </div>
+                        <!-- <div class="text-box">
+                            <div class="text-title"> 副顏色</div>
+                            <div class="text-content">
+                                <input class="text-input" data-format="rgb" type="text" id="text-theme-colorGrey">
+                            </div>
+                        </div> -->
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title"> 視窗圓角 </div>
+                        <div class="text-box">
+                            <div class="text-title"> 0~15</div>
+                            <div class="text-content">
+                                <input class="text-input" type="text" id="text-theme-windowBorderRadius">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 工具列 -->
+                <div class="page-tabsPage" id="tabsPage-tools">
+                    <div class="page-title" i18b=""> 工具列 </div>
+
+                </div>
+
+                <!-- 快速鍵 -->
+                <div class="page-tabsPage" id="tabsPage-shortcutKeys">
+                    <div class="page-title" i18b=""> 快速鍵 </div>
+                </div>
+
+
+                <!-- 關於 -->
+                <div class="page-tabsPage" id="tabsPage-about">
+                    <div class="page-title" i18b=""> 關於 </div>
+
+                    <div class="box">
+                        <div class="box-title"> TiefSee 4.0.0-bate.2 </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="window-LC window-border"></div>
+        <div class="window-RC window-border"></div>
+        <div class="window-CT window-border"></div>
+        <div class="window-LT window-border"></div>
+        <div class="window-RT window-border"></div>
+        <div class="window-CB window-border"></div>
+        <div class="window-LB window-border"></div>
+        <div class="window-RB window-border"></div>
+
+    </div>
+
+
+    <script>
+       //     $(`[data-format="rgba"]`).minicolors({ format: "rgb", opacity: true, });
+       //     $(`[data-format="rgb"]`).minicolors({ format: "rgb", opacity: false, });
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>

@@ -16,6 +16,7 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
+        this.scriptSteting = new ScriptSteting(M);
     }
 }
 class ScriptImg {
@@ -24,7 +25,7 @@ class ScriptImg {
     }
     /** 全滿 */
     zoomFull() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-100%']);
+        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-wh']);
     }
     /** 原始大小 */
     zoom100() {
@@ -106,7 +107,7 @@ class ScriptOpen {
             let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
             let exePath = yield WV_Window.GetAppPath();
             if (yield WV_File.Exists(filePath)) {
-                WV_RunApp.ProcessStart(exePath, filePath, true, false);
+                WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
             }
             else {
                 WV_RunApp.ProcessStart(exePath, "", true, false);
@@ -171,6 +172,31 @@ class ScriptOpen {
                 return;
             }
             WV_RunApp.Open3DMSPaint(filePath); //開啟檔案
+        });
+    }
+}
+class ScriptSteting {
+    constructor(_M) {
+        this.temp_setting = null; //用於判斷視窗是否已經開啟
+        this.M = _M;
+    }
+    /** 開啟 設定 視窗 */
+    OpenSetting() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.temp_setting != null) {
+                if ((yield this.temp_setting.Visible) === true) {
+                    this.temp_setting.WindowState = 0; //視窗化
+                    return;
+                }
+            }
+            this.temp_setting = yield baseWindow.newWindow("Setting.html");
+            //設定坐標，從父視窗的中間開啟
+            let w = (yield this.temp_setting.Width) - (yield WV_Window.Width);
+            let h = (yield this.temp_setting.Height) - (yield WV_Window.Height);
+            this.temp_setting.Left = (yield WV_Window.Left) - (w / 2);
+            this.temp_setting.Top = (yield WV_Window.Top) - (h / 2);
+            this.temp_setting.WindowState = 1; //視窗化
+            this.temp_setting.WindowState = 0; //視窗化
         });
     }
 }

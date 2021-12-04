@@ -26,7 +26,6 @@
 }
 .tiefseeview .view-bigimg {
   position: relative;
-
 }
 .tiefseeview .view-bigimg-canvas {
   position: absolute;
@@ -34,20 +33,20 @@
 .tiefseeview .view-bigimg-bg {
   position: absolute;
   left: 0;
-  top:0;
+  top: 0;
 }
 
-.tiefseeview-loading{  
-    background-position: center center;
-    background-size: 200px;
-    /* background-size:100%; */
-    z-index: 100;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-repeat: no-repeat ;
+.tiefseeview-loading {
+  background-position: center center;
+  background-size: 200px;
+  /* background-size:100%; */
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-repeat: no-repeat;
 }
 
 /*-----------------------*/
@@ -64,28 +63,30 @@
 /*背景*/
 .tiefseeview .scroll-y .scroll-bg {
   height: 100%;
-  width: 0;
-  background-color: rgba(255, 255, 255, 0.3);
+  width: 9px;
+  background-color: var(--color-black60);
   position: absolute;
   margin: auto;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
+
+  opacity: 0;
 }
 
 /*拖曳區域*/
 .tiefseeview .scroll-y .scroll-box {
   height: 33%;
   width: 9px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--color-white40);
   position: absolute;
   margin: auto;
   left: 0;
   right: 0;
   top: 100px;
-  transition: transform 0.1s;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.1);
+  /* transition: transform 0.1s; */
+  box-shadow: 0px 0px 3px 1px var(--color-black10);
   transform: scaleX(0.4);
 }
 
@@ -96,14 +97,13 @@
 /*移入與拖曳時-背景*/
 .tiefseeview .scroll-y:hover .scroll-bg,
 .tiefseeview .scroll-y[action="true"] .scroll-bg {
-  /* width: 3px;
-    box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.1); */
+  opacity: 1;
 }
 
 /*移入與拖曳時-拖曳區域*/
 .tiefseeview .scroll-y:hover .scroll-box,
 .tiefseeview .scroll-y[action="true"] .scroll-box {
-  background-color: rgb(255, 255, 255);
+  /* background-color: rgba(255, 255, 255, 0.8); */
   transform: scaleX(1);
 }
 
@@ -120,28 +120,30 @@
 
 /*背景*/
 .tiefseeview .scroll-x .scroll-bg {
-  height: 0;
+  height: 9px;
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--color-black60);
   position: absolute;
   margin: auto;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
+
+  opacity: 0;
 }
 
 /*拖曳區域*/
 .tiefseeview .scroll-x .scroll-box {
   width: 33%;
   height: 9px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--color-white40);
   position: absolute;
   top: 0;
   bottom: 0;
   margin: auto 0;
-  transition: transform 0.1s;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.1);
+  /* transition: transform 0.1s; */
+  box-shadow: 0px 0px 3px 1px var(--color-black10);
   transform: scaleY(0.4);
 }
 
@@ -152,13 +154,12 @@
 /*移入與拖曳時-背景*/
 .tiefseeview .scroll-x:hover .scroll-bg,
 .tiefseeview .scroll-x[action="true"] .scroll-bg {
-  /* width: 3px;
-  background-color: rgba(255, 255, 255, 0.5);*/
+  opacity: 1;
 }
 
 /*移入與拖曳時-拖曳區域*/
 .tiefseeview .scroll-x:hover .scroll-box,
 .tiefseeview .scroll-x[action="true"] .scroll-box {
-  background-color: rgb(255, 255, 255);
+  /* background-color: rgba(255, 255, 255, 0.8); */
   transform: scaleY(1);
 }

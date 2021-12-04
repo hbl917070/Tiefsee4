@@ -7,6 +7,7 @@ class Script {
     public file: ScriptFile;
     public menu: ScriptMenu;
     public open: ScriptOpen;
+    public scriptSteting: ScriptSteting;
 
     constructor(M: MainWindow) {
 
@@ -16,7 +17,7 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
-
+        this.scriptSteting = new ScriptSteting(M);
     }
 
 }
@@ -30,7 +31,7 @@ class ScriptImg {
 
     /** 全滿 */
     public zoomFull() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-100%']);
+        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-wh']);
     }
 
     /** 原始大小 */
@@ -133,7 +134,7 @@ class ScriptOpen {
         let exePath = await WV_Window.GetAppPath();
 
         if (await WV_File.Exists(filePath)) {
-            WV_RunApp.ProcessStart(exePath, filePath, true, false);
+            WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
         } else {
             WV_RunApp.ProcessStart(exePath, "", true, false);
         }
@@ -154,7 +155,7 @@ class ScriptOpen {
     }
 
     /** 列印 */
-    public async PrintFile(){
+    public async PrintFile() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
 
@@ -162,23 +163,54 @@ class ScriptOpen {
     }
 
     /** 設成桌布 */
-    public async SetWallpaper(){
+    public async SetWallpaper() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
         WV_System.SetWallpaper(filePath);
     }
 
     /** 選擇其他應用程式*/
-    public async RunApp (){
+    public async RunApp() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
         WV_RunApp.ShowMenu(filePath);
     }
 
     /** 以3D小畫家開啟 */
-    public async Open3DMSPaint(){
+    public async Open3DMSPaint() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
         WV_RunApp.Open3DMSPaint(filePath);//開啟檔案
     }
+}
+
+
+class ScriptSteting {
+
+    M: MainWindow;
+    constructor(_M: MainWindow) {
+        this.M = _M;
+    }
+
+    temp_setting: WebWindow | null = null;//用於判斷視窗是否已經開啟
+
+    /** 開啟 設定 視窗 */
+    public async OpenSetting() {
+        if (this.temp_setting != null) {
+            if (await this.temp_setting.Visible === true) {
+                this.temp_setting.WindowState = 0;//視窗化
+                return;
+            }
+        }
+        this.temp_setting = await baseWindow.newWindow("Setting.html");
+
+        //設定坐標，從父視窗的中間開啟
+        let w = await this.temp_setting.Width - await WV_Window.Width;
+        let h = await this.temp_setting.Height - await WV_Window.Height;
+        this.temp_setting.Left = await WV_Window.Left - (w / 2);
+        this.temp_setting.Top = await WV_Window.Top - (h / 2);
+        this.temp_setting.WindowState = 1;//視窗化
+        this.temp_setting.WindowState = 0;//視窗化
+    }
+
 }

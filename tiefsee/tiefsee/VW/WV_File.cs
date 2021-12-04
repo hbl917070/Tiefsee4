@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -12,7 +13,19 @@ using System.Windows.Forms;
 
 namespace tiefsee {
 
-    [ClassInterface(ClassInterfaceType.AutoDual)]
+
+    [ComVisible(true)]
+    public class FileInfo2 {
+        public string Type = "none";// file / dir / none
+        public string Path = "";//檔案路徑
+        public long Lenght = 0;//檔案大小
+        public long CreationTimeUtc = 0;//建立時間
+        public long LastWriteTimeUtc = 0;//修改時間
+        public string HexValue = "";//用於辨識檔案類型
+    }
+
+
+    //[ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     /// <summary>
@@ -26,6 +39,60 @@ namespace tiefsee {
             this.M = m;
         }
 
+        public String GetFileInfo2(string path) {
+
+            DateTime time_start = DateTime.Now;//計時開始 取得目前時間
+
+
+            FileInfo2 info = new FileInfo2();
+            info.Path = path;
+
+            if (File.Exists(path)) {
+
+                info.Type = "file";
+                info.Lenght = new FileInfo(path).Length;
+                info.CreationTimeUtc = GetCreationTimeUtc(path);
+                info.LastWriteTimeUtc = GetLastWriteTimeUtc(path);
+
+                StringBuilder sb = new StringBuilder();
+                try {
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                        using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
+                            for (int i = 0; i < 100; i++) {
+                                string hexValue = br.ReadByte().ToString("X2");
+                                sb.Append(hexValue + " ");
+                            }
+                            if (fs != null) {
+                                fs.Close();
+                                br.Close();
+                            }
+                        }//using
+                    }//using
+                } catch { }
+
+                info.HexValue = sb.ToString();
+                //return info;
+
+            } else if (Directory.Exists(path)) {
+
+                info.Type = "dir";
+                info.Lenght = 0;
+                info.CreationTimeUtc = toUnix(Directory.GetLastWriteTimeUtc(path));
+                info.LastWriteTimeUtc = toUnix(Directory.GetLastWriteTimeUtc(path));
+                info.HexValue = "";
+                //return info;
+
+            } else {
+                info.Type = "none";
+            }
+
+
+            String json = JsonConvert.SerializeObject(info);
+            DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
+            string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
+            System.Console.WriteLine("+++++++++++++++++++++++++++++++++++" + result2 + " 毫秒");
+            return json;
+        }
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
@@ -98,7 +165,7 @@ namespace tiefsee {
 
             try {
 
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
+                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                     using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
 
                         /*var ar = br.ReadSingle(300);
@@ -106,7 +173,7 @@ namespace tiefsee {
                             fileType += ar[i];
                         }*/
 
-                       
+
                         for (int i = 0; i < 2; i++) {
                             fileType += br.ReadByte();
                         }
@@ -155,7 +222,7 @@ namespace tiefsee {
 
             try {
 
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
+                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                     using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
 
                         string fileType = string.Empty;
@@ -230,18 +297,20 @@ namespace tiefsee {
         /// <param name="path"></param>
         public void DragDropFile(string path) {
 
-            if (File.Exists(path) == false) {
-                return;
-            }
+            if (File.Exists(path) == false) { return; }
 
             string[] files = { path };
 
             try {
-                var file = new System.Windows.DataObject(System.Windows.DataFormats.FileDrop, files);
-                System.Windows.DragDrop.DoDragDrop(btnDragDropFile, file, System.Windows.DragDropEffects.All);
+                var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
+                // System.Windows.DragDrop.DoDragDrop(btnDragDropFile, file, System.Windows.DragDropEffects.All);
+                M.DoDragDrop(file, DragDropEffects.All);
+
             } catch { }
+
+
         }
-        System.Windows.Controls.Button btnDragDropFile = new System.Windows.Controls.Button();
+
 
 
         /// <summary>

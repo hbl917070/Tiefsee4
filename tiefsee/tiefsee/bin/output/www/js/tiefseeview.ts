@@ -353,7 +353,7 @@ class Tieefseeview {
         });
 
         //拖曳
-        hammerPan.get("pan").set({ threshold: 0 });
+        hammerPan.get("pan").set({ threshold: 0 ,direction: Hammer.DIRECTION_VERTICAL});
         hammerPan.on("pan", (ev) => {
 
             //避免多指觸發
@@ -648,6 +648,14 @@ class Tieefseeview {
                 _url = errerUrl;
                 dom_img.src = _url;
                 return false;
+            }
+
+            temp_drawImage = {
+                scale: 1,
+                sx: 0, sy: 0,
+                sWidth: 1, sHeight: 1,
+                dx: 0, dy: 0,
+                dWidth: 1, dHeight: 1
             }
 
             dom_img.src = _url;
@@ -1105,7 +1113,7 @@ class Tieefseeview {
                 let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
                 //context.imageSmoothingEnabled = false;
 
-                /*context.drawImage(tmp_can,
+                /*context.drawImage(temp_can,
                     sx, sy, sWidth, sHeight,
                     0, 0, dWidth, dHeight
                 );
@@ -1124,15 +1132,25 @@ class Tieefseeview {
                 let resizeQuality: ResizeQuality = "medium";
 
 
-                if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
 
-                    //寬高跟高度全部渲染
+                if (_scale >= 1) {
+
+                    //console.log("drawImage直接渲染");
+                    context.drawImage(temp_can,
+                        sx, sy, sWidth, sHeight,
+                        0, 0, dWidth, dHeight
+                    );
+
+                } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
+
+                    //console.log("寬高跟高度全部渲染");
                     sWidth = getOriginalWidth();
                     sHeight = getOriginalHeight();
                     sx = dx * -1
                     sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     dHeight = getOriginalHeight() * _scale
+
                     await createImageBitmap(temp_can, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1142,7 +1160,7 @@ class Tieefseeview {
 
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
 
-                    //高度全部渲染
+                    //console.log("高度全部渲染");
                     //sWidth = getOriginalWidth();
                     sHeight = getOriginalHeight();
                     //sx = dx * -1
@@ -1158,24 +1176,24 @@ class Tieefseeview {
 
                 } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
 
-                    //寬度全部渲染
+                    //console.log("寬度全部渲染");
                     sWidth = getOriginalWidth();
                     //sHeight = getOriginalHeight();
                     sx = dx * -1
                     //sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     //dHeight = getOriginalHeight() * _scale
+
                     await createImageBitmap(temp_can, 0, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, sx, 0,);
+                            context.drawImage(sprites, sx, 0);
                         });
-
 
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
 
-                    //局部渲染
+                    //console.log("局部渲染");
                     await createImageBitmap(temp_can, sx, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1967,23 +1985,19 @@ class TieefseeviewScroll {
 
 
         //拖曳中
-        hammer_scroll.get("pan").set({ threshold: 0 });
+        hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
         hammer_scroll.on("pan", (ev) => {
-
             ev.preventDefault();
             let deltaX = ev["deltaX"];
             let deltaY = ev["deltaY"];
-
             if (type === "y") {
                 let top = startTop + deltaY;
                 setTop(top, "pan");
             }
-
             if (type === "x") {
                 let left = startLeft + deltaX;
                 setTop(left, "pan");
             }
-
             dom_scroll.setAttribute("action", "true"); //表示「拖曳中」，用於CSS樣式
         });
 

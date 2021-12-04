@@ -88,9 +88,11 @@ class FileShow {
          *
          * @param _path
          */
-        function openImage(_path) {
+        function openImage(fileInfo2) {
             var _a, _b, _c;
             return __awaiter(this, void 0, void 0, function* () {
+                let _path = fileInfo2.Path;
+                console.log(fileInfo2.HexValue);
                 setShowType(GroupType.img); //改變顯示類型
                 let imgurl = _path; //圖片網址
                 if (M.fileLoad.getGroupType() === GroupType.unknown) {
@@ -99,16 +101,20 @@ class FileShow {
                 else {
                     imgurl = "/api/getimg/" + encodeURIComponent(_path);
                 }
-                //if (await WV_File.Exists(_path) === true) { }
-                //await view_image.loadImg(imgurl);
                 view_image.setLoading(true);
                 yield view_image.getIsLoaded(imgurl); //預載入
-                if (view_image.getOriginalWidth() * view_image.getOriginalHeight() > 2000 * 2000) {
-                    yield view_image.loadBigimg(imgurl);
+                if (Lib.IsAnimation(fileInfo2) === true) { //動圖
+                    yield view_image.loadImg(imgurl); //使用<img>渲染
                 }
                 else {
-                    yield view_image.loadImg(imgurl);
+                    yield view_image.loadBigimg(imgurl); //使用canvas渲染
                 }
+                //await view_image.loadImg(imgurl);
+                /*if (view_image.getOriginalWidth() * view_image.getOriginalHeight() > 2000 * 2000) {
+                    await view_image.loadBigimg(imgurl);
+                } else {
+                    await view_image.loadImg(imgurl);
+                }*/
                 view_image.setLoading(false);
                 view_image.transformRefresh(false);
                 view_image.setEventChangeZoom(((ratio) => {
@@ -124,21 +130,19 @@ class FileShow {
                 if (dom_size != null) {
                     dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
                 }
-                if ((yield WV_File.Exists(_path)) === true) {
-                    //檔案類型
-                    let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
-                    if (dom_type != null) {
-                        let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
-                        let fileLength = yield getFileLength(_path);
-                        dom_type.innerHTML = `${fileType}<br>${fileLength}`;
-                    }
-                    //檔案修改時間
-                    let dom_writeTime = (_c = getToolsDom(GroupType.img)) === null || _c === void 0 ? void 0 : _c.querySelector(`[data-name="infoWriteTime"]`);
-                    if (dom_writeTime != null) {
-                        let timeUtc = yield WV_File.GetLastWriteTimeUtc(_path);
-                        let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
-                        dom_writeTime.innerHTML = time;
-                    }
+                //檔案類型
+                let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
+                if (dom_type != null) {
+                    let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
+                    let fileLength = getFileLength(fileInfo2.Lenght);
+                    dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+                }
+                //檔案修改時間
+                let dom_writeTime = (_c = getToolsDom(GroupType.img)) === null || _c === void 0 ? void 0 : _c.querySelector(`[data-name="infoWriteTime"]`);
+                if (dom_writeTime != null) {
+                    let timeUtc = fileInfo2.LastWriteTimeUtc;
+                    let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
+                    dom_writeTime.innerHTML = time;
                 }
             });
         }
@@ -146,9 +150,10 @@ class FileShow {
          *
          * @param _url
          */
-        function openPdf(_path) {
+        function openPdf(fileInfo2) {
             var _a, _b;
             return __awaiter(this, void 0, void 0, function* () {
+                let _path = fileInfo2.Path;
                 setShowType(GroupType.pdf); //改變顯示類型
                 let _url = "/api/getpdf/" + encodeURIComponent(_path);
                 dom_pdfview.setAttribute("src", _url);
@@ -156,13 +161,13 @@ class FileShow {
                 let dom_type = (_a = getToolsDom(GroupType.pdf)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
                     let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
-                    let fileLength = yield getFileLength(_path);
+                    let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
                 //檔案修改時間
                 let dom_writeTime = (_b = getToolsDom(GroupType.pdf)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoWriteTime"]`);
                 if (dom_writeTime != null) {
-                    let timeUtc = yield WV_File.GetLastWriteTimeUtc(_path);
+                    let timeUtc = fileInfo2.LastWriteTimeUtc;
                     let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
                     dom_writeTime.innerHTML = time;
                 }
@@ -172,22 +177,23 @@ class FileShow {
          *
          * @param _path
          */
-        function openTxt(_path) {
+        function openTxt(fileInfo2) {
             var _a, _b;
             return __awaiter(this, void 0, void 0, function* () {
+                let _path = fileInfo2.Path;
                 setShowType(GroupType.txt); //改變顯示類型
                 dom_txtview.value = yield WV_File.GetText(_path);
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.txt)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
                     let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
-                    let fileLength = yield getFileLength(_path);
+                    let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
                 //檔案修改時間
                 let dom_writeTime = (_b = getToolsDom(GroupType.txt)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoWriteTime"]`);
                 if (dom_writeTime != null) {
-                    let timeUtc = yield WV_File.GetLastWriteTimeUtc(_path);
+                    let timeUtc = fileInfo2.LastWriteTimeUtc;
                     let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
                     dom_writeTime.innerHTML = time;
                 }
@@ -207,20 +213,18 @@ class FileShow {
          * @param path
          * @returns
          */
-        function getFileLength(path) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let len = yield WV_File.GetFileInfo(path).Length;
-                if (len / 1024 < 1) {
-                    return len.toFixed(1) + " B";
-                }
-                else if (len / (1024 * 1024) < 1) {
-                    return (len / (1024)).toFixed(1) + " KB";
-                }
-                else if (len / (1024 * 1024 * 1024) < 1) {
-                    return (len / (1024 * 1024)).toFixed(1) + " MB";
-                }
-                return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
-            });
+        function getFileLength(len) {
+            //let len = await WV_File.GetFileInfo(path).Length;
+            if (len / 1024 < 1) {
+                return len.toFixed(1) + " B";
+            }
+            else if (len / (1024 * 1024) < 1) {
+                return (len / (1024)).toFixed(1) + " KB";
+            }
+            else if (len / (1024 * 1024 * 1024) < 1) {
+                return (len / (1024 * 1024)).toFixed(1) + " MB";
+            }
+            return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
         }
     }
 }

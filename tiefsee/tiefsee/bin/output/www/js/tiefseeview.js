@@ -275,7 +275,7 @@ class Tieefseeview {
             panStartY = toInt(dom_con.style.top);
         });
         //拖曳
-        hammerPan.get("pan").set({ threshold: 0 });
+        hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
         hammerPan.on("pan", (ev) => {
             //避免多指觸發
             if (ev.maxPointers > 1) {
@@ -541,6 +541,13 @@ class Tieefseeview {
                     dom_img.src = _url;
                     return false;
                 }
+                temp_drawImage = {
+                    scale: 1,
+                    sx: 0, sy: 0,
+                    sWidth: 1, sHeight: 1,
+                    dx: 0, dy: 0,
+                    dWidth: 1, dHeight: 1
+                };
                 dom_img.src = _url;
                 temp_can = document.createElement("canvas");
                 temp_can.width = dom_img.width;
@@ -976,7 +983,7 @@ class Tieefseeview {
                     dom_bigimg_canvas.style.top = dy + "px";
                     let context = dom_bigimg_canvas.getContext("2d");
                     //context.imageSmoothingEnabled = false;
-                    /*context.drawImage(tmp_can,
+                    /*context.drawImage(temp_can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
                     );
@@ -986,8 +993,12 @@ class Tieefseeview {
                     var time = new Date();
                     //context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
                     let resizeQuality = "medium";
-                    if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
-                        //寬高跟高度全部渲染
+                    if (_scale >= 1) {
+                        //console.log("drawImage直接渲染");
+                        context.drawImage(temp_can, sx, sy, sWidth, sHeight, 0, 0, dWidth, dHeight);
+                    }
+                    else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
+                        //console.log("寬高跟高度全部渲染");
                         sWidth = getOriginalWidth();
                         sHeight = getOriginalHeight();
                         sx = dx * -1;
@@ -1003,7 +1014,7 @@ class Tieefseeview {
                         });
                     }
                     else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
-                        //高度全部渲染
+                        //console.log("高度全部渲染");
                         //sWidth = getOriginalWidth();
                         sHeight = getOriginalHeight();
                         //sx = dx * -1
@@ -1019,7 +1030,7 @@ class Tieefseeview {
                         });
                     }
                     else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
-                        //寬度全部渲染
+                        //console.log("寬度全部渲染");
                         sWidth = getOriginalWidth();
                         //sHeight = getOriginalHeight();
                         sx = dx * -1;
@@ -1035,7 +1046,7 @@ class Tieefseeview {
                         });
                     }
                     else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
-                        //局部渲染
+                        //console.log("局部渲染");
                         yield createImageBitmap(temp_can, sx, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                             .then(function (sprites) {
                             if (tc !== temp_canvasSN) {
@@ -1733,7 +1744,7 @@ class TieefseeviewScroll {
             startTop = toInt(dom_box.style.top);
         };
         //拖曳中
-        hammer_scroll.get("pan").set({ threshold: 0 });
+        hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
         hammer_scroll.on("pan", (ev) => {
             ev.preventDefault();
             let deltaX = ev["deltaX"];

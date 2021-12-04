@@ -166,7 +166,7 @@ namespace tiefsee {
 
             if (File.Exists(_path)) {
 
-                using (Stream input = new FileStream(_path, FileMode.Open)) {
+                using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                     context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
                     context.Response.ContentLength64 = input.Length;
@@ -183,7 +183,7 @@ namespace tiefsee {
                     //context.Response.OutputStream.Flush();
                 }
                 return true;
-                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read)) {
+                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
                     byte[] _responseArray = new byte[fs.Length];
                     fs.Read(_responseArray, 0, _responseArray.Length);
                     fs.Close();
@@ -216,7 +216,7 @@ namespace tiefsee {
 
             if (File.Exists(_path)) {
 
-                using (Stream input = new FileStream(_path, FileMode.Open)) {
+                using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                     //context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
                     context.Response.ContentType = "application/pdf";
@@ -234,7 +234,7 @@ namespace tiefsee {
                     //context.Response.OutputStream.Flush();
                 }
                 return true;
-                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read)) {
+                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
                     byte[] _responseArray = new byte[fs.Length];
                     fs.Read(_responseArray, 0, _responseArray.Length);
                     fs.Close();
@@ -319,14 +319,14 @@ namespace tiefsee {
             _path = _path.Split('?')[0];//去掉?後面的文字
             if (File.Exists(_path)) {
                 //Console.WriteLine("file");
-                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read)) {
+                /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
                     byte[] _responseArray = new byte[fs.Length];
                     fs.Read(_responseArray, 0, _responseArray.Length);
                     fs.Close();
                     context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
                 }*/
 
-                using (Stream input = new FileStream(_path, FileMode.Open)) {
+                using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                     context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
                     context.Response.ContentLength64 = input.Length;
@@ -422,7 +422,7 @@ namespace tiefsee {
 
                 if (File.Exists(path)) {
                     Console.WriteLine("file");
-                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                         _responseArray = new byte[fs.Length];
                         fs.Read(_responseArray, 0, _responseArray.Length);
                         fs.Close();

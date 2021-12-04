@@ -167,19 +167,28 @@ class FileLoad {
 
             let path = getFilePath();
 
+            let fileInfo2 = await Lib.GetFileInfo2(path);
+            console.log(Lib.GetFileType (fileInfo2))
+            
+            if (fileInfo2.Type == "none") {
+                M.fileShow.openWelcome();
+                return
+            }
+
+
             //如果是自定名單，就根據檔案類型判斷要用什麼方式顯示檔案
             if (fileLoadType === FileLoadType.userDefined) {
                 groupType = await fileToGroupType(path);
             }
 
             if (groupType === GroupType.img || groupType === GroupType.unknown) {
-                M.fileShow.openImage(path)
+                M.fileShow.openImage(fileInfo2)
             }
             if (groupType === GroupType.pdf) {
-                M.fileShow.openPdf(path)
+                M.fileShow.openPdf(fileInfo2)
             }
             if (groupType === GroupType.txt) {
-                M.fileShow.openTxt(path)
+                M.fileShow.openTxt(fileInfo2)
             }
 
             //修改視窗標題

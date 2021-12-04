@@ -1,7 +1,7 @@
 
 class Config {
 
-    constructor(M: MainWindow) {
+    constructor() {
     }
 
 
@@ -57,7 +57,7 @@ class Config {
                 { ext: "bmp", type: ["image"] },
                 { ext: "webp", type: ["image"] },
                 { ext: "jpeg", type: ["image"] },
-                { ext: "tif", type: ["image"] },
+                //{ ext: "tif", type: ["image"] },
                 { ext: "svg", type: ["image"] },
                 { ext: "", type: ["image"] },
                 { ext: "", type: ["image"] },
@@ -147,6 +147,19 @@ class Config {
         }
 
         return fileExt;//無法辨識，則直接回傳附檔名
+    }
+
+
+    public settings = {
+        theme: {
+            "--window-border-radius": 10,
+            "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
+            "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
+            "--color-white": { r: 255, g: 255, b: 255, },
+            "--color-black": { r: 0, g: 0, b: 0, },
+            "--color-blue": { r: 0, g: 200, b: 255, },
+            "--color-grey": { r: 30, g: 30, b: 30, },
+        }
     }
 }
 

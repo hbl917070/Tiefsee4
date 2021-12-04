@@ -1,0 +1,137 @@
+.window {
+  display: flex;
+  flex-direction: row;
+  font-size: 15px;
+}
+.window-left {
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-window-border);
+}
+.window-right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  /* background-color: var(--color-black60); */
+}
+
+.pagetab {
+  margin: 0px;
+  padding: 20px 20px;
+  /* background-color: var(--color-white10);  */
+  border-radius: 10px;
+}
+
+.page-tabsBtn {
+  min-width: 150px;
+  max-width: 250px;
+  padding: 0px 15px;
+  height: 40px;
+  border-radius: 5px;
+  color: var(--color-white);
+  line-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+}
+.page-tabsBtn:hover {
+  background-color: var(--color-white10);
+  cursor: pointer;
+}
+.page-tabsBtn[active="true"] {
+  background-color: var(--color-white20);
+  /* color:var(--color-blue); */
+}
+.page-tabsBtn[active="true"]::after {
+  width: 0px;
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+/**************/
+.window-body {
+  flex: 1;
+  overflow: auto;
+  position: absolute;
+  left: 0;
+  right: 5px;
+  top: 30px;
+  bottom: 5px;
+}
+.page-tabsPage {
+  padding-top: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 100px;
+  display: none;
+}
+.page-title {
+  font-size: 24px;
+  color: var(--color-white);
+  margin-bottom: 20px;
+  margin-top: -5px;
+}
+
+.page-tabsPage[active="true"] {
+  display: block !important;
+}
+/**************/
+
+.text-box {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.text-title {
+  color: var(--color-white);
+  margin-bottom: 3px;
+}
+.text-content {
+  width: 250px;
+  display: flex;
+}
+.text-input {
+  background-color: rgba(0, 0, 0, 0);
+  color: var(--color-white);
+  height: 35px;
+  border: 1px solid var(--color-white40);
+  border-radius: 5px;
+  padding: 0 5px;
+  min-width: 260px;
+  flex: 1;
+}
+
+/******************/
+
+.box {
+  margin-bottom: 40px;
+}
+.box-title {
+  color: var(--color-white);
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+.btn {
+  color: var(--color-white);
+  background-color: var(--color-white20);
+  border: none;
+  height: 35px;
+  padding: 0 10px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 5px;
+}
+
+.btn:hover {
+  cursor: pointer;
+  background-color: var(--color-white30);
+}

@@ -31,6 +31,7 @@ namespace tiefsee {
         /// <param name="path"></param>
         public void ShowMenu(string path) {
             if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
+                path = "\"" + path + "\"";
                 try {
                     Process.Start(new ProcessStartInfo("rundll32.exe") {
                         Arguments = $"shell32.dll,OpenAs_RunDLL {path}",

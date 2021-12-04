@@ -27,6 +27,7 @@ class BaseWindow {
         this.width = 0;
         this.height = 0;
         this.windowState = "Normal";
+        this.closingEvents = []; //關閉視窗時執行的function
         var dom_window = document.querySelector('.window');
         var btn_menu = document.querySelector(".titlebar-tools-menu");
         var btn_topmost = document.querySelector(".titlebar-tools-topmost");
@@ -43,10 +44,15 @@ class BaseWindow {
         this.btn_maximized = btn_maximized;
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
-        btn_menu.addEventListener("click", e => {
+        //判斷目前的狀態是視窗化還是最大化
+        (() => __awaiter(this, void 0, void 0, function* () {
+            this.windowState = yield WV_Window.WindowState;
+            this.initWindowState();
+        }))();
+        btn_menu === null || btn_menu === void 0 ? void 0 : btn_menu.addEventListener("click", e => {
             //alert()
         });
-        btn_topmost.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        btn_topmost === null || btn_topmost === void 0 ? void 0 : btn_topmost.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             this.topMost = yield WV_Window.TopMost;
             if (this.topMost === true) {
                 btn_topmost.setAttribute("active", "");
@@ -56,17 +62,17 @@ class BaseWindow {
             }
             WV_Window.TopMost = !this.topMost;
         }));
-        btn_normal.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        btn_normal === null || btn_normal === void 0 ? void 0 : btn_normal.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             this.normal();
         }));
-        btn_minimized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        btn_minimized === null || btn_minimized === void 0 ? void 0 : btn_minimized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             this.minimized();
         }));
-        btn_maximized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
+        btn_maximized === null || btn_maximized === void 0 ? void 0 : btn_maximized.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             this.maximized();
         }));
-        btn_close.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
-            WV_Window.Close();
+        btn_close === null || btn_close === void 0 ? void 0 : btn_close.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
+            this.close();
         }));
         //註冊視窗邊框拖曳
         windowBorder(document.querySelector(".window-CT"), "CT");
@@ -88,27 +94,64 @@ class BaseWindow {
             }));
         }
     }
-    SizeChanged(left, top, width, height, windowState) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.windowState = windowState;
-        this.initWindowState();
+    /**
+     * 取得拖曳進來的檔案路徑
+     * @returns
+     */
+    getDropPath() {
+        return __awaiter(this, void 0, void 0, function* () {
+            //觸發拖曳檔案後，C#會修改全域變數temp_dropPath
+            let _dropPath = "";
+            for (let i = 0; i < 100; i++) {
+                if (temp_dropPath !== "") {
+                    _dropPath = temp_dropPath;
+                    _dropPath = decodeURIComponent(temp_dropPath);
+                    if (_dropPath.indexOf("file:///") === 0) {
+                        _dropPath = _dropPath.substr(8);
+                    }
+                    break;
+                }
+                yield sleep(10);
+            }
+            temp_dropPath = "";
+            _dropPath = _dropPath.replace(/[/]/g, "\\");
+            return _dropPath;
+        });
     }
-    Move(left, top, width, height, windowState) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.windowState = windowState;
-        //this.initWindowState();
+    /**
+     * 設定視窗標題
+     * @param txt
+     */
+    setTitle(txt) {
+        return __awaiter(this, void 0, void 0, function* () {
+            WV_Window.Text = txt;
+            this.dom_titlebarTxt.innerHTML = `<span>${txt}</span>`;
+        });
     }
-    VisibleChanged() {
-        console.log("VisibleChanged");
+    /**
+     * 開啟新的子視窗
+     * @param _name
+     * @returns
+     */
+    newWindow(_name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = location.protocol + '//' + location.host + "/www/" + _name;
+            var w = yield WV_Window.NewWindow(url, []);
+            WV_Window.SetOwner(w); //設為子視窗
+            //w.Focus();//取得焦點
+            return w;
+        });
     }
-    FormClosing() {
-        console.log("FormClosing");
+    /**
+     * 關閉視窗
+     */
+    close() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (let i = 0; i < this.closingEvents.length; i++) {
+                yield this.closingEvents[i]();
+            }
+            WV_Window.Close();
+        });
     }
     /** 最大化 */
     maximized() {
@@ -136,121 +179,23 @@ class BaseWindow {
             this.btn_maximized.style.display = "flex";
         }
     }
-    /**
-     * 取得拖曳進來的檔案路徑
-     * @returns
-     */
-    GetDropPath() {
-        return __awaiter(this, void 0, void 0, function* () {
-            //觸發拖曳檔案後，C#會修改全域變數temp_dropPath
-            let _dropPath = "";
-            for (let i = 0; i < 100; i++) {
-                yield sleep(10);
-                if (temp_dropPath !== "") {
-                    _dropPath = temp_dropPath;
-                    _dropPath = decodeURIComponent(temp_dropPath);
-                    if (_dropPath.indexOf("file:///") === 0) {
-                        _dropPath = _dropPath.substr(8);
-                    }
-                    break;
-                }
-            }
-            _dropPath = _dropPath.replace(/[/]/g, "\\");
-            return _dropPath;
-        });
+    //由C#主動呼叫
+    SizeChanged(left, top, width, height, windowState) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+        this.initWindowState();
     }
-    /**
-     * 設定視窗標題
-     * @param txt
-     */
-    setTitle(txt) {
-        return __awaiter(this, void 0, void 0, function* () {
-            WV_Window.Text = txt;
-            this.dom_titlebarTxt.innerHTML = `<span>${txt}</span>`;
-        });
+    //由C#主動呼叫
+    Move(left, top, width, height, windowState) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.windowState = windowState;
+        //this.initWindowState();
     }
 }
 //---------------
-/**
- * 匯入外部檔案
- */
-function initDomImport() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let ar_dom = document.querySelectorAll("import");
-        for (let i = 0; i < ar_dom.length; i++) {
-            const _dom = ar_dom[i];
-            let src = _dom.getAttribute("src");
-            if (src != null)
-                yield fetch(src, {
-                    "method": "get",
-                }).then((response) => {
-                    return response.text();
-                }).then((html) => {
-                    _dom.outerHTML = html;
-                }).catch((err) => {
-                    console.log("error: ", err);
-                });
-        }
-    });
-}
-/**
- * html字串 轉 dom物件
- * @param html
- * @returns
- */
-function newDiv(html) {
-    let div = document.createElement("div");
-    div.innerHTML = html;
-    return div.getElementsByTagName("div")[0];
-}
-/**
- * 等待
- * @param ms 毫秒
- */
-function sleep(ms) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield new Promise((resolve, reject) => {
-            setTimeout(function () {
-                resolve(0); //繼續往下執行
-            }, ms);
-        });
-    });
-}
-/**
- * 轉 number
- */
-function toNumber(t) {
-    if (typeof (t) === "number") {
-        return t;
-    } //如果本來就是數字，直接回傳     
-    if (typeof t === 'string') {
-        return Number(t.replace('px', ''));
-    } //如果是string，去掉px後轉型成數字
-    return 0;
-}
-/**
- * 對Date的擴充套件，將 Date 轉化為指定格式的String
- * 月(M)、日(d)、小時(h)、分(m)、秒(s)、季度(q) 可以用 1-2 個佔位符，
- * 年(y)可以用 1-4 個佔位符，毫秒(S)只能用 1 個佔位符(是 1-3 位的數字)
- * 例子：
- * (new Date()).format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
- * (new Date()).format("yyyy-M-d h:m:s.S")   ==> 2006-7-2 8:9:4.18
- */
-Date.prototype.format = function (format) {
-    var o = {
-        "M+": this.getMonth() + 1,
-        "d+": this.getDate(),
-        "h+": this.getHours(),
-        "m+": this.getMinutes(),
-        "s+": this.getSeconds(),
-        "q+": Math.floor((this.getMonth() + 3) / 3),
-        "S": this.getMilliseconds() //millisecond
-    };
-    if (/(y+)/.test(format))
-        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
-        if (new RegExp("(" + k + ")").test(format))
-            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] :
-                ("00" + o[k]).substr(("" + o[k]).length));
-    return format;
-};

@@ -14,7 +14,7 @@ namespace tiefsee {
         [STAThread]
         static void Main(string[] args) {
 
-          
+           
 
             //在本地端建立server
             BaseServer bserver = new BaseServer();
@@ -24,12 +24,14 @@ namespace tiefsee {
 
             //String path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "www", "main.html");
 
-            
+      
+
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WebWindow(_url, args));
+            Application.Run(new WebWindow(_url, args,null));
+          
             //Application.Run(new WebStart(_url));
-
+          
 
         }
     }

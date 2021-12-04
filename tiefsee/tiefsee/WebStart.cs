@@ -23,17 +23,22 @@ namespace tiefsee {
 
             DateTime time_start = DateTime.Now;//計時開始 取得目前時間
 
-           // await wv2.EnsureCoreWebView2Async();
-            wv2.NavigateToString("<html><body><h2>This is an HTML fragment</h2></body></html>");
-
+            await wv2.EnsureCoreWebView2Async();
 
             DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
             string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
             System.Console.WriteLine("+++++++++++++++++++++++++++++++++++" + result2 + " 毫秒");
 
-            MessageBox.Show(result2 + " 毫秒");
+            wv2.NavigateToString($"<html><body><h2>{result2}</h2></body></html>");
 
-          
+
+             string _url = $"http://localhost:{55444}/www/MainWindow.html";
+                // new WebWindow(_url, new string[0], null);
+
+
+            //MessageBox.Show(result2 + " 毫秒");
+
+
 
             // String  x = await  wv2.ExecuteScriptAsync("return '10';");
 
@@ -45,9 +50,9 @@ namespace tiefsee {
 
         public  WebStart(String _url) {
 
-            Adapter.Initialize();
+            //Adapter.Initialize();
+        
 
-            
 
             wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             wv2.Dock = DockStyle.Fill;

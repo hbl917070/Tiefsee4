@@ -12,23 +12,31 @@ class MainWindow {
     constructor() {
         baseWindow = new BaseWindow(); //初始化視窗
         var dom_tools = document.getElementById("main-tools");
-        var config = new Config(this);
+        var dom_maxBtnLeft = document.getElementById("maxBtnLeft");
+        var dom_maxBtnRight = document.getElementById("maxBtnRight");
+        var config = new Config();
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
         var script = new Script(this);
         new InitMenu(this);
         this.dom_tools = dom_tools;
+        this.dom_maxBtnLeft = dom_maxBtnLeft;
+        this.dom_maxBtnRight = dom_maxBtnRight;
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.menu = menu;
         this.config = config;
         this.script = script;
+        this.readSetting = readSetting;
         new MainTools(this);
         init();
         function init() {
             return __awaiter(this, void 0, void 0, function* () {
                 initDomImport();
+                //讀取設定
+                yield getSettingFile();
+                readSetting(config.settings);
                 //取得命令列參數
                 let args = yield WV_Window.GetArguments();
                 if (args.length === 0) {
@@ -40,6 +48,12 @@ class MainWindow {
                 else {
                     fileLoad.loadFiles(args[0], args);
                 }
+                dom_maxBtnLeft.addEventListener('click', function (e) {
+                    script.fileLoad.prev();
+                });
+                dom_maxBtnRight.addEventListener('click', function (e) {
+                    script.fileLoad.next();
+                });
                 //封鎖原生右鍵選單
                 document.addEventListener('contextmenu', function (e) {
                     e.preventDefault();
@@ -65,7 +79,7 @@ class MainWindow {
                     }
                 }));
                 //double click 最大化或視窗化
-                Lib.AddEventDblclick(baseWindow.dom_titlebarTxt, () => __awaiter(this, void 0, void 0, function* () {
+                Lib.addEventDblclick(baseWindow.dom_titlebarTxt, () => __awaiter(this, void 0, void 0, function* () {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Maximized") {
                         baseWindow.normal();
@@ -74,7 +88,7 @@ class MainWindow {
                         baseWindow.maximized();
                     }
                 }));
-                Lib.AddEventDblclick(dom_tools, (e) => __awaiter(this, void 0, void 0, function* () {
+                Lib.addEventDblclick(dom_tools, (e) => __awaiter(this, void 0, void 0, function* () {
                     //如果是按鈕就不雙擊全螢幕
                     let _dom = e.target;
                     if (_dom) {
@@ -90,7 +104,7 @@ class MainWindow {
                         baseWindow.maximized();
                     }
                 }));
-                Lib.AddEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
+                Lib.addEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Maximized") {
                         baseWindow.normal();
@@ -144,7 +158,7 @@ class MainWindow {
                         let files = e.dataTransfer.files;
                         //console.log(files);
                         //取得拖曳進來的檔案路徑
-                        let _dropPath = yield baseWindow.GetDropPath();
+                        let _dropPath = yield baseWindow.getDropPath();
                         if (_dropPath === "") {
                             return;
                         }
@@ -164,6 +178,48 @@ class MainWindow {
                         e.preventDefault();
                     });
                 }
+            });
+        }
+        function readSetting(s) {
+            var setting = (s);
+            //@ts-ignore
+            config.settings = setting;
+            var cssRoot = document.documentElement;
+            cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
+            initColor("--color-window-background", true);
+            initColor("--color-window-border", true);
+            initColor("--color-white");
+            initColor("--color-black");
+            initColor("--color-blue");
+            //initColor("--color-grey");
+            function initColor(name, opacity = false) {
+                //@ts-ignore
+                let c = config.settings.theme[name];
+                if (opacity) {
+                    cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a} )`);
+                }
+                else {
+                    for (let i = 1; i < 9; i++) {
+                        cssRoot.style.setProperty(name + `${i}0`, `rgba(${c.r}, ${c.g}, ${c.b}, ${(i / 10)} )`);
+                    }
+                    cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, 1 )`);
+                }
+            }
+        }
+        /**
+         * 讀取設定
+         */
+        function getSettingFile() {
+            return __awaiter(this, void 0, void 0, function* () {
+                let s = JSON.stringify(config.settings, null, '\t');
+                var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);
+                if ((yield WV_Directory.Exists(path)) === false) {
+                    yield WV_Directory.CreateDirectory(path);
+                }
+                path = Lib.Combine([path, "setting.json"]);
+                let txt = yield WV_File.GetText(path);
+                let json = JSON.parse(txt);
+                config.settings = json;
             });
         }
     }
