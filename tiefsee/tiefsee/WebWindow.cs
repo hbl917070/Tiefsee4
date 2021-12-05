@@ -15,19 +15,19 @@ namespace tiefsee {
     [ComVisible(true)]
     public class WebWindow : FormNone {
 
-    
-       /* protected override CreateParams CreateParams {
-            get {
-                var style = base.CreateParams;
-                //style.ClassStyle |= 200; // NoCloseBtn
-                //style.ExStyle |= 0x8; // TopMost
-                style.ExStyle |= 0x80000; // Layered
-                //style.ExStyle |= 0x8000000; // NoActive          
-                return style;
-            }
-        }*/
-      
-       
+
+        /* protected override CreateParams CreateParams {
+             get {
+                 var style = base.CreateParams;
+                 //style.ClassStyle |= 200; // NoCloseBtn
+                 //style.ExStyle |= 0x8; // TopMost
+                 style.ExStyle |= 0x80000; // Layered
+                 //style.ExStyle |= 0x8000000; // NoActive          
+                 return style;
+             }
+         }*/
+
+
         public WebWindow parentWindow;//父親視窗
         public Microsoft.Web.WebView2.WinForms.WebView2 wv2;
         public string[] args;
@@ -39,28 +39,15 @@ namespace tiefsee {
             this.args = _args;
             this.parentWindow = _parentWindow;
 
-            this.Width = 550;
-            this.Height = 400;  
             wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
+            this.Width = 550;
+            this.Height = 400;
             this.Opacity = 0;//一開始先隱藏，webview2初始化完成才顯示視窗
             this.Show();
-          
-     
-            //EnableBlur(this.Handle);//毛玻璃
 
             InitWebview(_url);
 
-            this.Move += (sender, e) => { setMove(); };
-            this.SizeChanged += (sender, e) => { setMove(); };
-            this.SystemColorsChanged += (sender, e) => { setMove(); };
-            this.VisibleChanged += (sender, e) => { setMove(); };
-            this.GotFocus += (sernde, e) => {
-                //parentForm.Focus();//避免移動視窗後，焦點被父視窗搶走
-            };
-
-            string windowState = this.WindowState.ToString();
-            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{windowState}')");
-
+        
             this.SizeChanged += (sender, e) => {
                 string s = this.WindowState.ToString();
                 RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{s}')");
@@ -72,35 +59,27 @@ namespace tiefsee {
 
             //this.VisibleChanged += (sender, e) => { RunJs("baseWindow.VisibleChanged()"); };
             //this.FormClosing += (sender, e) => { RunJs("baseWindow.FormClosing()"); };
-            //this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };//無效
-            //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };//無效
+            //this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };
+            //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
 
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_url"></param>
         private async void InitWebview(string _url) {
 
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
             wv2.Source = new Uri(_url);
-            
+
             await wv2.EnsureCoreWebView2Async();//等待初始化完成
 
-            /*var tim = new System.Windows.Forms.Timer();
-            tim.Interval = 150;
-            tim.Tick += (e, sentet) => {
-            };
-            tim.Start();*/
-
             wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                this.BackColor = Color.Red;//設定視窗為透明背景
-                this.TransparencyKey = this.BackColor;
-                this.Controls.Add(wv2);
-
-                this.Opacity = 1;
             };
 
-        
             wv2.CoreWebView2.AddHostObjectToScript("WV_Window", new WV_Window(this));
             wv2.CoreWebView2.AddHostObjectToScript("WV_Directory", new WV_Directory(this));
             wv2.CoreWebView2.AddHostObjectToScript("WV_File", new WV_File(this));
@@ -121,43 +100,47 @@ namespace tiefsee {
                 RunJs($"var temp_dropPath = \"{_fileurl}\"");
 
             };
-          
+
         }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="js"></param>
         public void RunJs(String js) {
             if (wv2.CoreWebView2 != null)
                 wv2.CoreWebView2.ExecuteScriptAsync(js);
         }
 
 
-        void setMove() {
+        /// <summary>
+        /// 呼叫此函數後才會顯示視窗( 以js呼叫
+        /// </summary>
+        public void ShowWindow() {
 
+            string windowState = this.WindowState.ToString();
+            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{windowState}')");
 
-            //int c = SystemInformation.VerticalResizeBorderThickness;
-
-            // GetWindowRectangle
-            //System.Console.WriteLine(btn.PointToScreen(new Point(0,0)).Y + " " + this.PointToScreen(new Point(0, 0)).Y);
-
-            /* if (this.WindowState == FormWindowState.Maximized) {
-                 //最大化時，視窗內縮8px
-                 int h = SystemInformation.VerticalResizeBorderThickness - SystemInformation.BorderSize.Height;
-                 h = 8;
-                 this.Width = this.Width - h * 2;
-                 this.Height = this.Height - h * 2;
-                 this.Left = this.Left + h;
-                 this.Top = this.Top + h;
-             } else {
-                 int h = 7;
-                 this.Width = this.Width - h * 2;
-                 this.Height = this.Height - h;
-                 this.Left = this.Left + h;
-                 this.Top = this.Top;
-             }*/
-        
+            this.BackColor = Color.Red;//設定視窗為透明背景
+            this.TransparencyKey = this.BackColor;
+            this.Controls.Add(wv2);
+            this.Opacity = 1;
         }
 
 
+        private static bool CheckWebView() {
+            try {
+                var str = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
+                if (!string.IsNullOrWhiteSpace(str)) {
+                    return true;
+                }
+            } catch (Exception) {
+                return false;
+            }
+            return false;
+        }
 
     }
 
@@ -206,6 +189,7 @@ namespace tiefsee {
         }
 
 
+        // https://rjcodeadvance.com/final-modern-ui-aero-snap-window-resizing-sliding-menu-c-winforms/
         //移除標題列
         protected override void WndProc(ref Message m) {
             const int WM_NCCALCSIZE = 0x0083;//Standar Title Bar - Snap Window

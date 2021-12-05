@@ -111,7 +111,7 @@ class Config {
     public async getFileType(path: string) {
 
         let fileType = await WV_File.GetFIleType(path);//取得檔案類型
-//console.log("fileType  " + fileType)
+        //console.log("fileType  " + fileType)
         let fileExt = Lib.GetExtension(path);//取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
 
@@ -152,6 +152,7 @@ class Config {
 
     public settings = {
         theme: {
+            "aero": false,
             "--window-border-radius": 10,
             "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
             "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
@@ -159,6 +160,7 @@ class Config {
             "--color-black": { r: 0, g: 0, b: 0, },
             "--color-blue": { r: 0, g: 200, b: 255, },
             "--color-grey": { r: 30, g: 30, b: 30, },
+
         }
     }
 }

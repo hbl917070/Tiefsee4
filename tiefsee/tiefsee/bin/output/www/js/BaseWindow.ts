@@ -48,7 +48,7 @@ class BaseWindow {
 
         let _dropPath: string = "";
         for (let i = 0; i < 100; i++) {
-         
+
 
             if (temp_dropPath !== "") {
                 _dropPath = temp_dropPath;
@@ -182,7 +182,15 @@ class BaseWindow {
             this.close();
         });
 
-
+        //double click 最大化或視窗化
+        Lib.addEventDblclick(dom_titlebarTxt, async () => {//標題列
+            let WindowState = this.windowState;
+            if (WindowState === "Maximized") {
+                this.normal();
+            } else {
+                this.maximized();
+            }
+        });
 
         //註冊視窗邊框拖曳
         windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");
@@ -203,6 +211,7 @@ class BaseWindow {
             });
 
             _dom.addEventListener("touchstart", async (e) => {
+                //await WV_Window.WindowDrag(_type);
             });
         }
 

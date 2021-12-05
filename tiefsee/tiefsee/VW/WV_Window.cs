@@ -54,6 +54,12 @@ namespace tiefsee {
 
         }
 
+        /// <summary>
+        /// 網頁載入完成後，以js呼叫此函數，才會顯示視窗
+        /// </summary>
+        public void ShowWindow() {
+            M.ShowWindow();
+        }
 
         /// <summary>
         /// 設定視窗最小size
@@ -66,7 +72,7 @@ namespace tiefsee {
 
 
         /// <summary>
-        /// 視窗使用毛玻璃特效
+        /// 視窗使用毛玻璃效果
         /// </summary>
         public void SetAERO() {
 
@@ -82,7 +88,14 @@ namespace tiefsee {
                 WebWindow webwindow = (WebWindow)_window;
                 //webwindow.Owner = M.parentForm;
                 //webwindow.ShowInTaskbar = true;
-                webwindow.Owner = M;
+                if (M.TopMost == true) {
+                    M.TopMost = false;//設定子視窗的時候，如果付錢視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
+                    webwindow.Owner = M;
+                    M.TopMost = true;
+                } else {
+                    webwindow.Owner = M;
+                }
+
                 //M.StartPosition = FormStartPosition.CenterParent;
             }
         }

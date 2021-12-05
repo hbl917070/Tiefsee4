@@ -54,7 +54,7 @@
             <!-- <img src="/img/logo.svg" style="width:35px;display:block;margin:10px;margin-top:10px"> -->
 
             <div class="pagetab">
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 主題</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 外觀</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
@@ -97,16 +97,16 @@
                 <!-- 主題 -->
                 <div class="page-tabsPage" id="tabsPage-theme">
 
-                    <div class="page-title" i18b=""> 主題 </div>
+                    <div class="page-title" i18b=""> 外觀 </div>
 
                     <div class="box">
-                        <div class="box-title"> 套用 </div>
+                        <div class="box-title"> 套用預設主題 </div>
                         <div id="applyTheme-btns"></div>
                     </div>
 
                     <div class="box">
-                        <div class="box-title"> 顏色詳細自定 </div>
-                     
+                        <div class="box-title"> 自定主題顏色 </div>
+
                         <div class="text-box">
                             <div class="text-title"> 視窗背景色</div>
                             <div class="text-content">
@@ -149,26 +149,49 @@
 
 
                     <div class="box">
-                        <div class="box-title"> 視窗圓角 </div>
+                        <div class="box-title"> 視窗設定 </div>
                         <div class="text-box">
-                            <div class="text-title"> 0~15</div>
+                            <div class="text-title"> 視窗圓角 (0~15)</div>
                             <div class="text-content">
                                 <input class="text-input" type="text" id="text-theme-windowBorderRadius">
                             </div>
                         </div>
+                        <div class="text-box">
+                            <div class="text-title"> 毛玻璃效果(需重啟程式)</div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-theme-areo">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
+
+
+
 
                 </div>
 
                 <!-- 工具列 -->
                 <div class="page-tabsPage" id="tabsPage-tools">
                     <div class="page-title" i18b=""> 工具列 </div>
-
+                    <div class="box">
+                        <div class="box-title">
+                            還在做
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 快速鍵 -->
                 <div class="page-tabsPage" id="tabsPage-shortcutKeys">
                     <div class="page-title" i18b=""> 快速鍵 </div>
+                    
+                    <div class="box">
+                        <div class="box-title">
+                            還在做
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -177,31 +200,41 @@
                     <div class="page-title" i18b=""> 關於 </div>
 
                     <div class="box">
-                        <div class="box-title"> TiefSee 4.0.0-bate.2 </div>
+                        <div class="box-title">
+                            版本：TiefSee 4.0.0-bate.2
+                        </div>
+                        <div class="box-title">
+                            作者：
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+                        </div>
+                        <div class="box-title">
+                            原始碼：
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/tiefsee4')">GitHub</span>
+                        </div>
                     </div>
-
                 </div>
+
             </div>
+
+
+            <div class="window-LC window-border"></div>
+            <div class="window-RC window-border"></div>
+            <div class="window-CT window-border"></div>
+            <div class="window-LT window-border"></div>
+            <div class="window-RT window-border"></div>
+            <div class="window-CB window-border"></div>
+            <div class="window-LB window-border"></div>
+            <div class="window-RB window-border"></div>
 
         </div>
 
 
-        <div class="window-LC window-border"></div>
-        <div class="window-RC window-border"></div>
-        <div class="window-CT window-border"></div>
-        <div class="window-LT window-border"></div>
-        <div class="window-RT window-border"></div>
-        <div class="window-CB window-border"></div>
-        <div class="window-LB window-border"></div>
-        <div class="window-RB window-border"></div>
-
-    </div>
-
-
-    <script>
+        <script>
        //     $(`[data-format="rgba"]`).minicolors({ format: "rgb", opacity: true, });
        //     $(`[data-format="rgb"]`).minicolors({ format: "rgb", opacity: false, });
-    </script>
+        </script>
 
 
 

@@ -44,8 +44,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   color: var(--color-white);
+  user-select: none;
+  /* pointer-events: none; */
 }
 
 .main-tiefseeview {
@@ -82,10 +83,12 @@
   margin: auto;
   margin-bottom: 30px;
   display: block;
+  pointer-events: none;
 }
 .welcomeview-txt {
   text-align: center;
   font-size: 20px;
+  pointer-events: none;
 }
 
 /*---------------------------*/

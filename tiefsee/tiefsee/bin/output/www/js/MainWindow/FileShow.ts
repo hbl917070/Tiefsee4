@@ -10,6 +10,7 @@ class FileShow {
 
     public view_image;
     public dom_image;
+    public dom_welcomeview;
 
     constructor(M: MainWindow) {
 
@@ -25,6 +26,7 @@ class FileShow {
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
+        this.dom_welcomeview= dom_welcomeview;
 
         this.dom_image = dom_image;
         this.view_image = view_image;

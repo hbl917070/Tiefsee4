@@ -50,6 +50,7 @@ class Config {
         };
         this.settings = {
             theme: {
+                "aero": false,
                 "--window-border-radius": 10,
                 "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
                 "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },

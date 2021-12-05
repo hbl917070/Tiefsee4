@@ -34,6 +34,9 @@ interface WebWindow {
 
 interface WV_Window {
 
+    /** 網頁載入完成後，以js呼叫此函數，才會顯示視窗 */
+    ShowWindow():void;
+
     /**
      * 新開視窗
      * @param url 完整網址
@@ -46,6 +49,9 @@ interface WV_Window {
 
     /** 在父親視窗運行js */
     RunJsOfParent(js: string): string;
+
+    /** 啟用AERO毛玻璃效果 */
+    SetAERO():void;
 
     /** 設定視窗最小size */
     SetMinimumSize(width: number, height: number):void;
@@ -228,7 +234,7 @@ interface FileInfo2 {
 
     /** 修改時間 */
     LastWriteTimeUtc: number,
-    
+
     /** 讀取前50個byte，用於辨識檔案類型 */
     HexValue: string
 }
@@ -346,6 +352,8 @@ interface WV_RunApp {
      * @param UseShellExecute false=新視窗個體 
      */
     ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean); void
+
+    OpenUrl(url:string):boolean;
 }
 
 

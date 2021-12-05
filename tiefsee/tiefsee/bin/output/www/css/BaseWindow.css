@@ -1,7 +1,10 @@
 :root {
+  /** 可拖曳的邊框 */
   --window-border: 8px;
+  /** 可拖曳的四個角落 */
   --window-border-corner: 20px;
-  --window-border-radius: 10px;
+  /** 視窗圓角 */
+  --window-border-radius: 0px;
 
   --color-window-border: rgba(255, 255, 255, 0.25);
   --color-window-background: rgba(31, 39, 43, 0.97);
@@ -213,9 +216,7 @@ button {
 
 /* #endregion */
 
-
 /*----------------------------------------------------------------*/
-
 
 /*捲動軸樣式*/
 
@@ -236,6 +237,6 @@ button {
   background-color: var(--color-white40);
 }
 /*右下角交匯處*/
-.base-scrollbar::-webkit-scrollbar-corner{
+.base-scrollbar::-webkit-scrollbar-corner {
   background-color: rgba(0, 0, 0, 0);
 }

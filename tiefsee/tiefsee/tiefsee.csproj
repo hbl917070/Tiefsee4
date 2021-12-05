@@ -86,9 +86,6 @@
     <Compile Include="VW\WV_System.cs" />
     <Compile Include="VW\WV_T.cs" />
     <Compile Include="VW\WV_Window.cs" />
-    <Compile Include="WebStart.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="WebWindow.cs">
       <SubType>Form</SubType>
     </Compile>

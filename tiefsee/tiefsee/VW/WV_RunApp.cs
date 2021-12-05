@@ -22,6 +22,7 @@ namespace tiefsee {
 
         public WV_RunApp(WebWindow m) {
             this.M = m;
+
         }
 
 
@@ -31,7 +32,7 @@ namespace tiefsee {
         /// <param name="path"></param>
         public void ShowMenu(string path) {
             if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
-                path = "\"" + path + "\"";
+                //path = "\"" + path + "\"";
                 try {
                     Process.Start(new ProcessStartInfo("rundll32.exe") {
                         Arguments = $"shell32.dll,OpenAs_RunDLL {path}",
@@ -110,6 +111,7 @@ namespace tiefsee {
             }
         }
 
+
         /// <summary>
         /// 以 photos APP開啟(已失效)
         /// </summary>
@@ -125,7 +127,6 @@ namespace tiefsee {
             }
         }
 
-        
 
 
         /// <summary>
@@ -150,7 +151,16 @@ namespace tiefsee {
         }
 
 
+        public bool OpenUrl(string url) {
 
+            try {
+                System.Diagnostics.Process.Start(url);
+                return true;
+            } catch {
+                return false;
+            }
+
+        }
 
 
 

@@ -1,20 +1,25 @@
+WV_Window.ShowWindow();//顯示視窗
 
 class Setting {
 
-
+    public saveData;
 
     constructor() {
+
+        this.saveData = saveData;
 
         var config = new Config();
 
         var cssRoot = document.documentElement;
 
-        var jQdom_theme_windowBorderRadius = $("#text-theme-windowBorderRadius");
-        var jQdom_theme_colorWindowBackground = $("#text-theme-colorWindowBackground");
-        var jQdom_theme_colorWindowBorder = $("#text-theme-colorWindowBorder");
-        var jQdom_theme_colorWhite = $("#text-theme-colorWhite");
-        var jQdom_theme_colorBlack = $("#text-theme-colorBlack");
-        var jQdom_theme_colorBlue = $("#text-theme-colorBlue");
+        var jqdom_theme_windowBorderRadius = $("#text-theme-windowBorderRadius");
+        var jqdom_theme_colorWindowBackground = $("#text-theme-colorWindowBackground");
+        var jqdom_theme_colorWindowBorder = $("#text-theme-colorWindowBorder");
+        var jqdom_theme_colorWhite = $("#text-theme-colorWhite");
+        var jqdom_theme_colorBlack = $("#text-theme-colorBlack");
+        var jqdom_theme_colorBlue = $("#text-theme-colorBlue");
+        var dom_theme_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
+
         //var jQdom_theme_colorGrey = $("#text-theme-colorGrey");
 
         var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
@@ -86,11 +91,11 @@ class Setting {
         /** 初始化顏色選擇器物件 */
         function initTheme() {
 
-            addEvent(jQdom_theme_colorWindowBackground, "--color-window-background", true);//視窗顏色
-            addEvent(jQdom_theme_colorWindowBorder, "--color-window-border", true);//邊框顏色
-            addEvent(jQdom_theme_colorWhite, "--color-white", false);//
-            addEvent(jQdom_theme_colorBlack, "--color-black", false);//
-            addEvent(jQdom_theme_colorBlue, "--color-blue", false);//
+            addEvent(jqdom_theme_colorWindowBackground, "--color-window-background", true);//視窗顏色
+            addEvent(jqdom_theme_colorWindowBorder, "--color-window-border", true);//邊框顏色
+            addEvent(jqdom_theme_colorWhite, "--color-white", false);//
+            addEvent(jqdom_theme_colorBlack, "--color-black", false);//
+            addEvent(jqdom_theme_colorBlue, "--color-blue", false);//
             //add(jQdom_theme_colorGrey, "--color-grey", false);//
 
 
@@ -122,13 +127,19 @@ class Setting {
 
         }
 
-        jQdom_theme_windowBorderRadius.change(() => {
-            let val = Number(jQdom_theme_windowBorderRadius.val());
+        jqdom_theme_windowBorderRadius.change(() => {
+            let val = Number(jqdom_theme_windowBorderRadius.val());
             if (val < 0) { val = 0; }
             if (val > 15) { val = 15; }
 
             config.settings["theme"]["--window-border-radius"] = val;
             WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+        });
+
+
+        dom_theme_areo?.addEventListener("change", () => {
+            let val = dom_theme_areo.checked;
+            config.settings["theme"]["aero"] = val;
         });
 
 
@@ -162,9 +173,15 @@ class Setting {
         }
 
 
+        /**
+         * 讀取設置值
+         */
         function readSetting() {
 
-            jQdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
+            jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
+            dom_theme_areo.checked = config.settings["theme"]["aero"];
+
+            //-------------
 
             function setRgb(jqdom: JQuery<HTMLElement>, c: { r: number, g: number, b: number, }) {
                 //@ts-ignore
@@ -174,11 +191,11 @@ class Setting {
                 //@ts-ignore
                 jqdom.minicolors("value", `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`);
             }
-            setRgba(jQdom_theme_colorWindowBackground, config.settings.theme["--color-window-background"]);
-            setRgba(jQdom_theme_colorWindowBorder, config.settings.theme["--color-window-border"]);
-            setRgb(jQdom_theme_colorWhite, config.settings.theme["--color-white"]);
-            setRgb(jQdom_theme_colorBlack, config.settings.theme["--color-black"]);
-            setRgb(jQdom_theme_colorBlue, config.settings.theme["--color-blue"]);
+            setRgba(jqdom_theme_colorWindowBackground, config.settings.theme["--color-window-background"]);
+            setRgba(jqdom_theme_colorWindowBorder, config.settings.theme["--color-window-border"]);
+            setRgb(jqdom_theme_colorWhite, config.settings.theme["--color-white"]);
+            setRgb(jqdom_theme_colorBlack, config.settings.theme["--color-black"]);
+            setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
 
         }
 

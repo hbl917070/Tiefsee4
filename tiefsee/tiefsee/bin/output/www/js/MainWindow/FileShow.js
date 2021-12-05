@@ -19,6 +19,7 @@ class FileShow {
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
+        this.dom_welcomeview = dom_welcomeview;
         this.dom_image = dom_image;
         this.view_image = view_image;
         //openImage("https://wall.bahamut.com.tw/B/40/5328257e8d00594e61f8b815d505cab3_4080425.JPG")

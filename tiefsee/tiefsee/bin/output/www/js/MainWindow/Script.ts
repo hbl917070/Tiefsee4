@@ -1,3 +1,4 @@
+
 class Script {
 
     //private M: MainWindow;
@@ -7,7 +8,7 @@ class Script {
     public file: ScriptFile;
     public menu: ScriptMenu;
     public open: ScriptOpen;
-    public scriptSteting: ScriptSteting;
+    public steting: ScriptSteting;
 
     constructor(M: MainWindow) {
 
@@ -17,7 +18,7 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
-        this.scriptSteting = new ScriptSteting(M);
+        this.steting = new ScriptSteting(M);
     }
 
 }

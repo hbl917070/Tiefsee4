@@ -16,7 +16,7 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
-        this.scriptSteting = new ScriptSteting(M);
+        this.steting = new ScriptSteting(M);
     }
 }
 class ScriptImg {

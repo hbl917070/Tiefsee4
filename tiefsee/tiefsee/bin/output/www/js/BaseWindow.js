@@ -74,6 +74,16 @@ class BaseWindow {
         btn_close === null || btn_close === void 0 ? void 0 : btn_close.addEventListener("click", (e) => __awaiter(this, void 0, void 0, function* () {
             this.close();
         }));
+        //double click 最大化或視窗化
+        Lib.addEventDblclick(dom_titlebarTxt, () => __awaiter(this, void 0, void 0, function* () {
+            let WindowState = this.windowState;
+            if (WindowState === "Maximized") {
+                this.normal();
+            }
+            else {
+                this.maximized();
+            }
+        }));
         //註冊視窗邊框拖曳
         windowBorder(document.querySelector(".window-CT"), "CT");
         windowBorder(document.querySelector(".window-RC"), "RC");
@@ -91,6 +101,7 @@ class BaseWindow {
                 }
             }));
             _dom.addEventListener("touchstart", (e) => __awaiter(this, void 0, void 0, function* () {
+                //await WV_Window.WindowDrag(_type);
             }));
         }
     }

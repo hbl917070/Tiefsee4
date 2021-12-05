@@ -37,17 +37,31 @@ class MainWindow {
                 //讀取設定
                 yield getSettingFile();
                 readSetting(config.settings);
+                baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
+                    if (script.steting.temp_setting != null) { //如果有開啟 設定視窗
+                        if ((yield script.steting.temp_setting.Visible) === true) {
+                            yield script.steting.temp_setting.RunJs("setting.saveData();"); //關閉前先儲存設定
+                            yield sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
+                        }
+                    }
+                }));
+                WV_Window.SetMinimumSize(250, 250); //設定視窗最小size
+                WV_Window.ShowWindow(); //顯示視窗
+                if (config.settings["theme"]["aero"]) {
+                    WV_Window.SetAERO(); // aero毛玻璃效果
+                }
                 //取得命令列參數
                 let args = yield WV_Window.GetArguments();
                 if (args.length === 0) {
                     fileShow.openWelcome();
                 }
                 else if (args.length === 1) {
-                    fileLoad.loadFile(args[0]);
+                    fileLoad.loadFile(args[0]); //載入單張圖片
                 }
                 else {
-                    fileLoad.loadFiles(args[0], args);
+                    fileLoad.loadFiles(args[0], args); //載入多張圖片
                 }
+                //大型換頁按鈕
                 dom_maxBtnLeft.addEventListener('click', function (e) {
                     script.fileLoad.prev();
                 });
@@ -79,15 +93,6 @@ class MainWindow {
                     }
                 }));
                 //double click 最大化或視窗化
-                Lib.addEventDblclick(baseWindow.dom_titlebarTxt, () => __awaiter(this, void 0, void 0, function* () {
-                    let WindowState = baseWindow.windowState;
-                    if (WindowState === "Maximized") {
-                        baseWindow.normal();
-                    }
-                    else {
-                        baseWindow.maximized();
-                    }
-                }));
                 Lib.addEventDblclick(dom_tools, (e) => __awaiter(this, void 0, void 0, function* () {
                     //如果是按鈕就不雙擊全螢幕
                     let _dom = e.target;
@@ -105,6 +110,15 @@ class MainWindow {
                     }
                 }));
                 Lib.addEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Maximized") {
+                        baseWindow.normal();
+                    }
+                    else {
+                        baseWindow.maximized();
+                    }
+                }));
+                Lib.addEventDblclick(fileShow.dom_welcomeview, () => __awaiter(this, void 0, void 0, function* () {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Maximized") {
                         baseWindow.normal();
@@ -139,6 +153,19 @@ class MainWindow {
                         dom_tools.scroll(scrollLeft - 20, 0);
                     }
                 }, false);
+                //讓歡迎畫面允許拖曳視窗
+                fileShow.dom_welcomeview.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
+                    console.log(2);
+                    let _dom = e.target;
+                    if (_dom) {
+                        if (_dom.classList.contains("js-noDrag")) {
+                            return;
+                        }
+                    }
+                    if (e.button === 0) { //滑鼠左鍵
+                        yield WV_Window.WindowDrag("move");
+                    }
+                }));
                 window.addEventListener("dragenter", dragenter, false);
                 window.addEventListener("dragover", dragover, false);
                 window.addEventListener('drop', drop, false);

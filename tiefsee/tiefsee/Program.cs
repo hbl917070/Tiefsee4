@@ -14,25 +14,36 @@ namespace tiefsee {
         [STAThread]
         static void Main(string[] args) {
 
-           
-
             //在本地端建立server
             BaseServer bserver = new BaseServer();
             String _url = $"http://localhost:{bserver.port}/www/MainWindow.html";
 
             //new Window1().Show();
 
-            //String path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "www", "main.html");
+            
 
-      
+            /*if (CheckWebView() == false) {
+                MessageBox.Show("必須安裝Webview2執行環境才能使用");
+
+            } else {
+                //Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new WebWindow(_url, args, null));
+            }*/
 
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WebWindow(_url, args,null));
-          
+            Application.Run(new WebWindow(_url, args, null));
+
+
             //Application.Run(new WebStart(_url));
-          
+
 
         }
+
+       
+
+
+
     }
 }

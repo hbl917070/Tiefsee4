@@ -1,6 +1,6 @@
 ﻿{
 	"theme": {
-		"--window-border-radius": 8,
+		"--window-border-radius": 9,
 		"--color-window-background": {
 			"r": 31,
 			"g": 39,
@@ -35,6 +35,7 @@
 			"r": 30,
 			"g": 30,
 			"b": 30
-		}
+		},
+		"aero": false
 	}
 }
