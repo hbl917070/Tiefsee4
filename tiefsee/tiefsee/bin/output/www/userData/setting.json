@@ -2,10 +2,10 @@
 	"theme": {
 		"--window-border-radius": 8,
 		"--color-window-background": {
-			"r": 33,
-			"g": 41,
-			"b": 46,
-			"a": 0.89
+			"r": 31,
+			"g": 39,
+			"b": 43,
+			"a": 0.97
 		},
 		"--color-window-border": {
 			"r": 255,

@@ -151,15 +151,18 @@ namespace tiefsee {
         }
 
 
+        /// <summary>
+        /// 用瀏覽器開啟網址
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public bool OpenUrl(string url) {
-
             try {
                 System.Diagnostics.Process.Start(url);
                 return true;
             } catch {
                 return false;
             }
-
         }
 
 

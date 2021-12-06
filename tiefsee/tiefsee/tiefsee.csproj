@@ -77,7 +77,6 @@
     <Compile Include="IconHandler.cs" />
     <Compile Include="LnkToExe.cs" />
     <Compile Include="ShellContextMenu.cs" />
-    <Compile Include="TouchInjector.cs" />
     <Compile Include="VW\WV_Image.cs" />
     <Compile Include="VW\WV_RunApp.cs" />
     <Compile Include="VW\WV_Path.cs" />

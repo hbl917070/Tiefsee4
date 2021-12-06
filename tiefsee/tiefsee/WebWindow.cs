@@ -36,9 +36,11 @@ namespace tiefsee {
 
             Adapter.Initialize();
 
+            DownloadWebview2();//檢查是否有webview2執行環境
+
             this.args = _args;
             this.parentWindow = _parentWindow;
-
+            
             wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.Width = 550;
             this.Height = 400;
@@ -47,7 +49,6 @@ namespace tiefsee {
 
             InitWebview(_url);
 
-        
             this.SizeChanged += (sender, e) => {
                 string s = this.WindowState.ToString();
                 RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{s}')");
@@ -130,7 +131,7 @@ namespace tiefsee {
         }
 
 
-        private static bool CheckWebView() {
+        private bool CheckWebView2() {
             try {
                 var str = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
                 if (!string.IsNullOrWhiteSpace(str)) {
@@ -140,6 +141,20 @@ namespace tiefsee {
                 return false;
             }
             return false;
+        }
+
+        private void DownloadWebview2() {
+          
+            new Thread(() => {
+                if (CheckWebView2() == true) { //檢查安裝webview2執行環境
+                    return;
+                }
+                Adapter.UIThread(() => {//如果沒有執行環境，就用瀏覽器開啟下載頁面
+                    MessageBox.Show("必須安裝Webview2才能運行TiefSee");
+                    System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
+                    this.Close();
+                });
+            }).Start();
         }
 
     }

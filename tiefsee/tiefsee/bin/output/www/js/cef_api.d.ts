@@ -353,6 +353,7 @@ interface WV_RunApp {
      */
     ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean); void
 
+    /** 用瀏覽器開啟網址 */
     OpenUrl(url:string):boolean;
 }
 
