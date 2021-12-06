@@ -109,7 +109,7 @@ class Lib {
      * @param fileInfo2 
      * @returns 
      */
-    public static IsAnimation(fileInfo2: FileInfo2){
+    public static IsAnimation(fileInfo2: FileInfo2) {
         let hex = fileInfo2.HexValue;
         if (hex.indexOf("47 49 46 38 39 61") === 0) {
             return true;
@@ -117,7 +117,7 @@ class Lib {
         if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) {
             if (hex.indexOf("08 61 63 54") > 10) {//acTL
                 return true;
-            } 
+            }
         }
         if (hex.indexOf("57 45 42 50 56 50 38 58 0A") > 0) {//WEBPVP8X 動圖
             return true;
@@ -130,12 +130,17 @@ class Lib {
      */
     public static GetFileType(fileInfo2: FileInfo2) {
 
-        let hex = fileInfo2.HexValue;
+        let fileExt = Lib.GetExtension(fileInfo2.Path);//取得附檔名
+        fileExt = fileExt.replace(".", "").toLocaleLowerCase();
 
+        let hex = fileInfo2.HexValue;
         if (hex.indexOf("FF D8 FF") === 0) {
             return "jpg";
         }
-        if (hex.indexOf("47 49 46 38 39 61") === 0) {
+        if (hex.indexOf("42 4D") === 0 && hex.length > 30 && hex.substr(18, 11) === "00 00 00 00") {
+            return "bmp";
+        }
+        if (hex.indexOf("47 49 46 38") === 0) {//GIF8
             return "gif";
         }
         if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) {
@@ -146,7 +151,7 @@ class Lib {
             }
         }
         if (hex.indexOf("57 45 42 50 56 50 38 58 0A") > 0) {//WEBPVP8X 動圖
-            return "webp動圖";
+            return "webp";
         }
         if (hex.indexOf("57 45 42 50 56 50 38") > 0) {//WEBPVP8 靜態
             return "webp";
@@ -155,8 +160,19 @@ class Lib {
             //mimetypeapplication/vnd.adobe.sparkler.projectdcxucfPK
             return "xd";
         }
+        if (hex.indexOf("25 50 44 46") === 0) {// %PDF
+            if (fileExt === "ai") { return "ai"; }
+            return "pdf";
+        }
+        if (hex.indexOf("4C 00 00 00 01 14 02 00") === 0) {
+            return "lnk";
+        }
 
-        return "?";
+        console.log("檔案類型辨識失敗");
+        console.log(hex);
+
+   
+        return fileExt;
     }
 
 }

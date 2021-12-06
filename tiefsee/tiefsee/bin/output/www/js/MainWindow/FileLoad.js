@@ -88,7 +88,8 @@ class FileLoad {
                 else if ((yield WV_File.Exists(path)) === true) { //如果是檔案
                     let p = yield WV_Path.GetDirectoryName(path); //取得檔案所在的資料夾路徑
                     arWaitingList = yield WV_Directory.GetFiles(p, "*.*");
-                    groupType = yield fileToGroupType(path);
+                    let fileInfo2 = yield Lib.GetFileInfo2(path);
+                    groupType = fileToGroupType(fileInfo2);
                     arWaitingList = yield filter();
                     if (arWaitingList.indexOf(path) === -1) {
                         arWaitingList.splice(0, 0, path);
@@ -136,14 +137,14 @@ class FileLoad {
                 }
                 let path = getFilePath();
                 let fileInfo2 = yield Lib.GetFileInfo2(path);
-                console.log(Lib.GetFileType(fileInfo2));
+                //console.log(Lib.GetFileType(fileInfo2))
                 if (fileInfo2.Type == "none") {
                     M.fileShow.openWelcome();
                     return;
                 }
                 //如果是自定名單，就根據檔案類型判斷要用什麼方式顯示檔案
                 if (fileLoadType === FileLoadType.userDefined) {
-                    groupType = yield fileToGroupType(path);
+                    groupType = fileToGroupType(fileInfo2);
                 }
                 if (groupType === GroupType.img || groupType === GroupType.unknown) {
                     M.fileShow.openImage(fileInfo2);
@@ -187,20 +188,18 @@ class FileLoad {
          * 從檔案類型判斷，要使用什麼用什麼類型來顯示
          * @returns
          */
-        function fileToGroupType(path) {
-            return __awaiter(this, void 0, void 0, function* () {
-                //let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
-                let fileExt = yield M.config.getFileType(path);
-                for (var type in GroupType) {
-                    for (let j = 0; j < M.config.allowFileType(type).length; j++) {
-                        const fileType = M.config.allowFileType(type)[j];
-                        if (fileExt == fileType["ext"]) {
-                            return type;
-                        }
+        function fileToGroupType(fileInfo2) {
+            //let fileExt = await M.config.getFileType(path)
+            let fileExt = Lib.GetFileType(fileInfo2);
+            for (var type in GroupType) {
+                for (let j = 0; j < M.config.allowFileType(type).length; j++) {
+                    const fileType = M.config.allowFileType(type)[j];
+                    if (fileExt == fileType["ext"]) {
+                        return type;
                     }
                 }
-                return GroupType.unknown;
-            });
+            }
+            return GroupType.unknown;
         }
         function getGroupType() {
             return groupType;

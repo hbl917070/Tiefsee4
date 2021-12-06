@@ -93,18 +93,17 @@ class FileShow {
             var _a, _b, _c;
             return __awaiter(this, void 0, void 0, function* () {
                 let _path = fileInfo2.Path;
-                console.log(fileInfo2.HexValue);
                 setShowType(GroupType.img); //改變顯示類型
                 let imgurl = _path; //圖片網址
-                if (M.fileLoad.getGroupType() === GroupType.unknown) {
-                    imgurl = yield WV_Image.GetFileIcon(_path, 256);
+                if (M.fileLoad.getGroupType() === GroupType.unknown) { //如果是未知的類型
+                    imgurl = yield WV_Image.GetFileIcon(_path, 256); //取得檔案總管的圖示
                 }
                 else {
                     imgurl = "/api/getimg/" + encodeURIComponent(_path);
                 }
                 view_image.setLoading(true);
                 yield view_image.getIsLoaded(imgurl); //預載入
-                if (Lib.IsAnimation(fileInfo2) === true) { //動圖
+                if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
                     yield view_image.loadImg(imgurl); //使用<img>渲染
                 }
                 else {
@@ -134,7 +133,8 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
+                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                    let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
@@ -161,7 +161,8 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.pdf)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
+                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                    let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
@@ -187,7 +188,8 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.txt)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = (yield M.config.getFileType(_path)).toLocaleUpperCase();
+                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
+                    let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }

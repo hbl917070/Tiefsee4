@@ -111,7 +111,8 @@ class FileLoad {
                 let p: string = await WV_Path.GetDirectoryName(path);//取得檔案所在的資料夾路徑
                 arWaitingList = await WV_Directory.GetFiles(p, "*.*");
 
-                groupType = await fileToGroupType(path)
+                let fileInfo2 = await Lib.GetFileInfo2(path);
+                groupType =  fileToGroupType(fileInfo2)
                 arWaitingList = await filter();
                 if (arWaitingList.indexOf(path) === -1) {
                     arWaitingList.splice(0, 0, path);
@@ -168,8 +169,8 @@ class FileLoad {
             let path = getFilePath();
 
             let fileInfo2 = await Lib.GetFileInfo2(path);
-            console.log(Lib.GetFileType (fileInfo2))
-            
+            //console.log(Lib.GetFileType(fileInfo2))
+
             if (fileInfo2.Type == "none") {
                 M.fileShow.openWelcome();
                 return
@@ -178,7 +179,7 @@ class FileLoad {
 
             //如果是自定名單，就根據檔案類型判斷要用什麼方式顯示檔案
             if (fileLoadType === FileLoadType.userDefined) {
-                groupType = await fileToGroupType(path);
+                groupType = fileToGroupType(fileInfo2);
             }
 
             if (groupType === GroupType.img || groupType === GroupType.unknown) {
@@ -223,10 +224,10 @@ class FileLoad {
          * 從檔案類型判斷，要使用什麼用什麼類型來顯示
          * @returns 
          */
-        async function fileToGroupType(path: string) {
+        function fileToGroupType(fileInfo2: FileInfo2) {
 
-            //let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
-            let fileExt = await M.config.getFileType(path)
+            //let fileExt = await M.config.getFileType(path)
+            let fileExt = Lib.GetFileType(fileInfo2)
 
             for (var type in GroupType) {
                 for (let j = 0; j < M.config.allowFileType(type).length; j++) {

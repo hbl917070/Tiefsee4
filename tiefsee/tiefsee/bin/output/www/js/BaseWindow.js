@@ -101,7 +101,7 @@ class BaseWindow {
                 }
             }));
             _dom.addEventListener("touchstart", (e) => __awaiter(this, void 0, void 0, function* () {
-                //await WV_Window.WindowDrag(_type);
+                yield WV_Window.WindowDrag(_type);
             }));
         }
     }

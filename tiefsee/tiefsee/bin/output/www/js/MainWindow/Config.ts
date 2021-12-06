@@ -59,10 +59,7 @@ class Config {
                 { ext: "jpeg", type: ["image"] },
                 //{ ext: "tif", type: ["image"] },
                 { ext: "svg", type: ["image"] },
-                { ext: "", type: ["image"] },
-                { ext: "", type: ["image"] },
-                { ext: "", type: ["image"] },
-                { ext: "", type: ["image"] },
+           
             ]
         }
 
@@ -104,7 +101,7 @@ class Config {
 
 
     /**
-     * 取得檔案類型
+     * 取得檔案類型(棄用)
      * @param path 
      * @returns 小寫附檔名，例如「jpg」
      */

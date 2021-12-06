@@ -145,9 +145,9 @@ class MainTools {
                 group: GroupType.img,
                 html: `
                 <div class="main-tools-btn js-noDrag">
-                    <div style="margin:0 3px; pointer-events:none;" data-name="btnScale">1%</div>
+                    <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">1%</div>
                 </div>
-            `,
+                `,
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.img.zoom100();
