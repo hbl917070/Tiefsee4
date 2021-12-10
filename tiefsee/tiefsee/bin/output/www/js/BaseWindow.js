@@ -26,6 +26,8 @@ class BaseWindow {
         this.top = 0;
         this.width = 0;
         this.height = 0;
+        this.dpiX = 0;
+        this.dpiY = 0;
         this.windowState = "Normal";
         this.closingEvents = []; //關閉視窗時執行的function
         var dom_window = document.querySelector('.window');
@@ -44,10 +46,13 @@ class BaseWindow {
         this.btn_maximized = btn_maximized;
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
-        //判斷目前的狀態是視窗化還是最大化
         (() => __awaiter(this, void 0, void 0, function* () {
+            //判斷目前的狀態是視窗化還是最大化
             this.windowState = yield WV_Window.WindowState;
             this.initWindowState();
+            let dpi = yield WV_System.GetDpi();
+            this.dpiX = dpi[0] / 96;
+            this.dpiY = dpi[1] / 96;
         }))();
         btn_menu === null || btn_menu === void 0 ? void 0 : btn_menu.addEventListener("click", e => {
             //alert()
@@ -81,7 +86,9 @@ class BaseWindow {
                 this.normal();
             }
             else {
-                this.maximized();
+                setTimeout(() => {
+                    this.maximized();
+                }, 50);
             }
         }));
         //註冊視窗邊框拖曳
@@ -168,6 +175,7 @@ class BaseWindow {
     maximized() {
         WV_Window.WindowState = "Maximized";
         this.initWindowState();
+        console.log("最大化");
     }
     /** 最小化 */
     minimized() {
@@ -177,6 +185,7 @@ class BaseWindow {
     normal() {
         WV_Window.WindowState = "Normal";
         this.initWindowState();
+        console.log("視窗化");
     }
     initWindowState() {
         if (this.windowState === "Maximized") {

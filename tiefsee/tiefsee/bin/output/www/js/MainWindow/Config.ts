@@ -100,51 +100,6 @@ class Config {
     }
 
 
-    /**
-     * 取得檔案類型(棄用)
-     * @param path 
-     * @returns 小寫附檔名，例如「jpg」
-     */
-    public async getFileType(path: string) {
-
-        let fileType = await WV_File.GetFIleType(path);//取得檔案類型
-        //console.log("fileType  " + fileType)
-        let fileExt = Lib.GetExtension(path);//取得附檔名
-        fileExt = fileExt.replace(".", "").toLocaleLowerCase();
-
-        if (fileType == "255216") { return "jpg"; }
-        if (fileType == "7173") { return "gif"; }
-        if (fileType == "13780") { return "png"; }
-        if (fileType == "6787") { return "swf"; }
-        if (fileType == "6677") { return "bmp"; }
-        if (fileType == "5666") { return "psd"; }
-        if (fileType == "4838") { return "wmv"; }
-        if (fileType == "2669") { return "mkv"; }
-        if (fileType == "7076") { return "flv"; }
-        if (fileType == "1") { return "ttf"; }
-        if (fileType == "8297") { return "rar"; }
-        if (fileType == "55122") { return "7z"; }
-        if (fileType == "8075") {
-            if (fileExt == "docx") { return "docx"; }
-            if (fileExt == "pptx") { return "pptx"; }
-            if (fileExt == "xlsx") { return "xlsx"; }
-            if (fileExt == "xlsm") { return "xlsm"; }
-            if (fileExt == "apk") { return "apk"; }
-            if (fileExt == "xd") { return "xd"; }
-            return "zip";
-        }
-        if (fileType == "3780") {
-            if (fileExt == "ai") { return "ai"; }
-            return "pdf";
-        }
-        if (fileType == "8273") {
-            if (fileExt == "avi") { return "avi"; }
-            if (fileExt == "wav") { return "wav"; }
-            return "webp";
-        }
-
-        return fileExt;//無法辨識，則直接回傳附檔名
-    }
 
 
     public settings = {

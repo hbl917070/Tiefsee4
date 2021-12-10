@@ -29,6 +29,11 @@ class BaseWindow {
     public top: number = 0;
     public width: number = 0;
     public height: number = 0;
+
+    public dpiX: number = 0;
+    public dpiY: number = 0;
+
+
     public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
     public closingEvents: (() => void)[] = [];//關閉視窗時執行的function
@@ -104,17 +109,21 @@ class BaseWindow {
     public maximized() {
         WV_Window.WindowState = "Maximized";
         this.initWindowState();
+        console.log("最大化")
     }
 
     /** 最小化 */
     public minimized() {
         WV_Window.WindowState = "Minimized";
+
     }
 
     /** 視窗化 */
     public normal() {
         WV_Window.WindowState = "Normal";
         this.initWindowState();
+        console.log("視窗化")
+
     }
 
 
@@ -150,10 +159,17 @@ class BaseWindow {
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
 
-        //判斷目前的狀態是視窗化還是最大化
+
+
+
         (async () => {
+            //判斷目前的狀態是視窗化還是最大化
             this.windowState = await WV_Window.WindowState;
             this.initWindowState();
+
+            let dpi = await WV_System.GetDpi();
+            this.dpiX = dpi[0] / 96;
+            this.dpiY = dpi[1] / 96;
         })()
 
 
@@ -188,7 +204,9 @@ class BaseWindow {
             if (WindowState === "Maximized") {
                 this.normal();
             } else {
-                this.maximized();
+                setTimeout(() => {
+                    this.maximized();
+                }, 50);
             }
         });
 

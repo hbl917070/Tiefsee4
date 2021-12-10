@@ -7,6 +7,7 @@ using System.Windows.Forms;
 namespace tiefsee {
     static class Program {
 
+      
 
         /// <summary>
         /// 應用程式的主要進入點。
@@ -16,13 +17,11 @@ namespace tiefsee {
 
             //在本地端建立server
             BaseServer bserver = new BaseServer();
-            String _url = $"http://localhost:{bserver.port}/www/MainWindow.html";
-
+            String _url = $"http://localhost:{bserver.port}/www/MainWindow.html"; 
 
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new WebWindow(_url, args, null));
-
 
             //Application.Run(new WebStart(_url));
 

@@ -84,6 +84,7 @@ class Lib {
                 clickTimeout = setTimeout(function () {
                     // click!
                     clickTimeout = -1;
+                    
                 }, dealy);
             }
         });
@@ -125,8 +126,11 @@ class Lib {
         return false;
     }
 
+
     /**
      * 取得真實檔案類型
+     * @param fileInfo2 
+     * @returns 小寫附檔名，例如「jpg」
      */
     public static GetFileType(fileInfo2: FileInfo2) {
 

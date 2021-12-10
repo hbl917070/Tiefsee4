@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace tiefsee {
-    class WV_T {
+
+    [ComVisible(true)]
+    public class WV_T {
 
 
         public Form newForm() {
@@ -23,7 +27,7 @@ namespace tiefsee {
         }
 
         public void t2(Stream fs) {
-            using (var fileStream = new FileStream(@"C:\Users\wen\Desktop\123.jpg", FileMode.Create, FileAccess.Write)) {
+            using (var fileStream = new FileStream(@"C:\Users\wen\Desktop\86123632_p0.png", FileMode.Create, FileAccess.Write)) {
                 fs.CopyTo(fileStream);
             }
         }
@@ -33,5 +37,10 @@ namespace tiefsee {
             var str = t1(@"C:\Users\wen\Desktop\89796867_p0.jpg");
             t2(str);
         }
+
+        public Bitmap t4() {
+            return new Bitmap(@"C:\Users\wen\Desktop\86123632_p0.png");
+        }
+
     }
 }

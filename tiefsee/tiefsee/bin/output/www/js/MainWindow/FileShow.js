@@ -133,7 +133,6 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
                     let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
@@ -161,7 +160,6 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.pdf)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
                     let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
@@ -188,7 +186,6 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.txt)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    //let fileType = (await M.config.getFileType(_path)).toLocaleUpperCase();
                     let fileType = Lib.GetFileType(fileInfo2);
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;

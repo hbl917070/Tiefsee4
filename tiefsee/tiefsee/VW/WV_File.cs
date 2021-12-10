@@ -39,11 +39,14 @@ namespace tiefsee {
             this.M = m;
         }
 
+
+        /// <summary>
+        /// 取得基本檔案資訊
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public String GetFileInfo2(string path) {
-
-            DateTime time_start = DateTime.Now;//計時開始 取得目前時間
-
-
+    
             FileInfo2 info = new FileInfo2();
             info.Path = path;
 
@@ -86,13 +89,11 @@ namespace tiefsee {
                 info.Type = "none";
             }
 
-
             String json = JsonConvert.SerializeObject(info);
-            DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
-            string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
-            System.Console.WriteLine("+++++++++++++++++++++++++++++++++++" + result2 + " 毫秒");
+    
             return json;
         }
+
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
@@ -103,6 +104,7 @@ namespace tiefsee {
             //path = path.Substring(0, 1);
             return path;
         }
+
 
         /// <summary>
         /// 在檔案總管顯示檔案
@@ -146,151 +148,6 @@ namespace tiefsee {
         }
 
 
-
-
-
-
-        /// <summary>
-        /// 判斷真實檔案類型
-        /// </summary>
-        /// <param name="fileName">檔案或資料夾路徑</param>
-        /// <returns>大寫附檔名，如果沒有則回傳 "" </returns>
-        public String GetFIleType(string fileName) {
-
-            //避免檔案不存在
-            if (Directory.Exists(fileName)) { return ""; }
-            if (File.Exists(fileName) == false) { return ""; }
-
-            string fileType = string.Empty;
-
-            try {
-
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
-
-                        /*var ar = br.ReadSingle(300);
-                        for (int i = 0; i < ar.Length; i++) {
-                            fileType += ar[i];
-                        }*/
-
-
-                        for (int i = 0; i < 2; i++) {
-                            fileType += br.ReadByte();
-                        }
-
-                        /*byte data = br.ReadByte();
-                        fileType += data.ToString();
-                        data = br.ReadByte();
-                        fileType += data.ToString();
-
-                        for (int i = 0; i < 30; i++) {
-                            data = br.ReadByte();
-                            fileType += data.ToString();
-                        }*/
-
-                        if (fs != null) {
-                            fs.Close();
-                            br.Close();
-                        }
-
-                        return fileType;
-
-                    }//using
-                }//using
-
-            } catch {
-
-                return "";
-            }
-
-
-
-        }
-
-
-        public String GetFIleTypeTxt(string fileName) {
-
-            //避免檔案不存在
-            if (Directory.Exists(fileName)) { return ""; }
-            if (File.Exists(fileName) == false) { return ""; }
-
-            String fileExt = Path.GetExtension(fileName);//無法判斷時，直接用附檔名判斷
-            fileExt = fileExt.ToUpper();//轉大寫
-            if (fileExt.Length > 1 && fileExt.Substring(0, 1) == ".") {
-                fileExt = fileExt.Substring(1, fileExt.Length - 1);
-            }
-
-            try {
-
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
-
-                        string fileType = string.Empty;
-                        try {
-                            byte data = br.ReadByte();
-                            fileType += data.ToString();
-                            data = br.ReadByte();
-                            fileType += data.ToString();
-
-                            System.Console.WriteLine(fileType);
-
-                            if (fileType == "255216") { return "JPG"; }
-                            if (fileType == "7173") { return "GIF"; }
-                            if (fileType == "13780") { return "PNG"; }
-                            if (fileType == "6787") { return "SWF"; }
-                            if (fileType == "6677") { return "BMP"; }
-                            if (fileType == "5666") { return "PSD"; }
-                            if (fileType == "8297") { return "RAR"; }
-                            if (fileType == "8075") {
-                                if (fileExt == "DOCX") { return "DOCX"; }
-                                if (fileExt == "PPTX") { return "PPTX"; }
-                                if (fileExt == "APK") { return "APK"; }
-                                if (fileExt == "XD") { return "XD"; }
-                                return "ZIP";
-                            }
-                            if (fileType == "55122") { return "7Z"; }
-                            if (fileType == "3780") {
-                                if (fileExt == "AI") { return "AI"; }
-                                return "PDF";
-                            }
-                            if (fileType == "8273") {
-                                if (fileExt == "AVI") { return "AVI"; }
-                                if (fileExt == "WAV") { return "WAV"; }
-                                return "WEBP";
-                            }
-                            if (fileType == "4838") { return "WMV"; }
-                            if (fileType == "2669") { return "MKV"; }
-                            if (fileType == "7076") { return "FLV"; }
-                            if (fileType == "1") { return "TTF"; }
-
-                            //無法判斷時，直接用附檔名判斷
-                            return fileExt;
-
-
-                        } catch (Exception ex) {
-
-                            return fileExt;
-
-                        } finally {
-                            if (fs != null) {
-                                fs.Close();
-                                br.Close();
-                            }
-                        }
-
-                    }//using
-                }//using
-
-            } catch {
-
-                return fileExt;
-            }
-
-
-
-        }
-
-
         /// <summary>
         /// 快速拖曳 (拖出檔案
         /// </summary>
@@ -303,14 +160,10 @@ namespace tiefsee {
 
             try {
                 var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
-                // System.Windows.DragDrop.DoDragDrop(btnDragDropFile, file, System.Windows.DragDropEffects.All);
                 M.DoDragDrop(file, DragDropEffects.All);
-
             } catch { }
 
-
         }
-
 
 
         /// <summary>

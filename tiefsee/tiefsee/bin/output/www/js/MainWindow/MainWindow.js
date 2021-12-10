@@ -37,15 +37,8 @@ class MainWindow {
                 //讀取設定
                 yield getSettingFile();
                 readSetting(config.settings);
-                baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
-                    if (script.steting.temp_setting != null) { //如果有開啟 設定視窗
-                        if ((yield script.steting.temp_setting.Visible) === true) {
-                            yield script.steting.temp_setting.RunJs("setting.saveData();"); //關閉前先儲存設定
-                            yield sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
-                        }
-                    }
-                }));
-                WV_Window.SetMinimumSize(250, 250); //設定視窗最小size
+                WV_Window.SetSize(600 * baseWindow.dpiX, 500 * baseWindow.dpiY); //初始化視窗大小
+                WV_Window.SetMinimumSize(250 * baseWindow.dpiX, 250 * baseWindow.dpiY); //設定視窗最小size
                 WV_Window.ShowWindow(); //顯示視窗
                 if (config.settings["theme"]["aero"]) {
                     WV_Window.SetAERO(); // aero毛玻璃效果
@@ -61,6 +54,14 @@ class MainWindow {
                 else {
                     fileLoad.loadFiles(args[0], args); //載入多張圖片
                 }
+                //設定icon
+                function initIcon() {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
+                        WV_Window.SetIcon(path);
+                    });
+                }
+                initIcon();
                 //大型換頁按鈕
                 dom_maxBtnLeft.addEventListener('click', function (e) {
                     script.fileLoad.prev();
@@ -72,14 +73,15 @@ class MainWindow {
                 document.addEventListener('contextmenu', function (e) {
                     e.preventDefault();
                 });
-                //設定icon
-                function initIcon() {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
-                        WV_Window.SetIcon(path);
-                    });
-                }
-                initIcon();
+                //關閉視窗前觸發
+                baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
+                    if (script.steting.temp_setting != null) { //如果有開啟 設定視窗
+                        if ((yield script.steting.temp_setting.Visible) === true) {
+                            yield script.steting.temp_setting.RunJs("setting.saveData();"); //關閉前先儲存設定
+                            yield sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
+                        }
+                    }
+                }));
                 //圖片區域也允許拖曳視窗
                 fileShow.dom_image.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
                     //圖片沒有出現捲動軸
@@ -106,7 +108,9 @@ class MainWindow {
                         baseWindow.normal();
                     }
                     else {
-                        baseWindow.maximized();
+                        setTimeout(() => {
+                            baseWindow.maximized();
+                        }, 50);
                     }
                 }));
                 Lib.addEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
@@ -115,7 +119,9 @@ class MainWindow {
                         baseWindow.normal();
                     }
                     else {
-                        baseWindow.maximized();
+                        setTimeout(() => {
+                            baseWindow.maximized();
+                        }, 50);
                     }
                 }));
                 Lib.addEventDblclick(fileShow.dom_welcomeview, () => __awaiter(this, void 0, void 0, function* () {
@@ -124,7 +130,9 @@ class MainWindow {
                         baseWindow.normal();
                     }
                     else {
-                        baseWindow.maximized();
+                        setTimeout(() => {
+                            baseWindow.maximized();
+                        }, 50);
                     }
                 }));
                 //讓工具列允許拖曳視窗
@@ -155,15 +163,19 @@ class MainWindow {
                 }, false);
                 //讓歡迎畫面允許拖曳視窗
                 fileShow.dom_welcomeview.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
-                    console.log(2);
+                    //排除不允許拖拉的物件
                     let _dom = e.target;
                     if (_dom) {
                         if (_dom.classList.contains("js-noDrag")) {
                             return;
                         }
                     }
+                    e.preventDefault();
                     if (e.button === 0) { //滑鼠左鍵
-                        yield WV_Window.WindowDrag("move");
+                        let WindowState = baseWindow.windowState;
+                        if (WindowState === "Normal") {
+                            WV_Window.WindowDrag("move");
+                        }
                     }
                 }));
                 window.addEventListener("dragenter", dragenter, false);

@@ -22,6 +22,41 @@ namespace tiefsee {
             this.M = m;
         }
 
+
+
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
+        public enum DeviceCap {
+            /// <summary>
+            /// Logical pixels inch in X
+            /// </summary>
+            LOGPIXELSX = 88,
+            /// <summary>
+            /// Logical pixels inch in Y
+            /// </summary>
+            LOGPIXELSY = 90
+
+            // Other constants may be founded on pinvoke.net
+        }
+
+        /// <summary>
+        /// 取得註螢幕的dpi，預設為96
+        /// </summary>
+        /// <returns></returns>
+        public float[] GetDpi() {
+
+            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
+            IntPtr desktop = g.GetHdc();
+
+            int Xdpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
+            int Ydpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY);
+          
+            return new float[] { Xdpi, Ydpi };
+        }
+
+
+
         /// <summary>
         /// 存入剪貼簿 - 
         /// </summary>
@@ -74,7 +109,7 @@ namespace tiefsee {
         /// <param name="txt"></param>
         /// <returns></returns>
         public bool SetClipboard_FileToBase64(string path) {
-            
+
             try {
 
                 if (File.Exists(path) == false) { return false; }

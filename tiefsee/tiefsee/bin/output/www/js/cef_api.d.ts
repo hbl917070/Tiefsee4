@@ -1,11 +1,18 @@
 interface WebWindow {
+
     /** 運行js */
     RunJs(js: string): string;
 
-    Show(): void;
+    /** 視窗取得焦點 */
     Focus(): void;
 
-    StartPosition: number;
+    /** 設定視窗size */
+    SetSize(width: number, height: number): void;
+
+    /** 設定視窗坐標 */
+    SetPosition(left: number, top: number): void;
+
+    //StartPosition: number;
 
     /** 標題 */
     Text: string;
@@ -35,7 +42,7 @@ interface WebWindow {
 interface WV_Window {
 
     /** 網頁載入完成後，以js呼叫此函數，才會顯示視窗 */
-    ShowWindow():void;
+    ShowWindow(): void;
 
     /**
      * 新開視窗
@@ -51,10 +58,16 @@ interface WV_Window {
     RunJsOfParent(js: string): string;
 
     /** 啟用AERO毛玻璃效果 */
-    SetAERO():void;
+    SetAERO(): void;
 
     /** 設定視窗最小size */
-    SetMinimumSize(width: number, height: number):void;
+    SetMinimumSize(width: number, height: number): void;
+
+    /** 設定視窗size */
+    SetSize(width: number, height: number): void;
+
+    /** 設定視窗坐標 */
+    SetPosition(left: number, top: number): void;
 
     /** 取得執行檔目錄 */
     GetAppDirPath(): string;
@@ -145,7 +158,7 @@ interface WV_File {
     /** 在檔案總管顯示檔案 */
     ShowOnExplorer(path: string): void;
 
-    /** 取得 Type、Lenght、CreationTimeUtc、LastWriteTimeUtc、HexValue */
+    /** 取得 Type、Lenght、CreationTimeUtc、LastWriteTimeUtc、HexValue(用於判斷檔案類型) */
     GetFileInfo2(path: string): string;
 
     /**
@@ -155,9 +168,6 @@ interface WV_File {
      * @param Title 視窗標題
      */
     OpenFileDialog(Multiselect: boolean, Filter: string, Title: string): string[];
-
-    /** 取得檔案的開頭byte，用於判斷檔案類型 */
-    GetFIleType(path: string): string;
 
     /**
      * 顯示檔案原生右鍵選單
@@ -224,7 +234,7 @@ interface FileInfo2 {
     Type: ("file" | "dir" | "none"),
 
     /** 檔案路徑 */
-    Path:string;
+    Path: string;
 
     /** 檔案大小 */
     Lenght: number,
@@ -290,6 +300,9 @@ interface WV_Path {
 
 interface WV_System {
 
+    /** 取得註螢幕的dpi，預設為96 */
+    GetDpi(): number[2];
+
     SetClipboard_FileToPng(path: string): bool;
 
     SetClipboard_FileToTxt(path: string): bool;
@@ -354,7 +367,7 @@ interface WV_RunApp {
     ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean); void
 
     /** 用瀏覽器開啟網址 */
-    OpenUrl(url:string):boolean;
+    OpenUrl(url: string): boolean;
 }
 
 

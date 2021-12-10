@@ -55,7 +55,7 @@ class Setting {
                 yield getSettingFile();
                 yield readSetting();
                 //var  W = await  WV_Window.This;
-                WV_Window.SetMinimumSize(400, 300); //設定視窗最小size
+                WV_Window.SetMinimumSize(400 * baseWindow.dpiX, 300 * baseWindow.dpiY); //設定視窗最小size
                 WV_Window.Text = "設定";
                 let iconPath = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
                 WV_Window.SetIcon(iconPath);

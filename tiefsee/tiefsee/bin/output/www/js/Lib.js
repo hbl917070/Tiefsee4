@@ -75,6 +75,8 @@ class Lib {
     }
     /**
      * 取得真實檔案類型
+     * @param fileInfo2
+     * @returns 小寫附檔名，例如「jpg」
      */
     static GetFileType(fileInfo2) {
         let fileExt = Lib.GetExtension(fileInfo2.Path); //取得附檔名

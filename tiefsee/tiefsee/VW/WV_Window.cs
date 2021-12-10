@@ -72,6 +72,25 @@ namespace tiefsee {
 
 
         /// <summary>
+        /// 設定視窗size
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
+        public void SetSize(int w, int h) {
+            M.SetSize(w, h);
+        }
+
+        /// <summary>
+        /// 設定視窗坐標
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        public void SetPosition(int left, int top) {
+            M.SetPosition(left, top);
+        }
+        
+
+        /// <summary>
         /// 視窗使用毛玻璃效果
         /// </summary>
         public void SetAERO() {
@@ -88,6 +107,7 @@ namespace tiefsee {
                 WebWindow webwindow = (WebWindow)_window;
                 //webwindow.Owner = M.parentForm;
                 //webwindow.ShowInTaskbar = true;
+                //webwindow.StartPosition = FormStartPosition.CenterParent;
                 if (M.TopMost == true) {
                     M.TopMost = false;//設定子視窗的時候，如果付錢視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
@@ -96,7 +116,7 @@ namespace tiefsee {
                     webwindow.Owner = M;
                 }
 
-                //M.StartPosition = FormStartPosition.CenterParent;
+
             }
         }
 

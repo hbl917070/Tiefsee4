@@ -27,7 +27,8 @@ class Setting {
 
         baseWindow = new BaseWindow();//初始化視窗
         initDomImport();//初始化圖示
-        init()
+        init();
+     
 
         baseWindow.closingEvents.push(async () => {//關閉視窗前觸發
             await saveData();
@@ -62,7 +63,7 @@ class Setting {
 
             //var  W = await  WV_Window.This;
 
-            WV_Window.SetMinimumSize(400, 300);//設定視窗最小size
+            WV_Window.SetMinimumSize(400 * baseWindow.dpiX, 300 * baseWindow.dpiY);//設定視窗最小size
             WV_Window.Text = "設定";
             let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
             WV_Window.SetIcon(iconPath);

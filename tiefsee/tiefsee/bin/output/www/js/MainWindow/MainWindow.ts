@@ -56,23 +56,14 @@ class MainWindow {
             await getSettingFile();
             readSetting(config.settings);
 
-            baseWindow.closingEvents.push(async () => {//關閉視窗前觸發
-                if (script.steting.temp_setting != null) {//如果有開啟 設定視窗
-                    if (await script.steting.temp_setting.Visible === true) {
-                        await script.steting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
-                        await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
-                    }
-                }
-            });
 
-            WV_Window.SetMinimumSize(250, 250);//設定視窗最小size
+            WV_Window.SetSize(600 * baseWindow.dpiX, 500 * baseWindow.dpiY);//初始化視窗大小
+            WV_Window.SetMinimumSize(250 * baseWindow.dpiX, 250 * baseWindow.dpiY);//設定視窗最小size
             WV_Window.ShowWindow();//顯示視窗
 
             if (config.settings["theme"]["aero"]) {
                 WV_Window.SetAERO();// aero毛玻璃效果
             }
-
-
 
             //取得命令列參數
             let args = await WV_Window.GetArguments()
@@ -83,6 +74,13 @@ class MainWindow {
             } else {
                 fileLoad.loadFiles(args[0], args);//載入多張圖片
             }
+
+            //設定icon
+            async function initIcon() {
+                let path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
+                WV_Window.SetIcon(path);
+            }
+            initIcon();
 
             //大型換頁按鈕
             dom_maxBtnLeft.addEventListener('click', function (e) {
@@ -97,12 +95,18 @@ class MainWindow {
                 e.preventDefault();
             })
 
-            //設定icon
-            async function initIcon() {
-                let path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
-                WV_Window.SetIcon(path);
-            }
-            initIcon();
+
+            //關閉視窗前觸發
+            baseWindow.closingEvents.push(async () => {
+                if (script.steting.temp_setting != null) {//如果有開啟 設定視窗
+                    if (await script.steting.temp_setting.Visible === true) {
+                        await script.steting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
+                        await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
+                    }
+                }
+            });
+
+
 
             //圖片區域也允許拖曳視窗
             fileShow.dom_image.addEventListener("mousedown", async (e) => {
@@ -129,7 +133,9 @@ class MainWindow {
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
                 } else {
-                    baseWindow.maximized();
+                    setTimeout(() => {
+                        baseWindow.maximized();
+                    }, 50);
                 }
             });
             Lib.addEventDblclick(fileShow.dom_image, async () => {//圖片物件
@@ -137,15 +143,19 @@ class MainWindow {
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
                 } else {
-                    baseWindow.maximized();
+                    setTimeout(() => {
+                        baseWindow.maximized();
+                    }, 50);
                 }
             });
-            Lib.addEventDblclick(fileShow.dom_welcomeview, async () => {//圖片物件
+            Lib.addEventDblclick(fileShow.dom_welcomeview, async () => {//歡迎頁面
                 let WindowState = baseWindow.windowState
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
                 } else {
-                    baseWindow.maximized();
+                    setTimeout(() => {
+                        baseWindow.maximized();
+                    }, 50);
                 }
             });
 
@@ -175,15 +185,23 @@ class MainWindow {
                 }
             }, false)
 
+
+
             //讓歡迎畫面允許拖曳視窗
             fileShow.dom_welcomeview.addEventListener("mousedown", async (e) => {
-                console.log(2)
+
+                //排除不允許拖拉的物件
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
+                e.preventDefault();
+
                 if (e.button === 0) {//滑鼠左鍵
-                    await WV_Window.WindowDrag("move");
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Normal") {
+                        WV_Window.WindowDrag("move");
+                    }
                 }
             });
 

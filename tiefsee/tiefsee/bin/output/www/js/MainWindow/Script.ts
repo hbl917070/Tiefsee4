@@ -205,13 +205,22 @@ class ScriptSteting {
         }
         this.temp_setting = await baseWindow.newWindow("Setting.html");
 
+        //this.temp_setting.Width = 500 * baseWindow.dpiX;
+        //this.temp_setting.Height = 450 * baseWindow.dpiY;
+        await   this.temp_setting.SetSize(500 * baseWindow.dpiX, 450 * baseWindow.dpiY);//初始化視窗大小
+
         //設定坐標，從父視窗的中間開啟
-        let w = await this.temp_setting.Width - await WV_Window.Width;
-        let h = await this.temp_setting.Height - await WV_Window.Height;
-        this.temp_setting.Left = await WV_Window.Left - (w / 2);
-        this.temp_setting.Top = await WV_Window.Top - (h / 2);
-        this.temp_setting.WindowState = 1;//視窗化
-        this.temp_setting.WindowState = 0;//視窗化
+        let w = await this.temp_setting.Width  - baseWindow.width;
+        let h = await this.temp_setting.Height - baseWindow.height;
+        //this.temp_setting.Left = baseWindow.left - (w / 2);
+        //this.temp_setting.Top = baseWindow.top - (h / 2);
+        this.temp_setting.SetPosition(
+            baseWindow.left - (w / 2),
+            baseWindow.top - (h / 2)
+        )
+      this.temp_setting.WindowState = 1;//最小化
+      this.temp_setting.WindowState = 0;//視窗化
+
     }
 
 }
