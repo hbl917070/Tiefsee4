@@ -16,6 +16,8 @@ class Tieefseeview {
     public setLoading;//顯示或隱藏 loading
     public getMargin;//取得 外距
     public setMargin;
+    public getDpizoom;// 圖片dpi縮放，原始 1
+    public setDpizoom;
     public getOverflowDistance;//取得 圖片拖曳允許的溢位距離
     public setOverflowDistance;
     public getLoadingUrl;//取得 loading圖片
@@ -62,13 +64,15 @@ class Tieefseeview {
 
         _dom.innerHTML = `
             <div class="tiefseeview-loading" ></div>   
-            <div class="tiefseeview-container">
-                <div class="tiefseeview-data" style="width:400px;">
-                    <div class="view-bigimg">
-                        <canvas class="view-bigimg-canvas"></canvas>
-                        <img class="view-bigimg-bg" style="display:none">
-                    </div>   
-                    <img class="view-img" style="display:none">
+            <div class="tiefseeview-dpizoom">
+                <div class="tiefseeview-container">
+                    <div class="tiefseeview-data" style="width:400px;">
+                        <div class="view-bigimg">
+                            <canvas class="view-bigimg-canvas"></canvas>
+                            <img class="view-bigimg-bg" style="display:none">
+                        </div>   
+                        <img class="view-img" style="display:none">
+                    </div>
                 </div>
             </div>
             <div class="scroll-y">
@@ -81,6 +85,7 @@ class Tieefseeview {
             </div>`;
 
         var dom_tiefseeview = _dom;
+        var dom_dpizoom = <HTMLDivElement>dom_tiefseeview.querySelector(".tiefseeview-dpizoom");
         var dom_con = <HTMLDivElement>dom_tiefseeview.querySelector(".tiefseeview-container");
         var dom_data = <HTMLDivElement>dom_tiefseeview.querySelector(".tiefseeview-data");
         var dom_img = <HTMLImageElement>dom_tiefseeview.querySelector(".view-img");
@@ -92,6 +97,7 @@ class Tieefseeview {
 
         var url: string;//目前的圖片網址
         var dataType: ("img" | "movie" | "imgs" | "bigimg") = "img";//資料類型
+        var dpizoom = 2;
         var degNow: number = 0;//目前的角度 0~359
         var zoomRatio: number = 1.1;//縮放比率(必須大於1)
         var transformDuration: number = 200;//transform 動畫時間(毫秒)
@@ -107,13 +113,13 @@ class Tieefseeview {
         var errerUrl: string = "img/error.svg";
         var rotateCriticalValue = 15;//觸控旋轉的最低旋轉角度
 
-        var hammerPan = new Hammer(dom_tiefseeview);//單指拖曳
+        var hammerPan = new Hammer(dom_dpizoom);//單指拖曳
         var panStartX: number = 0;//開始拖曳的坐標
         var panStartY: number = 0;
         var isMoving = false;//目前是否正在拖曳圖片
         var isPaning = false;//目前是否正在拖曳圖片
 
-        var hammerPlural = new Hammer.Manager(dom_tiefseeview);//用於雙指旋轉與縮放
+        var hammerPlural = new Hammer.Manager(dom_dpizoom);//用於雙指旋轉與縮放
         var temp_rotateStareDegValue = 0;//雙指旋轉，初始角度
         var temp_touchRotateStarting = false;//觸控旋轉 開始
         var temp_rotateStareDegNow = 0;//觸控旋轉的起始角度
@@ -193,6 +199,8 @@ class Tieefseeview {
         this.getOriginalHeight = getOriginalHeight;
         this.setMargin = setMargin;
         this.getMargin = getMargin;
+        this.getDpizoom = getDpizoom;
+        this.setDpizoom = setDpizoom;
         this.getOverflowDistance = getOverflowDistance;
         this.setOverflowDistance = setOverflowDistance;
         this.getLoadingUrl = getLoadingUrl;
@@ -205,14 +213,14 @@ class Tieefseeview {
         setLoading(false);//預設為隱藏
         $(dom_tiefseeview).addClass("tiefseeview");
         setTransform(undefined, undefined, false);//初始化定位
-
+        setDpizoom(1);
 
         //顯示圖片的區塊改變大小時
         new ResizeObserver(() => {
             init_point(false);//重新定位圖片
             eventChangeZoom(getZoomRatio());
 
-        }).observe(dom_tiefseeview)
+        }).observe(dom_dpizoom)
 
         //捲動軸變化時，同步至圖片位置
         scrollY.setEventChange((v: number, mode: string) => {
@@ -288,27 +296,27 @@ class Tieefseeview {
 
 
         //滑鼠滾輪上下滾動時
-        dom_tiefseeview.addEventListener("wheel", (e: WheelEvent) => {
+        dom_dpizoom.addEventListener("wheel", (e: WheelEvent) => {
 
             e.preventDefault();//禁止頁面滾動
             e = e || window.event;
 
             //避免在捲動軸上面也觸發
-            if (e.target !== dom_tiefseeview) { return; }
+            if (e.target !== dom_dpizoom) { return; }
 
             $(dom_con).stop(true, false);
 
             //縮放計算
             if (e.deltaX < 0 || e.deltaY < 0) {//往上
-                eventMouseWheel("up", e.offsetX, e.offsetY);
+                eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
             } else { //往下
-                eventMouseWheel("down", e.offsetX, e.offsetY);
+                eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
             }
         }, true);
 
 
         //拖曳開始
-        dom_tiefseeview.addEventListener("mousedown", (ev) => {
+        dom_dpizoom.addEventListener("mousedown", (ev) => {
             ev.preventDefault();
 
             //沒有出現捲動條就不要執行拖曳
@@ -317,7 +325,7 @@ class Tieefseeview {
             }
 
             //避免在捲動軸上面也觸發
-            if (ev.target !== dom_tiefseeview) {
+            if (ev.target !== dom_dpizoom) {
                 isMoving = false;
                 isPaning = false;
                 return;
@@ -328,7 +336,7 @@ class Tieefseeview {
             panStartX = toInt(dom_con.style.left);
             panStartY = toInt(dom_con.style.top);
         });
-        dom_tiefseeview.addEventListener("touchstart", (ev) => {
+        dom_dpizoom.addEventListener("touchstart", (ev) => {
             ev.preventDefault();
 
             //避免多指觸發
@@ -339,7 +347,7 @@ class Tieefseeview {
             }
 
             //避免在捲動軸上面也觸發
-            if (ev.target !== dom_tiefseeview) {
+            if (ev.target !== dom_dpizoom) {
                 isMoving = false;
                 isPaning = false;
                 return;
@@ -353,7 +361,7 @@ class Tieefseeview {
         });
 
         //拖曳
-        hammerPan.get("pan").set({ threshold: 0 ,direction: Hammer.DIRECTION_VERTICAL});
+        hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
         hammerPan.on("pan", (ev) => {
 
             //避免多指觸發
@@ -372,19 +380,19 @@ class Tieefseeview {
 
             let deltaX = ev["deltaX"];
             let deltaY = ev["deltaY"];
-            let left = panStartX + deltaX * 1;
-            let top = panStartY + deltaY * 1;
+            let left = panStartX + deltaX * dpizoom;
+            let top = panStartY + deltaY * dpizoom;
 
             if (getIsOverflowY()) {//高度大於視窗
                 if (top > marginTop + overflowDistance) {//上
                     top = marginTop + overflowDistance;
                 }
-                let t = dom_tiefseeview.offsetHeight - dom_con.offsetHeight - marginBottom;//下
+                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
                 if (top < t - overflowDistance) {
                     top = t - overflowDistance;
                 }
             } else {
-                let t = (dom_tiefseeview.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
+                let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
                 if (top > t + overflowDistance) {
                     top = t + overflowDistance;
                 }
@@ -397,12 +405,12 @@ class Tieefseeview {
                 if (left > marginLeft + overflowDistance) {//左
                     left = marginLeft + overflowDistance;
                 }
-                let l = dom_tiefseeview.offsetWidth - dom_con.offsetWidth - marginRight;//右
+                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
                 if (left < l - overflowDistance) {
                     left = l - overflowDistance;
                 }
             } else {
-                let l = (dom_tiefseeview.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
+                let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
                 if (left > l + overflowDistance) {
                     left = l + overflowDistance;
                 }
@@ -458,13 +466,13 @@ class Tieefseeview {
                     top = marginTop + overflowDistance;
                     bool_overflowX = true;
                 }
-                let t = dom_tiefseeview.offsetHeight - dom_con.offsetHeight - marginBottom;//下
+                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
                 if (top < t - overflowDistance) {
                     top = t - overflowDistance;
                     bool_overflowX = true;
                 }
             } else {
-                let t = (dom_tiefseeview.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
+                let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
                 if (top > t + overflowDistance) {
                     top = t + overflowDistance;
                     bool_overflowX = true;
@@ -480,13 +488,13 @@ class Tieefseeview {
                     left = marginLeft + overflowDistance;
                     bool_overflowY = true;
                 }
-                let l = dom_tiefseeview.offsetWidth - dom_con.offsetWidth - marginRight;//右
+                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
                 if (left < l - overflowDistance) {
                     left = l - overflowDistance;
                     bool_overflowY = true;
                 }
             } else {
-                let l = (dom_tiefseeview.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
+                let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
                 if (left > l + overflowDistance) {
                     left = l + overflowDistance;
                     bool_overflowY = true;
@@ -706,6 +714,19 @@ class Tieefseeview {
         }
 
         /**
+         * 取得 dpizoom
+         */
+        function getDpizoom() { return dpizoom; }
+        /**
+         * 設定 dpizoom
+         */
+        function setDpizoom(val: number) {
+            //@ts-ignore
+            dom_dpizoom.style.zoom = (1 / val);
+            dpizoom = val;
+        }
+
+        /**
          * 取得 允許拖曳的溢位距離
          * @returns 
          */
@@ -919,20 +940,20 @@ class Tieefseeview {
                 x = marginLeft;
             }
             if (type_horizontal === "center") {
-                x = (dom_tiefseeview.offsetWidth - dom_con.offsetWidth) / 2;
+                x = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;
             }
             if (type_horizontal === "right") {
-                x = dom_tiefseeview.offsetWidth - dom_con.offsetWidth - marginRight;
+                x = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;
             }
 
             if (type_vertical === "top") {
                 y = marginTop;
             }
             if (type_vertical === "center") {
-                y = (dom_tiefseeview.offsetHeight - dom_con.offsetHeight) / 2;
+                y = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;
             }
             if (type_vertical === "bottom") {
-                y = dom_tiefseeview.offsetHeight - dom_con.offsetHeight - marginBottom;
+                y = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;
             }
 
             setXY(x, y, 0);
@@ -1022,9 +1043,9 @@ class Tieefseeview {
 
             //計算顯示範圍的四個角落在圖片旋轉前的位置
             let origPoint1 = getOrigPoint(img_left, img_top, _w, _h, degNow);
-            let origPoint2 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top, _w, _h, degNow);
-            let origPoint3 = getOrigPoint(img_left + dom_tiefseeview.offsetWidth, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
-            let origPoint4 = getOrigPoint(img_left, img_top + dom_tiefseeview.offsetHeight, _w, _h, degNow);
+            let origPoint2 = getOrigPoint(img_left + dom_dpizoom.offsetWidth, img_top, _w, _h, degNow);
+            let origPoint3 = getOrigPoint(img_left + dom_dpizoom.offsetWidth, img_top + dom_dpizoom.offsetHeight, _w, _h, degNow);
+            let origPoint4 = getOrigPoint(img_left, img_top + dom_dpizoom.offsetHeight, _w, _h, degNow);
 
             //轉換鏡像前的坐標
             function calc(_p: { x: number, y: number }) {
@@ -1233,8 +1254,8 @@ class Tieefseeview {
             let dom_con_offsetHeight = rect.rectHeight;
 
             if (_type === TieefseeviewZoomType["full-100%"]) {
-                if (getOriginalWidth() > (dom_tiefseeview.offsetWidth - marginLeft - marginRight) ||
-                    getOriginalHeight() > (dom_tiefseeview.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
+                if (getOriginalWidth() > (dom_dpizoom.offsetWidth - marginLeft - marginRight) ||
+                    getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
                     _type = TieefseeviewZoomType["full-wh"];//縮放至視窗大小
                 } else {
                     _type = TieefseeviewZoomType["100%"];//圖片原始大小
@@ -1246,8 +1267,8 @@ class Tieefseeview {
                 setDataSize(getOriginalWidth());
             }
             if (_type === TieefseeviewZoomType["full-wh"]) {//縮放至視窗大小
-                let ratio_w = dom_con_offsetWidth / (dom_tiefseeview.offsetWidth - marginLeft - marginRight)
-                let ratio_h = dom_con_offsetHeight / (dom_tiefseeview.offsetHeight - marginTop - marginBottom)
+                let ratio_w = dom_con_offsetWidth / (dom_dpizoom.offsetWidth - marginLeft - marginRight)
+                let ratio_h = dom_con_offsetHeight / (dom_dpizoom.offsetHeight - marginTop - marginBottom)
                 if (ratio_w > ratio_h) {
                     _type = TieefseeviewZoomType["full-w"]
                 } else {
@@ -1263,13 +1284,13 @@ class Tieefseeview {
                 _type = TieefseeviewZoomType["%-h"];
             }
             if (_type === TieefseeviewZoomType["%-w"]) {//以視窗寬度比例設定
-                let w = dom_tiefseeview.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
+                let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 setDataSize(w * ratio * (_val / 100));
             }
             if (_type === TieefseeviewZoomType["%-h"]) {//以視窗高度比例設定
-                let w = dom_tiefseeview.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
+                let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
@@ -1307,8 +1328,8 @@ class Tieefseeview {
         function zoomIn(_x?: number, _y?: number, _zoomRatio?: number, _rendering?: TieefseeviewImageRendering) {
 
             //未填入參數則從中央進行縮放
-            if (_x === undefined) { _x = dom_tiefseeview.offsetWidth / 2; }
-            if (_y === undefined) { _y = dom_tiefseeview.offsetHeight / 2; }
+            if (_x === undefined) { _x = dom_dpizoom.offsetWidth / 2; }
+            if (_y === undefined) { _y = dom_dpizoom.offsetHeight / 2; }
 
             //未填入縮放比例，就是用預設縮放比例
             if (_zoomRatio === undefined) { _zoomRatio = zoomRatio }
@@ -1377,7 +1398,7 @@ class Tieefseeview {
          * @returns 
          */
         function getIsOverflowX(): boolean {
-            if (dom_con.offsetWidth + marginLeft + marginRight > dom_tiefseeview.offsetWidth) {
+            if (dom_con.offsetWidth + marginLeft + marginRight > dom_dpizoom.offsetWidth) {
                 return true;
             }
             return false;
@@ -1388,7 +1409,7 @@ class Tieefseeview {
          * @returns 
          */
         function getIsOverflowY(): boolean {
-            if (dom_con.offsetHeight + marginTop + marginBottom > dom_tiefseeview.offsetHeight) {
+            if (dom_con.offsetHeight + marginTop + marginBottom > dom_dpizoom.offsetHeight) {
                 return true;
             }
             return false;
@@ -1400,12 +1421,12 @@ class Tieefseeview {
         function init_scroll(): void {
             scrollX.init_size(
                 dom_con.offsetWidth + marginLeft + marginRight,
-                dom_tiefseeview.offsetWidth,
+                dom_dpizoom.offsetWidth,
                 toInt(dom_con.style.left) * -1 + marginLeft
             );
             scrollY.init_size(
                 dom_con.offsetHeight + marginTop + marginBottom,
-                dom_tiefseeview.offsetHeight,
+                dom_dpizoom.offsetHeight,
                 toInt(dom_con.style.top) * -1 + marginTop
             );
         }
@@ -1437,11 +1458,11 @@ class Tieefseeview {
                 if (toInt(dom_con.style.left) > marginLeft) {
                     left = marginLeft;
                 }
-                let t = dom_tiefseeview.offsetHeight - dom_con.offsetHeight - marginBottom;
+                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;
                 if (toInt(dom_con.style.top) < t) {
                     top = t;
                 }
-                let l = dom_tiefseeview.offsetWidth - dom_con.offsetWidth - marginRight;
+                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;
                 if (toInt(dom_con.style.left) < l) {
                     left = l;
                 }
@@ -1451,27 +1472,27 @@ class Tieefseeview {
                 if (toInt(dom_con.style.top) > marginTop) {
                     top = marginTop;
                 }
-                let t = dom_tiefseeview.offsetHeight - dom_con.offsetHeight - marginBottom;
+                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;
                 if (toInt(dom_con.style.top) < t) {
                     top = t;
                 }
-                left = (dom_tiefseeview.offsetWidth - dom_con.offsetWidth) / 2;
+                left = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;
             }
 
             if (bool_w && bool_h === false) {
                 if (toInt(dom_con.style.left) > marginLeft) {
                     left = marginLeft;
                 }
-                let l = dom_tiefseeview.offsetWidth - dom_con.offsetWidth - marginRight;
+                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;
                 if (toInt(dom_con.style.left) < l) {
                     left = l;
                 }
-                top = (dom_tiefseeview.offsetHeight - dom_con.offsetHeight) / 2;
+                top = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;
             }
 
             if (bool_w === false && bool_h === false) { //圖片小於視窗、置中
-                left = (dom_tiefseeview.offsetWidth - dom_con.offsetWidth) / 2;
-                top = (dom_tiefseeview.offsetHeight - dom_con.offsetHeight) / 2;
+                left = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;
+                top = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;
             }
 
             if (isAnimation) {
@@ -1522,8 +1543,8 @@ class Tieefseeview {
             eventChangeMirror(mirrorHorizontal, mirrorVertical);
 
             //取得顯示範圍的中心點
-            let left = -toInt(dom_con.style.left) + (dom_tiefseeview.offsetWidth / 2);
-            let top = -toInt(dom_con.style.top) + (dom_tiefseeview.offsetHeight / 2);
+            let left = -toInt(dom_con.style.left) + (dom_dpizoom.offsetWidth / 2);
+            let top = -toInt(dom_con.style.top) + (dom_dpizoom.offsetHeight / 2);
 
             //計算鏡像後的坐標
             left = dom_data.getBoundingClientRect().width - left;
@@ -1544,8 +1565,8 @@ class Tieefseeview {
             top = rotateRect.y;
 
             //轉換成定位用的值，並移動回中心點
-            top = -top + (dom_tiefseeview.offsetHeight / 2)
-            left = -left + (dom_tiefseeview.offsetWidth / 2)
+            top = -top + (dom_dpizoom.offsetHeight / 2)
+            left = -left + (dom_dpizoom.offsetWidth / 2)
 
             await setTransform(undefined, undefined, false);
 
@@ -1573,8 +1594,8 @@ class Tieefseeview {
             eventChangeMirror(mirrorHorizontal, mirrorVertical);
 
             //取得顯示範圍的中心點
-            let left = -toInt(dom_con.style.left) + (dom_tiefseeview.offsetWidth / 2);
-            let top = -toInt(dom_con.style.top) + (dom_tiefseeview.offsetHeight / 2);
+            let left = -toInt(dom_con.style.left) + (dom_dpizoom.offsetWidth / 2);
+            let top = -toInt(dom_con.style.top) + (dom_dpizoom.offsetHeight / 2);
 
             //計算鏡像後的坐標
             //left = dom_data.getBoundingClientRect().width - left;
@@ -1595,8 +1616,8 @@ class Tieefseeview {
             top = rotateRect.y;
 
             //轉換成定位用的值，並移動回中心點
-            top = -top + (dom_tiefseeview.offsetHeight / 2)
-            left = -left + (dom_tiefseeview.offsetWidth / 2)
+            top = -top + (dom_dpizoom.offsetHeight / 2)
+            left = -left + (dom_dpizoom.offsetWidth / 2)
 
             await setTransform(undefined, undefined, false);
 
@@ -1731,8 +1752,8 @@ class Tieefseeview {
                         let andata: { transform_rotate, transform_scaleX, transform_scaleY } = $(dom_data).animate()[0];//取得記錄所有動畫變數的物件
 
                         //沒有指定從哪裡開始旋轉，就從中間
-                        if (_x === undefined) { _x = (dom_tiefseeview.offsetWidth / 2); }
-                        if (_y === undefined) { _y = (dom_tiefseeview.offsetHeight / 2); }
+                        if (_x === undefined) { _x = (dom_dpizoom.offsetWidth / 2); }
+                        if (_y === undefined) { _y = (dom_dpizoom.offsetHeight / 2); }
 
                         //取得旋轉點在在旋轉前的位置(絕對坐標)
                         let _x2 = _x - toInt(dom_con.style.left);
@@ -2227,11 +2248,11 @@ enum TieefseeviewZoomType {
 enum TieefseeviewImageRendering {
 
     /**預設值，運算成本較高 */
-    "auto",
+    "auto" = 0,
 
     /**運算成本低，放大時呈現方塊 */
-    "pixelated",
+    "pixelated" = 1,
 
     /**圖片大於100%時切換成pixelated，否則使用auto */
-    "auto-pixelated",
+    "auto-pixelated" = 2,
 }

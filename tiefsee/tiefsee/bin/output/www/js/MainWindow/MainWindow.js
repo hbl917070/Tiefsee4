@@ -219,10 +219,18 @@ class MainWindow {
                 }
             });
         }
-        function readSetting(s) {
-            var setting = (s);
+        function readSetting(setting) {
             //@ts-ignore
             config.settings = setting;
+            //-----------
+            let dpizoom = Number(config.settings["image"]["dpizoom"]);
+            if (dpizoom == -1 || isNaN(dpizoom)) {
+                dpizoom = baseWindow.dpiX;
+            }
+            fileShow.view_image.setDpizoom(dpizoom);
+            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
+            fileShow.view_image.setRendering(tieefseeviewImageRendering);
+            //-----------
             var cssRoot = document.documentElement;
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
             initColor("--color-window-background", true);

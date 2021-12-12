@@ -56,6 +56,7 @@
             <div class="pagetab">
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 外觀</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 圖片</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
             </div>
@@ -167,9 +168,6 @@
                         </div>
                     </div>
 
-
-
-
                 </div>
 
                 <!-- 工具列 -->
@@ -182,10 +180,53 @@
                     </div>
                 </div>
 
+                <!-- 圖片 -->
+                <div class="page-tabsPage" id="tabsPage-image">
+                    <div class="page-title" i18b=""> 圖片 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片DPI縮放 </div>
+                        <div class="text-box">
+                            <div class="text-title"> 強制將圖片渲染成更高的解析度。預設100% </div>
+                            <div class="text-content">
+                                <select class="text-input" id="image-dpizoom">
+                                    <option value="-1">auto</option>
+                                    <option value="1">100%</option>
+                                    <option value="1.25">125%</option>
+                                    <option value="1.5">150%</option>
+                                    <option value="1.75">175%</option>
+                                    <option value="2.0">200%</option>
+                                    <option value="2.25">225%</option>
+                                    <option value="2.5">250%</option>
+                                    <option value="2.75">275%</option>
+                                    <option value="3.0">300%</option>
+                                </select>
+                            </div>
+                        </div>
+
+ 
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片縮放模式 </div>
+   
+                        <div class="text-box">
+                            <div class="text-title">  </div>
+                            <div class="text-content">
+                                <select class="text-input" id="image-tieefseeviewImageRendering">
+                                    <option value="0">平滑</option>
+                                    <option value="1">銳利</option>
+                                    <option value="2">僅放大時銳利</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 快速鍵 -->
                 <div class="page-tabsPage" id="tabsPage-shortcutKeys">
                     <div class="page-title" i18b=""> 快速鍵 </div>
-                    
+
                     <div class="box">
                         <div class="box-title">
                             還在做
@@ -201,7 +242,7 @@
 
                     <div class="box">
                         <div class="box-title">
-                            版本：TiefSee 4.0.0-beta.2
+                            版本：TiefSee 4.0.0-beta.3
                         </div>
                         <div class="box-title">
                             作者：

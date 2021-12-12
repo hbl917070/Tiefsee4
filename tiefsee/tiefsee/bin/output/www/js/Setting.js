@@ -12,7 +12,7 @@ WV_Window.ShowWindow(); //顯示視窗
 class Setting {
     constructor() {
         var _a;
-        this.saveData = saveData;
+        this.saveData = saveSetting;
         var config = new Config();
         var cssRoot = document.documentElement;
         var jqdom_theme_windowBorderRadius = $("#text-theme-windowBorderRadius");
@@ -22,13 +22,15 @@ class Setting {
         var jqdom_theme_colorBlack = $("#text-theme-colorBlack");
         var jqdom_theme_colorBlue = $("#text-theme-colorBlue");
         var dom_theme_areo = document.querySelector("#switch-theme-areo");
+        var dom_image_dpizoom = document.querySelector("#image-dpizoom");
+        var dom_image_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
         //var jQdom_theme_colorGrey = $("#text-theme-colorGrey");
         var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
         baseWindow = new BaseWindow(); //初始化視窗
         initDomImport(); //初始化圖示
         init();
         baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
-            yield saveData();
+            yield saveSetting();
         }));
         //拖曳視窗
         (_a = document.getElementById("window-left")) === null || _a === void 0 ? void 0 : _a.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
@@ -46,15 +48,15 @@ class Setting {
         var tabs = new Tabs();
         tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { });
         tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
+        tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
         tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
         tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { });
         tabs.set(document.getElementById("tabsBtn-theme")); //預設選擇的頁面
         function init() {
             return __awaiter(this, void 0, void 0, function* () {
                 initTheme(); //初始化顏色選擇器物件
-                yield getSettingFile();
-                yield readSetting();
-                //var  W = await  WV_Window.This;
+                yield readSetting(); //讀取設定檔
+                yield applySetting(); //套用設置值
                 WV_Window.SetMinimumSize(400 * baseWindow.dpiX, 300 * baseWindow.dpiY); //設定視窗最小size
                 WV_Window.Text = "設定";
                 let iconPath = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
@@ -102,11 +104,21 @@ class Setting {
                 val = 15;
             }
             config.settings["theme"]["--window-border-radius"] = val;
-            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+            appleSettingOfMain();
         });
         dom_theme_areo === null || dom_theme_areo === void 0 ? void 0 : dom_theme_areo.addEventListener("change", () => {
             let val = dom_theme_areo.checked;
             config.settings["theme"]["aero"] = val;
+        });
+        dom_image_dpizoom === null || dom_image_dpizoom === void 0 ? void 0 : dom_image_dpizoom.addEventListener("change", () => {
+            let val = dom_image_dpizoom.value;
+            config.settings["image"]["dpizoom"] = val;
+            appleSettingOfMain();
+        });
+        dom_image_tieefseeviewImageRendering === null || dom_image_tieefseeviewImageRendering === void 0 ? void 0 : dom_image_tieefseeviewImageRendering.addEventListener("change", () => {
+            let val = dom_image_tieefseeviewImageRendering.value;
+            config.settings["image"]["tieefseeviewImageRendering"] = val;
+            appleSettingOfMain();
         });
         /**
          * 產生 套用主題 的按鈕
@@ -125,14 +137,50 @@ class Setting {
                 config.settings.theme["--color-white"] = white;
                 config.settings.theme["--color-black"] = black;
                 config.settings.theme["--color-blue"] = blue;
-                readSetting();
+                applySetting();
             };
             dom_applyTheme_btns === null || dom_applyTheme_btns === void 0 ? void 0 : dom_applyTheme_btns.append(btn);
         }
         /**
-         * 讀取設置值
+         * 將設定套用至 mainwiwndow
+         */
+        function appleSettingOfMain() {
+            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+        }
+        /**
+         * 讀取設定檔案
          */
         function readSetting() {
+            return __awaiter(this, void 0, void 0, function* () {
+                let s = JSON.stringify(config.settings, null, '\t');
+                var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);
+                if ((yield WV_Directory.Exists(path)) === false) {
+                    yield WV_Directory.CreateDirectory(path);
+                }
+                path = Lib.Combine([path, "setting.json"]);
+                let txt = yield WV_File.GetText(path);
+                let json = JSON.parse(txt);
+                config.settings = json;
+            });
+        }
+        /**
+         * 讀取設置值
+         */
+        function applySetting() {
+            //設定預設值
+            //@ts-ignore
+            if (config.settings["image"] === undefined) {
+                config.settings["image"] = {};
+            }
+            if (config.settings["image"]["dpizoom"] === undefined) {
+                config.settings["image"]["dpizoom"] = "1";
+            }
+            if (config.settings["image"]["tieefseeviewImageRendering"] === undefined) {
+                config.settings["image"]["tieefseeviewImageRendering"] = "0";
+            }
+            //-------------
+            dom_image_dpizoom.value = config.settings["image"]["dpizoom"];
+            dom_image_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
             jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
             dom_theme_areo.checked = config.settings["theme"]["aero"];
             //-------------
@@ -151,25 +199,9 @@ class Setting {
             setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
         }
         /**
-         * 讀取設定檔
-         */
-        function getSettingFile() {
-            return __awaiter(this, void 0, void 0, function* () {
-                let s = JSON.stringify(config.settings, null, '\t');
-                var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);
-                if ((yield WV_Directory.Exists(path)) === false) {
-                    yield WV_Directory.CreateDirectory(path);
-                }
-                path = Lib.Combine([path, "setting.json"]);
-                let txt = yield WV_File.GetText(path);
-                let json = JSON.parse(txt);
-                config.settings = json;
-            });
-        }
-        /**
          * 儲存設定
          */
-        function saveData() {
+        function saveSetting() {
             return __awaiter(this, void 0, void 0, function* () {
                 let s = JSON.stringify(config.settings, null, '\t');
                 var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);

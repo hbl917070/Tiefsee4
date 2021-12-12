@@ -252,17 +252,28 @@ class MainWindow {
 
 
 
-        function readSetting(s: any) {
-
-            var setting = (s);
+        function readSetting(setting: any) {
 
             //@ts-ignore
             config.settings = setting;
 
+            //-----------
+
+            let dpizoom = Number(config.settings["image"]["dpizoom"]);
+            if (dpizoom == -1 || isNaN(dpizoom)) {
+                dpizoom = baseWindow.dpiX;
+            }
+            fileShow.view_image.setDpizoom(dpizoom);
+
+
+            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
+            fileShow.view_image.setRendering(tieefseeviewImageRendering);
+
+            //-----------
+
             var cssRoot = document.documentElement;
 
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
-
 
             initColor("--color-window-background", true);
             initColor("--color-window-border", true);
@@ -278,15 +289,11 @@ class MainWindow {
 
                 if (opacity) {
                     cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a} )`);
-
                 } else {
-
                     for (let i = 1; i < 9; i++) {
                         cssRoot.style.setProperty(name + `${i}0`, `rgba(${c.r}, ${c.g}, ${c.b}, ${(i / 10)} )`)
                     }
-
                     cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, 1 )`);
-
                 }
             }
 

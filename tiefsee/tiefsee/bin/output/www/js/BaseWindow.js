@@ -175,7 +175,6 @@ class BaseWindow {
     maximized() {
         WV_Window.WindowState = "Maximized";
         this.initWindowState();
-        console.log("最大化");
     }
     /** 最小化 */
     minimized() {
@@ -185,7 +184,6 @@ class BaseWindow {
     normal() {
         WV_Window.WindowState = "Normal";
         this.initWindowState();
-        console.log("視窗化");
     }
     initWindowState() {
         if (this.windowState === "Maximized") {

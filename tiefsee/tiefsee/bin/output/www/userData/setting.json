@@ -2,10 +2,10 @@
 	"theme": {
 		"--window-border-radius": 8,
 		"--color-window-background": {
-			"r": 31,
-			"g": 39,
-			"b": 43,
-			"a": 0.97
+			"r": 35,
+			"g": 42,
+			"b": 48,
+			"a": 0.91
 		},
 		"--color-window-border": {
 			"r": 255,
@@ -36,6 +36,10 @@
 			"g": 30,
 			"b": 30
 		},
-		"aero": false
+		"aero": true
+	},
+	"image": {
+		"dpizoom": "-1",
+		"tieefseeviewImageRendering": "0"
 	}
 }

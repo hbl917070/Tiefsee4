@@ -109,7 +109,6 @@ class BaseWindow {
     public maximized() {
         WV_Window.WindowState = "Maximized";
         this.initWindowState();
-        console.log("最大化")
     }
 
     /** 最小化 */
@@ -122,8 +121,6 @@ class BaseWindow {
     public normal() {
         WV_Window.WindowState = "Normal";
         this.initWindowState();
-        console.log("視窗化")
-
     }
 
 

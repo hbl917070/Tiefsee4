@@ -49,6 +49,10 @@ class Config {
                 "--color-black": { r: 0, g: 0, b: 0, },
                 "--color-blue": { r: 0, g: 200, b: 255, },
                 "--color-grey": { r: 30, g: 30, b: 30, },
+            },
+            image: {
+                "dpizoom": "-1",
+                "tieefseeviewImageRendering": "auto"
             }
         };
     }

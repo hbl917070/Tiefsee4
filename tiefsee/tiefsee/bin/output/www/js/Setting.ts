@@ -6,7 +6,7 @@ class Setting {
 
     constructor() {
 
-        this.saveData = saveData;
+        this.saveData = saveSetting;
 
         var config = new Config();
 
@@ -20,6 +20,10 @@ class Setting {
         var jqdom_theme_colorBlue = $("#text-theme-colorBlue");
         var dom_theme_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
 
+        var dom_image_dpizoom = document.querySelector("#image-dpizoom") as HTMLInputElement;
+        var dom_image_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering") as HTMLInputElement;
+
+
         //var jQdom_theme_colorGrey = $("#text-theme-colorGrey");
 
         var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
@@ -28,10 +32,10 @@ class Setting {
         baseWindow = new BaseWindow();//初始化視窗
         initDomImport();//初始化圖示
         init();
-     
+
 
         baseWindow.closingEvents.push(async () => {//關閉視窗前觸發
-            await saveData();
+            await saveSetting();
         });
 
 
@@ -51,6 +55,7 @@ class Setting {
         var tabs = new Tabs();
         tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { });
         tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
+        tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
         tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
         tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { });
         tabs.set(document.getElementById("tabsBtn-theme"));//預設選擇的頁面
@@ -58,10 +63,8 @@ class Setting {
 
         async function init() {
             initTheme();//初始化顏色選擇器物件
-            await getSettingFile()
-            await readSetting()
-
-            //var  W = await  WV_Window.This;
+            await readSetting();//讀取設定檔
+            await applySetting();//套用設置值
 
             WV_Window.SetMinimumSize(400 * baseWindow.dpiX, 300 * baseWindow.dpiY);//設定視窗最小size
             WV_Window.Text = "設定";
@@ -99,7 +102,6 @@ class Setting {
             addEvent(jqdom_theme_colorBlue, "--color-blue", false);//
             //add(jQdom_theme_colorGrey, "--color-grey", false);//
 
-
             function addEvent(jQdim: JQuery, name: string, opacity: boolean = false) {
 
                 //@ts-ignore
@@ -134,7 +136,7 @@ class Setting {
             if (val > 15) { val = 15; }
 
             config.settings["theme"]["--window-border-radius"] = val;
-            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+            appleSettingOfMain();
         });
 
 
@@ -143,6 +145,17 @@ class Setting {
             config.settings["theme"]["aero"] = val;
         });
 
+        dom_image_dpizoom?.addEventListener("change", () => {
+            let val = dom_image_dpizoom.value;
+            config.settings["image"]["dpizoom"] = val;
+            appleSettingOfMain();
+        });
+
+        dom_image_tieefseeviewImageRendering?.addEventListener("change", () => {
+            let val = dom_image_tieefseeviewImageRendering.value;
+            config.settings["image"]["tieefseeviewImageRendering"] = val;
+            appleSettingOfMain();
+        });
 
         /**
          * 產生 套用主題 的按鈕
@@ -167,7 +180,7 @@ class Setting {
                 config.settings.theme["--color-white"] = white;
                 config.settings.theme["--color-black"] = black;
                 config.settings.theme["--color-blue"] = blue;
-                readSetting()
+                applySetting()
             };
             dom_applyTheme_btns?.append(btn);
 
@@ -175,9 +188,44 @@ class Setting {
 
 
         /**
+         * 將設定套用至 mainwiwndow
+         */
+        function appleSettingOfMain() {
+            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+        }
+
+        /**
+         * 讀取設定檔案
+         */
+        async function readSetting() {
+            let s = JSON.stringify(config.settings, null, '\t');
+            var path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\userData"])
+            if (await WV_Directory.Exists(path) === false) {
+                await WV_Directory.CreateDirectory(path);
+            }
+            path = Lib.Combine([path, "setting.json"]);
+
+            let txt = await WV_File.GetText(path);
+            let json = JSON.parse(txt);
+            config.settings = json;
+        }
+
+
+        /**
          * 讀取設置值
          */
-        function readSetting() {
+        function applySetting() {
+
+            //設定預設值
+            //@ts-ignore
+            if (config.settings["image"] === undefined) { config.settings["image"] = {} }
+            if (config.settings["image"]["dpizoom"] === undefined) { config.settings["image"]["dpizoom"] = "1" }
+            if (config.settings["image"]["tieefseeviewImageRendering"] === undefined) { config.settings["image"]["tieefseeviewImageRendering"] = "0" }
+
+            //-------------
+
+            dom_image_dpizoom.value = config.settings["image"]["dpizoom"];
+            dom_image_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
 
             jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
             dom_theme_areo.checked = config.settings["theme"]["aero"];
@@ -197,32 +245,13 @@ class Setting {
             setRgb(jqdom_theme_colorWhite, config.settings.theme["--color-white"]);
             setRgb(jqdom_theme_colorBlack, config.settings.theme["--color-black"]);
             setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
-
-        }
-
-
-
-        /**
-         * 讀取設定檔
-         */
-        async function getSettingFile() {
-            let s = JSON.stringify(config.settings, null, '\t');
-            var path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\userData"])
-            if (await WV_Directory.Exists(path) === false) {
-                await WV_Directory.CreateDirectory(path);
-            }
-            path = Lib.Combine([path, "setting.json"]);
-
-            let txt = await WV_File.GetText(path);
-            let json = JSON.parse(txt);
-            config.settings = json;
         }
 
 
         /**
          * 儲存設定
          */
-        async function saveData() {
+        async function saveSetting() {
             let s = JSON.stringify(config.settings, null, '\t');
             var path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\userData"])
             if (await WV_Directory.Exists(path) === false) {

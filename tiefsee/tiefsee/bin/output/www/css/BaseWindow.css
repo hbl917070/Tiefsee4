@@ -60,6 +60,10 @@ button {
     "蘋果儷中黑", sans-serif;
 }
 
+select option {
+  background: var(--color-black);
+}
+
 /* 視窗本體 */
 .window {
   flex: 1;
