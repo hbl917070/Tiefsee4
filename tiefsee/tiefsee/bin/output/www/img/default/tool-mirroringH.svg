@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
-	<g style="fill:var(--color-white)">
-		<rect x="12" y="1.1" width="1" height="22.8"/>
-		<path d="M14.6,12.6l8.6,7.7V4.8L14.6,12.6z M22.2,18l-6.1-5.5L22.2,7V18z"/>
-		<path d="M1.8,20.2l8.6-7.7L1.8,4.8V20.2z M2.8,7l6.1,5.5L2.8,18V7z"/>
-	</g>
-</svg>
