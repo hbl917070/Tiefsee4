@@ -3,3 +3,11 @@
 ################################################################################
 
 /tiefsee/tiefsee/bin/output/tiefsee.exe.WebView2/EBWebView
+/Tiefsee/.vs
+/Tiefsee/Tiefsee/obj
+/Tiefsee/Tiefsee/bin/output/Tiefsee.exe.WebView2
+/Tiefsee/Tiefsee/bin/output/Tiefsee.pdb
+/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Core.xml
+/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.WinForms.xml
+/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Wpf.xml
+/Tiefsee/Tiefsee/bin/output/Tiefsee.exe.config
