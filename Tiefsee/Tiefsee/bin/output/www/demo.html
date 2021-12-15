@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiefseeView Demo</title>
+
+    <script src="vender/hammer.min.js"></script>
+    <script src="vender/jquery-3.6.0.min.js"></script>
+    <script src="vender/jquery.easing.js"></script>
+
+    <script src="js/Tiefseeview.js"></script>
+    <link rel="stylesheet" href="css/tiefseeview.css">
+
+</head>
+
+<body>
+
+    <style>
+        html,
+        body {
+            touch-action: none;
+        }
+
+        #dd {
+            /* width: 700px; */
+            height: 100px;
+            /* background-color: rgba(123, 240, 255, 0.3); */
+        }
+
+        #tiefseeview {
+            width: 90%;
+            height: 400px;
+            background-color: rgba(0, 0, 0, 0.753);
+        }
+    </style>
+
+    <button onclick="loadurl()">載入</button>
+    <input type="text" id="imgurl"
+        value="https://wall.bahamut.com.tw/B/07/7d41a3dde7ab7ad8489d8c116d07ef56_0779698.JPG">
+    <hr>
+    <button onclick="tv.zoomFull(TieefseeviewZoomType['full-100%'])">全滿</button>
+    <button onclick="tv.setDegReverse()">逆時針</button>
+    <button onclick="tv.setDegForward()">順時針</button>
+    <button onclick="tv.setMirrorHorizontal(!tv.getMirrorHorizontal())">水平鏡像</button>
+    <button onclick="tv.setMirrorVertica(!tv.getMirrorVertica())">垂直鏡像</button>
+    <button onclick="tv.transformRefresh()">重設旋轉</button>
+
+    <input id="range_dge" type="range" min="0" max="360" step="1" value="0" style="width:100px">
+    <hr>
+
+    <label> <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto'])" checked>
+        平滑 </label>
+    <label> <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['pixelated'])"> 銳利
+    </label>
+    <label> <input type="radio" name="rendering"
+            onclick="tv.setRendering(TieefseeviewImageRendering['auto-pixelated'])"> 僅放大時銳利 </label>
+
+
+    <div id="tiefseeview"></div>
+
+    <div>
+        圖片原始size：<span id="output-size"></span>
+    </div>
+    <div>
+        縮放比例：<span id="output-zoom"></span>
+    </div>
+    <div>
+        超出視窗：<span id="output-overflow"></span>
+    </div>
+    <div>
+        旋轉角度：<span id="output-deg"></span>
+    </div>
+    <div>
+        鏡像：<span id="output-mirror"></span>
+    </div>
+    <div>
+        坐標：<span id="output-xy"></span>
+    </div>
+
+    <div id="dd"> </div>
+
+   
+    <script>
+
+        var tv;
+
+        async function loadurl() {
+
+            let _url = $('#imgurl').val();
+
+            await tv.loadImg(_url);
+            //await tv.loadBigimg(_url); 
+            tv.transformRefresh(false)
+            tv.zoomFull(TieefseeviewZoomType['full-100%']);
+            $('#output-size').html(`${tv.getOriginalWidth()} , ${tv.getOriginalHeight()}`);
+        }
+
+
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            tv = new Tieefseeview(document.querySelector('#tiefseeview'));
+            //tv.setOverflowDistance(0);
+            loadurl()
+
+            tv.setEventChangeZoom((ratio) => {
+                $('#output-zoom').html((ratio * 100).toFixed(2) + '%');
+                $('#output-overflow').html(`水平：${tv.getIsOverflowX()}  垂直：${tv.getIsOverflowY()}`);
+            })
+            tv.setEventChangeDeg((deg) => {
+                $('#output-deg').html(deg);
+                $('#range_dge').val(deg);
+            })
+            tv.setEventChangeMirror((isMirrorHorizontal, isMirrorVertica) => {
+                $('#output-mirror').html(`水平鏡像：${isMirrorHorizontal}  垂直鏡像：${isMirrorVertica}`);
+            })
+            tv.setEventChangeXY((x, y) => {
+                $('#output-xy').html(`${x.toFixed(2)} , ${y.toFixed(2)}`);
+            })
+
+
+        });
+
+
+
+
+        var range_dge = document.querySelector('#range_dge');
+        range_dge.addEventListener('input', () => {
+            //console.log(range_dge.value)
+            tv.setDeg(range_dge.value, undefined, undefined, false, true)
+        })
+
+    </script>
+
+</body>
+
+</html>
