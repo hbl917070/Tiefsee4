@@ -9,9 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace tiefsee {
+namespace TiefSee {
+  
 
-    [ClassInterface(ClassInterfaceType.AutoDual)]
+    //[ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     public class WV_System {
@@ -44,14 +45,14 @@ namespace tiefsee {
         /// 取得註螢幕的dpi，預設為96
         /// </summary>
         /// <returns></returns>
-        public float[] GetDpi() {
+        public float[] GetDpi() {        
 
             Graphics g = Graphics.FromHwnd(IntPtr.Zero);
             IntPtr desktop = g.GetHdc();
 
             int Xdpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
             int Ydpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY);
-          
+
             return new float[] { Xdpi, Ydpi };
         }
 

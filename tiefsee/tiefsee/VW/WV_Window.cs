@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace tiefsee {
+namespace TiefSee {
 
 
     //[ClassInterface(ClassInterfaceType.AutoDual)]
@@ -21,12 +21,9 @@ namespace tiefsee {
         public WebWindow M;
 
 
-
-
         public WV_Window(WebWindow m) {
             this.M = m;
         }
-
 
         /// <summary>
         /// 新開視窗
@@ -36,8 +33,7 @@ namespace tiefsee {
         /// <returns></returns>
         public WebWindow NewWindow(string _url, object[] _args) {
 
-            // _url = $"http://localhost:{55444}/www/MainWindow.html";
-
+        
             string[] args = new string[_args.Length];
             for (int i = 0; i < args.Length; i++) {
                 args[i] = _args[i].ToString();
@@ -51,7 +47,6 @@ namespace tiefsee {
             //x.Show();
             //x.Owner = M.parentForm;
             return w;
-
         }
 
         /// <summary>

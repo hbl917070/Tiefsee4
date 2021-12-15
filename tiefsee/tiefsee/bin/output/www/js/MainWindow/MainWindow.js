@@ -37,8 +37,8 @@ class MainWindow {
                 //讀取設定
                 yield getSettingFile();
                 readSetting(config.settings);
-                WV_Window.SetSize(600 * baseWindow.dpiX, 500 * baseWindow.dpiY); //初始化視窗大小
-                WV_Window.SetMinimumSize(250 * baseWindow.dpiX, 250 * baseWindow.dpiY); //設定視窗最小size
+                WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio); //初始化視窗大小
+                WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio); //設定視窗最小size
                 WV_Window.ShowWindow(); //顯示視窗
                 if (config.settings["theme"]["aero"]) {
                     WV_Window.SetAERO(); // aero毛玻璃效果
@@ -225,7 +225,8 @@ class MainWindow {
             //-----------
             let dpizoom = Number(config.settings["image"]["dpizoom"]);
             if (dpizoom == -1 || isNaN(dpizoom)) {
-                dpizoom = baseWindow.dpiX;
+                //dpizoom = baseWindow.dpiX;
+                dpizoom = -1;
             }
             fileShow.view_image.setDpizoom(dpizoom);
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);

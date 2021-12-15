@@ -157,7 +157,18 @@ class BaseWindow {
         this.dom_titlebarTxt = dom_titlebarTxt;
 
 
-
+        /*//判斷作業系統類型
+        //@ts-ignore
+        navigator.userAgentData.getHighEntropyValues(["platformVersion"]).then(ua => {
+            //@ts-ignore
+            if (navigator.userAgentData.platform === "Windows") {
+                const majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
+                if (majorPlatformVersion >= 13) {
+                    console.log("Windows 11 or later");
+                    dom_window.setAttribute("os","win11");
+                }
+            } 
+        });*/
 
         (async () => {
             //判斷目前的狀態是視窗化還是最大化

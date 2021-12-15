@@ -13,7 +13,9 @@
 }
 input,
 button,
-textarea,option {
+textarea,
+option,
+select {
   font-size: 15px;
 }
 

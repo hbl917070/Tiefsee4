@@ -46,6 +46,18 @@ class BaseWindow {
         this.btn_maximized = btn_maximized;
         this.btn_close = btn_close;
         this.dom_titlebarTxt = dom_titlebarTxt;
+        /*//判斷作業系統類型
+        //@ts-ignore
+        navigator.userAgentData.getHighEntropyValues(["platformVersion"]).then(ua => {
+            //@ts-ignore
+            if (navigator.userAgentData.platform === "Windows") {
+                const majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
+                if (majorPlatformVersion >= 13) {
+                    console.log("Windows 11 or later");
+                    dom_window.setAttribute("os","win11");
+                }
+            }
+        });*/
         (() => __awaiter(this, void 0, void 0, function* () {
             //判斷目前的狀態是視窗化還是最大化
             this.windowState = yield WV_Window.WindowState;

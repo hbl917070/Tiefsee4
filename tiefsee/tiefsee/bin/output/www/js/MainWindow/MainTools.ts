@@ -82,7 +82,6 @@ class MainTools {
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        console.log(e.button)
                         if (e.button === 2) {//滑鼠左鍵
                             M.script.file.ShowContextMenu();
                         }
@@ -289,7 +288,6 @@ class MainTools {
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        console.log(e.button)
                         if (e.button === 2) {//滑鼠左鍵
                             M.script.file.ShowContextMenu();
                         }
@@ -404,7 +402,6 @@ class MainTools {
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        console.log(e.button)
                         if (e.button === 2) {//滑鼠左鍵
                             M.script.file.ShowContextMenu();
                         }

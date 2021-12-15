@@ -10,10 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TiefSee;
 
-namespace tiefsee {
+namespace TiefSee {
 
-
-    [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     public class WV_Image {
@@ -22,8 +20,6 @@ namespace tiefsee {
 
         public WV_Image(WebWindow m) {
             this.M = m;
-
-
         }
 
 
@@ -36,7 +32,7 @@ namespace tiefsee {
         public string GetFileIcon(String path,int size) {
 
             //取得圖片在Windows系統的縮圖
-            System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
+            Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
                             path, size, size, ThumbnailOptions.ScaleUp
                         );
 
@@ -77,8 +73,7 @@ namespace tiefsee {
                 }
 
                 base64String = "data:image/png;base64," + Convert.ToBase64String(temp);
-
-                
+               
             } catch (Exception e) {
                 System.Windows.Forms.MessageBox.Show(e.ToString());
             }
@@ -88,21 +83,6 @@ namespace tiefsee {
 
 
 
-        public bool IsAn(string path) {
-            /*
-82737070 19016340087696680868056881000020
-82737070 96112120876966808680568810000180
-82737070 601811030876966808680568810000180
-82737070 64531087696680868056325253101612
-
-
-0 8769668086805688 10 = WEBPVP8X
-WEBPVP8
-
-            apng acTL 97998476
-        */
-            return true;
-        
-        }
+  
     }
 }

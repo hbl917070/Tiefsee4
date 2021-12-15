@@ -192,7 +192,7 @@ class ScriptSteting {
             this.temp_setting = yield baseWindow.newWindow("Setting.html");
             //this.temp_setting.Width = 500 * baseWindow.dpiX;
             //this.temp_setting.Height = 450 * baseWindow.dpiY;
-            yield this.temp_setting.SetSize(500 * baseWindow.dpiX, 450 * baseWindow.dpiY); //初始化視窗大小
+            yield this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio); //初始化視窗大小
             //設定坐標，從父視窗的中間開啟
             let w = (yield this.temp_setting.Width) - baseWindow.width;
             let h = (yield this.temp_setting.Height) - baseWindow.height;

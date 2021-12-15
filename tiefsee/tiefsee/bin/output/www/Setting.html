@@ -55,12 +55,11 @@
 
             <div class="pagetab">
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 外觀</div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 圖片</div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理</div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
             </div>
-
 
         </div>
 
@@ -182,12 +181,27 @@
 
                 <!-- 圖片 -->
                 <div class="page-tabsPage" id="tabsPage-image">
-                    <div class="page-title" i18b=""> 圖片 </div>
+                    <div class="page-title" i18b=""> 影像處理 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片縮放模式 </div>
+
+                        <div class="text-box">
+                            <div class="text-title"> </div>
+                            <div class="text-content">
+                                <select class="text-input" id="image-tieefseeviewImageRendering">
+                                    <option value="0">平滑</option>
+                                    <option value="1">銳利</option>
+                                    <option value="2">僅放大時銳利</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="box">
                         <div class="box-title"> 圖片DPI縮放 </div>
                         <div class="text-box">
-                            <div class="text-title"> 強制將圖片渲染成更高的解析度。預設100% </div>
+                            <div class="text-title"> 強制將圖片渲染成更高的解析度 </div>
                             <div class="text-content">
                                 <select class="text-input" id="image-dpizoom">
                                     <option value="-1">auto</option>
@@ -203,24 +217,10 @@
                                 </select>
                             </div>
                         </div>
-
- 
                     </div>
 
-                    <div class="box">
-                        <div class="box-title"> 圖片縮放模式 </div>
-   
-                        <div class="text-box">
-                            <div class="text-title">  </div>
-                            <div class="text-content">
-                                <select class="text-input" id="image-tieefseeviewImageRendering">
-                                    <option value="0">平滑</option>
-                                    <option value="1">銳利</option>
-                                    <option value="2">僅放大時銳利</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+
+
                 </div>
 
                 <!-- 快速鍵 -->
@@ -242,7 +242,7 @@
 
                     <div class="box">
                         <div class="box-title">
-                            版本：TiefSee 4.0.0-beta.3
+                            版本：TiefSee 4.0.0-beta.4
                         </div>
                         <div class="box-title">
                             作者：

@@ -1,11 +1,11 @@
 ﻿{
 	"theme": {
-		"--window-border-radius": 8,
+		"--window-border-radius": 7,
 		"--color-window-background": {
-			"r": 35,
-			"g": 42,
-			"b": 48,
-			"a": 0.91
+			"r": 31,
+			"g": 39,
+			"b": 43,
+			"a": 0.97
 		},
 		"--color-window-border": {
 			"r": 255,
@@ -36,7 +36,7 @@
 			"g": 30,
 			"b": 30
 		},
-		"aero": true
+		"aero": false
 	},
 	"image": {
 		"dpizoom": "-1",

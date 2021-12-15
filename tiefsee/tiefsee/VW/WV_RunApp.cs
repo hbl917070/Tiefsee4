@@ -11,18 +11,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace tiefsee {
+namespace TiefSee {
 
-    [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
     public class WV_RunApp {
 
 
         WebWindow M;
-
         public WV_RunApp(WebWindow m) {
             this.M = m;
-
         }
 
 

@@ -57,7 +57,7 @@ class Setting {
                 initTheme(); //初始化顏色選擇器物件
                 yield readSetting(); //讀取設定檔
                 yield applySetting(); //套用設置值
-                WV_Window.SetMinimumSize(400 * baseWindow.dpiX, 300 * baseWindow.dpiY); //設定視窗最小size
+                WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio); //設定視窗最小size
                 WV_Window.Text = "設定";
                 let iconPath = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
                 WV_Window.SetIcon(iconPath);
