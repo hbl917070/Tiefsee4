@@ -6,9 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiefSee {
+namespace Tiefsee {
 
-    [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     /// <summary>

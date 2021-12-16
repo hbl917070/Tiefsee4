@@ -125,9 +125,6 @@ class FileShow {
 
             let _path = fileInfo2.Path;
 
-
-
-
             setShowType(GroupType.img);//改變顯示類型
 
             let imgurl = _path;//圖片網址
@@ -138,8 +135,6 @@ class FileShow {
                 imgurl = "/api/getimg/" + encodeURIComponent(_path);
 
             }
-
-
 
             view_image.setLoading(true);
 
@@ -170,9 +165,7 @@ class FileShow {
                 //$('#output-overflow').html(`水平：${view_image.getIsOverflowX()}  垂直：${view_image.getIsOverflowY()}`);
             }))
 
-
             view_image.zoomFull(TieefseeviewZoomType['full-100%']);
-
 
             //圖片長寬
             let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
@@ -180,11 +173,10 @@ class FileShow {
                 dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
             }
 
-
             //檔案類型
             let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
-                let fileType = Lib.GetFileType(fileInfo2);
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
                 let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
@@ -218,7 +210,7 @@ class FileShow {
             //檔案類型
             let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
-                let fileType = Lib.GetFileType(fileInfo2);    
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
                 let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
@@ -247,7 +239,7 @@ class FileShow {
             //檔案類型
             let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
-                let fileType = Lib.GetFileType(fileInfo2);
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
                 let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
@@ -265,7 +257,7 @@ class FileShow {
          * 
          */
         async function openWelcome() {
-            baseWindow.setTitle("TiefSee 4");
+            baseWindow.setTitle("Tiefsee 4");
             setShowType(GroupType.welcome);//改變顯示類型
         }
 

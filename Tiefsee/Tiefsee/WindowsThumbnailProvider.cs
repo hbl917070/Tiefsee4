@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
  * 
  **/
 
-namespace TiefSee {
+namespace Tiefsee {
     [Flags]
     internal enum ThumbnailOptions {
         None = 0x00,

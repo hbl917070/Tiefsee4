@@ -133,7 +133,8 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = Lib.GetFileType(fileInfo2);
+                    let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
+                    ;
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
@@ -160,7 +161,7 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.pdf)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = Lib.GetFileType(fileInfo2);
+                    let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
@@ -186,7 +187,8 @@ class FileShow {
                 //檔案類型
                 let dom_type = (_a = getToolsDom(GroupType.txt)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoType"]`);
                 if (dom_type != null) {
-                    let fileType = Lib.GetFileType(fileInfo2);
+                    let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
+                    ;
                     let fileLength = getFileLength(fileInfo2.Lenght);
                     dom_type.innerHTML = `${fileType}<br>${fileLength}`;
                 }
@@ -204,7 +206,7 @@ class FileShow {
          */
         function openWelcome() {
             return __awaiter(this, void 0, void 0, function* () {
-                baseWindow.setTitle("TiefSee 4");
+                baseWindow.setTitle("Tiefsee 4");
                 setShowType(GroupType.welcome); //改變顯示類型
             });
         }

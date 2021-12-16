@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TiefSee {
+namespace Tiefsee {
 
     //[ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
@@ -161,7 +161,7 @@ namespace TiefSee {
                     return;
                 }
                 Adapter.UIThread(() => {//如果沒有執行環境，就用瀏覽器開啟下載頁面
-                    MessageBox.Show("必須安裝Webview2才能運行TiefSee");
+                    MessageBox.Show("必須安裝Webview2才能運行Tiefsee");
                     System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
                     this.Close();
                 });

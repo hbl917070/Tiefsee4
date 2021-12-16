@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TiefSee {
+namespace Tiefsee {
 
     [ComVisible(true)]
     public class WV_T {

@@ -7,7 +7,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TiefSee {
+namespace Tiefsee {
 
     public class BaseServer {
 

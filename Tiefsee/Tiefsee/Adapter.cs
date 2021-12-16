@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TiefSee {
+namespace Tiefsee {
     public static class Adapter {
         public static SynchronizationContext Dispacher { get; private set; }
         /// <summary>

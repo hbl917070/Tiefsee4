@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TiefSee {
+namespace Tiefsee {
     static class Program {
 
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        public static extern bool SetProcessDPIAware();
+        //[System.Runtime.InteropServices.DllImport("user32.dll")]
+        //public static extern bool SetProcessDPIAware();
 
 
         /// <summary>
@@ -17,8 +17,8 @@ namespace TiefSee {
         [STAThread]
         static void Main(string[] args) {
 
-            if (Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
+            //if (Environment.OSVersion.Version.Major >= 6)
+            //    SetProcessDPIAware();*/
 
             //在本地端建立server
             BaseServer bserver = new BaseServer();

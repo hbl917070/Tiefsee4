@@ -1,6 +1,6 @@
 :root {
   /** 可拖曳的邊框 */
-  --window-border: 8px;
+  --window-border: 7px;
   /** 可拖曳的四個角落 */
   --window-border-corner: 20px;
   /** 視窗圓角 */
@@ -55,9 +55,8 @@ body,
 input,
 textarea,
 button {
-  /* font-family:  "微軟正黑體"; */
-  font-family: "Noto Sans", "微軟正黑體", "Microsoft JhengHei", "黑體-繁",
-    "蘋果儷中黑", sans-serif;
+  font-family: "Microsoft JhengHei UI";
+  /* font-family: "Noto Sans TC", "Microsoft JhengHei"; */
 }
 
 select option {
@@ -72,20 +71,19 @@ select option {
   background-color: var(--color-window-background);
   border-radius: var(--window-border-radius);
   border: 1px solid var(--color-window-border);
-  margin: 0.5px;
+  /* margin: 5px;  */
+  margin-right: 1.5px;
+  margin-bottom: 1.5px;
   display: flex;
   flex-direction: column;
 }
 
 /*視窗最大化時*/
 .window.maximized {
-  /* margin: 7px; */
+  margin: 0px;
   box-shadow: none;
   border: none;
   border-radius: 0px;
-}
-.window.maximized[os=win11] {
-  /* margin: 5px; */
 }
 .window.maximized .window-border {
   display: none;
