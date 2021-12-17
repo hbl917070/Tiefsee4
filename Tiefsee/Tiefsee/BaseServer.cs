@@ -94,7 +94,7 @@ namespace Tiefsee {
 
             _httpListener.IgnoreWriteExceptions = true;//忽略不可回傳的檔案
 
-            _httpListener.Prefixes.Add("http://localhost:" + port + "/"); //
+            _httpListener.Prefixes.Add("http://localhost:" + port + "/");
             _httpListener.Start(); // start server (Run application as Administrator!)
 
             _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
@@ -131,8 +131,10 @@ namespace Tiefsee {
             header.Add("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
             header.Add("Access-Control-Max-Age", "1728000");
             request.Headers.Add(header);*/
-
+            
             if (get400(_url, context)) {
+            } else if (api_newwindow(_url, context)) {
+            } else if (api_ckeck(_url, context)) {
             } else if (api_getimg(_url, context)) {
             } else if (api_getpdf(_url, context)) {
             } else if (getwww(_url, context)) {
@@ -150,8 +152,68 @@ namespace Tiefsee {
         }
 
 
+        private bool api_ckeck(String _url, HttpListenerContext context) {
+
+            if (_url.IndexOf("api/check") != 0) {
+                return false;
+            }
+
+            HttpListenerRequest request = context.Request;
+            String headersReferer = request.Headers.Get("Referer");
+
+            if (headersReferer == null || (headersReferer.IndexOf("http://localhost:" + port + "/") == 0)) {
+                byte[] _responseArray = Encoding.UTF8.GetBytes("tiefsee");
+                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+                return true;
+            }
+            return false;
+        }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_url"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private bool api_newwindow(String _url, HttpListenerContext context) {
+
+            if (_url.IndexOf("api/newWindow/") != 0) {
+                return false;
+            }
+
+            String _path = _url.Substring(14);
+            _path = _path.Split('?')[0];//去掉?後面的文字
+            _path = Uri.UnescapeDataString(_path);
+
+            HttpListenerRequest request = context.Request;
+            String headersReferer = request.Headers.Get("Referer");
+
+            Console.WriteLine("api/newWindow/  " + headersReferer);
+
+            if (headersReferer == null || (headersReferer.IndexOf("http://localhost:" + port + "/") == 0)) {
+    
+                string[] args = Uri.UnescapeDataString(_path).Split('*');
+                Adapter.UIThread(() => {
+                    new WebWindow($"http://localhost:{port}/www/MainWindow.html", args, null);
+                });
+
+                //context.Response.StatusCode = 200;
+                byte[] _responseArray = Encoding.UTF8.GetBytes("ok");
+                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+                return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_url"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private bool api_getimg(String _url, HttpListenerContext context) {
 
             if (_url.IndexOf("api/getimg/") != 0) {
@@ -201,7 +263,12 @@ namespace Tiefsee {
 
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_url"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private bool api_getpdf(String _url, HttpListenerContext context) {
 
             if (_url.IndexOf("api/getpdf/") != 0) {

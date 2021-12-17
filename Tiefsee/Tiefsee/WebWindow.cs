@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Timer = System.Windows.Forms.Timer;
 
 namespace Tiefsee {
 
@@ -24,10 +23,15 @@ namespace Tiefsee {
 
         public WebWindow(String _url, string[] _args, WebWindow _parentWindow) {
 
-            if (_parentWindow == null) {//只有啟動程式是才會執行
+            if (_parentWindow == null) {//只有啟動程式時才會執行這裡
                 Adapter.Initialize();
                 DownloadWebview2();//檢查是否有webview2執行環境
             }
+
+            QuickRun.WindowCreat();
+            this.FormClosed += (sender, e) => {
+                QuickRun.WindowFreed();
+            };
 
             //this.AutoScaleMode = AutoScaleMode.Dpi;
             //this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
