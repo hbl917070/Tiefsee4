@@ -120,7 +120,7 @@ class InitMenu {
                                 return;
                             }
                             M.menu.close(); //關閉menu
-                            WV_RunApp.ProcessStart(exePath, filePath, true, false); //開啟檔案
+                            WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false); //開啟檔案
                         });
                         dom_menuOtherAppOpen === null || dom_menuOtherAppOpen === void 0 ? void 0 : dom_menuOtherAppOpen.append(dom);
                     }

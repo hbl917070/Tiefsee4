@@ -46,8 +46,6 @@ class MainWindow {
         new MainTools(this);
         init();
 
-
-
         async function init() {
 
             initDomImport();
@@ -60,6 +58,7 @@ class MainWindow {
             WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio);//初始化視窗大小
             WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio);//設定視窗最小size
             WV_Window.ShowWindow();//顯示視窗
+
 
             if (config.settings["theme"]["aero"]) {
                 WV_Window.SetAERO();// aero毛玻璃效果

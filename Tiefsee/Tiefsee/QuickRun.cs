@@ -10,11 +10,9 @@ using System.Net;
 namespace Tiefsee {
     public class QuickRun {
 
-
         private static int runNumber = 0;//目前的視窗數量
         private static int mainPort;//程式目前使用的port
         public static StartWindow startWindow;//用於防止程式被關閉的視窗
-
 
 
         /// <summary>
@@ -99,14 +97,15 @@ namespace Tiefsee {
                         StringBuilder sb = new StringBuilder();
                         for (int i = 0; i < args.Length; i++) {
                             if (i != args.Length - 1) {
-                                sb.Append(args[i] + "*");
+                                sb.Append(args[i] + "\n");
                             } else {
                                 sb.Append(args[i]);
                             }
                         }
 
                         //開啟新視窗
-                        uri = $"http://localhost:{port}/api/newWindow/" + Uri.EscapeDataString(sb.ToString());
+                        string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
+                        uri = $"http://localhost:{port}/api/newWindow/" + base64;
                         HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create(uri);
                         using (HttpWebResponse response = (HttpWebResponse)request2.GetResponse()) { }
 

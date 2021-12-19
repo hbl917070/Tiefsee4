@@ -127,7 +127,7 @@ class InitMenu {
                         let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
                         if (await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close();//關閉menu
-                        WV_RunApp.ProcessStart(exePath, filePath, true, false);//開啟檔案
+                        WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);//開啟檔案
                     };
                     dom_menuOtherAppOpen?.append(dom);
                 }

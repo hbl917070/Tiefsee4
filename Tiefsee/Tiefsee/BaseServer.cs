@@ -192,10 +192,12 @@ namespace Tiefsee {
             Console.WriteLine("api/newWindow/  " + headersReferer);
 
             if (headersReferer == null || (headersReferer.IndexOf("http://localhost:" + port + "/") == 0)) {
-    
-                string[] args = Uri.UnescapeDataString(_path).Split('*');
+
+                string arg = Encoding.UTF8.GetString(Convert.FromBase64String(_path));//將字串剖析回命令列參數
+                string[] args = arg.Split('\n');
+
                 Adapter.UIThread(() => {
-                    new WebWindow($"http://localhost:{port}/www/MainWindow.html", args, null);
+                   new WebWindow($"http://localhost:{port}/www/MainWindow.html", args, null);
                 });
 
                 //context.Response.StatusCode = 200;

@@ -54,16 +54,19 @@ class Lib {
         });
     }
     /**
-     * 判斷是否為動圖(gif、apng、webp動圖)
+     * 判斷是否為動圖(gif、apng、webp動圖、svg)
      * @param fileInfo2
      * @returns
      */
     static IsAnimation(fileInfo2) {
         let hex = fileInfo2.HexValue;
-        if (hex.indexOf("47 49 46 38 39 61") === 0) {
+        if (Lib.GetExtension(fileInfo2.Path) === ".svg") {
             return true;
         }
-        if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) {
+        if (hex.indexOf("47 49 46 38 39 61") === 0) { //gif
+            return true;
+        }
+        if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) { //apng
             if (hex.indexOf("08 61 63 54") > 10) { //acTL
                 return true;
             }
@@ -118,7 +121,7 @@ class Lib {
         if (hex.indexOf("4C 00 00 00 01 14 02 00") === 0) {
             return "lnk";
         }
-        console.log("檔案類型辨識失敗");
+        console.log("檔案類型辨識失敗: " + fileInfo2.Path);
         console.log(hex);
         return fileExt;
     }
@@ -134,7 +137,7 @@ Lib.GetFileName = (path) => {
     return name;
 };
 /**
- * 取得附檔名。例如「.jpg」
+ * 取得附檔名。例如「.jpg」(一律小寫)
  * @param path
  * @returns
  */

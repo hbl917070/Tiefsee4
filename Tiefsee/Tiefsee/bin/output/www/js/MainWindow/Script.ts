@@ -159,7 +159,6 @@ class ScriptOpen {
     public async PrintFile() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
-
         WV_File.PrintFile(filePath);
     }
 

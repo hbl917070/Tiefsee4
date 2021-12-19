@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Core;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -54,7 +55,7 @@ namespace Tiefsee {
             this.SizeChanged += (sender, e) => {
                 string s = this.WindowState.ToString();
                 RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{s}')");
-             
+
                 //最大化時，程式網內縮
                 if (this.WindowState == FormWindowState.Maximized) {
                     int x = System.Windows.Forms.Screen.FromHandle(this.Handle).WorkingArea.X
@@ -65,7 +66,7 @@ namespace Tiefsee {
                 } else {
                     this.Padding = new System.Windows.Forms.Padding(0);
                 }
-         
+
 
             };
             this.Move += (sender, e) => {
@@ -89,13 +90,17 @@ namespace Tiefsee {
 
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
-            wv2.Source = new Uri(_url);
 
-            await wv2.EnsureCoreWebView2Async();//等待初始化完成
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
+            //System.Console.WriteLine(AppData);
+
+            var webView2Environment = await CoreWebView2Environment.CreateAsync(null, appData);
+            await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
 
             wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
             };
 
+            wv2.Source = new Uri(_url);
             wv2.CoreWebView2.AddHostObjectToScript("WV_Window", new WV_Window(this));
             wv2.CoreWebView2.AddHostObjectToScript("WV_Directory", new WV_Directory(this));
             wv2.CoreWebView2.AddHostObjectToScript("WV_File", new WV_File(this));
@@ -144,6 +149,11 @@ namespace Tiefsee {
             this.Show();
             this.Controls.Add(wv2);
             this.Opacity = 1;
+
+            //讓視窗在最上面
+            this.TopMost = true;
+            this.TopMost = false;
+
             /*var tim = new System.Windows.Forms.Timer();
             tim.Interval = 300;
             tim.Tick += (sender,e) => {
