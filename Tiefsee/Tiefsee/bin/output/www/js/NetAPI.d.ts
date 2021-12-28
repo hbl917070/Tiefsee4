@@ -69,6 +69,9 @@ interface WV_Window {
     /** 設定視窗坐標 */
     SetPosition(left: number, top: number): void;
 
+    /** 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee4 */
+    GetAppDataPath(): string;
+
     /** 取得執行檔目錄 */
     GetAppDirPath(): string;
 
@@ -116,8 +119,6 @@ interface WV_Window {
 
 }
 
-
-
 interface WV_Directory {
 
     /**
@@ -151,7 +152,6 @@ interface WV_Directory {
     /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
     GetLastWriteTimeUtc(path: string): number;
 }
-
 
 interface WV_File {
 
@@ -206,7 +206,6 @@ interface WV_File {
     /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
     GetLastWriteTimeUtc(path: string): number;
 }
-
 
 interface WV_FileInfo {
 
@@ -297,11 +296,7 @@ interface WV_Path {
     IsPathRooted(path: string): bool;
 }
 
-
 interface WV_System {
-
-    /** 取得註螢幕的dpi，預設為96 */
-    GetDpi(): number[2];
 
     SetClipboard_FileToPng(path: string): bool;
 
@@ -344,7 +339,6 @@ interface WV_System {
     Collect(): void;
 }
 
-
 interface WV_RunApp {
 
     /** 以其他程式開啟(系統原生選單) */
@@ -370,7 +364,6 @@ interface WV_RunApp {
     OpenUrl(url: string): boolean;
 }
 
-
 interface WV_Image {
 
     /**
@@ -386,8 +379,33 @@ interface WV_Image {
      * @returns base64
      */
     GetExeIcon_32(path: string): string;
-
-
 }
 
- //declare let cef_window: cef_window;
+interface AppInfo {
+
+    /** 命令列參數 */
+    args: string[];
+
+    /** 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體 */
+    startType: number;
+
+    /** 程式開始的port */
+    startPort: number;
+
+    /** 程式所在的資料夾 */
+    appDirPath: string;
+
+    /** 程式的暫存資料夾 */
+    appDataPath: string;
+
+    /** 目前使用的port */
+    mainPort: number;
+
+    /** setting.js 的路徑 */
+    settingPath: string;
+
+    /** setting.js 的文字 */
+    settingTxt: string;
+}
+
+//declare let cef_window: cef_window;

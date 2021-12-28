@@ -42,7 +42,7 @@ class Config {
         this.settings = {
             theme: {
                 "aero": false,
-                "--window-border-radius": 10,
+                "--window-border-radius": 7,
                 "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
                 "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
                 "--color-white": { r: 255, g: 255, b: 255, },
@@ -52,10 +52,15 @@ class Config {
             },
             image: {
                 "dpizoom": "-1",
-                "tieefseeviewImageRendering": "auto"
+                "tieefseeviewImageRendering": "0"
             }
         };
     }
+    /**
+     *
+     * @param type
+     * @returns
+     */
     allowFileType(type) {
         if (type === GroupType.img) {
             return [
@@ -104,11 +109,19 @@ class Config {
     }
 }
 var GroupType = {
-    unknown: "unknown",
-    img: "img",
-    imgs: "imgs",
-    pdf: "pdf",
-    movie: "movie",
-    txt: "txt",
+    /** 起始畫面 */
     welcome: "welcome",
+    /** 不顯示任何東西 */
+    none: "none",
+    /** 顯示檔案總管的icon */
+    unknown: "unknown",
+    /** 一般的圖片 */
+    img: "img",
+    /** 多幀圖片 */
+    imgs: "imgs",
+    /** pdf 或 ai */
+    pdf: "pdf",
+    /** 純文字 */
+    txt: "txt",
+    movie: "movie",
 };

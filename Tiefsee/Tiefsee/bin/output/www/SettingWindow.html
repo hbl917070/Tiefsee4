@@ -24,9 +24,9 @@
     <link rel="stylesheet" href="/css/Setting.css">
     <link rel="stylesheet" href="/css/Menu.css">
 
-    <script src="/js/MainWindow/Config.js"></script>
+    <script src="/js/Config.js"></script>
     <script src="/js/MainWindow/Menu.js"></script>
-    <script src="/js/Setting.js"></script>
+    <script src="/js/SettinWindow/SettinWindow.js"></script>
 
     <!-- MiniColors -->
     <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
@@ -37,9 +37,8 @@
         document.addEventListener("DOMContentLoaded", async () => {
             setting = new Setting();
         });
-
-
     </script>
+
 </head>
 
 <body>
@@ -54,10 +53,12 @@
             <!-- <img src="/img/logo.svg" style="width:35px;display:block;margin:10px;margin-top:10px"> -->
 
             <div class="pagetab">
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n="" active="true"> 外觀</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-common" i18n="" active="true"> 一般 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n=""> 外觀</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n=""> 進階設定</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
             </div>
 
@@ -93,6 +94,36 @@
             </div>
 
             <div class="window-body base-scrollbar">
+
+
+                <!-- 一般 -->
+                <div class="page-tabsPage" id="tabsPage-common">
+                    <div class="page-title" i18b=""> 一般 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 啟動模式 </div>
+
+                        <div class="text-box">
+                            <div class="text-title"> </div>
+                            <!-- <div class="text-content"> -->
+
+                            <div class="radio-group">
+                                <label> <input type="radio" name="1"> <span>直接啟動 (每個視窗都是新的執行個體)</span> </label>
+                                <label> <input type="radio" name="1"> <span>快速啟動 (所有視窗共用同一個執行個體)</span> </label>
+                                <label> <input type="radio" name="1"> <span>快速啟動且常駐在背景</span> </label>
+                                <!-- <label> <input type="radio" name="1"> <span>單一視窗</span> </label> -->
+                            </div>
+
+                            <!-- </div> -->
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+
 
                 <!-- 主題 -->
                 <div class="page-tabsPage" id="tabsPage-theme">
@@ -236,6 +267,37 @@
                 </div>
 
 
+                <!-- 進階設定 -->
+                <div class="page-tabsPage" id="tabsPage-advanced">
+                    <div class="page-title" i18b=""> 進階設定 </div>
+
+
+
+                    <div class="box">
+                        <div class="box-title"> 本地伺服器port </div>
+                        <div class="text-box">
+                            <div class="text-title"> 如果port被佔用，則會使用下一個 </div>
+                            <div class="text-content">
+                                <input class="text-input" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title"> 相關路徑 </div>
+
+                        <div class="text-box">
+                            <div class="text-title"> </div>
+                            <div class="text-content">
+                                <input class="text-input" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
                 <!-- 關於 -->
                 <div class="page-tabsPage" id="tabsPage-about">
                     <div class="page-title" i18b=""> 關於 </div>
@@ -243,7 +305,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.4</span>
+                            <span> Tiefsee 4.0.0-beta.5</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

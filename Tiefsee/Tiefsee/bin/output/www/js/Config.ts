@@ -1,9 +1,7 @@
 
 class Config {
 
-    constructor() {
-    }
-
+    constructor() { }
 
 
     public OtherAppOpenList = {
@@ -43,10 +41,31 @@ class Config {
             { name: "FotoSketcher", type: ["img"] },
             { name: "PhoXo", type: ["img"] },
         ]
+    }
 
+    public settings = {
+        theme: {
+            "aero": false,
+            "--window-border-radius": 7,
+            "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
+            "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
+            "--color-white": { r: 255, g: 255, b: 255, },
+            "--color-black": { r: 0, g: 0, b: 0, },
+            "--color-blue": { r: 0, g: 200, b: 255, },
+            "--color-grey": { r: 30, g: 30, b: 30, },
+        },
+        image: {
+            "dpizoom": "-1",
+            "tieefseeviewImageRendering": "0"
+        }
     }
 
 
+    /**
+     * 
+     * @param type 
+     * @returns 
+     */
     public allowFileType(type: string) {
 
         if (type === GroupType.img) {
@@ -101,30 +120,33 @@ class Config {
 
 
 
-    public settings = {
-        theme: {
-            "aero": false,
-            "--window-border-radius": 10,
-            "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
-            "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
-            "--color-white": { r: 255, g: 255, b: 255, },
-            "--color-black": { r: 0, g: 0, b: 0, },
-            "--color-blue": { r: 0, g: 200, b: 255, },
-            "--color-grey": { r: 30, g: 30, b: 30, },
-        },
-        image: {
-            "dpizoom": "-1",
-            "tieefseeviewImageRendering": "auto"
-        }
-    }
+ 
+
 }
 
 var GroupType = {
-    unknown: "unknown",
-    img: "img",
-    imgs: "imgs",
-    pdf: "pdf",
-    movie: "movie",
-    txt: "txt",
+
+    /** 起始畫面 */
     welcome: "welcome",
+
+    /** 不顯示任何東西 */
+    none: "none",
+
+    /** 顯示檔案總管的icon */
+    unknown: "unknown",
+
+    /** 一般的圖片 */
+    img: "img",
+
+    /** 多幀圖片 */
+    imgs: "imgs",
+
+    /** pdf 或 ai */
+    pdf: "pdf",
+
+    /** 純文字 */
+    txt: "txt",
+
+    movie: "movie",
+
 }
