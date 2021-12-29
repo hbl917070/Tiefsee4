@@ -1,14 +1,8 @@
-
-
-
-
 class MainWindow {
 
     public dom_tools: HTMLElement;
     public dom_maxBtnLeft: HTMLElement;
     public dom_maxBtnRight: HTMLElement;
-
-    //public waitingList: WaitingList;
 
     public config;
     public fileLoad;
@@ -30,6 +24,8 @@ class MainWindow {
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
         var script = new Script(this);
+        let firstRun = true;//用於判斷是否為第一次執行
+
         new InitMenu(this);
 
         this.dom_tools = dom_tools;
@@ -41,38 +37,89 @@ class MainWindow {
         this.menu = menu;
         this.config = config;
         this.script = script;
-        this.readSetting = readSetting;
+        this.readSetting = applySetting;
+
 
         new MainTools(this);
         init();
+        //WV_Window.ShowWindow();//顯示視窗 
 
+
+        /**
+         * 覆寫 onCreate
+         * @param json 
+         */
+        baseWindow.onCreate = async (json: AppInfo) => {
+
+
+            if (firstRun === true) {   //首次開啟視窗
+
+                firstRun = false;
+
+                WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio);//初始化視窗大小
+                WV_Window.ShowWindow();//顯示視窗 
+
+                //讀取設定
+                var userSetting = {};
+                try {
+                    userSetting = JSON.parse(json.settingTxt);
+                } catch (e) { }
+                $.extend(true, config.settings, userSetting);
+                applySetting(config.settings);
+
+                // baseWindow.dom_window.style.opacity ="1";
+
+                //取得命令列參數
+                let args = json.args;
+                if (args.length === 0) {
+                    fileShow.openWelcome();
+                } else if (args.length === 1) {
+                    fileLoad.loadFile(args[0]);//載入單張圖片
+                } else {
+                    fileLoad.loadFiles(args[0], args);//載入多張圖片
+                }
+
+                //baseWindow.dom_titlebarTxt.focus();
+
+                if (config.settings["theme"]["aero"]) {
+                    WV_Window.SetAERO();// aero毛玻璃效果
+                }
+
+                /*setTimeout(async () => {           
+                    await WV_Window.This().Focus()
+                    console.log("Focus")
+                }, 500);*/
+
+            } else {//單純開啟圖片(用於 單一執行個體)
+
+                WV_Window.ShowWindow();//顯示視窗 
+
+                //取得命令列參數
+                let args = json.args;
+                if (args.length === 0) {
+                    fileShow.openWelcome();
+                } else if (args.length === 1) {
+                    fileLoad.loadFile(args[0]);//載入單張圖片
+                } else {
+                    fileLoad.loadFiles(args[0], args);//載入多張圖片
+                }
+
+
+            }
+
+
+        }
+
+
+        /**
+         * 
+         */
         async function init() {
 
+            fileShow.openNone();//不顯示任何東西
             initDomImport();
 
-            //讀取設定
-            await getSettingFile();
-            readSetting(config.settings);
-
-
-            WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio);//初始化視窗大小
             WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio);//設定視窗最小size
-            WV_Window.ShowWindow();//顯示視窗
-
-
-            if (config.settings["theme"]["aero"]) {
-                WV_Window.SetAERO();// aero毛玻璃效果
-            }
-
-            //取得命令列參數
-            let args = await WV_Window.GetArguments()
-            if (args.length === 0) {
-                fileShow.openWelcome();
-            } else if (args.length === 1) {
-                fileLoad.loadFile(args[0]);//載入單張圖片
-            } else {
-                fileLoad.loadFiles(args[0], args);//載入多張圖片
-            }
 
             //設定icon
             async function initIcon() {
@@ -94,7 +141,6 @@ class MainWindow {
                 e.preventDefault();
             })
 
-
             //關閉視窗前觸發
             baseWindow.closingEvents.push(async () => {
                 if (script.steting.temp_setting != null) {//如果有開啟 設定視窗
@@ -105,12 +151,10 @@ class MainWindow {
                 }
             });
 
-
-
             //圖片區域也允許拖曳視窗
-            fileShow.dom_image.addEventListener("mousedown", async (e) => {
+            fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
                 //圖片沒有出現捲動軸
-                if (fileShow.view_image.getIsOverflowX() === false && fileShow.view_image.getIsOverflowY() === false) {
+                if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
                     if (e.button === 0) {//滑鼠左鍵
                         let WindowState = baseWindow.windowState;
                         if (WindowState === "Normal") {
@@ -127,7 +171,6 @@ class MainWindow {
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
-
                 let WindowState = baseWindow.windowState
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
@@ -137,7 +180,7 @@ class MainWindow {
                     }, 50);
                 }
             });
-            Lib.addEventDblclick(fileShow.dom_image, async () => {//圖片物件
+            Lib.addEventDblclick(fileShow.dom_imgview, async () => {//圖片物件
                 let WindowState = baseWindow.windowState
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
@@ -183,7 +226,6 @@ class MainWindow {
                     dom_tools.scroll(scrollLeft - 20, 0)
                 }
             }, false)
-
 
 
             //讓歡迎畫面允許拖曳視窗
@@ -250,8 +292,11 @@ class MainWindow {
         }
 
 
-
-        function readSetting(setting: any) {
+        /**
+         * 套用設定
+         * @param setting 
+         */
+        function applySetting(setting: any) {
 
             //@ts-ignore
             config.settings = setting;
@@ -260,14 +305,12 @@ class MainWindow {
 
             let dpizoom = Number(config.settings["image"]["dpizoom"]);
             if (dpizoom == -1 || isNaN(dpizoom)) {
-                //dpizoom = baseWindow.dpiX;
                 dpizoom = -1;
             }
-            fileShow.view_image.setDpizoom(dpizoom);
-
+            fileShow.tieefseeview.setDpizoom(dpizoom);
 
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
-            fileShow.view_image.setRendering(tieefseeviewImageRendering);
+            fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
 
             //-----------
 
@@ -281,7 +324,6 @@ class MainWindow {
             initColor("--color-black");
             initColor("--color-blue");
             //initColor("--color-grey");
-
 
             function initColor(name: string, opacity: boolean = false) {
                 //@ts-ignore
@@ -297,25 +339,10 @@ class MainWindow {
                 }
             }
 
-
         }
 
 
-        /**
-         * 讀取設定
-         */
-        async function getSettingFile() {
-            let s = JSON.stringify(config.settings, null, '\t');
-            var path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\userData"])
-            if (await WV_Directory.Exists(path) === false) {
-                await WV_Directory.CreateDirectory(path);
-            }
-            path = Lib.Combine([path, "setting.json"]);
 
-            let txt = await WV_File.GetText(path);
-            let json = JSON.parse(txt);
-            config.settings = json;
-        }
 
     }
 }

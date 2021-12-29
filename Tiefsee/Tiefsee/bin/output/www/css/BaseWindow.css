@@ -49,6 +49,7 @@ body {
 
 body {
   display: flex;
+  overflow: hidden;
 }
 
 body,
@@ -56,6 +57,7 @@ input,
 textarea,
 button {
   font-family: "Segoe UI", "Microsoft JhengHei UI";
+  font-weight: 100;
   /* font-family: "Noto Sans TC", "Microsoft JhengHei"; */
 }
 
@@ -63,8 +65,15 @@ select option {
   background: var(--color-black);
 }
 
+.window.window-start {
+  /* opacity: 0.9; */
+
+}
+
 /* 視窗本體 */
 .window {
+  /* transition: transform 0.2s;
+  transform: translateY(10px) scale(0.98); */
   flex: 1;
   position: relative;
   overflow: hidden;
@@ -103,7 +112,7 @@ select option {
 
 .titlebar-txt {
   height: 100%;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-white);
   display: flex;
   align-items: center;

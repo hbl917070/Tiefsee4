@@ -12,14 +12,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet">
 
+    <script src="/vender/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+
+    <script src="/vender/jquery.easing.js"></script>
+
+    <!-- MiniColors -->
+    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+
+
     <link rel="stylesheet" href="/css/BaseWindow.css">
     <script src="/js/BaseWindow.js"></script>
     <script src="/js/Lib.js"></script>
 
-    <!-- <script src="/vender/jquery-3.6.0.min.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
-    <script src="/vender/jquery.easing.js"></script>
 
     <link rel="stylesheet" href="/css/Setting.css">
     <link rel="stylesheet" href="/css/Menu.css">
@@ -28,9 +35,9 @@
     <script src="/js/MainWindow/Menu.js"></script>
     <script src="/js/SettinWindow/SettinWindow.js"></script>
 
-    <!-- MiniColors -->
-    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
-    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+    <!-- 工具提示 -->
+    <script src="/vender/tippyjs/popper.min.js"></script>
+    <script src="/vender/tippyjs/tippy-bundle.umd.min.js"></script>
 
     <script>
         var setting;
@@ -42,7 +49,6 @@
 </head>
 
 <body>
-
 
 
 
@@ -104,17 +110,67 @@
                         <div class="box-title"> 啟動模式 </div>
 
                         <div class="text-box">
-                            <div class="text-title"> </div>
-                            <!-- <div class="text-content"> -->
-
+                            <div class="text-title">(修改後需重啟程式) </div>
+                   
+                            <!-- 提示 -->
+                            <div style="display: none;">
+                                <div id="tooltip-startType1">
+                                    每個視窗都是一個新的執行個體，啟動速度較慢
+                                </div>
+                                <div id="tooltip-startType2">
+                                    所有視窗共用同一個執行個體。存在一個以上的視窗時，能以極快的速度啟動
+                                </div>
+                                <div id="tooltip-startType3">
+                                    所有視窗共用同一個執行個體。程式會常駐在背景，隨時都能以極快的速度啟動
+                                </div>
+                                <div id="tooltip-startType4">
+                                    只允許存在一個視窗
+                                </div>
+                                <div id="tooltip-startType5">
+                                    只允許存在一個視窗。程式會常駐在背景，隨時都能以極快的速度啟動
+                                </div>
+                            </div>
+                            
                             <div class="radio-group">
-                                <label> <input type="radio" name="1"> <span>直接啟動 (每個視窗都是新的執行個體)</span> </label>
-                                <label> <input type="radio" name="1"> <span>快速啟動 (所有視窗共用同一個執行個體)</span> </label>
-                                <label> <input type="radio" name="1"> <span>快速啟動且常駐在背景</span> </label>
-                                <!-- <label> <input type="radio" name="1"> <span>單一視窗</span> </label> -->
+                                <label>
+                                    <input type="radio" name="radio-startType" value="1">
+                                    <span>直接啟動</span>
+                                    <div class="img-help" data-tooltip="tooltip-startType1">
+                                        <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    </div>
+                                </label>
+                                <label>
+                                    <input type="radio" name="radio-startType" value="2">
+                                    <span>快速啟動</span>
+                                    <div class="img-help" data-tooltip="tooltip-startType2">
+                                        <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    </div>
+                                </label>
+                                <label>
+                                    <input type="radio" name="radio-startType" value="3">
+                                    <span>快速啟動 + 常駐背景</span>
+                                    <div class="img-help" data-tooltip="tooltip-startType3">
+                                        <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    </div>
+                                </label>
+                                <label>
+                                    <input type="radio" name="radio-startType" value="4">
+                                    <span>單一視窗 </span>
+                                    <div class="img-help" data-tooltip="tooltip-startType4">
+                                        <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    </div>
+                                </label>
+                                <label>
+                                    <input type="radio" name="radio-startType" value="5">
+                                    <span>單一視窗 + 常駐背景</span>
+                                    <div class="img-help" data-tooltip="tooltip-startType5">
+                                        <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    </div>
+                                </label>
                             </div>
 
-                            <!-- </div> -->
+    
+
                         </div>
                     </div>
 
@@ -271,27 +327,22 @@
                 <div class="page-tabsPage" id="tabsPage-advanced">
                     <div class="page-title" i18b=""> 進階設定 </div>
 
-
-
                     <div class="box">
-                        <div class="box-title"> 本地伺服器port </div>
+                        <div class="box-title"> Tiefsee localhost port </div>
                         <div class="text-box">
-                            <div class="text-title"> 如果port被佔用，則會使用下一個 </div>
+                            <div class="text-title"> (如果port已經被使用，則會使用下一號) </div>
                             <div class="text-content">
-                                <input class="text-input" type="text">
+                                <input class="text-input" type="text" id="txt-startPort">
                             </div>
                         </div>
                     </div>
 
-
                     <div class="box">
                         <div class="box-title"> 相關路徑 </div>
-
                         <div class="text-box">
                             <div class="text-title"> </div>
-                            <div class="text-content">
-                                <input class="text-input" type="text">
-                            </div>
+                            <div class="link" id="btn_openAppData">AppData(使用者資料)</div>
+                            <div class="link" id="btn_openWww">www(原始碼)</div>
                         </div>
                     </div>
 

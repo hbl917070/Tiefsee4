@@ -9,8 +9,6 @@ using System.Windows.Forms;
 
 namespace Tiefsee {
 
-
-    //[ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
 
     /// <summary>
@@ -25,6 +23,30 @@ namespace Tiefsee {
             this.M = m;
         }
 
+
+        /// <summary>
+        /// 儲存到 start.ini
+        /// </summary>
+        /// <param name="startPort">程式開始的port</param>
+        /// <param name="startType">1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體</param>
+        public void SetStartIni(int startPort, int startType) {
+            IniManager iniManager = new IniManager(Program.startIniPath);
+            iniManager.WriteIniFile("setting", "startPort", startPort);
+            iniManager.WriteIniFile("setting", "startType", startType);
+            Program.startPort = startPort;
+            Program.startType = startType;
+        }
+
+
+        /// <summary>
+        /// 取得 AppInfo
+        /// </summary>
+        /// <returns></returns>
+        public string GetAppInfo() {
+            return WebWindow.GetAppInfo(M.args);
+        }
+
+
         /// <summary>
         /// 新開視窗
         /// </summary>
@@ -32,22 +54,14 @@ namespace Tiefsee {
         /// <param name="_args"></param>
         /// <returns></returns>
         public WebWindow NewWindow(string _url, object[] _args) {
-
-        
             string[] args = new string[_args.Length];
             for (int i = 0; i < args.Length; i++) {
                 args[i] = _args[i].ToString();
             }
-
-            var w = new WebWindow(_url, args, M);
-            //w.StartPosition = FormStartPosition.CenterParent;
-            //w.Show();
-
-            //var x = new WebStart(_url);
-            //x.Show();
-            //x.Owner = M.parentForm;
+            var w = WebWindow.Create(_url, args, M);
             return w;
         }
+
 
         /// <summary>
         /// 網頁載入完成後，以js呼叫此函數，才會顯示視窗
@@ -55,6 +69,7 @@ namespace Tiefsee {
         public void ShowWindow() {
             M.ShowWindow();
         }
+
 
         /// <summary>
         /// 設定視窗最小size
@@ -75,6 +90,7 @@ namespace Tiefsee {
             M.SetSize(w, h);
         }
 
+
         /// <summary>
         /// 設定視窗坐標
         /// </summary>
@@ -83,15 +99,15 @@ namespace Tiefsee {
         public void SetPosition(int left, int top) {
             M.SetPosition(left, top);
         }
-        
+
 
         /// <summary>
-        /// 視窗使用毛玻璃效果
+        /// 視窗使用毛玻璃效果(只有win10、win11有效
         /// </summary>
         public void SetAERO() {
-
             EnableBlur(M.Handle);
         }
+
 
         /// <summary>
         /// 傳入 webWindow，將其設為目前視窗的子視窗
@@ -104,16 +120,15 @@ namespace Tiefsee {
                 //webwindow.ShowInTaskbar = true;
                 //webwindow.StartPosition = FormStartPosition.CenterParent;
                 if (M.TopMost == true) {
-                    M.TopMost = false;//設定子視窗的時候，如果付錢視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
+                    M.TopMost = false;//設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
                     M.TopMost = true;
                 } else {
                     webwindow.Owner = M;
                 }
-
-
             }
         }
+
 
         /// <summary>
         /// 在父親視窗運行js
@@ -136,7 +151,6 @@ namespace Tiefsee {
         }*/
 
 
-
         /// <summary>
         /// 設定視窗的 icon
         /// </summary>
@@ -147,6 +161,20 @@ namespace Tiefsee {
             }
         }
 
+
+        /// <summary>
+        /// 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee4
+        /// </summary>
+        /// <returns></returns>
+        public string GetAppDataPath() {
+            string path = Program.appDataPath;
+            if (Directory.Exists(path) == false) {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
+
         /// <summary>
         /// 取得執行檔目錄
         /// </summary>
@@ -155,6 +183,7 @@ namespace Tiefsee {
             return System.AppDomain.CurrentDomain.BaseDirectory;
         }
 
+
         /// <summary>
         /// 取得執行檔路徑
         /// </summary>
@@ -162,6 +191,7 @@ namespace Tiefsee {
         public string GetAppPath() {
             return M.GetType().Assembly.Location;
         }
+
 
         /// <summary>
         /// 取得命令列參數
@@ -203,7 +233,6 @@ namespace Tiefsee {
             get { return M.Width; }
             set { M.Width = value; }
         }
-
         public int Height {
             get { return M.Height; }
             set { M.Height = value; }
@@ -236,32 +265,22 @@ namespace Tiefsee {
         /// 關閉視窗
         /// </summary>
         public void Close() {
-
             M.wv2.Visible = false;
             M.Close();
-
-            /*var tim = new Timer();
-            tim.Interval = 10;
-            tim.Tick += (sender, e) => {
-                       
-            };
-            tim.Start();*/
         }
 
 
+        /// <summary>
+        /// 視窗固定在最上層
+        /// </summary>
         public Boolean TopMost {
             get { return M.TopMost; }
             set { M.TopMost = value; }
         }
 
 
-
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
         /// <summary>
-        /// 
+        /// 拖曳視窗
         /// </summary>
         /// <param name="_type"></param>
         public void WindowDrag(String _type) {
@@ -300,11 +319,7 @@ namespace Tiefsee {
 
 
 
-
-
         #region 視窗拖曳
-
-
         public enum ResizeDirection {
             LC = 0xF001,//左
             RC = 0xF002,//右
@@ -337,7 +352,6 @@ namespace Tiefsee {
 
 
         #region 毛玻璃
-
 
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);

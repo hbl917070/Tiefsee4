@@ -26,8 +26,6 @@ class BaseWindow {
         this.top = 0;
         this.width = 0;
         this.height = 0;
-        this.dpiX = 0;
-        this.dpiY = 0;
         this.windowState = "Normal";
         this.closingEvents = []; //關閉視窗時執行的function
         var dom_window = document.querySelector('.window');
@@ -62,9 +60,6 @@ class BaseWindow {
             //判斷目前的狀態是視窗化還是最大化
             this.windowState = yield WV_Window.WindowState;
             this.initWindowState();
-            let dpi = yield WV_System.GetDpi();
-            this.dpiX = dpi[0] / 96;
-            this.dpiY = dpi[1] / 96;
         }))();
         btn_menu === null || btn_menu === void 0 ? void 0 : btn_menu.addEventListener("click", e => {
             //alert()
@@ -209,8 +204,15 @@ class BaseWindow {
             this.btn_maximized.style.display = "flex";
         }
     }
-    //由C#主動呼叫
-    SizeChanged(left, top, width, height, windowState) {
+    /**
+     * 由C#主動呼叫。建立視窗時，必須覆寫此函數
+     * @param jsonTxt
+     */
+    onCreate(json) {
+        WV_Window.ShowWindow(); //顯示視窗 
+    }
+    //
+    onSizeChanged(left, top, width, height, windowState) {
         this.left = left;
         this.top = top;
         this.width = width;
@@ -219,13 +221,12 @@ class BaseWindow {
         this.initWindowState();
     }
     //由C#主動呼叫
-    Move(left, top, width, height, windowState) {
+    onMove(left, top, width, height, windowState) {
         this.left = left;
         this.top = top;
         this.width = width;
         this.height = height;
         this.windowState = windowState;
-        //this.initWindowState();
     }
 }
 //---------------

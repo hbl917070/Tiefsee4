@@ -207,6 +207,7 @@ async function initDomImport() {
     }
 }
 
+
 /**
  * html字串 轉 dom物件
  * @param html 
@@ -232,6 +233,7 @@ async function sleep(ms: number) {
     })
 }
 
+
 /**
  * 轉 number
  */
@@ -239,11 +241,6 @@ function toNumber(t: string | number): number {
     if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳     
     if (typeof t === 'string') { return Number(t.replace('px', '')); } //如果是string，去掉px後轉型成數字
     return 0;
-}
-
-
-interface Date {
-    format(format: string): string;
 }
 
 
@@ -274,4 +271,24 @@ Date.prototype.format = function (format: string) {
                 ("00" + o[k]).substr(("" + o[k]).length));
     return format;
 }
+interface Date {
+    format(format: string): string;
+}
 
+
+/**
+ * radio 取得值
+ */
+function getRadio(queryName: string): string {
+    return $(`${queryName}:checked`).val() + "";//
+}
+
+
+/**
+ * radio 設定值
+ * @param {*} queryName 例如 #rad 、 #aa [name='bb']
+ * @param {*} value 
+ */
+function setRadio(queryName: string, value: string) {
+    $(`${queryName}[value='${value}']`).prop('checked', true);//radio 賦值
+}

@@ -2,7 +2,6 @@
 class InitMenu {
 
 
-
     constructor(M: MainWindow) {
 
         initOpen();
@@ -227,7 +226,6 @@ class InitMenu {
                     if (await WV_File.Exists(filePath) === false) { return; }
 
                     WV_System.SetClipboard_FileToTxt(filePath);
-
                 }
             }
 
@@ -244,8 +242,7 @@ class InitMenu {
             if (dom_rotateCw !== null) {
                 dom_rotateCw.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    M.fileShow.view_image.setDegForward(undefined, undefined);
+                    M.fileShow.tieefseeview.setDegForward(undefined, undefined);
                 }
             }
 
@@ -254,8 +251,7 @@ class InitMenu {
             if (dom_rotateCcw !== null) {
                 dom_rotateCcw.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    M.fileShow.view_image.setDegReverse(undefined, undefined);
+                    M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
                 }
             }
 
@@ -264,9 +260,7 @@ class InitMenu {
             if (dom_mirroringH !== null) {
                 dom_mirroringH.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    M.fileShow.view_image.setMirrorHorizontal(!M.fileShow.view_image.getMirrorHorizontal());
-
+                    M.fileShow.tieefseeview.setMirrorHorizontal(!M.fileShow.tieefseeview.getMirrorHorizontal());
                 }
             }
 
@@ -275,8 +269,7 @@ class InitMenu {
             if (dom_mirroringV !== null) {
                 dom_mirroringV.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    M.fileShow.view_image.setMirrorVertica(!M.fileShow.view_image.getMirrorVertica());
+                    M.fileShow.tieefseeview.setMirrorVertica(!M.fileShow.tieefseeview.getMirrorVertica());
                 }
             }
 
@@ -285,8 +278,7 @@ class InitMenu {
             if (dom_initRotate !== null) {
                 dom_initRotate.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    M.fileShow.view_image.transformRefresh(true);
+                    M.fileShow.tieefseeview.transformRefresh(true);
                 }
             }
         }

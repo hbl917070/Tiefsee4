@@ -296,13 +296,13 @@
   left: 5px;
 }
 .minicolors-theme-default.minicolors {
-  width: auto;
-  display: inline-block;
+  width: 100%;
+  display: block;
 }
 .minicolors-theme-default .minicolors-input {
   /* height: 20px; */
-  width: auto;
-  display: inline-block;
+  width: 100%;
+  display: block;
   padding-left: 32px; /* LTR */
 }
 [dir="rtl"] .minicolors-theme-default .minicolors-input {

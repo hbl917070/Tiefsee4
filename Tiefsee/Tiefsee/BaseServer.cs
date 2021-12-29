@@ -11,9 +11,9 @@ namespace Tiefsee {
 
     public class BaseServer {
 
-        public int port;
+        public int port;//當前掛載的port
         HttpListener _httpListener = new HttpListener();
-        String exeDir = "";
+        String exeDir = "";//程式的目錄，用於讀取靜態網頁
 
         private static IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
         #region extension to MIME type list
@@ -90,7 +90,7 @@ namespace Tiefsee {
         public BaseServer() {
 
             exeDir = System.AppDomain.CurrentDomain.BaseDirectory;
-            port = getAllowPost();//取得能使用的port
+            port = GetAllowPost();//取得能使用的port
 
             _httpListener.IgnoreWriteExceptions = true;//忽略不可回傳的檔案
 
@@ -112,20 +112,15 @@ namespace Tiefsee {
         private void GetContextCallBack(IAsyncResult ar) {
 
             HttpListener listener = ar.AsyncState as HttpListener;
-
             HttpListenerContext context = listener.EndGetContext(ar);
-
             listener.BeginGetContext(new AsyncCallback(GetContextCallBack), listener);
-
-
             HttpListenerRequest request = context.Request;
             var header = new System.Collections.Specialized.NameValueCollection();
             String _url = request.Url.ToString();
+
             _url = _url.Replace("http://localhost:" + port + "/", "");
 
-            // 
             // Console.WriteLine(_url);
-
             /*header.Add("Access-Control-Allow-Origin", "*");
             header.Add("Access-Control-Allow-Methods", "GET,POST");
             header.Add("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
@@ -146,8 +141,6 @@ namespace Tiefsee {
 
             context.Response.KeepAlive = false; // set the KeepAlive bool to false
             context.Response.Close(); // close the connection
-
-            //Console.WriteLine(_url);
 
         }
 
@@ -197,7 +190,7 @@ namespace Tiefsee {
                 string[] args = arg.Split('\n');
 
                 Adapter.UIThread(() => {
-                   new WebWindow($"http://localhost:{port}/www/MainWindow.html", args, null);
+                    WebWindow.Create($"http://localhost:{port}/www/MainWindow.html", args, null);
                 });
 
                 //context.Response.StatusCode = 200;
@@ -359,9 +352,7 @@ namespace Tiefsee {
         /// <param name="context"></param>
         /// <returns></returns>
         private bool get404(String _url, HttpListenerContext context) {
-
             context.Response.StatusCode = 404;
-
             byte[] _responseArray = Encoding.UTF8.GetBytes("404");
             context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             return true;
@@ -375,7 +366,6 @@ namespace Tiefsee {
         /// <param name="context"></param>
         /// <returns></returns>
         private bool getwww(String _url, HttpListenerContext context) {
-
 
             String _path;
 
@@ -426,11 +416,9 @@ namespace Tiefsee {
         /// <returns></returns>
         public bool PortInUse(int port) {
             bool inUse = false;
-
             IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
-
-            foreach (IPEndPoint endPoint in ipEndPoints) { // www.jbxue.com
+            foreach (IPEndPoint endPoint in ipEndPoints) {
                 if (endPoint.Port == port) {
                     inUse = true;
                     break;
@@ -439,20 +427,18 @@ namespace Tiefsee {
             return inUse;
         }
 
-
-
         /// <summary>
         /// 取得能用的port
         /// </summary>
         /// <returns></returns>
-        public int getAllowPost() {
+        public int GetAllowPost() {
 
             IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
 
-            for (int i = 55444; i < 65535; i++) {
+            for (int i = Program.startPort; i < 65535; i++) {
                 bool inUse = false;
-                foreach (IPEndPoint endPoint in ipEndPoints) { // www.jbxue.com
+                foreach (IPEndPoint endPoint in ipEndPoints) {
                     if (endPoint.Port == i) {
                         inUse = true;
                         break;

@@ -148,7 +148,6 @@
   margin: 0px 5px;
   font-size: 15px;
   line-height: 16px;
-  /* font-weight: 100; */
   display: flex;
   align-items: center;
   user-select: none;
@@ -164,7 +163,6 @@
   justify-content: center;
   border-radius: 4px;
   font-size: 15px;
-  /* font-weight: 100; */
   user-select: none;
   flex-shrink: 0; /*避免壓縮*/
 }

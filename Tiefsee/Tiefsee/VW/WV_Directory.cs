@@ -48,6 +48,7 @@ namespace Tiefsee {
             return arWaitingList.ToArray();
         }
 
+
         /// <summary>
         /// 判斷指定路徑是否參考磁碟上的現有目錄
         /// </summary>
@@ -75,6 +76,7 @@ namespace Tiefsee {
             return Directory.GetParent(path);
         }
 
+
         /// <summary>
         /// 刪除資料夾(包含子目錄與檔案)
         /// </summary>
@@ -82,6 +84,7 @@ namespace Tiefsee {
         public void Delete(string path) {
             Directory.Delete(path, true);
         }
+
 
         /// <summary>
         /// 移動檔案或目錄和其內容到新位置
@@ -91,6 +94,7 @@ namespace Tiefsee {
         public void Move(string sourceDirName, string destDirName) {
             Directory.Move(sourceDirName, destDirName);
         }
+
 
         /// <summary>
         /// 回傳資料夾裡面的檔案
@@ -104,6 +108,7 @@ namespace Tiefsee {
             }
             return Directory.GetFiles(path, searchPattern);
         }
+
 
         /// <summary>
         /// 傳回指定目錄中符合指定搜尋模式的子目錄名稱 (包括檔案的路徑)
@@ -124,6 +129,7 @@ namespace Tiefsee {
             String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
             return long.Parse(unixTimestamp);
         }
+
 
         /// <summary>
         /// 取得資料夾的建立時間
@@ -149,6 +155,7 @@ namespace Tiefsee {
             long unixTimestamp = toUnix(time);
             return unixTimestamp;
         }
+
 
         /// <summary>
         /// 取得資料夾的建立時間(於js使用的話，必須在加上時區)

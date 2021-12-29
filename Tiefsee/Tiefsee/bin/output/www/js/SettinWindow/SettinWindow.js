@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-WV_Window.ShowWindow(); //顯示視窗 
 class Setting {
     constructor() {
         /*(async () => {
@@ -27,15 +26,30 @@ class Setting {
         var dom_theme_areo = document.querySelector("#switch-theme-areo");
         var dom_image_dpizoom = document.querySelector("#image-dpizoom");
         var dom_image_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
+        var dom_startPort = document.querySelector("#txt-startPort");
+        var dom_openAppData = document.getElementById("btn_openAppData");
+        var dom_openWww = document.getElementById("btn_openWww");
         var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
         baseWindow = new BaseWindow(); //初始化視窗
         init();
         initDomImport(); //初始化圖示
+        tippy(".img-help", {
+            content(reference) {
+                const id = reference.getAttribute("data-tooltip");
+                if (id === null) {
+                    return "";
+                }
+                const template = document.getElementById(id);
+                return template === null || template === void 0 ? void 0 : template.innerHTML;
+            },
+            allowHTML: true,
+        });
         /**
           * 覆寫 onCreate
           * @param json
           */
-        baseWindow.onCreate = (json) => __awaiter(this, void 0, void 0, function* () {
+        baseWindow.onCreate = (json) => {
+            WV_Window.ShowWindow(); //顯示視窗 
             //讀取設定檔
             var userSetting = {};
             try {
@@ -43,8 +57,12 @@ class Setting {
             }
             catch (e) { }
             $.extend(true, config.settings, userSetting);
-            yield applySetting(); //套用設置值
-        });
+            setRadio("[name='radio-startType']", json.startType.toString());
+            dom_startPort.value = json.startPort.toString();
+            setTimeout(() => {
+                applySetting(); //套用設置值
+            }, 100);
+        };
         /**
          *
          */
@@ -61,8 +79,8 @@ class Setting {
                 }));
                 //初始化顏色選擇器物件
                 (() => {
-                    addEvent(jqdom_theme_colorWindowBackground, "--color-window-background", true); //視窗顏色
                     addEvent(jqdom_theme_colorWindowBorder, "--color-window-border", true); //邊框顏色
+                    addEvent(jqdom_theme_colorWindowBackground, "--color-window-background", true); //視窗顏色
                     addEvent(jqdom_theme_colorWhite, "--color-white", false); //
                     addEvent(jqdom_theme_colorBlack, "--color-black", false); //
                     addEvent(jqdom_theme_colorBlue, "--color-blue", false); //
@@ -147,6 +165,15 @@ class Setting {
                     config.settings["image"]["tieefseeviewImageRendering"] = val;
                     appleSettingOfMain();
                 });
+                dom_openAppData === null || dom_openAppData === void 0 ? void 0 : dom_openAppData.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                    let path = yield WV_Window.GetAppDataPath();
+                    WV_RunApp.OpenUrl(path);
+                }));
+                dom_openWww === null || dom_openWww === void 0 ? void 0 : dom_openWww.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                    let path = yield WV_Window.GetAppDirPath();
+                    path = Lib.Combine([path, "www"]);
+                    WV_RunApp.OpenUrl(path);
+                }));
             });
         }
         /**
@@ -177,37 +204,9 @@ class Setting {
             WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
         }
         /**
-         * 讀取設定檔案
-         */
-        function readSetting() {
-            return __awaiter(this, void 0, void 0, function* () {
-                let s = JSON.stringify(config.settings, null, '\t');
-                var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);
-                if ((yield WV_Directory.Exists(path)) === false) {
-                    yield WV_Directory.CreateDirectory(path);
-                }
-                path = Lib.Combine([path, "setting.json"]);
-                let txt = yield WV_File.GetText(path);
-                let json = JSON.parse(txt);
-                config.settings = json;
-            });
-        }
-        /**
          * 讀取設置值
          */
         function applySetting() {
-            //設定預設值
-            //@ts-ignore
-            if (config.settings["image"] === undefined) {
-                config.settings["image"] = {};
-            }
-            if (config.settings["image"]["dpizoom"] === undefined) {
-                config.settings["image"]["dpizoom"] = "1";
-            }
-            if (config.settings["image"]["tieefseeviewImageRendering"] === undefined) {
-                config.settings["image"]["tieefseeviewImageRendering"] = "0";
-            }
-            //-------------
             dom_image_dpizoom.value = config.settings["image"]["dpizoom"];
             dom_image_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
             jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
@@ -215,7 +214,7 @@ class Setting {
             //-------------
             function setRgb(jqdom, c) {
                 //@ts-ignore
-                jqdom.minicolors("value", `rgba(${c.r}, ${c.g}, ${c.b})`);
+                jqdom.minicolors("value", `rgb(${c.r}, ${c.g}, ${c.b})`);
             }
             function setRgba(jqdom, c) {
                 //@ts-ignore
@@ -228,12 +227,23 @@ class Setting {
             setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
         }
         /**
-         * 儲存設定
+         * 儲存設定(關閉視窗時呼叫)
          */
         function saveSetting() {
             return __awaiter(this, void 0, void 0, function* () {
+                //儲存 start.ini
+                let startPort = parseInt(dom_startPort.value);
+                let startType = getRadio("[name='radio-startType']");
+                if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
+                    startPort = 4876;
+                }
+                if (startType.search(/^[1|2|3|4|5]$/) !== 0) {
+                    startType = 2;
+                }
+                startType = parseInt(startType);
+                yield WV_Window.SetStartIni(startPort, startType);
+                //儲存 setting.json
                 let s = JSON.stringify(config.settings, null, '\t');
-                //var path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\userData"])
                 var path = yield WV_Window.GetAppDataPath(); //程式的暫存資料夾
                 path = Lib.Combine([path, "setting.json"]);
                 yield WV_File.SetText(path, s);

@@ -41,6 +41,12 @@ interface WebWindow {
 
 interface WV_Window {
 
+    /** 儲存到 start.ini */
+    SetStartIni(startPort: number, startType: number)
+
+    /** 取得 AppInfo*/
+    GetAppInfo(): string;
+
     /** 網頁載入完成後，以js呼叫此函數，才會顯示視窗 */
     ShowWindow(): void;
 
@@ -87,7 +93,7 @@ interface WV_Window {
     /** 設定視窗的 icon */
     SetIcon(psth: string);
 
-    This: WebWindow;
+    This(): WebWindow;
 
     /** 標題 */
     Text: string;

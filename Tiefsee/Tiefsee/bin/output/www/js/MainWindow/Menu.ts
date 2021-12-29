@@ -8,11 +8,7 @@ class Menu {
 
     constructor(M: MainWindow) {
 
-
-
         this.open_Button = open_Button;
-
-
 
         var temp_closeList: any[] = [];//記錄所有被開過的menu
         this.close = close;
@@ -24,7 +20,6 @@ class Menu {
             for (let i = 0; i < temp_closeList.length; i++) {
                 temp_closeList[i]()
             }
-
         }
 
 

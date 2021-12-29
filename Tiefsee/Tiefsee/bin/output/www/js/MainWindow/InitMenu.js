@@ -229,7 +229,7 @@ class InitMenu {
                 if (dom_rotateCw !== null) {
                     dom_rotateCw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setDegForward(undefined, undefined);
+                        M.fileShow.tieefseeview.setDegForward(undefined, undefined);
                     });
                 }
                 //逆時針90°
@@ -237,7 +237,7 @@ class InitMenu {
                 if (dom_rotateCcw !== null) {
                     dom_rotateCcw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setDegReverse(undefined, undefined);
+                        M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
                     });
                 }
                 //水平鏡像
@@ -245,7 +245,7 @@ class InitMenu {
                 if (dom_mirroringH !== null) {
                     dom_mirroringH.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setMirrorHorizontal(!M.fileShow.view_image.getMirrorHorizontal());
+                        M.fileShow.tieefseeview.setMirrorHorizontal(!M.fileShow.tieefseeview.getMirrorHorizontal());
                     });
                 }
                 //垂直鏡像
@@ -253,7 +253,7 @@ class InitMenu {
                 if (dom_mirroringV !== null) {
                     dom_mirroringV.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.setMirrorVertica(!M.fileShow.view_image.getMirrorVertica());
+                        M.fileShow.tieefseeview.setMirrorVertica(!M.fileShow.tieefseeview.getMirrorVertica());
                     });
                 }
                 //初始化旋轉
@@ -261,7 +261,7 @@ class InitMenu {
                 if (dom_initRotate !== null) {
                     dom_initRotate.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.view_image.transformRefresh(true);
+                        M.fileShow.tieefseeview.transformRefresh(true);
                     });
                 }
             });

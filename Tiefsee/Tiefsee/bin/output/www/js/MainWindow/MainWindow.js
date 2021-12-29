@@ -19,6 +19,7 @@ class MainWindow {
         var fileShow = new FileShow(this);
         var menu = new Menu(this);
         var script = new Script(this);
+        let firstRun = true; //用於判斷是否為第一次執行
         new InitMenu(this);
         this.dom_tools = dom_tools;
         this.dom_maxBtnLeft = dom_maxBtnLeft;
@@ -28,23 +29,30 @@ class MainWindow {
         this.menu = menu;
         this.config = config;
         this.script = script;
-        this.readSetting = readSetting;
+        this.readSetting = applySetting;
         new MainTools(this);
         init();
-        function init() {
-            return __awaiter(this, void 0, void 0, function* () {
-                initDomImport();
-                //讀取設定
-                yield getSettingFile();
-                readSetting(config.settings);
+        //WV_Window.ShowWindow();//顯示視窗 
+        /**
+         * 覆寫 onCreate
+         * @param json
+         */
+        baseWindow.onCreate = (json) => __awaiter(this, void 0, void 0, function* () {
+            if (firstRun === true) { //首次開啟視窗
+                firstRun = false;
                 WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio); //初始化視窗大小
-                WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio); //設定視窗最小size
-                WV_Window.ShowWindow(); //顯示視窗
-                if (config.settings["theme"]["aero"]) {
-                    WV_Window.SetAERO(); // aero毛玻璃效果
+                WV_Window.ShowWindow(); //顯示視窗 
+                //讀取設定
+                var userSetting = {};
+                try {
+                    userSetting = JSON.parse(json.settingTxt);
                 }
+                catch (e) { }
+                $.extend(true, config.settings, userSetting);
+                applySetting(config.settings);
+                // baseWindow.dom_window.style.opacity ="1";
                 //取得命令列參數
-                let args = yield WV_Window.GetArguments();
+                let args = json.args;
                 if (args.length === 0) {
                     fileShow.openWelcome();
                 }
@@ -54,6 +62,38 @@ class MainWindow {
                 else {
                     fileLoad.loadFiles(args[0], args); //載入多張圖片
                 }
+                //baseWindow.dom_titlebarTxt.focus();
+                if (config.settings["theme"]["aero"]) {
+                    WV_Window.SetAERO(); // aero毛玻璃效果
+                }
+                /*setTimeout(async () => {
+                    await WV_Window.This().Focus()
+                    console.log("Focus")
+                }, 500);*/
+            }
+            else { //單純開啟圖片(用於 單一執行個體)
+                WV_Window.ShowWindow(); //顯示視窗 
+                //取得命令列參數
+                let args = json.args;
+                if (args.length === 0) {
+                    fileShow.openWelcome();
+                }
+                else if (args.length === 1) {
+                    fileLoad.loadFile(args[0]); //載入單張圖片
+                }
+                else {
+                    fileLoad.loadFiles(args[0], args); //載入多張圖片
+                }
+            }
+        });
+        /**
+         *
+         */
+        function init() {
+            return __awaiter(this, void 0, void 0, function* () {
+                fileShow.openNone(); //不顯示任何東西
+                initDomImport();
+                WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio); //設定視窗最小size
                 //設定icon
                 function initIcon() {
                     return __awaiter(this, void 0, void 0, function* () {
@@ -83,9 +123,9 @@ class MainWindow {
                     }
                 }));
                 //圖片區域也允許拖曳視窗
-                fileShow.dom_image.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
+                fileShow.dom_imgview.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
                     //圖片沒有出現捲動軸
-                    if (fileShow.view_image.getIsOverflowX() === false && fileShow.view_image.getIsOverflowY() === false) {
+                    if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
                         if (e.button === 0) { //滑鼠左鍵
                             let WindowState = baseWindow.windowState;
                             if (WindowState === "Normal") {
@@ -113,7 +153,7 @@ class MainWindow {
                         }, 50);
                     }
                 }));
-                Lib.addEventDblclick(fileShow.dom_image, () => __awaiter(this, void 0, void 0, function* () {
+                Lib.addEventDblclick(fileShow.dom_imgview, () => __awaiter(this, void 0, void 0, function* () {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Maximized") {
                         baseWindow.normal();
@@ -219,18 +259,21 @@ class MainWindow {
                 }
             });
         }
-        function readSetting(setting) {
+        /**
+         * 套用設定
+         * @param setting
+         */
+        function applySetting(setting) {
             //@ts-ignore
             config.settings = setting;
             //-----------
             let dpizoom = Number(config.settings["image"]["dpizoom"]);
             if (dpizoom == -1 || isNaN(dpizoom)) {
-                //dpizoom = baseWindow.dpiX;
                 dpizoom = -1;
             }
-            fileShow.view_image.setDpizoom(dpizoom);
+            fileShow.tieefseeview.setDpizoom(dpizoom);
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
-            fileShow.view_image.setRendering(tieefseeviewImageRendering);
+            fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
             //-----------
             var cssRoot = document.documentElement;
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
@@ -253,22 +296,6 @@ class MainWindow {
                     cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, 1 )`);
                 }
             }
-        }
-        /**
-         * 讀取設定
-         */
-        function getSettingFile() {
-            return __awaiter(this, void 0, void 0, function* () {
-                let s = JSON.stringify(config.settings, null, '\t');
-                var path = Lib.Combine([yield WV_Window.GetAppDirPath(), "www\\userData"]);
-                if ((yield WV_Directory.Exists(path)) === false) {
-                    yield WV_Directory.CreateDirectory(path);
-                }
-                path = Lib.Combine([path, "setting.json"]);
-                let txt = yield WV_File.GetText(path);
-                let json = JSON.parse(txt);
-                config.settings = json;
-            });
         }
     }
 }

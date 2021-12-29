@@ -10,52 +10,16 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Tiefsee {
-  
 
-    //[ClassInterface(ClassInterfaceType.AutoDual)]
+
     [ComVisible(true)]
 
     public class WV_System {
 
         WebWindow M;
-
         public WV_System(WebWindow m) {
             this.M = m;
         }
-
-
-
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
-        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
-
-        public enum DeviceCap {
-            /// <summary>
-            /// Logical pixels inch in X
-            /// </summary>
-            LOGPIXELSX = 88,
-            /// <summary>
-            /// Logical pixels inch in Y
-            /// </summary>
-            LOGPIXELSY = 90
-
-            // Other constants may be founded on pinvoke.net
-        }
-
-        /// <summary>
-        /// 取得註螢幕的dpi，預設為96
-        /// </summary>
-        /// <returns></returns>
-        public float[] GetDpi() {        
-
-            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
-            IntPtr desktop = g.GetHdc();
-
-            int Xdpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
-            int Ydpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY);
-
-            return new float[] { Xdpi, Ydpi };
-        }
-
 
 
         /// <summary>
@@ -64,9 +28,7 @@ namespace Tiefsee {
         /// <param name="txt"></param>
         /// <returns></returns>
         public bool SetClipboard_FileToPng(string path) {
-
             try {
-
                 if (File.Exists(path) == false) { return false; }
 
                 System.Drawing.Bitmap bm_transparent = null;
@@ -83,7 +45,6 @@ namespace Tiefsee {
                 MessageBox.Show(e2.ToString());
                 return false;
             }
-
         }
 
 
@@ -103,6 +64,7 @@ namespace Tiefsee {
                 return false;
             }
         }
+
 
         /// <summary>
         /// 存入剪貼簿 - 
@@ -234,7 +196,6 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 修改桌布用的函數
         /// </summary>
@@ -261,8 +222,6 @@ namespace Tiefsee {
             }
 
         }
-
-
 
 
         /// <summary>
@@ -293,7 +252,6 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// lnk 轉 exe路徑
         /// </summary>
@@ -304,8 +262,6 @@ namespace Tiefsee {
         }
 
 
-
-
         /// <summary>
         /// 回傳程式目前記憶體使用量（MB
         /// </summary>
@@ -313,18 +269,6 @@ namespace Tiefsee {
             Process proc = Process.GetCurrentProcess();
             var xx = proc.WorkingSet64;
             return xx / 1024 / 1024;
-
-            /*     
-            Process thisProc = Process.GetCurrentProcess();  
-            PerformanceCounter PC = new PerformanceCounter();
-            float fff = 0;
-            try {
-                PC.CategoryName = "Process";
-                PC.CounterName = "Working Set - Private";
-                PC.InstanceName = thisProc.ProcessName;
-                fff = PC.NextValue() / 1024 / 1024;
-            } catch { }
-            return fff;*/
         }
 
 

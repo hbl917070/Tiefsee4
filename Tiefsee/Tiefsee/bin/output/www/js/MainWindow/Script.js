@@ -25,11 +25,11 @@ class ScriptImg {
     }
     /** 全滿 */
     zoomFull() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-wh']);
+        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['full-wh']);
     }
     /** 原始大小 */
     zoom100() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['100%']);
+        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['100%']);
     }
 }
 class ScriptFileLoad {
@@ -189,7 +189,7 @@ class ScriptSteting {
                     return;
                 }
             }
-            this.temp_setting = yield baseWindow.newWindow("Setting.html");
+            this.temp_setting = yield baseWindow.newWindow("SettingWindow.html");
             //this.temp_setting.Width = 500 * baseWindow.dpiX;
             //this.temp_setting.Height = 450 * baseWindow.dpiY;
             yield this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio); //初始化視窗大小
@@ -199,8 +199,8 @@ class ScriptSteting {
             //this.temp_setting.Left = baseWindow.left - (w / 2);
             //this.temp_setting.Top = baseWindow.top - (h / 2);
             this.temp_setting.SetPosition(baseWindow.left - (w / 2), baseWindow.top - (h / 2));
-            this.temp_setting.WindowState = 1; //最小化
-            this.temp_setting.WindowState = 0; //視窗化
+            //this.temp_setting.WindowState = 1;//最小化
+            //this.temp_setting.WindowState = 0;//視窗化
         });
     }
 }

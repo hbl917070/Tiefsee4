@@ -82,6 +82,7 @@
     <Compile Include="Adapter.cs" />
     <Compile Include="BaseServer.cs" />
     <Compile Include="IconHandler.cs" />
+    <Compile Include="IniManager.cs" />
     <Compile Include="LnkToExe.cs" />
     <Compile Include="ShellContextMenu.cs" />
     <Compile Include="QuickRun.cs" />

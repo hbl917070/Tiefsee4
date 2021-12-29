@@ -32,12 +32,12 @@ class ScriptImg {
 
     /** 全滿 */
     public zoomFull() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['full-wh']);
+        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['full-wh']);
     }
 
     /** 原始大小 */
     public zoom100() {
-        this.M.fileShow.view_image.zoomFull(TieefseeviewZoomType['100%']);
+        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['100%']);
     }
 }
 
@@ -202,14 +202,14 @@ class ScriptSteting {
                 return;
             }
         }
-        this.temp_setting = await baseWindow.newWindow("Setting.html");
+        this.temp_setting = await baseWindow.newWindow("SettingWindow.html");
 
         //this.temp_setting.Width = 500 * baseWindow.dpiX;
         //this.temp_setting.Height = 450 * baseWindow.dpiY;
-        await   this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio);//初始化視窗大小
+        await this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio);//初始化視窗大小
 
         //設定坐標，從父視窗的中間開啟
-        let w = await this.temp_setting.Width  - baseWindow.width;
+        let w = await this.temp_setting.Width - baseWindow.width;
         let h = await this.temp_setting.Height - baseWindow.height;
         //this.temp_setting.Left = baseWindow.left - (w / 2);
         //this.temp_setting.Top = baseWindow.top - (h / 2);
@@ -217,8 +217,8 @@ class ScriptSteting {
             baseWindow.left - (w / 2),
             baseWindow.top - (h / 2)
         )
-      this.temp_setting.WindowState = 1;//最小化
-      this.temp_setting.WindowState = 0;//視窗化
+        //this.temp_setting.WindowState = 1;//最小化
+        //this.temp_setting.WindowState = 0;//視窗化
 
     }
 

@@ -30,15 +30,9 @@ class BaseWindow {
     public width: number = 0;
     public height: number = 0;
 
-    public dpiX: number = 0;
-    public dpiY: number = 0;
-
-
     public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
     public closingEvents: (() => void)[] = [];//關閉視窗時執行的function
-
-
 
 
 
@@ -175,9 +169,6 @@ class BaseWindow {
             this.windowState = await WV_Window.WindowState;
             this.initWindowState();
 
-            let dpi = await WV_System.GetDpi();
-            this.dpiX = dpi[0] / 96;
-            this.dpiY = dpi[1] / 96;
         })()
 
 
@@ -244,10 +235,16 @@ class BaseWindow {
     }
 
 
+    /**
+     * 由C#主動呼叫。建立視窗時，必須覆寫此函數
+     * @param jsonTxt 
+     */
+    public onCreate(json: AppInfo) {
+        WV_Window.ShowWindow();//顯示視窗 
+    }
 
-
-    //由C#主動呼叫
-    SizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+    //
+    public onSizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
         this.left = left;
         this.top = top;
         this.width = width;
@@ -258,13 +255,12 @@ class BaseWindow {
     }
 
     //由C#主動呼叫
-    public Move(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+    public onMove(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
         this.left = left;
         this.top = top;
         this.width = width;
         this.height = height;
         this.windowState = windowState;
-        //this.initWindowState();
     }
 
     /*public VisibleChanged() {

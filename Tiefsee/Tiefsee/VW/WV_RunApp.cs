@@ -16,7 +16,6 @@ namespace Tiefsee {
     [ComVisible(true)]
     public class WV_RunApp {
 
-
         WebWindow M;
         public WV_RunApp(WebWindow m) {
             this.M = m;
@@ -29,7 +28,6 @@ namespace Tiefsee {
         /// <param name="path"></param>
         public void ShowMenu(string path) {
             if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
-                //path = "\"" + path + "\"";
                 try {
                     Process.Start(new ProcessStartInfo("rundll32.exe") {
                         Arguments = $"shell32.dll,OpenAs_RunDLL {path}",
@@ -66,9 +64,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="s_資料夾"></param>
         private void GetDirForeachFiles(String sDir, List<String> arFile) {
-
             var arDir = Directory.EnumerateFileSystemEntries(sDir);
-
             foreach (var item in arDir) {
                 if (File.Exists(item)) {
                     arFile.Add(item);
@@ -76,7 +72,6 @@ namespace Tiefsee {
                     GetDirForeachFiles(item, arFile);
                 }
             }
-
         }
 
 
@@ -85,13 +80,10 @@ namespace Tiefsee {
         /// </summary>
         /// <returns></returns>
         public String GetSystemRoot() {
-
             string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
             //path = path.Substring(0, 1);
-
             return path;
         }
-
 
 
         /// <summary>
@@ -133,10 +125,7 @@ namespace Tiefsee {
         /// <param name="Arguments"></param>
         /// <param name="CreateNoWindow"></param>
         /// <param name="UseShellExecute"></param>
-        public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
-            //System.Diagnostics.Process.Start(app, "\"" + path + "\"");
-
-            //完整執行                 
+        public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {                
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.FileName = FileName;//執行檔路徑
             psi.WorkingDirectory = Path.GetDirectoryName(FileName);//設定執行檔所在的目錄
@@ -144,7 +133,6 @@ namespace Tiefsee {
             psi.CreateNoWindow = CreateNoWindow;//是否使用新視窗
             psi.UseShellExecute = UseShellExecute;//false=新視窗個體 
             System.Diagnostics.Process.Start(psi);
-
         }
 
 
@@ -161,8 +149,6 @@ namespace Tiefsee {
                 return false;
             }
         }
-
-
 
 
 

@@ -22,18 +22,19 @@ select {
 .window-left {
   flex-shrink: 0;
   /* border-right: 1px solid var(--color-window-border); */
+  box-shadow: 0px 0px 10px rgb(0 0 0 / 60%);
 }
 .window-right {
   display: flex;
   flex-direction: column;
   flex: 1;
   position: relative;
-  /* background-color: var(--color-black60); */
+  background-color: var(--color-black20);
 }
 
 .pagetab {
   margin: 0px;
-  padding: 10px 10px;
+  padding: 10px 0px;
   /* background-color: var(--color-white10);  */
   border-radius: 10px;
 }
@@ -112,7 +113,7 @@ select {
   margin-bottom: 3px;
 }
 .text-content {
-  width: 250px;
+  max-width: 250px;
   display: flex;
 }
 .text-input {
@@ -122,7 +123,8 @@ select {
   border: 1px solid var(--color-white40);
   border-radius: 5px;
   padding: 0 5px;
-  min-width: 260px;
+  width: 100%;
+  display: block;
   flex: 1;
 }
 
@@ -154,9 +156,9 @@ select {
   background-color: var(--color-white30);
 }
 
-/*-------------*/
+/*------------------*/
 
-/* #region */
+/* #region switch*/
 
 .switch {
   position: relative;
@@ -218,6 +220,35 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.radio-group {
+}
+.radio-group label {
+  display: block;
+  /* line-height: 20px; */
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  color: var(--color-white);
+}
+/* #endregion */
+
+/*------------------*/
+
+/* #region tooltip*/
+
+.img-help {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  margin-left: 5px;
+}
+.img-help svg {
+  pointer-events: none;
+}
+.img-help svg path {
+  fill: var(--color-blue);
 }
 
 /* #endregion */

@@ -259,3 +259,17 @@ Date.prototype.format = function (format) {
                 ("00" + o[k]).substr(("" + o[k]).length));
     return format;
 };
+/**
+ * radio 取得值
+ */
+function getRadio(queryName) {
+    return $(`${queryName}:checked`).val() + ""; //
+}
+/**
+ * radio 設定值
+ * @param {*} queryName 例如 #rad 、 #aa [name='bb']
+ * @param {*} value
+ */
+function setRadio(queryName, value) {
+    $(`${queryName}[value='${value}']`).prop('checked', true); //radio 賦值
+}

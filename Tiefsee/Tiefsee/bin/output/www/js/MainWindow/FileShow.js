@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 class FileShow {
     constructor(M) {
-        var view_image = new Tieefseeview(document.querySelector("#main-tiefseeview"));
-        var dom_image = document.querySelector("#main-tiefseeview");
+        var tieefseeview = new Tieefseeview(document.querySelector("#main-tiefseeview"));
+        var dom_imgview = document.querySelector("#main-tiefseeview");
         var dom_pdfview = document.querySelector("#main-pdfview");
         var dom_txtview = document.querySelector("#main-txtview");
         var dom_welcomeview = document.querySelector("#main-welcomeview");
@@ -19,21 +19,38 @@ class FileShow {
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
+        this.openNone = openNone;
         this.dom_welcomeview = dom_welcomeview;
-        this.dom_image = dom_image;
-        this.view_image = view_image;
-        //openImage("https://wall.bahamut.com.tw/B/40/5328257e8d00594e61f8b815d505cab3_4080425.JPG")
+        this.dom_imgview = dom_imgview;
+        this.tieefseeview = tieefseeview;
+        /**
+         *
+         * @param groupType
+         * @returns
+         */
         function setShowType(groupType) {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e;
             let arToolsGroup = document.querySelectorAll(".main-tools-group");
             for (let i = 0; i < arToolsGroup.length; i++) {
                 const item = arToolsGroup[i];
                 item.setAttribute("active", "");
             }
+            if (groupType === GroupType.none) {
+                //更換工具列
+                (_a = getToolsDom(GroupType.none)) === null || _a === void 0 ? void 0 : _a.setAttribute("active", "true");
+                dom_imgview.style.display = "none";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "none";
+                dom_welcomeview.style.display = "none";
+                dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                tieefseeview.loadNone();
+                return;
+            }
             if (groupType === GroupType.img) {
                 //更換工具列
-                (_a = getToolsDom(GroupType.img)) === null || _a === void 0 ? void 0 : _a.setAttribute("active", "true");
-                dom_image.style.display = "block";
+                (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.setAttribute("active", "true");
+                dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
                 dom_welcomeview.style.display = "none";
@@ -47,41 +64,46 @@ class FileShow {
             }
             if (groupType === GroupType.txt) {
                 //更換工具列
-                (_b = getToolsDom(GroupType.txt)) === null || _b === void 0 ? void 0 : _b.setAttribute("active", "true");
-                dom_image.style.display = "none";
+                (_c = getToolsDom(GroupType.txt)) === null || _c === void 0 ? void 0 : _c.setAttribute("active", "true");
+                dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "block";
                 dom_welcomeview.style.display = "none";
                 dom_pdfview.setAttribute("src", "");
                 //dom_txtview.value = "";
-                view_image.loadNone();
+                tieefseeview.loadNone();
                 return;
             }
             if (groupType === GroupType.pdf) {
                 //更換工具列
-                (_c = getToolsDom(GroupType.pdf)) === null || _c === void 0 ? void 0 : _c.setAttribute("active", "true");
-                dom_image.style.display = "none";
+                (_d = getToolsDom(GroupType.pdf)) === null || _d === void 0 ? void 0 : _d.setAttribute("active", "true");
+                dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";
                 dom_txtview.style.display = "none";
                 dom_welcomeview.style.display = "none";
                 //dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
-                view_image.loadNone();
+                tieefseeview.loadNone();
                 return;
             }
             if (groupType === GroupType.welcome) {
                 //更換工具列
-                (_d = getToolsDom(GroupType.welcome)) === null || _d === void 0 ? void 0 : _d.setAttribute("active", "true");
-                dom_image.style.display = "none";
+                (_e = getToolsDom(GroupType.welcome)) === null || _e === void 0 ? void 0 : _e.setAttribute("active", "true");
+                dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
                 dom_welcomeview.style.display = "flex";
                 dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
-                view_image.loadNone();
+                tieefseeview.loadNone();
                 return;
             }
         }
+        /**
+         *
+         * @param type
+         * @returns
+         */
         function getToolsDom(type) {
             return M.dom_tools.querySelector(`.main-tools-group[data-name="${type}"]`);
         }
@@ -101,34 +123,27 @@ class FileShow {
                 else {
                     imgurl = "/api/getimg/" + encodeURIComponent(_path);
                 }
-                view_image.setLoading(true);
-                yield view_image.getIsLoaded(imgurl); //預載入
+                tieefseeview.setLoading(true);
+                yield tieefseeview.getIsLoaded(imgurl); //預載入
                 if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
-                    yield view_image.loadImg(imgurl); //使用<img>渲染
+                    yield tieefseeview.loadImg(imgurl); //使用<img>渲染
                 }
                 else {
-                    yield view_image.loadBigimg(imgurl); //使用canvas渲染
+                    yield tieefseeview.loadBigimg(imgurl); //使用canvas渲染
                 }
-                //await view_image.loadImg(imgurl);
-                /*if (view_image.getOriginalWidth() * view_image.getOriginalHeight() > 2000 * 2000) {
-                    await view_image.loadBigimg(imgurl);
-                } else {
-                    await view_image.loadImg(imgurl);
-                }*/
-                view_image.setLoading(false);
-                view_image.transformRefresh(false);
-                view_image.setEventChangeZoom(((ratio) => {
+                tieefseeview.setLoading(false);
+                tieefseeview.transformRefresh(false); //初始化 旋轉、鏡像
+                tieefseeview.setEventChangeZoom(((ratio) => {
                     let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);
                     if (dom_btnScale != null) {
                         dom_btnScale.innerHTML = (ratio * 100).toFixed(0) + "%";
                     }
-                    //$('#output-overflow').html(`水平：${view_image.getIsOverflowX()}  垂直：${view_image.getIsOverflowY()}`);
                 }));
-                view_image.zoomFull(TieefseeviewZoomType['full-100%']);
+                tieefseeview.zoomFull(TieefseeviewZoomType['full-100%']);
                 //圖片長寬
                 let dom_size = (_a = getToolsDom(GroupType.img)) === null || _a === void 0 ? void 0 : _a.querySelector(`[data-name="infoSize"]`);
                 if (dom_size != null) {
-                    dom_size.innerHTML = `${view_image.getOriginalWidth()}<br>${view_image.getOriginalHeight()}`;
+                    dom_size.innerHTML = `${tieefseeview.getOriginalWidth()}<br>${tieefseeview.getOriginalHeight()}`;
                 }
                 //檔案類型
                 let dom_type = (_b = getToolsDom(GroupType.img)) === null || _b === void 0 ? void 0 : _b.querySelector(`[data-name="infoType"]`);
@@ -148,7 +163,7 @@ class FileShow {
             });
         }
         /**
-         *
+         * pdf 或 ai
          * @param _url
          */
         function openPdf(fileInfo2) {
@@ -175,7 +190,7 @@ class FileShow {
             });
         }
         /**
-         *
+         * 純文字
          * @param _path
          */
         function openTxt(fileInfo2) {
@@ -202,13 +217,20 @@ class FileShow {
             });
         }
         /**
-         *
+         * 起始畫面
          */
         function openWelcome() {
             return __awaiter(this, void 0, void 0, function* () {
                 baseWindow.setTitle("Tiefsee 4");
                 setShowType(GroupType.welcome); //改變顯示類型
             });
+        }
+        /**
+         * 不顯示任何東西
+         */
+        function openNone() {
+            baseWindow.setTitle("Tiefsee 4");
+            setShowType(GroupType.none); //改變顯示類型
         }
         /**
          * 取得檔案的大小的文字

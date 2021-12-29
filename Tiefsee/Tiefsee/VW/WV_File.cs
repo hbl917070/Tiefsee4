@@ -25,7 +25,7 @@ namespace Tiefsee {
     }
 
 
-    //[ClassInterface(ClassInterfaceType.AutoDual)]
+
     [ComVisible(true)]
 
     /// <summary>
@@ -46,7 +46,7 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public String GetFileInfo2(string path) {
-    
+
             FileInfo2 info = new FileInfo2();
             info.Path = path;
 
@@ -90,7 +90,6 @@ namespace Tiefsee {
             }
 
             String json = JsonConvert.SerializeObject(info);
-    
             return json;
         }
 
@@ -129,7 +128,6 @@ namespace Tiefsee {
         /// <param name="Title"> 視窗標題 </param>
         /// <returns></returns>
         public string[] OpenFileDialog(bool Multiselect, string Filter, string Title) {
-
             using (OpenFileDialog openFileDialog = new OpenFileDialog()) {
                 openFileDialog.Multiselect = Multiselect; //是否允許多選，false表示單選
                 openFileDialog.Filter = Filter;//檔案類型 All files (*.*)|*.*
@@ -141,10 +139,8 @@ namespace Tiefsee {
                     var files = openFileDialog.FileNames;
                     return files;
                 }
-
                 return new string[0];
             }
-
         }
 
 
@@ -153,16 +149,12 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         public void DragDropFile(string path) {
-
             if (File.Exists(path) == false) { return; }
-
             string[] files = { path };
-
             try {
                 var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
                 M.DoDragDrop(file, DragDropEffects.All);
             } catch { }
-
         }
 
 
@@ -178,9 +170,7 @@ namespace Tiefsee {
                 arrFI[0] = new FileInfo(path);
 
                 if (followMouse) {
-
                     ctxMnu.ShowContextMenu(arrFI, System.Windows.Forms.Cursor.Position);
-
                 } else {
                     ctxMnu.ShowContextMenu(arrFI, new System.Drawing.Point(
                        (int)M.PointToScreen(new Point(0, 0)).X + 10,
@@ -190,7 +180,6 @@ namespace Tiefsee {
             } catch {
                 MessageBox.Show("error");
             }
-
         }
 
 
@@ -209,10 +198,7 @@ namespace Tiefsee {
             } catch (Exception e2) {
                 MessageBox.Show("找不到對應開啟的程式：\n" + e2.ToString(), "列印失敗");
             }
-
         }
-
-
 
 
         /// <summary>
@@ -235,7 +221,6 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public void SetText(string path, string t) {
-
             using (FileStream fs = new FileStream(path, FileMode.Create)) {
                 using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8)) {
                     sw.Write(t);
@@ -285,11 +270,17 @@ namespace Tiefsee {
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         long toUnix(DateTime time) {
             var t = time.Subtract(new DateTime(1970, 1, 1));
             String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
             return long.Parse(unixTimestamp);
         }
+
 
         /// <summary>
         /// 取得檔案的建立時間
