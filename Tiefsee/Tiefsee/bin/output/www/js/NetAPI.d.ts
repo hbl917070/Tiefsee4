@@ -343,6 +343,10 @@ interface WV_System {
 
     /** 回收記憶體 */
     Collect(): void;
+
+    /** 關聯副檔名 */
+    SetAssociationExtension(arExtension: string[], appPath: string): void;
+
 }
 
 interface WV_RunApp {

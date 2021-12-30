@@ -103,23 +103,30 @@ select {
 }
 /**************/
 
-.text-box {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
+.box {
+  margin-bottom: 40px;
 }
+.box-title {
+  color: var(--color-white);
+  font-size: 20px;
+  margin-bottom: 0px;
+}
+
+
 .text-title {
   color: var(--color-white);
   margin-bottom: 3px;
+  margin-top: 10px;
 }
 .text-content {
   max-width: 250px;
   display: flex;
+
 }
 .text-input {
   background-color: rgba(0, 0, 0, 0);
   color: var(--color-white);
-  height: 35px;
+  min-height: 35px;
   border: 1px solid var(--color-white40);
   border-radius: 5px;
   padding: 0 5px;
@@ -130,14 +137,7 @@ select {
 
 /******************/
 
-.box {
-  margin-bottom: 40px;
-}
-.box-title {
-  color: var(--color-white);
-  font-size: 18px;
-  margin-bottom: 5px;
-}
+
 .btn {
   color: var(--color-white);
   background-color: var(--color-white20);
@@ -149,6 +149,7 @@ select {
   align-items: center;
   justify-content: center;
   margin-right: 5px;
+  margin-top: 5px;
 }
 
 .btn:hover {

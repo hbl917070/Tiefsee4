@@ -28,7 +28,7 @@ namespace Tiefsee {
             startIniPath = Path.Combine(appDataPath, "start.ini");
             IniManager iniManager = new IniManager(startIniPath);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-            startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "5"));
+            startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
 
             //如果允許快速啟動，就不開啟新個體
             if (QuickRun.Check(args)) { return; }

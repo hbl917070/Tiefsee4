@@ -17,25 +17,29 @@ class Setting {
 
         var cssRoot = document.documentElement;
 
-        var jqdom_theme_windowBorderRadius = $("#text-theme-windowBorderRadius");
-        var jqdom_theme_colorWindowBackground = $("#text-theme-colorWindowBackground");
-        var jqdom_theme_colorWindowBorder = $("#text-theme-colorWindowBorder");
-        var jqdom_theme_colorWhite = $("#text-theme-colorWhite");
-        var jqdom_theme_colorBlack = $("#text-theme-colorBlack");
-        var jqdom_theme_colorBlue = $("#text-theme-colorBlue");
-        var dom_theme_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
+        var jqtxt_windowBorderRadius = $("#text-theme-windowBorderRadius");
+        var jqtxt_colorWindowBackground = $("#text-theme-colorWindowBackground");
+        var jqtxt_colorWindowBorder = $("#text-theme-colorWindowBorder");
+        var jqtxt_colorWhite = $("#text-theme-colorWhite");
+        var jqtxt_colorBlack = $("#text-theme-colorBlack");
+        var jqtxt_colorBlue = $("#text-theme-colorBlue");
+        var switch_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
 
-        var dom_image_dpizoom = document.querySelector("#image-dpizoom") as HTMLInputElement;
-        var dom_image_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering") as HTMLInputElement;
-        var dom_startPort = document.querySelector("#txt-startPort") as HTMLInputElement;
+        var txt_imageDpizoom = document.querySelector("#image-dpizoom") as HTMLInputElement;
+        var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering") as HTMLInputElement;
 
-        var dom_openAppData = document.getElementById("btn_openAppData") as HTMLElement;
-        var dom_openWww = document.getElementById("btn_openWww") as HTMLElement;
+        var txt_startPort = document.querySelector("#txt-startPort") as HTMLInputElement;
+        var btn_openAppData = document.getElementById("btn-openAppData") as HTMLElement;
+        var btn_openWww = document.getElementById("btn-openWww") as HTMLElement;
+
+        var btn_openSystemSetting = document.getElementById("btn-openSystemSetting") as HTMLElement;
+        var txt_extension = document.querySelector("#txt-extension") as HTMLTextAreaElement;
+        var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
 
 
 
 
-        var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
+        var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
 
 
         baseWindow = new BaseWindow();//初始化視窗
@@ -69,7 +73,7 @@ class Setting {
             $.extend(true, config.settings, userSetting);
 
             setRadio("[name='radio-startType']", json.startType.toString())
-            dom_startPort.value = json.startPort.toString()
+            txt_startPort.value = json.startPort.toString()
 
             setTimeout(() => {
                 applySetting();//套用設置值
@@ -97,11 +101,11 @@ class Setting {
             //初始化顏色選擇器物件
             (() => {
 
-                addEvent(jqdom_theme_colorWindowBorder, "--color-window-border", true);//邊框顏色
-                addEvent(jqdom_theme_colorWindowBackground, "--color-window-background", true);//視窗顏色
-                addEvent(jqdom_theme_colorWhite, "--color-white", false);//
-                addEvent(jqdom_theme_colorBlack, "--color-black", false);//
-                addEvent(jqdom_theme_colorBlue, "--color-blue", false);//
+                addEvent(jqtxt_colorWindowBorder, "--color-window-border", true);//邊框顏色
+                addEvent(jqtxt_colorWindowBackground, "--color-window-background", true);//視窗顏色
+                addEvent(jqtxt_colorWhite, "--color-white", false);//
+                addEvent(jqtxt_colorBlack, "--color-black", false);//
+                addEvent(jqtxt_colorBlue, "--color-blue", false);//
                 //add(jQdom_theme_colorGrey, "--color-grey", false);//
 
                 function addEvent(jQdim: JQuery, name: string, opacity: boolean = false) {
@@ -141,11 +145,11 @@ class Setting {
                 tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
                 tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
                 tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
+                tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { });
                 tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { });
                 tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { });
 
                 tabs.set(document.getElementById("tabsBtn-common"));//預設選擇的頁面
-
             })();
 
 
@@ -170,6 +174,25 @@ class Setting {
             })();
 
 
+            //關聯副檔名 預設顯示文字
+            let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",].join("\n");
+            txt_extension.value = s_extension;
+            btn_extension.addEventListener("mousedown", async (e) => {
+                let ar_extension = txt_extension.value.split("\n");
+                let ar = [];
+
+                for (let i = 0; i < ar_extension.length; i++) {
+                    const item = ar_extension[i].toLocaleLowerCase().trim();
+                    if (item !== "" && ar.indexOf(item) === -1) {
+                        ar.push(item);
+                    }
+                }
+                let appPath = await WV_Window.GetAppPath();
+                WV_System.SetAssociationExtension(ar, appPath);
+                console.log(ar)
+            })
+
+
             //拖曳視窗
             document.getElementById("window-left")?.addEventListener("mousedown", async (e) => {
                 let _dom = e.target as HTMLDivElement;
@@ -183,8 +206,8 @@ class Setting {
 
 
             //視窗 圓角
-            jqdom_theme_windowBorderRadius.change(() => {
-                let val = Number(jqdom_theme_windowBorderRadius.val());
+            jqtxt_windowBorderRadius.change(() => {
+                let val = Number(jqtxt_windowBorderRadius.val());
                 if (val < 0) { val = 0; }
                 if (val > 15) { val = 15; }
 
@@ -193,36 +216,43 @@ class Setting {
             });
 
             // 視窗 aero毛玻璃
-            dom_theme_areo?.addEventListener("change", () => {
-                let val = dom_theme_areo.checked;
+            switch_areo?.addEventListener("change", () => {
+                let val = switch_areo.checked;
                 config.settings["theme"]["aero"] = val;
             });
 
             // 圖片 dpi
-            dom_image_dpizoom?.addEventListener("change", () => {
-                let val = dom_image_dpizoom.value;
+            txt_imageDpizoom?.addEventListener("change", () => {
+                let val = txt_imageDpizoom.value;
                 config.settings["image"]["dpizoom"] = val;
                 appleSettingOfMain();
             });
 
             // 圖片 縮放模式
-            dom_image_tieefseeviewImageRendering?.addEventListener("change", () => {
-                let val = dom_image_tieefseeviewImageRendering.value;
+            select_tieefseeviewImageRendering?.addEventListener("change", () => {
+                let val = select_tieefseeviewImageRendering.value;
                 config.settings["image"]["tieefseeviewImageRendering"] = val;
                 appleSettingOfMain();
             });
 
-
-            dom_openAppData?.addEventListener("click", async () => {
+            //開啟 AppData(使用者資料)
+            btn_openAppData?.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDataPath();
                 WV_RunApp.OpenUrl(path)
             });
-            dom_openWww?.addEventListener("click", async () => {
+
+            //開啟 www(原始碼)
+            btn_openWww?.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDirPath();
                 path = Lib.Combine([path, "www"]);
                 WV_RunApp.OpenUrl(path)
             });
 
+            //開啟 系統設定
+            btn_openSystemSetting?.addEventListener("click", async () => {
+                let path = "ms-settings:defaultapps";
+                WV_RunApp.OpenUrl(path)
+            });
 
         }
 
@@ -252,7 +282,7 @@ class Setting {
                 config.settings.theme["--color-blue"] = blue;
                 applySetting()
             };
-            dom_applyTheme_btns?.append(btn);
+            dom_applyThemeBtns?.append(btn);
         }
 
 
@@ -270,11 +300,11 @@ class Setting {
          */
         function applySetting() {
 
-            dom_image_dpizoom.value = config.settings["image"]["dpizoom"];
-            dom_image_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
+            txt_imageDpizoom.value = config.settings["image"]["dpizoom"];
+            select_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
 
-            jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
-            dom_theme_areo.checked = config.settings["theme"]["aero"];
+            jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
+            switch_areo.checked = config.settings["theme"]["aero"];
 
             //-------------
 
@@ -287,11 +317,11 @@ class Setting {
                 jqdom.minicolors("value", `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`);
             }
 
-            setRgba(jqdom_theme_colorWindowBackground, config.settings.theme["--color-window-background"]);
-            setRgba(jqdom_theme_colorWindowBorder, config.settings.theme["--color-window-border"]);
-            setRgb(jqdom_theme_colorWhite, config.settings.theme["--color-white"]);
-            setRgb(jqdom_theme_colorBlack, config.settings.theme["--color-black"]);
-            setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
+            setRgba(jqtxt_colorWindowBackground, config.settings.theme["--color-window-background"]);
+            setRgba(jqtxt_colorWindowBorder, config.settings.theme["--color-window-border"]);
+            setRgb(jqtxt_colorWhite, config.settings.theme["--color-white"]);
+            setRgb(jqtxt_colorBlack, config.settings.theme["--color-black"]);
+            setRgb(jqtxt_colorBlue, config.settings.theme["--color-blue"]);
 
         }
 
@@ -302,7 +332,7 @@ class Setting {
         async function saveSetting() {
 
             //儲存 start.ini
-            let startPort = parseInt(dom_startPort.value);
+            let startPort = parseInt(txt_startPort.value);
             let startType: any = getRadio("[name='radio-startType']");
             if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
                 startPort = 4876;

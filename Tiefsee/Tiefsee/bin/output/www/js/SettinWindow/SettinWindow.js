@@ -17,19 +17,22 @@ class Setting {
         this.saveData = saveSetting;
         var config = new Config();
         var cssRoot = document.documentElement;
-        var jqdom_theme_windowBorderRadius = $("#text-theme-windowBorderRadius");
-        var jqdom_theme_colorWindowBackground = $("#text-theme-colorWindowBackground");
-        var jqdom_theme_colorWindowBorder = $("#text-theme-colorWindowBorder");
-        var jqdom_theme_colorWhite = $("#text-theme-colorWhite");
-        var jqdom_theme_colorBlack = $("#text-theme-colorBlack");
-        var jqdom_theme_colorBlue = $("#text-theme-colorBlue");
-        var dom_theme_areo = document.querySelector("#switch-theme-areo");
-        var dom_image_dpizoom = document.querySelector("#image-dpizoom");
-        var dom_image_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
-        var dom_startPort = document.querySelector("#txt-startPort");
-        var dom_openAppData = document.getElementById("btn_openAppData");
-        var dom_openWww = document.getElementById("btn_openWww");
-        var dom_applyTheme_btns = document.querySelector("#applyTheme-btns");
+        var jqtxt_windowBorderRadius = $("#text-theme-windowBorderRadius");
+        var jqtxt_colorWindowBackground = $("#text-theme-colorWindowBackground");
+        var jqtxt_colorWindowBorder = $("#text-theme-colorWindowBorder");
+        var jqtxt_colorWhite = $("#text-theme-colorWhite");
+        var jqtxt_colorBlack = $("#text-theme-colorBlack");
+        var jqtxt_colorBlue = $("#text-theme-colorBlue");
+        var switch_areo = document.querySelector("#switch-theme-areo");
+        var txt_imageDpizoom = document.querySelector("#image-dpizoom");
+        var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
+        var txt_startPort = document.querySelector("#txt-startPort");
+        var btn_openAppData = document.getElementById("btn-openAppData");
+        var btn_openWww = document.getElementById("btn-openWww");
+        var btn_openSystemSetting = document.getElementById("btn-openSystemSetting");
+        var txt_extension = document.querySelector("#txt-extension");
+        var btn_extension = document.querySelector("#btn-extension");
+        var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
         baseWindow = new BaseWindow(); //初始化視窗
         init();
         initDomImport(); //初始化圖示
@@ -58,7 +61,7 @@ class Setting {
             catch (e) { }
             $.extend(true, config.settings, userSetting);
             setRadio("[name='radio-startType']", json.startType.toString());
-            dom_startPort.value = json.startPort.toString();
+            txt_startPort.value = json.startPort.toString();
             setTimeout(() => {
                 applySetting(); //套用設置值
             }, 100);
@@ -79,11 +82,11 @@ class Setting {
                 }));
                 //初始化顏色選擇器物件
                 (() => {
-                    addEvent(jqdom_theme_colorWindowBorder, "--color-window-border", true); //邊框顏色
-                    addEvent(jqdom_theme_colorWindowBackground, "--color-window-background", true); //視窗顏色
-                    addEvent(jqdom_theme_colorWhite, "--color-white", false); //
-                    addEvent(jqdom_theme_colorBlack, "--color-black", false); //
-                    addEvent(jqdom_theme_colorBlue, "--color-blue", false); //
+                    addEvent(jqtxt_colorWindowBorder, "--color-window-border", true); //邊框顏色
+                    addEvent(jqtxt_colorWindowBackground, "--color-window-background", true); //視窗顏色
+                    addEvent(jqtxt_colorWhite, "--color-white", false); //
+                    addEvent(jqtxt_colorBlack, "--color-black", false); //
+                    addEvent(jqtxt_colorBlue, "--color-blue", false); //
                     //add(jQdom_theme_colorGrey, "--color-grey", false);//
                     function addEvent(jQdim, name, opacity = false) {
                         //@ts-ignore
@@ -115,6 +118,7 @@ class Setting {
                     tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
                     tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
                     tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
+                    tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { });
                     tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { });
                     tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { });
                     tabs.set(document.getElementById("tabsBtn-common")); //預設選擇的頁面
@@ -124,6 +128,22 @@ class Setting {
                     applyThemeAddBtn(`<div class="btn">深色主題</div>`, { r: 31, g: 39, b: 43, a: 0.97 }, { r: 255, g: 255, b: 255, a: 0.25 }, { r: 255, g: 255, b: 255, }, { r: 0, g: 0, b: 0, }, { r: 0, g: 200, b: 255, });
                     applyThemeAddBtn(`<div class="btn">淺色主題</div>`, { r: 255, g: 255, b: 255, a: 0.97 }, { r: 112, g: 112, b: 112, a: 0.25 }, { r: 0, g: 0, b: 0, }, { r: 255, g: 255, b: 255, }, { r: 0, g: 125, b: 170, });
                 })();
+                //關聯副檔名 預設顯示文字
+                let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",].join("\n");
+                txt_extension.value = s_extension;
+                btn_extension.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
+                    let ar_extension = txt_extension.value.split("\n");
+                    let ar = [];
+                    for (let i = 0; i < ar_extension.length; i++) {
+                        const item = ar_extension[i].toLocaleLowerCase().trim();
+                        if (item !== "" && ar.indexOf(item) === -1) {
+                            ar.push(item);
+                        }
+                    }
+                    let appPath = yield WV_Window.GetAppPath();
+                    WV_System.SetAssociationExtension(ar, appPath);
+                    console.log(ar);
+                }));
                 //拖曳視窗
                 (_a = document.getElementById("window-left")) === null || _a === void 0 ? void 0 : _a.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
                     let _dom = e.target;
@@ -137,8 +157,8 @@ class Setting {
                     }
                 }));
                 //視窗 圓角
-                jqdom_theme_windowBorderRadius.change(() => {
-                    let val = Number(jqdom_theme_windowBorderRadius.val());
+                jqtxt_windowBorderRadius.change(() => {
+                    let val = Number(jqtxt_windowBorderRadius.val());
                     if (val < 0) {
                         val = 0;
                     }
@@ -149,29 +169,36 @@ class Setting {
                     appleSettingOfMain();
                 });
                 // 視窗 aero毛玻璃
-                dom_theme_areo === null || dom_theme_areo === void 0 ? void 0 : dom_theme_areo.addEventListener("change", () => {
-                    let val = dom_theme_areo.checked;
+                switch_areo === null || switch_areo === void 0 ? void 0 : switch_areo.addEventListener("change", () => {
+                    let val = switch_areo.checked;
                     config.settings["theme"]["aero"] = val;
                 });
                 // 圖片 dpi
-                dom_image_dpizoom === null || dom_image_dpizoom === void 0 ? void 0 : dom_image_dpizoom.addEventListener("change", () => {
-                    let val = dom_image_dpizoom.value;
+                txt_imageDpizoom === null || txt_imageDpizoom === void 0 ? void 0 : txt_imageDpizoom.addEventListener("change", () => {
+                    let val = txt_imageDpizoom.value;
                     config.settings["image"]["dpizoom"] = val;
                     appleSettingOfMain();
                 });
                 // 圖片 縮放模式
-                dom_image_tieefseeviewImageRendering === null || dom_image_tieefseeviewImageRendering === void 0 ? void 0 : dom_image_tieefseeviewImageRendering.addEventListener("change", () => {
-                    let val = dom_image_tieefseeviewImageRendering.value;
+                select_tieefseeviewImageRendering === null || select_tieefseeviewImageRendering === void 0 ? void 0 : select_tieefseeviewImageRendering.addEventListener("change", () => {
+                    let val = select_tieefseeviewImageRendering.value;
                     config.settings["image"]["tieefseeviewImageRendering"] = val;
                     appleSettingOfMain();
                 });
-                dom_openAppData === null || dom_openAppData === void 0 ? void 0 : dom_openAppData.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                //開啟 AppData(使用者資料)
+                btn_openAppData === null || btn_openAppData === void 0 ? void 0 : btn_openAppData.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
                     let path = yield WV_Window.GetAppDataPath();
                     WV_RunApp.OpenUrl(path);
                 }));
-                dom_openWww === null || dom_openWww === void 0 ? void 0 : dom_openWww.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                //開啟 www(原始碼)
+                btn_openWww === null || btn_openWww === void 0 ? void 0 : btn_openWww.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
                     let path = yield WV_Window.GetAppDirPath();
                     path = Lib.Combine([path, "www"]);
+                    WV_RunApp.OpenUrl(path);
+                }));
+                //開啟 系統設定
+                btn_openSystemSetting === null || btn_openSystemSetting === void 0 ? void 0 : btn_openSystemSetting.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                    let path = "ms-settings:defaultapps";
                     WV_RunApp.OpenUrl(path);
                 }));
             });
@@ -195,7 +222,7 @@ class Setting {
                 config.settings.theme["--color-blue"] = blue;
                 applySetting();
             };
-            dom_applyTheme_btns === null || dom_applyTheme_btns === void 0 ? void 0 : dom_applyTheme_btns.append(btn);
+            dom_applyThemeBtns === null || dom_applyThemeBtns === void 0 ? void 0 : dom_applyThemeBtns.append(btn);
         }
         /**
          * 將設定套用至 mainwiwndow
@@ -207,10 +234,10 @@ class Setting {
          * 讀取設置值
          */
         function applySetting() {
-            dom_image_dpizoom.value = config.settings["image"]["dpizoom"];
-            dom_image_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
-            jqdom_theme_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
-            dom_theme_areo.checked = config.settings["theme"]["aero"];
+            txt_imageDpizoom.value = config.settings["image"]["dpizoom"];
+            select_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
+            jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
+            switch_areo.checked = config.settings["theme"]["aero"];
             //-------------
             function setRgb(jqdom, c) {
                 //@ts-ignore
@@ -220,11 +247,11 @@ class Setting {
                 //@ts-ignore
                 jqdom.minicolors("value", `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`);
             }
-            setRgba(jqdom_theme_colorWindowBackground, config.settings.theme["--color-window-background"]);
-            setRgba(jqdom_theme_colorWindowBorder, config.settings.theme["--color-window-border"]);
-            setRgb(jqdom_theme_colorWhite, config.settings.theme["--color-white"]);
-            setRgb(jqdom_theme_colorBlack, config.settings.theme["--color-black"]);
-            setRgb(jqdom_theme_colorBlue, config.settings.theme["--color-blue"]);
+            setRgba(jqtxt_colorWindowBackground, config.settings.theme["--color-window-background"]);
+            setRgba(jqtxt_colorWindowBorder, config.settings.theme["--color-window-border"]);
+            setRgb(jqtxt_colorWhite, config.settings.theme["--color-white"]);
+            setRgb(jqtxt_colorBlack, config.settings.theme["--color-black"]);
+            setRgb(jqtxt_colorBlue, config.settings.theme["--color-blue"]);
         }
         /**
          * 儲存設定(關閉視窗時呼叫)
@@ -232,7 +259,7 @@ class Setting {
         function saveSetting() {
             return __awaiter(this, void 0, void 0, function* () {
                 //儲存 start.ini
-                let startPort = parseInt(dom_startPort.value);
+                let startPort = parseInt(txt_startPort.value);
                 let startType = getRadio("[name='radio-startType']");
                 if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
                     startPort = 4876;
