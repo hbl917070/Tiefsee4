@@ -129,20 +129,28 @@ class Setting {
                     applyThemeAddBtn(`<div class="btn">淺色主題</div>`, { r: 255, g: 255, b: 255, a: 0.97 }, { r: 112, g: 112, b: 112, a: 0.25 }, { r: 0, g: 0, b: 0, }, { r: 255, g: 255, b: 255, }, { r: 0, g: 125, b: 170, });
                 })();
                 //關聯副檔名 預設顯示文字
-                let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",].join("\n");
-                txt_extension.value = s_extension;
+                let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
+                txt_extension.value = s_extension.join("\n");
                 btn_extension.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {
-                    let ar_extension = txt_extension.value.split("\n");
-                    let ar = [];
-                    for (let i = 0; i < ar_extension.length; i++) {
-                        const item = ar_extension[i].toLocaleLowerCase().trim();
-                        if (item !== "" && ar.indexOf(item) === -1) {
-                            ar.push(item);
-                        }
-                    }
-                    let appPath = yield WV_Window.GetAppPath();
-                    WV_System.SetAssociationExtension(ar, appPath);
-                    console.log(ar);
+                    Msgbox.show({
+                        txt: "確定用Tiefsee來開啟這些檔案嗎？<br>" + s_extension.join(", "),
+                        funcYes: (dom, inputTxt) => __awaiter(this, void 0, void 0, function* () {
+                            Msgbox.close(dom);
+                            //let msgboxLoading = Msgbox.show({ txt: "處理中...", isAllowClose: false, isShowBtn: false });
+                            let ar_extension = txt_extension.value.split("\n");
+                            let ar = [];
+                            for (let i = 0; i < ar_extension.length; i++) {
+                                const item = ar_extension[i].toLocaleLowerCase().trim();
+                                if (item !== "" && ar.indexOf(item) === -1) {
+                                    ar.push(item);
+                                }
+                            }
+                            let appPath = yield WV_Window.GetAppPath();
+                            yield WV_System.SetAssociationExtension(ar, appPath);
+                            //Msgbox.close(msgboxLoading);
+                            Msgbox.show({ txt: "關聯完成", });
+                        })
+                    });
                 }));
                 //拖曳視窗
                 (_a = document.getElementById("window-left")) === null || _a === void 0 ? void 0 : _a.addEventListener("mousedown", (e) => __awaiter(this, void 0, void 0, function* () {

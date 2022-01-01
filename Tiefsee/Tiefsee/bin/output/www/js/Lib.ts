@@ -213,11 +213,11 @@ async function initDomImport() {
  * @param html 
  * @returns 
  */
-function newDiv(html: string): HTMLDivElement {
+function newDiv(html: string): HTMLElement {
     let div = document.createElement("div");
     div.innerHTML = html
 
-    return <HTMLDivElement>div.getElementsByTagName("div")[0];
+    return <HTMLElement>div.getElementsByTagName("div")[0];
 }
 
 

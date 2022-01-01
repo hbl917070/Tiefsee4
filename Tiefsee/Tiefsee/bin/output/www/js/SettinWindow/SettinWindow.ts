@@ -175,21 +175,38 @@ class Setting {
 
 
             //關聯副檔名 預設顯示文字
-            let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",].join("\n");
-            txt_extension.value = s_extension;
+            let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
+            txt_extension.value = s_extension.join("\n");
             btn_extension.addEventListener("mousedown", async (e) => {
-                let ar_extension = txt_extension.value.split("\n");
-                let ar = [];
 
-                for (let i = 0; i < ar_extension.length; i++) {
-                    const item = ar_extension[i].toLocaleLowerCase().trim();
-                    if (item !== "" && ar.indexOf(item) === -1) {
-                        ar.push(item);
+                Msgbox.show({
+                    txt: "確定用Tiefsee來開啟這些檔案嗎？<br>" + s_extension.join(", "),
+                    funcYes: async (dom: HTMLElement, inputTxt: string) => {
+
+                        Msgbox.close(dom);
+
+                        //let msgboxLoading = Msgbox.show({ txt: "處理中...", isAllowClose: false, isShowBtn: false });
+
+                        let ar_extension = txt_extension.value.split("\n");
+                        let ar = [];
+                        for (let i = 0; i < ar_extension.length; i++) {
+                            const item = ar_extension[i].toLocaleLowerCase().trim();
+                            if (item !== "" && ar.indexOf(item) === -1) {
+                                ar.push(item);
+                            }
+                        }
+                        let appPath = await WV_Window.GetAppPath();
+                        await WV_System.SetAssociationExtension(ar, appPath);
+               
+                        //Msgbox.close(msgboxLoading);
+
+                        Msgbox.show({ txt: "關聯完成", });
+
                     }
-                }
-                let appPath = await WV_Window.GetAppPath();
-                WV_System.SetAssociationExtension(ar, appPath);
-                console.log(ar)
+                });
+
+
+
             })
 
 
