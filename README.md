@@ -1,7 +1,7 @@
 # Tiefsee4
 > Tiefsee是圖片檢視軟體。 4.0.0版全面改寫架構，程式UI界面全部以HTML、css、JavaScript渲染，可實現半透明視窗與AERO毛玻璃視窗。目前程式還在測試階段，功能尚未齊全到足以取代Tiefsee 3.0.2
 
-目前版本：Tiefsee 4.0.0-beta.4
+目前版本：Tiefsee 4.0.0-beta.5
 [下載測試版](https://github.com/hbl917070/tiefsee4/releases)
 
 - 專案類型：C# WinForm(net 4.7.2)
@@ -36,8 +36,8 @@ tiefsee4使用js的createImageBitmap來對圖片進行縮小處理，一般的�
 
 
 ### 3、啟動程式的速度偏慢
-初始化webview2大約需要1秒，之後會嘗試讓程式常駐在背景，這樣就不需要這1秒的初始化成本。<br>
-我用另一台灌win11筆電來測試，開啟幾乎是無延遲，可能是win11有優化webview2，直接讓他變成系統核心常駐在背景？
+已經於Tiefsee 4.0.0-beta.5加入「快速啟動」功能，只要Tiefsee還存在於背景，就能以極快的速度開啟
+
 
 ### 4、win7無法讓視窗透明化
 無解
