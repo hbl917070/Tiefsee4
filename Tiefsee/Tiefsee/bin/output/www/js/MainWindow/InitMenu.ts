@@ -90,48 +90,68 @@ class InitMenu {
 
             //以第三方程式開啟
             var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
-            let ar_lnk = await WV_RunApp.GetStartMenuList();//取得開始選單裡面的所有lnk
-            async function OtherAppOpenCheck(lnk: string, name: string) {
-                //let name = await WV_Path.GetFileNameWithoutExtension(lnk);
+            (async () => {
 
-                for (let i = 0; i < M.config.OtherAppOpenList.startMenu.length; i++) {
-                    const item = M.config.OtherAppOpenList.startMenu[i];
-                    if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) > -1) {
-                        return true;
+               
+                let arExe: { path: string, name: string, type: string }[] = [];
+
+                //加入絕對路徑的exe
+                for (let i = 0; i < M.config.OtherAppOpenList.absolute.length; i++) {
+                    let exePath = M.config.OtherAppOpenList.absolute[i].path;
+                    let exeName = M.config.OtherAppOpenList.absolute[i].name;
+                    let type = M.config.OtherAppOpenList.absolute[i].type.join(",");
+                    exePath = exePath.replace(/[/]/g, "\\");
+                    if (arExe.some(e => e.path === exePath) === false) {
+                        arExe.push({ path: exePath, name: exeName, type: type });
                     }
                 }
-                return false;
-            }
-            for (let i = 0; i < ar_lnk.length; i++) {
-                const lnk = ar_lnk[i];
-                let name = lnk.substr(lnk.lastIndexOf("\\") + 1);//取得檔名
-                name = name.substr(0, name.length - 4);
-                if (await OtherAppOpenCheck(lnk, name)) {
 
-                    let exePath = await WV_System.LnkToExePath(lnk);
+                //加入lnk
+                 let arLnk = await WV_RunApp.GetStartMenuList();//取得開始選單裡面的所有lnk
+                for (let i = 0; i < arLnk.length; i++) {
+                    const lnk = arLnk[i];
+                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1);//取得檔名
+                    name = name.substr(0, name.length - 4);
 
-                    //let imgBase64 = await WV_Image.GetExeIcon_32(exePath);
-                    let imgBase64 = await WV_Image.GetFileIcon(exePath, 32);
+                    for (let j = 0; j < M.config.OtherAppOpenList.startMenu.length; j++) {
+                        const item = M.config.OtherAppOpenList.startMenu[j];
+                        if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
+                            let exePath = await WV_System.LnkToExePath(lnk);
+                            if (arExe.some(e => e.path === exePath) === false) {
+                                arExe.push({ path: exePath, name: name, type: item.type.join(",") });
+                            }
+                        }
+                    }
+                }
+                //console.log(arExe)
+
+                for (let i = 0; i < arExe.length; i++) {
+
+                    const exe = arExe[i];
+                    let name = exe.name;//顯示的名稱
+                    let imgBase64 = await WV_Image.GetFileIcon(exe.path, 32);//圖示
+
+                    if (imgBase64 === "") { continue; }//如果沒有圖示，表示檔案不存在
 
                     let dom = newDiv(`
-                    <div class="menu-hor-item">
-                        <div class="menu-hor-icon">
-                            <img src="${imgBase64}">
+                        <div class="menu-hor-item">
+                            <div class="menu-hor-icon">
+                                <img src="${imgBase64}">
+                            </div>
+                            <div class="menu-hor-txt" i18n="">${name}</div>
                         </div>
-                        <div class="menu-hor-txt" i18n="">${name}</div>
-                    </div>
-                `);
+                    `);
 
                     dom.onclick = async () => {
                         let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
                         if (await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close();//關閉menu
-                        WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);//開啟檔案
+                        WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false);//開啟檔案
                     };
                     dom_menuOtherAppOpen?.append(dom);
                 }
-            }
 
+            })();
 
         }
 

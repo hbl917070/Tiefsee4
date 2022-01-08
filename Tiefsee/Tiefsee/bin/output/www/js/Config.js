@@ -5,7 +5,7 @@ class Config {
             absolute: [
                 { name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
                 { name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
-                { name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: "img" },
+                { name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: ["img"] },
             ],
             startMenu: [
                 { name: "photoshop", type: ["img"] },
@@ -41,7 +41,9 @@ class Config {
         };
         this.settings = {
             theme: {
+                /** 是否啟用毛玻璃 */
                 "aero": false,
+                /** 視窗圓角 */
                 "--window-border-radius": 7,
                 "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
                 "--color-window-border": { r: 255, g: 255, b: 255, a: 0.25 },
@@ -52,8 +54,17 @@ class Config {
             },
             image: {
                 "dpizoom": "-1",
+                /** 圖片渲染模式 */
                 "tieefseeviewImageRendering": "0"
-            }
+            },
+            /** 記錄程式上次關閉時的位置 */
+            position: {
+                left: -9999,
+                top: -9999,
+                width: 600,
+                height: 600,
+                windowState: "Normal"
+            },
         };
     }
     /**

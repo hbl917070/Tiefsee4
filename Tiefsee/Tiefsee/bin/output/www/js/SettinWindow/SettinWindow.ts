@@ -44,6 +44,7 @@ class Setting {
 
         baseWindow = new BaseWindow();//初始化視窗
         init();
+
         initDomImport();//初始化圖示
 
         tippy(".img-help", {
@@ -61,9 +62,9 @@ class Setting {
           * 覆寫 onCreate
           * @param json 
           */
-        baseWindow.onCreate = (json: AppInfo) => {
+        baseWindow.onCreate = async (json: AppInfo) => {
 
-            WV_Window.ShowWindow();//顯示視窗 
+            await WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
 
             //讀取設定檔
             var userSetting = {};
@@ -75,10 +76,7 @@ class Setting {
             setRadio("[name='radio-startType']", json.startType.toString())
             txt_startPort.value = json.startPort.toString()
 
-            setTimeout(() => {
-                applySetting();//套用設置值
-            }, 100);
-
+            applySetting();//套用設置值
         }
 
 
@@ -197,7 +195,7 @@ class Setting {
                         }
                         let appPath = await WV_Window.GetAppPath();
                         await WV_System.SetAssociationExtension(ar, appPath);
-               
+
                         //Msgbox.close(msgboxLoading);
 
                         Msgbox.show({ txt: "關聯完成", });

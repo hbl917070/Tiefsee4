@@ -85,46 +85,61 @@ class InitMenu {
                 }
                 //以第三方程式開啟
                 var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
-                let ar_lnk = yield WV_RunApp.GetStartMenuList(); //取得開始選單裡面的所有lnk
-                function OtherAppOpenCheck(lnk, name) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        //let name = await WV_Path.GetFileNameWithoutExtension(lnk);
-                        for (let i = 0; i < M.config.OtherAppOpenList.startMenu.length; i++) {
-                            const item = M.config.OtherAppOpenList.startMenu[i];
-                            if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) > -1) {
-                                return true;
+                (() => __awaiter(this, void 0, void 0, function* () {
+                    let arExe = [];
+                    //加入絕對路徑的exe
+                    for (let i = 0; i < M.config.OtherAppOpenList.absolute.length; i++) {
+                        let exePath = M.config.OtherAppOpenList.absolute[i].path;
+                        let exeName = M.config.OtherAppOpenList.absolute[i].name;
+                        let type = M.config.OtherAppOpenList.absolute[i].type.join(",");
+                        exePath = exePath.replace(/[/]/g, "\\");
+                        if (arExe.some(e => e.path === exePath) === false) {
+                            arExe.push({ path: exePath, name: exeName, type: type });
+                        }
+                    }
+                    //加入lnk
+                    let arLnk = yield WV_RunApp.GetStartMenuList(); //取得開始選單裡面的所有lnk
+                    for (let i = 0; i < arLnk.length; i++) {
+                        const lnk = arLnk[i];
+                        let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
+                        name = name.substr(0, name.length - 4);
+                        for (let j = 0; j < M.config.OtherAppOpenList.startMenu.length; j++) {
+                            const item = M.config.OtherAppOpenList.startMenu[j];
+                            if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
+                                let exePath = yield WV_System.LnkToExePath(lnk);
+                                if (arExe.some(e => e.path === exePath) === false) {
+                                    arExe.push({ path: exePath, name: name, type: item.type.join(",") });
+                                }
                             }
                         }
-                        return false;
-                    });
-                }
-                for (let i = 0; i < ar_lnk.length; i++) {
-                    const lnk = ar_lnk[i];
-                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
-                    name = name.substr(0, name.length - 4);
-                    if (yield OtherAppOpenCheck(lnk, name)) {
-                        let exePath = yield WV_System.LnkToExePath(lnk);
-                        //let imgBase64 = await WV_Image.GetExeIcon_32(exePath);
-                        let imgBase64 = yield WV_Image.GetFileIcon(exePath, 32);
+                    }
+                    //console.log(arExe)
+                    for (let i = 0; i < arExe.length; i++) {
+                        const exe = arExe[i];
+                        let name = exe.name; //顯示的名稱
+                        let imgBase64 = yield WV_Image.GetFileIcon(exe.path, 32); //圖示
+                        if (imgBase64 === "") {
+                            continue;
+                        } //如果沒有圖示，表示檔案不存在
                         let dom = newDiv(`
-                    <div class="menu-hor-item">
-                        <div class="menu-hor-icon">
-                            <img src="${imgBase64}">
+                        <div class="menu-hor-item">
+                            <div class="menu-hor-icon">
+                                <img src="${imgBase64}">
+                            </div>
+                            <div class="menu-hor-txt" i18n="">${name}</div>
                         </div>
-                        <div class="menu-hor-txt" i18n="">${name}</div>
-                    </div>
-                `);
+                    `);
                         dom.onclick = () => __awaiter(this, void 0, void 0, function* () {
                             let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
                             if ((yield WV_File.Exists(filePath)) === false) {
                                 return;
                             }
                             M.menu.close(); //關閉menu
-                            WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false); //開啟檔案
+                            WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); //開啟檔案
                         });
                         dom_menuOtherAppOpen === null || dom_menuOtherAppOpen === void 0 ? void 0 : dom_menuOtherAppOpen.append(dom);
                     }
-                }
+                }))();
             });
         }
         /**

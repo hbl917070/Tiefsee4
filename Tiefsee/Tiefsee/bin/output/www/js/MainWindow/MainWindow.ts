@@ -26,7 +26,7 @@ class MainWindow {
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
 
-        new InitMenu(this);
+
 
         this.dom_tools = dom_tools;
         this.dom_maxBtnLeft = dom_maxBtnLeft;
@@ -45,6 +45,28 @@ class MainWindow {
         //WV_Window.ShowWindow();//顯示視窗 
 
 
+        //關閉視窗前觸發
+        baseWindow.closingEvents.push(async () => {
+
+            //視窗目前的狀態
+            let jsonPosition = {
+                left: baseWindow.left,
+                top: baseWindow.top,
+                width: baseWindow.width,
+                height: baseWindow.height,
+                windowState: baseWindow.windowState
+            };
+            //window.localStorage.setItem("position", JSON.stringify(jsonPosition));
+            config.settings.position = jsonPosition;
+
+            //儲存 setting.json
+            let s = JSON.stringify(config.settings, null, '\t');
+            var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
+            path = Lib.Combine([path, "setting.json"]);
+            await WV_File.SetText(path, s);
+        });
+
+
         /**
          * 覆寫 onCreate
          * @param json 
@@ -52,12 +74,12 @@ class MainWindow {
         baseWindow.onCreate = async (json: AppInfo) => {
 
 
-            if (firstRun === true) {   //首次開啟視窗
+
+            //document.body.style.opacity = "0";
+
+            if (firstRun === true) { //首次開啟視窗
 
                 firstRun = false;
-
-                WV_Window.SetSize(600 * window.devicePixelRatio, 500 * window.devicePixelRatio);//初始化視窗大小
-                WV_Window.ShowWindow();//顯示視窗 
 
                 //讀取設定
                 var userSetting = {};
@@ -66,6 +88,49 @@ class MainWindow {
                 } catch (e) { }
                 $.extend(true, config.settings, userSetting);
                 applySetting(config.settings);
+
+                let txtPosition = config.settings.position;
+
+                if (txtPosition.left !== -9999) {
+
+                    if (txtPosition.windowState == "Maximized") {
+
+                        await WV_Window.ShowWindow_SetSize(
+                            txtPosition.left, txtPosition.top,
+                            800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
+                            "Maximized"
+                        );//顯示視窗 
+
+                    } else if (txtPosition.windowState == "Normal") {
+
+                        await WV_Window.ShowWindow_SetSize(
+                            txtPosition.left, txtPosition.top,
+                            txtPosition.width, txtPosition.height,
+                            "Normal"
+                        );//顯示視窗 
+
+                    } else {
+
+                        await WV_Window.ShowWindow();//顯示視窗 
+                        await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
+
+                    }
+
+                } else {
+
+                    await WV_Window.ShowWindow();//顯示視窗 
+                    await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
+
+                }
+
+                //document.body.style.opacity = "1";
+
+                //await sleep(500);
+
+
+
+
+                new InitMenu(this);
 
                 // baseWindow.dom_window.style.opacity ="1";
 

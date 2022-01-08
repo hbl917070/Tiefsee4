@@ -64,10 +64,33 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 網頁載入完成後，以js呼叫此函數，才會顯示視窗
+        /// 網頁載入完成後，呼叫此函數才會顯示視窗
         /// </summary>
         public void ShowWindow() {
             M.ShowWindow();
+        }
+
+
+        /// <summary>
+        /// 網頁載入完成後，呼叫此函數才會顯示視窗，指定起始坐標
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="windowState"></param>
+        public void ShowWindow_SetSize(int x, int y, int width, int height,string windowState) {
+            M.ShowWindow_SetSize(x, y, width, height, windowState);
+        }
+
+
+        /// <summary>
+        /// 網頁載入完成後，呼叫此函數才會顯示視窗，子視窗從父視窗中間開啟
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void ShowWindow_Center(int width, int height) {
+            M.ShowWindow_Center(width, height);
         }
 
 
@@ -255,9 +278,18 @@ namespace Tiefsee {
                 return "null";
             }
             set {
-                if (value == "Maximized") { M.WindowState = FormWindowState.Maximized; }
-                if (value == "Minimized") { M.WindowState = FormWindowState.Minimized; }
-                if (value == "Normal") { M.WindowState = FormWindowState.Normal; }
+                if (value == "Maximized") {
+                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
+                    M.WindowState = FormWindowState.Maximized; 
+                }
+                if (value == "Minimized") {
+                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MINIMIZE);
+                    M.WindowState = FormWindowState.Minimized;
+                }
+                if (value == "Normal") {
+                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_NORMAL);
+                    M.WindowState = FormWindowState.Normal;
+                }
             }
         }
 

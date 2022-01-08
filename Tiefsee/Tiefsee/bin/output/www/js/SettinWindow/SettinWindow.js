@@ -51,8 +51,8 @@ class Setting {
           * 覆寫 onCreate
           * @param json
           */
-        baseWindow.onCreate = (json) => {
-            WV_Window.ShowWindow(); //顯示視窗 
+        baseWindow.onCreate = (json) => __awaiter(this, void 0, void 0, function* () {
+            yield WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
             //讀取設定檔
             var userSetting = {};
             try {
@@ -62,10 +62,8 @@ class Setting {
             $.extend(true, config.settings, userSetting);
             setRadio("[name='radio-startType']", json.startType.toString());
             txt_startPort.value = json.startPort.toString();
-            setTimeout(() => {
-                applySetting(); //套用設置值
-            }, 100);
-        };
+            applySetting(); //套用設置值
+        });
         /**
          *
          */

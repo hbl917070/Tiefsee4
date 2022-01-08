@@ -47,8 +47,15 @@ interface WV_Window {
     /** 取得 AppInfo*/
     GetAppInfo(): string;
 
-    /** 網頁載入完成後，以js呼叫此函數，才會顯示視窗 */
+    /** 網頁載入完成後，呼叫此函數才會顯示視窗 */
     ShowWindow(): void;
+
+    /** 網頁載入完成後，呼叫此函數才會顯示視窗，指定起始坐標 */
+    ShowWindow_SetSize(x: number, y: number, width: number, height: number, windowState: string): void;
+
+    /** 網頁載入完成後，呼叫此函數才會顯示視窗，子視窗從父視窗中間開啟 */
+    ShowWindow_Center(width: number, height: number): void;
+
 
     /**
      * 新開視窗

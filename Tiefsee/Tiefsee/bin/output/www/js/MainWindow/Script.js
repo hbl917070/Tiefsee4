@@ -183,24 +183,24 @@ class ScriptSteting {
     /** 開啟 設定 視窗 */
     OpenSetting() {
         return __awaiter(this, void 0, void 0, function* () {
+            //如果視窗已經存在，就不再新開
             if (this.temp_setting != null) {
                 if ((yield this.temp_setting.Visible) === true) {
                     this.temp_setting.WindowState = 0; //視窗化
                     return;
                 }
             }
+            //新開視窗
             this.temp_setting = yield baseWindow.newWindow("SettingWindow.html");
-            //this.temp_setting.Width = 500 * baseWindow.dpiX;
-            //this.temp_setting.Height = 450 * baseWindow.dpiY;
-            yield this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio); //初始化視窗大小
+            /*await this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio);//初始化視窗大小
+    
             //設定坐標，從父視窗的中間開啟
-            let w = (yield this.temp_setting.Width) - baseWindow.width;
-            let h = (yield this.temp_setting.Height) - baseWindow.height;
-            //this.temp_setting.Left = baseWindow.left - (w / 2);
-            //this.temp_setting.Top = baseWindow.top - (h / 2);
-            this.temp_setting.SetPosition(baseWindow.left - (w / 2), baseWindow.top - (h / 2));
-            //this.temp_setting.WindowState = 1;//最小化
-            //this.temp_setting.WindowState = 0;//視窗化
+            let w = await this.temp_setting.Width - baseWindow.width;
+            let h = await this.temp_setting.Height - baseWindow.height;
+            this.temp_setting.SetPosition(
+                baseWindow.left - (w / 2),
+                baseWindow.top - (h / 2)
+            )*/
         });
     }
 }

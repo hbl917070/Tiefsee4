@@ -1155,17 +1155,20 @@ class Tieefseeview {
 
                 let tc = temp_canvasSN;
 
-                var time = new Date();
-
-                //context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
-
+                //var time = new Date();
 
 
                 let resizeQuality: ResizeQuality = "medium";
 
+                if (getOriginalWidth() * getOriginalHeight() > 8000 * 8000) {
 
+                    //console.log("drawImage直接渲染");
+                    context.drawImage(temp_can,
+                        sx, sy, sWidth, sHeight,
+                        0, 0, dWidth, dHeight
+                    );
 
-                if (_scale >= 1) {
+                } else if (_scale >= 1) {
 
                     //console.log("drawImage直接渲染");
                     context.drawImage(temp_can,
