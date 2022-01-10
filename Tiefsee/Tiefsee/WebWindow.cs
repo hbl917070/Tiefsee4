@@ -265,7 +265,7 @@ namespace Tiefsee {
                     //必須使用此語法，否則會無法點擊視窗
                     this.BackColor = Color.Red;
                     this.TransparencyKey = Color.Red;
-
+       
                     this.Controls.Add(wv2);
                 };
 
