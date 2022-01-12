@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet"> -->
 
     <script src="/vender/jquery-3.6.0.min.js"></script>
-    <script src="/vender/jquery.easing.js"></script>
+    <!-- <script src="/vender/jquery.easing.js"></script> -->
 
     <!-- MiniColors(選擇顏色套件 -->
     <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
@@ -177,7 +177,7 @@
                 </div>
 
 
-                <!-- 主題 -->
+                <!-- 外觀 -->
                 <div class="page-tabsPage" id="tabsPage-theme">
 
                     <div class="page-title" i18b=""> 外觀 </div>
@@ -221,6 +221,11 @@
 
                     <div class="box">
                         <div class="box-title"> 視窗設定 </div>
+
+                        <div class="text-title"> 視窗縮放 (0.5~3.0)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-theme-zoomFactor">
+                        </div>
 
                         <div class="text-title"> 視窗圓角 (0~15)</div>
                         <div class="text-content">
@@ -328,11 +333,19 @@
                     <div class="page-title" i18b=""> 進階設定 </div>
 
                     <div class="box">
-                        <div class="box-title"> Tiefsee localhost port </div>
+                        <div class="box-title"> Tiefsee localhost server </div>
 
-                        <div class="text-title"> (如果port已經被使用，則會使用下一號) </div>
+                        <div class="text-title"> port (如果已經被使用，則會使用下一號) </div>
                         <div class="text-content">
                             <input class="text-input" type="text" id="txt-startPort">
+                        </div>
+
+                        <div class="text-title"> 快取靜態資源</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-serverCache">
+                                <span class="slider round"></span>
+                            </label>
                         </div>
 
                     </div>

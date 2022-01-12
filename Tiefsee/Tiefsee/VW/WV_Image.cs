@@ -13,7 +13,6 @@ using Tiefsee;
 namespace Tiefsee {
 
     [ComVisible(true)]
-
     public class WV_Image {
 
         WebWindow M;

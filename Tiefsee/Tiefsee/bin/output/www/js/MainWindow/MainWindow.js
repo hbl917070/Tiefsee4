@@ -84,7 +84,7 @@ class MainWindow {
                     yield WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio); //初始化視窗大小
                 }
                 //document.body.style.opacity = "1";
-                //await sleep(500);
+                //await sleep(100);
                 new InitMenu(this);
                 // baseWindow.dom_window.style.opacity ="1";
                 //取得命令列參數
@@ -303,13 +303,14 @@ class MainWindow {
             //@ts-ignore
             config.settings = setting;
             //-----------
-            let dpizoom = Number(config.settings["image"]["dpizoom"]);
+            let dpizoom = Number(config.settings["image"]["dpizoom"]); //圖片DPI縮放
             if (dpizoom == -1 || isNaN(dpizoom)) {
                 dpizoom = -1;
             }
             fileShow.tieefseeview.setDpizoom(dpizoom);
-            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
+            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]); //圖片縮放模式
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
+            WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]); //視窗縮放
             //-----------
             var cssRoot = document.documentElement;
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");

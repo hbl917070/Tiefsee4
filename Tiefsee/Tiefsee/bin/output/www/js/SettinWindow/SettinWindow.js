@@ -24,9 +24,11 @@ class Setting {
         var jqtxt_colorBlack = $("#text-theme-colorBlack");
         var jqtxt_colorBlue = $("#text-theme-colorBlue");
         var switch_areo = document.querySelector("#switch-theme-areo");
+        var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
         var txt_imageDpizoom = document.querySelector("#image-dpizoom");
         var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
         var txt_startPort = document.querySelector("#txt-startPort");
+        var switch_serverCache = document.querySelector("#switch-serverCache");
         var btn_openAppData = document.getElementById("btn-openAppData");
         var btn_openWww = document.getElementById("btn-openWww");
         var btn_openSystemSetting = document.getElementById("btn-openSystemSetting");
@@ -52,6 +54,7 @@ class Setting {
           * @param json
           */
         baseWindow.onCreate = (json) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             yield WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
             //讀取設定檔
             var userSetting = {};
@@ -62,7 +65,10 @@ class Setting {
             $.extend(true, config.settings, userSetting);
             setRadio("[name='radio-startType']", json.startType.toString());
             txt_startPort.value = json.startPort.toString();
+            switch_serverCache.checked = (json.serverCache == 1);
             applySetting(); //套用設置值
+            //document.querySelector("input")?.focus();
+            (_a = document.querySelector("input")) === null || _a === void 0 ? void 0 : _a.blur(); //失去焦點
         });
         /**
          *
@@ -174,6 +180,24 @@ class Setting {
                     config.settings["theme"]["--window-border-radius"] = val;
                     appleSettingOfMain();
                 });
+                //視窗縮放
+                jqtxt_zoomFactor.change(() => {
+                    let val = Number(jqtxt_zoomFactor.val());
+                    if (isNaN(val)) {
+                        val = 1;
+                    }
+                    if (val === 0) {
+                        val = 1;
+                    }
+                    if (val < 0.5) {
+                        val = 0.5;
+                    }
+                    if (val > 3) {
+                        val = 3;
+                    }
+                    config.settings["theme"]["zoomFactor"] = val;
+                    appleSettingOfMain();
+                });
                 // 視窗 aero毛玻璃
                 switch_areo === null || switch_areo === void 0 ? void 0 : switch_areo.addEventListener("change", () => {
                     let val = switch_areo.checked;
@@ -242,8 +266,10 @@ class Setting {
         function applySetting() {
             txt_imageDpizoom.value = config.settings["image"]["dpizoom"];
             select_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
-            jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]).change();
-            switch_areo.checked = config.settings["theme"]["aero"];
+            jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]); //圓角
+            switch_areo.checked = config.settings["theme"]["aero"]; //毛玻璃
+            jqtxt_zoomFactor.val(config.settings.theme["zoomFactor"]); //視窗縮放
+            appleSettingOfMain(); //將設定套用至 mainwiwndow
             //-------------
             function setRgb(jqdom, c) {
                 //@ts-ignore
@@ -267,6 +293,7 @@ class Setting {
                 //儲存 start.ini
                 let startPort = parseInt(txt_startPort.value);
                 let startType = getRadio("[name='radio-startType']");
+                let serverCache = switch_serverCache.checked ? 1 : 0;
                 if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
                     startPort = 4876;
                 }
@@ -274,7 +301,7 @@ class Setting {
                     startType = 2;
                 }
                 startType = parseInt(startType);
-                yield WV_Window.SetStartIni(startPort, startType);
+                yield WV_Window.SetStartIni(startPort, startType, serverCache);
                 //儲存 setting.json
                 let s = JSON.stringify(config.settings, null, '\t');
                 var path = yield WV_Window.GetAppDataPath(); //程式的暫存資料夾

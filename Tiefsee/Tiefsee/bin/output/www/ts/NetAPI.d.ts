@@ -42,7 +42,7 @@ interface WebWindow {
 interface WV_Window {
 
     /** 儲存到 start.ini */
-    SetStartIni(startPort: number, startType: number)
+    SetStartIni(startPort: number, startType: number, serverCache: number)
 
     /** 取得 AppInfo*/
     GetAppInfo(): string;
@@ -72,6 +72,12 @@ interface WV_Window {
 
     /** 啟用AERO毛玻璃效果 */
     SetAERO(): void;
+
+    /** 設定縮放倍率，預設 1.0 */
+    SetZoomFactor(d:number): void;
+
+    /** 取得碩放倍率 */
+    GetZoomFactor():number;
 
     /** 設定視窗最小size */
     SetMinimumSize(width: number, height: number): void;
@@ -408,6 +414,9 @@ interface AppInfo {
 
     /** 程式開始的port */
     startPort: number;
+
+    /** 伺服器對靜態資源使用快取 0=不使用 1=使用 */
+    serverCache: number;
 
     /** 程式所在的資料夾 */
     appDirPath: string;

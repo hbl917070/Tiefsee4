@@ -125,7 +125,7 @@ class MainWindow {
 
                 //document.body.style.opacity = "1";
 
-                //await sleep(500);
+                //await sleep(100);
 
 
 
@@ -368,14 +368,14 @@ class MainWindow {
 
             //-----------
 
-            let dpizoom = Number(config.settings["image"]["dpizoom"]);
-            if (dpizoom == -1 || isNaN(dpizoom)) {
-                dpizoom = -1;
-            }
+            let dpizoom = Number(config.settings["image"]["dpizoom"]);//圖片DPI縮放
+            if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
             fileShow.tieefseeview.setDpizoom(dpizoom);
 
-            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);
+            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);//圖片縮放模式
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
+
+            WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
 
             //-----------
 

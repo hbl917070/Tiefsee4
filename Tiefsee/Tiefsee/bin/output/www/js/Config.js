@@ -43,6 +43,10 @@ class Config {
             theme: {
                 /** 是否啟用毛玻璃 */
                 "aero": false,
+                /** 視窗縮放比例 */
+                "zoomFactor": 1.0,
+                /**文字粗細 */
+                "fontWeight": 300,
                 /** 視窗圓角 */
                 "--window-border-radius": 7,
                 "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },
@@ -53,6 +57,7 @@ class Config {
                 "--color-grey": { r: 30, g: 30, b: 30, },
             },
             image: {
+                /**圖片dpi縮放 */
                 "dpizoom": "-1",
                 /** 圖片渲染模式 */
                 "tieefseeviewImageRendering": "0"

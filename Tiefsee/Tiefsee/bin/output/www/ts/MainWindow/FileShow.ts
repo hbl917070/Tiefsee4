@@ -155,7 +155,7 @@ class FileShow {
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
-                imgurl = "/api/getimg/" + encodeURIComponent(_path);
+                imgurl = "/api/getimg/" + encodeURIComponent(_path)+`?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
             }
 

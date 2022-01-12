@@ -13,6 +13,7 @@ namespace Tiefsee {
         public static string startIniPath;// start.ini
         public static int startPort;//程式開始的port
         public static int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
+        public static int serverCache;//伺服器對靜態資源使用快取 0=不使用 1=使用 
         public static BaseServer bserver;//本地伺服器
 
         /// <summary>
@@ -20,7 +21,7 @@ namespace Tiefsee {
         /// </summary>
         [STAThread]
         static void Main(string[] args) {
-
+   
             appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
             if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(appDataPath);
@@ -29,6 +30,7 @@ namespace Tiefsee {
             IniManager iniManager = new IniManager(startIniPath);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
+            serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "1"));
 
             //如果允許快速啟動，就不開啟新個體
             if (QuickRun.Check(args)) { return; }
@@ -36,6 +38,7 @@ namespace Tiefsee {
             //在本地端建立server
             bserver = new BaseServer();
             String _url = $"http://localhost:{bserver.port}/www/MainWindow.html";
+            bserver.SetIsCache(serverCache);
 
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

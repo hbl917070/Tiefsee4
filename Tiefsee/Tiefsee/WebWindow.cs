@@ -119,6 +119,7 @@ namespace Tiefsee {
                 ww.parentWindow = _parentWindow;
                 ww.args = _args;
                 ww.wv2.Source = new Uri(_url);
+
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                     ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
                 };
@@ -259,18 +260,20 @@ namespace Tiefsee {
 
                     //ShowWindow(this.Handle, SW_SHOWDEFAULT); //視窗狀態
                     //ShowWindow(this.Handle, SW_HIDE);
+                    this.Controls.Add(wv2);//必須在show之前
                     this.Show();
                     this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
-                    
+
                     //必須使用此語法，否則會無法點擊視窗
                     this.BackColor = Color.Red;
                     this.TransparencyKey = Color.Red;
-       
-                    this.Controls.Add(wv2);
+
+
                 };
 
             } else {
 
+                this.Controls.Add(wv2);
                 this.Show();
                 this.Hide();
 
@@ -278,13 +281,17 @@ namespace Tiefsee {
                 this.BackColor = Color.Red;
                 this.TransparencyKey = Color.Red;
 
-                this.Controls.Add(wv2);
             }
-
+            wv2.ZoomFactor = 1;
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath);
             await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
+            /*wv2.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                "appassets.example",
+                @"D:\GitHub\tiefsee4\tiefsee\Tiefsee\bin\output\www", 
+                CoreWebView2HostResourceAccessKind.DenyCors
+            );*/
 
             wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;//是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
             wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;//觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
@@ -361,6 +368,7 @@ namespace Tiefsee {
             appInfo.args = args;
             appInfo.startType = Program.startType;
             appInfo.startPort = Program.startPort;
+            appInfo.serverCache = Program.serverCache;        
             appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
             appInfo.appDataPath = Program.appDataPath;
             appInfo.mainPort = Program.bserver.port;
@@ -379,8 +387,9 @@ namespace Tiefsee {
         }
         public class AppInfo {
             public string[] args;//命令列參數
-            public int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體
+            public int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
             public int startPort;//程式開始的port
+            public int serverCache;//伺服器對靜態資源使用快取 0=不使用 1=使用 
             public string appDirPath;// 程式所在的資料夾
             public string appDataPath;// 程式的暫存資料夾
             public int mainPort;//目前使用的port
@@ -558,7 +567,7 @@ namespace Tiefsee {
             this.wv2.Focus();
             this.wv2.RunFocus();
 
-          
+
             //var child = GetWindow(this.wv2.Handle, GW_CHILD);
             //SetFocus(child);
 

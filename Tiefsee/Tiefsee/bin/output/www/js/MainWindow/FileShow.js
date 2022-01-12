@@ -121,7 +121,7 @@ class FileShow {
                     imgurl = yield WV_Image.GetFileIcon(_path, 256); //取得檔案總管的圖示
                 }
                 else {
-                    imgurl = "/api/getimg/" + encodeURIComponent(_path);
+                    imgurl = "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
                 }
                 tieefseeview.setLoading(true);
                 yield tieefseeview.getIsLoaded(imgurl); //預載入

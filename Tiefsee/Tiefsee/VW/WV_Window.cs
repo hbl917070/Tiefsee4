@@ -28,13 +28,18 @@ namespace Tiefsee {
         /// 儲存到 start.ini
         /// </summary>
         /// <param name="startPort">程式開始的port</param>
-        /// <param name="startType">1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體</param>
-        public void SetStartIni(int startPort, int startType) {
+        /// <param name="startType">1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐</param>
+        /// <param name="serverCache"> 伺服器對靜態資源使用快取 0=不使用 1=使用 </param>
+        public void SetStartIni(int startPort, int startType, int serverCache) {
             IniManager iniManager = new IniManager(Program.startIniPath);
             iniManager.WriteIniFile("setting", "startPort", startPort);
             iniManager.WriteIniFile("setting", "startType", startType);
+            iniManager.WriteIniFile("setting", "serverCache", serverCache);
             Program.startPort = startPort;
             Program.startType = startType;
+            Program.serverCache = serverCache;
+
+            Program.bserver.SetIsCache(serverCache);
         }
 
 
@@ -79,7 +84,7 @@ namespace Tiefsee {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="windowState"></param>
-        public void ShowWindow_SetSize(int x, int y, int width, int height,string windowState) {
+        public void ShowWindow_SetSize(int x, int y, int width, int height, string windowState) {
             M.ShowWindow_SetSize(x, y, width, height, windowState);
         }
 
@@ -129,6 +134,22 @@ namespace Tiefsee {
         /// </summary>
         public void SetAERO() {
             EnableBlur(M.Handle);
+        }
+
+        /// <summary>
+        /// 設定縮放倍率，預設1.0
+        /// </summary>
+        /// <param name="d"></param>
+        public void SetZoomFactor(double d) {
+            M.wv2.ZoomFactor = d;
+        }
+
+        /// <summary>
+        /// 取得碩放倍率
+        /// </summary>
+        /// <returns></returns>
+        public double GetZoomFactor() {
+            return M.wv2.ZoomFactor;
         }
 
 
@@ -280,7 +301,7 @@ namespace Tiefsee {
             set {
                 if (value == "Maximized") {
                     //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
-                    M.WindowState = FormWindowState.Maximized; 
+                    M.WindowState = FormWindowState.Maximized;
                 }
                 if (value == "Minimized") {
                     //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MINIMIZE);
