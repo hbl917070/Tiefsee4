@@ -300,6 +300,7 @@ class MainWindow {
          * @param setting
          */
         function applySetting(setting) {
+            var cssRoot = document.documentElement;
             //@ts-ignore
             config.settings = setting;
             //-----------
@@ -311,8 +312,9 @@ class MainWindow {
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]); //圖片縮放模式
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
             WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]); //視窗縮放
+            document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; //文字粗細
+            cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); //圖示粗細
             //-----------
-            var cssRoot = document.documentElement;
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
             initColor("--color-window-background", true);
             initColor("--color-window-border", true);

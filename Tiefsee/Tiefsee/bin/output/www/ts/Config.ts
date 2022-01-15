@@ -49,8 +49,10 @@ class Config {
             "aero": false,
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
-            /**文字粗細 */
-            "fontWeight": 300,
+            /** 文字粗細 */
+            "fontWeight": "300",
+            /** 圖示粗細 */
+            "svgWeight": "0px",
             /** 視窗圓角 */
             "--window-border-radius": 7,
             "--color-window-background": { r: 31, g: 39, b: 43, a: 0.97 },

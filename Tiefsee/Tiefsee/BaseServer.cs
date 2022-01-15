@@ -250,7 +250,7 @@ namespace Tiefsee {
             _path = _path.Split('?')[0];//去掉?後面的文字
             _path = Uri.UnescapeDataString(_path);
 
-            if (File.Exists(_path)) { return false; }
+            if (File.Exists(_path) == false) { return false; }
 
             using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 

@@ -25,6 +25,8 @@ class Setting {
         var jqtxt_colorBlue = $("#text-theme-colorBlue");
         var switch_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
         var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
+        var jqselect_fontWeight = $("#select-fontWeight");//文字粗細
+        var jqselect_svgWeight = $("#select-svgWeight");//圖示粗細
 
         var txt_imageDpizoom = document.querySelector("#image-dpizoom") as HTMLInputElement;
         var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering") as HTMLInputElement;
@@ -249,6 +251,20 @@ class Setting {
                 appleSettingOfMain();
             });
 
+            //文字粗細
+            jqselect_fontWeight.change(() => {
+                let val = jqselect_fontWeight.val() as string;
+                config.settings["theme"]["fontWeight"] = val;
+                appleSettingOfMain();
+            });
+
+            //圖示粗細
+            jqselect_svgWeight.change(() => {
+                let val = jqselect_svgWeight.val() as string;
+                config.settings["theme"]["svgWeight"] = val;
+                appleSettingOfMain();
+            });
+            
             // 視窗 aero毛玻璃
             switch_areo?.addEventListener("change", () => {
                 let val = switch_areo.checked;
@@ -339,6 +355,8 @@ class Setting {
             jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]);//圓角
             switch_areo.checked = config.settings["theme"]["aero"];//毛玻璃
             jqtxt_zoomFactor.val(config.settings.theme["zoomFactor"]);//視窗縮放
+            jqselect_fontWeight.val(config.settings.theme["fontWeight"]);//文字粗細
+            jqselect_svgWeight.val(config.settings.theme["svgWeight"]);//圖示粗細
 
             appleSettingOfMain();//將設定套用至 mainwiwndow
 

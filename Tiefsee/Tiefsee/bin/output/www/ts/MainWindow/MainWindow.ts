@@ -363,6 +363,8 @@ class MainWindow {
          */
         function applySetting(setting: any) {
 
+            var cssRoot = document.documentElement;
+
             //@ts-ignore
             config.settings = setting;
 
@@ -376,10 +378,12 @@ class MainWindow {
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
 
             WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
+            document.body.style.fontWeight = config.settings["theme"]["fontWeight"];//文字粗細
+            cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);//圖示粗細
 
             //-----------
 
-            var cssRoot = document.documentElement;
+
 
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
 

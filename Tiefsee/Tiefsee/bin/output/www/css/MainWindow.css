@@ -1,3 +1,16 @@
+/* 圖示粗細 */
+:root {
+  --svgWeight: 0px;
+}
+.titlebar-tools-btn svg,
+.main-tools-btn svg,
+.menu-hor-icon svg {
+  stroke: var(--color-white);
+  stroke-width: var(--svgWeight);
+}
+
+/*---------------------------*/
+
 /*內容區塊*/
 .window-body {
   flex: 1;
