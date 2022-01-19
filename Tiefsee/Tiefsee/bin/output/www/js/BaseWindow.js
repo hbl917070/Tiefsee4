@@ -28,6 +28,7 @@ class BaseWindow {
         this.height = 0;
         this.windowState = "Normal";
         this.closingEvents = []; //關閉視窗時執行的function
+        this.sizeChangeEvents = []; //sizeChange時執行的function
         var dom_window = document.querySelector('.window');
         var btn_menu = document.querySelector(".titlebar-tools-menu");
         var btn_topmost = document.querySelector(".titlebar-tools-topmost");
@@ -213,12 +214,17 @@ class BaseWindow {
     }
     //
     onSizeChanged(left, top, width, height, windowState) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.windowState = windowState;
-        this.initWindowState();
+        return __awaiter(this, void 0, void 0, function* () {
+            this.left = left;
+            this.top = top;
+            this.width = width;
+            this.height = height;
+            this.windowState = windowState;
+            this.initWindowState();
+            for (let i = 0; i < this.sizeChangeEvents.length; i++) {
+                yield this.sizeChangeEvents[i]();
+            }
+        });
     }
     //由C#主動呼叫
     onMove(left, top, width, height, windowState) {

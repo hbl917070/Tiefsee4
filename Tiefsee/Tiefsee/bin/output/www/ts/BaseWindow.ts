@@ -33,6 +33,7 @@ class BaseWindow {
     public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
     public closingEvents: (() => void)[] = [];//關閉視窗時執行的function
+    public sizeChangeEvents: (() => void)[] = [];//sizeChange時執行的function
 
 
 
@@ -244,7 +245,7 @@ class BaseWindow {
     }
 
     //
-    public onSizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
+    public async onSizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
         this.left = left;
         this.top = top;
         this.width = width;
@@ -252,6 +253,10 @@ class BaseWindow {
         this.windowState = windowState;
 
         this.initWindowState();
+
+        for (let i = 0; i < this.sizeChangeEvents.length; i++) {
+            await this.sizeChangeEvents[i]();
+        }
     }
 
     //由C#主動呼叫

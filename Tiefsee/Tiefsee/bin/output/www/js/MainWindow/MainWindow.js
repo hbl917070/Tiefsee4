@@ -32,18 +32,22 @@ class MainWindow {
         new MainTools(this);
         init();
         //WV_Window.ShowWindow();//顯示視窗 
+        //視窗改變大小時觸發
+        baseWindow.sizeChangeEvents.push(() => __awaiter(this, void 0, void 0, function* () {
+            //必須在視窗化的狀態下記錄size，不可以在最大化的時候記錄size
+            if (baseWindow.windowState === "Normal") {
+                config.settings.position.width = baseWindow.width;
+                config.settings.position.height = baseWindow.height;
+            }
+        }));
         //關閉視窗前觸發
         baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
             //視窗目前的狀態
-            let jsonPosition = {
-                left: baseWindow.left,
-                top: baseWindow.top,
-                width: baseWindow.width,
-                height: baseWindow.height,
-                windowState: baseWindow.windowState
-            };
-            //window.localStorage.setItem("position", JSON.stringify(jsonPosition));
-            config.settings.position = jsonPosition;
+            config.settings.position.left = baseWindow.left;
+            config.settings.position.top = baseWindow.top;
+            //config.settings.position.width = baseWindow.width;
+            //config.settings.position.height = baseWindow.height;
+            config.settings.position.windowState = baseWindow.windowState;
             //儲存 setting.json
             let s = JSON.stringify(config.settings, null, '\t');
             var path = yield WV_Window.GetAppDataPath(); //程式的暫存資料夾
@@ -69,7 +73,9 @@ class MainWindow {
                 let txtPosition = config.settings.position;
                 if (txtPosition.left !== -9999) {
                     if (txtPosition.windowState == "Maximized") {
-                        yield WV_Window.ShowWindow_SetSize(txtPosition.left, txtPosition.top, 800 * window.devicePixelRatio, 600 * window.devicePixelRatio, "Maximized"); //顯示視窗 
+                        yield WV_Window.ShowWindow_SetSize(txtPosition.left, txtPosition.top, 
+                        //800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
+                        txtPosition.width, txtPosition.height, "Maximized"); //顯示視窗 
                     }
                     else if (txtPosition.windowState == "Normal") {
                         yield WV_Window.ShowWindow_SetSize(txtPosition.left, txtPosition.top, txtPosition.width, txtPosition.height, "Normal"); //顯示視窗 

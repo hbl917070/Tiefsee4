@@ -44,20 +44,25 @@ class MainWindow {
         init();
         //WV_Window.ShowWindow();//顯示視窗 
 
+        //視窗改變大小時觸發
+        baseWindow.sizeChangeEvents.push(async () => {
+            //必須在視窗化的狀態下記錄size，不可以在最大化的時候記錄size
+            if (baseWindow.windowState === "Normal") {
+                config.settings.position.width = baseWindow.width;
+                config.settings.position.height = baseWindow.height;
+            }
+        });
+
 
         //關閉視窗前觸發
         baseWindow.closingEvents.push(async () => {
 
             //視窗目前的狀態
-            let jsonPosition = {
-                left: baseWindow.left,
-                top: baseWindow.top,
-                width: baseWindow.width,
-                height: baseWindow.height,
-                windowState: baseWindow.windowState
-            };
-            //window.localStorage.setItem("position", JSON.stringify(jsonPosition));
-            config.settings.position = jsonPosition;
+            config.settings.position.left = baseWindow.left;
+            config.settings.position.top = baseWindow.top;
+            //config.settings.position.width = baseWindow.width;
+            //config.settings.position.height = baseWindow.height;
+            config.settings.position.windowState = baseWindow.windowState;
 
             //儲存 setting.json
             let s = JSON.stringify(config.settings, null, '\t');
@@ -97,7 +102,8 @@ class MainWindow {
 
                         await WV_Window.ShowWindow_SetSize(
                             txtPosition.left, txtPosition.top,
-                            800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
+                            //800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
+                            txtPosition.width, txtPosition.height,
                             "Maximized"
                         );//顯示視窗 
 
