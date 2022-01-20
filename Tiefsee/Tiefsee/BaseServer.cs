@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Tiefsee {
@@ -13,7 +14,7 @@ namespace Tiefsee {
 
         public int port;//當前掛載的port
         private HttpListener _httpListener = new HttpListener();
-        private String exeDir = "";//程式的目錄，用於讀取靜態網頁
+        private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>();//路由
         private bool isCache = true;//是否對靜態資源使用快取
 
         private static IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
@@ -88,18 +89,28 @@ namespace Tiefsee {
         #endregion
         };
 
-        public BaseServer() {
 
-            exeDir = System.AppDomain.CurrentDomain.BaseDirectory;
+        public BaseServer() {
+         
             port = GetAllowPost();//取得能使用的port
 
             _httpListener.IgnoreWriteExceptions = true;//忽略不可回傳的檔案
-
             _httpListener.Prefixes.Add("http://localhost:" + port + "/");
             _httpListener.Start(); // start server (Run application as Administrator!)
-
             _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
 
+            //註冊路由
+            RouteAddGet("/aa/bb/{*}", (RequestData d) => {
+                byte[] _responseArray = Encoding.UTF8.GetBytes("-" + d.value + "-");
+                d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+            });
+            RouteAddGet("/api/check", api_ckeck);
+            RouteAddGet("/api/newWindow/{*}", api_newwindow);
+            RouteAddGet("/api/getimg/{*}", api_getimg);
+            RouteAddGet("/api/getpdf/{*}", api_getpdf);
+            RouteAddGet("/www/{*}", getwww);
+            RouteAddGet("/{*}", getwww);
+            //RouteAddGet("{*}", get404);
         }
 
 
@@ -113,30 +124,82 @@ namespace Tiefsee {
             HttpListenerContext context = listener.EndGetContext(ar);
             listener.BeginGetContext(new AsyncCallback(GetContextCallBack), listener);
             HttpListenerRequest request = context.Request;
-            var header = new System.Collections.Specialized.NameValueCollection();
-            String _url = request.Url.ToString();
 
-            _url = _url.Replace("http://localhost:" + port + "/", "");
-
-            // Console.WriteLine(_url);
             /*header.Add("Access-Control-Allow-Origin", "*");
-            header.Add("Access-Control-Allow-Methods", "GET,POST");
-            header.Add("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
-            header.Add("Access-Control-Max-Age", "1728000");
             request.Headers.Add(header);*/
 
-            if (get400(_url, context)) {
-            } else if (api_newwindow(_url, context)) {
-            } else if (api_ckeck(_url, context)) {
-            } else if (api_getimg(_url, context)) {
-            } else if (api_getpdf(_url, context)) {
-            } else if (getwww(_url, context)) {
-            } else {
-                get404(_url, context);
+            String _url = request.Url.ToString();
+            _url = _url.Substring($"http://localhost:{port}".Length);
+
+            Dictionary<string, string> dirArgs = new Dictionary<string, string>();
+            int argStart = _url.IndexOf("?");
+            if (argStart != -1) {//如果有「?」，就解析傳入參數 
+                string[] arArgs = _url.Substring(argStart + 1).Split('&');
+                for (int i = 0; i < arArgs.Length; i++) {
+                    string item = arArgs[i];
+                    int ss = item.IndexOf('=');
+                    string key = "";
+                    string val = "";
+                    if (ss != -1) {
+                        key = item.Substring(0, ss);
+                        val = item.Substring(ss + 1);
+                    } else {
+                        key = item;
+                        val = "";
+                    }
+                    if (dirArgs.ContainsKey(key) == false) {
+                        dirArgs[key] = val;
+                    }
+                }
+
+                _url = _url.Substring(0, argStart);//取得「?」前面的文字
             }
 
-            context.Response.KeepAlive = true; // set the KeepAlive bool to false
+            for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由
+                var requestData = new RequestData();
+                requestData.context = context;
+                requestData.url = _url;
+                requestData.args = dirArgs;
+                if (ArRoute[i](requestData) == true) {//如果匹配網址成功，就離開
+                    break;
+                }
+            }
+
+            //context.Response.KeepAlive = true; // set the KeepAlive bool to false
             context.Response.Close(); // close the connection
+        }
+
+
+        /// <summary>
+        /// 註冊一個新的路由
+        /// </summary>
+        /// <param name="_urlFormat">網址匹配規則，無視大小寫，允許在結尾使用「{*}」，表示任何字串</param>
+        /// <param name="_func"></param>
+        public void RouteAddGet(string _urlFormat, Action<RequestData> _func) {
+
+            var func2 = new Func<RequestData, bool>((RequestData requestData) => {
+
+                //規則字串 
+                string pattern = "^" + _urlFormat.Replace("{*}", ".*") + "$"; ;
+                //宣告 Regex 忽略大小寫 
+                Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+
+                if (regex.IsMatch(requestData.url) == true) {
+
+                    if (_urlFormat.IndexOf("{*}") != -1 && requestData.url.Length >= _urlFormat.Length - 3) {
+                        String val = requestData.url.Substring(_urlFormat.Length - 3);
+                        requestData.value = val;
+                    }
+
+                    _func(requestData);
+                    return true;
+                }
+
+                return false;
+
+            });
+
+            ArRoute.Add(func2);
         }
 
 
@@ -146,13 +209,9 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool api_ckeck(String _url, HttpListenerContext context) {
-
-            if (_url.IndexOf("api/check") != 0) { return false; }
-
+        private void api_ckeck(RequestData d) {
             byte[] _responseArray = Encoding.UTF8.GetBytes("tiefsee");
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-            return true;
+            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
         }
 
 
@@ -162,26 +221,17 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool api_newwindow(String _url, HttpListenerContext context) {
+        private void api_newwindow(RequestData d) {
 
-            if (_url.IndexOf("api/newWindow/") != 0) { return false; }
-
-            String _path = _url.Substring(14);
-            _path = _path.Split('?')[0];//去掉?後面的文字
-            _path = Uri.UnescapeDataString(_path);
-
-            string arg = Encoding.UTF8.GetString(Convert.FromBase64String(_path));//將字串剖析回命令列參數
+            string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.value));//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
                 WebWindow.Create($"http://localhost:{port}/www/MainWindow.html", args, null);
             });
 
-            //context.Response.StatusCode = 200;
             byte[] _responseArray = Encoding.UTF8.GetBytes("ok");
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-            return true;
-
+            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
         }
 
 
@@ -191,48 +241,43 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool api_getimg(String _url, HttpListenerContext context) {
-
-            if (_url.IndexOf("api/getimg/") != 0) { return false; }
-
-            String _path = _url.Substring(11);
-            _path = _path.Split('?')[0];//去掉?後面的文字
-            _path = Uri.UnescapeDataString(_path);
+        private void api_getimg(RequestData d) {
 
             //Console.WriteLine("api/getimg/  " + _path);
 
-            if (File.Exists(_path) == false) { return false; }
+            string _path = d.value;
+
+            if (File.Exists(_path) == false) { return; }
 
             using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
-                context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
-                context.Response.ContentLength64 = input.Length;
+                d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
+                d.context.Response.ContentLength64 = input.Length;
 
                 if (isCache == true) {//讓瀏覽器快取檔案
                     string lastModified = File.GetLastWriteTime(_path).ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
-                    context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-                    context.Response.Headers.Add("Cache-Control", "max-age=31536000");
+                    d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
+                    d.context.Response.Headers.Add("Cache-Control", "max-age=31536000");
                 }
 
-                if (context.Request.HttpMethod != "HEAD") {
+                if (d.context.Request.HttpMethod != "HEAD") {
                     byte[] buffer = new byte[1024 * 16];
                     int nbytes;
                     while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
                         //context.Response.SendChunked = input.Length > 1024 * 16;
-                        context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                     }
                 }
                 //context.Response.StatusCode = (int)HttpStatusCode.OK;
                 //context.Response.OutputStream.Flush();
             }
-            return true;
+
             /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
                 byte[] _responseArray = new byte[fs.Length];
                 fs.Read(_responseArray, 0, _responseArray.Length);
                 fs.Close();
                 context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             }*/
-
         }
 
 
@@ -242,41 +287,31 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool api_getpdf(String _url, HttpListenerContext context) {
+        private void api_getpdf(RequestData d) {
 
-            if (_url.IndexOf("api/getpdf/") != 0) { return false; }
+            string _path = d.value;
 
-            String _path = _url.Substring(11);
-            _path = _path.Split('?')[0];//去掉?後面的文字
-            _path = Uri.UnescapeDataString(_path);
-
-            if (File.Exists(_path) == false) { return false; }
+            if (File.Exists(_path) == false) { return; }
 
             using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
-                //context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
-                context.Response.ContentType = "application/pdf";
-                context.Response.ContentLength64 = input.Length;
+                d.context.Response.ContentType = "application/pdf";
+                d.context.Response.ContentLength64 = input.Length;
 
                 if (isCache == true) {//讓瀏覽器快取檔案
                     string lastModified = File.GetLastWriteTime(_path).ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
-                    context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-                    context.Response.Headers.Add("Cache-Control", "max-age=31536000");
+                    d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
+                    d.context.Response.Headers.Add("Cache-Control", "max-age=31536000");
                 }
 
-                if (context.Request.HttpMethod != "HEAD") {
+                if (d.context.Request.HttpMethod != "HEAD") {
                     byte[] buffer = new byte[1024 * 16];
                     int nbytes;
                     while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
-                        //context.Response.SendChunked = input.Length > 1024 * 16;
-                        context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                     }
                 }
-                //context.Response.StatusCode = (int)HttpStatusCode.OK;
-                //context.Response.OutputStream.Flush();
             }
-            return true;
-
         }
 
 
@@ -310,11 +345,10 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool get404(String _url, HttpListenerContext context) {
-            context.Response.StatusCode = 404;
+        private void get404(RequestData d) {
+            d.context.Response.StatusCode = 404;
             byte[] _responseArray = Encoding.UTF8.GetBytes("404");
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-            return true;
+            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
         }
 
 
@@ -324,36 +358,34 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private bool getwww(String _url, HttpListenerContext context) {
+        private void getwww(RequestData d) {
+
+            String exeDir = System.AppDomain.CurrentDomain.BaseDirectory; ;//程式的目錄
 
             String _path;
-            //Console.WriteLine(_url);
-            if (_url.IndexOf("www/") == 0) {
-                _path = System.IO.Path.Combine(exeDir, _url);
+            if (d.value.IndexOf("www/") == 0) {
+                _path = System.IO.Path.Combine(exeDir, d.value);
             } else {
-                _path = System.IO.Path.Combine(exeDir, "www", _url);
+                _path = System.IO.Path.Combine(exeDir, "www", d.value);
             }
 
-            _path = _path.Split('?')[0];//去掉?後面的文字
-            if (File.Exists(_path) == false) { return false; }
-
-            //Console.WriteLine("file");
-            /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
-                byte[] _responseArray = new byte[fs.Length];
-                fs.Read(_responseArray, 0, _responseArray.Length);
-                fs.Close();
-                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-            }*/
+            //如果檔案不存在就返回404錯誤
+            if (File.Exists(_path) == false) {
+                d.context.Response.StatusCode = 404;
+                byte[] _responseArray = Encoding.UTF8.GetBytes("404");
+                d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+                return;
+            }
 
             using (Stream input = new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
-                context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
-                context.Response.ContentLength64 = input.Length;
+                d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
+                d.context.Response.ContentLength64 = input.Length;
 
                 if (isCache == true) {//讓瀏覽器快取檔案
                     string lastModified = File.GetLastWriteTime(_path).ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
-                    context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-                    context.Response.Headers.Add("Cache-Control", "max-age=31536000");
+                    d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
+                    d.context.Response.Headers.Add("Cache-Control", "max-age=31536000");
                 }
 
                 /*context.Response.Headers.Add("ETag", @"W/""2d49-17e45f9a21e""");//
@@ -366,19 +398,18 @@ namespace Tiefsee {
                     context.Response.StatusCode = (int)HttpStatusCode.NotModified;
                 }*/
 
-                if (context.Request.HttpMethod != "HEAD") {
+                if (d.context.Request.HttpMethod != "HEAD") {
                     byte[] buffer = new byte[1024 * 16];
                     int nbytes;
                     while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
                         //context.Response.SendChunked = input.Length > 1024 * 16;
-                        context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                     }
                 }
 
-                context.Response.OutputStream.Flush();
+                d.context.Response.OutputStream.Flush();
             }
 
-            return true;
         }
 
 
@@ -443,5 +474,16 @@ namespace Tiefsee {
 
 
 
+    }
+
+
+    /// <summary>
+    /// 路由用的資料
+    /// </summary>
+    public class RequestData {
+        public string url = "";
+        public string value = "";//取得網址結尾「{*}」實際的字串
+        public Dictionary<string, string> args = new Dictionary<string, string>();//「?」後面的參數
+        public HttpListenerContext context;
     }
 }
