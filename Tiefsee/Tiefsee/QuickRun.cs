@@ -173,7 +173,7 @@ namespace Tiefsee {
             var cm = new System.Windows.Forms.ContextMenu();//右鍵選單
 
             cm.MenuItems.Add("New", new EventHandler((sender2, e2) => {
-                String _url = $"http://localhost:{Program.bserver.port}/www/MainWindow.html";
+                String _url = $"http://localhost:{Program.webServer.port}/www/MainWindow.html";
                 WebWindow.Create(_url, new string[0], null);
             }));
 
@@ -185,7 +185,7 @@ namespace Tiefsee {
             nIcon.ContextMenu = cm;
 
             nIcon.DoubleClick += (sender, e) => {
-                String _url = $"http://localhost:{Program.bserver.port}/www/MainWindow.html";
+                String _url = $"http://localhost:{Program.webServer.port}/www/MainWindow.html";
                 WebWindow.Create(_url, new string[0], null);
             };
 

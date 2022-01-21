@@ -39,7 +39,7 @@ namespace Tiefsee {
             Program.startType = startType;
             Program.serverCache = serverCache;
 
-            Program.bserver.SetIsCache(serverCache);
+            Program.webServer.controller.SetIsCache(serverCache);
         }
 
 

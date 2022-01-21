@@ -214,7 +214,7 @@ namespace Tiefsee {
                 tempWindow.isDelayInit = true;
                 tempWindow.Init();
                 tempWindow.args = new string[0] { };
-                tempWindow.wv2.Source = new Uri($"http://localhost:{Program.bserver.port}/www/MainWindow.html");
+                tempWindow.wv2.Source = new Uri($"http://localhost:{Program.webServer.port}/www/MainWindow.html");
             });
 
             return temp2;//回傳剛剛新建的window
@@ -371,7 +371,7 @@ namespace Tiefsee {
             appInfo.serverCache = Program.serverCache;        
             appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
             appInfo.appDataPath = Program.appDataPath;
-            appInfo.mainPort = Program.bserver.port;
+            appInfo.mainPort = Program.webServer.port;
             appInfo.settingPath = Path.Combine(Program.appDataPath, "setting.json");
 
             if (File.Exists(appInfo.settingPath)) {

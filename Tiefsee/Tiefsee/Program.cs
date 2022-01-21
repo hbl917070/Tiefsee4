@@ -14,7 +14,7 @@ namespace Tiefsee {
         public static int startPort;//程式開始的port
         public static int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
         public static int serverCache;//伺服器對靜態資源使用快取 0=不使用 1=使用 
-        public static BaseServer bserver;//本地伺服器
+        public static WebServer webServer;//本地伺服器
 
         /// <summary>
         /// 應用程式的主要進入點。
@@ -36,15 +36,15 @@ namespace Tiefsee {
             if (QuickRun.Check(args)) { return; }
 
             //在本地端建立server
-            bserver = new BaseServer();
-            String _url = $"http://localhost:{bserver.port}/www/MainWindow.html";
-            bserver.SetIsCache(serverCache);
+            webServer = new WebServer();
+            String _url = $"http://localhost:{webServer.port}/www/MainWindow.html";
+            webServer.controller.SetIsCache(serverCache);
 
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             WebWindow.Create(_url, args, null);
-            StartWindow startWindow = QuickRun.PortCreat(bserver.port);// 寫入檔案，表示此post已經被佔用
+            StartWindow startWindow = QuickRun.PortCreat(webServer.port);// 寫入檔案，表示此post已經被佔用
             Application.Run(startWindow);
 
         }

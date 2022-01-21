@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapter.cs" />
-    <Compile Include="BaseServer.cs" />
+    <Compile Include="WebServer.cs" />
     <Compile Include="IconHandler.cs" />
     <Compile Include="IniManager.cs" />
     <Compile Include="LnkToExe.cs" />
@@ -129,6 +129,7 @@
     <Compile Include="VW\WV_System.cs" />
     <Compile Include="VW\WV_T.cs" />
     <Compile Include="VW\WV_Window.cs" />
+    <Compile Include="WebServerController.cs" />
     <Compile Include="WebWindow.cs">
       <SubType>Component</SubType>
     </Compile>
