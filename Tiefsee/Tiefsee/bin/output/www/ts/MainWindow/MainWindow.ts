@@ -78,8 +78,6 @@ class MainWindow {
          */
         baseWindow.onCreate = async (json: AppInfo) => {
 
-
-
             //document.body.style.opacity = "0";
 
             if (firstRun === true) { //首次開啟視窗
@@ -130,10 +128,7 @@ class MainWindow {
                 }
 
                 //document.body.style.opacity = "1";
-
                 //await sleep(100);
-
-
 
 
                 new InitMenu(this);
@@ -174,7 +169,6 @@ class MainWindow {
                 } else {
                     fileLoad.loadFiles(args[0], args);//載入多張圖片
                 }
-
 
             }
 
@@ -369,7 +363,7 @@ class MainWindow {
          */
         function applySetting(setting: any) {
 
-            var cssRoot = document.documentElement;
+            var cssRoot = document.body;
 
             //@ts-ignore
             config.settings = setting;

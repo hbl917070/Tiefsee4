@@ -91,7 +91,6 @@
 /*右上角的 X */
 .msgbox-close {
   position: absolute;
-  background-color: var(--color-blue10);
   width: 30px;
   height: 30px;
   display: flex;
@@ -122,4 +121,22 @@
   background-color: var(--color-blue);
   position: absolute;
   transform: rotate(45deg);
+}
+
+/* radio */
+.msgbox-radioList {
+  margin-bottom: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.msgbox-radio {
+  display: block;
+  min-height: 30px;
+  display:flex;
+  align-items: center;
+}
+.msgbox-radio:hover {
+  cursor: pointer;
+  background-color: var(--color-white10)
 }

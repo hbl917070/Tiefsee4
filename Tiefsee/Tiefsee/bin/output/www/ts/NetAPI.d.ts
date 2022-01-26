@@ -74,10 +74,10 @@ interface WV_Window {
     SetAERO(): void;
 
     /** 設定縮放倍率，預設 1.0 */
-    SetZoomFactor(d:number): void;
+    SetZoomFactor(d: number): void;
 
     /** 取得碩放倍率 */
-    GetZoomFactor():number;
+    GetZoomFactor(): number;
 
     /** 設定視窗最小size */
     SetMinimumSize(width: number, height: number): void;
@@ -160,7 +160,7 @@ interface WV_Directory {
     GetParent(path: string);
 
     /** 刪除資料夾(包含子目錄與檔案) */
-    Delete(path: string);
+    Delete(path: string): bool;
 
     /** 移動檔案或目錄和其內容到新位置 */
     Move(sourceDirName: string, destDirName: string);
@@ -173,6 +173,9 @@ interface WV_Directory {
 }
 
 interface WV_File {
+
+    /** 檔案移到資源回收桶 */
+    MoveToRecycle(path: string): bool;
 
     /** 在檔案總管顯示檔案 */
     ShowOnExplorer(path: string): void;
@@ -214,7 +217,7 @@ interface WV_File {
     Exists(path: string): bool;
 
     /** 刪除檔案 */
-    Delete(path: string);
+    Delete(path: string): bool;
 
     /** 移動檔案到新位置 */
     Move(sourceDirName: string, destDirName: string);

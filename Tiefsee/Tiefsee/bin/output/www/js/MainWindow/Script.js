@@ -44,6 +44,10 @@ class ScriptFileLoad {
     next() {
         this.M.fileLoad.next();
     }
+    /** 顯式刪除檔案的對話方塊 */
+    deleteMsg() {
+        this.M.fileLoad.deleteMsg();
+    }
 }
 class ScriptFileShow {
     constructor(_M) {

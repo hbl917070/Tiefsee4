@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,6 +38,26 @@ namespace Tiefsee {
 
         public WV_File(WebWindow m) {
             this.M = m;
+        }
+
+        /// <summary>
+        /// 檔案移到資源回收桶
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool MoveToRecycle(string path) {
+            if (File.Exists(path) == false) { return false; }
+
+            try {
+                FileSystem.DeleteFile(
+                    path,
+                    UIOption.OnlyErrorDialogs,
+                    RecycleOption.SendToRecycleBin
+                );
+            } catch (Exception) {
+                return false;
+            }
+            return true;
         }
 
 
@@ -255,8 +276,14 @@ namespace Tiefsee {
         /// 刪除檔案
         /// </summary>
         /// <param name="path"></param>
-        public void Delete(string path) {
-            File.Delete(path);
+        public bool Delete(string path) {
+            if (File.Exists(path) == false) { return false; }
+            try {
+                File.Delete(path);
+            } catch (Exception) {
+                return false;
+            }
+            return true;
         }
 
 

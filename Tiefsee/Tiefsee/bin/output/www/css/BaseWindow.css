@@ -57,8 +57,8 @@ input,
 textarea,
 button {
   font-family: "Segoe UI", "Microsoft JhengHei UI";
-  font-weight: 100;
-  /* font-family: "Noto Sans TC", "Microsoft JhengHei"; */
+  /* font-weight: 100; */
+  /* font-family: "Noto Sans TC","Noto Sans CJK TC Light" ; */
 }
 
 select option {
