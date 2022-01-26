@@ -306,7 +306,7 @@ class MainWindow {
          * @param setting
          */
         function applySetting(setting) {
-            var cssRoot = document.documentElement;
+            var cssRoot = document.body;
             //@ts-ignore
             config.settings = setting;
             //-----------

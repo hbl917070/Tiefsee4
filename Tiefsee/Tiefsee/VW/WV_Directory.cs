@@ -81,8 +81,14 @@ namespace Tiefsee {
         /// 刪除資料夾(包含子目錄與檔案)
         /// </summary>
         /// <param name="path"></param>
-        public void Delete(string path) {
-            Directory.Delete(path, true);
+        public bool Delete(string path) {   
+            if (Directory.Exists(path) == false) { return false; }
+            try {
+                Directory.Delete(path, true);
+            } catch (Exception) {
+                return false;
+            }
+            return true;
         }
 
 

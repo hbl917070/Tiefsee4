@@ -28,6 +28,7 @@ class FileLoad {
         this.getGroupType = getGroupType;
         this.setGroupType = setGroupType;
         this.getFileLoadType = getFileLoadType;
+        this.deleteMsg = deleteMsg;
         /**
          * 載入檔案陣列
          * @param dirPath
@@ -135,16 +136,26 @@ class FileLoad {
                 if (_flag !== undefined) {
                     flag = _flag;
                 }
-                let path = getFilePath();
-                let fileInfo2 = yield Lib.GetFileInfo2(path);
-                //console.log(Lib.GetFileType(fileInfo2))
-                if (fileInfo2.Type == "none") {
+                if (flag < 0) {
+                    flag = 0;
+                }
+                if (flag >= arWaitingList.length) {
+                    flag = arWaitingList.length - 1;
+                }
+                if (arWaitingList.length === 0) { //如果資料夾裡面沒有圖片
                     M.fileShow.openWelcome();
                     return;
                 }
-                //如果是自定名單，就根據檔案類型判斷要用什麼方式顯示檔案
-                if (fileLoadType === FileLoadType.userDefined) {
-                    groupType = fileToGroupType(fileInfo2);
+                let path = getFilePath();
+                let fileInfo2 = yield Lib.GetFileInfo2(path);
+                //console.log(Lib.GetFileType(fileInfo2))
+                if (fileInfo2.Type === "none") { //如果檔案不存在
+                    arWaitingList.splice(flag, 1); //刪除此筆
+                    show(flag);
+                    return;
+                }
+                if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
+                    groupType = fileToGroupType(fileInfo2); //根據檔案類型判斷要用什麼方式顯示檔案
                 }
                 if (groupType === GroupType.img || groupType === GroupType.unknown) {
                     M.fileShow.openImage(fileInfo2);
@@ -254,6 +265,38 @@ class FileLoad {
                     });
                 }
                 return [];
+            });
+        }
+        /**
+         * 顯式刪除檔案的對話方塊
+         */
+        function deleteMsg() {
+            return __awaiter(this, void 0, void 0, function* () {
+                let path = getFilePath();
+                Msgbox.show({
+                    type: "radio",
+                    txt: "刪除檔案" + "<br>" + Lib.GetFileName(path),
+                    arRadio: [
+                        { value: "1", name: "移至資源回收桶" },
+                        { value: "2", name: "永久刪除檔案" },
+                    ],
+                    radioValue: "1",
+                    funcYes: (dom, value) => __awaiter(this, void 0, void 0, function* () {
+                        Msgbox.close(dom);
+                        let state = true;
+                        if (value == "1") {
+                            state = yield WV_File.MoveToRecycle(path);
+                        }
+                        if (value == "2") {
+                            state = yield WV_File.Delete(path);
+                        }
+                        show();
+                        if (state === false) {
+                            Msgbox.show({ txt: "刪除失敗" });
+                        }
+                        //alert(value)
+                    })
+                });
             });
         }
     }

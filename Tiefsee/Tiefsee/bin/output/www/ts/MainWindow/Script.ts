@@ -56,6 +56,11 @@ class ScriptFileLoad {
     public next() {
         this.M.fileLoad.next()
     }
+
+    /** 顯式刪除檔案的對話方塊 */
+    public deleteMsg(){
+        this.M.fileLoad.deleteMsg()
+    }
 }
 
 class ScriptFileShow {
@@ -81,7 +86,6 @@ class ScriptFile {
     /** 顯示檔案原生右鍵選單 */
     public ShowContextMenu() {
         WV_File.ShowContextMenu(this.M.fileLoad.getFilePath(), true);
-
     }
 }
 

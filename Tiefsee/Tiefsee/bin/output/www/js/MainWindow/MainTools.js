@@ -74,16 +74,16 @@ class MainTools {
                 },
             });
             //刪除
-            /*addToolsBtn({
+            addToolsBtn({
                 group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-delete.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-
+                        M.script.fileLoad.deleteMsg();
                     });
                 },
-            });*/
+            });
             //搜圖
             /*addToolsBtn({
                 group: GroupType.img,

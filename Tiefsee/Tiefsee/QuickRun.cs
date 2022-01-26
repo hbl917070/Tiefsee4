@@ -68,9 +68,8 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
-        /// 快速開啟。染回true表示結束程式
+        /// 快速開啟。回傳true表示結束程式
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
@@ -88,10 +87,10 @@ namespace Tiefsee {
                 return false;
             }
 
-            foreach (String item in Directory.GetFiles(portDir, "*")) {//判斷目前已經開啟的視窗
+            foreach (String filePort in Directory.GetFiles(portDir, "*")) {//判斷目前已經開啟的視窗
                 try {
 
-                    string port = Path.GetFileName(item);
+                    string port = Path.GetFileName(filePort);
 
                     //偵測是否可用
                     String uri = $"http://localhost:{port}/api/check";
@@ -125,6 +124,9 @@ namespace Tiefsee {
                         return true;
                     }
                 } catch { }
+
+                File.Delete(filePort);//如果這個port超過時間沒有回應，就當做無法使用，將檔案刪除
+
             }//foreach
 
 
