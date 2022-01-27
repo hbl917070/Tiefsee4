@@ -57,7 +57,7 @@ class InitMenu {
             if (dom_ShowSystemMenu !== null) {
                 dom_ShowSystemMenu.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.fileLoad.renameMsg();        
+                    M.script.fileLoad.renameMsg();
                 }
             }
 
@@ -175,10 +175,7 @@ class InitMenu {
             if (dom_copyFile !== null) {
                 dom_copyFile.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_File(filePath);
+                    M.script.copy.copyFile();
                 }
             }
 
@@ -187,11 +184,7 @@ class InitMenu {
             if (dom_copyName !== null) {
                 dom_copyName.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    let name = Lib.GetFileName(filePath)
-                    WV_System.SetClipboard_Txt(name);
+                    M.script.copy.copyName();         
                 }
             }
 
@@ -200,10 +193,7 @@ class InitMenu {
             if (dom_copyPath !== null) {
                 dom_copyPath.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_Txt(filePath);
+                    M.script.copy.copyPath();
                 }
             }
 
@@ -212,11 +202,7 @@ class InitMenu {
             if (dom_copyImg !== null) {
                 dom_copyImg.onclick = async () => {
                     M.menu.close();//關閉menu
-
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_FileToImg(filePath);
+                    M.script.copy.copyImg();                
                 }
             }
 
@@ -224,12 +210,8 @@ class InitMenu {
             var dom_copyBase64 = document.getElementById("menuitem-img-copyBase64");
             if (dom_copyBase64 !== null) {
                 dom_copyBase64.onclick = async () => {
-                    M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_FileToBase64(filePath);
-
+                    M.menu.close();//關閉menu      
+                    M.script.copy.copyBase64();  
                 }
             }
 
@@ -238,11 +220,7 @@ class InitMenu {
             if (dom_copyPng !== null) {
                 dom_copyPng.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_FileToPng(filePath);
-
+                    M.script.copy.copyPng();  
                 }
             }
 
@@ -251,10 +229,7 @@ class InitMenu {
             if (dom_copyTxt !== null) {
                 dom_copyTxt.onclick = async () => {
                     M.menu.close();//關閉menu
-                    let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
-                    if (await WV_File.Exists(filePath) === false) { return; }
-
-                    WV_System.SetClipboard_FileToTxt(filePath);
+                    M.script.copy.copyTxt();  
                 }
             }
 
@@ -271,7 +246,7 @@ class InitMenu {
             if (dom_rotateCw !== null) {
                 dom_rotateCw.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.fileShow.tieefseeview.setDegForward(undefined, undefined);
+                    M.script.img.degForward();
                 }
             }
 
@@ -280,7 +255,7 @@ class InitMenu {
             if (dom_rotateCcw !== null) {
                 dom_rotateCcw.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
+                    M.script.img.degReverse();
                 }
             }
 
@@ -289,7 +264,7 @@ class InitMenu {
             if (dom_mirroringH !== null) {
                 dom_mirroringH.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.fileShow.tieefseeview.setMirrorHorizontal(!M.fileShow.tieefseeview.getMirrorHorizontal());
+                    M.script.img.mirrorHorizontal();
                 }
             }
 
@@ -298,7 +273,7 @@ class InitMenu {
             if (dom_mirroringV !== null) {
                 dom_mirroringV.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.fileShow.tieefseeview.setMirrorVertica(!M.fileShow.tieefseeview.getMirrorVertica());
+                    M.script.img.mirrorVertica();
                 }
             }
 
@@ -307,7 +282,7 @@ class InitMenu {
             if (dom_initRotate !== null) {
                 dom_initRotate.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.fileShow.tieefseeview.transformRefresh(true);
+                    M.script.img.transformRefresh();
                 }
             }
         }

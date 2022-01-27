@@ -8,7 +8,8 @@ class Script {
     public file: ScriptFile;
     public menu: ScriptMenu;
     public open: ScriptOpen;
-    public steting: ScriptSteting;
+    public copy: ScriptCopy;
+    public setting: ScriptSetting;
 
     constructor(M: MainWindow) {
 
@@ -18,7 +19,8 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
-        this.steting = new ScriptSteting(M);
+        this.copy = new ScriptCopy(M);
+        this.setting = new ScriptSetting(M);
     }
 
 }
@@ -39,6 +41,48 @@ class ScriptImg {
     public zoom100() {
         this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['100%']);
     }
+
+    /** 順時針90° */
+    public degForward() {
+        this.M.fileShow.tieefseeview.setDegForward(undefined, undefined);
+    }
+
+    /** 逆時針90° */
+    public degReverse() {
+        this.M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
+    }
+
+    /** 水平鏡像 */
+    public mirrorHorizontal() {
+        this.M.fileShow.tieefseeview.setMirrorHorizontal(!this.M.fileShow.tieefseeview.getMirrorHorizontal());
+    }
+
+    /** 垂直鏡像 */
+    public mirrorVertica() {
+        this.M.fileShow.tieefseeview.setMirrorVertica(!this.M.fileShow.tieefseeview.getMirrorVertica())
+    }
+
+    /** 初始化旋轉 */
+    public transformRefresh() {
+        this.M.fileShow.tieefseeview.transformRefresh(true);
+    }
+
+    /** 放大 */
+    public zoomIn() {
+        this.M.fileShow.tieefseeview.zoomIn();
+    }
+
+    /** 縮小 */
+    public zoomOut() {
+        this.M.fileShow.tieefseeview.zoomOut();
+    }
+
+    /** 向特定方向移動圖片 */
+    public move(type: "up" | "right" | "down" | "left", distance?: number) {
+        this.M.fileShow.tieefseeview.move(type, distance);
+    }
+
+
 }
 
 class ScriptFileLoad {
@@ -195,7 +239,73 @@ class ScriptOpen {
 }
 
 
-class ScriptSteting {
+class ScriptCopy {
+
+    M: MainWindow;
+    constructor(_M: MainWindow) {
+        this.M = _M;
+    }
+
+    /** 複製 檔案 */
+    public async copyFile() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_File(filePath);
+    }
+
+    /** 複製 檔名 */
+    public async copyName() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        let name = Lib.GetFileName(filePath)
+        WV_System.SetClipboard_Txt(name);
+    }
+
+    /** 複製 完整路徑 */
+    public async copyPath() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_Txt(filePath);
+    }
+
+    /** 複製 影像 */
+    public async copyImg() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_FileToImg(filePath);
+    }
+
+    /** 複製 base64  */
+    public async copyBase64() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_FileToBase64(filePath);
+    }
+
+    /** 複製 影像(含透明色) */
+    public async copyPng() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_FileToPng(filePath);
+    }
+
+    /** 複製 SVG 文字 */
+    public async copyTxt() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+
+        WV_System.SetClipboard_FileToTxt(filePath);
+    }
+}
+
+
+class ScriptSetting {
 
     M: MainWindow;
     constructor(_M: MainWindow) {

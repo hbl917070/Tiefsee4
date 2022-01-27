@@ -113,7 +113,7 @@ class MainTools {
                 icon: "/img/default/tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.steting.OpenSetting();
+                        M.script.setting.OpenSetting();
                     });
                 },
             });
@@ -260,7 +260,7 @@ class MainTools {
                 icon: "/img/default/tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.steting.OpenSetting();
+                        M.script.setting.OpenSetting();
                     });
                 },
             });
@@ -360,7 +360,7 @@ class MainTools {
                 icon: "/img/default/tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.steting.OpenSetting();
+                        M.script.setting.OpenSetting();
                     });
                 },
             });
@@ -409,7 +409,7 @@ class MainTools {
                 icon: "/img/default/tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M.script.steting.OpenSetting();
+                        M.script.setting.OpenSetting();
                     });
                 },
             });

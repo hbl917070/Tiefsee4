@@ -30,6 +30,7 @@ class MainWindow {
         this.script = script;
         this.readSetting = applySetting;
         new MainTools(this);
+        new Hotkey(this);
         init();
         //WV_Window.ShowWindow();//顯示視窗 
         //視窗改變大小時觸發
@@ -157,9 +158,9 @@ class MainWindow {
                 });
                 //關閉視窗前觸發
                 baseWindow.closingEvents.push(() => __awaiter(this, void 0, void 0, function* () {
-                    if (script.steting.temp_setting != null) { //如果有開啟 設定視窗
-                        if ((yield script.steting.temp_setting.Visible) === true) {
-                            yield script.steting.temp_setting.RunJs("setting.saveData();"); //關閉前先儲存設定
+                    if (script.setting.temp_setting != null) { //如果有開啟 設定視窗
+                        if ((yield script.setting.temp_setting.Visible) === true) {
+                            yield script.setting.temp_setting.RunJs("setting.saveData();"); //關閉前先儲存設定
                             yield sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
                         }
                     }
@@ -262,7 +263,7 @@ class MainWindow {
                 }));
                 window.addEventListener("dragenter", dragenter, false);
                 window.addEventListener("dragover", dragover, false);
-                window.addEventListener('drop', drop, false);
+                window.addEventListener("drop", drop, false);
                 function dragenter(e) {
                     e.stopPropagation();
                     e.preventDefault();

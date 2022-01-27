@@ -95,11 +95,11 @@ class Msgbox {
             donBtnNo.style.display = "none";
         }
         if (isShowBtn === false) {
-            donBottom.style.display = "none";
-        } //不顯示按鈕
+            donBottom.style.display = "none"; //不顯示按鈕
+        }
         if (type !== "text") {
-            donInput.style.display = "none";
-        } //沒有輸入框
+            donInput.style.display = "none"; //隱藏輸入框
+        }
         donInput.value = inputTxt;
         donBtnClose.addEventListener("click", () => { this.close(dom); });
         donBtnNo.addEventListener("click", () => { this.close(dom); });
@@ -118,8 +118,17 @@ class Msgbox {
             funcYes(dom, value);
         });
         document.body.appendChild(dom);
+        if (type === "text") {
+            donInput.focus(); //取得焦點
+            donInput.select();
+        }
         //setRadio(``, radioValue);
-        return dom;
+        //return dom;
+        return {
+            domMsg: dom,
+            domInput: donInput,
+            close: () => { this.close(dom); }
+        };
     }
     /**
      * 關閉特定的訊息方塊
@@ -150,6 +159,33 @@ class Msgbox {
             (_a = dom.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(dom);
         }
         this._isShow = false;
+    }
+    /**
+    * 當前的Msg 關閉
+    */
+    static closeNow() {
+        var _a;
+        let arMsgbox = document.querySelectorAll(".msgbox");
+        if (arMsgbox.length === 0) {
+            return;
+        }
+        if (arMsgbox.length === 1) {
+            this._isShow = false;
+        }
+        const dom = arMsgbox[arMsgbox.length - 1];
+        (_a = dom.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(dom);
+    }
+    /**
+     * 當前的Msg 按下
+     */
+    static clickYes() {
+        let arMsgbox = document.querySelectorAll(".msgbox");
+        if (arMsgbox.length === 0) {
+            return;
+        }
+        const dom = arMsgbox[arMsgbox.length - 1];
+        const btnYes = dom.querySelector(".msgbox-btn__yes");
+        btnYes.click();
     }
 }
 Msgbox._isShow = false;

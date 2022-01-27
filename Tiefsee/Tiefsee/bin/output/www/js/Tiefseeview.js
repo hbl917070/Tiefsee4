@@ -119,6 +119,10 @@ class Tieefseeview {
         this.setMirrorHorizontal = setMirrorHorizontal;
         this.getMirrorVertica = getMirrorVertica;
         this.setMirrorVertica = setMirrorVertica;
+        this.getXY = getXY;
+        this.setXY = setXY;
+        this.move = move;
+        this.init_point = init_point;
         this.transformRefresh = transformRefresh;
         this.setAlign = setAlign;
         this.zoomOut = zoomOut;
@@ -1465,6 +1469,15 @@ class Tieefseeview {
             });
         }
         /**
+         * 取得 圖片的坐標
+         */
+        function getXY() {
+            return {
+                x: toNumber(dom_con.style.left),
+                y: toNumber(dom_con.style.top)
+            };
+        }
+        /**
          * 設定 圖片的坐標
          * @param _left
          * @param _top
@@ -1514,6 +1527,27 @@ class Tieefseeview {
             });
         }
         /**
+         * 向特定方向移動圖片
+         * @param type 移動方向
+         * @param distance 移動距離
+         */
+        function move(type, distance = 100) {
+            const point = getXY();
+            if (type === "up") {
+                setXY(point.x, point.y + distance, 0);
+            }
+            if (type === "down") {
+                setXY(point.x, point.y - distance, 0);
+            }
+            if (type === "right") {
+                setXY(point.x + distance, point.y, 0);
+            }
+            if (type === "left") {
+                setXY(point.x - distance, point.y, 0);
+            }
+            init_point(false);
+        }
+        /**
          * 旋轉跟鏡像初始化
          * @param boolAnimation 是否使用動畫
          */
@@ -1526,12 +1560,6 @@ class Tieefseeview {
                     yield setMirrorHorizontal(false);
                 }
                 yield setDeg(0, undefined, undefined, boolAnimation);
-                /*degNow = 0;
-                mirrorVertical = false;
-                mirrorHorizontal = false;
-                eventChangeMirror(mirrorHorizontal, mirrorVertical);
-                eventChangeDeg(degNow);
-                await setTransform(undefined, undefined, boolAnimation);*/
             });
         }
         /**

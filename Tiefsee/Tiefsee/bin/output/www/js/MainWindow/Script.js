@@ -16,7 +16,8 @@ class Script {
         this.file = new ScriptFile(M);
         this.menu = new ScriptMenu(M);
         this.open = new ScriptOpen(M);
-        this.steting = new ScriptSteting(M);
+        this.copy = new ScriptCopy(M);
+        this.setting = new ScriptSetting(M);
     }
 }
 class ScriptImg {
@@ -30,6 +31,38 @@ class ScriptImg {
     /** 原始大小 */
     zoom100() {
         this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['100%']);
+    }
+    /** 順時針90° */
+    degForward() {
+        this.M.fileShow.tieefseeview.setDegForward(undefined, undefined);
+    }
+    /** 逆時針90° */
+    degReverse() {
+        this.M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
+    }
+    /** 水平鏡像 */
+    mirrorHorizontal() {
+        this.M.fileShow.tieefseeview.setMirrorHorizontal(!this.M.fileShow.tieefseeview.getMirrorHorizontal());
+    }
+    /** 垂直鏡像 */
+    mirrorVertica() {
+        this.M.fileShow.tieefseeview.setMirrorVertica(!this.M.fileShow.tieefseeview.getMirrorVertica());
+    }
+    /** 初始化旋轉 */
+    transformRefresh() {
+        this.M.fileShow.tieefseeview.transformRefresh(true);
+    }
+    /** 放大 */
+    zoomIn() {
+        this.M.fileShow.tieefseeview.zoomIn();
+    }
+    /** 縮小 */
+    zoomOut() {
+        this.M.fileShow.tieefseeview.zoomOut();
+    }
+    /** 向特定方向移動圖片 */
+    move(type, distance) {
+        this.M.fileShow.tieefseeview.move(type, distance);
     }
 }
 class ScriptFileLoad {
@@ -183,7 +216,83 @@ class ScriptOpen {
         });
     }
 }
-class ScriptSteting {
+class ScriptCopy {
+    constructor(_M) {
+        this.M = _M;
+    }
+    /** 複製 檔案 */
+    copyFile() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_File(filePath);
+        });
+    }
+    /** 複製 檔名 */
+    copyName() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            let name = Lib.GetFileName(filePath);
+            WV_System.SetClipboard_Txt(name);
+        });
+    }
+    /** 複製 完整路徑 */
+    copyPath() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_Txt(filePath);
+        });
+    }
+    /** 複製 影像 */
+    copyImg() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_FileToImg(filePath);
+        });
+    }
+    /** 複製 base64  */
+    copyBase64() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_FileToBase64(filePath);
+        });
+    }
+    /** 複製 影像(含透明色) */
+    copyPng() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_FileToPng(filePath);
+        });
+    }
+    /** 複製 SVG 文字 */
+    copyTxt() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            if ((yield WV_File.Exists(filePath)) === false) {
+                return;
+            }
+            WV_System.SetClipboard_FileToTxt(filePath);
+        });
+    }
+}
+class ScriptSetting {
     constructor(_M) {
         this.temp_setting = null; //用於判斷視窗是否已經開啟
         this.M = _M;

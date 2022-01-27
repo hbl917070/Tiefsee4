@@ -39,6 +39,10 @@ class Tieefseeview {
     public setMirrorHorizontal;
     public getMirrorVertica;//取得 垂直鏡像
     public setMirrorVertica;
+    public getXY;//取得 圖片坐標
+    public setXY;
+    public move;//向特定方向移動
+    public init_point;//初始化坐標(避免超出範圍)
     public transformRefresh;//旋轉跟鏡像初始化
     public setAlign;//圖片對齊
     public getRendering;//取得渲染模式
@@ -178,6 +182,10 @@ class Tieefseeview {
         this.setMirrorHorizontal = setMirrorHorizontal;
         this.getMirrorVertica = getMirrorVertica;
         this.setMirrorVertica = setMirrorVertica;
+        this.getXY = getXY;
+        this.setXY = setXY;
+        this.move = move;
+        this.init_point = init_point;
         this.transformRefresh = transformRefresh;
         this.setAlign = setAlign;
         this.zoomOut = zoomOut;
@@ -1655,6 +1663,16 @@ class Tieefseeview {
             await setTransform(_x, _y, isAnimation);
         }
 
+
+        /**
+         * 取得 圖片的坐標
+         */
+        function getXY() {
+            return {
+                x: toNumber(dom_con.style.left),
+                y: toNumber(dom_con.style.top)
+            };
+        }
         /**
          * 設定 圖片的坐標
          * @param _left 
@@ -1709,6 +1727,31 @@ class Tieefseeview {
 
 
         /**
+         * 向特定方向移動圖片
+         * @param type 移動方向
+         * @param distance 移動距離
+         */
+        function move(type: ("up" | "right" | "down" | "left"), distance: number = 100) {
+
+            const point = getXY();
+
+            if (type === "up") {
+                setXY(point.x, point.y + distance, 0);
+            }
+            if (type === "down") {
+                setXY(point.x, point.y - distance, 0);
+            }
+            if (type === "right") {
+                setXY(point.x + distance, point.y, 0);
+            }
+            if (type === "left") {
+                setXY(point.x - distance, point.y, 0);
+            }
+            init_point(false);
+        }
+
+
+        /**
          * 旋轉跟鏡像初始化
          * @param boolAnimation 是否使用動畫
          */
@@ -1721,13 +1764,6 @@ class Tieefseeview {
                 await setMirrorHorizontal(false);
             }
             await setDeg(0, undefined, undefined, boolAnimation);
-
-            /*degNow = 0;
-            mirrorVertical = false;
-            mirrorHorizontal = false;
-            eventChangeMirror(mirrorHorizontal, mirrorVertical);
-            eventChangeDeg(degNow);
-            await setTransform(undefined, undefined, boolAnimation);*/
         }
 
         /**

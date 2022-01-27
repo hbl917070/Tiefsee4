@@ -160,11 +160,7 @@ class InitMenu {
                 if (dom_copyFile !== null) {
                     dom_copyFile.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_File(filePath);
+                        M.script.copy.copyFile();
                     });
                 }
                 //複製 檔名
@@ -172,12 +168,7 @@ class InitMenu {
                 if (dom_copyName !== null) {
                     dom_copyName.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        let name = Lib.GetFileName(filePath);
-                        WV_System.SetClipboard_Txt(name);
+                        M.script.copy.copyName();
                     });
                 }
                 //複製 完整路徑
@@ -185,11 +176,7 @@ class InitMenu {
                 if (dom_copyPath !== null) {
                     dom_copyPath.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_Txt(filePath);
+                        M.script.copy.copyPath();
                     });
                 }
                 //複製 影像
@@ -197,23 +184,15 @@ class InitMenu {
                 if (dom_copyImg !== null) {
                     dom_copyImg.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_FileToImg(filePath);
+                        M.script.copy.copyImg();
                     });
                 }
                 //複製 base64
                 var dom_copyBase64 = document.getElementById("menuitem-img-copyBase64");
                 if (dom_copyBase64 !== null) {
                     dom_copyBase64.onclick = () => __awaiter(this, void 0, void 0, function* () {
-                        M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_FileToBase64(filePath);
+                        M.menu.close(); //關閉menu      
+                        M.script.copy.copyBase64();
                     });
                 }
                 //複製 影像(含透明色)
@@ -221,11 +200,7 @@ class InitMenu {
                 if (dom_copyPng !== null) {
                     dom_copyPng.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_FileToPng(filePath);
+                        M.script.copy.copyPng();
                     });
                 }
                 //複製 SVG 文字
@@ -233,11 +208,7 @@ class InitMenu {
                 if (dom_copyTxt !== null) {
                     dom_copyTxt.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
-                        if ((yield WV_File.Exists(filePath)) === false) {
-                            return;
-                        }
-                        WV_System.SetClipboard_FileToTxt(filePath);
+                        M.script.copy.copyTxt();
                     });
                 }
             });
@@ -252,7 +223,7 @@ class InitMenu {
                 if (dom_rotateCw !== null) {
                     dom_rotateCw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.tieefseeview.setDegForward(undefined, undefined);
+                        M.script.img.degForward();
                     });
                 }
                 //逆時針90°
@@ -260,7 +231,7 @@ class InitMenu {
                 if (dom_rotateCcw !== null) {
                     dom_rotateCcw.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
+                        M.script.img.degReverse();
                     });
                 }
                 //水平鏡像
@@ -268,7 +239,7 @@ class InitMenu {
                 if (dom_mirroringH !== null) {
                     dom_mirroringH.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.tieefseeview.setMirrorHorizontal(!M.fileShow.tieefseeview.getMirrorHorizontal());
+                        M.script.img.mirrorHorizontal();
                     });
                 }
                 //垂直鏡像
@@ -276,7 +247,7 @@ class InitMenu {
                 if (dom_mirroringV !== null) {
                     dom_mirroringV.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.tieefseeview.setMirrorVertica(!M.fileShow.tieefseeview.getMirrorVertica());
+                        M.script.img.mirrorVertica();
                     });
                 }
                 //初始化旋轉
@@ -284,7 +255,7 @@ class InitMenu {
                 if (dom_initRotate !== null) {
                     dom_initRotate.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
-                        M.fileShow.tieefseeview.transformRefresh(true);
+                        M.script.img.transformRefresh();
                     });
                 }
             });

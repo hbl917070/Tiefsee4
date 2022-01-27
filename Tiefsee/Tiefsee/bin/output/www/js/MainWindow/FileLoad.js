@@ -167,10 +167,15 @@ class FileLoad {
                 if (groupType === GroupType.txt) {
                     M.fileShow.openTxt(fileInfo2);
                 }
-                //修改視窗標題
-                let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(path)}`;
-                baseWindow.setTitle(title);
+                updateTitle();
             });
+        }
+        /**
+         * 修改視窗標題
+         */
+        function updateTitle() {
+            let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;
+            baseWindow.setTitle(title);
         }
         /**
          * 載入下一個檔案
@@ -307,7 +312,7 @@ class FileLoad {
             return __awaiter(this, void 0, void 0, function* () {
                 let path = getFilePath();
                 let fileName = Lib.GetFileName(path);
-                Msgbox.show({
+                let msg = Msgbox.show({
                     txt: "重新命名檔案",
                     type: "text",
                     inputTxt: fileName,
@@ -320,6 +325,10 @@ class FileLoad {
                             Msgbox.show({ txt: "檔案名稱不可以包含下列任意字元：" + "<br>" + "\\ / : * ? \" < > |" });
                             return;
                         }
+                        if (fileName == inputTxt) {
+                            Msgbox.close(dom);
+                            return;
+                        }
                         let newName = Lib.Combine([yield WV_Path.GetDirectoryName(path), inputTxt]);
                         let err = yield WV_File.Move(path, newName);
                         if (err != "") {
@@ -327,10 +336,12 @@ class FileLoad {
                             return;
                         }
                         arWaitingList[flag] = newName;
-                        show();
+                        updateTitle();
                         Msgbox.close(dom);
                     })
                 });
+                const len = fileName.length - Lib.GetExtension(path).length;
+                msg.domInput.setSelectionRange(0, len);
             });
         }
     }

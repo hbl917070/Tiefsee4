@@ -102,8 +102,13 @@ class Msgbox {
             donBtnClose.style.display = "none";
             donBtnNo.style.display = "none";
         }
-        if (isShowBtn === false) { donBottom.style.display = "none"; }//不顯示按鈕
-        if (type !== "text") { donInput.style.display = "none"; }//沒有輸入框
+        if (isShowBtn === false) {
+            donBottom.style.display = "none"; //不顯示按鈕
+        }
+        if (type !== "text") {
+            donInput.style.display = "none";   //隱藏輸入框
+        }
+
         donInput.value = inputTxt;
 
         donBtnClose.addEventListener("click", () => { this.close(dom) })
@@ -123,8 +128,18 @@ class Msgbox {
 
         document.body.appendChild(dom);
 
+        if (type === "text") {
+            donInput.focus();//取得焦點
+            donInput.select();
+        }
+
         //setRadio(``, radioValue);
-        return dom;
+        //return dom;
+        return {
+            domMsg: dom,
+            domInput: donInput,
+            close: () => { this.close(dom) }
+        };
     }
 
 
@@ -160,4 +175,34 @@ class Msgbox {
         this._isShow = false;
     }
 
+
+    /**
+    * 當前的Msg 關閉
+    */
+    public static closeNow() {
+
+        let arMsgbox = document.querySelectorAll(".msgbox");
+
+        if (arMsgbox.length === 0) { return }
+        if (arMsgbox.length === 1) { this._isShow = false; }
+
+        const dom = arMsgbox[arMsgbox.length - 1];
+        dom.parentNode?.removeChild(dom);
+    }
+
+
+    /**
+     * 當前的Msg 按下
+     */
+    public static clickYes() {
+
+        let arMsgbox = document.querySelectorAll(".msgbox");
+
+        if (arMsgbox.length === 0) { return }
+
+        const dom = arMsgbox[arMsgbox.length - 1];
+        const btnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;
+        btnYes.click();
+
+    }
 }
