@@ -57,10 +57,16 @@ class ScriptFileLoad {
         this.M.fileLoad.next()
     }
 
-    /** 顯式刪除檔案的對話方塊 */
-    public deleteMsg(){
+    /** 顯示 刪除檔案 的對話方塊 */
+    public deleteMsg() {
         this.M.fileLoad.deleteMsg()
     }
+
+    /** 顯示 重新命名檔案 的對話方塊 */
+    public renameMsg() {
+        this.M.fileLoad.renameMsg()
+    }
+
 }
 
 class ScriptFileShow {

@@ -15,6 +15,7 @@ class FileLoad {
     public setGroupType;
     public getFileLoadType;
     public deleteMsg;
+    public renameMsg;
 
     constructor(M: MainWindow) {
 
@@ -38,6 +39,7 @@ class FileLoad {
         this.setGroupType = setGroupType;
         this.getFileLoadType = getFileLoadType;
         this.deleteMsg = deleteMsg;
+        this.renameMsg = renameMsg;
 
         /**
          * 載入檔案陣列
@@ -317,7 +319,7 @@ class FileLoad {
 
 
         /**
-         * 顯式刪除檔案的對話方塊
+         * 顯示 刪除檔案 的對話方塊
          */
         async function deleteMsg() {
 
@@ -325,14 +327,14 @@ class FileLoad {
 
             Msgbox.show({
                 type: "radio",
-                txt: "刪除檔案" + "<br>" + Lib.GetFileName(path),
+                txt: `刪除檔案` + "<br>" + Lib.GetFileName(path),
                 arRadio: [
                     { value: "1", name: "移至資源回收桶" },
                     { value: "2", name: "永久刪除檔案" },
                 ],
                 radioValue: "1",
                 funcYes: async (dom: HTMLElement, value: string) => {
-                  
+
                     Msgbox.close(dom);
 
                     let state = true;
@@ -355,6 +357,41 @@ class FileLoad {
         }
 
 
+        /**
+         * 顯示 重新命名檔案 的對話方塊
+         */
+        async function renameMsg() {
+
+            let path = getFilePath();
+            let fileName = Lib.GetFileName(path);
+
+            Msgbox.show({
+                txt: "重新命名檔案",
+                type: "text",
+                inputTxt: fileName,
+                funcYes: async (dom: HTMLElement, inputTxt: string) => {
+                    if (inputTxt.trim() == "") {
+                        Msgbox.show({ txt: "必須輸入檔名" });
+                        return;
+                    }
+                    if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) != -1) {
+                        Msgbox.show({ txt: "檔案名稱不可以包含下列任意字元：" + "<br>" + "\\ / : * ? \" < > |" });
+                        return;
+                    }
+
+                    let newName = Lib.Combine([await WV_Path.GetDirectoryName(path), inputTxt]);
+                    let err = await WV_File.Move(path, newName);
+                    if (err != "") {
+                        Msgbox.show({ txt: "重新命名失敗：" + "<br>" + err });
+                        return;
+                    }
+
+                    arWaitingList[flag] = newName;
+                    show();
+                    Msgbox.close(dom);
+                }
+            });
+        }
 
 
     }

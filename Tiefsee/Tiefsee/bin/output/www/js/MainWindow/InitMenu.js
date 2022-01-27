@@ -20,7 +20,7 @@ class InitMenu {
         function initOpen() {
             return __awaiter(this, void 0, void 0, function* () {
                 //載入檔案
-                var dom_OpenFile = document.getElementById("menuitem-OpenFile");
+                var dom_OpenFile = document.getElementById("menuitem-openFile");
                 if (dom_OpenFile !== null) {
                     dom_OpenFile.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
@@ -36,7 +36,7 @@ class InitMenu {
                     });
                 }
                 //開啟檔案位置
-                var dom_ShowOnExplorer = document.getElementById("menuitem-ShowOnExplorer");
+                var dom_ShowOnExplorer = document.getElementById("menuitem-showOnExplorer");
                 if (dom_ShowOnExplorer !== null) {
                     dom_ShowOnExplorer.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
@@ -44,15 +44,23 @@ class InitMenu {
                     });
                 }
                 //顯示檔案右鍵選單
-                var dom_ShowSystemMenu = document.getElementById("menuitem-ShowSystemMenu");
+                var dom_ShowSystemMenu = document.getElementById("menuitem-showSystemMenu");
                 if (dom_ShowSystemMenu !== null) {
                     dom_ShowSystemMenu.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
                         M.script.open.ShowContextMenu();
                     });
                 }
+                //重新命名檔案
+                var dom_ShowSystemMenu = document.getElementById("menuitem-renameFile");
+                if (dom_ShowSystemMenu !== null) {
+                    dom_ShowSystemMenu.onclick = () => __awaiter(this, void 0, void 0, function* () {
+                        M.menu.close(); //關閉menu
+                        M.script.fileLoad.renameMsg();
+                    });
+                }
                 //列印
-                var dom_PrintFile = document.getElementById("menuitem-PrintFile");
+                var dom_PrintFile = document.getElementById("menuitem-printFile");
                 if (dom_PrintFile !== null) {
                     dom_PrintFile.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
@@ -60,7 +68,7 @@ class InitMenu {
                     });
                 }
                 //設成桌布
-                var dom_SetWallpaper = document.getElementById("menuitem-SetWallpaper");
+                var dom_SetWallpaper = document.getElementById("menuitem-setWallpaper");
                 if (dom_SetWallpaper !== null) {
                     dom_SetWallpaper.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
@@ -68,7 +76,7 @@ class InitMenu {
                     });
                 }
                 //選擇其他應用程式
-                var dom_RunApp = document.getElementById("menuitem-RunApp");
+                var dom_RunApp = document.getElementById("menuitem-runApp");
                 if (dom_RunApp !== null) {
                     dom_RunApp.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu
@@ -76,7 +84,7 @@ class InitMenu {
                     });
                 }
                 //以3D小畫家開啟
-                var dom_Open3DMSPaint = document.getElementById("menuitem-Open3DMSPaint");
+                var dom_Open3DMSPaint = document.getElementById("menuitem-open3DMSPaint");
                 if (dom_Open3DMSPaint !== null) {
                     dom_Open3DMSPaint.onclick = () => __awaiter(this, void 0, void 0, function* () {
                         M.menu.close(); //關閉menu

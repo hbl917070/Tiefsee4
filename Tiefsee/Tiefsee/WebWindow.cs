@@ -55,7 +55,7 @@ namespace Tiefsee {
         public string[] args;//命令列參數
         private static bool firstRun = true;//用於判斷是否為第一次執行(用於偵測是否有webview2執行環境
         private static WebWindow tempWindow;//用於快速啟動的暫存視窗
-        private bool isShow = false;//是否已經顯式過視窗(用於單一啟動
+        private bool isShow = false;//是否已經顯示過視窗(用於單一啟動
         public bool isDelayInit = false;//是否延遲初始化(暫存視窗必須設定成true
 
         public WV_Window WV_Window;

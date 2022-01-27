@@ -219,8 +219,13 @@ interface WV_File {
     /** 刪除檔案 */
     Delete(path: string): bool;
 
-    /** 移動檔案到新位置 */
-    Move(sourceDirName: string, destDirName: string);
+    /**
+     * 移動檔案到新位置
+     * @param sourceFileName 原始檔案路徑
+     * @param destFileName 目標檔案路徑
+     * @returns 錯誤訊息，成功的話回傳空字串
+     */
+    Move(sourceFileName: string, destFileName: string): string;
 
     /** 取得檔案的建立時間 */
     GetCreationTimeUtc(path: string): number;

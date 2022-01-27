@@ -107,7 +107,7 @@ class Msgbox {
             let value = "";
             if (type === "txt") { }
             if (type === "text") {
-                value = inputTxt;
+                value = donInput.value;
             }
             if (type === "radio") {
                 let radioChecked = dom.querySelector(".msgbox-radio :checked");

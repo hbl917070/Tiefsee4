@@ -95,7 +95,6 @@ class Msgbox {
             donBox.setAttribute("active", "true");
         }, 1);
 
-
         if (json.funcYes === undefined) {//如果沒有指定按下「確定」的事件，就隱藏「取消」按鈕
             donBtnNo.style.display = "none";
         }
@@ -112,10 +111,12 @@ class Msgbox {
         donBtnYes.addEventListener("click", () => {//按下確認時
             let value: string = "";
             if (type === "txt") { }
-            if (type === "text") { value = inputTxt }
+            if (type === "text") {
+                value = donInput.value;
+            }
             if (type === "radio") {
                 let radioChecked = dom.querySelector(".msgbox-radio :checked") as HTMLInputElement;
-                if (radioChecked!= null) { value = radioChecked.value }
+                if (radioChecked != null) { value = radioChecked.value }
             }
             funcYes(dom, value);
         })

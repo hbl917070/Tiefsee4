@@ -290,10 +290,17 @@ namespace Tiefsee {
         /// <summary>
         /// 移動檔案到新位置
         /// </summary>
-        /// <param name="sourceDirName"></param>
-        /// <param name="destDirName"></param>
-        public void Move(string sourceDirName, string destDirName) {
-            File.Move(sourceDirName, destDirName);
+        /// <param name="sourceFileName"></param>
+        /// <param name="destFileName"></param>
+        public string Move(string sourceFileName, string destFileName) {
+            //if (File.Exists(sourceFileName) == false) { return false; }
+            //if (File.Exists(destFileName) == true) { return false; }
+            try {
+                File.Move(sourceFileName, destFileName);
+            } catch (Exception e) {
+                return e.Message;
+            }
+            return "";
         }
 
 

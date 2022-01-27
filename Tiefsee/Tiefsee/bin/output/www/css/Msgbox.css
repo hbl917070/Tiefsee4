@@ -9,7 +9,11 @@
   justify-content: center;
   z-index: 99;
 }
-
+@media screen and (max-width: 300px) {
+  .msgbox-box {
+    min-width: 100% !important;
+  }
+}
 .msgbox-box {
   min-width: 300px;
   max-width: 500px;
@@ -59,6 +63,7 @@
   margin-right: 40px;
   margin-bottom: 20px;
   flex: 1;
+  font-size: 15px;
 }
 
 .msgbox-bottom {
@@ -75,12 +80,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   color: var(--color-white);
   background-color: var(--color-white20);
   border: none;
   height: 35px;
   border-radius: 5px;
+  user-select: none;
 }
 
 .msgbox-btn:hover {
@@ -133,10 +138,10 @@
 .msgbox-radio {
   display: block;
   min-height: 30px;
-  display:flex;
+  display: flex;
   align-items: center;
 }
 .msgbox-radio:hover {
   cursor: pointer;
-  background-color: var(--color-white10)
+  background-color: var(--color-white10);
 }
