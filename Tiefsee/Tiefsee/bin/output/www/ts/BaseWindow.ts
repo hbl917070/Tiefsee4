@@ -229,7 +229,10 @@ class BaseWindow {
             });
 
             _dom.addEventListener("touchstart", async (e) => {
-                await WV_Window.WindowDrag(_type);
+                //await WV_Window.WindowDrag(_type);
+                //window.chrome.webview.hostObjects.sync.WV_Window.WindowDrag(_type);
+                //e.preventDefault();
+                //e.stopPropagation();
             });
         }
 

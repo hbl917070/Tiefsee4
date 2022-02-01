@@ -30,9 +30,10 @@ class Setting {
         var txt_imageDpizoom = document.querySelector("#image-dpizoom");
         var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering");
         var txt_startPort = document.querySelector("#txt-startPort");
-        var switch_serverCache = document.querySelector("#switch-serverCache");
+        var txt_serverCache = document.querySelector("#txt-serverCache");
         var btn_openAppData = document.getElementById("btn-openAppData");
         var btn_openWww = document.getElementById("btn-openWww");
+        var btn_clearBrowserCache = document.getElementById("btn-clearBrowserCache");
         var btn_openSystemSetting = document.getElementById("btn-openSystemSetting");
         var txt_extension = document.querySelector("#txt-extension");
         var btn_extension = document.querySelector("#btn-extension");
@@ -67,7 +68,7 @@ class Setting {
             $.extend(true, config.settings, userSetting);
             setRadio("[name='radio-startType']", json.startType.toString());
             txt_startPort.value = json.startPort.toString();
-            switch_serverCache.checked = (json.serverCache == 1);
+            txt_serverCache.value = json.serverCache.toString();
             applySetting(); //套用設置值
             //document.querySelector("input")?.focus();
             (_a = document.querySelector("input")) === null || _a === void 0 ? void 0 : _a.blur(); //失去焦點
@@ -245,6 +246,11 @@ class Setting {
                     let path = "ms-settings:defaultapps";
                     WV_RunApp.OpenUrl(path);
                 }));
+                //清理快取資料
+                btn_clearBrowserCache === null || btn_clearBrowserCache === void 0 ? void 0 : btn_clearBrowserCache.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+                    WV_Window.ClearBrowserCache();
+                    Msgbox.show({ txt: "快取資料清理完成" });
+                }));
             });
         }
         /**
@@ -306,17 +312,33 @@ class Setting {
          */
         function saveSetting() {
             return __awaiter(this, void 0, void 0, function* () {
+                appleSettingOfMain(); //將設定套用至 mainwiwndow
                 //儲存 start.ini
                 let startPort = parseInt(txt_startPort.value);
                 let startType = getRadio("[name='radio-startType']");
-                let serverCache = switch_serverCache.checked ? 1 : 0;
-                if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
+                let serverCache = parseInt(txt_serverCache.value);
+                if (isNaN(startPort)) {
                     startPort = 4876;
+                }
+                if (startPort > 65535) {
+                    startPort = 65535;
+                }
+                if (startPort < 1024) {
+                    startPort = 1024;
                 }
                 if (startType.search(/^[1|2|3|4|5]$/) !== 0) {
                     startType = 2;
                 }
                 startType = parseInt(startType);
+                if (isNaN(serverCache)) {
+                    serverCache = 0;
+                }
+                if (serverCache > 31536000) {
+                    serverCache = 31536000;
+                }
+                if (serverCache < 0) {
+                    serverCache = 0;
+                }
                 yield WV_Window.SetStartIni(startPort, startType, serverCache);
                 //儲存 setting.json
                 let s = JSON.stringify(config.settings, null, '\t');

@@ -41,6 +41,9 @@ interface WebWindow {
 
 interface WV_Window {
 
+    /** 清理webview2的暫存 */
+    ClearBrowserCache(): void;
+
     /** 儲存到 start.ini */
     SetStartIni(startPort: number, startType: number, serverCache: number)
 
@@ -55,7 +58,6 @@ interface WV_Window {
 
     /** 網頁載入完成後，呼叫此函數才會顯示視窗，子視窗從父視窗中間開啟 */
     ShowWindow_Center(width: number, height: number): void;
-
 
     /**
      * 新開視窗
@@ -423,7 +425,7 @@ interface AppInfo {
     /** 程式開始的port */
     startPort: number;
 
-    /** 伺服器對靜態資源使用快取 0=不使用 1=使用 */
+    /** 伺服器對靜態資源快取的時間(秒) */
     serverCache: number;
 
     /** 程式所在的資料夾 */

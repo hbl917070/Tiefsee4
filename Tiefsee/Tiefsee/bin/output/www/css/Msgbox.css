@@ -1,6 +1,6 @@
 .msgbox {
   position: fixed;
-  top: 0;
+  top: 30px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: center;
   z-index: 99;
+  padding-bottom: 30px;
 }
 @media screen and (max-width: 300px) {
   .msgbox-box {

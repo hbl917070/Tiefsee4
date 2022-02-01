@@ -10,7 +10,7 @@ namespace Tiefsee {
     public class WebServerController {
 
         WebServer webServer;
-        private bool isCache = true;//是否對靜態資源使用快取
+        private int CacheTime = 0;//靜態資源快取的時間
 
 
         public WebServerController(WebServer _webServer) {
@@ -35,13 +35,11 @@ namespace Tiefsee {
         /// <summary>
         /// 設定是否對靜態資源使用快取
         /// </summary>
-        /// <param name="type"></param>
-        public void SetIsCache(int type) {
-            if (type >= 1) {
-                isCache = true;
-            } else {
-                isCache = false;
-            }
+        /// <param name="time"> 秒數</param>
+        public void SetCacheTime(int time) {
+            if (time <= 0) { time = 0; }
+            if (time >= 31536000) { time = 31536000; }//一年
+            CacheTime = time;
         }
 
 
@@ -62,6 +60,7 @@ namespace Tiefsee {
         /// <param name="d"></param>
         /// <param name="path"></param>
         private void WriteFile(RequestData d, string path) {
+
             using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                 d.context.Response.ContentLength64 = input.Length;
@@ -92,21 +91,32 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="d"></param>
         /// <param name="path"></param>
-        private void HeadersAddCache(RequestData d, string path) {
-            if (isCache == true) {//讓瀏覽器快取檔案
-                string lastModified = File.GetLastWriteTime(path).ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
-                d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-                d.context.Response.Headers.Add("Cache-Control", "max-age=31536000");
+        /// <returns> true=304 false=正常回傳檔案</returns>
+        private bool HeadersAdd304(RequestData d, string path) {
+
+            DateTime dt = File.GetLastWriteTime(path);
+            string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
+            string etag = dt.ToFileTimeUtc().ToString();
+
+            /*
+            d.context.Response.KeepAlive = true;
+            d.context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");//
+            d.context.Response.Headers.Add("Accept-Ranges", "bytes");
+            d.context.Response.Headers.Add("Vary", "Origin");
+            d.context.Response.Headers.Add("Connection", "keep-alive");*/
+
+            d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
+            d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
+            d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
+
+
+            //Console.WriteLine(inm + " -- " + etag);
+            if (d.context.Request.Headers["If-None-Match"] == etag) {
+                d.context.Response.StatusCode = 304;
+                return true;
             }
-            /*context.Response.Headers.Add("ETag", @"W/""2d49-17e45f9a21e""");//
-            context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");//
-            context.Response.Headers.Add("Cache-Control", "public, max-age=0");
-            context.Response.Headers.Add("Accept-Ranges", "bytes");
-            context.Response.Headers.Add("Vary", "Origin");
-            context.Response.Headers.Add("Connection", "keep-alive");
-            if (context.Response.ContentType == "text/html") {
-                context.Response.StatusCode = (int)HttpStatusCode.NotModified;
-            }*/
+
+            return false;
         }
 
 
@@ -133,7 +143,7 @@ namespace Tiefsee {
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
-                WebWindow.Create($"http://localhost:{webServer.port}/www/MainWindow.html", args, null);
+                WebWindow.Create($"{webServer.origin}/www/MainWindow.html", args, null);
             });
 
             WriteString(d, "ok");
@@ -150,8 +160,10 @@ namespace Tiefsee {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
-            HeadersAddCache(d, path);//回傳檔案時加入快取的Headers
-            WriteFile(d, path);//回傳檔案
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == false) {
+                WriteFile(d, path);//回傳檔案
+            }
         }
 
 
@@ -165,8 +177,10 @@ namespace Tiefsee {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = "application/pdf";
-            HeadersAddCache(d, path);//回傳檔案時加入快取的Headers
-            WriteFile(d, path);//回傳檔案
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == false) {
+                WriteFile(d, path);//回傳檔案
+            }
         }
 
 
@@ -180,23 +194,25 @@ namespace Tiefsee {
 
             String exeDir = System.AppDomain.CurrentDomain.BaseDirectory;//程式的目錄
 
-            String _path;
+            String path;
             if (d.value.IndexOf("www/") == 0) {
-                _path = System.IO.Path.Combine(exeDir, d.value);
+                path = System.IO.Path.Combine(exeDir, d.value);
             } else {
-                _path = System.IO.Path.Combine(exeDir, "www", d.value);
+                path = System.IO.Path.Combine(exeDir, "www", d.value);
             }
 
             //如果檔案不存在就返回404錯誤
-            if (File.Exists(_path) == false) {
+            if (File.Exists(path) == false) {
                 d.context.Response.StatusCode = 404;
                 WriteString(d, "404");
                 return;
             }
 
-            d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(_path), out string mime) ? mime : "application/octet-stream";
-            HeadersAddCache(d, _path);//回傳檔案時加入快取的Headers
-            WriteFile(d, _path);//回傳檔案
+            d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == false) {
+                WriteFile(d, path);//回傳檔案
+            }
         }
 
 

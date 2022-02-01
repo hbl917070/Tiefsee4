@@ -116,6 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapter.cs" />
+    <Compile Include="StartWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="WebServer.cs" />
     <Compile Include="IconHandler.cs" />
     <Compile Include="IniManager.cs" />

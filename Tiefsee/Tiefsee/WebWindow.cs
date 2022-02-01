@@ -20,19 +20,20 @@ namespace Tiefsee {
         public bool allowFocus = false;
 
         // 讓視窗看不到
-        protected override CreateParams CreateParams {
+        /*protected override CreateParams CreateParams {
             get {
                 var style = base.CreateParams;
                 //style.ClassStyle |= 200; // NoCloseBtn
                 //style.ExStyle |= 0x8; // TopMost
                 //style.ExStyle |= 0x80000; // Layered
-                style.ExStyle |= 0x02000000;
+                //style.ExStyle |= 0x02000000;
                 //style.ExStyle |= 0x8000000; // NoActive
+                style.ExStyle |= 0x00200000;
                 return style;
             }
-        }
+        }*/
 
-        protected override void OnGotFocus(EventArgs e) {
+        /*protected override void OnGotFocus(EventArgs e) {
             if (allowFocus) {
                 base.OnGotFocus(e);
             }
@@ -40,7 +41,7 @@ namespace Tiefsee {
 
         public void RunFocus() {
             OnGotFocus(new EventArgs());
-        }
+        }*/
 
     }
 
@@ -52,10 +53,9 @@ namespace Tiefsee {
         //public WebView2 wv2;
         public WV2 wv2;
         public WebWindow parentWindow;//父親視窗
-        public string[] args;//命令列參數
-        private static bool firstRun = true;//用於判斷是否為第一次執行(用於偵測是否有webview2執行環境
+        public string[] args;//命令列參數 
         private static WebWindow tempWindow;//用於快速啟動的暫存視窗
-        private bool isShow = false;//是否已經顯示過視窗(用於單一啟動
+        private bool isShow = false;//是否已經顯式過視窗(用於單一啟動
         public bool isDelayInit = false;//是否延遲初始化(暫存視窗必須設定成true
 
         public WV_Window WV_Window;
@@ -67,24 +67,12 @@ namespace Tiefsee {
         public WV_Image WV_Image;
 
 
-        #region
+        /// <summary>
+        /// 
+        /// </summary>
+        public WebWindow() {
 
-        //API 常數定義
-        public const int SW_HIDE = 0;
-        public const int SW_NORMAL = 1;
-        public const int SW_MAXIMIZE = 3;
-        public const int SW_SHOWNOACTIVATE = 4;
-        public const int SW_SHOW = 5;
-        public const int SW_MINIMIZE = 6;
-        public const int SW_RESTORE = 9;
-        public const int SW_SHOWDEFAULT = 10;
-
-        [DllImport("user32.dll")]
-        public static extern int ShowWindow(IntPtr hwnd, int nCmdShow);
-
-        #endregion
-
-
+        }
 
 
         /// <summary>
@@ -195,7 +183,6 @@ namespace Tiefsee {
 
             var temp2 = tempWindow;
 
-
             //呼叫先前已經建立的window來顯示
             temp2.parentWindow = _parentWindow;
             temp2.args = _args;
@@ -214,26 +201,13 @@ namespace Tiefsee {
                 tempWindow.isDelayInit = true;
                 tempWindow.Init();
                 tempWindow.args = new string[0] { };
-                tempWindow.wv2.Source = new Uri($"http://localhost:{Program.webServer.port}/www/MainWindow.html");
+                tempWindow.wv2.Source = new Uri($"{Program.webServer.origin}/www/MainWindow.html");
             });
 
             return temp2;//回傳剛剛新建的window
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public WebWindow() {
-
-            if (firstRun == true) {//只有啟動程式時才會執行這裡
-                Adapter.Initialize();
-                DownloadWebview2();//檢查是否有webview2執行環境
-                firstRun = false;
-            }
-
-            //Init();
-        }
 
 
         /// <summary>
@@ -244,7 +218,6 @@ namespace Tiefsee {
 
             //this.SetSize(400, 300);
             this.Opacity = 0;
-
             wv2 = new WV2();
 
             if (isDelayInit) {
@@ -258,16 +231,9 @@ namespace Tiefsee {
                         firstRunNavigationCompleted = false;
                     } else { return; }
 
-                    //ShowWindow(this.Handle, SW_SHOWDEFAULT); //視窗狀態
-                    //ShowWindow(this.Handle, SW_HIDE);
                     this.Controls.Add(wv2);//必須在show之前
                     this.Show();
                     this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
-
-                    //必須使用此語法，否則會無法點擊視窗
-                    this.BackColor = Color.Red;
-                    this.TransparencyKey = Color.Red;
-
 
                 };
 
@@ -277,11 +243,13 @@ namespace Tiefsee {
                 this.Show();
                 this.Hide();
 
+                //ShowWindow(this.Handle, SW_SHOWDEFAULT); //視窗狀態
+                //ShowWindow(this.Handle, SW_HIDE);
                 //必須使用此語法，否則會無法點擊視窗
-                this.BackColor = Color.Red;
-                this.TransparencyKey = Color.Red;
-
+                //this.BackColor = Color.Red;
+                //this.TransparencyKey = Color.Red;
             }
+
             wv2.ZoomFactor = 1;
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
@@ -368,7 +336,7 @@ namespace Tiefsee {
             appInfo.args = args;
             appInfo.startType = Program.startType;
             appInfo.startPort = Program.startPort;
-            appInfo.serverCache = Program.serverCache;        
+            appInfo.serverCache = Program.serverCache;
             appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
             appInfo.appDataPath = Program.appDataPath;
             appInfo.mainPort = Program.webServer.port;
@@ -415,7 +383,7 @@ namespace Tiefsee {
             }
             isShow = true;
 
-            QuickRun.WindowCreat();
+            QuickRun.WindowCreate();
             this.FormClosed += (sender, e) => {
                 QuickRun.WindowFreed();
             };
@@ -437,9 +405,9 @@ namespace Tiefsee {
             this.Show();
             this.Opacity = 1;
 
+            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
 
-            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
         }
 
 
@@ -464,12 +432,11 @@ namespace Tiefsee {
             }
             isShow = true;
 
-            QuickRun.WindowCreat();
+            QuickRun.WindowCreate();
             this.FormClosed += (sender, e) => {
                 QuickRun.WindowFreed();
             };
 
-            //this.Controls.Add(wv2);
             this.SetPosition(x, y);
             this.SetSize(width, height);
 
@@ -488,10 +455,10 @@ namespace Tiefsee {
             this.Show();
             this.Opacity = 1;
 
-
-            SetFocus(); //讓視窗在最上面並且取得焦點
             RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
+            SetFocus(); //讓視窗在最上面並且取得焦點
         }
+
 
 
         /// <summary>
@@ -502,7 +469,8 @@ namespace Tiefsee {
             //如果視窗已經顯示了，則只取得焦點，不做其他事情
             if (isShow) {
                 if (this.WindowState == FormWindowState.Minimized) {//如果是最小化
-                    ShowWindow(this.Handle, SW_NORMAL);//視窗狀態    
+
+                    ShowWindow(this.Handle, SW_RESTORE);//視窗狀態    
                     //this.WindowState = FormWindowState.Normal;//視窗化
                 }
                 SetFocus(); //讓視窗在最上面並且取得焦點
@@ -510,23 +478,20 @@ namespace Tiefsee {
             }
             isShow = true;
 
-            QuickRun.WindowCreat();
+            QuickRun.WindowCreate();
             this.FormClosed += (sender, e) => {
                 QuickRun.WindowFreed();
             };
 
-            //this.Controls.Add(wv2);
             ShowWindow(this.Handle, SW_SHOWDEFAULT);//視窗狀態
             SetPositionInit();
             this.Show();
             this.Opacity = 1;
 
+            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
 
-            RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
         }
-
-
 
 
         /// <summary>
@@ -560,68 +525,75 @@ namespace Tiefsee {
         /// </summary>
         public void SetFocus() {
 
-            this.TopMost = true;
-            this.TopMost = false;
-            //SetForegroundWindow(this.wv2.Handle);
+            //this.TopMost = true;
+            //this.TopMost = false;
+
             this.wv2.allowFocus = true;
+
+            GlobalActivate(this.Handle);
+            this.Activate();
             this.wv2.Focus();
-            this.wv2.RunFocus();
 
-
-            //var child = GetWindow(this.wv2.Handle, GW_CHILD);
-            //SetFocus(child);
-
-            /* DelayRun(1000, () => {
-
+            /*DelayRun(30, () => {
+                //this.wv2.Focus();
+                //SwitchToThisWindow(this.wv2.Handle, true);
             });*/
-
         }
-        [DllImport("USER32.DLL")]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);//視窗取得焦點
+
+        [DllImport("User32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool SwitchToThisWindow(IntPtr hWnd, Boolean fAltTab);
 
 
-        public const uint GW_CHILD = 5;
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
-        [DllImport("user32.dll")]
-        public static extern IntPtr SetFocus(IntPtr hWnd);
+        #region 視窗取得焦點
 
-        //static WebWindow tempFocus;//當暫存視窗載入網頁時，必須把焦點設定回目前的視窗
-
+        //https://stackoverflow.com/questions/257587/bring-a-window-to-the-front-in-wpf
 
         /// <summary>
-        /// 檢查是否有執行環境
+        /// Activate a window from anywhere by attaching to the foreground window
         /// </summary>
-        /// <returns></returns>
-        private void DownloadWebview2() {
+        public static void GlobalActivate(IntPtr interopHelper) {
+            //Get the process ID for this window's thread
+            //var interopHelper = new WindowInteropHelper(w);
+            UInt32 thisWindowThreadId = GetWindowThreadProcessId(interopHelper, IntPtr.Zero);
 
-            new Thread(() => {
-                if (CheckWebView2() == true) { //檢查安裝webview2執行環境
-                    return;
-                }
-                Adapter.UIThread(() => {//如果沒有執行環境，就用瀏覽器開啟下載頁面
-                    MessageBox.Show("必須安裝Webview2才能運行Tiefsee");
-                    System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
-                    this.Close();
-                });
-            }).Start();
+            //Get the process ID for the foreground window's thread
+            var currentForegroundWindow = GetForegroundWindow();
+            var currentForegroundWindowThreadId = GetWindowThreadProcessId(currentForegroundWindow, IntPtr.Zero);
+
+            //Attach this window's thread to the current window's thread
+            AttachThreadInput(currentForegroundWindowThreadId, thisWindowThreadId, true);
         }
-        private bool CheckWebView2() {
-            try {
-                var str = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
-                if (!string.IsNullOrWhiteSpace(str)) {
-                    return true;
-                }
-            } catch (Exception) {
-                return false;
-            }
-            return false;
-        }
+
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+
+        [DllImport("user32.dll")]
+        private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        #endregion
+
+
+        #region  ShowWindow (設定視窗狀態
+
+        public const int SW_HIDE = 0;
+        public const int SW_NORMAL = 1;
+        public const int SW_MAXIMIZE = 3;
+        public const int SW_SHOWNOACTIVATE = 4;
+        public const int SW_SHOW = 5;
+        public const int SW_MINIMIZE = 6;
+        public const int SW_RESTORE = 9;
+        public const int SW_SHOWDEFAULT = 10;
+
+        [DllImport("user32.dll")]
+        public static extern int ShowWindow(IntPtr hwnd, int nCmdShow);
+
+        #endregion
 
     }
-
-
-
 
 
     /// <summary>
@@ -649,7 +621,7 @@ namespace Tiefsee {
             oldX = this.Left;//記錄預設的坐標
             oldY = this.Top;
 
-            //this.SetPosition(-9999, -9999);//避免設定坐標前，視窗就已經被看到
+            this.SetPosition(-9999, -9999);//避免設定坐標前，視窗就已經被看到
 
             //base.OnHandleCreated(e);
         }
@@ -661,9 +633,10 @@ namespace Tiefsee {
                 var style = base.CreateParams;
                 //style.ClassStyle |= 200; // NoCloseBtn
                 //style.ExStyle |= 0x8; // TopMost
-                style.ExStyle |= 0x80000; // Layered
+                //style.ExStyle |= 0x80000; // Layered
                 //style.ExStyle |= 0x02000000;
                 //style.ExStyle |= 0x8000000; // NoActive
+                style.ExStyle |= 0x00200000;
                 return style;
             }
         }

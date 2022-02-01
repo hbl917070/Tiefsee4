@@ -50,7 +50,7 @@ class Config {
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
             /** 文字粗細 */
-            "fontWeight": "300",
+            "fontWeight": "400",
             /** 圖示粗細 */
             "svgWeight": "0px",
             /** 視窗圓角 */

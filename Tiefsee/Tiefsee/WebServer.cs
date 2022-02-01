@@ -13,6 +13,7 @@ namespace Tiefsee {
     public class WebServer {
 
         public int port;//當前掛載的port
+        public string origin;
         public WebServerController controller;
         private HttpListener _httpListener = new HttpListener();
         private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>();//路由
@@ -21,9 +22,11 @@ namespace Tiefsee {
         public WebServer() {
 
             port = GetAllowPost();//取得能使用的port
+            origin = "http://127.0.0.1:" + port + "/";
 
             _httpListener.IgnoreWriteExceptions = true;
             _httpListener.Prefixes.Add("http://localhost:" + port + "/");
+            _httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
             _httpListener.Start();
             _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
 
@@ -47,6 +50,7 @@ namespace Tiefsee {
 
             String _url = request.Url.ToString();
             _url = _url.Substring($"http://localhost:{port}".Length);
+            //_url = _url.Substring($"http://127.0.0.1:{port}".Length);
 
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");

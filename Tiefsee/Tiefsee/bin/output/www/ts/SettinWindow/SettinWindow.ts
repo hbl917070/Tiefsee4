@@ -32,9 +32,11 @@ class Setting {
         var select_tieefseeviewImageRendering = document.querySelector("#image-tieefseeviewImageRendering") as HTMLInputElement;
 
         var txt_startPort = document.querySelector("#txt-startPort") as HTMLInputElement;
-        var switch_serverCache = document.querySelector("#switch-serverCache") as HTMLInputElement;
+        var txt_serverCache = document.querySelector("#txt-serverCache") as HTMLInputElement;
         var btn_openAppData = document.getElementById("btn-openAppData") as HTMLElement;
         var btn_openWww = document.getElementById("btn-openWww") as HTMLElement;
+        var btn_clearBrowserCache = document.getElementById("btn-clearBrowserCache") as HTMLElement;
+
 
         var btn_openSystemSetting = document.getElementById("btn-openSystemSetting") as HTMLElement;
         var txt_extension = document.querySelector("#txt-extension") as HTMLTextAreaElement;
@@ -80,7 +82,7 @@ class Setting {
 
             setRadio("[name='radio-startType']", json.startType.toString())
             txt_startPort.value = json.startPort.toString();
-            switch_serverCache.checked = (json.serverCache == 1);
+            txt_serverCache.value = json.serverCache.toString();
 
             applySetting();//套用設置值
 
@@ -264,7 +266,7 @@ class Setting {
                 config.settings["theme"]["svgWeight"] = val;
                 appleSettingOfMain();
             });
-            
+
             // 視窗 aero毛玻璃
             switch_areo?.addEventListener("change", () => {
                 let val = switch_areo.checked;
@@ -304,6 +306,11 @@ class Setting {
                 WV_RunApp.OpenUrl(path)
             });
 
+            //清理快取資料
+            btn_clearBrowserCache?.addEventListener("click", async () => {
+                WV_Window.ClearBrowserCache();
+                Msgbox.show({ txt: "快取資料清理完成" });
+            });
         }
 
 
@@ -385,17 +392,23 @@ class Setting {
          */
         async function saveSetting() {
 
+            appleSettingOfMain();//將設定套用至 mainwiwndow
+
             //儲存 start.ini
             let startPort = parseInt(txt_startPort.value);
             let startType: any = getRadio("[name='radio-startType']");
-            let serverCache = switch_serverCache.checked ? 1 : 0;
-            if (isNaN(startPort) || startPort > 65535 || startPort < 1024) {
-                startPort = 4876;
-            }
-            if (startType.search(/^[1|2|3|4|5]$/) !== 0) {
-                startType = 2;
-            }
+            let serverCache = parseInt(txt_serverCache.value);
+
+            if (isNaN(startPort)) { startPort = 4876; }
+            if (startPort > 65535) { startPort = 65535; }
+            if (startPort < 1024) { startPort = 1024; }
+
+            if (startType.search(/^[1|2|3|4|5]$/) !== 0) { startType = 2; }
             startType = parseInt(startType);
+
+            if (isNaN(serverCache)) { serverCache = 0; }
+            if (serverCache > 31536000) { serverCache = 31536000; }
+            if (serverCache < 0) { serverCache = 0; }
 
             await WV_Window.SetStartIni(startPort, startType, serverCache);
 

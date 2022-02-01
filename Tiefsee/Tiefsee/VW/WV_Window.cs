@@ -23,6 +23,12 @@ namespace Tiefsee {
             this.M = m;
         }
 
+        /// <summary>
+        /// 清理webview2的暫存
+        /// </summary>
+        public void ClearBrowserCache() {
+            M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
+        }
 
         /// <summary>
         /// 儲存到 start.ini
@@ -39,7 +45,7 @@ namespace Tiefsee {
             Program.startType = startType;
             Program.serverCache = serverCache;
 
-            Program.webServer.controller.SetIsCache(serverCache);
+            Program.webServer.controller.SetCacheTime(serverCache);
         }
 
 
@@ -354,7 +360,7 @@ namespace Tiefsee {
 
             ReleaseCapture();
             SendMessage(M.Handle, WM_SYSCOMMAND, (int)(_run), 0);
-
+    
             /*IntPtr windowHandle = new System.Windows.Interop.WindowInteropHelper(M.win).Handle;
           
             Adapter.UIThread(() => {
@@ -398,7 +404,6 @@ namespace Tiefsee {
         public static extern bool SendMessage(IntPtr hwnd, int wMsg, int wParam, int lParam);
         public const int WM_SYSCOMMAND = 0x0112;
         public const int WM_LBUTTONUP = 0x202;
-
 
         #endregion
 

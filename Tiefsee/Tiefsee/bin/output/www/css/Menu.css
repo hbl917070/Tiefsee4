@@ -22,7 +22,6 @@
 
 .menu-content {
   position: absolute;
-
   bottom: 0;
   overflow: auto;
   overflow: overlay ;
