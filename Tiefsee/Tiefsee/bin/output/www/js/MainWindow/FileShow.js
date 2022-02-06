@@ -15,11 +15,13 @@ class FileShow {
         var dom_pdfview = document.querySelector("#main-pdfview");
         var dom_txtview = document.querySelector("#main-txtview");
         var dom_welcomeview = document.querySelector("#main-welcomeview");
+        var isLoaded = true;
         this.openImage = openImage;
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
         this.openNone = openNone;
+        this.getIsLoaded = getIsLoaded;
         this.dom_welcomeview = dom_welcomeview;
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
@@ -107,6 +109,9 @@ class FileShow {
         function getToolsDom(type) {
             return M.dom_tools.querySelector(`.main-tools-group[data-name="${type}"]`);
         }
+        function getIsLoaded() {
+            return isLoaded;
+        }
         /**
          *
          * @param _path
@@ -114,6 +119,9 @@ class FileShow {
         function openImage(fileInfo2) {
             var _a, _b, _c;
             return __awaiter(this, void 0, void 0, function* () {
+                //if (isLoaded) {
+                isLoaded = false;
+                //}
                 let _path = fileInfo2.Path;
                 setShowType(GroupType.img); //改變顯示類型
                 let imgurl = _path; //圖片網址
@@ -124,7 +132,7 @@ class FileShow {
                     imgurl = "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
                 }
                 tieefseeview.setLoading(true);
-                yield tieefseeview.getIsLoaded(imgurl); //預載入
+                yield tieefseeview.preload(imgurl); //預載入
                 if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
                     yield tieefseeview.loadImg(imgurl); //使用<img>渲染
                 }
@@ -160,6 +168,8 @@ class FileShow {
                     let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
                     dom_writeTime.innerHTML = time;
                 }
+                //if (isLoaded === false) {
+                isLoaded = true;
             });
         }
         /**

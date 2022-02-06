@@ -8,6 +8,7 @@ class FileShow {
     public openTxt;
     public openWelcome;
     public openNone;
+    public getIsLoaded;
 
     public tieefseeview;
     public dom_imgview;
@@ -20,12 +21,14 @@ class FileShow {
         var dom_pdfview = <HTMLDivElement>document.querySelector("#main-pdfview")
         var dom_txtview = <HTMLTextAreaElement>document.querySelector("#main-txtview")
         var dom_welcomeview = <HTMLDivElement>document.querySelector("#main-welcomeview")
+        var isLoaded = true;
 
         this.openImage = openImage;
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
         this.openNone = openNone;
+        this.getIsLoaded = getIsLoaded;
         this.dom_welcomeview = dom_welcomeview;
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
@@ -140,11 +143,19 @@ class FileShow {
         }
 
 
+        function getIsLoaded() {
+            return isLoaded;
+        }
+
         /**
          * 
          * @param _path 
          */
         async function openImage(fileInfo2: FileInfo2) {
+
+            //if (isLoaded) {
+            isLoaded = false;
+            //}
 
             let _path = fileInfo2.Path;
 
@@ -155,19 +166,18 @@ class FileShow {
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
-                imgurl = "/api/getimg/" + encodeURIComponent(_path)+`?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-
+                imgurl = "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
             tieefseeview.setLoading(true);
 
-            await tieefseeview.getIsLoaded(imgurl);//預載入
+            await tieefseeview.preload(imgurl);//預載入
+
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
                 await tieefseeview.loadImg(imgurl);//使用<img>渲染
             } else {
                 await tieefseeview.loadBigimg(imgurl);//使用canvas渲染
             }
-
 
             tieefseeview.setLoading(false);
             tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
@@ -201,6 +211,9 @@ class FileShow {
                 dom_writeTime.innerHTML = time;
             }
 
+            //if (isLoaded === false) {
+                isLoaded = true;
+            //}
 
         }
 

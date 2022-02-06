@@ -142,7 +142,6 @@ class FileLoad {
         }
 
 
-
         /**
          * 取得目前檔案的路徑
          * @returns 
@@ -161,6 +160,16 @@ class FileLoad {
             return fileLoadType;
         }
 
+        //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
+        var _show = async () => { };
+        async function timer01() {
+            let func = _show;
+            _show = async () => { };
+            await func();
+          
+            setTimeout(() => { timer01(); }, 5);  //遞迴
+        }
+        timer01();
 
         /**
          * 
@@ -174,40 +183,43 @@ class FileLoad {
 
             if (arWaitingList.length === 0) {//如果資料夾裡面沒有圖片
                 M.fileShow.openWelcome();
+                _show = async () => { }
                 return;
             }
 
             let path = getFilePath();
             let fileInfo2 = await Lib.GetFileInfo2(path);
-            //console.log(Lib.GetFileType(fileInfo2))
 
             if (fileInfo2.Type === "none") {//如果檔案不存在
                 arWaitingList.splice(flag, 1);//刪除此筆
                 show(flag);
+                _show = async () => { }
                 return;
             }
 
-
+            updateTitle();//更新視窗標題
 
             if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
                 groupType = fileToGroupType(fileInfo2);//根據檔案類型判斷要用什麼方式顯示檔案
             }
-            if (groupType === GroupType.img || groupType === GroupType.unknown) {
-                M.fileShow.openImage(fileInfo2);
-            }
-            if (groupType === GroupType.pdf) {
-                M.fileShow.openPdf(fileInfo2);
-            }
-            if (groupType === GroupType.txt) {
-                M.fileShow.openTxt(fileInfo2);
+
+            _show = async () => {
+                if (groupType === GroupType.img || groupType === GroupType.unknown) {
+                    await M.fileShow.openImage(fileInfo2);
+                }
+                if (groupType === GroupType.pdf) {
+                    await M.fileShow.openPdf(fileInfo2);
+                }
+                if (groupType === GroupType.txt) {
+                    await M.fileShow.openTxt(fileInfo2);
+                }
             }
 
-            updateTitle();
         }
 
 
         /**
-         * 修改視窗標題
+         * 更新視窗標題
          */
         function updateTitle() {
             let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;

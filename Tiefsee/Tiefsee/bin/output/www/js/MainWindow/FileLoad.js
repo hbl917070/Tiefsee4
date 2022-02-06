@@ -128,6 +128,17 @@ class FileLoad {
         function getFileLoadType() {
             return fileLoadType;
         }
+        //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
+        var _show = () => __awaiter(this, void 0, void 0, function* () { });
+        function timer01() {
+            return __awaiter(this, void 0, void 0, function* () {
+                let func = _show;
+                _show = () => __awaiter(this, void 0, void 0, function* () { });
+                yield func();
+                setTimeout(() => { timer01(); }, 5); //遞迴
+            });
+        }
+        timer01();
         /**
          *
          * @param _flag
@@ -145,33 +156,36 @@ class FileLoad {
                 }
                 if (arWaitingList.length === 0) { //如果資料夾裡面沒有圖片
                     M.fileShow.openWelcome();
+                    _show = () => __awaiter(this, void 0, void 0, function* () { });
                     return;
                 }
                 let path = getFilePath();
                 let fileInfo2 = yield Lib.GetFileInfo2(path);
-                //console.log(Lib.GetFileType(fileInfo2))
                 if (fileInfo2.Type === "none") { //如果檔案不存在
                     arWaitingList.splice(flag, 1); //刪除此筆
                     show(flag);
+                    _show = () => __awaiter(this, void 0, void 0, function* () { });
                     return;
                 }
+                updateTitle(); //更新視窗標題
                 if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
                     groupType = fileToGroupType(fileInfo2); //根據檔案類型判斷要用什麼方式顯示檔案
                 }
-                if (groupType === GroupType.img || groupType === GroupType.unknown) {
-                    M.fileShow.openImage(fileInfo2);
-                }
-                if (groupType === GroupType.pdf) {
-                    M.fileShow.openPdf(fileInfo2);
-                }
-                if (groupType === GroupType.txt) {
-                    M.fileShow.openTxt(fileInfo2);
-                }
-                updateTitle();
+                _show = () => __awaiter(this, void 0, void 0, function* () {
+                    if (groupType === GroupType.img || groupType === GroupType.unknown) {
+                        yield M.fileShow.openImage(fileInfo2);
+                    }
+                    if (groupType === GroupType.pdf) {
+                        yield M.fileShow.openPdf(fileInfo2);
+                    }
+                    if (groupType === GroupType.txt) {
+                        yield M.fileShow.openTxt(fileInfo2);
+                    }
+                });
             });
         }
         /**
-         * 修改視窗標題
+         * 更新視窗標題
          */
         function updateTitle() {
             let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;

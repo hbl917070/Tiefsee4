@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+/**
+ * 圖片瀏覽器
+ */
 class Tieefseeview {
     constructor(_dom) {
         _dom.innerHTML = `
@@ -101,7 +104,7 @@ class Tieefseeview {
         this.dom_img = dom_img;
         this.scrollX = scrollX;
         this.scrollY = scrollY;
-        this.getIsLoaded = getIsLoaded;
+        this.preload = preload;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
         this.loadNone = loadNone;
@@ -156,7 +159,7 @@ class Tieefseeview {
         this.getUrl = getUrl;
         setLoadingUrl(loadingUrl); //初始化 loading 圖片
         setLoading(false); //預設為隱藏
-        $(dom_tiefseeview).addClass("tiefseeview");
+        dom_tiefseeview.classList.add("tiefseeview");
         setTransform(undefined, undefined, false); //初始化定位
         setDpizoom(-1);
         //顯示圖片的區塊改變大小時
@@ -482,10 +485,9 @@ class Tieefseeview {
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
-        function getIsLoaded(_url) {
+        function preload(_url) {
             return __awaiter(this, void 0, void 0, function* () {
                 let img = document.createElement("img");
-                img.src = _url;
                 let p = yield new Promise((resolve, reject) => {
                     img.addEventListener("load", (e) => {
                         temp_originalWidth = img.naturalWidth; //初始化圖片size
@@ -497,6 +499,7 @@ class Tieefseeview {
                         temp_originalHeight = 1;
                         resolve(false); //繼續往下執行
                     });
+                    img.src = _url;
                 });
                 temp_img = img;
                 //img.src = "";
@@ -522,11 +525,11 @@ class Tieefseeview {
             return __awaiter(this, void 0, void 0, function* () {
                 //setLoading(true);
                 url = _url;
-                let p = yield getIsLoaded(_url);
+                let p = yield preload(_url);
                 //setLoading(false);
                 setDataType("img");
                 if (p === false) {
-                    yield getIsLoaded(errerUrl);
+                    yield preload(errerUrl);
                     _url = errerUrl;
                     dom_img.src = _url;
                     return false;
@@ -544,11 +547,11 @@ class Tieefseeview {
             return __awaiter(this, void 0, void 0, function* () {
                 //setLoading(true);
                 url = _url;
-                let p = yield getIsLoaded(_url);
+                let p = yield preload(_url);
                 //setLoading(false);
                 setDataType("bigimg");
                 if (p === false) {
-                    yield getIsLoaded(errerUrl);
+                    yield preload(errerUrl);
                     _url = errerUrl;
                     dom_img.src = _url;
                     return false;
@@ -1394,9 +1397,6 @@ class Tieefseeview {
                 let origPoint = getOrigPoint(left, top, toNumber(dom_data.style.width), toNumber(dom_data.style.height), degNow);
                 left = origPoint.x;
                 top = origPoint.y;
-                /*//計算鏡像後的坐標
-                left = toInt(dom_data.style.width) - left;
-                //top = toInt(dom_data.style.height) - top;*/
                 //取得旋轉回原本角度的坐標
                 let rotateRect = getRotateRect(toNumber(dom_data.style.width), toNumber(dom_data.style.height), left, top, degNow);
                 left = rotateRect.x;
@@ -1436,9 +1436,6 @@ class Tieefseeview {
                 let origPoint = getOrigPoint(left, top, toNumber(dom_data.style.width), toNumber(dom_data.style.height), degNow);
                 left = origPoint.x;
                 top = origPoint.y;
-                /*//計算鏡像後的坐標
-                //left = toInt(dom_data.style.width) - left;
-                top = toInt(dom_data.style.height) - top;*/
                 //取得旋轉回原本角度的坐標
                 let rotateRect = getRotateRect(toNumber(dom_data.style.width), toNumber(dom_data.style.height), left, top, degNow);
                 left = rotateRect.x;
@@ -1448,7 +1445,6 @@ class Tieefseeview {
                 left = -left + (dom_dpizoom.offsetWidth / 2);
                 yield setTransform(undefined, undefined, false);
                 setXY(left, top, 0);
-                //init_point(false);
             });
         }
         /**
@@ -1827,8 +1823,8 @@ class TieefseeviewScroll {
         dom_scroll.addEventListener("touchstart", (ev) => { touchStart(ev); });
         const touchStart = (ev) => {
             ev.preventDefault();
-            startLeft = toInt(dom_box.style.left);
-            startTop = toInt(dom_box.style.top);
+            startLeft = toNumber(dom_box.style.left);
+            startTop = toNumber(dom_box.style.top);
         };
         //拖曳中
         hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
@@ -1906,10 +1902,10 @@ class TieefseeviewScroll {
          */
         function getTop() {
             if (type === "y") {
-                return toInt(dom_box.style.top);
+                return toNumber(dom_box.style.top);
             }
             if (type === "x") {
-                return toInt(dom_box.style.left);
+                return toNumber(dom_box.style.left);
             }
             return 0;
         }
@@ -1919,7 +1915,7 @@ class TieefseeviewScroll {
          * @param mode set/pan/wheel
          */
         function setTop(v, mode) {
-            v = toInt(v);
+            v = toNumber(v);
             if (type === "y") {
                 if (v < 0) {
                     v = 0;
@@ -1962,22 +1958,22 @@ class TieefseeviewScroll {
             let x = 0;
             if (type === "y") {
                 x = dom_scroll.offsetHeight - dom_box.offsetHeight; //計算剩餘空間
-                x = toInt(dom_box.style.top) / x; //計算比例
+                x = toNumber(dom_box.style.top) / x; //計算比例
                 x = x * (contentHeight - panelHeight);
             }
             if (type === "x") {
                 x = dom_scroll.offsetWidth - dom_box.offsetWidth; //計算剩餘空間
-                x = toInt(dom_box.style.left) / x; //計算比例
+                x = toNumber(dom_box.style.left) / x; //計算比例
                 x = x * (contentHeight - panelHeight);
             }
             _eventChange(x, mode);
         }
         /**
-         * 轉 int
+         * 轉 number
          * @param t
          * @returns
          */
-        function toInt(t) {
+        function toNumber(t) {
             if (typeof (t) === "number") {
                 return t;
             } //如果本來就是數字，直接回傳

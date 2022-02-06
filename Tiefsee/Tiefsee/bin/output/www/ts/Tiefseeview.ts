@@ -1,5 +1,6 @@
-
-
+/**
+ * 圖片瀏覽器
+ */
 class Tieefseeview {
 
     public dom_tiefseeview: HTMLDivElement;//整體的div
@@ -9,7 +10,7 @@ class Tieefseeview {
     public scrollX;//水平滾動條
     public scrollY;//垂直滾動條
 
-    public getIsLoaded;//預載入
+    public preload;//預載入
     public loadImg;//載入圖片
     public loadBigimg;
     public loadNone;//載入空白圖片
@@ -164,7 +165,7 @@ class Tieefseeview {
         this.dom_img = dom_img;
         this.scrollX = scrollX;
         this.scrollY = scrollY;
-        this.getIsLoaded = getIsLoaded;
+        this.preload = preload;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
         this.loadNone = loadNone;
@@ -220,7 +221,7 @@ class Tieefseeview {
 
         setLoadingUrl(loadingUrl);//初始化 loading 圖片
         setLoading(false);//預設為隱藏
-        $(dom_tiefseeview).addClass("tiefseeview");
+        dom_tiefseeview.classList.add("tiefseeview");
         setTransform(undefined, undefined, false);//初始化定位
         setDpizoom(-1);
 
@@ -587,10 +588,9 @@ class Tieefseeview {
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
-        async function getIsLoaded(_url: string): Promise<boolean> {
+        async function preload(_url: string): Promise<boolean> {
 
-            let img = document.createElement("img");
-            img.src = _url;
+            let img = document.createElement("img");            
             let p = await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     temp_originalWidth = img.naturalWidth;//初始化圖片size
@@ -602,7 +602,9 @@ class Tieefseeview {
                     temp_originalHeight = 1;
                     resolve(false);//繼續往下執行
                 });
+                img.src = _url;
             })
+  
             temp_img = img;
 
             //img.src = "";
@@ -629,13 +631,13 @@ class Tieefseeview {
 
             //setLoading(true);
             url = _url;
-            let p = await getIsLoaded(_url);
+            let p = await preload(_url);
 
             //setLoading(false);
             setDataType("img");
 
             if (p === false) {
-                await getIsLoaded(errerUrl);
+                await preload(errerUrl);
                 _url = errerUrl;
                 dom_img.src = _url;
                 return false;
@@ -655,13 +657,13 @@ class Tieefseeview {
 
             //setLoading(true);
             url = _url;
-            let p = await getIsLoaded(_url);
+            let p = await preload(_url);
 
             //setLoading(false);
             setDataType("bigimg");
 
             if (p === false) {
-                await getIsLoaded(errerUrl);
+                await preload(errerUrl);
                 _url = errerUrl;
                 dom_img.src = _url;
                 return false;
@@ -1577,10 +1579,6 @@ class Tieefseeview {
             left = origPoint.x;
             top = origPoint.y;
 
-            /*//計算鏡像後的坐標
-            left = toInt(dom_data.style.width) - left;
-            //top = toInt(dom_data.style.height) - top;*/
-
             //取得旋轉回原本角度的坐標
             let rotateRect = getRotateRect(toNumber(dom_data.style.width), toNumber(dom_data.style.height), left, top, degNow);
             left = rotateRect.x;
@@ -1628,10 +1626,6 @@ class Tieefseeview {
             left = origPoint.x;
             top = origPoint.y;
 
-            /*//計算鏡像後的坐標
-            //left = toInt(dom_data.style.width) - left;
-            top = toInt(dom_data.style.height) - top;*/
-
             //取得旋轉回原本角度的坐標
             let rotateRect = getRotateRect(toNumber(dom_data.style.width), toNumber(dom_data.style.height), left, top, degNow);
             left = rotateRect.x;
@@ -1644,7 +1638,6 @@ class Tieefseeview {
             await setTransform(undefined, undefined, false);
 
             setXY(left, top, 0);
-            //init_point(false);
         }
 
         /**
@@ -2081,8 +2074,8 @@ class TieefseeviewScroll {
         dom_scroll.addEventListener("touchstart", (ev) => { touchStart(ev); });
         const touchStart = (ev: any) => {
             ev.preventDefault();
-            startLeft = toInt(dom_box.style.left);
-            startTop = toInt(dom_box.style.top);
+            startLeft = toNumber(dom_box.style.left);
+            startTop = toNumber(dom_box.style.top);
         }
 
 
@@ -2106,7 +2099,6 @@ class TieefseeviewScroll {
         hammer_scroll.on("panend", (ev) => {
             dom_scroll.setAttribute("action", "");//表示「結束拖曳」，用於CSS樣式
         });
-
 
 
         /**
@@ -2179,10 +2171,10 @@ class TieefseeviewScroll {
          */
         function getTop(): number {
             if (type === "y") {
-                return toInt(dom_box.style.top);
+                return toNumber(dom_box.style.top);
             }
             if (type === "x") {
-                return toInt(dom_box.style.left);
+                return toNumber(dom_box.style.left);
             }
             return 0;
         }
@@ -2195,7 +2187,7 @@ class TieefseeviewScroll {
          */
         function setTop(v: number, mode: ("set" | "pan" | "wheel")): void {
 
-            v = toInt(v);
+            v = toNumber(v);
 
             if (type === "y") {
                 if (v < 0) {
@@ -2248,13 +2240,13 @@ class TieefseeviewScroll {
             let x = 0;
             if (type === "y") {
                 x = dom_scroll.offsetHeight - dom_box.offsetHeight;//計算剩餘空間
-                x = toInt(dom_box.style.top) / x;//計算比例
+                x = toNumber(dom_box.style.top) / x;//計算比例
                 x = x * (contentHeight - panelHeight)
             }
 
             if (type === "x") {
                 x = dom_scroll.offsetWidth - dom_box.offsetWidth;//計算剩餘空間
-                x = toInt(dom_box.style.left) / x;//計算比例
+                x = toNumber(dom_box.style.left) / x;//計算比例
                 x = x * (contentHeight - panelHeight)
             }
 
@@ -2263,11 +2255,11 @@ class TieefseeviewScroll {
 
 
         /**
-         * 轉 int
+         * 轉 number
          * @param t 
          * @returns 
          */
-        function toInt(t: string | number): number {
+        function toNumber(t: string | number): number {
             if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳
             if (typeof t === "string") { return Number(t.replace("px", "")); }//如果是string，去掉px後轉型成數字
             return 0;

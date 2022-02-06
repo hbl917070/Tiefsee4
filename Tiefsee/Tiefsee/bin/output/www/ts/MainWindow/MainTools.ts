@@ -52,10 +52,45 @@ class MainTools {
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showOpen(btn);
+                    });
+                },
+            });
+
+            //上一個資料夾
+            /*addToolsBtn({
+                group: GroupType.img,
+                name: "file",
+                icon: "/img/default/tool-prevDir.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
 
                     });
                 },
             });
+
+            //下一個資料夾
+            addToolsBtn({
+                group: GroupType.img,
+                name: "file",
+                icon: "/img/default/tool-nextDir.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+
+                    });
+                },
+            });
+
+            //排序
+            addToolsBtn({
+                group: GroupType.img,
+                name: "file",
+                icon: "/img/default/tool-sort.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+
+                    });
+                },
+            });*/
 
             //複製
             addToolsBtn({

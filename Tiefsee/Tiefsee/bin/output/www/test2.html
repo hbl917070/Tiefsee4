@@ -93,7 +93,7 @@
             let _url = $('#imgurl').val();
 
 
-            await tv.getIsLoaded(_url);
+            await tv.preload(_url);
             if (tv.getOriginalWidth() * tv.getOriginalHeight() > 500 * 500) {
                 await tv.loadBigimg(_url);
             } else {
