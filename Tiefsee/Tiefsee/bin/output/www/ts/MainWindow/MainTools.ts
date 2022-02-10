@@ -24,7 +24,7 @@ class MainTools {
             /*addToolsBtn({
                 group: GroupType.img,
                 name: "prev",
-                icon: "/img/default/tool-prev.svg",
+                icon: "tool-prev.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.prev()
@@ -36,7 +36,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "next",
-                icon: "/img/default/tool-next.svg",
+                icon: "tool-next.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.next()
@@ -48,7 +48,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-open.svg",
+                icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showOpen(btn);
@@ -60,7 +60,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-prevDir.svg",
+                icon: "tool-prevDir.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
 
@@ -72,7 +72,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-nextDir.svg",
+                icon: "tool-nextDir.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
 
@@ -84,10 +84,10 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-sort.svg",
+                icon: "tool-sort.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-
+                        M.script.menu.showSort(btn);
                     });
                 },
             });
@@ -96,7 +96,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-copy.svg",
+                icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showCopy(btn);
@@ -109,7 +109,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "dragDropFile",
-                icon: "/img/default/tool-dragDropFile.svg",
+                icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 0) {//滑鼠左鍵
@@ -129,7 +129,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-delete.svg",
+                icon: "tool-delete.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.deleteMsg();
@@ -141,7 +141,7 @@ class MainTools {
             /*addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-search.svg",
+                icon: "tool-search.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
 
@@ -153,7 +153,7 @@ class MainTools {
             /*addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-allBrowse.svg",
+                icon: "tool-allBrowse.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
 
@@ -165,7 +165,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-setting.svg",
+                icon: "tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.setting.OpenSetting();
@@ -177,7 +177,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-rotate.svg",
+                icon: "tool-rotate.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showRotate(btn);
@@ -189,7 +189,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.img,
                 name: "file",
-                icon: "/img/default/tool-full.svg",
+                icon: "tool-full.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.img.zoomFull();
@@ -266,7 +266,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "prev",
-                icon: "/img/default/tool-prev.svg",
+                icon: "tool-prev.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.prev()
@@ -278,7 +278,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "next",
-                icon: "/img/default/tool-next.svg",
+                icon: "tool-next.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.next()
@@ -290,7 +290,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "file",
-                icon: "/img/default/tool-open.svg",
+                icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showOpen(btn);
@@ -302,7 +302,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "file",
-                icon: "/img/default/tool-copy.svg",
+                icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showCopy(btn);
@@ -315,7 +315,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "dragDropFile",
-                icon: "/img/default/tool-dragDropFile.svg",
+                icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 0) {//滑鼠左鍵
@@ -334,7 +334,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.pdf,
                 name: "file",
-                icon: "/img/default/tool-setting.svg",
+                icon: "tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.setting.OpenSetting();
@@ -380,7 +380,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "prev",
-                icon: "/img/default/tool-prev.svg",
+                icon: "tool-prev.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.prev()
@@ -392,7 +392,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "next",
-                icon: "/img/default/tool-next.svg",
+                icon: "tool-next.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.fileLoad.next()
@@ -404,7 +404,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "file",
-                icon: "/img/default/tool-open.svg",
+                icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showOpen(btn);
@@ -416,7 +416,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "file",
-                icon: "/img/default/tool-copy.svg",
+                icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.menu.showCopy(btn);
@@ -429,7 +429,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "dragDropFile",
-                icon: "/img/default/tool-dragDropFile.svg",
+                icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 0) {//滑鼠左鍵
@@ -448,7 +448,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.txt,
                 name: "file",
-                icon: "/img/default/tool-setting.svg",
+                icon: "tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.setting.OpenSetting();
@@ -494,7 +494,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.welcome,
                 name: "file",
-                icon: "/img/default/tool-open.svg",
+                icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.open.openFile();
@@ -507,7 +507,7 @@ class MainTools {
             addToolsBtn({
                 group: GroupType.welcome,
                 name: "file",
-                icon: "/img/default/tool-setting.svg",
+                icon: "tool-setting.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M.script.setting.OpenSetting();
@@ -560,7 +560,7 @@ class MainTools {
             //產生按鈕
             let div = newDiv(`
                 <div class="main-tools-btn js-noDrag" data-name="${item.name}">
-                    <import type="svg" src="${item.icon}"> </import>
+                    ${SvgList[item.icon]}
                 </div>`);
 
             addToolsDom({

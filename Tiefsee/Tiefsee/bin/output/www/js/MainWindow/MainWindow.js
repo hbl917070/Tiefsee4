@@ -27,6 +27,7 @@ class MainWindow {
     var config = new Config();
     var fileLoad = new FileLoad(this);
     var fileShow = new FileShow(this);
+    var fileSort = new FileSort(this);
     var menu = new Menu(this);
     var script = new Script(this);
     let firstRun = true;
@@ -35,6 +36,7 @@ class MainWindow {
     this.dom_maxBtnRight = dom_maxBtnRight;
     this.fileLoad = fileLoad;
     this.fileShow = fileShow;
+    this.fileSort = fileSort;
     this.menu = menu;
     this.config = config;
     this.script = script;

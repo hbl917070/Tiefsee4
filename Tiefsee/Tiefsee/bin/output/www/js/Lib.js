@@ -165,6 +165,21 @@ function initDomImport() {
     }
   });
 }
+function readFile(url) {
+  return __async(this, null, function* () {
+    let txt = "";
+    yield fetch(url, {
+      "method": "get"
+    }).then((response) => {
+      return response.text();
+    }).then((html) => {
+      txt = html;
+    }).catch((err) => {
+      console.log("error: ", err);
+    });
+    return txt;
+  });
+}
 function newDiv(html) {
   let div = document.createElement("div");
   div.innerHTML = html;

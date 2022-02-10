@@ -209,6 +209,28 @@ async function initDomImport() {
 
 
 /**
+ * 讀取文字檔
+ * @param url 
+ * @returns 
+ */
+async function readFile(url: string) {
+
+    let txt = "";
+    await fetch(url, {
+        "method": "get",
+    }).then((response) => {
+        return response.text();
+    }).then((html) => {
+        txt = html;
+    }).catch((err) => {
+        console.log("error: ", err);
+    });
+
+    return txt
+}
+
+
+/**
  * html字串 轉 dom物件
  * @param html 
  * @returns 

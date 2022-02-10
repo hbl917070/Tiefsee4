@@ -113,6 +113,9 @@ class ScriptMenu {
   showRotate(btn) {
     this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
   }
+  showSort(btn) {
+    this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+  }
 }
 class ScriptOpen {
   constructor(_M) {

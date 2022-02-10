@@ -7,6 +7,7 @@ class MainWindow {
     public config;
     public fileLoad;
     public fileShow;
+    public fileSort;
     public menu;
     public script;
     public readSetting;
@@ -22,6 +23,7 @@ class MainWindow {
         var config = new Config();
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
+        var fileSort = new FileSort(this);
         var menu = new Menu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
@@ -34,6 +36,7 @@ class MainWindow {
 
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
+        this.fileSort = fileSort;
         this.menu = menu;
         this.config = config;
         this.script = script;

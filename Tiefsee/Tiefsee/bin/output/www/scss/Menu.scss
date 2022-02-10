@@ -24,7 +24,7 @@
   position: absolute;
   bottom: 0;
   overflow: auto;
-  overflow: overlay ;
+  overflow: overlay;
   /* margin-top: -5px;
   padding-top: 5px; */
 }
@@ -48,7 +48,7 @@
   max-width: 400px;
   padding: 5px 5px;
   padding-right: 35px;
-  color: var(--color-white);;
+  color: var(--color-white);
   border-radius: 5px;
   user-select: none;
   display: flex;
@@ -57,6 +57,14 @@
 .menu-hor-item:hover {
   background-color: var(--color-white10);
   cursor: pointer;
+}
+
+.menu-hor-title {
+  padding: 5px 5px;
+  // padding-left: 30px;
+  padding-right: 35px;
+  color: var(--color-blue);
+  user-select: none;
 }
 
 /*圖示*/
@@ -87,7 +95,7 @@
 
 /*水平線*/
 .menu-hor-hr {
-  height:1px;
+  height: 1px;
   background-color: var(--color-white10);
   margin: 5px 0;
 }

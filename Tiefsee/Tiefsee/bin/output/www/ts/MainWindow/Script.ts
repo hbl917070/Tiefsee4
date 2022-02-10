@@ -160,6 +160,10 @@ class ScriptMenu {
         this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
     }
 
+    /** 顯示選單 旋轉與鏡像 */
+    showSort(btn: HTMLElement) {
+        this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+    }
 
 
 }

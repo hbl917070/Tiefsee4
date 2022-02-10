@@ -166,7 +166,7 @@ class FileLoad {
             let func = _show;
             _show = async () => { };
             await func();
-          
+
             setTimeout(() => { timer01(); }, 5);  //遞迴
         }
         timer01();
@@ -417,6 +417,7 @@ class FileLoad {
             const len = fileName.length - Lib.GetExtension(path).length;
             msg.domInput.setSelectionRange(0, len);
         }
+
 
 
     }
