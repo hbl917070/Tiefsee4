@@ -1,0 +1,255 @@
+/* 圖示粗細 */
+:root {
+  --svgWeight: 0px;
+}
+.titlebar-tools-btn svg,
+.main-tools-btn svg,
+.menu-hor-icon svg {
+  stroke: var(--color-white);
+  stroke-width: var(--svgWeight);
+}
+
+/*---------------------------*/
+
+/*內容區塊*/
+.window-body {
+  flex: 1;
+  display: flex;
+}
+
+/*---------------------------*/
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.main-T {
+}
+
+.main-C {
+  display: flex;
+  flex: 1;
+}
+
+.main-B {
+}
+
+.main-L {
+}
+
+.main-V {
+  flex: 1;
+  position: relative;
+}
+
+.main-R {
+}
+
+/*---------------------------*/
+
+.main-welcomeview {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-white);
+  user-select: none;
+  /* pointer-events: none; */
+}
+
+.main-tiefseeview {
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.main-pdfview {
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+
+.main-txtview {
+  height: 100%;
+  width: 100%;
+  /* position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 10px; */
+  border: none;
+  font-size: 15px;
+  color: var(--color-white);
+  background-color: rgba(0, 0, 0, 0);
+  padding: 10px;
+  outline: none;
+}
+
+/*---------------------------*/
+.welcomeview-logo {
+  max-width: 150px;
+  margin: auto;
+  margin-bottom: 30px;
+  display: block;
+  pointer-events: none;
+}
+.welcomeview-txt {
+  text-align: center;
+  font-size: 20px;
+  pointer-events: none;
+}
+
+/*---------------------------*/
+
+/* #region main-tools 工具列 */
+
+.main-tools {
+  /* background-color: rgba(165, 42, 42, 0.411); */
+  /* height: 35px; */
+  color: var(--color-white);
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+/*捲動軸樣式*/
+.main-tools:hover {
+  overflow-x: overlay;
+}
+.main-tools::-webkit-scrollbar {
+  /* background-color: var(--color-black40); */
+  height: 3px;
+  /* border-radius: 5px; */
+}
+
+.main-tools::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.main-tools::-webkit-scrollbar-thumb {
+  background-color: var(--color-white40);
+  /* border-radius: 5px; */
+}
+
+.main-tools-group {
+  display: none;
+  margin-left: 3px;
+  margin-bottom: 3px;
+}
+.main-tools-group[active="true"] {
+  display: flex;
+}
+/*垂直線*/
+.main-tools-hr {
+  width: 1px;
+  min-width: 1px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-white20);
+  margin: 0 3px;
+}
+
+/*純文字資訊*/
+.main-tools-txt {
+  height: 35px;
+  margin: 0px 5px;
+  font-size: 15px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/*按鈕*/
+.main-tools-btn {
+  min-width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 15px;
+  user-select: none;
+  flex-shrink: 0; /*避免壓縮*/
+}
+
+.main-tools-btn:hover {
+  cursor: pointer;
+  background-color: var(--color-white20);
+}
+.main-tools-btn:active {
+  background-color: var(--color-white30);
+}
+
+.main-tools-btn svg,
+.main-tools-btn img {
+  width: 25px;
+  height: 25px;
+  pointer-events: none;
+}
+
+/*開啟選單時*/
+.main-tools-btn.menuActive {
+  background-color: var(--color-white20) !important;
+}
+/* #endregion */
+
+/* #region 下面的大型換頁按鈕 */
+
+.maxBtn {
+  /* backdrop-filter: saturate(180%) blur(20px); */
+  position: absolute;
+  border-radius: 5px;
+  background-color: var(--color-black40);
+  /* border: 1px solid var(--color-blue40); */
+  border: 1px solid var(--color-white20);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  z-index: 5;
+}
+.maxBtn:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+.maxBtn:active {
+  /* border: 1px solid var(--color-blue60); */
+  /* transform: translateX(-2px); */
+}
+.maxBtn:active svg {
+  transform: scale(1.05);
+  /* border: 1px solid var(--color-blue60); */
+  /* transform: translateX(-2px); */
+}
+/*.maxBtnLeft-bottom:active {
+  transform: translateX(-1px);
+}
+.maxBtnRight-bottom:active {
+  transform: translateX(1px);
+} */
+.maxBtn svg {
+  max-height: 30px;
+}
+.maxBtnLeft-bottom {
+  bottom: 20px;
+  left: 20px;
+  right: 50%;
+  height: 60px;
+}
+
+.maxBtnRight-bottom {
+  bottom: 20px;
+  left: 50%;
+  right: 20px;
+  height: 60px;
+}
+/* #endregion */

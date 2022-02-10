@@ -1,7 +1,6 @@
 
 class InitMenu {
 
-
     constructor(M: MainWindow) {
 
         initOpen();

@@ -49,157 +49,197 @@
 
 <body>
  
-    <div class="menu" active="">
-        <div class="menu-content" id="menu-open">
-            <div class="menu-box">
-                <div class="menu-hor-item" id="menuitem-openFile">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">載入檔案</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-newWindow">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">另開視窗</div>
-                </div>
-
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-showOnExplorer">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-showSystemMenu">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-renameFile">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">重新命名檔案</div>
-                </div>
-
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-printFile">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">列印</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-setWallpaper">
-                    <div class="menu-hor-icon"></div>
-                    <div class="menu-hor-txt" i18n="">設成桌布</div>
-                </div>
-
-
+    <!-- 下拉選單 & 右鍵選單 -->
+    
+<!-- 檔案 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-open">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-openFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">載入檔案</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-newWindow">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">另開視窗</div>
             </div>
 
-            <div class="menu-box">
-                <div class="menu-hor-item" id="menuitem-runApp">
-                    <div class="menu-hor-icon">
-                    </div>
-                    <div class="menu-hor-txt" i18n="">選擇其他應用程式</div>
-                </div>
+            <div class="menu-hor-hr"></div>
 
-
-                <div class="menu-hor-item" id="menuitem-open3DMSPaint">
-                    <div class="menu-hor-icon">
-                        <img src="/img/icon-Paint3D.png">
-                    </div>
-                    <div class="menu-hor-txt" i18n="">3D 小畫家</div>
-                </div>
-
-                <div id="menu-otherAppOpen">
-
-
-                </div>
-
-
+            <div class="menu-hor-item" id="menuitem-showOnExplorer">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
             </div>
+            <div class="menu-hor-item" id="menuitem-showSystemMenu">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-renameFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">重新命名檔案</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-printFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">列印</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-setWallpaper">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">設成桌布</div>
+            </div>
+
 
         </div>
-    </div>
 
-    <div class="menu" active="">
-        <div class="menu-content" id="menu-copy">
-            <div class="menu-box">
-                <div class="menu-hor-item" id="menuitem-img-copyFile">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 檔案</div>
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-runApp">
+                <div class="menu-hor-icon">
                 </div>
-                <div class="menu-hor-item" id="menuitem-img-copyName">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 檔名</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-img-copyPath">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 完整路徑</div>
-                </div>
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-img-copyImg">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 影像</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-img-copyBase64">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 base64</div>
-                </div>
-
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-img-copyPng">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 影像(含透明色)</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-img-copyTxt">
-                    <div class="menu-hor-icon"> </div>
-                    <div class="menu-hor-txt" i18n="">複製 SVG 文字</div>
-                </div>
+                <div class="menu-hor-txt" i18n="">選擇其他應用程式</div>
             </div>
 
-        </div>
-    </div>
 
-    <div class="menu" active="">
-        <div class="menu-content" id="menu-rotate">
-            <div class="menu-box">
-                <div class="menu-hor-item" id="menuitem-img-rotateCw">
-                    <div class="menu-hor-icon">
-                        <import type="svg" src="/img/default/tool-rotateCw.svg"> </import>
-                    </div>
-                    <div class="menu-hor-txt" i18n="">順時針90°</div>
+            <div class="menu-hor-item" id="menuitem-open3DMSPaint">
+                <div class="menu-hor-icon">
+                    <img src="/img/icon-Paint3D.png">
                 </div>
-                <div class="menu-hor-item" id="menuitem-img-rotateCcw">
-                    <div class="menu-hor-icon">
-                        <import type="svg" src="/img/default/tool-rotateCcw.svg"> </import>
-                    </div>
-                    <div class="menu-hor-txt" i18n="">逆時針90°</div>
-                </div>
-
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-img-mirroringH">
-                    <div class="menu-hor-icon">
-                        <import type="svg" src="/img/default/tool-mirroringH.svg"> </import>
-                    </div>
-                    <div class="menu-hor-txt" i18n="">水平鏡像</div>
-                </div>
-                <div class="menu-hor-item" id="menuitem-img-mirroringV">
-                    <div class="menu-hor-icon">
-                        <import type="svg" src="/img/default/tool-mirroringV.svg"> </import>
-                    </div>
-                    <div class="menu-hor-txt" i18n="">垂直鏡像</div>
-                </div>
-
-                <div class="menu-hor-hr"></div>
-
-                <div class="menu-hor-item" id="menuitem-img-initRotate">
-                    <div class="menu-hor-icon">
-                        <import type="svg" src="/img/default/tool-initRotate.svg"> </import>
-                    </div>
-                    <div class="menu-hor-txt" i18n="">初始化旋轉</div>
-                </div>
+                <div class="menu-hor-txt" i18n="">3D 小畫家</div>
             </div>
 
+            <div id="menu-otherAppOpen">
+
+
+            </div>
+
+
         </div>
+
     </div>
+</div>
+
+
+<!-- 複製 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-copy">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-img-copyFile">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 檔案</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyName">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 檔名</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyPath">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 完整路徑</div>
+            </div>
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-copyImg">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 影像</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyBase64">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 base64</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-copyPng">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 影像(含透明色)</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyTxt">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 SVG 文字</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 旋轉 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-rotate">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-img-rotateCw">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M3.6,8C5,5.5,7.2,3.7,9.9,2.9s5.6-0.5,8.1,0.9c1.6,0.9,4,3.6,4,3.6V2h1v7h-8V8h6.1c-0.9-1.2-2.1-2.4-3.6-3.2
+	c-2.3-1.2-4.8-1.5-7.3-0.8C7.7,4.6,5.7,6.3,4.4,8.5s-1.5,4.8-0.8,7.3s2.4,4.5,4.6,5.7c4,2.2,9.1,1.2,12-2.3c0.4-0.5,0.8-1,1.1-1.5
+	l0.9,0.5c-0.3,0.6-0.7,1.2-1.2,1.7c-2.1,2.5-5.1,3.8-8.2,3.8c-1.7,0-3.5-0.4-5.1-1.3c-2.5-1.4-4.3-3.6-5.1-6.3S2.2,10.5,3.6,8z"/>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">順時針90°</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-rotateCcw">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M21.5,8c-1.4-2.5-3.6-4.3-6.3-5.1C12.4,2.2,9.5,2.5,7,3.8C5.5,4.7,3,7.4,3,7.4V2H2v7h7V8H3.9C4.8,6.8,6,5.5,7.5,4.7
+	c2.3-1.2,4.8-1.5,7.3-0.8s4.5,2.4,5.7,4.6s1.5,4.8,0.8,7.3s-2.4,4.5-4.6,5.7c-4,2.2-9.1,1.2-12-2.3c-0.4-0.5-0.8-1-1.1-1.5l-0.9,0.5
+	c0.3,0.6,0.7,1.2,1.2,1.7c2.1,2.5,5.1,3.8,8.2,3.8c1.7,0,3.5-0.4,5.1-1.3c2.5-1.4,4.3-3.6,5.1-6.3S22.8,10.5,21.5,8z"/>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">逆時針90°</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-mirroringH">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<rect x="12" y="1" width="1" height="23"/>
+		<path d="M14.4,12.6l8.6,7.7V4.8L14.4,12.6z M22,18l-6.1-5.5L22,7V18z"/>
+		<path d="M2,20.2l8.6-7.7L2,4.8V20.2z M3,7l6.1,5.5L3,18V7z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">水平鏡像</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-mirroringV">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<rect x="1" y="12" width="23" height="1"/>
+		<path d="M4.8,23h15.4l-7.7-8.6L4.8,23z M7,22l5.5-6.1L18,22H7z"/>
+		<path d="M20.3,2H4.8l7.7,8.6L20.3,2z M18,3l-5.5,6.1L7,3H18z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">垂直鏡像</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-initRotate">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M23.4,12.1h-1.2c-0.2-4.9-4.2-9-9.1-9.3V1.6c0-0.3-0.2-0.5-0.5-0.5s-0.5,0.2-0.5,0.5v1.2C7.1,2.9,3,7,2.8,12H1.6
+			c-0.3,0-0.5,0.2-0.5,0.5S1.3,13,1.6,13h1.2C3,18,7,22,12,22.2v1.2c0,0.3,0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5v-1.2c5-0.3,9-4.2,9.2-9.2
+			h1.2c0.3,0,0.5-0.2,0.5-0.5S23.7,12.1,23.4,12.1z M12.5,21.3c-4.8,0-8.8-3.9-8.8-8.8c0-4.8,3.9-8.8,8.8-8.8l0,0h0.1l0,0
+			c4.8,0.1,8.7,4,8.7,8.8C21.2,17.4,17.3,21.3,12.5,21.3z"/>
+		<path d="M12.5,10.2c-1.2,0-2.3,1-2.3,2.3c0,1.2,1,2.3,2.3,2.3s2.3-1,2.3-2.3C14.8,11.3,13.7,10.2,12.5,10.2z"/>
+		<path d="M23.6,12.1h-1.2c-0.2-4.9-4.2-9-9.1-9.3V1.6c0-0.3-0.2-0.5-0.5-0.5s-0.5,0.2-0.5,0.5v1.2C7.3,2.9,3.2,7,3,12H1.8
+			c-0.3,0-0.5,0.2-0.5,0.5S1.5,13,1.8,13H3c0.2,5,4.2,9,9.2,9.2v1.2c0,0.3,0.2,0.5,0.5,0.5s0.5-0.2,0.5-0.5v-1.2c5-0.3,9-4.2,9.2-9.2
+			h1.2c0.3,0,0.5-0.2,0.5-0.5S23.9,12.1,23.6,12.1z M12.7,21.3c-4.8,0-8.8-3.9-8.8-8.8c0-4.8,3.9-8.8,8.8-8.8l0,0h0.1l0,0
+			c4.8,0.1,8.7,4,8.7,8.8C21.4,17.4,17.5,21.3,12.7,21.3z"/>
+		<path d="M12.7,10.2c-1.2,0-2.3,1-2.3,2.3c0,1.2,1,2.3,2.3,2.3s2.3-1,2.3-2.3C15,11.3,13.9,10.2,12.7,10.2z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">初始化旋轉</div>
+            </div>
+        </div>
+
+    </div>
+</div>
 
     <div class="window">
 
@@ -211,29 +251,49 @@
             </div>
 
             <div class="titlebar-tools">
-
                 <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
-                    <import type="svg" src="/img/default/window-menu.svg"> </import>
+                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<g style="fill:var(--color-white);">
+		<rect x="6" y="7" width="13" height="1"/>
+		<rect x="6" y="11" width="13" height="1"/>
+		<path d="M12.5,19c-0.1,0-0.2,0-0.3-0.1L9,16.3l0.6-0.7l2.9,2.3l2.9-2.3l0.6,0.8L12.8,19C12.7,19,12.6,19,12.5,19z"/>
+	</g>
+</svg>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-topmost">
-                    <import type="svg" src="/img/default/window-topmost.svg"> </import>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<g style="fill:var(--color-white);">
+		<rect x="7" y="18"  width="11" height="1"/>
+		<path  d="M7.7,11.8L7,11.1L12.1,6c0.2-0.2,0.5-0.2,0.7,0l5.1,5.1l-0.7,0.7l-4.8-4.8L7.7,11.8z"/>
+		<rect x="12" y="7" width="1" height="9"/>
+	</g>
+</svg>
+
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-minimized">
-                    <import type="svg" src="/img/default/window-minimized.svg"> </import>
+                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
+</svg>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
-                    <import type="svg" src="/img/default/window-normal.svg"> </import>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white);" d="M8,7v2H7v9h9v-1h2V7H8z M15,17H8v-7h7V17z M17,16h-1V9H9V8h8V16z"/>
+</svg>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-maximized">
-                    <import type="svg" src="/img/default/window-maximized.svg"> </import>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white);">
+		<path  d="M17,8v9H8V8H17 M18,7H7v11h11V7L18,7z"/>
+	</g>
+</svg>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-close">
-                    <import type="svg" src="/img/default/window-close.svg"> </import>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<polygon style="fill:var(--color-white)" points="18.4,7.4 17.6,6.6 12.5,11.8 7.4,6.6 6.6,7.4 11.8,12.5 6.6,17.6 7.4,18.4 12.5,13.2 17.6,18.4 18.4,17.6 
+		13.2,12.5 "/>
+</svg>
                 </div>
-
             </div>
-
-
 
         </div>
 
@@ -265,10 +325,14 @@
                         <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
 
                         <div class="maxBtn maxBtnLeft-bottom" id="maxBtnLeft">
-                            <import type="svg" src="/img/default/tool-prev.svg"> </import>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M24.9,12H2.2l11.6-9.3L13.1,2L0.4,12.1c-0.1,0.1-0.2,0.2-0.2,0.4s0.1,0.3,0.2,0.4L13.1,23l0.6-0.8L2.2,13H25v-1H24.9z"/>
+</svg>
                         </div>
                         <div class="maxBtn maxBtnRight-bottom" id="maxBtnRight">
-                            <import type="svg" src="/img/default/tool-next.svg"> </import>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M0,13h22.8l-11.6,9.3l0.6,0.7l12.7-10.1c0.1-0.1,0.2-0.2,0.2-0.4s-0.1-0.3-0.2-0.4L11.8,2l-0.6,0.8L22.7,12H0V13z"/>
+</svg>
                         </div>
 
                         <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
@@ -281,10 +345,6 @@
                 <div class="main-B"></div>
 
             </div>
-
-
-
-
 
         </div>
 

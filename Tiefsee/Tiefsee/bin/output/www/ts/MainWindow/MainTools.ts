@@ -57,7 +57,7 @@ class MainTools {
             });
 
             //上一個資料夾
-            /*addToolsBtn({
+            addToolsBtn({
                 group: GroupType.img,
                 name: "file",
                 icon: "/img/default/tool-prevDir.svg",
@@ -90,7 +90,7 @@ class MainTools {
 
                     });
                 },
-            });*/
+            });
 
             //複製
             addToolsBtn({

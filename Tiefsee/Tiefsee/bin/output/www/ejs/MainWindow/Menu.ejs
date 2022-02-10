@@ -1,0 +1,157 @@
+
+<!-- 檔案 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-open">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-openFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">載入檔案</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-newWindow">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">另開視窗</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-showOnExplorer">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-showSystemMenu">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-renameFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">重新命名檔案</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-printFile">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">列印</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-setWallpaper">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">設成桌布</div>
+            </div>
+
+
+        </div>
+
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-runApp">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="">選擇其他應用程式</div>
+            </div>
+
+
+            <div class="menu-hor-item" id="menuitem-open3DMSPaint">
+                <div class="menu-hor-icon">
+                    <img src="/img/icon-Paint3D.png">
+                </div>
+                <div class="menu-hor-txt" i18n="">3D 小畫家</div>
+            </div>
+
+            <div id="menu-otherAppOpen">
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 複製 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-copy">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-img-copyFile">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 檔案</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyName">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 檔名</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyPath">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 完整路徑</div>
+            </div>
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-copyImg">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 影像</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyBase64">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 base64</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-copyPng">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 影像(含透明色)</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-copyTxt">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">複製 SVG 文字</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 旋轉 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-rotate">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-img-rotateCw">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rotateCw.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">順時針90°</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-rotateCcw">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rotateCcw.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">逆時針90°</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-mirroringH">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-mirroringH.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">水平鏡像</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-img-mirroringV">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-mirroringV.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">垂直鏡像</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-initRotate">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-initRotate.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">初始化旋轉</div>
+            </div>
+        </div>
+
+    </div>
+</div>

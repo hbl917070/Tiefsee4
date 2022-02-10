@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tiefsee 4</title>
+
+    <!--google字體-->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet"> -->
+
+    <script src="/vender/jquery-3.6.0.min.js"></script>
+    <!-- <script src="/vender/jquery.easing.js"></script> -->
+
+    <!-- MiniColors(選擇顏色套件 -->
+    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+
+    <!-- tippy(工具提示套件 -->
+    <script src="/vender/tippyjs/popper.min.js"></script>
+    <script src="/vender/tippyjs/tippy-bundle.umd.min.js"></script>
+
+    <link rel="stylesheet" href="/css/BaseWindow.css">
+    <script src="/js/BaseWindow.js"></script>
+    <script src="/js/Lib.js"></script>
+
+
+
+    <link rel="stylesheet" href="/css/Setting.css">
+    <link rel="stylesheet" href="/css/Menu.css">
+    <link rel="stylesheet" href="/css/Msgbox.css">
+
+    <script src="/js/Config.js"></script>
+    <script src="/js/MainWindow/Menu.js"></script>
+    <script src="/js/Msgbox.js"></script>
+    <script src="/js/SettinWindow/SettinWindow.js"></script>
+
+
+
+    <script>
+        var setting;
+        document.addEventListener("DOMContentLoaded", async () => {
+            setting = new Setting();
+        });
+    </script>
+
+</head>
+
+<body>
+
+
+
+
+
+
+    <div class="window">
+
+        <div class="window-left" id="window-left">
+
+            <!-- <img src="/img/logo.svg" style="width:35px;display:block;margin:10px;margin-top:10px"> -->
+
+            <div class="pagetab">
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-common" i18n="" active="true"> 一般 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n=""> 外觀</div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理</div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n=""> 設為預設程式</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n=""> 進階設定</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於</div>
+            </div>
+
+        </div>
+
+        <div class="window-right">
+
+            <!-- 標題列 -->
+            <div class="window-titlebar">
+
+                <div class="titlebar-txt"></div>
+
+                <div class="titlebar-tools">
+
+                    <!-- <div class="titlebar-tools-btn titlebar-tools-topmost">
+                        <import type="svg" src="/img/default/window-topmost.svg"> </import>
+                    </div> -->
+                    <div class="titlebar-tools-btn titlebar-tools-minimized">
+                        <import type="svg" src="/img/default/window-minimized.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                        <import type="svg" src="/img/default/window-normal.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-maximized">
+                        <import type="svg" src="/img/default/window-maximized.svg"> </import>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-close">
+                        <import type="svg" src="/img/default/window-close.svg"> </import>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="window-body base-scrollbar">
+
+                <!-- 一般 -->
+                <div class="page-tabsPage" id="tabsPage-common">
+                    <div class="page-title" i18b=""> 一般 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 啟動模式 </div>
+
+                        <div class="text-title">(修改後需重啟程式) </div>
+
+                        <!-- 提示 -->
+                        <div style="display: none;">
+                            <div id="tooltip-startType1">
+                                每個視窗都是一個新的執行個體，啟動速度較慢
+                            </div>
+                            <div id="tooltip-startType2">
+                                所有視窗共用同一個執行個體。存在一個以上的視窗時，能以極快的速度啟動
+                            </div>
+                            <div id="tooltip-startType3">
+                                所有視窗共用同一個執行個體。程式會常駐在背景，隨時都能以極快的速度啟動
+                            </div>
+                            <div id="tooltip-startType4">
+                                只允許存在一個視窗
+                            </div>
+                            <div id="tooltip-startType5">
+                                只允許存在一個視窗。程式會常駐在背景，隨時都能以極快的速度啟動
+                            </div>
+                        </div>
+
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="radio-startType" value="1">
+                                <span>直接啟動</span>
+                                <div class="img-help" data-tooltip="tooltip-startType1">
+                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="radio-startType" value="2">
+                                <span>快速啟動</span>
+                                <div class="img-help" data-tooltip="tooltip-startType2">
+                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="radio-startType" value="3">
+                                <span>快速啟動 + 常駐背景</span>
+                                <div class="img-help" data-tooltip="tooltip-startType3">
+                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="radio-startType" value="4">
+                                <span>單一視窗 </span>
+                                <div class="img-help" data-tooltip="tooltip-startType4">
+                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="radio-startType" value="5">
+                                <span>單一視窗 + 常駐背景</span>
+                                <div class="img-help" data-tooltip="tooltip-startType5">
+                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                </div>
+                            </label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 外觀 -->
+                <div class="page-tabsPage" id="tabsPage-theme">
+
+                    <div class="page-title" i18b=""> 外觀 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 套用預設主題 </div>
+                        <div id="applyTheme-btns"></div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 自定主題顏色 </div>
+
+                        <div class="text-title"> 視窗背景色</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" data-format="rgba"
+                                id="text-theme-colorWindowBackground">
+                        </div>
+
+                        <div class="text-title"> 視窗邊框色</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" data-format="rgba" id="text-theme-colorWindowBorder">
+                        </div>
+
+                        <div class="text-title"> 文字顏色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-theme-colorWhite">
+                        </div>
+
+                        <div class="text-title"> 區塊底色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-theme-colorBlack">
+                        </div>
+
+                        <div class="text-title"> 主顏色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-theme-colorBlue">
+                        </div>
+
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title"> 視窗設定 </div>
+
+                        <div class="text-title"> 視窗縮放 (0.5~3.0)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-theme-zoomFactor">
+                        </div>
+
+                        <div class="text-title"> 視窗圓角 (0~15)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-theme-windowBorderRadius">
+                        </div>
+
+                        <div class="text-title"> 文字粗細 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-fontWeight">
+                                <option value="100">1(最細)</option>
+                                <option value="200">2</option>
+                                <option value="300">3</option>
+                                <option value="400">4(預設)</option>
+                                <option value="500">5</option>
+                                <option value="600">6</option>
+                                <option value="700">7</option>
+                                <option value="800">8</option>
+                                <option value="900">9(最粗)</option>
+                            </select>
+                        </div>
+
+
+                        <div class="text-title"> 圖示粗細 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-svgWeight">
+                                <option value="0px">0(最細、預設)</option>
+                                <option value="0.1px">1</option>
+                                <option value="0.2px">2</option>
+                                <option value="0.3px">3</option>
+                                <option value="0.4px">4</option>
+                                <option value="0.5px">5</option>
+                                <option value="0.6px">6</option>
+                                <option value="0.7px">7</option>
+                                <option value="0.8px">8</option>
+                                <option value="0.9px">9</option>
+                                <option value="1px">10(最粗)</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title"> 毛玻璃效果(需重啟程式)</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-theme-areo">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 工具列 -->
+                <div class="page-tabsPage" id="tabsPage-tools">
+                    <div class="page-title" i18b=""> 工具列 </div>
+                    <div class="box">
+                        <div class="box-title">
+                            還在做
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 圖片 -->
+                <div class="page-tabsPage" id="tabsPage-image">
+                    <div class="page-title" i18b=""> 影像處理 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片縮放模式 </div>
+                        <div class="text-title"> </div>
+                        <div class="text-content">
+                            <select class="text-input" id="image-tieefseeviewImageRendering">
+                                <option value="0">平滑</option>
+                                <option value="1">銳利</option>
+                                <option value="2">僅放大時銳利</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片DPI縮放 </div>
+
+                        <div class="text-title"> 強制將圖片渲染成更高的解析度 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="image-dpizoom">
+                                <option value="-1">auto</option>
+                                <option value="1">100%</option>
+                                <option value="1.25">125%</option>
+                                <option value="1.5">150%</option>
+                                <option value="1.75">175%</option>
+                                <option value="2.0">200%</option>
+                                <option value="2.25">225%</option>
+                                <option value="2.5">250%</option>
+                                <option value="2.75">275%</option>
+                                <option value="3.0">300%</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <!-- 快速鍵 -->
+                <div class="page-tabsPage" id="tabsPage-shortcutKeys">
+                    <div class="page-title" i18b=""> 快速鍵 </div>
+
+                    <div class="box">
+                        <div class="box-title">
+                            還在做
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- 設為預設程式 -->
+                <div class="page-tabsPage" id="tabsPage-extension">
+                    <div class="page-title" i18b=""> 設為預設程式 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 步驟1、把Tiefsee關聯到特定副檔名 </div>
+                        <div class="text-title"> (一行代表一種副檔名) </div>
+                        <div class="text-content">
+                            <textarea class="text-input base-scrollbar" rows="7" id="txt-extension"> </textarea>
+                        </div>
+                        <div class="btn" id="btn-extension">套用</div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 步驟2、修改系統預設APP </div>
+                        <div class="text-title">開啟系統設定後將「相片檢視器」修改成「Tiefsee」 </div>
+                        <div class="btn" id="btn-openSystemSetting">開啟系統設定</div>
+                    </div>
+
+                </div>
+
+                <!-- 進階設定 -->
+                <div class="page-tabsPage" id="tabsPage-advanced">
+                    <div class="page-title" i18b=""> 進階設定 </div>
+
+                    <div class="box">
+                        <div class="box-title"> Tiefsee localhost server </div>
+
+                        <div class="text-title"> Port (如果已經被使用，則會使用下一號) </div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="txt-startPort">
+                        </div>
+
+                        <div class="text-title"> 快取有效時間 (秒) </div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="txt-serverCache">
+                        </div>
+
+                        <div class="text-title"> 清理快取資料 </div>
+                        <div class="text-content">
+                            <div class="btn" id="btn-clearBrowserCache">清理</div>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 相關路徑 </div>
+                        <div class="text-box">
+                            <div class="text-title"> </div>
+                            <div class="link" id="btn-openAppData">AppData(使用者資料)</div>
+                            <div class="link" id="btn-openWww">www(原始碼)</div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- 關於 -->
+                <div class="page-tabsPage" id="tabsPage-about">
+                    <div class="page-title" i18b=""> 關於 </div>
+
+                    <div class="box">
+                        <div class="box-title">
+                            <span>版本:</span>
+                            <span> Tiefsee 4.0.0-beta.8</span>
+                        </div>
+                        <div class="box-title">
+                            <span>作者:</span>
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+                        </div>
+                        <div class="box-title">
+                            <span>原始碼:</span>
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="window-LC window-border"></div>
+            <div class="window-RC window-border"></div>
+            <div class="window-CT window-border"></div>
+            <div class="window-LT window-border"></div>
+            <div class="window-RT window-border"></div>
+            <div class="window-CB window-border"></div>
+            <div class="window-LB window-border"></div>
+            <div class="window-RB window-border"></div>
+
+        </div>
+
+
+        <script>
+       //     $(`[data-format="rgba"]`).minicolors({ format: "rgb", opacity: true, });
+       //     $(`[data-format="rgb"]`).minicolors({ format: "rgb", opacity: false, });
+        </script>
+
+
+
+
+
+
+</body>
+
+</html>

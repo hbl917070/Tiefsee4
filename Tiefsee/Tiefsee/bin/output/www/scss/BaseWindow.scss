@@ -1,0 +1,257 @@
+:root {
+  /** 可拖曳的邊框 */
+  --window-border: 7px;
+  /** 可拖曳的四個角落 */
+  --window-border-corner: 20px;
+  /** 視窗圓角 */
+  --window-border-radius: 0px;
+
+  --color-window-border: rgba(255, 255, 255, 0.25);
+  --color-window-background: rgba(31, 39, 43, 0.97);
+
+  --color-black: rgba(0, 0, 0, 1);
+  --color-black80: rgba(0, 0, 0, 0.8);
+  --color-black60: rgba(0, 0, 0, 0.6);
+  --color-black40: rgba(0, 0, 0, 0.4);
+  --color-black20: rgba(0, 0, 0, 0.2);
+
+  --color-grey: rgba(30, 30, 30, 1);
+  --color-grey80: rgba(30, 30, 30, 0.8);
+  --color-grey60: rgba(30, 30, 30, 0.6);
+  --color-grey40: rgba(30, 30, 30, 0.4);
+  --color-grey20: rgba(30, 30, 30, 0.2);
+
+  --color-white: rgb(255, 255, 255);
+  --color-white80: rgba(255, 255, 255, 0.8);
+  --color-white60: rgba(255, 255, 255, 0.6);
+  --color-white40: rgba(255, 255, 255, 0.4);
+  --color-white30: rgba(255, 255, 255, 0.3);
+  --color-white20: rgba(255, 255, 255, 0.2);
+  --color-white10: rgba(255, 255, 255, 0.1);
+
+  --color-blue: rgb(0, 200, 255);
+  --color-blue80: rgba(0, 200, 255, 0.8);
+  --color-blue60: rgba(0, 200, 255, 0.6);
+  --color-blue40: rgba(0, 200, 255, 0.4);
+  --color-blue20: rgba(0, 200, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  overflow: hidden;
+}
+
+body,
+input,
+textarea,
+button {
+  font-family: "Segoe UI", "Microsoft JhengHei UI";
+  /* font-weight: 100; */
+  /* font-family: "Noto Sans TC","Noto Sans CJK TC Light" ; */
+}
+
+select option {
+  background: var(--color-black);
+}
+
+.window.window-start {
+  /* opacity: 0.9; */
+
+}
+
+/* 視窗本體 */
+.window {
+  /* transition: transform 0.2s;
+  transform: translateY(10px) scale(0.98); */
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-window-background);
+  border-radius: var(--window-border-radius);
+  border: 1px solid var(--color-window-border);
+  /* margin: 5px;  */
+  margin-right: 1.5px;
+  margin-bottom: 1.5px;
+  display: flex;
+  flex-direction: column;
+}
+
+/*視窗最大化時*/
+.window.maximized {
+  margin: 0px;
+  box-shadow: none;
+  border: none;
+  border-radius: 0px;
+}
+.window.maximized .window-border {
+  display: none;
+}
+
+/*---------------------------*/
+
+/* #region window-titlebar 標題列*/
+
+/*標題列*/
+.window-titlebar {
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: space-between;
+}
+
+.titlebar-txt {
+  height: 100%;
+  font-size: 15px;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  flex: 1;
+  user-select: none;
+  overflow: hidden;
+}
+.titlebar-txt span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar-tools {
+  display: flex;
+}
+.titlebar-tools-btn {
+  height: 100%;
+  width: 38px;
+  margin-left: 1px;
+  /* background-color: antiquewhite; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border-radius: 4px; */
+}
+/*選取時*/
+.titlebar-tools-btn[active="true"] {
+  background-color: var(--color-white20);
+}
+.titlebar-tools-btn:hover {
+  background-color: var(--color-white20);
+  cursor: pointer;
+  /* outline: 1px solid var(--color-white60); */
+}
+.titlebar-tools-btn svg {
+  width: 25px;
+  height: 25px;
+  pointer-events: none;
+}
+
+/* #endregion */
+
+/*---------------------------*/
+
+/* #region window-border 改變視窗大小的框 */
+
+.window-border {
+  position: fixed;
+  z-index: 9999;
+}
+.window-CT {
+  height: var(--window-border);
+  top: 0;
+  left: var(--window-border-corner);
+  right: var(--window-border);
+  cursor: n-resize;
+}
+
+.window-RC {
+  width: var(--window-border);
+  top: var(--window-border);
+  right: 0;
+  bottom: var(--window-border-corner);
+  cursor: w-resize;
+}
+
+.window-CB {
+  height: var(--window-border);
+  bottom: 0;
+  left: var(--window-border-corner);
+  right: var(--window-border-corner);
+  cursor: n-resize;
+}
+
+.window-LC {
+  width: var(--window-border);
+  top: var(--window-border-corner);
+  left: 0;
+  bottom: var(--window-border-corner);
+  cursor: w-resize;
+}
+
+.window-LT {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  left: 0;
+  top: 0;
+  cursor: nw-resize;
+}
+
+.window-RT {
+  width: var(--window-border);
+  height: var(--window-border);
+  right: 0;
+  top: 0;
+  cursor: ne-resize;
+}
+
+.window-LB {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  left: 0;
+  bottom: 0;
+  cursor: ne-resize;
+}
+
+.window-RB {
+  width: var(--window-border-corner);
+  height: var(--window-border-corner);
+  right: 0;
+  bottom: 0;
+  cursor: nw-resize;
+}
+
+/* #endregion */
+
+/*----------------------------------------------------------------*/
+
+/*捲動軸樣式*/
+
+/*整體背景*/
+.base-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.base-scrollbar::-webkit-scrollbar:hover {
+  background-color: var(--color-black60);
+}
+/*滾動條軌道*/
+.base-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0);
+}
+/*拖曳區塊*/
+.base-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-white40);
+}
+/*右下角交匯處*/
+.base-scrollbar::-webkit-scrollbar-corner {
+  background-color: rgba(0, 0, 0, 0);
+}

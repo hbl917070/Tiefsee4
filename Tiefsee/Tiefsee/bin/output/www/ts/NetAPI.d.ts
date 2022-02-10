@@ -147,7 +147,7 @@ interface WV_Directory {
      * @param dirPath 資料夾路徑
      * @param arName 檔名陣列
      */
-    GetFiles2(dirPath: string, arName: string[] = []): string[];
+    GetFiles2(dirPath: string, arName: string[]): string[];
 
     /** 回傳資料夾裡面的檔案 */
     GetFiles(path: string, searchPattern: string): string[];
