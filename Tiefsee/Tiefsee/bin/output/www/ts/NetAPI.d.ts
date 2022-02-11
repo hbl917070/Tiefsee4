@@ -370,6 +370,8 @@ interface WV_System {
     /** 關聯副檔名 */
     SetAssociationExtension(arExtension: string[], appPath: string): void;
 
+    /** 對檔案進行排序 */
+    Sort(ar: string[], type: string)
 }
 
 interface WV_RunApp {

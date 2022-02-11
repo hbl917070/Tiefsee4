@@ -17,17 +17,6 @@ namespace Tiefsee {
             LockPort();//寫入檔案，表示此port已經被佔用
             CheckWebView2();//檢查是否有webview2執行環境
 
-            /*var tim = new System.Windows.Forms.Timer();
-            tim.Interval = 1;
-            tim.Tick += (sender, e) => {
-                if (Program.newWar != null) {
-
-                    WebWindow.Create($"{Program.webServer.origin}/www/MainWindow.html",Program. newWar, null);
-                    Program. newWar = null;
-                }
-            };
-            tim.Start();*/
-
             this.Opacity = 0;
             this.ShowInTaskbar = false;
 
@@ -44,6 +33,8 @@ namespace Tiefsee {
             };
 
         }
+
+
 
         /// <summary>
         /// 寫入檔案，表示此port已經被佔用

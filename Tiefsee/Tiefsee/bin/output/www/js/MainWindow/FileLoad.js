@@ -20,13 +20,13 @@ var __async = (__this, __arguments, generator) => {
 };
 class FileLoad {
   constructor(M) {
-    var arWaitingList = [];
+    var arWaitingFile = [];
     var flag;
     var sortType = FileSortType.name;
     var groupType = "img";
     var fileLoadType;
     this.getArray = () => {
-      return arWaitingList;
+      return arWaitingFile;
     };
     this.loadFile = loadFile;
     this.loadFiles = loadFiles;
@@ -38,15 +38,16 @@ class FileLoad {
     this.getFileLoadType = getFileLoadType;
     this.deleteMsg = deleteMsg;
     this.renameMsg = renameMsg;
+    this.setSort = setSort;
     function loadFiles(_0) {
       return __async(this, arguments, function* (dirPath, arName = []) {
         fileLoadType = FileLoadType.userDefined;
-        arWaitingList = yield WV_Directory.GetFiles2(dirPath, arName);
-        let path = arWaitingList[0];
-        arWaitingList = yield sort(sortType);
+        arWaitingFile = yield WV_Directory.GetFiles2(dirPath, arName);
+        let path = arWaitingFile[0];
+        arWaitingFile = yield sort(sortType);
         flag = 0;
-        for (let i = 0; i < arWaitingList.length; i++) {
-          if (arWaitingList[i] == path) {
+        for (let i = 0; i < arWaitingFile.length; i++) {
+          if (arWaitingFile[i] == path) {
             flag = i;
             break;
           }
@@ -57,26 +58,26 @@ class FileLoad {
     function loadFile(path) {
       return __async(this, null, function* () {
         fileLoadType = FileLoadType.dir;
-        arWaitingList = [];
+        arWaitingFile = [];
         if ((yield WV_Directory.Exists(path)) === true) {
-          arWaitingList = yield WV_Directory.GetFiles(path, "*.*");
-          arWaitingList = yield sort(sortType);
+          arWaitingFile = yield WV_Directory.GetFiles(path, "*.*");
+          arWaitingFile = yield sort(sortType);
           groupType = GroupType.img;
-          arWaitingList = yield filter();
+          arWaitingFile = yield filter();
         } else if ((yield WV_File.Exists(path)) === true) {
           let p = yield WV_Path.GetDirectoryName(path);
-          arWaitingList = yield WV_Directory.GetFiles(p, "*.*");
+          arWaitingFile = yield WV_Directory.GetFiles(p, "*.*");
           let fileInfo2 = yield Lib.GetFileInfo2(path);
           groupType = fileToGroupType(fileInfo2);
-          arWaitingList = yield filter();
-          if (arWaitingList.indexOf(path) === -1) {
-            arWaitingList.splice(0, 0, path);
+          arWaitingFile = yield filter();
+          if (arWaitingFile.indexOf(path) === -1) {
+            arWaitingFile.splice(0, 0, path);
           }
-          arWaitingList = yield sort(sortType);
+          arWaitingFile = yield sort(sortType);
         }
         flag = 0;
-        for (let i = 0; i < arWaitingList.length; i++) {
-          if (arWaitingList[i] == path) {
+        for (let i = 0; i < arWaitingFile.length; i++) {
+          if (arWaitingFile[i] == path) {
             flag = i;
             break;
           }
@@ -85,7 +86,7 @@ class FileLoad {
       });
     }
     function getFilePath() {
-      var p = arWaitingList[flag];
+      var p = arWaitingFile[flag];
       return p;
     }
     function getFileLoadType() {
@@ -113,10 +114,10 @@ class FileLoad {
         if (flag < 0) {
           flag = 0;
         }
-        if (flag >= arWaitingList.length) {
-          flag = arWaitingList.length - 1;
+        if (flag >= arWaitingFile.length) {
+          flag = arWaitingFile.length - 1;
         }
-        if (arWaitingList.length === 0) {
+        if (arWaitingFile.length === 0) {
           M.fileShow.openWelcome();
           _show = () => __async(this, null, function* () {
           });
@@ -125,7 +126,7 @@ class FileLoad {
         let path = getFilePath();
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
-          arWaitingList.splice(flag, 1);
+          arWaitingFile.splice(flag, 1);
           show(flag);
           _show = () => __async(this, null, function* () {
           });
@@ -149,13 +150,13 @@ class FileLoad {
       });
     }
     function updateTitle() {
-      let title = `\u300C${flag + 1}/${arWaitingList.length}\u300D ${Lib.GetFileName(getFilePath())}`;
+      let title = `\u300C${flag + 1}/${arWaitingFile.length}\u300D ${Lib.GetFileName(getFilePath())}`;
       baseWindow.setTitle(title);
     }
     function next() {
       return __async(this, null, function* () {
         flag += 1;
-        if (flag >= arWaitingList.length) {
+        if (flag >= arWaitingFile.length) {
           flag = 0;
         }
         show();
@@ -165,7 +166,7 @@ class FileLoad {
       return __async(this, null, function* () {
         flag -= 1;
         if (flag < 0) {
-          flag = arWaitingList.length - 1;
+          flag = arWaitingFile.length - 1;
         }
         show();
       });
@@ -191,8 +192,8 @@ class FileLoad {
     function filter() {
       return __async(this, null, function* () {
         let ar = [];
-        for (let i = 0; i < arWaitingList.length; i++) {
-          let path = arWaitingList[i];
+        for (let i = 0; i < arWaitingFile.length; i++) {
+          let path = arWaitingFile[i];
           let fileExt = Lib.GetExtension(path).toLocaleLowerCase();
           for (let j = 0; j < M.config.allowFileType(groupType).length; j++) {
             const fileType = M.config.allowFileType(groupType)[j];
@@ -208,20 +209,16 @@ class FileLoad {
     function sort(_type) {
       return __async(this, null, function* () {
         if (_type === FileSortType.name) {
-          return arWaitingList.sort(function(a, b) {
-            return a.localeCompare(b, void 0, {
-              numeric: true,
-              sensitivity: "base"
-            });
-          });
+          return yield WV_System.Sort(arWaitingFile, "name");
         }
         if (_type === FileSortType.nameDesc) {
-          return arWaitingList.sort(function(a, b) {
-            return -1 * a.localeCompare(b, void 0, {
-              numeric: true,
-              sensitivity: "base"
-            });
-          });
+          return yield WV_System.Sort(arWaitingFile, "nameDesc");
+        }
+        if (_type === FileSortType.lastWriteTime) {
+          return yield WV_System.Sort(arWaitingFile, "lastWriteTime");
+        }
+        if (_type === FileSortType.lastWriteTimeDesc) {
+          return yield WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
         }
         return [];
       });
@@ -281,13 +278,29 @@ class FileLoad {
               Msgbox.show({ txt: "\u91CD\u65B0\u547D\u540D\u5931\u6557\uFF1A<br>" + err });
               return;
             }
-            arWaitingList[flag] = newName;
+            arWaitingFile[flag] = newName;
             updateTitle();
             Msgbox.close(dom);
           })
         });
         const len = fileName.length - Lib.GetExtension(path).length;
         msg.domInput.setSelectionRange(0, len);
+      });
+    }
+    function setSort(type) {
+      return __async(this, null, function* () {
+        sortType = type;
+        let path = getFilePath();
+        let ar = yield sort(sortType);
+        flag = 0;
+        for (let i = 0; i < ar.length; i++) {
+          if (ar[i] == path) {
+            flag = i;
+            break;
+          }
+        }
+        arWaitingFile = ar;
+        updateTitle();
       });
     }
   }
@@ -300,7 +313,7 @@ var FileLoadType = /* @__PURE__ */ ((FileLoadType2) => {
 var FileSortType = /* @__PURE__ */ ((FileSortType2) => {
   FileSortType2[FileSortType2["name"] = 0] = "name";
   FileSortType2[FileSortType2["nameDesc"] = 1] = "nameDesc";
-  FileSortType2[FileSortType2["editDate"] = 2] = "editDate";
-  FileSortType2[FileSortType2["editDateDesc"] = 3] = "editDateDesc";
+  FileSortType2[FileSortType2["lastWriteTime"] = 2] = "lastWriteTime";
+  FileSortType2[FileSortType2["lastWriteTimeDesc"] = 3] = "lastWriteTimeDesc";
   return FileSortType2;
 })(FileSortType || {});

@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapter.cs" />
+    <Compile Include="FileSort.cs" />
     <Compile Include="StartWindow.cs">
       <SubType>Form</SubType>
     </Compile>

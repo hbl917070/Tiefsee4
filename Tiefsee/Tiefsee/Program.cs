@@ -22,6 +22,9 @@ namespace Tiefsee {
         [STAThread]
         static void Main(string[] args) {
 
+            //修改 工作目錄 為程式資料夾 (如果有傳入args的話，工作目錄會被修改，所以需要改回來
+            Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
+
             appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
             if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(appDataPath);

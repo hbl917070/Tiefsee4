@@ -3,19 +3,21 @@ class FileSort {
 
     dom_fileSort_name = document.getElementById("menuitem-fileSort-name") as HTMLInputElement;
     dom_fileSort_nameDesc = document.getElementById("menuitem-fileSort-nameDesc") as HTMLInputElement;
-    dom_fileSort_editDate = document.getElementById("menuitem-fileSort-editDate") as HTMLInputElement;
-    dom_fileSort_editDateDesc = document.getElementById("menuitem-fileSort-editDateDesc") as HTMLInputElement;
+    dom_fileSort_lastWriteTime = document.getElementById("menuitem-fileSort-lastWriteTime") as HTMLInputElement;
+    dom_fileSort_lastWriteTimeDesc = document.getElementById("menuitem-fileSort-lastWriteTimeDesc") as HTMLInputElement;
 
     dom_dirSort_name = document.getElementById("menuitem-dirSort-name") as HTMLInputElement;
     dom_dirSort_nameDesc = document.getElementById("menuitem-dirSort-nameDesc") as HTMLInputElement;
-    dom_dirSort_editDate = document.getElementById("menuitem-dirSort-editDate") as HTMLInputElement;
-    dom_dirSort_editDateDesc = document.getElementById("menuitem-dirSort-editDateDesc") as HTMLInputElement;
+    dom_dirSort_lastWriteTime = document.getElementById("menuitem-dirSort-lastWriteTime") as HTMLInputElement;
+    dom_dirSort_lastWriteTimeDesc = document.getElementById("menuitem-dirSort-lastWriteTimeDesc") as HTMLInputElement;
 
     yesSvgTxt: string = "";
 
 
-    constructor(M: MainWindow) {
+    M: MainWindow;
 
+    constructor(_M: MainWindow) {
+        this.M = _M;
         this.init()
     }
 
@@ -23,8 +25,7 @@ class FileSort {
     async init() {
         this.yesSvgTxt = SvgList["yes.svg"];
 
-        this.setFileSortMenu(FileSortType.editDateDesc);
-        this.setFileSortMenu(FileSortType.editDate);
+        //this.setFileSortMenu(FileSortType.lastWriteTimeDesc);
 
         this.dom_fileSort_name.addEventListener("click", () => {
             this.setFileSortMenu(FileSortType.name);
@@ -32,11 +33,11 @@ class FileSort {
         this.dom_fileSort_nameDesc.addEventListener("click", () => {
             this.setFileSortMenu(FileSortType.nameDesc);
         });
-        this.dom_fileSort_editDate.addEventListener("click", () => {
-            this.setFileSortMenu(FileSortType.editDate);
+        this.dom_fileSort_lastWriteTime.addEventListener("click", () => {
+            this.setFileSortMenu(FileSortType.lastWriteTime);
         });
-        this.dom_fileSort_editDateDesc.addEventListener("click", () => {
-            this.setFileSortMenu(FileSortType.editDateDesc);
+        this.dom_fileSort_lastWriteTimeDesc.addEventListener("click", () => {
+            this.setFileSortMenu(FileSortType.lastWriteTimeDesc);
         });
 
     }
@@ -46,20 +47,28 @@ class FileSort {
 
         this.dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
         this.dom_fileSort_nameDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-        this.dom_fileSort_editDate.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-        this.dom_fileSort_editDateDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+        this.dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+        this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
         if (_type === FileSortType.name) {
             this.dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+            this.M.fileLoad.setSort(FileSortType.name);
+            this. M.menu.close();//關閉menu
         }
         if (_type === FileSortType.nameDesc) {
             this.dom_fileSort_nameDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+            this.M.fileLoad.setSort(FileSortType.nameDesc);
+            this. M.menu.close();//關閉menu
         }
-        if (_type === FileSortType.editDate) {
-            this.dom_fileSort_editDate.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+        if (_type === FileSortType.lastWriteTime) {
+            this.dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+            this.M.fileLoad.setSort(FileSortType.lastWriteTime);
+            this. M.menu.close();//關閉menu
         }
-        if (_type === FileSortType.editDateDesc) {
-            this.dom_fileSort_editDateDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+        if (_type === FileSortType.lastWriteTimeDesc) {
+            this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
+            this.M.fileLoad.setSort(FileSortType.lastWriteTimeDesc);
+            this. M.menu.close();//關閉menu
         }
     }
 

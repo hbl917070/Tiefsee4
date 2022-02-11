@@ -341,5 +341,23 @@ namespace Tiefsee {
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
 
+
+        /// <summary>
+        /// 對檔案進行排序
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public string[] Sort(object[] ar, string type) {
+
+            string[] arFile = new string[ar.Length];
+            for (int i = 0; i < arFile.Length; i++) {
+                arFile[i] = ar[i].ToString();
+            }
+
+            var filesort = new FileSort();
+            return filesort.Sort(arFile, type);
+        }
+
     }
 }

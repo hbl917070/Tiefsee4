@@ -95,7 +95,7 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
  * @param {*} path 
  * @returns 
  */
- async function readFile(path) {
+async function readFile(path) {
     let t = await new Promise((resolve, reject) => {
         fs.readFile(path, "utf8", function (err, data) {
             resolve(data);//繼續往下執行

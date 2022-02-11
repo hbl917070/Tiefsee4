@@ -16,11 +16,12 @@ class FileLoad {
     public getFileLoadType;
     public deleteMsg;
     public renameMsg;
+    public setSort;
 
     constructor(M: MainWindow) {
 
 
-        var arWaitingList: string[] = [];//待載入名單
+        var arWaitingFile: string[] = [];//待載入名單
         var flag: number;//目前在哪一張圖片
         var sortType = FileSortType.name;//排序方式
 
@@ -29,7 +30,7 @@ class FileLoad {
         var fileLoadType: FileLoadType //資料夾或自定名單
 
 
-        this.getArray = () => { return arWaitingList; };
+        this.getArray = () => { return arWaitingFile; };
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
         this.next = next;
@@ -40,6 +41,7 @@ class FileLoad {
         this.getFileLoadType = getFileLoadType;
         this.deleteMsg = deleteMsg;
         this.renameMsg = renameMsg;
+        this.setSort = setSort;
 
         /**
          * 載入檔案陣列
@@ -51,7 +53,7 @@ class FileLoad {
             fileLoadType = FileLoadType.userDefined;//名單類型，自定義
 
             //改用C#處理，增加執行效率
-            arWaitingList = await WV_Directory.GetFiles2(dirPath, arName);
+            arWaitingFile = await WV_Directory.GetFiles2(dirPath, arName);
 
             /*if (await WV_File.Exists(DirPath) === true) {
                 DirPath = await WV_Path.GetDirectoryName(DirPath);
@@ -72,15 +74,15 @@ class FileLoad {
                 }
             }*/
 
-            let path = arWaitingList[0];//以拖曳進來的第一個檔案為開啟對象
+            let path = arWaitingFile[0];//以拖曳進來的第一個檔案為開啟對象
 
             //arWaitingList = await filter();
-            arWaitingList = await sort(sortType);
+            arWaitingFile = await sort(sortType);
 
             //目前檔案位置
             flag = 0;
-            for (let i = 0; i < arWaitingList.length; i++) {
-                if (arWaitingList[i] == path) {
+            for (let i = 0; i < arWaitingFile.length; i++) {
+                if (arWaitingFile[i] == path) {
                     flag = i;
                     break;
                 }
@@ -99,29 +101,29 @@ class FileLoad {
 
             fileLoadType = FileLoadType.dir;//名單類型，資料夾內所有檔案
 
-            arWaitingList = [];
+            arWaitingFile = [];
 
             if (await WV_Directory.Exists(path) === true) {//如果是資料夾
 
-                arWaitingList = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
+                arWaitingFile = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
 
-                arWaitingList = await sort(sortType);
+                arWaitingFile = await sort(sortType);
                 groupType = GroupType.img;
                 //groupType = await fileToGroupType(arWaitingList[0])
-                arWaitingList = await filter();
+                arWaitingFile = await filter();
 
             } else if (await WV_File.Exists(path) === true) {//如果是檔案
 
                 let p: string = await WV_Path.GetDirectoryName(path);//取得檔案所在的資料夾路徑
-                arWaitingList = await WV_Directory.GetFiles(p, "*.*");
+                arWaitingFile = await WV_Directory.GetFiles(p, "*.*");
 
                 let fileInfo2 = await Lib.GetFileInfo2(path);
                 groupType = fileToGroupType(fileInfo2)
-                arWaitingList = await filter();
-                if (arWaitingList.indexOf(path) === -1) {
-                    arWaitingList.splice(0, 0, path);
+                arWaitingFile = await filter();
+                if (arWaitingFile.indexOf(path) === -1) {
+                    arWaitingFile.splice(0, 0, path);
                 }
-                arWaitingList = await sort(sortType);
+                arWaitingFile = await sort(sortType);
             }
 
             /*var time = new Date();
@@ -131,8 +133,8 @@ class FileLoad {
 
             //目前檔案位置
             flag = 0;
-            for (let i = 0; i < arWaitingList.length; i++) {
-                if (arWaitingList[i] == path) {
+            for (let i = 0; i < arWaitingFile.length; i++) {
+                if (arWaitingFile[i] == path) {
                     flag = i;
                     break;
                 }
@@ -147,7 +149,7 @@ class FileLoad {
          * @returns 
          */
         function getFilePath() {
-            var p = arWaitingList[flag];
+            var p = arWaitingFile[flag];
             return p;
         }
 
@@ -179,9 +181,9 @@ class FileLoad {
 
             if (_flag !== undefined) { flag = _flag; }
             if (flag < 0) { flag = 0; }
-            if (flag >= arWaitingList.length) { flag = arWaitingList.length - 1; }
+            if (flag >= arWaitingFile.length) { flag = arWaitingFile.length - 1; }
 
-            if (arWaitingList.length === 0) {//如果資料夾裡面沒有圖片
+            if (arWaitingFile.length === 0) {//如果資料夾裡面沒有圖片
                 M.fileShow.openWelcome();
                 _show = async () => { }
                 return;
@@ -191,7 +193,7 @@ class FileLoad {
             let fileInfo2 = await Lib.GetFileInfo2(path);
 
             if (fileInfo2.Type === "none") {//如果檔案不存在
-                arWaitingList.splice(flag, 1);//刪除此筆
+                arWaitingFile.splice(flag, 1);//刪除此筆
                 show(flag);
                 _show = async () => { }
                 return;
@@ -222,7 +224,7 @@ class FileLoad {
          * 更新視窗標題
          */
         function updateTitle() {
-            let title = `「${flag + 1}/${arWaitingList.length}」 ${Lib.GetFileName(getFilePath())}`;
+            let title = `「${flag + 1}/${arWaitingFile.length}」 ${Lib.GetFileName(getFilePath())}`;
             baseWindow.setTitle(title);
         }
 
@@ -232,7 +234,7 @@ class FileLoad {
          */
         async function next() {
             flag += 1;
-            if (flag >= arWaitingList.length) { flag = 0; }
+            if (flag >= arWaitingFile.length) { flag = 0; }
             show();
         }
 
@@ -242,7 +244,7 @@ class FileLoad {
          */
         async function prev() {
             flag -= 1;
-            if (flag < 0) { flag = arWaitingList.length - 1; }
+            if (flag < 0) { flag = arWaitingFile.length - 1; }
             show();
         }
 
@@ -285,9 +287,9 @@ class FileLoad {
 
             let ar = [];
 
-            for (let i = 0; i < arWaitingList.length; i++) {
+            for (let i = 0; i < arWaitingFile.length; i++) {
 
-                let path = arWaitingList[i];
+                let path = arWaitingFile[i];
                 let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
 
                 for (let j = 0; j < M.config.allowFileType(groupType).length; j++) {
@@ -311,6 +313,20 @@ class FileLoad {
          */
         async function sort(_type: FileSortType): Promise<string[]> {
 
+            if (_type === FileSortType.name) {
+                return await WV_System.Sort(arWaitingFile, "name");
+            }
+            if (_type === FileSortType.nameDesc) {
+                return await WV_System.Sort(arWaitingFile, "nameDesc");
+            }
+            if (_type === FileSortType.lastWriteTime) {
+                return await WV_System.Sort(arWaitingFile, "lastWriteTime");
+            }
+            if (_type === FileSortType.lastWriteTimeDesc) {
+                return await WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
+            }
+
+            /*
             //檔名自然排序
             if (_type === FileSortType.name) {
                 return arWaitingList.sort(function (a, b) {
@@ -329,7 +345,7 @@ class FileLoad {
                         sensitivity: 'base'
                     });
                 });
-            }
+            }*/
 
 
             return [];
@@ -408,7 +424,7 @@ class FileLoad {
                         return;
                     }
 
-                    arWaitingList[flag] = newName;
+                    arWaitingFile[flag] = newName;
                     updateTitle();
                     Msgbox.close(dom);
                 }
@@ -418,6 +434,28 @@ class FileLoad {
             msg.domInput.setSelectionRange(0, len);
         }
 
+
+        async function setSort(type: FileSortType) {
+
+            sortType = type;
+
+            let path = getFilePath();
+
+            let ar = await sort(sortType)
+
+            //目前檔案位置
+            flag = 0;
+            for (let i = 0; i < ar.length; i++) {
+                if (ar[i] == path) {
+                    flag = i;
+                    break;
+                }
+            }
+
+            arWaitingFile = ar;
+            updateTitle();
+
+        }
 
 
     }
@@ -450,9 +488,9 @@ enum FileSortType {
     "nameDesc",
 
     /** 修改時間排序 */
-    "editDate",
+    "lastWriteTime",
 
     /** 修改時間排序(逆) */
-    "editDateDesc",
+    "lastWriteTimeDesc",
 }
 
