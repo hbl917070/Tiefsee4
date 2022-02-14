@@ -115,7 +115,7 @@ class Lib {
         if (Lib.GetExtension(fileInfo2.Path) === ".svg") {
             return true;
         }
-        if (hex.indexOf("47 49 46 38 39 61") === 0) {//gif
+        if (hex.indexOf("47 49 46 38") === 0) {//gif
             return true;
         }
         if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) {//apng
