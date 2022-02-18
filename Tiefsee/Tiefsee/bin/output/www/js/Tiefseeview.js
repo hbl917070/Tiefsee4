@@ -705,11 +705,9 @@ class Tieefseeview {
     }
     function getOriginalWidth() {
       return temp_originalWidth;
-      return 1;
     }
     function getOriginalHeight() {
       return temp_originalHeight;
-      return 1;
     }
     function setDataSize(_width) {
       if (dataType === "img") {
@@ -748,7 +746,7 @@ class Tieefseeview {
         }
         let _w = toNumber(dom_data.style.width);
         let _h = toNumber(dom_data.style.height);
-        let _margin = 100;
+        let _margin = 35;
         let _scale = _w / getOriginalWidth();
         let radio_can = 1;
         if (_w > getOriginalWidth()) {
@@ -885,6 +883,13 @@ class Tieefseeview {
                 return;
               }
               context.drawImage(sprites, 0, sy);
+              if (sx < 1) {
+                context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height);
+              }
+              let right = (getOriginalWidth() - sx - sWidth) * _scale;
+              if (right * -1 < _margin + marginRight + 1) {
+                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+              }
             });
           } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
             sWidth = getOriginalWidth();
@@ -895,6 +900,13 @@ class Tieefseeview {
                 return;
               }
               context.drawImage(sprites, sx, 0);
+              if (sy < 1) {
+                context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale);
+              }
+              let bottom = (getOriginalHeight() - sy - sHeight) * _scale;
+              if (bottom * -1 < _margin + marginBottom + 1) {
+                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+              }
             });
           } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
             yield createImageBitmap(temp_can, sx, sy, sWidth, sHeight, { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality }).then(function(sprites) {
@@ -902,6 +914,20 @@ class Tieefseeview {
                 return;
               }
               context.drawImage(sprites, 0, 0);
+              if (sx < 1) {
+                context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height);
+              }
+              let right = (getOriginalWidth() - sx - sWidth) * _scale;
+              if (right * -1 < _margin + marginRight + 1) {
+                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+              }
+              if (sy < 1) {
+                context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale);
+              }
+              let bottom = (getOriginalHeight() - sy - sHeight) * _scale;
+              if (bottom * -1 < _margin + marginBottom + 1) {
+                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+              }
             });
           }
         }

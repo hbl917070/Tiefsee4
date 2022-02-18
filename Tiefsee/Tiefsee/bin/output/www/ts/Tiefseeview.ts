@@ -590,7 +590,7 @@ class Tieefseeview {
          */
         async function preload(_url: string): Promise<boolean> {
 
-            let img = document.createElement("img");            
+            let img = document.createElement("img");
             let p = await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     temp_originalWidth = img.naturalWidth;//初始化圖片size
@@ -604,7 +604,7 @@ class Tieefseeview {
                 });
                 img.src = _url;
             })
-  
+
             temp_img = img;
 
             //img.src = "";
@@ -990,9 +990,6 @@ class Tieefseeview {
          */
         function getOriginalWidth(): number {
             return temp_originalWidth;
-            //if (dataType === "img") { return dom_img.naturalWidth; }
-            //if (dataType === "bigimg") { return dom_img.naturalWidth; }
-            return 1;
         }
 
         /**
@@ -1001,9 +998,6 @@ class Tieefseeview {
          */
         function getOriginalHeight(): number {
             return temp_originalHeight;
-            //if (dataType === "img") { return dom_img.naturalHeight; }
-            //if (dataType === "bigimg") { return dom_img.naturalHeight; }
-            return 1;
         }
 
 
@@ -1048,7 +1042,7 @@ class Tieefseeview {
 
             let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
             let _h = toNumber(dom_data.style.height);
-            let _margin = 100;//多繪製的區域
+            let _margin = 35;//多繪製的區域
             let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
             let radio_can = 1;
             if (_w > getOriginalWidth()) {//如果圖片大於1倍，則用用原始大小
@@ -1165,10 +1159,12 @@ class Tieefseeview {
 
                 let tc = temp_canvasSN;
 
+
+                //context.clearRect(-100, -100, 2000, 2000);
                 //var time = new Date();
 
-
-                let resizeQuality: ResizeQuality = "medium";
+                //
+                let resizeQuality: ResizeQuality = "medium";//medium
 
                 if (getOriginalWidth() * getOriginalHeight() > 8000 * 8000) {
 
@@ -1215,8 +1211,17 @@ class Tieefseeview {
                     await createImageBitmap(temp_can, sx, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+
                             if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, 0, sy,);
+                            context.drawImage(sprites, 0, sy);
+
+                            //把多餘的部分清除
+                            if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
+                            let right = ((getOriginalWidth() - sx - sWidth) * _scale);
+                            if (right * -1 < _margin + marginRight + 1) {
+                                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                            }
+ 
                         });
 
                 } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
@@ -1232,9 +1237,19 @@ class Tieefseeview {
                     await createImageBitmap(temp_can, 0, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+
                             if (tc !== temp_canvasSN) { return; }
                             context.drawImage(sprites, sx, 0);
+
+                            //把多餘的部分清除
+                            if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
+                            let bottom = ((getOriginalHeight() - sy - sHeight) * _scale);
+                            if (bottom * -1 < _margin + marginBottom + 1) {
+                                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+                            }
                         });
+
+
 
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
 
@@ -1242,8 +1257,23 @@ class Tieefseeview {
                     await createImageBitmap(temp_can, sx, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+
                             if (tc !== temp_canvasSN) { return; }
                             context.drawImage(sprites, 0, 0,);
+
+                            //把多餘的部分清除
+                            if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
+                            let right = ((getOriginalWidth() - sx - sWidth) * _scale);
+                            if (right * -1 < _margin + marginRight + 1) {
+                                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                            }
+                            //把多餘的部分清除
+                            if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
+                            let bottom = ((getOriginalHeight() - sy - sHeight) * _scale);
+                            if (bottom * -1 < _margin + marginBottom + 1) {
+                                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+                            }
+
                         });
                 }
                 /*
