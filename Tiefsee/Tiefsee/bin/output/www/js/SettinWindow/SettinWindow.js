@@ -18,8 +18,10 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
+var baseWindow;
 class Setting {
   constructor() {
+    baseWindow = new BaseWindow();
     this.saveData = saveSetting;
     var config = new Config();
     var cssRoot = document.documentElement;
@@ -44,7 +46,6 @@ class Setting {
     var txt_extension = document.querySelector("#txt-extension");
     var btn_extension = document.querySelector("#btn-extension");
     var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
-    baseWindow = new BaseWindow();
     init();
     initDomImport();
     tippy(".img-help", {

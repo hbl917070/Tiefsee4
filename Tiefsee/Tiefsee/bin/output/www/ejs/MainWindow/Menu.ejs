@@ -50,7 +50,7 @@
 
             <div class="menu-hor-item" id="menuitem-open3DMSPaint">
                 <div class="menu-hor-icon">
-                    <img src="/img/icon-Paint3D.png">
+                    <img src="./img/icon-Paint3D.png">
                 </div>
                 <div class="menu-hor-txt" i18n="">3D 小畫家</div>
             </div>
@@ -166,7 +166,8 @@
 
             <div class="menu-hor-item" id="menuitem-fileSort-name">
                 <div class="menu-hor-icon">
-                    <import src="/img/default/yes.svg"></import>
+                    <!-- <import src="/img/default/yes.svg"></import> -->
+                    <%- await readFile("./img/default/yes.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="">檔名</div>
             </div>

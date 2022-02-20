@@ -14,33 +14,33 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100&display=swap" rel="stylesheet"> -->
 
-    <link rel="stylesheet" href="/css/BaseWindow.css">
-    <script src="/js/BaseWindow.js"></script>
-    <script src="/js/Lib.js"></script>
+    <link rel="stylesheet" href="./css/BaseWindow.css">
+    <script src="./js/BaseWindow.js"></script>
+    <script src="./js/Lib.js"></script>
 
-    <script src="/vender/hammer.min.js"></script>
-    <script src="/vender/jquery-3.6.0.min.js"></script>
-    <script src="/vender/jquery.easing.js"></script>
+    <script src="./vender/hammer.min.js"></script>
+    <script src="./vender/jquery-3.6.0.min.js"></script>
+    <script src="./vender/jquery.easing.js"></script>
 
-    <script src="/js/Tiefseeview.js"></script>
-    <link rel="stylesheet" href="/css/Tiefseeview.css">
-    <link rel="stylesheet" href="/css/MainWindow.css">
-    <link rel="stylesheet" href="/css/Menu.css">
-    <link rel="stylesheet" href="/css/Msgbox.css">
+    <script src="./js/Tiefseeview.js"></script>
+    <link rel="stylesheet" href="./css/Tiefseeview.css">
+    <link rel="stylesheet" href="./css/MainWindow.css">
+    <link rel="stylesheet" href="./css/Menu.css">
+    <link rel="stylesheet" href="./css/Msgbox.css">
 
-    <script src="/js/SvgList.js"></script>
+    <script src="./js/SvgList.js"></script>
 
-    <script src="/js/Config.js"></script>
-    <script src="/js/MainWindow/MainTools.js"></script>
-    <script src="/js/MainWindow/FileLoad.js"></script>
-    <script src="/js/MainWindow/FileShow.js"></script>
-    <script src="/js/MainWindow/FileSort.js"></script>
-    <script src="/js/MainWindow/InitMenu.js"></script>
-    <script src="/js/MainWindow/Menu.js"></script>
-    <script src="/js/Msgbox.js"></script>   
-    <script src="/js/MainWindow/Script.js"></script>
-    <script src="/js/MainWindow/Hotkey.js"></script>  
-    <script src="/js/MainWindow/MainWindow.js"></script>
+    <script src="./js/Config.js"></script>
+    <script src="./js/MainWindow/MainTools.js"></script>
+    <script src="./js/MainWindow/FileLoad.js"></script>
+    <script src="./js/MainWindow/FileShow.js"></script>
+    <script src="./js/MainWindow/FileSort.js"></script>
+    <script src="./js/MainWindow/InitMenu.js"></script>
+    <script src="./js/MainWindow/Menu.js"></script>
+    <script src="./js/Msgbox.js"></script>
+    <script src="./js/MainWindow/Script.js"></script>
+    <script src="./js/MainWindow/Hotkey.js"></script>
+    <script src="./js/MainWindow/MainWindow.js"></script>
 
     <script>
         var mainWindow;
@@ -51,7 +51,6 @@
 </head>
 
 <body>
- 
     <!-- 下拉選單 & 右鍵選單 -->
     <!-- 檔案 下拉選單 -->
 <div class="menu" active="">
@@ -105,7 +104,7 @@
 
             <div class="menu-hor-item" id="menuitem-open3DMSPaint">
                 <div class="menu-hor-icon">
-                    <img src="/img/icon-Paint3D.png">
+                    <img src="./img/icon-Paint3D.png">
                 </div>
                 <div class="menu-hor-txt" i18n="">3D 小畫家</div>
             </div>
@@ -254,7 +253,13 @@
 
             <div class="menu-hor-item" id="menuitem-fileSort-name">
                 <div class="menu-hor-icon">
-                    <import src="/img/default/yes.svg"></import>
+                    <!-- <import src="/img/default/yes.svg"></import> -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M11.4,21c-0.1,0-0.3,0-0.3-0.1l-8.5-8.2L3.3,12l8.1,7.7L21.7,3.8l0.8,0.5L11.8,20.8C11.8,20.9,11.6,21,11.4,21
+			C11.5,21,11.4,21,11.4,21z"/>
+	</g>
+</svg>
                 </div>
                 <div class="menu-hor-txt" i18n="">檔名</div>
             </div>
@@ -305,27 +310,27 @@
     </div>
 </div>
 
-    <div class="window">
+        <div class="window">
 
-        <!-- 標題列 -->
-        <div class="window-titlebar">
+            <!-- 標題列 -->
+            <div class="window-titlebar">
 
-            <div class="titlebar-txt">
-                <span>tiefsee 4</span>
-            </div>
+                <div class="titlebar-txt">
+                    <span>tiefsee 4</span>
+                </div>
 
-            <div class="titlebar-tools">
-                <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
-                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+                <div class="titlebar-tools">
+                    <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
 	<g style="fill:var(--color-white);">
 		<rect x="6" y="7" width="13" height="1"/>
 		<rect x="6" y="11" width="13" height="1"/>
 		<path d="M12.5,19c-0.1,0-0.2,0-0.3-0.1L9,16.3l0.6-0.7l2.9,2.3l2.9-2.3l0.6,0.8L12.8,19C12.7,19,12.6,19,12.5,19z"/>
 	</g>
 </svg>
-                </div>
-                <div class="titlebar-tools-btn titlebar-tools-topmost">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-topmost">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
 	<g style="fill:var(--color-white);">
 		<rect x="7" y="18"  width="11" height="1"/>
 		<path  d="M7.7,11.8L7,11.1L12.1,6c0.2-0.2,0.5-0.2,0.7,0l5.1,5.1l-0.7,0.7l-4.8-4.8L7.7,11.8z"/>
@@ -333,95 +338,95 @@
 	</g>
 </svg>
 
-                </div>
-                <div class="titlebar-tools-btn titlebar-tools-minimized">
-                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-minimized">
+                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
 	<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
 </svg>
-                </div>
-                <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<path style="fill:var(--color-white);" d="M8,7v2H7v9h9v-1h2V7H8z M15,17H8v-7h7V17z M17,16h-1V9H9V8h8V16z"/>
 </svg>
-                </div>
-                <div class="titlebar-tools-btn titlebar-tools-maximized">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-maximized">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<g style="fill:var(--color-white);">
 		<path  d="M17,8v9H8V8H17 M18,7H7v11h11V7L18,7z"/>
 	</g>
 </svg>
-                </div>
-                <div class="titlebar-tools-btn titlebar-tools-close">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-close">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<polygon style="fill:var(--color-white)" points="18.4,7.4 17.6,6.6 12.5,11.8 7.4,6.6 6.6,7.4 11.8,12.5 6.6,17.6 7.4,18.4 12.5,13.2 17.6,18.4 18.4,17.6 
 		13.2,12.5 "/>
 </svg>
+                    </div>
                 </div>
+
             </div>
 
-        </div>
+            <div class="window-body">
 
-        <div class="window-body">
+                <div class="main-content">
 
-            <div class="main-content">
+                    <div class="main-T">
 
-                <div class="main-T">
-
-                    <!-- 工具列 -->
-                    <div id="main-tools" class="main-tools"> </div>
-
-                </div>
-
-                <div class="main-C">
-                    <div class="main-L">
+                        <!-- 工具列 -->
+                        <div id="main-tools" class="main-tools"> </div>
 
                     </div>
-                    <div class="main-V">
 
-                        <div id="main-welcomeview" class="main-welcomeview">
-                            <div>
-                                <img class="welcomeview-logo" src="/img/logo.svg">
-                                <div class="welcomeview-txt">Tiefsee 4.0.0-beta.8</div>
-                            </div>
+                    <div class="main-C">
+                        <div class="main-L">
+
                         </div>
-                        <textarea id="main-txtview" class="main-txtview base-scrollbar"></textarea>
-                        <div id="main-tiefseeview" class="main-tiefseeview"></div>
-                        <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
+                        <div class="main-V">
 
-                        <div class="maxBtn maxBtnLeft-bottom" id="maxBtnLeft">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                            <div id="main-welcomeview" class="main-welcomeview">
+                                <div>
+                                    <img class="welcomeview-logo" src="./img/logo.svg">
+                                    <div class="welcomeview-txt">Tiefsee 4.0.0-beta.9</div>
+                                </div>
+                            </div>
+                            <textarea id="main-txtview" class="main-txtview base-scrollbar"></textarea>
+                            <div id="main-tiefseeview" class="main-tiefseeview"></div>
+                            <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
+
+                            <div class="maxBtn maxBtnLeft-bottom" id="maxBtnLeft">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<path style="fill:var(--color-white)" d="M24.9,12H2.2l11.6-9.3L13.1,2L0.4,12.1c-0.1,0.1-0.2,0.2-0.2,0.4s0.1,0.3,0.2,0.4L13.1,23l0.6-0.8L2.2,13H25v-1H24.9z"/>
 </svg>
-                        </div>
-                        <div class="maxBtn maxBtnRight-bottom" id="maxBtnRight">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+                            </div>
+                            <div class="maxBtn maxBtnRight-bottom" id="maxBtnRight">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<path style="fill:var(--color-white)" d="M0,13h22.8l-11.6,9.3l0.6,0.7l12.7-10.1c0.1-0.1,0.2-0.2,0.2-0.4s-0.1-0.3-0.2-0.4L11.8,2l-0.6,0.8L22.7,12H0V13z"/>
 </svg>
+                            </div>
+
+                            <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
                         </div>
+                        <div class="main-R">
 
-                        <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
+                        </div>
                     </div>
-                    <div class="main-R">
 
-                    </div>
+                    <div class="main-B"></div>
+
                 </div>
-
-                <div class="main-B"></div>
 
             </div>
 
+            <div class="window-LC window-border"></div>
+            <div class="window-RC window-border"></div>
+            <div class="window-CT window-border"></div>
+            <div class="window-LT window-border"></div>
+            <div class="window-RT window-border"></div>
+            <div class="window-CB window-border"></div>
+            <div class="window-LB window-border"></div>
+            <div class="window-RB window-border"></div>
+
         </div>
-
-        <div class="window-LC window-border"></div>
-        <div class="window-RC window-border"></div>
-        <div class="window-CT window-border"></div>
-        <div class="window-LT window-border"></div>
-        <div class="window-RT window-border"></div>
-        <div class="window-CB window-border"></div>
-        <div class="window-LB window-border"></div>
-        <div class="window-RB window-border"></div>
-
-    </div>
 
 
 </body>

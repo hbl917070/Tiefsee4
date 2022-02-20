@@ -82,7 +82,7 @@ class FileLoad {
             break;
           }
         }
-        show();
+        yield show();
       });
     }
     function getFilePath() {

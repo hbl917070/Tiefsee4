@@ -45,12 +45,10 @@ namespace Tiefsee {
             listener.BeginGetContext(new AsyncCallback(GetContextCallBack), listener);
             HttpListenerRequest request = context.Request;
 
-            /*header.Add("Access-Control-Allow-Origin", "*");
-            request.Headers.Add(header);*/
+            //request.Headers.Add("Access-Control-Allow-Origin", "*");
 
             String _url = request.Url.ToString();
-            _url = _url.Substring($"http://localhost:{port}".Length);
-            //_url = _url.Substring($"http://127.0.0.1:{port}".Length);
+            _url = _url.Substring($"http://127.0.0.1:{port}".Length);
 
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");

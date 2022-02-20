@@ -12,31 +12,30 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet"> -->
 
-    <script src="/vender/jquery-3.6.0.min.js"></script>
+    <script src="./vender/jquery-3.6.0.min.js"></script>
     <!-- <script src="/vender/jquery.easing.js"></script> -->
 
     <!-- MiniColors(選擇顏色套件 -->
-    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
-    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+    <script src="./vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="./vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
 
     <!-- tippy(工具提示套件 -->
-    <script src="/vender/tippyjs/popper.min.js"></script>
-    <script src="/vender/tippyjs/tippy-bundle.umd.min.js"></script>
+    <script src="./vender/tippyjs/popper.min.js"></script>
+    <script src="./vender/tippyjs/tippy-bundle.umd.min.js"></script>
 
-    <link rel="stylesheet" href="/css/BaseWindow.css">
-    <script src="/js/BaseWindow.js"></script>
-    <script src="/js/Lib.js"></script>
+    <link rel="stylesheet" href="./css/BaseWindow.css">
+    <script src="./js/BaseWindow.js"></script>
+    <script src="./js/Lib.js"></script>
 
 
+    <link rel="stylesheet" href="./css/Setting.css">
+    <link rel="stylesheet" href="./css/Menu.css">
+    <link rel="stylesheet" href="./css/Msgbox.css">
 
-    <link rel="stylesheet" href="/css/Setting.css">
-    <link rel="stylesheet" href="/css/Menu.css">
-    <link rel="stylesheet" href="/css/Msgbox.css">
-
-    <script src="/js/Config.js"></script>
-    <script src="/js/MainWindow/Menu.js"></script>
-    <script src="/js/Msgbox.js"></script>
-    <script src="/js/SettinWindow/SettinWindow.js"></script>
+    <script src="./js/Config.js"></script>
+    <script src="./js/MainWindow/Menu.js"></script>
+    <script src="./js/Msgbox.js"></script>
+    <script src="./js/SettinWindow/SettinWindow.js"></script>
 
 
 
@@ -50,10 +49,6 @@
 </head>
 
 <body>
-
-
-
-
 
 
     <div class="window">
@@ -83,21 +78,23 @@
                 <div class="titlebar-txt"></div>
 
                 <div class="titlebar-tools">
-
-                    <!-- <div class="titlebar-tools-btn titlebar-tools-topmost">
-                        <import type="svg" src="/img/default/window-topmost.svg"> </import>
+                    <!-- <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+                        <%- await readFile("./img/default/window-menu.svg"); %>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-topmost">
+                        <%- await readFile("./img/default/window-topmost.svg"); %>
                     </div> -->
                     <div class="titlebar-tools-btn titlebar-tools-minimized">
-                        <import type="svg" src="/img/default/window-minimized.svg"> </import>
+                        <%- await readFile("./img/default/window-minimized.svg"); %>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
-                        <import type="svg" src="/img/default/window-normal.svg"> </import>
+                        <%- await readFile("./img/default/window-normal.svg"); %>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-maximized">
-                        <import type="svg" src="/img/default/window-maximized.svg"> </import>
+                        <%- await readFile("./img/default/window-maximized.svg"); %>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-close">
-                        <import type="svg" src="/img/default/window-close.svg"> </import>
+                        <%- await readFile("./img/default/window-close.svg"); %>
                     </div>
 
                 </div>
@@ -139,35 +136,35 @@
                                 <input type="radio" name="radio-startType" value="1">
                                 <span>直接啟動</span>
                                 <div class="img-help" data-tooltip="tooltip-startType1">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <%- await readFile("./img/default/tool-help.svg"); %>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="2">
                                 <span>快速啟動</span>
                                 <div class="img-help" data-tooltip="tooltip-startType2">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <%- await readFile("./img/default/tool-help.svg"); %>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="3">
                                 <span>快速啟動 + 常駐背景</span>
                                 <div class="img-help" data-tooltip="tooltip-startType3">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <%- await readFile("./img/default/tool-help.svg"); %>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="4">
                                 <span>單一視窗 </span>
                                 <div class="img-help" data-tooltip="tooltip-startType4">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <%- await readFile("./img/default/tool-help.svg"); %>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="5">
                                 <span>單一視窗 + 常駐背景</span>
                                 <div class="img-help" data-tooltip="tooltip-startType5">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <%- await readFile("./img/default/tool-help.svg"); %>
                                 </div>
                             </label>
                         </div>
@@ -373,8 +370,8 @@
                             <input class="text-input" type="text" id="txt-startPort">
                         </div>
 
-                        <div class="text-title"> 快取有效時間 (秒) </div>
-                        <div class="text-content">
+                        <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
+                        <div class="text-content" style="display:none;">
                             <input class="text-input" type="text" id="txt-serverCache">
                         </div>
 
@@ -403,7 +400,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.8</span>
+                            <span> Tiefsee 4.0.0-beta.9</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

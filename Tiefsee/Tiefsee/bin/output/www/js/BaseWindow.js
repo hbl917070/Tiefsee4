@@ -18,15 +18,15 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-var cef = window.chrome.webview.hostObjects;
-var WV_Window = cef.WV_Window;
-var WV_Directory = cef.WV_Directory;
-var WV_File = cef.WV_File;
-var WV_Path = cef.WV_Path;
-var WV_System = cef.WV_System;
-var WV_RunApp = cef.WV_RunApp;
-var WV_Image = cef.WV_Image;
-var baseWindow;
+const WV2 = window.chrome.webview.hostObjects;
+const WV_Window = WV2.WV_Window;
+const WV_Directory = WV2.WV_Directory;
+const WV_File = WV2.WV_File;
+const WV_Path = WV2.WV_Path;
+const WV_System = WV2.WV_System;
+const WV_RunApp = WV2.WV_RunApp;
+const WV_Image = WV2.WV_Image;
+const APIURL = "http://127.0.0.1:" + location.hash.replace("#", "");
 var temp_dropPath = "";
 class BaseWindow {
   constructor() {
@@ -137,7 +137,7 @@ class BaseWindow {
   }
   newWindow(_name) {
     return __async(this, null, function* () {
-      let url = location.protocol + "//" + location.host + "/www/" + _name;
+      let url = _name;
       var w = yield WV_Window.NewWindow(url, []);
       WV_Window.SetOwner(w);
       return w;

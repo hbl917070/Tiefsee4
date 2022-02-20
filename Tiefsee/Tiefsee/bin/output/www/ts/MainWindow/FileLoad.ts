@@ -140,7 +140,7 @@ class FileLoad {
                 }
             }
 
-            show();
+            await show();
         }
 
 

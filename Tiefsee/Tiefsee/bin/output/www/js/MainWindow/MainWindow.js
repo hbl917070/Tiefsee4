@@ -18,6 +18,7 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
+var baseWindow;
 class MainWindow {
   constructor() {
     baseWindow = new BaseWindow();

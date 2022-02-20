@@ -166,7 +166,8 @@ class FileShow {
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
-                imgurl = "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                //imgurl = APIURL + "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                imgurl = _path + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
             tieefseeview.setLoading(true);
@@ -187,7 +188,7 @@ class FileShow {
                     dom_btnScale.innerHTML = (ratio * 100).toFixed(0) + "%";
                 }
             }))
-            tieefseeview.zoomFull(TieefseeviewZoomType['full-100%']);
+            tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
 
             //圖片長寬
             let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
@@ -212,7 +213,7 @@ class FileShow {
             }
 
             //if (isLoaded === false) {
-                isLoaded = true;
+            isLoaded = true;
             //}
 
         }
@@ -228,7 +229,7 @@ class FileShow {
 
             setShowType(GroupType.pdf);//改變顯示類型
 
-            let _url = "/api/getpdf/" + encodeURIComponent(_path)
+            let _url = APIURL + "/api/getpdf/" + encodeURIComponent(_path)
             dom_pdfview.setAttribute("src", _url);
 
             //檔案類型

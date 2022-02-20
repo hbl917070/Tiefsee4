@@ -1,4 +1,4 @@
-
+var baseWindow: BaseWindow;
 
 class Setting {
 
@@ -6,10 +6,7 @@ class Setting {
 
     constructor() {
 
-        /*(async () => {
-            await WV_Window.ShowWindow();//顯示視窗
-            baseWindow.dom_window.style.transform = "none";
-        })()*/
+        baseWindow = new BaseWindow();//初始化視窗
 
         this.saveData = saveSetting;
 
@@ -37,18 +34,13 @@ class Setting {
         var btn_openWww = document.getElementById("btn-openWww") as HTMLElement;
         var btn_clearBrowserCache = document.getElementById("btn-clearBrowserCache") as HTMLElement;
 
-
         var btn_openSystemSetting = document.getElementById("btn-openSystemSetting") as HTMLElement;
         var txt_extension = document.querySelector("#txt-extension") as HTMLTextAreaElement;
         var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
 
-
-
-
         var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
 
 
-        baseWindow = new BaseWindow();//初始化視窗
         init();
 
         initDomImport();//初始化圖示

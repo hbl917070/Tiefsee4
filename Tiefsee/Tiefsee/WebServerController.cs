@@ -54,17 +54,18 @@ namespace Tiefsee {
         }
 
 
+
         /// <summary>
         /// 回傳檔案
         /// </summary>
         /// <param name="d"></param>
         /// <param name="path"></param>
         private void WriteFile(RequestData d, string path) {
-
+      
             using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                 d.context.Response.ContentLength64 = input.Length;
-
+    
                 if (d.context.Request.HttpMethod != "HEAD") {
                     byte[] buffer = new byte[1024 * 16];
                     int nbytes;
@@ -73,6 +74,7 @@ namespace Tiefsee {
                         d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                     }
                 }
+
                 //context.Response.StatusCode = (int)HttpStatusCode.OK;
                 //context.Response.OutputStream.Flush();
             }
@@ -143,7 +145,7 @@ namespace Tiefsee {
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
-                WebWindow.Create($"{webServer.origin}/www/MainWindow.html", args, null);
+                WebWindow.Create("MainWindow.html", args, null);
             });
 
             WriteString(d, "ok");
@@ -210,6 +212,7 @@ namespace Tiefsee {
 
             d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //d.context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             if (is304 == false) {
                 WriteFile(d, path);//回傳檔案
             }

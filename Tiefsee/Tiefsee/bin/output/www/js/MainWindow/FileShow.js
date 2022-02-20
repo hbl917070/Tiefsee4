@@ -114,7 +114,7 @@ class FileShow {
         if (M.fileLoad.getGroupType() === GroupType.unknown) {
           imgurl = yield WV_Image.GetFileIcon(_path, 256);
         } else {
-          imgurl = "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+          imgurl = _path + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         }
         tieefseeview.setLoading(true);
         yield tieefseeview.preload(imgurl);
@@ -157,7 +157,7 @@ class FileShow {
         var _a, _b;
         let _path = fileInfo2.Path;
         setShowType(GroupType.pdf);
-        let _url = "/api/getpdf/" + encodeURIComponent(_path);
+        let _url = APIURL + "/api/getpdf/" + encodeURIComponent(_path);
         dom_pdfview.setAttribute("src", _url);
         let dom_type = (_a = getToolsDom(GroupType.pdf)) == null ? void 0 : _a.querySelector(`[data-name="infoType"]`);
         if (dom_type != null) {

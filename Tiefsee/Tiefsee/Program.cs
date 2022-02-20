@@ -33,7 +33,7 @@ namespace Tiefsee {
             IniManager iniManager = new IniManager(startIniPath);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
-            serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "5"));
+            serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
             //如果允許快速啟動，就不開啟新個體
             if (QuickRun.Check(args)) { return; }
@@ -45,8 +45,8 @@ namespace Tiefsee {
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            String _url = $"{webServer.origin}/www/MainWindow.html";
-            WebWindow.Create(_url, args, null);
+           
+            WebWindow.Create("MainWindow.html", args, null);
 
             startWindow = new StartWindow();
             Application.Run(startWindow);

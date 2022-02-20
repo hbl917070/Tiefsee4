@@ -12,31 +12,30 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet"> -->
 
-    <script src="/vender/jquery-3.6.0.min.js"></script>
+    <script src="./vender/jquery-3.6.0.min.js"></script>
     <!-- <script src="/vender/jquery.easing.js"></script> -->
 
     <!-- MiniColors(選擇顏色套件 -->
-    <script src="/vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
-    <link href="/vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+    <script src="./vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="./vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
 
     <!-- tippy(工具提示套件 -->
-    <script src="/vender/tippyjs/popper.min.js"></script>
-    <script src="/vender/tippyjs/tippy-bundle.umd.min.js"></script>
+    <script src="./vender/tippyjs/popper.min.js"></script>
+    <script src="./vender/tippyjs/tippy-bundle.umd.min.js"></script>
 
-    <link rel="stylesheet" href="/css/BaseWindow.css">
-    <script src="/js/BaseWindow.js"></script>
-    <script src="/js/Lib.js"></script>
+    <link rel="stylesheet" href="./css/BaseWindow.css">
+    <script src="./js/BaseWindow.js"></script>
+    <script src="./js/Lib.js"></script>
 
 
+    <link rel="stylesheet" href="./css/Setting.css">
+    <link rel="stylesheet" href="./css/Menu.css">
+    <link rel="stylesheet" href="./css/Msgbox.css">
 
-    <link rel="stylesheet" href="/css/Setting.css">
-    <link rel="stylesheet" href="/css/Menu.css">
-    <link rel="stylesheet" href="/css/Msgbox.css">
-
-    <script src="/js/Config.js"></script>
-    <script src="/js/MainWindow/Menu.js"></script>
-    <script src="/js/Msgbox.js"></script>
-    <script src="/js/SettinWindow/SettinWindow.js"></script>
+    <script src="./js/Config.js"></script>
+    <script src="./js/MainWindow/Menu.js"></script>
+    <script src="./js/Msgbox.js"></script>
+    <script src="./js/SettinWindow/SettinWindow.js"></script>
 
 
 
@@ -50,10 +49,6 @@
 </head>
 
 <body>
-
-
-
-
 
 
     <div class="window">
@@ -83,21 +78,47 @@
                 <div class="titlebar-txt"></div>
 
                 <div class="titlebar-tools">
+                    <!-- <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<g style="fill:var(--color-white);">
+		<rect x="6" y="7" width="13" height="1"/>
+		<rect x="6" y="11" width="13" height="1"/>
+		<path d="M12.5,19c-0.1,0-0.2,0-0.3-0.1L9,16.3l0.6-0.7l2.9,2.3l2.9-2.3l0.6,0.8L12.8,19C12.7,19,12.6,19,12.5,19z"/>
+	</g>
+</svg>
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-topmost">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<g style="fill:var(--color-white);">
+		<rect x="7" y="18"  width="11" height="1"/>
+		<path  d="M7.7,11.8L7,11.1L12.1,6c0.2-0.2,0.5-0.2,0.7,0l5.1,5.1l-0.7,0.7l-4.8-4.8L7.7,11.8z"/>
+		<rect x="12" y="7" width="1" height="9"/>
+	</g>
+</svg>
 
-                    <!-- <div class="titlebar-tools-btn titlebar-tools-topmost">
-                        <import type="svg" src="/img/default/window-topmost.svg"> </import>
                     </div> -->
                     <div class="titlebar-tools-btn titlebar-tools-minimized">
-                        <import type="svg" src="/img/default/window-minimized.svg"> </import>
+                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
+</svg>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
-                        <import type="svg" src="/img/default/window-normal.svg"> </import>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white);" d="M8,7v2H7v9h9v-1h2V7H8z M15,17H8v-7h7V17z M17,16h-1V9H9V8h8V16z"/>
+</svg>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-maximized">
-                        <import type="svg" src="/img/default/window-maximized.svg"> </import>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white);">
+		<path  d="M17,8v9H8V8H17 M18,7H7v11h11V7L18,7z"/>
+	</g>
+</svg>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-close">
-                        <import type="svg" src="/img/default/window-close.svg"> </import>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<polygon style="fill:var(--color-white)" points="18.4,7.4 17.6,6.6 12.5,11.8 7.4,6.6 6.6,7.4 11.8,12.5 6.6,17.6 7.4,18.4 12.5,13.2 17.6,18.4 18.4,17.6 
+		13.2,12.5 "/>
+</svg>
                     </div>
 
                 </div>
@@ -139,35 +160,85 @@
                                 <input type="radio" name="radio-startType" value="1">
                                 <span>直接啟動</span>
                                 <div class="img-help" data-tooltip="tooltip-startType1">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="2">
                                 <span>快速啟動</span>
                                 <div class="img-help" data-tooltip="tooltip-startType2">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="3">
                                 <span>快速啟動 + 常駐背景</span>
                                 <div class="img-help" data-tooltip="tooltip-startType3">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="4">
                                 <span>單一視窗 </span>
                                 <div class="img-help" data-tooltip="tooltip-startType4">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
                                 </div>
                             </label>
                             <label>
                                 <input type="radio" name="radio-startType" value="5">
                                 <span>單一視窗 + 常駐背景</span>
                                 <div class="img-help" data-tooltip="tooltip-startType5">
-                                    <import type="svg" src="/img/default/tool-help.svg"> </import>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
                                 </div>
                             </label>
                         </div>
@@ -373,8 +444,8 @@
                             <input class="text-input" type="text" id="txt-startPort">
                         </div>
 
-                        <div class="text-title"> 快取有效時間 (秒) </div>
-                        <div class="text-content">
+                        <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
+                        <div class="text-content" style="display:none;">
                             <input class="text-input" type="text" id="txt-serverCache">
                         </div>
 
@@ -403,7 +474,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.8</span>
+                            <span> Tiefsee 4.0.0-beta.9</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

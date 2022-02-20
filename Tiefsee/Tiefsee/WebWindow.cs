@@ -85,13 +85,13 @@ namespace Tiefsee {
         public static WebWindow Create(String _url, string[] _args, WebWindow _parentWindow) {
 
             //如果開啟非mainwindow的window
-            if (_url.IndexOf("/www/MainWindow.html") == -1) {//$"http://localhost:{Program.bserver.port}/www/MainWindow.html"
+            if (_url.IndexOf("MainWindow.html") == -1) {//$"http://localhost:{Program.bserver.port}/www/MainWindow.html"
                 var ww = new WebWindow();
                 ww.isDelayInit = false;
                 ww.Init();
                 ww.parentWindow = _parentWindow;
                 ww.args = _args;
-                ww.wv2.Source = new Uri(_url);
+                ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                     ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
                 };
@@ -106,8 +106,7 @@ namespace Tiefsee {
                 ww.Init();
                 ww.parentWindow = _parentWindow;
                 ww.args = _args;
-                ww.wv2.Source = new Uri(_url);
-
+                ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                     ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
                 };
@@ -124,7 +123,7 @@ namespace Tiefsee {
                     tempWindow.Init();
                     tempWindow.parentWindow = _parentWindow;
                     tempWindow.args = _args;
-                    tempWindow.wv2.Source = new Uri(_url);
+                    tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
                     tempWindow.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                         tempWindow.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
                     };
@@ -138,7 +137,7 @@ namespace Tiefsee {
                                 tempWindow.isDelayInit = true;
                                 tempWindow.Init();
                                 tempWindow.args = new string[0] { };
-                                tempWindow.wv2.Source = new Uri(_url);
+                                tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
                             });
                         };
                     }
@@ -163,51 +162,76 @@ namespace Tiefsee {
                 ww.Init();
                 ww.parentWindow = _parentWindow;
                 ww.args = _args;
-                ww.wv2.Source = new Uri(_url);
+                ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                     ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
                 };
 
                 //新建window，用於下次顯示
-                DelayRun(10, () => {
-                    tempWindow = new WebWindow();
-                    tempWindow.isDelayInit = true;
-                    tempWindow.Init();
-                    tempWindow.args = new string[0] { };
-                    tempWindow.wv2.Source = new Uri(_url);
-                });
-
+                NewTempWindow(GetHtmlFilePath("MainWindow.html"));
+                Console.WriteLine("第一次開啟:---" + _url);
                 return ww;
             }
 
 
             var temp2 = tempWindow;
-
+            tempWindow = null;
             //呼叫先前已經建立的window來顯示
             temp2.parentWindow = _parentWindow;
             temp2.args = _args;
-            if (temp2.wv2.CoreWebView2 != null) {
+            temp2.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                 temp2.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
-            } else {
-                temp2.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                    temp2.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
-                };
+            };
+            if (temp2.wv2.CoreWebView2 != null) {//頁面已經載入完成的話，必須再次注入語法
+                temp2.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
             }
-            //temp2.SetFocus();
 
             //新建window，用於下次顯示
-            DelayRun(10, () => {
-                tempWindow = new WebWindow();
-                tempWindow.isDelayInit = true;
-                tempWindow.Init();
-                tempWindow.args = new string[0] { };
-                tempWindow.wv2.Source = new Uri($"{Program.webServer.origin}/www/MainWindow.html");
-            });
+            NewTempWindow(GetHtmlFilePath("MainWindow.html"));
 
             return temp2;//回傳剛剛新建的window
         }
 
+        /// <summary>
+        /// 新建window，用於下次顯示
+        /// </summary>
+        /// <param name="url"></param>
+        private static void NewTempWindow(string url) {
+            if (tempWindow != null) { return; }
 
+            DelayRun(10, () => {
+                if (tempWindow != null) { return; }
+                WebWindow temp3 = new WebWindow();
+                temp3.isDelayInit = true;
+                temp3.Init();
+                temp3.args = new string[0] { };
+                temp3.wv2.Source = new Uri(url);
+                void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
+                    //DelayRun(30, () => {
+                    if (tempWindow == null) {
+                        tempWindow = temp3;
+                    } else {
+                        DelayRun(5000, () => {
+                            Console.WriteLine("釋放");
+                            temp3.Close();
+                        });
+                    }
+                    //});
+                    temp3.wv2.NavigationCompleted -= Wv2_NavigationCompleted;
+                }
+                temp3.wv2.NavigationCompleted += Wv2_NavigationCompleted;//網頁載入完成時
+            });
+        }
+
+
+
+        private static string GetHtmlFilePath(string path) {
+            string p = "file:///" + Path.Combine(
+                          System.AppDomain.CurrentDomain.BaseDirectory, "www", path
+                       ) + "#" + Program.webServer.port;
+            //string p = $"{Program.webServer.origin}/www/{path}";
+            return p;
+        }
 
 
         /// <summary>
@@ -219,6 +243,7 @@ namespace Tiefsee {
             //this.SetSize(400, 300);
             this.Opacity = 0;
             wv2 = new WV2();
+            this.Controls.Add(wv2);
 
             if (isDelayInit) {
 
@@ -231,29 +256,26 @@ namespace Tiefsee {
                         firstRunNavigationCompleted = false;
                     } else { return; }
 
-                    this.Controls.Add(wv2);//必須在show之前
                     this.Show();
                     this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
-
                 };
 
             } else {
 
-                this.Controls.Add(wv2);
                 this.Show();
                 this.Hide();
 
-                //ShowWindow(this.Handle, SW_SHOWDEFAULT); //視窗狀態
-                //ShowWindow(this.Handle, SW_HIDE);
-                //必須使用此語法，否則會無法點擊視窗
-                //this.BackColor = Color.Red;
-                //this.TransparencyKey = Color.Red;
             }
 
             wv2.ZoomFactor = 1;
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
-            CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath);
+
+            var opts = new CoreWebView2EnvironmentOptions {
+                //AdditionalBrowserArguments = "--allow-file-access-from-files"
+                AdditionalBrowserArguments = "--disable-web-security"
+            };
+            CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
             /*wv2.CoreWebView2.SetVirtualHostNameToFolderMapping(
                 "appassets.example",

@@ -1,3 +1,5 @@
+var baseWindow: BaseWindow;
+
 class MainWindow {
 
     public dom_tools: HTMLElement;
@@ -49,7 +51,7 @@ class MainWindow {
         //WV_Window.ShowWindow();//顯示視窗 
 
 
-      
+
 
         //視窗改變大小時觸發
         baseWindow.sizeChangeEvents.push(async () => {
@@ -84,8 +86,6 @@ class MainWindow {
          * @param json 
          */
         baseWindow.onCreate = async (json: AppInfo) => {
-
-            //document.body.style.opacity = "0";
 
             if (firstRun === true) { //首次開啟視窗
 
@@ -136,11 +136,16 @@ class MainWindow {
 
                 //document.body.style.opacity = "1";
                 //await sleep(100);
-
+                // baseWindow.dom_window.style.opacity ="1";
 
                 new InitMenu(this);
 
-                // baseWindow.dom_window.style.opacity ="1";
+                /*document.body.style.width = baseWindow.width + "px"
+                document.body.style.height = baseWindow.height + "px"
+                setTimeout(() => {
+                    document.body.style.width = ""
+                    document.body.style.height = ""
+                }, 300);*/
 
                 //取得命令列參數
                 let args = json.args;
@@ -152,16 +157,9 @@ class MainWindow {
                     fileLoad.loadFiles(args[0], args);//載入多張圖片
                 }
 
-                //baseWindow.dom_titlebarTxt.focus();
-
                 if (config.settings["theme"]["aero"]) {
                     WV_Window.SetAERO();// aero毛玻璃效果
                 }
-
-                /*setTimeout(async () => {           
-                    await WV_Window.This().Focus()
-                    console.log("Focus")
-                }, 500);*/
 
             } else {//單純開啟圖片(用於 單一執行個體)
 

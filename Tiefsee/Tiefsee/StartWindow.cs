@@ -70,8 +70,7 @@ namespace Tiefsee {
             var cm = new System.Windows.Forms.ContextMenu();//右鍵選單
 
             cm.MenuItems.Add("New", new EventHandler((sender2, e2) => {
-                String _url = $"{Program.webServer.origin}/www/MainWindow.html";
-                WebWindow.Create(_url, new string[0], null);
+                WebWindow.Create("MainWindow.html", new string[0], null);
             }));
 
             cm.MenuItems.Add("Quit Tiefsee", new EventHandler((sender2, e2) => {
@@ -82,8 +81,7 @@ namespace Tiefsee {
             nIcon.ContextMenu = cm;
 
             nIcon.DoubleClick += (sender, e) => {
-                String _url = $"{Program.webServer.origin}/www/MainWindow.html";
-                WebWindow.Create(_url, new string[0], null);
+                WebWindow.Create("MainWindow.html", new string[0], null);
             };
 
         }
@@ -93,8 +91,12 @@ namespace Tiefsee {
         /// 初始化webview2
         /// </summary>
         private async void InitWebview() {
+            var opts = new CoreWebView2EnvironmentOptions {
+                //AdditionalBrowserArguments = "--allow-file-access-from-files"
+                AdditionalBrowserArguments = "--disable-web-security"
+            };
             Microsoft.Web.WebView2.WinForms.WebView2 wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
-            var webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath);
+            var webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);
         }
 
