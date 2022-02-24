@@ -29,6 +29,9 @@ class FileSort {
     this.dom_dirSort_lastWriteTime = document.getElementById("menuitem-dirSort-lastWriteTime");
     this.dom_dirSort_lastWriteTimeDesc = document.getElementById("menuitem-dirSort-lastWriteTimeDesc");
     this.yesSvgTxt = "";
+    this.defaultFileSort = FileSortType.name;
+    this.defaultDirSort = FileSortType.name;
+    this.sortType = FileSortType.name;
     this.M = _M;
     this.init();
   }
@@ -36,43 +39,101 @@ class FileSort {
     return __async(this, null, function* () {
       this.yesSvgTxt = SvgList["yes.svg"];
       this.dom_fileSort_name.addEventListener("click", () => {
-        this.setFileSortMenu(FileSortType.name);
+        this.updateSort(FileSortType.name);
       });
       this.dom_fileSort_nameDesc.addEventListener("click", () => {
-        this.setFileSortMenu(FileSortType.nameDesc);
+        this.updateSort(FileSortType.nameDesc);
       });
       this.dom_fileSort_lastWriteTime.addEventListener("click", () => {
-        this.setFileSortMenu(FileSortType.lastWriteTime);
+        this.updateSort(FileSortType.lastWriteTime);
       });
       this.dom_fileSort_lastWriteTimeDesc.addEventListener("click", () => {
-        this.setFileSortMenu(FileSortType.lastWriteTimeDesc);
+        this.updateSort(FileSortType.lastWriteTimeDesc);
       });
     });
   }
-  setFileSortMenu(_type) {
+  updateSort(_sortType) {
+    return __async(this, null, function* () {
+      this.sortType = _sortType;
+      let path = this.M.fileLoad.getFilePath();
+      let dirPath = yield WV_Path.GetDirectoryName(path);
+      this.setFileSortType(dirPath, this.sortType);
+      let ar = yield this.sort(this.M.fileLoad.getWaitingFile(), this.sortType);
+      this.M.fileLoad.setFlag(0);
+      for (let i = 0; i < ar.length; i++) {
+        if (ar[i] == path) {
+          this.M.fileLoad.setFlag(i);
+          break;
+        }
+      }
+      this.M.fileLoad.setWaitingFile(ar);
+      this.M.fileLoad.updateTitle();
+      this.setFileSortMenu(_sortType);
+    });
+  }
+  setFileSortMenu(_sortType) {
     this.dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
     this.dom_fileSort_nameDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
     this.dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
     this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-    if (_type === FileSortType.name) {
+    if (_sortType === FileSortType.name) {
       this.dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
-      this.M.fileLoad.setSort(FileSortType.name);
-      this.M.menu.close();
     }
-    if (_type === FileSortType.nameDesc) {
+    if (_sortType === FileSortType.nameDesc) {
       this.dom_fileSort_nameDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
-      this.M.fileLoad.setSort(FileSortType.nameDesc);
-      this.M.menu.close();
     }
-    if (_type === FileSortType.lastWriteTime) {
+    if (_sortType === FileSortType.lastWriteTime) {
       this.dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
-      this.M.fileLoad.setSort(FileSortType.lastWriteTime);
-      this.M.menu.close();
     }
-    if (_type === FileSortType.lastWriteTimeDesc) {
+    if (_sortType === FileSortType.lastWriteTimeDesc) {
       this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
-      this.M.fileLoad.setSort(FileSortType.lastWriteTimeDesc);
-      this.M.menu.close();
+    }
+    this.M.menu.close();
+  }
+  sort(arWaitingFile, _type) {
+    return __async(this, null, function* () {
+      if (_type === FileSortType.name) {
+        return yield WV_System.Sort(arWaitingFile, "name");
+      }
+      if (_type === FileSortType.nameDesc) {
+        return yield WV_System.Sort(arWaitingFile, "nameDesc");
+      }
+      if (_type === FileSortType.lastWriteTime) {
+        return yield WV_System.Sort(arWaitingFile, "lastWriteTime");
+      }
+      if (_type === FileSortType.lastWriteTimeDesc) {
+        return yield WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
+      }
+      return [];
+    });
+  }
+  setFileSortType(dirPath, _sortType) {
+    let t = window.localStorage.getItem("sortFile");
+    let json = {};
+    if (t !== null) {
+      json = JSON.parse(t);
+    }
+    json[dirPath] = _sortType;
+    window.localStorage.setItem("sortFile", JSON.stringify(json));
+    console.log(`\u8A2D\u5B9A\uFF1A${dirPath}  + ${_sortType}`);
+  }
+  getFileSortType(dirPath) {
+    let t = window.localStorage.getItem("sortFile");
+    if (t === null) {
+      t = "{}";
+    }
+    let json = JSON.parse(t);
+    let _sortType = json[dirPath];
+    if (_sortType !== void 0) {
+      return _sortType;
+    } else {
+      return this.defaultFileSort;
     }
   }
 }
+var FileSortType = {
+  name: "name",
+  nameDesc: "nameDesc",
+  lastWriteTime: "lastWriteTime",
+  lastWriteTimeDesc: "lastWriteTimeDesc"
+};

@@ -73,7 +73,7 @@ namespace Tiefsee {
                     //偵測是否可用
                     String uri = $"http://127.0.0.1:{port}/api/check";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-                    request.Timeout = 30;
+                    request.Timeout = 300;
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                         using (Stream stream = response.GetResponseStream()) {
                             /*using (StreamReader reader = new StreamReader(stream)) {

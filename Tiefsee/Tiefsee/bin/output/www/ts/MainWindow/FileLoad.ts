@@ -4,7 +4,12 @@
  */
 class FileLoad {
 
-    public getArray: () => string[];
+    public getWaitingFile: () => string[];
+    public setWaitingFile: (ar: string[]) => void;
+
+    public getFlag: () => number;
+    public setFlag: (n: number) => void;
+
     public loadFile;
     public loadFiles;
 
@@ -16,21 +21,26 @@ class FileLoad {
     public getFileLoadType;
     public deleteMsg;
     public renameMsg;
-    public setSort;
+    public updateTitle;
+    //public setSort;
 
     constructor(M: MainWindow) {
 
 
         var arWaitingFile: string[] = [];//待載入名單
         var flag: number;//目前在哪一張圖片
-        var sortType = FileSortType.name;//排序方式
+
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  movie=影片  imgs=多幀圖片  txt=文字 */
         var groupType: string = "img";
         var fileLoadType: FileLoadType //資料夾或自定名單
 
 
-        this.getArray = () => { return arWaitingFile; };
+        this.getWaitingFile = () => { return arWaitingFile; };
+        this.setWaitingFile = (ar: string[]) => { arWaitingFile = ar };
+        this.getFlag = () => { return flag; };
+        this.setFlag = (n: number) => { flag = n };
+
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
         this.next = next;
@@ -41,7 +51,8 @@ class FileLoad {
         this.getFileLoadType = getFileLoadType;
         this.deleteMsg = deleteMsg;
         this.renameMsg = renameMsg;
-        this.setSort = setSort;
+        this.updateTitle = updateTitle;
+        //this.setSort = setSort;
 
         /**
          * 載入檔案陣列
@@ -76,8 +87,9 @@ class FileLoad {
 
             let path = arWaitingFile[0];//以拖曳進來的第一個檔案為開啟對象
 
-            //arWaitingList = await filter();
-            arWaitingFile = await sort(sortType);
+            M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
+            M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
+            arWaitingFile = await M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
 
             //目前檔案位置
             flag = 0;
@@ -107,15 +119,17 @@ class FileLoad {
 
                 arWaitingFile = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
 
-                arWaitingFile = await sort(sortType);
+                M.fileSort.sortType = M.fileSort.getFileSortType(path);//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
+                arWaitingFile = await M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
                 groupType = GroupType.img;
                 //groupType = await fileToGroupType(arWaitingList[0])
                 arWaitingFile = await filter();
 
             } else if (await WV_File.Exists(path) === true) {//如果是檔案
 
-                let p: string = await WV_Path.GetDirectoryName(path);//取得檔案所在的資料夾路徑
-                arWaitingFile = await WV_Directory.GetFiles(p, "*.*");
+                let dirPath: string = await WV_Path.GetDirectoryName(path);//取得檔案所在的資料夾路徑
+                arWaitingFile = await WV_Directory.GetFiles(dirPath, "*.*");
 
                 let fileInfo2 = await Lib.GetFileInfo2(path);
                 groupType = fileToGroupType(fileInfo2)
@@ -123,7 +137,10 @@ class FileLoad {
                 if (arWaitingFile.indexOf(path) === -1) {
                     arWaitingFile.splice(0, 0, path);
                 }
-                arWaitingFile = await sort(sortType);
+
+                M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
+                arWaitingFile = await M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
             }
 
             /*var time = new Date();
@@ -307,52 +324,6 @@ class FileLoad {
 
 
         /**
-         * 排序檔案
-         * @param _type 排序類型
-         * @returns 排序後的陣列
-         */
-        async function sort(_type: FileSortType): Promise<string[]> {
-
-            if (_type === FileSortType.name) {
-                return await WV_System.Sort(arWaitingFile, "name");
-            }
-            if (_type === FileSortType.nameDesc) {
-                return await WV_System.Sort(arWaitingFile, "nameDesc");
-            }
-            if (_type === FileSortType.lastWriteTime) {
-                return await WV_System.Sort(arWaitingFile, "lastWriteTime");
-            }
-            if (_type === FileSortType.lastWriteTimeDesc) {
-                return await WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
-            }
-
-            /*
-            //檔名自然排序
-            if (_type === FileSortType.name) {
-                return arWaitingList.sort(function (a, b) {
-                    return a.localeCompare(b, undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            }
-
-            //檔名自然排序(逆)
-            if (_type === FileSortType.nameDesc) {
-                return arWaitingList.sort(function (a, b) {
-                    return -1 * a.localeCompare(b, undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-                });
-            }*/
-
-
-            return [];
-        }
-
-
-        /**
          * 顯示 刪除檔案 的對話方塊
          */
         async function deleteMsg() {
@@ -435,27 +406,7 @@ class FileLoad {
         }
 
 
-        async function setSort(type: FileSortType) {
 
-            sortType = type;
-
-            let path = getFilePath();
-
-            let ar = await sort(sortType)
-
-            //目前檔案位置
-            flag = 0;
-            for (let i = 0; i < ar.length; i++) {
-                if (ar[i] == path) {
-                    flag = i;
-                    break;
-                }
-            }
-
-            arWaitingFile = ar;
-            updateTitle();
-
-        }
 
 
     }
@@ -475,22 +426,4 @@ enum FileLoadType {
     "userDefined"
 }
 
-
-/**
- * 排序類型
- */
-enum FileSortType {
-
-    /** 檔名自然排序 */
-    "name",
-
-    /** 檔名自然排序(逆) */
-    "nameDesc",
-
-    /** 修改時間排序 */
-    "lastWriteTime",
-
-    /** 修改時間排序(逆) */
-    "lastWriteTimeDesc",
-}
 

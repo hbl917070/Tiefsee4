@@ -109,6 +109,9 @@ const _Lib = class {
     console.log(hex);
     return fileExt;
   }
+  static pathToURL(path) {
+    return "file:///" + encodeURIComponent(path).replace(/[%]3A/g, ":").replace(/[%]2F/g, "/").replace(/[%]5C/g, "/");
+  }
 };
 let Lib = _Lib;
 Lib.GetFileName = (path) => {

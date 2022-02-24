@@ -30,8 +30,6 @@ class MainWindow {
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
 
-
-
         this.dom_tools = dom_tools;
         this.dom_maxBtnLeft = dom_maxBtnLeft;
         this.dom_maxBtnRight = dom_maxBtnRight;
@@ -44,13 +42,9 @@ class MainWindow {
         this.script = script;
         this.readSetting = applySetting;
 
-
         new MainTools(this);
         new Hotkey(this);
         init();
-        //WV_Window.ShowWindow();//顯示視窗 
-
-
 
 
         //視窗改變大小時觸發

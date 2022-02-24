@@ -22,11 +22,19 @@ class FileLoad {
   constructor(M) {
     var arWaitingFile = [];
     var flag;
-    var sortType = FileSortType.name;
     var groupType = "img";
     var fileLoadType;
-    this.getArray = () => {
+    this.getWaitingFile = () => {
       return arWaitingFile;
+    };
+    this.setWaitingFile = (ar) => {
+      arWaitingFile = ar;
+    };
+    this.getFlag = () => {
+      return flag;
+    };
+    this.setFlag = (n) => {
+      flag = n;
     };
     this.loadFile = loadFile;
     this.loadFiles = loadFiles;
@@ -38,13 +46,15 @@ class FileLoad {
     this.getFileLoadType = getFileLoadType;
     this.deleteMsg = deleteMsg;
     this.renameMsg = renameMsg;
-    this.setSort = setSort;
+    this.updateTitle = updateTitle;
     function loadFiles(_0) {
       return __async(this, arguments, function* (dirPath, arName = []) {
         fileLoadType = FileLoadType.userDefined;
         arWaitingFile = yield WV_Directory.GetFiles2(dirPath, arName);
         let path = arWaitingFile[0];
-        arWaitingFile = yield sort(sortType);
+        M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);
+        M.fileSort.setFileSortMenu(M.fileSort.sortType);
+        arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
         flag = 0;
         for (let i = 0; i < arWaitingFile.length; i++) {
           if (arWaitingFile[i] == path) {
@@ -61,19 +71,23 @@ class FileLoad {
         arWaitingFile = [];
         if ((yield WV_Directory.Exists(path)) === true) {
           arWaitingFile = yield WV_Directory.GetFiles(path, "*.*");
-          arWaitingFile = yield sort(sortType);
+          M.fileSort.sortType = M.fileSort.getFileSortType(path);
+          M.fileSort.setFileSortMenu(M.fileSort.sortType);
+          arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
           groupType = GroupType.img;
           arWaitingFile = yield filter();
         } else if ((yield WV_File.Exists(path)) === true) {
-          let p = yield WV_Path.GetDirectoryName(path);
-          arWaitingFile = yield WV_Directory.GetFiles(p, "*.*");
+          let dirPath = yield WV_Path.GetDirectoryName(path);
+          arWaitingFile = yield WV_Directory.GetFiles(dirPath, "*.*");
           let fileInfo2 = yield Lib.GetFileInfo2(path);
           groupType = fileToGroupType(fileInfo2);
           arWaitingFile = yield filter();
           if (arWaitingFile.indexOf(path) === -1) {
             arWaitingFile.splice(0, 0, path);
           }
-          arWaitingFile = yield sort(sortType);
+          M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);
+          M.fileSort.setFileSortMenu(M.fileSort.sortType);
+          arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
         }
         flag = 0;
         for (let i = 0; i < arWaitingFile.length; i++) {
@@ -206,23 +220,6 @@ class FileLoad {
         return ar;
       });
     }
-    function sort(_type) {
-      return __async(this, null, function* () {
-        if (_type === FileSortType.name) {
-          return yield WV_System.Sort(arWaitingFile, "name");
-        }
-        if (_type === FileSortType.nameDesc) {
-          return yield WV_System.Sort(arWaitingFile, "nameDesc");
-        }
-        if (_type === FileSortType.lastWriteTime) {
-          return yield WV_System.Sort(arWaitingFile, "lastWriteTime");
-        }
-        if (_type === FileSortType.lastWriteTimeDesc) {
-          return yield WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
-        }
-        return [];
-      });
-    }
     function deleteMsg() {
       return __async(this, null, function* () {
         let path = getFilePath();
@@ -287,22 +284,6 @@ class FileLoad {
         msg.domInput.setSelectionRange(0, len);
       });
     }
-    function setSort(type) {
-      return __async(this, null, function* () {
-        sortType = type;
-        let path = getFilePath();
-        let ar = yield sort(sortType);
-        flag = 0;
-        for (let i = 0; i < ar.length; i++) {
-          if (ar[i] == path) {
-            flag = i;
-            break;
-          }
-        }
-        arWaitingFile = ar;
-        updateTitle();
-      });
-    }
   }
 }
 var FileLoadType = /* @__PURE__ */ ((FileLoadType2) => {
@@ -310,10 +291,3 @@ var FileLoadType = /* @__PURE__ */ ((FileLoadType2) => {
   FileLoadType2[FileLoadType2["userDefined"] = 1] = "userDefined";
   return FileLoadType2;
 })(FileLoadType || {});
-var FileSortType = /* @__PURE__ */ ((FileSortType2) => {
-  FileSortType2[FileSortType2["name"] = 0] = "name";
-  FileSortType2[FileSortType2["nameDesc"] = 1] = "nameDesc";
-  FileSortType2[FileSortType2["lastWriteTime"] = 2] = "lastWriteTime";
-  FileSortType2[FileSortType2["lastWriteTimeDesc"] = 3] = "lastWriteTimeDesc";
-  return FileSortType2;
-})(FileSortType || {});

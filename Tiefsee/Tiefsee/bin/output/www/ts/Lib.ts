@@ -181,6 +181,19 @@ class Lib {
         return fileExt;
     }
 
+
+    /**
+     * 路徑 轉 URL
+     * @param path 
+     * @returns 
+     */
+    public static pathToURL(path: string): string {
+        return "file:///" + encodeURIComponent(path)
+            .replace(/[%]3A/g, ":")
+            .replace(/[%]2F/g, "/")
+            .replace(/[%]5C/g, "/");
+    }
+
 }
 
 

@@ -114,7 +114,7 @@ class FileShow {
         if (M.fileLoad.getGroupType() === GroupType.unknown) {
           imgurl = yield WV_Image.GetFileIcon(_path, 256);
         } else {
-          imgurl = _path + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+          imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         }
         tieefseeview.setLoading(true);
         yield tieefseeview.preload(imgurl);

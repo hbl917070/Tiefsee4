@@ -1,7 +1,4 @@
-
-
 class FileShow {
-
 
     public openImage;
     public openPdf;
@@ -167,7 +164,7 @@ class FileShow {
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
                 //imgurl = APIURL + "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                imgurl = _path + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
             tieefseeview.setLoading(true);
