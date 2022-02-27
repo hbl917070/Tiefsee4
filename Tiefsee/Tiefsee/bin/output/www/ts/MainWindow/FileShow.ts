@@ -163,7 +163,7 @@ class FileShow {
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
-                //imgurl = APIURL + "/api/getimg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                //imgurl = APIURL + "/api/getImg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
                 imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
@@ -226,7 +226,7 @@ class FileShow {
 
             setShowType(GroupType.pdf);//改變顯示類型
 
-            let _url = APIURL + "/api/getpdf/" + encodeURIComponent(_path)
+            let _url = APIURL + "/api/getPdf/" + encodeURIComponent(_path)
             dom_pdfview.setAttribute("src", _url);
 
             //檔案類型

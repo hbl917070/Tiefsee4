@@ -49,7 +49,7 @@ namespace Tiefsee {
 
             String _url = request.Url.ToString();
             _url = _url.Substring($"http://127.0.0.1:{port}".Length);
-
+        
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");
             if (argStart != -1) {//如果有「?」，就解析傳入參數 
@@ -74,11 +74,12 @@ namespace Tiefsee {
                 _url = _url.Substring(0, argStart);//取得「?」前面的文字
             }
 
-            for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由
-                var requestData = new RequestData();
-                requestData.context = context;
-                requestData.url = _url;
-                requestData.args = dirArgs;
+            var requestData = new RequestData();
+            requestData.context = context;
+            requestData.url = _url;
+            requestData.args = dirArgs;
+     
+            for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由 
                 if (ArRoute[i](requestData) == true) {//如果匹配網址成功，就離開
                     break;
                 }
@@ -99,7 +100,7 @@ namespace Tiefsee {
             var func2 = new Func<RequestData, bool>((RequestData requestData) => {
 
                 //規則字串 
-                string pattern = "^" + _urlFormat.Replace("{*}", ".*") + "$"; ;
+                string pattern = "^" + _urlFormat.Replace("{*}", ".*") + "$";
                 //宣告 Regex 忽略大小寫 
                 Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
 

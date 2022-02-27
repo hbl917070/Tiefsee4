@@ -15,6 +15,7 @@ class FileLoad {
 
     public next;
     public prev;
+    public show;
     public getFilePath;
     public getGroupType;
     public setGroupType;
@@ -45,6 +46,7 @@ class FileLoad {
         this.loadFiles = loadFiles;
         this.next = next;
         this.prev = prev;
+        this.show = show;
         this.getFilePath = getFilePath;
         this.getGroupType = getGroupType;
         this.setGroupType = setGroupType;
@@ -100,7 +102,8 @@ class FileLoad {
                 }
             }
 
-            show();
+            M.mainFileList.initFileList();//初始化檔案列表
+            await show();//載入圖片
 
         }
 
@@ -157,7 +160,8 @@ class FileLoad {
                 }
             }
 
-            await show();
+            M.mainFileList.initFileList();//初始化檔案列表
+            await show();//載入圖片
         }
 
 
@@ -235,6 +239,9 @@ class FileLoad {
             }
 
         }
+
+
+
 
 
         /**

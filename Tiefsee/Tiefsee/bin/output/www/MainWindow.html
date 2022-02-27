@@ -33,6 +33,7 @@
     <script src="./js/Config.js"></script>
     <script src="./js/MainWindow/MainTools.js"></script>
     <script src="./js/MainWindow/FileLoad.js"></script>
+    <script src="./js/MainWindow/MainFileList.js"></script>
     <script src="./js/MainWindow/FileShow.js"></script>
     <script src="./js/MainWindow/FileSort.js"></script>
     <script src="./js/MainWindow/InitMenu.js"></script>
@@ -378,12 +379,21 @@
                     </div>
 
                     <div class="main-C">
+
                         <div class="main-L">
 
+                            <!-- 檔案預覽列表 -->
+                            <div class="main-fileList base-scrollbar" id="main-fileList">
+                                <div class="main-fileListBody" id="main-fileListBody">
+                                    <div id="main-fileListData"></div>
+                                </div>
+                            </div>
+
                         </div>
+
                         <div class="main-V">
 
-                            <div id="main-welcomeview" class="main-welcomeview">
+                            <div class="main-welcomeview" id="main-welcomeview">
                                 <div>
                                     <img class="welcomeview-logo" src="./img/logo.svg">
                                     <div class="welcomeview-txt">Tiefsee 4.0.0-beta.9</div>

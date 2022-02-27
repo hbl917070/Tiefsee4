@@ -40,6 +40,7 @@ class FileLoad {
     this.loadFiles = loadFiles;
     this.next = next;
     this.prev = prev;
+    this.show = show;
     this.getFilePath = getFilePath;
     this.getGroupType = getGroupType;
     this.setGroupType = setGroupType;
@@ -62,7 +63,8 @@ class FileLoad {
             break;
           }
         }
-        show();
+        M.mainFileList.initFileList();
+        yield show();
       });
     }
     function loadFile(path) {
@@ -96,6 +98,7 @@ class FileLoad {
             break;
           }
         }
+        M.mainFileList.initFileList();
         yield show();
       });
     }

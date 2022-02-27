@@ -157,7 +157,7 @@ class FileShow {
         var _a, _b;
         let _path = fileInfo2.Path;
         setShowType(GroupType.pdf);
-        let _url = APIURL + "/api/getpdf/" + encodeURIComponent(_path);
+        let _url = APIURL + "/api/getPdf/" + encodeURIComponent(_path);
         dom_pdfview.setAttribute("src", _url);
         let dom_type = (_a = getToolsDom(GroupType.pdf)) == null ? void 0 : _a.querySelector(`[data-name="infoType"]`);
         if (dom_type != null) {

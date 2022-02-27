@@ -22,13 +22,15 @@ namespace Tiefsee {
                 byte[] _responseArray = Encoding.UTF8.GetBytes("-" + d.value + "-");
                 d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             });*/
-            webServer.RouteAddGet("/api/check", api_ckeck);
-            webServer.RouteAddGet("/api/newWindow/{*}", api_newwindow);
-            webServer.RouteAddGet("/api/getimg/{*}", api_getimg);
-            webServer.RouteAddGet("/api/getpdf/{*}", api_getpdf);
-            webServer.RouteAddGet("/www/{*}", getwww);
-            webServer.RouteAddGet("/{*}", getwww);
-            //webServer.RouteAddGet("{*}", get404);
+            webServer.RouteAddGet("/api/check", ckeck);
+            webServer.RouteAddGet("/api/newWindow/{*}", newwindow);
+            webServer.RouteAddGet("/api/getImg/{*}", getImg);
+            webServer.RouteAddGet("/api/getPdf/{*}", getPdf);
+            webServer.RouteAddGet("/api/getFileIcon", getFileIcon);
+
+            webServer.RouteAddGet("/www/{*}", getWww);
+            webServer.RouteAddGet("/{*}", getWww);
+
         }
 
 
@@ -61,11 +63,11 @@ namespace Tiefsee {
         /// <param name="d"></param>
         /// <param name="path"></param>
         private void WriteFile(RequestData d, string path) {
-      
+
             using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 
                 d.context.Response.ContentLength64 = input.Length;
-    
+
                 if (d.context.Request.HttpMethod != "HEAD") {
                     byte[] buffer = new byte[1024 * 16];
                     int nbytes;
@@ -128,7 +130,7 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void api_ckeck(RequestData d) {
+        private void ckeck(RequestData d) {
             WriteString(d, "tiefsee");
         }
 
@@ -139,7 +141,7 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void api_newwindow(RequestData d) {
+        private void newwindow(RequestData d) {
 
             string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.value));//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
@@ -158,7 +160,7 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void api_getimg(RequestData d) {
+        private void getImg(RequestData d) {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
@@ -175,7 +177,7 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void api_getpdf(RequestData d) {
+        private void getPdf(RequestData d) {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = "application/pdf";
@@ -186,13 +188,61 @@ namespace Tiefsee {
         }
 
 
+
+        private void getFileIcon(RequestData d) {
+            Dictionary<string, string> args = d.args;
+
+            int size = Int32.Parse(args["size"]);
+            string path = Uri.UnescapeDataString(args["path"]);
+            Console.WriteLine(size);
+
+            Console.WriteLine(path);
+
+            //如果檔案不存在就返回404錯誤
+            if (File.Exists(path) == false) {
+                d.context.Response.StatusCode = 404;
+                WriteString(d, "404");
+                return;
+            }
+
+            d.context.Response.ContentType = "image/png";
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == false) {
+
+                System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
+                    path, size, size, ThumbnailOptions.ScaleUp
+                );
+         
+                using (System.IO.Stream input = new MemoryStream()) {
+      
+                    icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+                    input.Position = 0;
+
+                    d.context.Response.ContentLength64 = input.Length;
+
+                    if (d.context.Request.HttpMethod != "HEAD") {
+                        byte[] buffer = new byte[1024 * 16];
+                        int nbytes;
+                        while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                            //context.Response.SendChunked = input.Length > 1024 * 16;
+                            d.context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        }
+                    }
+                }
+                icon.Dispose();
+                //WriteFile(d, path);//回傳檔案
+            }
+        }
+
+
+
         /// <summary>
         /// 取得 www 目錄裡面的檔案
         /// </summary>
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void getwww(RequestData d) {
+        private void getWww(RequestData d) {
 
             String exeDir = System.AppDomain.CurrentDomain.BaseDirectory;//程式的目錄
 

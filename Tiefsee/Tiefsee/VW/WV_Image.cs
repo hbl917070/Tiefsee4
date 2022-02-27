@@ -34,6 +34,7 @@ namespace Tiefsee {
                             path, size, size, ThumbnailOptions.ScaleUp
                         );
             string base64 = BitmapToBase64(icon);
+            icon.Dispose();
             return base64;
         }
 
