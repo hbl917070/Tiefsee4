@@ -13,6 +13,7 @@ class MainFileList {
         let itemHeight = 135;//單個項目的高度
         var temp_start = 0;
         var temp_count = 0;
+        var temp_loaded: number[] = [];
 
         this.initFileList = initFileList;
 
@@ -34,19 +35,20 @@ class MainFileList {
          */
         function updateItem() {
 
-            let start = Math.floor(dom_fileList.scrollTop / itemHeight)
-            let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 2
+            let start = Math.floor(dom_fileList.scrollTop / itemHeight);//開始位置
+            let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 5;//抓取數量
 
-            if (temp_start === start && temp_count === count) {
+            if (temp_start === start && temp_count === count) {//沒變化就離開
                 return
             }
-
             temp_start = start;
             temp_count = count;
 
-            console.log(start, count)
+            //console.log(start, count)
 
             dom_fileListData.innerHTML = "";//移除之前的所有物件
+
+
 
             let arWaitingFile = M.fileLoad.getWaitingFile()
 
@@ -55,12 +57,28 @@ class MainFileList {
             for (let i = start; i < end; i++) {
                 const path = arWaitingFile[i];
                 let name = Lib.GetFileName(path);
-                let imgUrl = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+
+                let style = "";
+                if (temp_loaded.indexOf(i) === -1) {//第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+                    setTimeout(() => {
+                        if (dom_fileListData.contains(div) === false) { return; }//如果物件武警不在UI上，就不載入圖片
+
+                        temp_loaded.push(i);//加到全域變數，表示已經載入過
+                        let _url = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path)
+                        let domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
+                        domImg.style.backgroundImage = `url("${_url}")`;
+                    }, 30);
+                } else {
+
+                    //圖片已經載入過了，直接顯示
+                    let imgUrl = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+                    style = `background-image:url('${imgUrl}')`;
+                }
 
                 let div = newDiv(
                     `<div class="fileList-item">
                         <div class="fileList-no">${i + 1}</div>
-                        <div class="fileList-img" style="background-image:url('${imgUrl}'"> </div>
+                        <div class="fileList-img" style="${style}"> </div>
                         <div class="fileList-title">${name}</div>                                                 
                     </div>`)
 
@@ -86,6 +104,7 @@ class MainFileList {
             let arWaitingFile = M.fileLoad.getWaitingFile()
             dom_fileListBody.style.height = (arWaitingFile.length * itemHeight) + "px";
             temp_start = -999;
+            temp_loaded = [];
             updateItem();
         }
 

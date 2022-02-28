@@ -260,7 +260,6 @@
 }
 /* #endregion */
 
-
 //檔案預覽列表
 .main-fileList {
   overflow-x: hidden;
@@ -268,8 +267,7 @@
   height: 100%;
 
   .main-fileListBody {
-    width: 126px;
-  overflow: hidden;
+    overflow: hidden;
   }
 
   .fileList-item {

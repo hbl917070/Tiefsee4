@@ -27,6 +27,7 @@ class MainFileList {
     let itemHeight = 135;
     var temp_start = 0;
     var temp_count = 0;
+    var temp_loaded = [];
     this.initFileList = initFileList;
     dom_fileList.addEventListener("scroll", () => {
       updateItem();
@@ -36,13 +37,12 @@ class MainFileList {
     }).observe(dom_fileList);
     function updateItem() {
       let start = Math.floor(dom_fileList.scrollTop / itemHeight);
-      let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 2;
+      let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 5;
       if (temp_start === start && temp_count === count) {
         return;
       }
       temp_start = start;
       temp_count = count;
-      console.log(start, count);
       dom_fileListData.innerHTML = "";
       let arWaitingFile = M.fileLoad.getWaitingFile();
       let end = start + count;
@@ -52,10 +52,24 @@ class MainFileList {
       for (let i = start; i < end; i++) {
         const path = arWaitingFile[i];
         let name = Lib.GetFileName(path);
-        let imgUrl = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+        let style = "";
+        if (temp_loaded.indexOf(i) === -1) {
+          setTimeout(() => {
+            if (dom_fileListData.contains(div) === false) {
+              return;
+            }
+            temp_loaded.push(i);
+            let _url = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+            let domImg = div.getElementsByClassName("fileList-img")[0];
+            domImg.style.backgroundImage = `url("${_url}")`;
+          }, 30);
+        } else {
+          let imgUrl = APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+          style = `background-image:url('${imgUrl}')`;
+        }
         let div = newDiv(`<div class="fileList-item">
                         <div class="fileList-no">${i + 1}</div>
-                        <div class="fileList-img" style="background-image:url('${imgUrl}'"> </div>
+                        <div class="fileList-img" style="${style}"> </div>
                         <div class="fileList-title">${name}</div>                                                 
                     </div>`);
         dom_fileListData.append(div);
@@ -72,6 +86,7 @@ class MainFileList {
         let arWaitingFile = M.fileLoad.getWaitingFile();
         dom_fileListBody.style.height = arWaitingFile.length * itemHeight + "px";
         temp_start = -999;
+        temp_loaded = [];
         updateItem();
       });
     }
