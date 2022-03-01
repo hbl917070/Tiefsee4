@@ -125,7 +125,7 @@ class Setting {
         })();
         (() => {
           applyThemeAddBtn(`<div class="btn">\u6DF1\u8272\u4E3B\u984C</div>`, { r: 31, g: 39, b: 43, a: 0.97 }, { r: 255, g: 255, b: 255, a: 0.25 }, { r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 }, { r: 0, g: 200, b: 255 });
-          applyThemeAddBtn(`<div class="btn">\u6DFA\u8272\u4E3B\u984C</div>`, { r: 255, g: 255, b: 255, a: 0.97 }, { r: 112, g: 112, b: 112, a: 0.25 }, { r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }, { r: 0, g: 125, b: 170 });
+          applyThemeAddBtn(`<div class="btn">\u6DFA\u8272\u4E3B\u984C</div>`, { r: 240, g: 242, b: 243, a: 0.97 }, { r: 112, g: 112, b: 112, a: 0.25 }, { r: 0, g: 20, b: 65 }, { r: 255, g: 255, b: 255 }, { r: 0, g: 135, b: 220 });
         })();
         let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP"];
         txt_extension.value = s_extension.join("\n");

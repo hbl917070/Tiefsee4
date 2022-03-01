@@ -288,6 +288,7 @@ namespace Tiefsee {
             wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;//自動填充啟用
             wv2.CoreWebView2.Settings.IsZoomControlEnabled = false;//使用者是否能夠影響 Web 視圖的縮放
             //wv2.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;//是否啟用特定於瀏覽器的快速鍵
+            wv2.CoreWebView2.Settings.IsStatusBarEnabled = false;//是否顯示左下角的網址狀態
 
             WV_Window = new WV_Window(this);
             WV_Directory = new WV_Directory(this);

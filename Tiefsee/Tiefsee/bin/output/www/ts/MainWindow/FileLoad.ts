@@ -102,9 +102,9 @@ class FileLoad {
                 }
             }
 
-            M.mainFileList.initFileList();//初始化檔案列表
+            M.mainFileList.initFileList();//檔案預覽列表 初始化
             await show();//載入圖片
-
+            M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
         }
 
 
@@ -160,8 +160,10 @@ class FileLoad {
                 }
             }
 
-            M.mainFileList.initFileList();//初始化檔案列表
+            M.mainFileList.initFileList();//檔案預覽列表 初始化
             await show();//載入圖片
+            M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
+
         }
 
 
@@ -215,12 +217,15 @@ class FileLoad {
 
             if (fileInfo2.Type === "none") {//如果檔案不存在
                 arWaitingFile.splice(flag, 1);//刪除此筆
+                M.mainFileList.initFileList();//檔案預覽列表 初始化
                 show(flag);
                 _show = async () => { }
                 return;
             }
 
             updateTitle();//更新視窗標題
+            M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
+            M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
             if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
                 groupType = fileToGroupType(fileInfo2);//根據檔案類型判斷要用什麼方式顯示檔案
@@ -356,10 +361,16 @@ class FileLoad {
                     if (value == "2") {
                         state = await WV_File.Delete(path);
                     }
-                    show();
+
 
                     if (state === false) {
                         Msgbox.show({ txt: "刪除失敗" })
+                    } else {
+                        await show();
+
+                        M.mainFileList.initFileList();//檔案預覽列表 初始化
+                        M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
+                        M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
                     }
 
                     //alert(value)
@@ -404,6 +415,10 @@ class FileLoad {
 
                     arWaitingFile[flag] = newName;
                     updateTitle();
+                    M.mainFileList.initFileList();//檔案預覽列表 初始化
+                    M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
+                    M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+
                     Msgbox.close(dom);
                 }
             });

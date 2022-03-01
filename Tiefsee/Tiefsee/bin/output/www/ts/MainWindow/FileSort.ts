@@ -70,7 +70,10 @@ class FileSort {
         }
 
         this.M.fileLoad.setWaitingFile(ar);
-        this.M.fileLoad.updateTitle();
+        this.M.fileLoad.updateTitle();//更新視窗標題
+        this.M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
+        this.M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
+        
         this.setFileSortMenu(_sortType);
     }
 

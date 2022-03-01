@@ -67,7 +67,6 @@ select option {
 
 .window.window-start {
   /* opacity: 0.9; */
-
 }
 
 /* 視窗本體 */
@@ -240,9 +239,15 @@ select option {
   width: 10px;
   height: 10px;
 }
-.base-scrollbar::-webkit-scrollbar:hover {
+
+//滑鼠移入時顯示
+.base-scrollbar:hover::-webkit-scrollbar {
   background-color: var(--color-black60);
 }
+/*.base-scrollbar::-webkit-scrollbar:hover {
+  background-color: var(--color-black60);
+}*/
+
 /*滾動條軌道*/
 .base-scrollbar::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);

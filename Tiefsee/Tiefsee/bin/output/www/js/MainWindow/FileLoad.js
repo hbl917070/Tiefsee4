@@ -65,6 +65,7 @@ class FileLoad {
         }
         M.mainFileList.initFileList();
         yield show();
+        M.mainFileList.setStartLocation();
       });
     }
     function loadFile(path) {
@@ -100,6 +101,7 @@ class FileLoad {
         }
         M.mainFileList.initFileList();
         yield show();
+        M.mainFileList.setStartLocation();
       });
     }
     function getFilePath() {
@@ -144,12 +146,15 @@ class FileLoad {
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
           arWaitingFile.splice(flag, 1);
+          M.mainFileList.initFileList();
           show(flag);
           _show = () => __async(this, null, function* () {
           });
           return;
         }
         updateTitle();
+        M.mainFileList.select();
+        M.mainFileList.updataLocation();
         if (fileLoadType === FileLoadType.userDefined) {
           groupType = fileToGroupType(fileInfo2);
         }
@@ -243,9 +248,13 @@ class FileLoad {
             if (value == "2") {
               state = yield WV_File.Delete(path);
             }
-            show();
             if (state === false) {
               Msgbox.show({ txt: "\u522A\u9664\u5931\u6557" });
+            } else {
+              yield show();
+              M.mainFileList.initFileList();
+              M.mainFileList.select();
+              M.mainFileList.updataLocation();
             }
           })
         });
@@ -280,6 +289,9 @@ class FileLoad {
             }
             arWaitingFile[flag] = newName;
             updateTitle();
+            M.mainFileList.initFileList();
+            M.mainFileList.select();
+            M.mainFileList.updataLocation();
             Msgbox.close(dom);
           })
         });
