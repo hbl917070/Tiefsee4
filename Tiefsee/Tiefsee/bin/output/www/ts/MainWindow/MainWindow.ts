@@ -13,7 +13,8 @@ class MainWindow {
     public mainFileList;
     public menu;
     public script;
-    public readSetting;
+    public applySetting;
+    public saveSetting;
 
     constructor() {
 
@@ -43,12 +44,12 @@ class MainWindow {
         this.menu = menu;
         this.config = config;
         this.script = script;
-        this.readSetting = applySetting;
-
+        this.applySetting = applySetting;
+        this.saveSetting=saveSetting;
+        
         new MainTools(this);
         new Hotkey(this);
         init();
-
 
         //視窗改變大小時觸發
         baseWindow.sizeChangeEvents.push(async () => {
@@ -62,19 +63,7 @@ class MainWindow {
 
         //關閉視窗前觸發
         baseWindow.closingEvents.push(async () => {
-
-            //視窗目前的狀態
-            config.settings.position.left = baseWindow.left;
-            config.settings.position.top = baseWindow.top;
-            //config.settings.position.width = baseWindow.width;
-            //config.settings.position.height = baseWindow.height;
-            config.settings.position.windowState = baseWindow.windowState;
-
-            //儲存 setting.json
-            let s = JSON.stringify(config.settings, null, '\t');
-            var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
-            path = Lib.Combine([path, "setting.json"]);
-            await WV_File.SetText(path, s);
+            await saveSetting();//儲存 setting.json
         });
 
 
@@ -94,7 +83,7 @@ class MainWindow {
                     userSetting = JSON.parse(json.settingTxt);
                 } catch (e) { }
                 $.extend(true, config.settings, userSetting);
-                applySetting(config.settings);
+                applySetting(config.settings, true);
 
                 let txtPosition = config.settings.position;
 
@@ -361,14 +350,14 @@ class MainWindow {
 
         /**
          * 套用設定
-         * @param setting 
+         * @param _settings 
          */
-        function applySetting(setting: any) {
+        function applySetting(_settings: any, isStart = false) {
 
-            var cssRoot = document.body;
+            let cssRoot = document.body;
 
             //@ts-ignore
-            config.settings = setting;
+            config.settings = _settings;
 
             //-----------
 
@@ -385,7 +374,14 @@ class MainWindow {
 
             //-----------
 
+            mainFileList.setEnabled(config.settings.layout.fileListEnabled);
+            mainFileList.setShowNo(config.settings.layout.fileListShowNo);
+            mainFileList.setShowName(config.settings.layout.fileListShowName);
+            if (isStart)
+                mainFileList.setItemWidth(config.settings.layout.fileListShowWidth);
 
+
+            //-----------
 
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
 
@@ -413,7 +409,24 @@ class MainWindow {
         }
 
 
+        /**
+         * 儲存 setting.json
+         */
+        async function saveSetting() {
 
+            //視窗目前的狀態
+            config.settings.position.left = baseWindow.left;
+            config.settings.position.top = baseWindow.top;
+            //config.settings.position.width = baseWindow.width;
+            //config.settings.position.height = baseWindow.height;
+            config.settings.position.windowState = baseWindow.windowState;
+
+            //儲存 setting.json
+            let s = JSON.stringify(config.settings, null, '\t');
+            var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
+            path = Lib.Combine([path, "setting.json"]);
+            await WV_File.SetText(path, s);
+        }
 
     }
 }

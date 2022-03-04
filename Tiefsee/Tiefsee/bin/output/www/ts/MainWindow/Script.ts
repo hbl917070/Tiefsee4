@@ -329,18 +329,11 @@ class ScriptSetting {
             }
         }
 
+        await this.M.saveSetting();//先儲存目前的設定值
+
         //新開視窗
         this.temp_setting = await baseWindow.newWindow("SettingWindow.html");
 
-        /*await this.temp_setting.SetSize(500 * window.devicePixelRatio, 450 * window.devicePixelRatio);//初始化視窗大小
-
-        //設定坐標，從父視窗的中間開啟
-        let w = await this.temp_setting.Width - baseWindow.width;
-        let h = await this.temp_setting.Height - baseWindow.height;
-        this.temp_setting.SetPosition(
-            baseWindow.left - (w / 2),
-            baseWindow.top - (h / 2)
-        )*/
 
     }
 

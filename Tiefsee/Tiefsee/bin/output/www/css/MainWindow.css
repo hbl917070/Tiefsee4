@@ -1,5 +1,4 @@
 @charset "UTF-8";
-/* 圖示粗細 */
 :root {
   --svgWeight: 0px;
 }
@@ -12,7 +11,6 @@
 }
 
 /*---------------------------*/
-/*內容區塊*/
 .window-body {
   flex: 1;
   display: flex;
@@ -261,13 +259,15 @@
 
 /* #endregion */
 :root {
-  --fileList-width: 80px;
+  --fileList-width: 120px;
 }
 
 .main-fileList {
+  display: none;
   overflow-x: hidden;
   overflow-y: auto !important;
   height: 100%;
+  width: var(--fileList-width);
 }
 .main-fileList .main-fileListBody {
   overflow: hidden;
@@ -275,10 +275,10 @@
 .main-fileList .fileList-item {
   user-select: none;
   color: var(--color-white);
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 3px;
   white-space: nowrap;
-  width: calc(var(--fileList-width) + 40px);
+  width: 100%;
 }
 .main-fileList .fileList-item:hover {
   outline: 2px solid var(--color-white40);
@@ -290,25 +290,49 @@
   outline-offset: -2px;
 }
 .main-fileList .fileList-no {
-  line-height: 16px;
-  height: 16px;
+  line-height: 14px;
+  height: 14px;
   overflow: hidden;
   color: var(--color-blue);
   font-size: 14px;
   font-weight: 500;
 }
-.main-fileList .fileList-title {
+.main-fileList .fileList-img {
+  width: calc(100% - 4px);
+  height: calc(var(--fileList-width) - 40px);
+  min-height: 60px;
+  margin: 3px auto;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.main-fileList .fileList-name {
   line-height: 18px;
   height: 18px;
   overflow: hidden;
   text-align: center;
   font-size: 14px;
 }
-.main-fileList .fileList-img {
-  width: calc(var(--fileList-width) + 30px);
-  height: var(--fileList-width);
-  margin: auto;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center center;
+
+.main-fileList[active=true] {
+  display: block;
+}
+
+.dragbar-v {
+  width: 4px;
+  height: 600px;
+  background-color: rgba(0, 0, 0, 0);
+  top: 40px;
+  left: 60px;
+  position: absolute;
+  z-index: 10;
+}
+
+.dragbar-v:hover {
+  background-color: var(--color-blue);
+  cursor: e-resize;
+}
+
+.dragbar-v[active=true] {
+  background-color: var(--color-blue);
 }

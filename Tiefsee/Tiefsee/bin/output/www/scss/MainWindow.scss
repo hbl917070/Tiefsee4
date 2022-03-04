@@ -1,4 +1,4 @@
-/* 圖示粗細 */
+//圖示粗細
 :root {
   --svgWeight: 0px;
 }
@@ -11,7 +11,7 @@
 
 /*---------------------------*/
 
-/*內容區塊*/
+//內容區塊
 .window-body {
   flex: 1;
   display: flex;
@@ -260,14 +260,19 @@
 }
 /* #endregion */
 
+//-----------------
+
 //檔案預覽列表
 :root {
-  --fileList-width: 80px;
+  --fileList-width: 120px;
 }
 .main-fileList {
+  display: none;
+
   overflow-x: hidden;
   overflow-y: auto !important;
   height: 100%;
+  width: var(--fileList-width);
 
   .main-fileListBody {
     overflow: hidden;
@@ -276,10 +281,10 @@
   .fileList-item {
     user-select: none;
     color: var(--color-white);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     padding: 3px;
     white-space: nowrap;
-    width: calc(var(--fileList-width) + 40px);
+    width: calc(100%);
   }
 
   .fileList-item:hover {
@@ -298,29 +303,56 @@
 
   //編號
   .fileList-no {
-    line-height: 16px;
-    height: 16px;
+    line-height: 14px;
+    height: 14px;
     overflow: hidden;
     color: var(--color-blue);
     font-size: 14px;
-	font-weight: 500;
+    font-weight: 500;
+  }
+
+  //圖片
+  .fileList-img {
+    width: calc(100% - 4px);
+    height: calc(var(--fileList-width) - 40px);
+    min-height: 60px;
+    margin: 3px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
   }
 
   //檔名
-  .fileList-title {
+  .fileList-name {
     line-height: 18px;
     height: 18px;
     overflow: hidden;
     text-align: center;
     font-size: 14px;
   }
+}
+.main-fileList[active="true"] {
+  display: block;
+}
 
-  .fileList-img {
-    width: calc(var(--fileList-width) + 30px);
-    height: var(--fileList-width);
-    margin: auto;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
+//-----------------
+
+//拖曳條
+.dragbar-v {
+  width: 4px;
+  height: 600px;
+  background-color: rgba(0, 0, 0, 0);
+  top: 40px;
+  left: 60px;
+  position: absolute;
+  z-index: 10;
+}
+//滑鼠移入時
+.dragbar-v:hover {
+  background-color: var(--color-blue);
+  cursor: e-resize;
+}
+//拖曳時
+.dragbar-v[active="true"] {
+  background-color: var(--color-blue);
 }

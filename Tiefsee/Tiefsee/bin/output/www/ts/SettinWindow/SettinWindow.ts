@@ -21,6 +21,11 @@ class Setting {
         var jqtxt_colorBlack = $("#text-theme-colorBlack");
         var jqtxt_colorBlue = $("#text-theme-colorBlue");
         var switch_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
+       
+        var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
+        var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo") as HTMLInputElement;
+        var switch_fileListShowName = document.querySelector("#switch-fileListShowName") as HTMLInputElement;
+
         var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
         var jqselect_fontWeight = $("#select-fontWeight");//文字粗細
         var jqselect_svgWeight = $("#select-svgWeight");//圖示粗細
@@ -63,7 +68,6 @@ class Setting {
         baseWindow.onCreate = async (json: AppInfo) => {
 
             await WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
-
 
             //讀取設定檔
             var userSetting = {};
@@ -143,6 +147,7 @@ class Setting {
                 var tabs = new Tabs();
                 tabs.add(document.getElementById("tabsBtn-common"), document.getElementById("tabsPage-common"), () => { });
                 tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { });
+                tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { });
                 tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
                 tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
                 tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
@@ -265,6 +270,25 @@ class Setting {
                 config.settings["theme"]["aero"] = val;
             });
 
+            switch_fileListEnabled?.addEventListener("change", () => {//啟用 檔案預覽列表
+                let val = switch_fileListEnabled.checked;
+                config.settings["layout"]["fileListEnabled"] = val;
+                appleSettingOfMain();
+            });
+            switch_fileListShowNo?.addEventListener("change", () => {//顯示編號
+                let val = switch_fileListShowNo.checked;
+                config.settings["layout"]["fileListShowNo"] = val;
+                appleSettingOfMain();
+            });
+            switch_fileListShowName?.addEventListener("change", () => {//顯示檔名
+                let val = switch_fileListShowName.checked;
+                config.settings["layout"]["fileListShowName"] = val;
+                appleSettingOfMain();
+            });
+
+      
+
+
             // 圖片 dpi
             txt_imageDpizoom?.addEventListener("change", () => {
                 let val = txt_imageDpizoom.value;
@@ -339,7 +363,7 @@ class Setting {
          * 將設定套用至 mainwiwndow
          */
         function appleSettingOfMain() {
-            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+            WV_Window.RunJsOfParent(`mainWindow.applySetting(${JSON.stringify(config.settings)})`);
         }
 
 
@@ -356,6 +380,10 @@ class Setting {
             jqtxt_zoomFactor.val(config.settings.theme["zoomFactor"]);//視窗縮放
             jqselect_fontWeight.val(config.settings.theme["fontWeight"]);//文字粗細
             jqselect_svgWeight.val(config.settings.theme["svgWeight"]);//圖示粗細
+
+            switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];//啟用 檔案預覽列表
+            switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];//顯示編號
+            switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];//顯示檔名
 
             appleSettingOfMain();//將設定套用至 mainwiwndow
 

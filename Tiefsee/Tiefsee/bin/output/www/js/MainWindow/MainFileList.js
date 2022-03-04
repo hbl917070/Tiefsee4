@@ -1,43 +1,127 @@
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 class MainFileList {
   constructor(M) {
     this.initFileList = initFileList;
     this.select = select;
     this.updataLocation = updataLocation;
     this.setStartLocation = setStartLocation;
+    this.setEnabled = setEnabled;
+    this.setShowNo = setShowNo;
+    this.setShowName = setShowName;
+    this.setItemWidth = setItemWidth;
     let dom_fileList = document.getElementById("main-fileList");
     let dom_fileListBody = document.getElementById("main-fileListBody");
     let dom_fileListData = document.getElementById("main-fileListData");
-    let itemHeight = 80 + 40 + 10;
+    var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList");
+    var isEnabled = true;
+    var isShowNo = true;
+    var isShowName = true;
+    var itemWidth = 1;
+    var itemHeight = 1;
     var temp_loaded = [];
     var temp_start = 0;
     var temp_count = 0;
+    var temp_itemHeight = 0;
+    var dragbar = new Dragbar();
+    dragbar.init(dom_fileList, dom_dragbar_mainFileList);
+    dragbar.setEventStart(() => {
+    });
+    dragbar.setEventMove((val) => {
+      if (val < 10) {
+        dom_dragbar_mainFileList.style.left = "0px";
+        dom_fileList.style.opacity = "0";
+      } else {
+        dom_fileList.style.opacity = "1";
+        setItemWidth(val);
+      }
+    });
+    dragbar.setEventEnd((val) => {
+      if (val < 10) {
+        setEnabled(false);
+      }
+    });
     dom_fileList.addEventListener("scroll", () => {
       updateItem();
     });
     new ResizeObserver(() => {
       updateItem();
     }).observe(dom_fileList);
+    function setEnabled(val) {
+      if (val) {
+        dom_fileList.setAttribute("active", "true");
+      } else {
+        dom_fileList.setAttribute("active", "");
+      }
+      M.config.settings.layout.fileListEnabled = val;
+      dragbar.setEnabled(val);
+      dom_fileList.style.opacity = "1";
+      if (isEnabled === val) {
+        return;
+      }
+      isEnabled = val;
+      temp_start = -1;
+      dom_fileListData.innerHTML = "";
+      updateItem();
+      setStartLocation();
+    }
+    function setShowNo(val) {
+      if (isShowNo === val) {
+        return;
+      }
+      isShowNo = val;
+      temp_start = -1;
+      dom_fileListData.innerHTML = "";
+      updateItem();
+      setStartLocation();
+    }
+    function setShowName(val) {
+      if (isShowName === val) {
+        return;
+      }
+      isShowName = val;
+      temp_start = -1;
+      dom_fileListData.innerHTML = "";
+      updateItem();
+      setStartLocation();
+    }
+    function setItemWidth(val) {
+      if (itemWidth === val) {
+        return;
+      }
+      let valMin = 80;
+      let valMax = 200;
+      if (val <= valMin) {
+        val = valMin;
+      }
+      if (val >= valMax) {
+        val = valMax;
+      }
+      itemWidth = val;
+      M.config.settings.layout.fileListShowWidth = val;
+      var cssRoot = document.body;
+      cssRoot.style.setProperty("--fileList-width", val + "px");
+      dom_dragbar_mainFileList.style.left = val + "px";
+      temp_start = -1;
+      updateItem();
+      setStartLocation();
+    }
     function updateItem() {
+      if (isEnabled === false) {
+        dom_fileListData.innerHTML = "";
+        return;
+      }
+      let fileListItem = dom_fileListData.querySelector(".fileList-item");
+      if (fileListItem === null) {
+        newItem(-1, "");
+        fileListItem = dom_fileListData.querySelector(".fileList-item");
+      }
+      if (fileListItem !== null) {
+        itemHeight = fileListItem.getBoundingClientRect().height + 5;
+      }
+      if (temp_itemHeight !== itemHeight) {
+        let arWaitingFile2 = M.fileLoad.getWaitingFile();
+        dom_fileListBody.style.height = arWaitingFile2.length * itemHeight + "px";
+      }
+      temp_itemHeight = itemHeight;
       let start = Math.floor(dom_fileList.scrollTop / itemHeight) - 1;
       let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 5;
       if (start < 0) {
@@ -49,6 +133,7 @@ class MainFileList {
       temp_start = start;
       temp_count = count;
       dom_fileListData.innerHTML = "";
+      dom_fileListData.style.marginTop = start * itemHeight + "px";
       let arWaitingFile = M.fileLoad.getWaitingFile();
       let end = start + count;
       if (end > arWaitingFile.length) {
@@ -56,9 +141,15 @@ class MainFileList {
       }
       for (let i = start; i < end; i++) {
         const path = arWaitingFile[i];
-        let name = Lib.GetFileName(path);
-        let style = "";
-        if (temp_loaded.indexOf(i) === -1) {
+        newItem(i, path);
+      }
+      select();
+    }
+    function newItem(i, path) {
+      let name = Lib.GetFileName(path);
+      let style = "";
+      if (temp_loaded.indexOf(i) === -1) {
+        if (path !== "") {
           setTimeout(() => {
             if (dom_fileListData.contains(div) === false) {
               return;
@@ -68,22 +159,29 @@ class MainFileList {
             let domImg = div.getElementsByClassName("fileList-img")[0];
             domImg.style.backgroundImage = `url("${_url}")`;
           }, 30);
-        } else {
-          let imgUrl = getImgUrl(path);
-          style = `background-image:url('${imgUrl}')`;
         }
-        let div = newDiv(`<div class="fileList-item" data-id="${i}">
-                        <div class="fileList-no">${i + 1}</div>
-                        <div class="fileList-img" style="${style}"> </div>
-                        <div class="fileList-title">${name}</div>                                                 
-                    </div>`);
-        dom_fileListData.append(div);
-        div.addEventListener("click", () => {
-          M.fileLoad.show(i);
-        });
+      } else {
+        let imgUrl = getImgUrl(path);
+        style = `background-image:url('${imgUrl}')`;
       }
-      dom_fileListData.style.marginTop = start * itemHeight + "px";
-      select();
+      let htmlNo = ``;
+      let htmlName = ``;
+      if (isShowNo === true) {
+        htmlNo = `<div class="fileList-no">${i + 1}</div>`;
+      }
+      if (isShowName === true) {
+        htmlName = ` <div class="fileList-name">${name}</div> `;
+      }
+      let div = newDiv(`<div class="fileList-item" data-id="${i}">
+                    ${htmlNo}
+                    <div class="fileList-img" style="${style}"> </div>
+                    ${htmlName}                                               
+                </div>`);
+      dom_fileListData.append(div);
+      div.addEventListener("click", () => {
+        M.fileLoad.show(i);
+      });
+      return div;
     }
     function getImgUrl(path) {
       if (Lib.GetExtension(path) === ".svg") {
@@ -92,16 +190,16 @@ class MainFileList {
       return APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
     }
     function initFileList() {
-      return __async(this, null, function* () {
-        let arWaitingFile = M.fileLoad.getWaitingFile();
-        dom_fileListBody.style.height = arWaitingFile.length * itemHeight + "px";
-        temp_start = -999;
-        temp_loaded = [];
-        updateItem();
-      });
+      temp_start = -999;
+      temp_loaded = [];
+      temp_itemHeight = -1;
+      updateItem();
     }
     function select() {
       var _a;
+      if (isEnabled === false) {
+        return;
+      }
       (_a = document.querySelector(`.fileList-item[active=true]`)) == null ? void 0 : _a.setAttribute("active", "");
       let id = M.fileLoad.getFlag();
       let div = document.querySelector(`.fileList-item[data-id="${id}"]`);
@@ -111,11 +209,17 @@ class MainFileList {
       div.setAttribute("active", "true");
     }
     function setStartLocation() {
+      if (isEnabled === false) {
+        return;
+      }
       let id = M.fileLoad.getFlag();
       let f = (dom_fileList.clientHeight - itemHeight) / 2 - 15;
       dom_fileList.scrollTop = id * itemHeight - f;
     }
     function updataLocation() {
+      if (isEnabled === false) {
+        return;
+      }
       let id = M.fileLoad.getFlag();
       let start = Math.floor(dom_fileList.scrollTop / itemHeight);
       if (id <= start) {

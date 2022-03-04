@@ -32,6 +32,9 @@ class Setting {
     var jqtxt_colorBlack = $("#text-theme-colorBlack");
     var jqtxt_colorBlue = $("#text-theme-colorBlue");
     var switch_areo = document.querySelector("#switch-theme-areo");
+    var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled");
+    var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo");
+    var switch_fileListShowName = document.querySelector("#switch-fileListShowName");
     var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
     var jqselect_fontWeight = $("#select-fontWeight");
     var jqselect_svgWeight = $("#select-svgWeight");
@@ -108,6 +111,8 @@ class Setting {
           tabs.add(document.getElementById("tabsBtn-common"), document.getElementById("tabsPage-common"), () => {
           });
           tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => {
+          });
+          tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => {
           });
           tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => {
           });
@@ -201,6 +206,21 @@ class Setting {
           let val = switch_areo.checked;
           config.settings["theme"]["aero"] = val;
         });
+        switch_fileListEnabled == null ? void 0 : switch_fileListEnabled.addEventListener("change", () => {
+          let val = switch_fileListEnabled.checked;
+          config.settings["layout"]["fileListEnabled"] = val;
+          appleSettingOfMain();
+        });
+        switch_fileListShowNo == null ? void 0 : switch_fileListShowNo.addEventListener("change", () => {
+          let val = switch_fileListShowNo.checked;
+          config.settings["layout"]["fileListShowNo"] = val;
+          appleSettingOfMain();
+        });
+        switch_fileListShowName == null ? void 0 : switch_fileListShowName.addEventListener("change", () => {
+          let val = switch_fileListShowName.checked;
+          config.settings["layout"]["fileListShowName"] = val;
+          appleSettingOfMain();
+        });
         txt_imageDpizoom == null ? void 0 : txt_imageDpizoom.addEventListener("change", () => {
           let val = txt_imageDpizoom.value;
           config.settings["image"]["dpizoom"] = val;
@@ -243,7 +263,7 @@ class Setting {
       dom_applyThemeBtns == null ? void 0 : dom_applyThemeBtns.append(btn);
     }
     function appleSettingOfMain() {
-      WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+      WV_Window.RunJsOfParent(`mainWindow.applySetting(${JSON.stringify(config.settings)})`);
     }
     function applySetting() {
       txt_imageDpizoom.value = config.settings["image"]["dpizoom"];
@@ -253,6 +273,9 @@ class Setting {
       jqtxt_zoomFactor.val(config.settings.theme["zoomFactor"]);
       jqselect_fontWeight.val(config.settings.theme["fontWeight"]);
       jqselect_svgWeight.val(config.settings.theme["svgWeight"]);
+      switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];
+      switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];
+      switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];
       appleSettingOfMain();
       function setRgb(jqdom, c) {
         jqdom.minicolors("value", `rgb(${c.r}, ${c.g}, ${c.b})`);

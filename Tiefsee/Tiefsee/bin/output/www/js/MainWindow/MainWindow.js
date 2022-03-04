@@ -43,7 +43,8 @@ class MainWindow {
     this.menu = menu;
     this.config = config;
     this.script = script;
-    this.readSetting = applySetting;
+    this.applySetting = applySetting;
+    this.saveSetting = saveSetting;
     new MainTools(this);
     new Hotkey(this);
     init();
@@ -54,13 +55,7 @@ class MainWindow {
       }
     }));
     baseWindow.closingEvents.push(() => __async(this, null, function* () {
-      config.settings.position.left = baseWindow.left;
-      config.settings.position.top = baseWindow.top;
-      config.settings.position.windowState = baseWindow.windowState;
-      let s = JSON.stringify(config.settings, null, "	");
-      var path = yield WV_Window.GetAppDataPath();
-      path = Lib.Combine([path, "setting.json"]);
-      yield WV_File.SetText(path, s);
+      yield saveSetting();
     }));
     baseWindow.onCreate = (json) => __async(this, null, function* () {
       if (firstRun === true) {
@@ -71,7 +66,7 @@ class MainWindow {
         } catch (e) {
         }
         $.extend(true, config.settings, userSetting);
-        applySetting(config.settings);
+        applySetting(config.settings, true);
         let txtPosition = config.settings.position;
         if (txtPosition.left !== -9999) {
           if (txtPosition.windowState == "Maximized") {
@@ -262,9 +257,9 @@ class MainWindow {
         }
       });
     }
-    function applySetting(setting) {
-      var cssRoot = document.body;
-      config.settings = setting;
+    function applySetting(_settings, isStart = false) {
+      let cssRoot = document.body;
+      config.settings = _settings;
       let dpizoom = Number(config.settings["image"]["dpizoom"]);
       if (dpizoom == -1 || isNaN(dpizoom)) {
         dpizoom = -1;
@@ -275,6 +270,11 @@ class MainWindow {
       WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]);
       document.body.style.fontWeight = config.settings["theme"]["fontWeight"];
       cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);
+      mainFileList.setEnabled(config.settings.layout.fileListEnabled);
+      mainFileList.setShowNo(config.settings.layout.fileListShowNo);
+      mainFileList.setShowName(config.settings.layout.fileListShowName);
+      if (isStart)
+        mainFileList.setItemWidth(config.settings.layout.fileListShowWidth);
       cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
       initColor("--color-window-background", true);
       initColor("--color-window-border", true);
@@ -292,6 +292,17 @@ class MainWindow {
           cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, 1 )`);
         }
       }
+    }
+    function saveSetting() {
+      return __async(this, null, function* () {
+        config.settings.position.left = baseWindow.left;
+        config.settings.position.top = baseWindow.top;
+        config.settings.position.windowState = baseWindow.windowState;
+        let s = JSON.stringify(config.settings, null, "	");
+        var path = yield WV_Window.GetAppDataPath();
+        path = Lib.Combine([path, "setting.json"]);
+        yield WV_File.SetText(path, s);
+      });
     }
   }
 }

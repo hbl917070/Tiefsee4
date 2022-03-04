@@ -283,6 +283,7 @@ class ScriptSetting {
           return;
         }
       }
+      yield this.M.saveSetting();
       this.temp_setting = yield baseWindow.newWindow("SettingWindow.html");
     });
   }

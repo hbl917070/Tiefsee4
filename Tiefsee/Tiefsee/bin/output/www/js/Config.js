@@ -56,6 +56,12 @@ class Config {
         "dpizoom": "-1",
         "tieefseeviewImageRendering": "0"
       },
+      layout: {
+        fileListEnabled: true,
+        fileListShowNo: true,
+        fileListShowName: true,
+        fileListShowWidth: 140
+      },
       position: {
         left: -9999,
         top: -9999,

@@ -68,6 +68,12 @@ class Config {
             /** 圖片渲染模式 */
             "tieefseeviewImageRendering": "0"
         },
+        layout: {
+            fileListEnabled: true,//啟用 檔案預覽列表
+            fileListShowNo: true,//顯示編號
+            fileListShowName: true,//顯示檔名
+            fileListShowWidth: 140,//寬度
+        },
 
         /** 記錄程式上次關閉時的位置 */
         position: {
