@@ -318,6 +318,10 @@
   display: block;
 }
 
+.main-fileList[hide=true] {
+  display: none !important;
+}
+
 .dragbar-v {
   width: 4px;
   height: 600px;

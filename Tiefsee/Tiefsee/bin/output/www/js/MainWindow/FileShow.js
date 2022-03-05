@@ -26,17 +26,23 @@ class FileShow {
     var dom_txtview = document.querySelector("#main-txtview");
     var dom_welcomeview = document.querySelector("#main-welcomeview");
     var isLoaded = true;
+    var _groupType = GroupType.none;
     this.openImage = openImage;
     this.openPdf = openPdf;
     this.openTxt = openTxt;
     this.openWelcome = openWelcome;
     this.openNone = openNone;
     this.getIsLoaded = getIsLoaded;
+    this.getGroupType = getGroupType;
     this.dom_welcomeview = dom_welcomeview;
     this.dom_imgview = dom_imgview;
     this.tieefseeview = tieefseeview;
+    function getGroupType() {
+      return _groupType;
+    }
     function setShowType(groupType) {
       var _a, _b, _c, _d, _e;
+      _groupType = groupType;
       let arToolsGroup = document.querySelectorAll(".main-tools-group");
       for (let i = 0; i < arToolsGroup.length; i++) {
         const item = arToolsGroup[i];
@@ -44,6 +50,7 @@ class FileShow {
       }
       if (groupType === GroupType.none) {
         (_a = getToolsDom(GroupType.none)) == null ? void 0 : _a.setAttribute("active", "true");
+        M.mainFileList.setHide(true);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "none";
@@ -53,8 +60,21 @@ class FileShow {
         tieefseeview.loadNone();
         return;
       }
+      if (groupType === GroupType.welcome) {
+        (_b = getToolsDom(GroupType.welcome)) == null ? void 0 : _b.setAttribute("active", "true");
+        M.mainFileList.setHide(true);
+        dom_imgview.style.display = "none";
+        dom_pdfview.style.display = "none";
+        dom_txtview.style.display = "none";
+        dom_welcomeview.style.display = "flex";
+        dom_pdfview.setAttribute("src", "");
+        dom_txtview.value = "";
+        tieefseeview.loadNone();
+        return;
+      }
       if (groupType === GroupType.img) {
-        (_b = getToolsDom(GroupType.img)) == null ? void 0 : _b.setAttribute("active", "true");
+        (_c = getToolsDom(GroupType.img)) == null ? void 0 : _c.setAttribute("active", "true");
+        M.mainFileList.setHide(false);
         dom_imgview.style.display = "block";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "none";
@@ -67,7 +87,8 @@ class FileShow {
         return;
       }
       if (groupType === GroupType.txt) {
-        (_c = getToolsDom(GroupType.txt)) == null ? void 0 : _c.setAttribute("active", "true");
+        (_d = getToolsDom(GroupType.txt)) == null ? void 0 : _d.setAttribute("active", "true");
+        M.mainFileList.setHide(false);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "block";
@@ -77,22 +98,12 @@ class FileShow {
         return;
       }
       if (groupType === GroupType.pdf) {
-        (_d = getToolsDom(GroupType.pdf)) == null ? void 0 : _d.setAttribute("active", "true");
+        (_e = getToolsDom(GroupType.pdf)) == null ? void 0 : _e.setAttribute("active", "true");
+        M.mainFileList.setHide(false);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "block";
         dom_txtview.style.display = "none";
         dom_welcomeview.style.display = "none";
-        dom_txtview.value = "";
-        tieefseeview.loadNone();
-        return;
-      }
-      if (groupType === GroupType.welcome) {
-        (_e = getToolsDom(GroupType.welcome)) == null ? void 0 : _e.setAttribute("active", "true");
-        dom_imgview.style.display = "none";
-        dom_pdfview.style.display = "none";
-        dom_txtview.style.display = "none";
-        dom_welcomeview.style.display = "flex";
-        dom_pdfview.setAttribute("src", "");
         dom_txtview.value = "";
         tieefseeview.loadNone();
         return;

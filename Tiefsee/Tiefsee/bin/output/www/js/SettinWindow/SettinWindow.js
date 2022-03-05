@@ -101,7 +101,7 @@ class Setting {
               change: function(value, opacity2) {
                 let c = jQdim.minicolors("rgbObject");
                 config.settings["theme"][name] = c;
-                WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+                appleSettingOfMain();
               }
             });
           }

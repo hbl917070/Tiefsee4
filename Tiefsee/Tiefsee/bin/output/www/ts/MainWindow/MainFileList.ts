@@ -8,6 +8,7 @@ class MainFileList {
     public select;
     public updataLocation;
     public setStartLocation;
+    public setHide;
     public setEnabled;
     public setShowNo;
     public setShowName;
@@ -19,6 +20,7 @@ class MainFileList {
         this.select = select;
         this.updataLocation = updataLocation;
         this.setStartLocation = setStartLocation;
+        this.setHide = setHide;
         this.setEnabled = setEnabled
         this.setShowNo = setShowNo
         this.setShowName = setShowName
@@ -29,6 +31,7 @@ class MainFileList {
         let dom_fileListData = document.getElementById("main-fileListData") as HTMLElement;//資料
         var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement;
 
+        var isHide = false;//暫時隱藏
         var isEnabled = true;//啟用 檔案預覽列表
         var isShowNo = true;//顯示編號
         var isShowName = true;//顯示檔名
@@ -72,6 +75,27 @@ class MainFileList {
         }).observe(dom_fileList)
 
 
+        /**
+         * 暫時隱藏(不影響設定值，強制隱藏
+         */
+        function setHide(val: boolean) {
+            isHide = val;
+            if (val) {
+                dom_fileList.setAttribute("hide", "true");
+                dragbar.setEnabled(false);
+            } else {
+                dom_fileList.setAttribute("hide", "");
+                dragbar.setEnabled(M.config.settings.layout.fileListEnabled);
+            }
+        }
+
+
+        /**
+         * 設定是否啟用
+         * @param val 
+         * @param onlyRun 單純執行而不儲存設定
+         * @returns 
+         */
         function setEnabled(val: boolean) {
 
             if (val) {
@@ -92,6 +116,12 @@ class MainFileList {
             setStartLocation();//捲到中間
         }
 
+
+        /**
+         * 設定是否顯示編號
+         * @param val 
+         * @returns 
+         */
         function setShowNo(val: boolean) {
             if (isShowNo === val) { return; }
             isShowNo = val;
@@ -101,6 +131,10 @@ class MainFileList {
             setStartLocation();//捲到中間
         }
 
+
+        /**
+         * 設定是否顯示檔名
+         */
         function setShowName(val: boolean) {
             if (isShowName === val) { return; }
             isShowName = val;
@@ -139,7 +173,7 @@ class MainFileList {
 
 
         /**
-         * 
+         * 刷新UI
          * @returns 
          */
         function updateItem() {
@@ -258,8 +292,6 @@ class MainFileList {
          * 檔案預覽列表初始化 (重新讀取列表
          */
         function initFileList() {
-            //let arWaitingFile = M.fileLoad.getWaitingFile()
-            //dom_fileListBody.style.height = (arWaitingFile.length * itemHeight) + "px";
             temp_start = -999;
             temp_loaded = [];
             temp_itemHeight = -1;

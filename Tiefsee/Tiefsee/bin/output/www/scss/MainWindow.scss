@@ -331,8 +331,14 @@
     font-size: 14px;
   }
 }
+
+//啟用
 .main-fileList[active="true"] {
   display: block;
+}
+//暫時隱藏
+.main-fileList[hide="true"] {
+  display: none !important;
 }
 
 //-----------------

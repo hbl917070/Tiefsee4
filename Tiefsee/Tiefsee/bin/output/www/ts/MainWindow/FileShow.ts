@@ -6,6 +6,7 @@ class FileShow {
     public openWelcome;
     public openNone;
     public getIsLoaded;
+    public getGroupType;
 
     public tieefseeview;
     public dom_imgview;
@@ -19,6 +20,7 @@ class FileShow {
         var dom_txtview = <HTMLTextAreaElement>document.querySelector("#main-txtview")
         var dom_welcomeview = <HTMLDivElement>document.querySelector("#main-welcomeview")
         var isLoaded = true;
+        var _groupType = GroupType.none;//目前顯示的類型
 
         this.openImage = openImage;
         this.openPdf = openPdf;
@@ -26,9 +28,17 @@ class FileShow {
         this.openWelcome = openWelcome;
         this.openNone = openNone;
         this.getIsLoaded = getIsLoaded;
+        this.getGroupType = getGroupType;
         this.dom_welcomeview = dom_welcomeview;
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
+
+
+        /** 
+         * 取得 目前顯示的類型
+         */
+        function getGroupType() { return _groupType }
+
 
         /**
          * 
@@ -36,6 +46,8 @@ class FileShow {
          * @returns 
          */
         function setShowType(groupType: string) {
+
+            _groupType = groupType;
 
             let arToolsGroup = document.querySelectorAll(".main-tools-group");
             for (let i = 0; i < arToolsGroup.length; i++) {
@@ -48,6 +60,8 @@ class FileShow {
                 //更換工具列
                 getToolsDom(GroupType.none)?.setAttribute("active", "true");
 
+                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
+
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -59,11 +73,30 @@ class FileShow {
                 return;
             }
 
+            if (groupType === GroupType.welcome) {
 
+                //更換工具列
+                getToolsDom(GroupType.welcome)?.setAttribute("active", "true");
+
+                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
+
+                dom_imgview.style.display = "none";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "none";
+                dom_welcomeview.style.display = "flex";
+
+                dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                tieefseeview.loadNone();
+                return;
+            }
+            
             if (groupType === GroupType.img) {
 
                 //更換工具列
                 getToolsDom(GroupType.img)?.setAttribute("active", "true");
+
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
 
                 dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
@@ -85,6 +118,8 @@ class FileShow {
                 //更換工具列
                 getToolsDom(GroupType.txt)?.setAttribute("active", "true");
 
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "block";
@@ -101,6 +136,8 @@ class FileShow {
                 //更換工具列
                 getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
 
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";
                 dom_txtview.style.display = "none";
@@ -112,21 +149,7 @@ class FileShow {
                 return;
             }
 
-            if (groupType === GroupType.welcome) {
 
-                //更換工具列
-                getToolsDom(GroupType.welcome)?.setAttribute("active", "true");
-
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_welcomeview.style.display = "flex";
-
-                dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                tieefseeview.loadNone();
-                return;
-            }
         }
 
 

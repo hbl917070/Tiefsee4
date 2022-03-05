@@ -134,7 +134,7 @@ class Setting {
                             //設定父親視窗的主題
                             //@ts-ignore
                             config.settings["theme"][name] = c;
-                            WV_Window.RunJsOfParent(`mainWindow.readSetting(${JSON.stringify(config.settings)})`);
+                            appleSettingOfMain();
                         }
                     });
                 }

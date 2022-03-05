@@ -142,6 +142,9 @@ class FileLoad {
           });
           return;
         }
+        M.mainFileList.setHide(false);
+        M.mainFileList.select();
+        M.mainFileList.updataLocation();
         let path = getFilePath();
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
@@ -153,8 +156,6 @@ class FileLoad {
           return;
         }
         updateTitle();
-        M.mainFileList.select();
-        M.mainFileList.updataLocation();
         if (fileLoadType === FileLoadType.userDefined) {
           groupType = fileToGroupType(fileInfo2);
         }

@@ -4,6 +4,7 @@ class MainFileList {
     this.select = select;
     this.updataLocation = updataLocation;
     this.setStartLocation = setStartLocation;
+    this.setHide = setHide;
     this.setEnabled = setEnabled;
     this.setShowNo = setShowNo;
     this.setShowName = setShowName;
@@ -12,6 +13,7 @@ class MainFileList {
     let dom_fileListBody = document.getElementById("main-fileListBody");
     let dom_fileListData = document.getElementById("main-fileListData");
     var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList");
+    var isHide = false;
     var isEnabled = true;
     var isShowNo = true;
     var isShowName = true;
@@ -45,6 +47,16 @@ class MainFileList {
     new ResizeObserver(() => {
       updateItem();
     }).observe(dom_fileList);
+    function setHide(val) {
+      isHide = val;
+      if (val) {
+        dom_fileList.setAttribute("hide", "true");
+        dragbar.setEnabled(false);
+      } else {
+        dom_fileList.setAttribute("hide", "");
+        dragbar.setEnabled(M.config.settings.layout.fileListEnabled);
+      }
+    }
     function setEnabled(val) {
       if (val) {
         dom_fileList.setAttribute("active", "true");

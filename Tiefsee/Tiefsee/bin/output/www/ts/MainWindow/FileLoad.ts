@@ -211,10 +211,14 @@ class FileLoad {
                 _show = async () => { }
                 return;
             }
+            
+            M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+            M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
+            M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
             let path = getFilePath();
             let fileInfo2 = await Lib.GetFileInfo2(path);
-
+          
             if (fileInfo2.Type === "none") {//如果檔案不存在
                 arWaitingFile.splice(flag, 1);//刪除此筆
                 M.mainFileList.initFileList();//檔案預覽列表 初始化
@@ -223,10 +227,9 @@ class FileLoad {
                 return;
             }
 
+           
             updateTitle();//更新視窗標題
-            M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
-            M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
-
+ 
             if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
                 groupType = fileToGroupType(fileInfo2);//根據檔案類型判斷要用什麼方式顯示檔案
             }
