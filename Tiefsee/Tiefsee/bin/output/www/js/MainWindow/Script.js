@@ -70,10 +70,10 @@ class ScriptFileLoad {
     this.M = _M;
   }
   prev() {
-    this.M.fileLoad.prev();
+    this.M.fileLoad.prevFile();
   }
   next() {
-    this.M.fileLoad.next();
+    this.M.fileLoad.nextFile();
   }
   deleteMsg() {
     this.M.fileLoad.deleteMsg();

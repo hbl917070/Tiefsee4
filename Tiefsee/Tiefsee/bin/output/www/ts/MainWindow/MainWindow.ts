@@ -5,12 +5,14 @@ class MainWindow {
     public dom_tools: HTMLElement;
     public dom_maxBtnLeft: HTMLElement;
     public dom_maxBtnRight: HTMLElement;
+    public dom_mainL: HTMLElement;
 
     public config;
     public fileLoad;
     public fileShow;
     public fileSort;
     public mainFileList;
+    public mainDirList;
     public menu;
     public script;
     public applySetting;
@@ -23,30 +25,32 @@ class MainWindow {
         var dom_tools = <HTMLElement>document.getElementById("main-tools");
         var dom_maxBtnLeft = <HTMLElement>document.getElementById("maxBtnLeft");
         var dom_maxBtnRight = <HTMLElement>document.getElementById("maxBtnRight");
+        var dom_mainL = <HTMLElement>document.getElementById("main-L");
+        this.dom_tools = dom_tools;
+        this.dom_maxBtnLeft = dom_maxBtnLeft;
+        this.dom_maxBtnRight = dom_maxBtnRight;
+        this.dom_mainL = dom_mainL;
 
         var config = new Config();
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var fileSort = new FileSort(this);
         var mainFileList = new MainFileList(this);
+        var mainDirList = new MainDirList(this);
         var menu = new Menu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
-
-        this.dom_tools = dom_tools;
-        this.dom_maxBtnLeft = dom_maxBtnLeft;
-        this.dom_maxBtnRight = dom_maxBtnRight;
-
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.fileSort = fileSort;
         this.mainFileList = mainFileList;
+        this.mainDirList = mainDirList;
         this.menu = menu;
         this.config = config;
         this.script = script;
         this.applySetting = applySetting;
-        this.saveSetting=saveSetting;
-        
+        this.saveSetting = saveSetting;
+
         new MainTools(this);
         new Hotkey(this);
         init();

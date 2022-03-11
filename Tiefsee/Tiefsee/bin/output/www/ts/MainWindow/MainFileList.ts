@@ -45,14 +45,14 @@ class MainFileList {
 
         //拖曳改變size
         var dragbar = new Dragbar();
-        dragbar.init(dom_fileList, dom_dragbar_mainFileList);
+        dragbar.init(dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
         //拖曳開始
         dragbar.setEventStart(() => { })
         //拖曳
         dragbar.setEventMove((val: number) => {
             if (val < 10) {//小於10的話就暫時隱藏
-                dom_dragbar_mainFileList.style.left = "0px";
                 dom_fileList.style.opacity = "0";
+                dragbar.setPosition(0);
             } else {
                 dom_fileList.style.opacity = "1";
                 setItemWidth(val);
@@ -163,7 +163,7 @@ class MainFileList {
 
             var cssRoot = document.body;
             cssRoot.style.setProperty("--fileList-width", val + "px");
-            dom_dragbar_mainFileList.style.left = val + "px";
+            dragbar.setPosition(val);
 
             temp_start = -1;//強制必須重新繪製
             updateItem();
@@ -196,7 +196,7 @@ class MainFileList {
             //重新計算整體的高度
             if (temp_itemHeight !== itemHeight) {
                 let arWaitingFile = M.fileLoad.getWaitingFile();
-                dom_fileListBody.style.height = (arWaitingFile.length * itemHeight) + "px";
+                dom_fileListBody.style.height = (arWaitingFile.length * itemHeight) + 4 + "px";
             }
             temp_itemHeight = itemHeight;
 
@@ -260,20 +260,21 @@ class MainFileList {
                 htmlNo = `<div class="fileList-no">${i + 1}</div>`
             }
             if (isShowName === true) {
-                htmlName = ` <div class="fileList-name">${name}</div> `
+                htmlName = `<div class="fileList-name">${name}</div> `
             }
 
             let div = newDiv(
                 `<div class="fileList-item" data-id="${i}">
-                    ${htmlNo}
-                    <div class="fileList-img" style="${style}"> </div>
-                    ${htmlName}                                               
+                    <div class="fileList-title">
+                        ${htmlNo} ${htmlName}
+                    </div>
+                    <div class="fileList-img" style="${style}"> </div>                                                            
                 </div>`)
             dom_fileListData.append(div);
 
             //click載入圖片
             div.addEventListener("click", () => {
-                M.fileLoad.show(i);
+                M.fileLoad.showFile(i);
             })
 
             return div
@@ -284,7 +285,7 @@ class MainFileList {
             if (Lib.GetExtension(path) === ".svg") {
                 return Lib.pathToURL(path);
             }
-            return APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+            return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g,"\\'");
         }
 
 
@@ -310,7 +311,7 @@ class MainFileList {
             //移除上一次選擇的項目
             document.querySelector(`.fileList-item[active=true]`)?.setAttribute("active", "");
 
-            let id = M.fileLoad.getFlag();//取得id
+            let id = M.fileLoad.getFlagFile();//取得id
 
             let div = document.querySelector(`.fileList-item[data-id="${id}"]`);
             if (div == null) { return; }
@@ -325,8 +326,8 @@ class MainFileList {
 
             if (isEnabled === false) { return; }
 
-            let id = M.fileLoad.getFlag();//取得id
-            let f = (dom_fileList.clientHeight - itemHeight) / 2 - 15;//計算距離中心的距離
+            let id = M.fileLoad.getFlagFile();//取得id
+            let f = (dom_fileList.clientHeight - itemHeight) / 2 - 20;//計算距離中心的距離
             dom_fileList.scrollTop = id * itemHeight - f;
         }
 
@@ -338,7 +339,7 @@ class MainFileList {
 
             if (isEnabled === false) { return; }
 
-            let id = M.fileLoad.getFlag();//取得id
+            let id = M.fileLoad.getFlagFile();//取得id
 
             //如果選中的項目在上面
             let start = Math.floor(dom_fileList.scrollTop / itemHeight);//開始位置

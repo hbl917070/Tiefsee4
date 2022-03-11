@@ -34,6 +34,7 @@
     <script src="./js/MainWindow/MainTools.js"></script>
     <script src="./js/MainWindow/FileLoad.js"></script>
     <script src="./js/MainWindow/MainFileList.js"></script>
+    <script src="./js/MainWindow/MainDirList.js"></script>
     <script src="./js/MainWindow/FileShow.js"></script>
     <script src="./js/MainWindow/FileSort.js"></script>
     <script src="./js/MainWindow/InitMenu.js"></script>
@@ -41,9 +42,9 @@
     <script src="./js/Msgbox.js"></script>
     <script src="./js/MainWindow/Script.js"></script>
     <script src="./js/MainWindow/Hotkey.js"></script>
-    <script src="./js/MainWindow/Dragbar.js"></script>  
+    <script src="./js/MainWindow/Dragbar.js"></script>
     <script src="./js/MainWindow/MainWindow.js"></script>
-
+    
     <script>
         var mainWindow;
         document.addEventListener("DOMContentLoaded", async () => {
@@ -314,7 +315,9 @@
 
         <div class="window">
 
+
             <div class="dragbar-v" id="dragbar-mainFileList"> </div>
+            <div class="dragbar-v" id="dragbar-mainDirList"> </div>
 
             <!-- 標題列 -->
             <div class="window-titlebar">
@@ -373,7 +376,7 @@
             <div class="window-body">
 
                 <div class="main-content">
-   
+
                     <div class="main-T">
 
                         <!-- 工具列 -->
@@ -383,7 +386,201 @@
 
                     <div class="main-C">
 
-                        <div class="main-L">
+                        <div class="main-L" id="main-L">
+
+                            <!-- 資料夾預覽列表 -->
+
+                            <div class="main-dirList base-scrollbar" id="main-dirList" active="true">
+                                <div class="main-dirListBody" id="main-dirListBody">
+                                    <div id="main-dirListData">
+
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dirList-item" data-id="25" >
+                                            <div class="dirList-title">
+                                                <div class="dirList-no">26</div>
+                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
+                                            </div>
+                                            <div class="dirList-imgbox">
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                                <div class="dirList-img"
+                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                             <!-- 檔案預覽列表 -->
                             <div class="main-fileList base-scrollbar" id="main-fileList">

@@ -20,27 +20,43 @@ var __async = (__this, __arguments, generator) => {
 };
 class FileLoad {
   constructor(M) {
-    var arWaitingFile = [];
-    var flag;
     var groupType = "img";
     var fileLoadType;
+    var arFile = [];
+    var flagFile;
+    var dirPath = "";
+    var arDir = {};
+    var arDirKey = [];
+    var flagDir;
     this.getWaitingFile = () => {
-      return arWaitingFile;
+      return arFile;
     };
     this.setWaitingFile = (ar) => {
-      arWaitingFile = ar;
+      arFile = ar;
     };
-    this.getFlag = () => {
-      return flag;
+    this.getFlagFile = () => {
+      return flagFile;
     };
-    this.setFlag = (n) => {
-      flag = n;
+    this.setFlagFile = (n) => {
+      flagFile = n;
+    };
+    this.getWaitingDir = () => {
+      return arDir;
+    };
+    this.getWaitingDirKey = () => {
+      return arDirKey;
+    };
+    this.getFlagDir = () => {
+      return flagDir;
+    };
+    this.setFlagDir = (n) => {
+      flagDir = n;
     };
     this.loadFile = loadFile;
     this.loadFiles = loadFiles;
-    this.next = next;
-    this.prev = prev;
-    this.show = show;
+    this.nextFile = nextFile;
+    this.prevFile = prevFile;
+    this.showFile = showFile;
     this.getFilePath = getFilePath;
     this.getGroupType = getGroupType;
     this.setGroupType = setGroupType;
@@ -48,64 +64,101 @@ class FileLoad {
     this.deleteMsg = deleteMsg;
     this.renameMsg = renameMsg;
     this.updateTitle = updateTitle;
+    this.showDir = showDir;
+    function initFlagDir() {
+    }
+    var temp_dirParent = "";
+    function initDirList(_dirPath) {
+      return __async(this, null, function* () {
+        if (dirPath === _dirPath) {
+          return;
+        }
+        dirPath = _dirPath;
+        let dirParent = yield WV_Path.GetDirectoryName(_dirPath);
+        if (temp_dirParent == dirParent) {
+          return;
+        }
+        temp_dirParent = dirParent;
+        let json = yield WV_Directory.GetSiblingDir(dirPath, ["jpg", "png"]);
+        if (dirPath !== _dirPath) {
+          return;
+        }
+        arDir = JSON.parse(json);
+        arDirKey = Object.keys(arDir);
+        for (let i = 0; i < arDirKey.length; i++) {
+          const path = arDirKey[i];
+          if (path === _dirPath) {
+            flagDir = i;
+            break;
+          }
+        }
+        M.mainDirList.initDirList();
+        M.mainDirList.setStartLocation();
+      });
+    }
     function loadFiles(_0) {
-      return __async(this, arguments, function* (dirPath, arName = []) {
+      return __async(this, arguments, function* (dirPath2, arName = []) {
         fileLoadType = FileLoadType.userDefined;
-        arWaitingFile = yield WV_Directory.GetFiles2(dirPath, arName);
-        let path = arWaitingFile[0];
-        M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);
+        arFile = yield WV_Directory.GetFiles2(dirPath2, arName);
+        let path = arFile[0];
+        M.fileSort.sortType = M.fileSort.getFileSortType(dirPath2);
         M.fileSort.setFileSortMenu(M.fileSort.sortType);
-        arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
-        flag = 0;
-        for (let i = 0; i < arWaitingFile.length; i++) {
-          if (arWaitingFile[i] == path) {
-            flag = i;
+        arFile = yield M.fileSort.sort(arFile, M.fileSort.sortType);
+        flagFile = 0;
+        for (let i = 0; i < arFile.length; i++) {
+          if (arFile[i] == path) {
+            flagFile = i;
             break;
           }
         }
         M.mainFileList.initFileList();
-        yield show();
+        yield showFile();
         M.mainFileList.setStartLocation();
       });
     }
     function loadFile(path) {
       return __async(this, null, function* () {
         fileLoadType = FileLoadType.dir;
-        arWaitingFile = [];
+        let dirPath2 = "";
+        arFile = [];
         if ((yield WV_Directory.Exists(path)) === true) {
-          arWaitingFile = yield WV_Directory.GetFiles(path, "*.*");
+          dirPath2 = path;
+          arFile = yield WV_Directory.GetFiles(path, "*.*");
           M.fileSort.sortType = M.fileSort.getFileSortType(path);
           M.fileSort.setFileSortMenu(M.fileSort.sortType);
-          arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
+          arFile = yield M.fileSort.sort(arFile, M.fileSort.sortType);
           groupType = GroupType.img;
-          arWaitingFile = yield filter();
+          arFile = yield filter();
         } else if ((yield WV_File.Exists(path)) === true) {
-          let dirPath = yield WV_Path.GetDirectoryName(path);
-          arWaitingFile = yield WV_Directory.GetFiles(dirPath, "*.*");
+          dirPath2 = yield WV_Path.GetDirectoryName(path);
+          arFile = yield WV_Directory.GetFiles(dirPath2, "*.*");
           let fileInfo2 = yield Lib.GetFileInfo2(path);
           groupType = fileToGroupType(fileInfo2);
-          arWaitingFile = yield filter();
-          if (arWaitingFile.indexOf(path) === -1) {
-            arWaitingFile.splice(0, 0, path);
+          arFile = yield filter();
+          if (arFile.indexOf(path) === -1) {
+            arFile.splice(0, 0, path);
           }
-          M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);
+          M.fileSort.sortType = M.fileSort.getFileSortType(dirPath2);
           M.fileSort.setFileSortMenu(M.fileSort.sortType);
-          arWaitingFile = yield M.fileSort.sort(arWaitingFile, M.fileSort.sortType);
+          arFile = yield M.fileSort.sort(arFile, M.fileSort.sortType);
         }
-        flag = 0;
-        for (let i = 0; i < arWaitingFile.length; i++) {
-          if (arWaitingFile[i] == path) {
-            flag = i;
+        flagFile = 0;
+        for (let i = 0; i < arFile.length; i++) {
+          if (arFile[i] == path) {
+            flagFile = i;
             break;
           }
         }
         M.mainFileList.initFileList();
-        yield show();
+        yield showFile();
         M.mainFileList.setStartLocation();
+        yield initDirList(dirPath2);
+        M.mainDirList.select();
+        M.mainDirList.updataLocation();
       });
     }
     function getFilePath() {
-      var p = arWaitingFile[flag];
+      var p = arFile[flagFile];
       return p;
     }
     function getFileLoadType() {
@@ -125,18 +178,18 @@ class FileLoad {
       });
     }
     timer01();
-    function show(_flag) {
+    function showFile(_flag) {
       return __async(this, null, function* () {
         if (_flag !== void 0) {
-          flag = _flag;
+          flagFile = _flag;
         }
-        if (flag < 0) {
-          flag = 0;
+        if (flagFile < 0) {
+          flagFile = 0;
         }
-        if (flag >= arWaitingFile.length) {
-          flag = arWaitingFile.length - 1;
+        if (flagFile >= arFile.length) {
+          flagFile = arFile.length - 1;
         }
-        if (arWaitingFile.length === 0) {
+        if (arFile.length === 0) {
           M.fileShow.openWelcome();
           _show = () => __async(this, null, function* () {
           });
@@ -148,9 +201,9 @@ class FileLoad {
         let path = getFilePath();
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
-          arWaitingFile.splice(flag, 1);
+          arFile.splice(flagFile, 1);
           M.mainFileList.initFileList();
-          show(flag);
+          showFile(flagFile);
           _show = () => __async(this, null, function* () {
           });
           return;
@@ -172,26 +225,41 @@ class FileLoad {
         });
       });
     }
-    function updateTitle() {
-      let title = `\u300C${flag + 1}/${arWaitingFile.length}\u300D ${Lib.GetFileName(getFilePath())}`;
-      baseWindow.setTitle(title);
-    }
-    function next() {
+    function showDir(_flag) {
       return __async(this, null, function* () {
-        flag += 1;
-        if (flag >= arWaitingFile.length) {
-          flag = 0;
+        if (_flag !== void 0) {
+          flagDir = _flag;
         }
-        show();
+        if (flagDir < 0) {
+          flagDir = 0;
+        }
+        if (flagDir >= arDirKey.length) {
+          flagDir = arDirKey.length - 1;
+        }
+        let path = arDirKey[flagDir];
+        loadFile(path);
       });
     }
-    function prev() {
+    function updateTitle() {
+      let title = `\u300C${flagFile + 1}/${arFile.length}\u300D ${Lib.GetFileName(getFilePath())}`;
+      baseWindow.setTitle(title);
+    }
+    function nextFile() {
       return __async(this, null, function* () {
-        flag -= 1;
-        if (flag < 0) {
-          flag = arWaitingFile.length - 1;
+        flagFile += 1;
+        if (flagFile >= arFile.length) {
+          flagFile = 0;
         }
-        show();
+        showFile();
+      });
+    }
+    function prevFile() {
+      return __async(this, null, function* () {
+        flagFile -= 1;
+        if (flagFile < 0) {
+          flagFile = arFile.length - 1;
+        }
+        showFile();
       });
     }
     function fileToGroupType(fileInfo2) {
@@ -215,8 +283,8 @@ class FileLoad {
     function filter() {
       return __async(this, null, function* () {
         let ar = [];
-        for (let i = 0; i < arWaitingFile.length; i++) {
-          let path = arWaitingFile[i];
+        for (let i = 0; i < arFile.length; i++) {
+          let path = arFile[i];
           let fileExt = Lib.GetExtension(path).toLocaleLowerCase();
           for (let j = 0; j < M.config.allowFileType(groupType).length; j++) {
             const fileType = M.config.allowFileType(groupType)[j];
@@ -252,7 +320,7 @@ class FileLoad {
             if (state === false) {
               Msgbox.show({ txt: "\u522A\u9664\u5931\u6557" });
             } else {
-              yield show();
+              yield showFile();
               M.mainFileList.initFileList();
               M.mainFileList.select();
               M.mainFileList.updataLocation();
@@ -288,7 +356,7 @@ class FileLoad {
               Msgbox.show({ txt: "\u91CD\u65B0\u547D\u540D\u5931\u6557\uFF1A<br>" + err });
               return;
             }
-            arWaitingFile[flag] = newName;
+            arFile[flagFile] = newName;
             updateTitle();
             M.mainFileList.initFileList();
             M.mainFileList.select();

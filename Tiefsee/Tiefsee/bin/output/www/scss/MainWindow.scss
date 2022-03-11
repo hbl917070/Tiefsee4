@@ -43,6 +43,8 @@
 .main-L {
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: row;
 }
 
 .main-V {
@@ -270,65 +272,86 @@
   display: none;
 
   overflow-x: hidden;
-  overflow-y: auto !important;
+  overflow-y: overlay !important;
   height: 100%;
   width: var(--fileList-width);
 
   .main-fileListBody {
     overflow: hidden;
+    padding-top: 4px;
   }
 
   .fileList-item {
+    margin-left: 5px;
+    margin-right: 15px;
     user-select: none;
     color: var(--color-white);
     margin-bottom: 5px;
-    padding: 3px;
+
+    //  border-radius: 5px;
+    //padding: 2px 20px 2px 2px;
     white-space: nowrap;
-    width: calc(100%);
+    // width: calc(100%);
   }
 
   .fileList-item:hover {
     // background-color: var(--color-white20);
     outline: 2px solid var(--color-white40);
-    outline-offset: -2px;
+    outline-offset: 2px;
     cursor: pointer;
   }
 
   //選中
   .fileList-item[active="true"] {
-    // outline: 1px solid var(--color-white40);
-    background-color: var(--color-white20);
-    outline-offset: -2px;
+    outline: 2px solid var(--color-blue);
+    // background-color: var(--color-white20);
+    outline-offset: 2px;
+  }
+
+  .fileList-title {
+    display: flex;
+    flex-direction: row;
   }
 
   //編號
   .fileList-no {
+    margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    overflow: hidden;
-    color: var(--color-blue);
     font-size: 14px;
-    font-weight: 500;
-  }
 
-  //圖片
-  .fileList-img {
-    width: calc(100% - 4px);
-    height: calc(var(--fileList-width) - 40px);
-    min-height: 60px;
-    margin: 3px auto;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
+    overflow: hidden;
+    font-weight: 500;
+    color: var(--color-blue);
+    margin-right: 3px;
+    // margin-left: 3px;
   }
 
   //檔名
   .fileList-name {
-    line-height: 18px;
-    height: 18px;
+    margin-bottom: 2px;
+    line-height: 14px;
+    height: 14px;
+    font-size: 14px;
+
     overflow: hidden;
     text-align: center;
-    font-size: 14px;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  //圖片
+  .fileList-img {
+    width: calc(var(--fileList-width) - 20px);
+    height: calc(var(--fileList-width) - 20px);
+    // min-height: 60px;
+    // margin: 3px auto;
+    // background-size: contain;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    overflow: hidden;
+    // border-radius: 5px;
   }
 }
 
@@ -342,6 +365,110 @@
 }
 
 //-----------------
+
+//資料夾預覽列表
+:root {
+  --dirList-width: 200px;
+}
+.main-dirList {
+  display: none;
+
+  overflow-x: hidden;
+  overflow-y: overlay !important;
+  height: 100%;
+  width: var(--dirList-width);
+
+  .main-dirListBody {
+    overflow: hidden;
+    padding-top: 4px;
+  }
+
+  .dirList-item {
+    user-select: none;
+    margin-bottom: 5px;
+    //padding: 3px;
+    white-space: nowrap;
+    margin-left: 5px;
+    margin-right: 15px;
+    //width: calc(100%);
+  }
+
+  .dirList-item:hover {
+    // background-color: var(--color-white20);
+    outline: 2px solid var(--color-white40);
+    outline-offset: 2px;
+    cursor: pointer;
+  }
+
+  //選中
+  .dirList-item[active="true"] {
+    outline: 2px solid var(--color-blue);
+    // background-color: var(--color-white20);
+    outline-offset: 2px;
+  }
+
+  //
+  .dirList-title {
+    display: flex;
+    flex-direction: row;
+  }
+
+  //編號
+  .dirList-no {
+    margin-bottom: 2px;
+    line-height: 14px;
+    height: 14px;
+    font-size: 14px;
+
+    overflow: hidden;
+    font-weight: 500;
+    color: var(--color-blue);
+    margin-right: 3px;
+  }
+
+  //檔名
+  .dirList-name {
+    margin-bottom: 2px;
+    line-height: 14px;
+    height: 14px;
+    font-size: 14px;
+
+    overflow: hidden;
+    text-align: center;
+    flex: 1;
+    white-space: nowrap;
+    color: var(--color-white);
+  }
+
+  .dirList-imgbox {
+    display: flex;
+    flex-direction: row;
+  }
+
+  //圖片
+  .dirList-img {
+    width: calc((var(--dirList-width) - 3 * 4px) / 3);
+    height: calc((var(--dirList-width) - 3 * 4px) / 3);
+    margin-right: 3px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+  .dirList-img:last-child {
+    margin-right: 0px;
+  }
+}
+
+//啟用
+.main-dirList[active="true"] {
+  display: block;
+}
+//暫時隱藏
+.main-dirList[hide="true"] {
+  display: none !important;
+}
+
+//-------------------
 
 //拖曳條
 .dragbar-v {

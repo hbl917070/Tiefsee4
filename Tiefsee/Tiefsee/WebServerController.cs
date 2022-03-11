@@ -194,9 +194,6 @@ namespace Tiefsee {
 
             int size = Int32.Parse(args["size"]);
             string path = Uri.UnescapeDataString(args["path"]);
-            Console.WriteLine(size);
-
-            Console.WriteLine(path);
 
             //如果檔案不存在就返回404錯誤
             if (File.Exists(path) == false) {

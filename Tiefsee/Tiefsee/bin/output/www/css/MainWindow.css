@@ -35,6 +35,8 @@
 .main-L {
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: row;
 }
 
 .main-V {
@@ -265,53 +267,62 @@
 .main-fileList {
   display: none;
   overflow-x: hidden;
-  overflow-y: auto !important;
+  overflow-y: overlay !important;
   height: 100%;
   width: var(--fileList-width);
 }
 .main-fileList .main-fileListBody {
   overflow: hidden;
+  padding-top: 4px;
 }
 .main-fileList .fileList-item {
+  margin-left: 5px;
+  margin-right: 15px;
   user-select: none;
   color: var(--color-white);
   margin-bottom: 5px;
-  padding: 3px;
   white-space: nowrap;
-  width: 100%;
 }
 .main-fileList .fileList-item:hover {
   outline: 2px solid var(--color-white40);
-  outline-offset: -2px;
+  outline-offset: 2px;
   cursor: pointer;
 }
 .main-fileList .fileList-item[active=true] {
-  background-color: var(--color-white20);
-  outline-offset: -2px;
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+.main-fileList .fileList-title {
+  display: flex;
+  flex-direction: row;
 }
 .main-fileList .fileList-no {
+  margin-bottom: 2px;
   line-height: 14px;
   height: 14px;
-  overflow: hidden;
-  color: var(--color-blue);
   font-size: 14px;
+  overflow: hidden;
   font-weight: 500;
-}
-.main-fileList .fileList-img {
-  width: calc(100% - 4px);
-  height: calc(var(--fileList-width) - 40px);
-  min-height: 60px;
-  margin: 3px auto;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center center;
+  color: var(--color-blue);
+  margin-right: 3px;
 }
 .main-fileList .fileList-name {
-  line-height: 18px;
-  height: 18px;
+  margin-bottom: 2px;
+  line-height: 14px;
+  height: 14px;
+  font-size: 14px;
   overflow: hidden;
   text-align: center;
-  font-size: 14px;
+  flex: 1;
+  white-space: nowrap;
+}
+.main-fileList .fileList-img {
+  width: calc(var(--fileList-width) - 20px);
+  height: calc(var(--fileList-width) - 20px);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  overflow: hidden;
 }
 
 .main-fileList[active=true] {
@@ -319,6 +330,86 @@
 }
 
 .main-fileList[hide=true] {
+  display: none !important;
+}
+
+:root {
+  --dirList-width: 200px;
+}
+
+.main-dirList {
+  display: none;
+  overflow-x: hidden;
+  overflow-y: overlay !important;
+  height: 100%;
+  width: var(--dirList-width);
+}
+.main-dirList .main-dirListBody {
+  overflow: hidden;
+  padding-top: 4px;
+}
+.main-dirList .dirList-item {
+  user-select: none;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  margin-left: 5px;
+  margin-right: 15px;
+}
+.main-dirList .dirList-item:hover {
+  outline: 2px solid var(--color-white40);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.main-dirList .dirList-item[active=true] {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+.main-dirList .dirList-title {
+  display: flex;
+  flex-direction: row;
+}
+.main-dirList .dirList-no {
+  margin-bottom: 2px;
+  line-height: 14px;
+  height: 14px;
+  font-size: 14px;
+  overflow: hidden;
+  font-weight: 500;
+  color: var(--color-blue);
+  margin-right: 3px;
+}
+.main-dirList .dirList-name {
+  margin-bottom: 2px;
+  line-height: 14px;
+  height: 14px;
+  font-size: 14px;
+  overflow: hidden;
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  color: var(--color-white);
+}
+.main-dirList .dirList-imgbox {
+  display: flex;
+  flex-direction: row;
+}
+.main-dirList .dirList-img {
+  width: calc((var(--dirList-width) - 12px) / 3);
+  height: calc((var(--dirList-width) - 12px) / 3);
+  margin-right: 3px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.main-dirList .dirList-img:last-child {
+  margin-right: 0px;
+}
+
+.main-dirList[active=true] {
+  display: block;
+}
+
+.main-dirList[hide=true] {
   display: none !important;
 }
 

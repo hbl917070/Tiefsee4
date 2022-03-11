@@ -20,6 +20,9 @@ namespace Tiefsee {
         /// <returns></returns>
         public string[] Sort(string[] ar, string type) {
 
+
+
+
             if (type == "name") {//檔名自然排序
                 Array.Sort(ar, new NaturalSort());
             }
@@ -98,31 +101,6 @@ namespace Tiefsee {
             return ar2;
         }
 
-
-        /// <summary>
-        /// 檔案排序（自然排序）
-        /// </summary>
-        private class NaturalSort : IComparer<string> {
-            [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-            static extern int StrCmpLogicalW(String x, String y);
-            public int Compare(string x, string y) {
-                return StrCmpLogicalW(x, y);
-            }
-        }
-
-
-        /// <summary>
-        /// 檔案排序（自然排序）
-        /// </summary>
-        private class NaturalSortDesc : IComparer<string> {
-            [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-            static extern int StrCmpLogicalW(String x, String y);
-            public int Compare(string x, string y) {
-                return StrCmpLogicalW(y, x);
-            }
-        }
-
-
         private class FileInfo2 {
             public DateTime LastWriteTime;
             public string Path = "";
@@ -130,5 +108,29 @@ namespace Tiefsee {
 
 
 
+    }
+
+
+    /// <summary>
+    /// 檔案排序（自然排序）
+    /// </summary>
+    public class NaturalSort : IComparer<string> {
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        static extern int StrCmpLogicalW(String x, String y);
+        public int Compare(string x, string y) {
+            return StrCmpLogicalW(x, y);
+        }
+    }
+
+
+    /// <summary>
+    /// 檔案排序（自然排序）
+    /// </summary>
+    public class NaturalSortDesc : IComparer<string> {
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        static extern int StrCmpLogicalW(String x, String y);
+        public int Compare(string x, string y) {
+            return StrCmpLogicalW(y, x);
+        }
     }
 }

@@ -93,12 +93,12 @@ class ScriptFileLoad {
 
     /** 上一張 */
     public prev() {
-        this.M.fileLoad.prev()
+        this.M.fileLoad.prevFile()
     }
 
     /** 下一張 */
     public next() {
-        this.M.fileLoad.next()
+        this.M.fileLoad.nextFile()
     }
 
     /** 顯示 刪除檔案 的對話方塊 */

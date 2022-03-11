@@ -60,7 +60,11 @@ class Config {
         fileListEnabled: true,
         fileListShowNo: true,
         fileListShowName: true,
-        fileListShowWidth: 140
+        fileListShowWidth: 100,
+        dirListEnabled: true,
+        dirListShowNo: true,
+        dirListShowName: true,
+        dirListShowWidth: 200
       },
       position: {
         left: -9999,

@@ -59,10 +59,10 @@ class FileSort {
       let dirPath = yield WV_Path.GetDirectoryName(path);
       this.setFileSortType(dirPath, this.sortType);
       let ar = yield this.sort(this.M.fileLoad.getWaitingFile(), this.sortType);
-      this.M.fileLoad.setFlag(0);
+      this.M.fileLoad.setFlagFile(0);
       for (let i = 0; i < ar.length; i++) {
         if (ar[i] == path) {
-          this.M.fileLoad.setFlag(i);
+          this.M.fileLoad.setFlagFile(i);
           break;
         }
       }

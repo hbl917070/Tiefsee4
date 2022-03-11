@@ -11,13 +11,15 @@ class Dragbar {
     public getEventEnd;
     public setEventEnd;
     public setEnabled;
+    public setPosition;
 
     constructor() {
 
-        let dom_box = document.getElementById("main-fileList") as HTMLElement;//螢幕看得到的區域
-        let dom_dragbar = document.getElementById("dragbar-mainFileList") as HTMLElement;
+        let dom_box:HTMLElement ;//螢幕看得到的區域
+        let dom_dragbar:HTMLElement ;
+        let dom_observe:HTMLElement;
         let temp_val = 0;
-        let hammer_dragbar = new Hammer(dom_dragbar);
+        let hammer_dragbar: HammerManager;
 
         let _eventStart = () => { };
         let _eventMove = (val: number) => { };
@@ -35,6 +37,10 @@ class Dragbar {
                 dom_dragbar.style.display = "none"
             }
         }
+        /**修改拉條的位置 */
+        this.setPosition = function (val: number) {
+            dom_dragbar.style.left = (dom_box.getBoundingClientRect().left + val) + "px";
+        }
 
 
         /**
@@ -42,48 +48,49 @@ class Dragbar {
          * @param _dom_box 要被修改size的物件
          * @param _dom_dragbar 拖曳條
          */
-        this.init = function init(_dom_box: HTMLElement, _dom_dragbar: HTMLElement) {
+        this.init = function init(_dom_box: HTMLElement, _dom_dragbar: HTMLElement, _dom_observe:HTMLElement) {
             dom_box = _dom_box;
             dom_dragbar = _dom_dragbar;
+            dom_observe = _dom_observe;
+            hammer_dragbar = new Hammer(dom_dragbar);
+
+            //區塊改變大小時
+            new ResizeObserver(() => {
+                dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
+                dom_dragbar.style.left = dom_box.getBoundingClientRect().left + dom_box.getBoundingClientRect().width + "px"
+                dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
+            }).observe(dom_observe)
+
+
+            //拖曳開始
+            dom_dragbar.addEventListener("mousedown", (ev) => {
+                ev.preventDefault();
+                //etemp_val = toNumber(dom_dragbar.style.left)
+                temp_val = toNumber(dom_dragbar.style.left)
+                _eventStart()
+            });
+            dom_dragbar.addEventListener("touchstart", (ev) => {
+                ev.preventDefault();
+                temp_val = toNumber(dom_dragbar.style.left)
+                _eventStart()
+            });
+
+            //拖曳
+            hammer_dragbar.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+            hammer_dragbar.on("pan", (ev) => {
+                dom_dragbar.setAttribute("active", "true");
+                let val = temp_val + ev.deltaX - dom_box.getBoundingClientRect().left;
+                _eventMove(val)
+            });
+
+            //拖曳 結束
+            hammer_dragbar.on("panend", (ev) => {
+                dom_dragbar.setAttribute("active", "");
+                let val = temp_val + ev.deltaX - dom_box.getBoundingClientRect().left;
+                _eventEnd(val)
+            });
+
         }
-
-
-        //區塊改變大小時
-        new ResizeObserver(() => {
-            dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
-            dom_dragbar.style.left = dom_box.getBoundingClientRect().left + dom_box.getBoundingClientRect().width + "px"
-            dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
-        }).observe(dom_box)
-
-
-        //拖曳開始
-        dom_dragbar.addEventListener("mousedown", (ev) => {
-            ev.preventDefault();
-            temp_val = toNumber(dom_dragbar.style.left)
-            _eventStart()
-        });
-        dom_dragbar.addEventListener("touchstart", (ev) => {
-            ev.preventDefault();
-            temp_val = toNumber(dom_dragbar.style.left)
-            _eventStart()
-        });
-
-        //拖曳
-        hammer_dragbar.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
-        hammer_dragbar.on("pan", (ev) => {
-            dom_dragbar.setAttribute("active", "true");
-            let val = temp_val + ev.deltaX;
-            _eventMove(val)
-        });
-
-        //拖曳 結束
-        hammer_dragbar.on("panend", (ev) => {
-            dom_dragbar.setAttribute("active", "");
-            let val = temp_val + ev.deltaX;
-            _eventEnd(val)
-        });
-
-
     }
 
 

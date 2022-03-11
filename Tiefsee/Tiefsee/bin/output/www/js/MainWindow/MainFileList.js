@@ -24,13 +24,13 @@ class MainFileList {
     var temp_count = 0;
     var temp_itemHeight = 0;
     var dragbar = new Dragbar();
-    dragbar.init(dom_fileList, dom_dragbar_mainFileList);
+    dragbar.init(dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
     dragbar.setEventStart(() => {
     });
     dragbar.setEventMove((val) => {
       if (val < 10) {
-        dom_dragbar_mainFileList.style.left = "0px";
         dom_fileList.style.opacity = "0";
+        dragbar.setPosition(0);
       } else {
         dom_fileList.style.opacity = "1";
         setItemWidth(val);
@@ -111,7 +111,7 @@ class MainFileList {
       M.config.settings.layout.fileListShowWidth = val;
       var cssRoot = document.body;
       cssRoot.style.setProperty("--fileList-width", val + "px");
-      dom_dragbar_mainFileList.style.left = val + "px";
+      dragbar.setPosition(val);
       temp_start = -1;
       updateItem();
       setStartLocation();
@@ -131,7 +131,7 @@ class MainFileList {
       }
       if (temp_itemHeight !== itemHeight) {
         let arWaitingFile2 = M.fileLoad.getWaitingFile();
-        dom_fileListBody.style.height = arWaitingFile2.length * itemHeight + "px";
+        dom_fileListBody.style.height = arWaitingFile2.length * itemHeight + 4 + "px";
       }
       temp_itemHeight = itemHeight;
       let start = Math.floor(dom_fileList.scrollTop / itemHeight) - 1;
@@ -182,16 +182,17 @@ class MainFileList {
         htmlNo = `<div class="fileList-no">${i + 1}</div>`;
       }
       if (isShowName === true) {
-        htmlName = ` <div class="fileList-name">${name}</div> `;
+        htmlName = `<div class="fileList-name">${name}</div> `;
       }
       let div = newDiv(`<div class="fileList-item" data-id="${i}">
-                    ${htmlNo}
-                    <div class="fileList-img" style="${style}"> </div>
-                    ${htmlName}                                               
+                    <div class="fileList-title">
+                        ${htmlNo} ${htmlName}
+                    </div>
+                    <div class="fileList-img" style="${style}"> </div>                                                            
                 </div>`);
       dom_fileListData.append(div);
       div.addEventListener("click", () => {
-        M.fileLoad.show(i);
+        M.fileLoad.showFile(i);
       });
       return div;
     }
@@ -199,7 +200,7 @@ class MainFileList {
       if (Lib.GetExtension(path) === ".svg") {
         return Lib.pathToURL(path);
       }
-      return APIURL + "/api/getFileIcon?size=128&path=" + encodeURIComponent(path);
+      return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g, "\\'");
     }
     function initFileList() {
       temp_start = -999;
@@ -213,7 +214,7 @@ class MainFileList {
         return;
       }
       (_a = document.querySelector(`.fileList-item[active=true]`)) == null ? void 0 : _a.setAttribute("active", "");
-      let id = M.fileLoad.getFlag();
+      let id = M.fileLoad.getFlagFile();
       let div = document.querySelector(`.fileList-item[data-id="${id}"]`);
       if (div == null) {
         return;
@@ -224,15 +225,15 @@ class MainFileList {
       if (isEnabled === false) {
         return;
       }
-      let id = M.fileLoad.getFlag();
-      let f = (dom_fileList.clientHeight - itemHeight) / 2 - 15;
+      let id = M.fileLoad.getFlagFile();
+      let f = (dom_fileList.clientHeight - itemHeight) / 2 - 20;
       dom_fileList.scrollTop = id * itemHeight - f;
     }
     function updataLocation() {
       if (isEnabled === false) {
         return;
       }
-      let id = M.fileLoad.getFlag();
+      let id = M.fileLoad.getFlagFile();
       let start = Math.floor(dom_fileList.scrollTop / itemHeight);
       if (id <= start) {
         dom_fileList.scrollTop = id * itemHeight;

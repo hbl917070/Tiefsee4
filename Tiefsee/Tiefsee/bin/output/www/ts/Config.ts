@@ -72,7 +72,12 @@ class Config {
             fileListEnabled: true,//啟用 檔案預覽列表
             fileListShowNo: true,//顯示編號
             fileListShowName: true,//顯示檔名
-            fileListShowWidth: 140,//寬度
+            fileListShowWidth: 100,//寬度
+
+            dirListEnabled: true,//啟用 資料夾預覽列表
+            dirListShowNo: true,//顯示編號
+            dirListShowName: true,//顯示檔名
+            dirListShowWidth: 200,//寬度
         },
 
         /** 記錄程式上次關閉時的位置 */

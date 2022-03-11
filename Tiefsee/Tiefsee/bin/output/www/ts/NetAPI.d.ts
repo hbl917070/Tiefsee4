@@ -142,6 +142,9 @@ interface WV_Window {
 
 interface WV_Directory {
 
+
+    GetSiblingDir(path: string, arExt: string[]): string;
+
     /**
      * 檔名陣列 轉 路徑陣列 (用於載入複數檔案
      * @param dirPath 資料夾路徑
@@ -151,6 +154,9 @@ interface WV_Directory {
 
     /** 回傳資料夾裡面的檔案 */
     GetFiles(path: string, searchPattern: string): string[];
+
+    /** 回傳資料夾裡面的子資料夾 */
+    GetDirectories(path: string, searchPattern: string): string[];
 
     /** 判斷指定路徑是否參考磁碟上的現有目錄 */
     Exists(path: string): bool;
