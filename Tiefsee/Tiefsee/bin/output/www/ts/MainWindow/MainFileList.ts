@@ -189,6 +189,7 @@ class MainFileList {
                 newItem(-1, "");
                 fileListItem = dom_fileListData.querySelector(".fileList-item");
             }
+
             if (fileListItem !== null) {
                 itemHeight = fileListItem.getBoundingClientRect().height + 5;
             }
@@ -236,6 +237,7 @@ class MainFileList {
             let name = Lib.GetFileName(path);//檔名
 
             let style = "";
+
             if (temp_loaded.indexOf(i) === -1) {//第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (path !== "") {
                     setTimeout(() => {
@@ -285,7 +287,7 @@ class MainFileList {
             if (Lib.GetExtension(path) === ".svg") {
                 return Lib.pathToURL(path);
             }
-            return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g,"\\'");
+            return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g, "\\'");
         }
 
 

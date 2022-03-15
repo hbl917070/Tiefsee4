@@ -146,7 +146,7 @@ class MainTools {
         icon: "tool-prev.svg",
         func: (btn) => {
           btn.addEventListener("click", () => {
-            M.script.fileLoad.prev();
+            M.script.fileLoad.prevFile();
           });
         }
       });
@@ -156,7 +156,7 @@ class MainTools {
         icon: "tool-next.svg",
         func: (btn) => {
           btn.addEventListener("click", () => {
-            M.script.fileLoad.next();
+            M.script.fileLoad.nextFile();
           });
         }
       });
@@ -237,7 +237,7 @@ class MainTools {
         icon: "tool-prev.svg",
         func: (btn) => {
           btn.addEventListener("click", () => {
-            M.script.fileLoad.prev();
+            M.script.fileLoad.prevFile();
           });
         }
       });
@@ -247,7 +247,7 @@ class MainTools {
         icon: "tool-next.svg",
         func: (btn) => {
           btn.addEventListener("click", () => {
-            M.script.fileLoad.next();
+            M.script.fileLoad.nextFile();
           });
         }
       });

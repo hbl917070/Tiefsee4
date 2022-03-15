@@ -51,6 +51,7 @@ class FileShow {
       if (groupType === GroupType.none) {
         (_a = getToolsDom(GroupType.none)) == null ? void 0 : _a.setAttribute("active", "true");
         M.mainFileList.setHide(true);
+        M.mainDirList.setHide(true);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "none";
@@ -63,6 +64,7 @@ class FileShow {
       if (groupType === GroupType.welcome) {
         (_b = getToolsDom(GroupType.welcome)) == null ? void 0 : _b.setAttribute("active", "true");
         M.mainFileList.setHide(true);
+        M.mainDirList.setHide(true);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "none";
@@ -75,6 +77,7 @@ class FileShow {
       if (groupType === GroupType.img) {
         (_c = getToolsDom(GroupType.img)) == null ? void 0 : _c.setAttribute("active", "true");
         M.mainFileList.setHide(false);
+        M.mainDirList.setHide(false);
         dom_imgview.style.display = "block";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "none";
@@ -89,6 +92,7 @@ class FileShow {
       if (groupType === GroupType.txt) {
         (_d = getToolsDom(GroupType.txt)) == null ? void 0 : _d.setAttribute("active", "true");
         M.mainFileList.setHide(false);
+        M.mainDirList.setHide(false);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "none";
         dom_txtview.style.display = "block";
@@ -100,6 +104,7 @@ class FileShow {
       if (groupType === GroupType.pdf) {
         (_e = getToolsDom(GroupType.pdf)) == null ? void 0 : _e.setAttribute("active", "true");
         M.mainFileList.setHide(false);
+        M.mainDirList.setHide(false);
         dom_imgview.style.display = "none";
         dom_pdfview.style.display = "block";
         dom_txtview.style.display = "none";

@@ -69,11 +69,23 @@ class ScriptFileLoad {
   constructor(_M) {
     this.M = _M;
   }
-  prev() {
+  firstFile() {
+    this.M.fileLoad.showFile(0);
+  }
+  lastFile() {
+    this.M.fileLoad.showFile(this.M.fileLoad.getWaitingFile().length - 1);
+  }
+  prevFile() {
     this.M.fileLoad.prevFile();
   }
-  next() {
+  nextFile() {
     this.M.fileLoad.nextFile();
+  }
+  prevDir() {
+    this.M.fileLoad.prevDir();
+  }
+  nextDir() {
+    this.M.fileLoad.nextDir();
   }
   deleteMsg() {
     this.M.fileLoad.deleteMsg();

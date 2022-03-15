@@ -61,6 +61,7 @@ class FileShow {
                 getToolsDom(GroupType.none)?.setAttribute("active", "true");
 
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
+                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -79,6 +80,7 @@ class FileShow {
                 getToolsDom(GroupType.welcome)?.setAttribute("active", "true");
 
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
+                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -90,13 +92,14 @@ class FileShow {
                 tieefseeview.loadNone();
                 return;
             }
-            
+
             if (groupType === GroupType.img) {
 
                 //更換工具列
                 getToolsDom(GroupType.img)?.setAttribute("active", "true");
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
 
                 dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
@@ -119,6 +122,7 @@ class FileShow {
                 getToolsDom(GroupType.txt)?.setAttribute("active", "true");
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -137,6 +141,7 @@ class FileShow {
                 getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";

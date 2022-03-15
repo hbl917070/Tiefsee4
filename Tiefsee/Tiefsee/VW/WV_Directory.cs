@@ -42,13 +42,13 @@ namespace Tiefsee {
             string[] arDir = new string[0];
             try { //如果取得所有資料夾失敗，就只處理自己目前的資料夾
 
-                if (parentPath==Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {
+                if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {//如果開啟的是桌面的圖片，則直接回傳
                     arDir = new string[1];
                     arDir[0] = siblingPath;
                 } else {
                     arDir = Directory.GetDirectories(parentPath);
                 }
-             
+
 
             } catch {
                 arDir = new string[1];
@@ -64,7 +64,7 @@ namespace Tiefsee {
                     continue;
                 }
 
-        
+
 
                 for (int i = 0; i < arFile.Length; i++) {
                     arFile[i] = Path.GetFileName(arFile[i]); //把路徑處理成只有檔名，排序比較快

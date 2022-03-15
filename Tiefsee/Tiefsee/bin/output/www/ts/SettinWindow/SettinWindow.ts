@@ -21,10 +21,15 @@ class Setting {
         var jqtxt_colorBlack = $("#text-theme-colorBlack");
         var jqtxt_colorBlue = $("#text-theme-colorBlue");
         var switch_areo = document.querySelector("#switch-theme-areo") as HTMLInputElement;
-       
+
         var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
         var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo") as HTMLInputElement;
         var switch_fileListShowName = document.querySelector("#switch-fileListShowName") as HTMLInputElement;
+        var switch_dirListEnabled = document.querySelector("#switch-dirListEnabled") as HTMLInputElement;
+        var switch_dirListShowNo = document.querySelector("#switch-dirListShowNo") as HTMLInputElement;
+        var switch_dirListShowName = document.querySelector("#switch-dirListShowName") as HTMLInputElement;
+        var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber") as HTMLInputElement;
+
 
         var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
         var jqselect_fontWeight = $("#select-fontWeight");//文字粗細
@@ -286,7 +291,27 @@ class Setting {
                 appleSettingOfMain();
             });
 
-      
+            switch_dirListEnabled?.addEventListener("change", () => {//啟用 資料夾預覽列表
+                let val = switch_dirListEnabled.checked;
+                config.settings["layout"]["dirListEnabled"] = val;
+                appleSettingOfMain();
+            });
+            switch_dirListShowNo?.addEventListener("change", () => {//顯示編號
+                let val = switch_dirListShowNo.checked;
+                config.settings["layout"]["dirListShowNo"] = val;
+                appleSettingOfMain();
+            });
+            switch_dirListShowName?.addEventListener("change", () => {//顯示檔名
+                let val = switch_dirListShowName.checked;
+                config.settings["layout"]["dirListShowName"] = val;
+                appleSettingOfMain();
+            });
+            select_dirListImgNumber?.addEventListener("change", () => {//圖片數量
+                let val = Number(select_dirListImgNumber.value);
+                config.settings["layout"]["dirListImgNumber"] = val;
+                appleSettingOfMain();
+            });
+
 
 
             // 圖片 dpi
@@ -384,6 +409,11 @@ class Setting {
             switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];//啟用 檔案預覽列表
             switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];//顯示編號
             switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];//顯示檔名
+
+            switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"];//啟用 資料夾預覽列表
+            switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"];//顯示編號
+            switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"];//顯示檔名
+            select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";//圖片數量
 
             appleSettingOfMain();//將設定套用至 mainwiwndow
 

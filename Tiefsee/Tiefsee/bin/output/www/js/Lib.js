@@ -114,19 +114,47 @@ const _Lib = class {
   }
 };
 let Lib = _Lib;
+Lib.GetDirectoryName = (path) => {
+  path = path.replace(/[/]/ig, "\\");
+  let count = path.split("\\").length - 1;
+  if (count === 0) {
+    return null;
+  }
+  if (path.length <= 2) {
+    return null;
+  }
+  if (path.substring(0, 2) === "\\\\") {
+    if (count <= 3) {
+      return null;
+    }
+    if (count === 4) {
+      if (path.lastIndexOf("\\") === path.length - 1) {
+        return null;
+      }
+    }
+  } else {
+    if (count === 1) {
+      if (path.lastIndexOf("\\") === path.length - 1) {
+        return null;
+      }
+    }
+  }
+  let name = path.substring(0, path.lastIndexOf("\\"));
+  return name;
+};
 Lib.GetFileName = (path) => {
   path = path.replace(/[/]/ig, "\\");
-  let name = path.substr(path.lastIndexOf("\\") + 1);
+  let name = path.substring(path.lastIndexOf("\\") + 1);
   return name;
 };
 Lib.GetExtension = (path) => {
   path = path.replace(/[/]/ig, "\\");
-  let name = path.substr(path.lastIndexOf("\\") + 1);
+  let name = path.substring(path.lastIndexOf("\\") + 1);
   let index = name.lastIndexOf(".");
   if (index === -1) {
     return "";
   }
-  return "." + name.substr(index + 1).toLocaleLowerCase();
+  return "." + name.substring(index + 1).toLocaleLowerCase();
 };
 Lib.Combine = (arPath) => {
   if (arPath.length === 0) {

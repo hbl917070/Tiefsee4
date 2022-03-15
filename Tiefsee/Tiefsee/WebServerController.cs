@@ -206,28 +206,34 @@ namespace Tiefsee {
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             if (is304 == false) {
 
-                System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
-                    path, size, size, ThumbnailOptions.ScaleUp
-                );
-         
-                using (System.IO.Stream input = new MemoryStream()) {
-      
-                    icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
-                    input.Position = 0;
+                try {
+                    System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
+                        path, size, size, ThumbnailOptions.ScaleUp
+                    );
 
-                    d.context.Response.ContentLength64 = input.Length;
+                    using (System.IO.Stream input = new MemoryStream()) {
 
-                    if (d.context.Request.HttpMethod != "HEAD") {
-                        byte[] buffer = new byte[1024 * 16];
-                        int nbytes;
-                        while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
-                            //context.Response.SendChunked = input.Length > 1024 * 16;
-                            d.context.Response.OutputStream.Write(buffer, 0, nbytes);
+                        icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+                        input.Position = 0;
+
+                        d.context.Response.ContentLength64 = input.Length;
+
+                        if (d.context.Request.HttpMethod != "HEAD") {
+                            byte[] buffer = new byte[1024 * 16];
+                            int nbytes;
+                            while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                                //context.Response.SendChunked = input.Length > 1024 * 16;
+                                d.context.Response.OutputStream.Write(buffer, 0, nbytes);
+                            }
                         }
                     }
+                    icon.Dispose();
+                    //WriteFile(d, path);//回傳檔案
+                } catch {
+                    d.context.Response.StatusCode = 500;
+                    WriteString(d, "500");
                 }
-                icon.Dispose();
-                //WriteFile(d, path);//回傳檔案
+
             }
         }
 

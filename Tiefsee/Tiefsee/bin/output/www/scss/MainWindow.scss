@@ -447,13 +447,32 @@
 
   //圖片
   .dirList-img {
-    width: calc((var(--dirList-width) - 3 * 4px) / 3);
-    height: calc((var(--dirList-width) - 3 * 4px) / 3);
     margin-right: 3px;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
   }
+  .dirList-img__1 {
+    width: calc((var(--dirList-width) - 1 * 4px) / 1);
+    height: calc((var(--dirList-width) - 1 * 4px) / 1);
+  }
+  .dirList-img__2 {
+    width: calc((var(--dirList-width) - 2 * 4px) / 2);
+    height: calc((var(--dirList-width) - 2 * 4px) / 2);
+  }
+  .dirList-img__3 {
+    width: calc((var(--dirList-width) - 3 * 4px) / 3);
+    height: calc((var(--dirList-width) - 3 * 4px) / 3);
+  }
+  .dirList-img__4 {
+    width: calc((var(--dirList-width) - 4 * 4px) / 4);
+    height: calc((var(--dirList-width) - 4 * 4px) / 4);
+  }
+  .dirList-img__5 {
+    width: calc((var(--dirList-width) - 5 * 4px) / 5);
+    height: calc((var(--dirList-width) - 5 * 4px) / 5);
+  }
+
   .dirList-img:last-child {
     margin-right: 0px;
   }

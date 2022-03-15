@@ -4,7 +4,7 @@
  */
 class MainDirList {
 
-    public initDirList;
+    public init;
     public select;
     public updataLocation;
     public setStartLocation;
@@ -13,18 +13,20 @@ class MainDirList {
     public setShowNo;
     public setShowName;
     public setItemWidth;
+    public setImgNumber;
 
     constructor(M: MainWindow) {
 
-        this.initDirList = initDirList;
+        this.init = init;
         this.select = select;
         this.updataLocation = updataLocation;
         this.setStartLocation = setStartLocation;
         this.setHide = setHide;
-        this.setEnabled = setEnabled
-        this.setShowNo = setShowNo
-        this.setShowName = setShowName
-        this.setItemWidth = setItemWidth
+        this.setEnabled = setEnabled;
+        this.setShowNo = setShowNo;
+        this.setShowName = setShowName;
+        this.setItemWidth = setItemWidth;
+        this.setImgNumber = setImgNumber;
 
         let dom_dirList = document.getElementById("main-dirList") as HTMLElement;//螢幕看得到的區域
         let dom_dirListBody = document.getElementById("main-dirListBody") as HTMLElement;//整體的高
@@ -37,6 +39,7 @@ class MainDirList {
         var isShowName = true;//顯示檔名
         var itemWidth = 1;//單個項目的寬度
         var itemHeight = 1;//單個項目的高度
+        var imgNumber = 3;//資料夾顯示的圖片數量
 
         var temp_loaded: string[] = [];//已經載入過的圖片編號
         var temp_start = 0;//用於判斷是否需要重新渲染UI
@@ -79,7 +82,7 @@ class MainDirList {
         /**
          * 檔案預覽列表初始化 (重新讀取列表
          */
-        async function initDirList() {
+        async function init() {
 
             temp_start = -999;
             temp_loaded = [];
@@ -158,6 +161,18 @@ class MainDirList {
             setStartLocation();//捲到中間
         }
 
+        /**
+         * 設定資料夾顯示的圖片數量
+         */
+        function setImgNumber(val: number) {
+            if (imgNumber === val) { return; }
+            imgNumber = val;
+            temp_start = -1;//強制必須重新繪製
+            dom_dirListData.innerHTML = "";//移除之前的所有物件
+            updateItem();
+            setStartLocation();//捲到中間
+        }
+
 
         /**
          * 設定size
@@ -197,8 +212,13 @@ class MainDirList {
                 return;
             }
 
-            let arDirKey = M.fileLoad.getWaitingDirKey()
             let arDir = M.fileLoad.getWaitingDir()
+            let arDirKey = M.fileLoad.getWaitingDirKey()
+
+            if (arDirKey.length === 0) {//如果沒資料
+                dom_dirListData.innerHTML = "";//移除之前的所有物件
+                return;
+            }
 
             //取得單個項目的高度
             let dirListItem = dom_dirListData.querySelector(".dirList-item");
@@ -212,7 +232,6 @@ class MainDirList {
 
             //重新計算整體的高度
             if (temp_itemHeight !== itemHeight) {
-
                 dom_dirListBody.style.height = (arDirKey.length * itemHeight) + 4 + "px";
             }
             temp_itemHeight = itemHeight;
@@ -249,7 +268,7 @@ class MainDirList {
         function newItem(n: number, _dirPath: string, arPath: string[]) {
 
             let len = arPath.length;
-            if (len > 3) { len = 3 }
+            if (len > imgNumber) { len = imgNumber }
 
             let imgHtml = "";
             for (let i = 0; i < len; i++) {
@@ -258,13 +277,11 @@ class MainDirList {
                 if (temp_loaded.indexOf(n + "-" + i) !== -1) {  //圖片已經載入過了，直接顯示
                     let imgUrl = getImgUrl(path);
                     style = `background-image:url('${imgUrl}')`;
-                } else {
-
                 }
-                imgHtml += `<div class="dirList-img" data-imgid="${i}" style="${style}"></div>`
+                imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}" style="${style}"></div>`
             }
             if (len === 0) {
-                imgHtml += `<div class="dirList-img" data-imgid="" style=""></div>`
+                imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`
             }
 
             let name = Lib.GetFileName(_dirPath);//檔名
@@ -305,7 +322,6 @@ class MainDirList {
                             let _url = getImgUrl(path)
                             let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
                             domImg.style.backgroundImage = `url("${_url}")`;
-
                         }
                     }
                 }, 30);
@@ -358,7 +374,7 @@ class MainDirList {
             if (isEnabled === false) { return; }
 
             let id = M.fileLoad.getFlagDir();//取得id
-            let f = (dom_dirList.clientHeight - itemHeight) / 2 ;//計算距離中心的距離
+            let f = (dom_dirList.clientHeight - itemHeight) / 2;//計算距離中心的距離
             dom_dirList.scrollTop = id * itemHeight - f;
         }
 

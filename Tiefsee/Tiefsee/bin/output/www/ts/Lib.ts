@@ -1,13 +1,49 @@
 class Lib {
 
     /**
+     * 取得資料夾路徑
+     */
+    public static GetDirectoryName = (path: string) => {
+        path = path.replace(/[/]/ig, "\\");
+
+        let count = path.split("\\").length - 1;// 計算斜線數量
+
+        /*if (path.lastIndexOf("\\") === path.length - 1) {
+            path = path.substring(0, path.length - 1);
+        }*/
+
+        if (count === 0) { return null; }// 沒有斜線表示沒有父親目錄
+        if (path.length <= 2) { return null; }
+
+        if (path.substring(0, 2) === "\\\\") {//網路路徑，例如 \\Desktop-abc\AA
+            if (count <= 3) {//網路路徑至少要2層
+                return null;
+            }
+            if (count === 4) {
+                if (path.lastIndexOf("\\") === path.length - 1) {//斜線在最後 例如 \\Desktop-abc\AA\
+                    return null;
+                }
+            }
+        } else {
+            if (count === 1) {
+                if (path.lastIndexOf("\\") === path.length - 1) {//斜線在最後 例如 D:/
+                    return null;
+                }
+            }
+        }
+
+        let name = path.substring(0, path.lastIndexOf("\\"));//取得資料夾路徑
+        return name;
+    }
+
+    /**
      * 取得檔名。例如「abc.jpg」
      * @param path 
      * @returns 
      */
     public static GetFileName = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
-        let name = path.substr(path.lastIndexOf("\\") + 1);//取得檔名
+        let name = path.substring(path.lastIndexOf("\\") + 1);//取得檔名
         return name;
     }
 
@@ -18,10 +54,10 @@ class Lib {
      */
     public static GetExtension = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
-        let name = path.substr(path.lastIndexOf("\\") + 1);//取得檔名
+        let name = path.substring(path.lastIndexOf("\\") + 1);//取得檔名
         let index = name.lastIndexOf(".");
         if (index === -1) { return ""; }
-        return "." + name.substr(index + 1).toLocaleLowerCase();
+        return "." + name.substring(index + 1).toLocaleLowerCase();
     }
 
 

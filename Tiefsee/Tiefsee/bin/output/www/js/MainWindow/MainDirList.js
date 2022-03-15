@@ -20,7 +20,7 @@ var __async = (__this, __arguments, generator) => {
 };
 class MainDirList {
   constructor(M) {
-    this.initDirList = initDirList;
+    this.init = init;
     this.select = select;
     this.updataLocation = updataLocation;
     this.setStartLocation = setStartLocation;
@@ -29,6 +29,7 @@ class MainDirList {
     this.setShowNo = setShowNo;
     this.setShowName = setShowName;
     this.setItemWidth = setItemWidth;
+    this.setImgNumber = setImgNumber;
     let dom_dirList = document.getElementById("main-dirList");
     let dom_dirListBody = document.getElementById("main-dirListBody");
     let dom_dirListData = document.getElementById("main-dirListData");
@@ -39,6 +40,7 @@ class MainDirList {
     var isShowName = true;
     var itemWidth = 1;
     var itemHeight = 1;
+    var imgNumber = 3;
     var temp_loaded = [];
     var temp_start = 0;
     var temp_count = 0;
@@ -67,7 +69,7 @@ class MainDirList {
     new ResizeObserver(() => {
       updateItem();
     }).observe(dom_dirList);
-    function initDirList() {
+    function init() {
       return __async(this, null, function* () {
         temp_start = -999;
         temp_loaded = [];
@@ -123,6 +125,16 @@ class MainDirList {
       updateItem();
       setStartLocation();
     }
+    function setImgNumber(val) {
+      if (imgNumber === val) {
+        return;
+      }
+      imgNumber = val;
+      temp_start = -1;
+      dom_dirListData.innerHTML = "";
+      updateItem();
+      setStartLocation();
+    }
     function setItemWidth(val) {
       if (itemWidth === val) {
         return;
@@ -149,8 +161,12 @@ class MainDirList {
         dom_dirListData.innerHTML = "";
         return;
       }
-      let arDirKey = M.fileLoad.getWaitingDirKey();
       let arDir = M.fileLoad.getWaitingDir();
+      let arDirKey = M.fileLoad.getWaitingDirKey();
+      if (arDirKey.length === 0) {
+        dom_dirListData.innerHTML = "";
+        return;
+      }
       let dirListItem = dom_dirListData.querySelector(".dirList-item");
       if (dirListItem === null) {
         newItem(-1, "", []);
@@ -186,8 +202,8 @@ class MainDirList {
     }
     function newItem(n, _dirPath, arPath) {
       let len = arPath.length;
-      if (len > 3) {
-        len = 3;
+      if (len > imgNumber) {
+        len = imgNumber;
       }
       let imgHtml = "";
       for (let i = 0; i < len; i++) {
@@ -196,12 +212,11 @@ class MainDirList {
         if (temp_loaded.indexOf(n + "-" + i) !== -1) {
           let imgUrl = getImgUrl(path);
           style = `background-image:url('${imgUrl}')`;
-        } else {
         }
-        imgHtml += `<div class="dirList-img" data-imgid="${i}" style="${style}"></div>`;
+        imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}" style="${style}"></div>`;
       }
       if (len === 0) {
-        imgHtml += `<div class="dirList-img" data-imgid="" style=""></div>`;
+        imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`;
       }
       let name = Lib.GetFileName(_dirPath);
       let htmlNo = ``;

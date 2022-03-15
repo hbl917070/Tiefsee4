@@ -28,6 +28,7 @@ class FileLoad {
     var arDir = {};
     var arDirKey = [];
     var flagDir;
+    var temp_dirParent = "";
     this.getWaitingFile = () => {
       return arFile;
     };
@@ -40,8 +41,15 @@ class FileLoad {
     this.setFlagFile = (n) => {
       flagFile = n;
     };
+    this.showDir = showDir;
+    this.prevDir = prevDir;
+    this.nextDir = nextDir;
     this.getWaitingDir = () => {
       return arDir;
+    };
+    this.setWaitingDir = (ar) => {
+      arDir = ar;
+      arDirKey = Object.keys(arDir);
     };
     this.getWaitingDirKey = () => {
       return arDirKey;
@@ -52,6 +60,8 @@ class FileLoad {
     this.setFlagDir = (n) => {
       flagDir = n;
     };
+    this.updateFlagDir = updateFlagDir;
+    this.getDirPath = getDirPath;
     this.loadFile = loadFile;
     this.loadFiles = loadFiles;
     this.nextFile = nextFile;
@@ -64,36 +74,153 @@ class FileLoad {
     this.deleteMsg = deleteMsg;
     this.renameMsg = renameMsg;
     this.updateTitle = updateTitle;
-    this.showDir = showDir;
-    function initFlagDir() {
+    function getDirPath() {
+      return arDirKey[flagDir];
     }
-    var temp_dirParent = "";
-    function initDirList(_dirPath) {
+    function updateFlagDir(_dirPath) {
+      return __async(this, null, function* () {
+        flagDir = 0;
+        for (let i = 0; i < arDirKey.length; i++) {
+          const path = arDirKey[i];
+          if (path === _dirPath) {
+            flagDir = i;
+            return;
+          }
+        }
+        yield initDirList(dirPath);
+        yield M.dirSort.sort(M.dirSort.getSortType());
+        M.mainDirList.init();
+        for (let i = 0; i < arDirKey.length; i++) {
+          const path = arDirKey[i];
+          if (path === _dirPath) {
+            flagDir = i;
+            return;
+          }
+        }
+      });
+    }
+    function isUpdateDirList(_dirPath) {
       return __async(this, null, function* () {
         if (dirPath === _dirPath) {
-          return;
+          return false;
         }
         dirPath = _dirPath;
-        let dirParent = yield WV_Path.GetDirectoryName(_dirPath);
-        if (temp_dirParent == dirParent) {
-          return;
+        let dirParent = Lib.GetDirectoryName(_dirPath);
+        if (dirParent === null) {
+          return false;
+        }
+        if (temp_dirParent === dirParent) {
+          return false;
         }
         temp_dirParent = dirParent;
-        let json = yield WV_Directory.GetSiblingDir(dirPath, ["jpg", "png"]);
+        return true;
+      });
+    }
+    function initDirList(_dirPath) {
+      return __async(this, null, function* () {
+        let arExt = [];
+        let ar = M.config.allowFileType(GroupType.img);
+        for (let i = 0; i < ar.length; i++) {
+          arExt.push(ar[i]["ext"]);
+        }
+        let json = yield WV_Directory.GetSiblingDir(dirPath, arExt);
         if (dirPath !== _dirPath) {
           return;
         }
         arDir = JSON.parse(json);
         arDirKey = Object.keys(arDir);
-        for (let i = 0; i < arDirKey.length; i++) {
-          const path = arDirKey[i];
-          if (path === _dirPath) {
-            flagDir = i;
-            break;
-          }
+      });
+    }
+    function clearDir() {
+      arDir = {};
+      arDirKey = Object.keys(arDir);
+      M.mainDirList.init();
+    }
+    var _showDir = () => __async(this, null, function* () {
+    });
+    function timerDir() {
+      return __async(this, null, function* () {
+        let func = _showDir;
+        _showDir = () => __async(this, null, function* () {
+        });
+        yield func();
+        setTimeout(() => {
+          timerDir();
+        }, 5);
+      });
+    }
+    timerDir();
+    function showDir(_flag) {
+      return __async(this, null, function* () {
+        if (_flag !== void 0) {
+          flagDir = _flag;
         }
-        M.mainDirList.initDirList();
-        M.mainDirList.setStartLocation();
+        if (flagDir < 0) {
+          flagDir = 0;
+        }
+        if (flagDir >= arDirKey.length) {
+          flagDir = arDirKey.length - 1;
+        }
+        if (arDirKey.length === 0) {
+          _showDir = () => __async(this, null, function* () {
+          });
+          return;
+        }
+        let path = arDirKey[flagDir];
+        if ((yield WV_Directory.Exists(path)) === false) {
+          delete arDir[path];
+          arDirKey = Object.keys(arDir);
+          showDir(_flag);
+          M.mainDirList.init();
+          return;
+        }
+        yield updateFlagDir(path);
+        M.mainDirList.select();
+        M.mainDirList.updataLocation();
+        _showDir = () => __async(this, null, function* () {
+          yield loadFile(path);
+        });
+      });
+    }
+    function nextDir() {
+      return __async(this, null, function* () {
+        flagDir += 1;
+        if (flagDir >= arDirKey.length) {
+          flagDir = 0;
+        }
+        showDir();
+      });
+    }
+    function prevDir() {
+      return __async(this, null, function* () {
+        flagDir -= 1;
+        if (flagDir < 0) {
+          flagDir = arDirKey.length - 1;
+        }
+        showDir();
+      });
+    }
+    function loadDir(dirPath2) {
+      return __async(this, null, function* () {
+        if (yield isUpdateDirList(dirPath2)) {
+          clearDir();
+          yield initDirList(dirPath2);
+          let dirParentPath = Lib.GetDirectoryName(dirPath2);
+          if (dirParentPath === null) {
+            console.log("\u8DEF\u5F91\u7570\u5E38: " + dirPath2);
+            return;
+          }
+          M.dirSort.setSortType(M.dirSort.getDirSortType(dirParentPath));
+          M.dirSort.setDirSortMenu(M.dirSort.getSortType());
+          yield M.dirSort.sort(M.dirSort.getSortType());
+          yield updateFlagDir(dirPath2);
+          M.mainDirList.init();
+          M.mainDirList.setStartLocation();
+        } else {
+          yield updateFlagDir(dirPath2);
+          M.mainDirList.select();
+          M.mainDirList.updataLocation();
+        }
       });
     }
     function loadFiles(_0) {
@@ -114,6 +241,7 @@ class FileLoad {
         M.mainFileList.initFileList();
         yield showFile();
         M.mainFileList.setStartLocation();
+        loadDir(dirPath2);
       });
     }
     function loadFile(path) {
@@ -130,7 +258,12 @@ class FileLoad {
           groupType = GroupType.img;
           arFile = yield filter();
         } else if ((yield WV_File.Exists(path)) === true) {
-          dirPath2 = yield WV_Path.GetDirectoryName(path);
+          let _dirPath = Lib.GetDirectoryName(path);
+          if (_dirPath === null) {
+            console.log("\u8DEF\u5F91\u7570\u5E38");
+            return;
+          }
+          dirPath2 = _dirPath;
           arFile = yield WV_Directory.GetFiles(dirPath2, "*.*");
           let fileInfo2 = yield Lib.GetFileInfo2(path);
           groupType = fileToGroupType(fileInfo2);
@@ -152,9 +285,7 @@ class FileLoad {
         M.mainFileList.initFileList();
         yield showFile();
         M.mainFileList.setStartLocation();
-        yield initDirList(dirPath2);
-        M.mainDirList.select();
-        M.mainDirList.updataLocation();
+        loadDir(dirPath2);
       });
     }
     function getFilePath() {
@@ -164,20 +295,20 @@ class FileLoad {
     function getFileLoadType() {
       return fileLoadType;
     }
-    var _show = () => __async(this, null, function* () {
+    var _showFile = () => __async(this, null, function* () {
     });
-    function timer01() {
+    function timerFile() {
       return __async(this, null, function* () {
-        let func = _show;
-        _show = () => __async(this, null, function* () {
+        let func = _showFile;
+        _showFile = () => __async(this, null, function* () {
         });
         yield func();
         setTimeout(() => {
-          timer01();
+          timerFile();
         }, 5);
       });
     }
-    timer01();
+    timerFile();
     function showFile(_flag) {
       return __async(this, null, function* () {
         if (_flag !== void 0) {
@@ -191,7 +322,7 @@ class FileLoad {
         }
         if (arFile.length === 0) {
           M.fileShow.openWelcome();
-          _show = () => __async(this, null, function* () {
+          _showFile = () => __async(this, null, function* () {
           });
           return;
         }
@@ -204,7 +335,7 @@ class FileLoad {
           arFile.splice(flagFile, 1);
           M.mainFileList.initFileList();
           showFile(flagFile);
-          _show = () => __async(this, null, function* () {
+          _showFile = () => __async(this, null, function* () {
           });
           return;
         }
@@ -212,7 +343,7 @@ class FileLoad {
         if (fileLoadType === FileLoadType.userDefined) {
           groupType = fileToGroupType(fileInfo2);
         }
-        _show = () => __async(this, null, function* () {
+        _showFile = () => __async(this, null, function* () {
           if (groupType === GroupType.img || groupType === GroupType.unknown) {
             yield M.fileShow.openImage(fileInfo2);
           }
@@ -224,25 +355,6 @@ class FileLoad {
           }
         });
       });
-    }
-    function showDir(_flag) {
-      return __async(this, null, function* () {
-        if (_flag !== void 0) {
-          flagDir = _flag;
-        }
-        if (flagDir < 0) {
-          flagDir = 0;
-        }
-        if (flagDir >= arDirKey.length) {
-          flagDir = arDirKey.length - 1;
-        }
-        let path = arDirKey[flagDir];
-        loadFile(path);
-      });
-    }
-    function updateTitle() {
-      let title = `\u300C${flagFile + 1}/${arFile.length}\u300D ${Lib.GetFileName(getFilePath())}`;
-      baseWindow.setTitle(title);
     }
     function nextFile() {
       return __async(this, null, function* () {
@@ -261,6 +373,14 @@ class FileLoad {
         }
         showFile();
       });
+    }
+    function updateTitle() {
+      let filePath = getFilePath();
+      if (filePath === void 0) {
+        return;
+      }
+      let title = `\u300C${flagFile + 1}/${arFile.length}\u300D ${Lib.GetFileName(filePath)}`;
+      baseWindow.setTitle(title);
     }
     function fileToGroupType(fileInfo2) {
       let fileExt = Lib.GetFileType(fileInfo2);
@@ -350,7 +470,12 @@ class FileLoad {
               Msgbox.close(dom);
               return;
             }
-            let newName = Lib.Combine([yield WV_Path.GetDirectoryName(path), inputTxt]);
+            let dirPath2 = Lib.GetDirectoryName(path);
+            if (dirPath2 === null) {
+              Msgbox.show({ txt: "\u91CD\u65B0\u547D\u540D\u5931\u6557\uFF1A\u8DEF\u5F91\u7570\u5E38" });
+              return;
+            }
+            let newName = Lib.Combine([dirPath2, inputTxt]);
             let err = yield WV_File.Move(path, newName);
             if (err != "") {
               Msgbox.show({ txt: "\u91CD\u65B0\u547D\u540D\u5931\u6557\uFF1A<br>" + err });

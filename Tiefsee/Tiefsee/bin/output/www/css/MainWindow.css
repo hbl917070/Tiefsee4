@@ -394,12 +394,30 @@
   flex-direction: row;
 }
 .main-dirList .dirList-img {
-  width: calc((var(--dirList-width) - 12px) / 3);
-  height: calc((var(--dirList-width) - 12px) / 3);
   margin-right: 3px;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
+}
+.main-dirList .dirList-img__1 {
+  width: calc((var(--dirList-width) - 4px) / 1);
+  height: calc((var(--dirList-width) - 4px) / 1);
+}
+.main-dirList .dirList-img__2 {
+  width: calc((var(--dirList-width) - 8px) / 2);
+  height: calc((var(--dirList-width) - 8px) / 2);
+}
+.main-dirList .dirList-img__3 {
+  width: calc((var(--dirList-width) - 12px) / 3);
+  height: calc((var(--dirList-width) - 12px) / 3);
+}
+.main-dirList .dirList-img__4 {
+  width: calc((var(--dirList-width) - 16px) / 4);
+  height: calc((var(--dirList-width) - 16px) / 4);
+}
+.main-dirList .dirList-img__5 {
+  width: calc((var(--dirList-width) - 20px) / 5);
+  height: calc((var(--dirList-width) - 20px) / 5);
 }
 .main-dirList .dirList-img:last-child {
   margin-right: 0px;

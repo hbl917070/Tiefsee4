@@ -56,7 +56,10 @@ class FileSort {
     return __async(this, null, function* () {
       this.sortType = _sortType;
       let path = this.M.fileLoad.getFilePath();
-      let dirPath = yield WV_Path.GetDirectoryName(path);
+      let dirPath = Lib.GetDirectoryName(path);
+      if (dirPath === null) {
+        return;
+      }
       this.setFileSortType(dirPath, this.sortType);
       let ar = yield this.sort(this.M.fileLoad.getWaitingFile(), this.sortType);
       this.M.fileLoad.setFlagFile(0);

@@ -64,7 +64,8 @@ class Config {
         dirListEnabled: true,
         dirListShowNo: true,
         dirListShowName: true,
-        dirListShowWidth: 200
+        dirListShowWidth: 200,
+        dirListImgNumber: 3
       },
       position: {
         left: -9999,

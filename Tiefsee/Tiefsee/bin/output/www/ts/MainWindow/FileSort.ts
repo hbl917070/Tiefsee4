@@ -56,7 +56,8 @@ class FileSort {
         this.sortType = _sortType;
 
         let path = this.M.fileLoad.getFilePath();
-        let dirPath = await WV_Path.GetDirectoryName(path);
+        let dirPath = Lib.GetDirectoryName(path);
+        if (dirPath === null) { return; }
         this.setFileSortType(dirPath, this.sortType);
 
         let ar = await this.sort(this.M.fileLoad.getWaitingFile(), this.sortType)
@@ -73,7 +74,7 @@ class FileSort {
         this.M.fileLoad.updateTitle();//更新視窗標題
         this.M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
         this.M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
-        
+
         this.setFileSortMenu(_sortType);
     }
 

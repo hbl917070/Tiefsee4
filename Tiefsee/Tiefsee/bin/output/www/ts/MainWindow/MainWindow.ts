@@ -11,6 +11,7 @@ class MainWindow {
     public fileLoad;
     public fileShow;
     public fileSort;
+    public dirSort;
     public mainFileList;
     public mainDirList;
     public menu;
@@ -35,6 +36,7 @@ class MainWindow {
         var fileLoad = new FileLoad(this);
         var fileShow = new FileShow(this);
         var fileSort = new FileSort(this);
+        var dirSort = new DirSort(this);
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
         var menu = new Menu(this);
@@ -43,6 +45,7 @@ class MainWindow {
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.fileSort = fileSort;
+        this.dirSort = dirSort;
         this.mainFileList = mainFileList;
         this.mainDirList = mainDirList;
         this.menu = menu;
@@ -190,10 +193,10 @@ class MainWindow {
 
             //大型換頁按鈕
             dom_maxBtnLeft.addEventListener('click', function (e) {
-                script.fileLoad.prev();
+                script.fileLoad.prevFile();
             })
             dom_maxBtnRight.addEventListener('click', function (e) {
-                script.fileLoad.next();
+                script.fileLoad.nextFile();
             })
 
             //封鎖原生右鍵選單
@@ -337,8 +340,10 @@ class MainWindow {
                         const item = files[i];
                         arFile.push(item.name);
                     }
-                    _dropPath = await WV_Path.GetDirectoryName(_dropPath);
-                    await fileLoad.loadFiles(_dropPath, arFile);
+                    let dirPath = Lib.GetDirectoryName(_dropPath);
+                    if (dirPath !== null) {
+                        await fileLoad.loadFiles(dirPath, arFile);
+                    }
                 } else {
 
                     await fileLoad.loadFile(_dropPath);
@@ -381,8 +386,13 @@ class MainWindow {
             mainFileList.setEnabled(config.settings.layout.fileListEnabled);
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
             mainFileList.setShowName(config.settings.layout.fileListShowName);
-            if (isStart)
-                mainFileList.setItemWidth(config.settings.layout.fileListShowWidth);
+            if (isStart) { mainFileList.setItemWidth(config.settings.layout.fileListShowWidth); }
+
+            mainDirList.setEnabled(config.settings.layout.dirListEnabled);
+            mainDirList.setShowNo(config.settings.layout.dirListShowNo);
+            mainDirList.setShowName(config.settings.layout.dirListShowName);
+            mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
+            if (isStart) { mainDirList.setItemWidth(config.settings.layout.dirListShowWidth); }
 
 
             //-----------

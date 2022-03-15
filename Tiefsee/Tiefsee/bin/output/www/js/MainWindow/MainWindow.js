@@ -34,6 +34,7 @@ class MainWindow {
     var fileLoad = new FileLoad(this);
     var fileShow = new FileShow(this);
     var fileSort = new FileSort(this);
+    var dirSort = new DirSort(this);
     var mainFileList = new MainFileList(this);
     var mainDirList = new MainDirList(this);
     var menu = new Menu(this);
@@ -42,6 +43,7 @@ class MainWindow {
     this.fileLoad = fileLoad;
     this.fileShow = fileShow;
     this.fileSort = fileSort;
+    this.dirSort = dirSort;
     this.mainFileList = mainFileList;
     this.mainDirList = mainDirList;
     this.menu = menu;
@@ -122,10 +124,10 @@ class MainWindow {
         }
         initIcon();
         dom_maxBtnLeft.addEventListener("click", function(e) {
-          script.fileLoad.prev();
+          script.fileLoad.prevFile();
         });
         dom_maxBtnRight.addEventListener("click", function(e) {
-          script.fileLoad.next();
+          script.fileLoad.nextFile();
         });
         document.addEventListener("contextmenu", function(e) {
           e.preventDefault();
@@ -250,8 +252,10 @@ class MainWindow {
                 const item = files[i];
                 arFile.push(item.name);
               }
-              _dropPath = yield WV_Path.GetDirectoryName(_dropPath);
-              yield fileLoad.loadFiles(_dropPath, arFile);
+              let dirPath = Lib.GetDirectoryName(_dropPath);
+              if (dirPath !== null) {
+                yield fileLoad.loadFiles(dirPath, arFile);
+              }
             } else {
               yield fileLoad.loadFile(_dropPath);
             }
@@ -277,8 +281,16 @@ class MainWindow {
       mainFileList.setEnabled(config.settings.layout.fileListEnabled);
       mainFileList.setShowNo(config.settings.layout.fileListShowNo);
       mainFileList.setShowName(config.settings.layout.fileListShowName);
-      if (isStart)
+      if (isStart) {
         mainFileList.setItemWidth(config.settings.layout.fileListShowWidth);
+      }
+      mainDirList.setEnabled(config.settings.layout.dirListEnabled);
+      mainDirList.setShowNo(config.settings.layout.dirListShowNo);
+      mainDirList.setShowName(config.settings.layout.dirListShowName);
+      mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
+      if (isStart) {
+        mainDirList.setItemWidth(config.settings.layout.dirListShowWidth);
+      }
       cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
       initColor("--color-window-background", true);
       initColor("--color-window-border", true);

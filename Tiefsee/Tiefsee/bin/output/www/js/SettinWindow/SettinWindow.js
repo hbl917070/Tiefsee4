@@ -35,6 +35,10 @@ class Setting {
     var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled");
     var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo");
     var switch_fileListShowName = document.querySelector("#switch-fileListShowName");
+    var switch_dirListEnabled = document.querySelector("#switch-dirListEnabled");
+    var switch_dirListShowNo = document.querySelector("#switch-dirListShowNo");
+    var switch_dirListShowName = document.querySelector("#switch-dirListShowName");
+    var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber");
     var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
     var jqselect_fontWeight = $("#select-fontWeight");
     var jqselect_svgWeight = $("#select-svgWeight");
@@ -221,6 +225,26 @@ class Setting {
           config.settings["layout"]["fileListShowName"] = val;
           appleSettingOfMain();
         });
+        switch_dirListEnabled == null ? void 0 : switch_dirListEnabled.addEventListener("change", () => {
+          let val = switch_dirListEnabled.checked;
+          config.settings["layout"]["dirListEnabled"] = val;
+          appleSettingOfMain();
+        });
+        switch_dirListShowNo == null ? void 0 : switch_dirListShowNo.addEventListener("change", () => {
+          let val = switch_dirListShowNo.checked;
+          config.settings["layout"]["dirListShowNo"] = val;
+          appleSettingOfMain();
+        });
+        switch_dirListShowName == null ? void 0 : switch_dirListShowName.addEventListener("change", () => {
+          let val = switch_dirListShowName.checked;
+          config.settings["layout"]["dirListShowName"] = val;
+          appleSettingOfMain();
+        });
+        select_dirListImgNumber == null ? void 0 : select_dirListImgNumber.addEventListener("change", () => {
+          let val = Number(select_dirListImgNumber.value);
+          config.settings["layout"]["dirListImgNumber"] = val;
+          appleSettingOfMain();
+        });
         txt_imageDpizoom == null ? void 0 : txt_imageDpizoom.addEventListener("change", () => {
           let val = txt_imageDpizoom.value;
           config.settings["image"]["dpizoom"] = val;
@@ -276,6 +300,10 @@ class Setting {
       switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];
       switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];
       switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];
+      switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"];
+      switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"];
+      switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"];
+      select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";
       appleSettingOfMain();
       function setRgb(jqdom, c) {
         jqdom.minicolors("value", `rgb(${c.r}, ${c.g}, ${c.b})`);

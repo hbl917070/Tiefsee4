@@ -91,14 +91,34 @@ class ScriptFileLoad {
         this.M = _M;
     }
 
-    /** 上一張 */
-    public prev() {
+    /** 第一個檔案 */
+    public firstFile() {
+        this.M.fileLoad.showFile(0)
+    }
+
+    /** 最後一個檔案 */
+    public lastFile() {
+        this.M.fileLoad.showFile(this.M.fileLoad.getWaitingFile().length - 1)
+    }
+
+    /** 上一張檔案 */
+    public prevFile() {
         this.M.fileLoad.prevFile()
     }
 
-    /** 下一張 */
-    public next() {
+    /** 下一張檔案 */
+    public nextFile() {
         this.M.fileLoad.nextFile()
+    }
+
+    /** 上一個資料夾 */
+    public prevDir() {
+        this.M.fileLoad.prevDir()
+    }
+
+    /** 下一個資料夾 */
+    public nextDir() {
+        this.M.fileLoad.nextDir()
     }
 
     /** 顯示 刪除檔案 的對話方塊 */
