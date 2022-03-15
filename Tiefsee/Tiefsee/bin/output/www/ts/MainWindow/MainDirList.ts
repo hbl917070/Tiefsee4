@@ -397,7 +397,7 @@ class MainDirList {
 
             //如果選中的項目在下面
             let count = Math.floor(dom_dirList.clientHeight / itemHeight);//抓取數量
-            let end = (id - count + 1) * itemHeight - (dom_dirList.clientHeight % itemHeight);
+            let end = (id - count + 1) * itemHeight - (dom_dirList.clientHeight % itemHeight) + 5;
             if (dom_dirList.scrollTop < end) {
                 dom_dirList.scrollTop = end;
             }

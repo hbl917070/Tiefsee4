@@ -297,7 +297,7 @@ class MainDirList {
         return;
       }
       let count = Math.floor(dom_dirList.clientHeight / itemHeight);
-      let end = (id - count + 1) * itemHeight - dom_dirList.clientHeight % itemHeight;
+      let end = (id - count + 1) * itemHeight - dom_dirList.clientHeight % itemHeight + 5;
       if (dom_dirList.scrollTop < end) {
         dom_dirList.scrollTop = end;
       }

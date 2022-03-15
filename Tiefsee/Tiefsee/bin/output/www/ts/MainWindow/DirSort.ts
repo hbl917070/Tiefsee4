@@ -59,8 +59,7 @@ class DirSort {
             let dirPath = M.fileLoad.getDirPath()
             let dirParentPath = Lib.GetDirectoryName(dirPath)
             if (dirParentPath === null) {
-                console.log("路徑異常: " + dirPath)
-                return
+                dirParentPath = dirPath;
             }
             setDirSortType(dirParentPath, sortType);
 

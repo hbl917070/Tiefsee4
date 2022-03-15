@@ -33,6 +33,13 @@ class Lib {
         }
 
         let name = path.substring(0, path.lastIndexOf("\\"));//取得資料夾路徑
+
+        //避免 D:\ 變成 D:
+        count = name.split("\\").length - 1;// 計算斜線數量  
+        if (count === 0) {
+            name = name + "\\"
+        }
+
         return name;
     }
 

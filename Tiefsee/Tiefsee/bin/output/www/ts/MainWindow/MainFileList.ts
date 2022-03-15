@@ -4,7 +4,7 @@
  */
 class MainFileList {
 
-    public initFileList;
+    public init;
     public select;
     public updataLocation;
     public setStartLocation;
@@ -16,7 +16,7 @@ class MainFileList {
 
     constructor(M: MainWindow) {
 
-        this.initFileList = initFileList;
+        this.init = init;
         this.select = select;
         this.updataLocation = updataLocation;
         this.setStartLocation = setStartLocation;
@@ -294,7 +294,7 @@ class MainFileList {
         /**
          * 檔案預覽列表初始化 (重新讀取列表
          */
-        function initFileList() {
+        function init() {
             temp_start = -999;
             temp_loaded = [];
             temp_itemHeight = -1;
@@ -329,7 +329,7 @@ class MainFileList {
             if (isEnabled === false) { return; }
 
             let id = M.fileLoad.getFlagFile();//取得id
-            let f = (dom_fileList.clientHeight - itemHeight) / 2 - 20;//計算距離中心的距離
+            let f = (dom_fileList.clientHeight - itemHeight) / 2 - 0;//計算距離中心的距離
             dom_fileList.scrollTop = id * itemHeight - f;
         }
 
@@ -343,6 +343,7 @@ class MainFileList {
 
             let id = M.fileLoad.getFlagFile();//取得id
 
+
             //如果選中的項目在上面
             let start = Math.floor(dom_fileList.scrollTop / itemHeight);//開始位置
             if (id <= start) {
@@ -352,7 +353,7 @@ class MainFileList {
 
             //如果選中的項目在下面
             let count = Math.floor(dom_fileList.clientHeight / itemHeight);//抓取數量
-            let end = (id - count + 1) * itemHeight - (dom_fileList.clientHeight % itemHeight);
+            let end = (id - count + 1) * itemHeight - (dom_fileList.clientHeight % itemHeight) + 5;
             if (dom_fileList.scrollTop < end) {
                 dom_fileList.scrollTop = end;
             }

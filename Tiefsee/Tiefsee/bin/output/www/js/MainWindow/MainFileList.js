@@ -1,6 +1,6 @@
 class MainFileList {
   constructor(M) {
-    this.initFileList = initFileList;
+    this.init = init;
     this.select = select;
     this.updataLocation = updataLocation;
     this.setStartLocation = setStartLocation;
@@ -202,7 +202,7 @@ class MainFileList {
       }
       return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g, "\\'");
     }
-    function initFileList() {
+    function init() {
       temp_start = -999;
       temp_loaded = [];
       temp_itemHeight = -1;
@@ -226,7 +226,7 @@ class MainFileList {
         return;
       }
       let id = M.fileLoad.getFlagFile();
-      let f = (dom_fileList.clientHeight - itemHeight) / 2 - 20;
+      let f = (dom_fileList.clientHeight - itemHeight) / 2 - 0;
       dom_fileList.scrollTop = id * itemHeight - f;
     }
     function updataLocation() {
@@ -240,7 +240,7 @@ class MainFileList {
         return;
       }
       let count = Math.floor(dom_fileList.clientHeight / itemHeight);
-      let end = (id - count + 1) * itemHeight - dom_fileList.clientHeight % itemHeight;
+      let end = (id - count + 1) * itemHeight - dom_fileList.clientHeight % itemHeight + 5;
       if (dom_fileList.scrollTop < end) {
         dom_fileList.scrollTop = end;
       }

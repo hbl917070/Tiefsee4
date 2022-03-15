@@ -56,8 +56,7 @@ class DirSort {
         let dirPath = M.fileLoad.getDirPath();
         let dirParentPath = Lib.GetDirectoryName(dirPath);
         if (dirParentPath === null) {
-          console.log("\u8DEF\u5F91\u7570\u5E38: " + dirPath);
-          return;
+          dirParentPath = dirPath;
         }
         setDirSortType(dirParentPath, sortType);
         M.fileLoad.updateTitle();

@@ -117,7 +117,7 @@ class FileLoad {
             await initDirList(dirPath);//取得資料夾名單
             await M.dirSort.sort(M.dirSort.getSortType());
             M.mainDirList.init();
-            
+
             for (let i = 0; i < arDirKey.length; i++) {
                 const path = arDirKey[i];
                 if (path === _dirPath) {
@@ -141,7 +141,7 @@ class FileLoad {
             dirPath = _dirPath;
 
             let dirParent = Lib.GetDirectoryName(_dirPath);
-            if (dirParent === null) { return false; }
+            if (dirParent === null) { dirParent = _dirPath }
             if (temp_dirParent === dirParent) { return false; }
             temp_dirParent = dirParent
 
@@ -165,6 +165,7 @@ class FileLoad {
 
             arDir = JSON.parse(json);
             arDirKey = Object.keys(arDir);
+
         }
 
 
@@ -229,7 +230,7 @@ class FileLoad {
 
             _showDir = async () => {
                 await loadFile(path);
-    
+
             };
 
 
@@ -269,8 +270,7 @@ class FileLoad {
 
                 let dirParentPath = Lib.GetDirectoryName(dirPath);//使用 父親資料夾 當做key來取得排序
                 if (dirParentPath === null) {
-                    console.log("路徑異常: " + dirPath)
-                    return
+                    dirParentPath = dirPath;
                 }
                 M.dirSort.setSortType(M.dirSort.getDirSortType(dirParentPath));//取得該資料夾設定的檔案排序方式
                 M.dirSort.setDirSortMenu(M.dirSort.getSortType());//更新menu選單
@@ -339,9 +339,10 @@ class FileLoad {
                 }
             }
 
-            M.mainFileList.initFileList();//檔案預覽列表 初始化
-            await showFile();//載入圖片
+            M.mainFileList.setHide(false);//顯示檔案預覽列表(必須顯示出物件才能計算高度)
+            M.mainFileList.init();//檔案預覽列表 初始化
             M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
+            await showFile();//載入圖片
 
             loadDir(dirPath);//處理資料夾預覽列表
         }
@@ -374,7 +375,6 @@ class FileLoad {
 
                 let _dirPath = Lib.GetDirectoryName(path);//取得檔案所在的資料夾路徑
                 if (_dirPath === null) {
-                    console.log("路徑異常");
                     return;
                 }
                 dirPath = _dirPath;
@@ -406,9 +406,10 @@ class FileLoad {
                 }
             }
 
-            M.mainFileList.initFileList();//檔案預覽列表 初始化
-            await showFile();//載入圖片
+            M.mainFileList.setHide(false);//顯示檔案預覽列表(必須顯示出物件才能計算高度)
+            M.mainFileList.init();//檔案預覽列表 初始化
             M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
+            await showFile();//載入圖片
 
 
             loadDir(dirPath);//處理資料夾預覽列表
@@ -460,7 +461,6 @@ class FileLoad {
                 return;
             }
 
-            M.mainFileList.setHide(false);//顯示檔案預覽列表(必須顯示出物件才能計算高度)
             M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
             M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
@@ -469,7 +469,7 @@ class FileLoad {
 
             if (fileInfo2.Type === "none") {//如果檔案不存在
                 arFile.splice(flagFile, 1);//刪除此筆
-                M.mainFileList.initFileList();//檔案預覽列表 初始化
+                M.mainFileList.init();//檔案預覽列表 初始化
                 showFile(flagFile);
                 _showFile = async () => { }
                 return;
@@ -616,7 +616,7 @@ class FileLoad {
                     } else {
                         await showFile();
 
-                        M.mainFileList.initFileList();//檔案預覽列表 初始化
+                        M.mainFileList.init();//檔案預覽列表 初始化
                         M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
                         M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
                     }
@@ -668,7 +668,7 @@ class FileLoad {
 
                     arFile[flagFile] = newName;
                     updateTitle();
-                    M.mainFileList.initFileList();//檔案預覽列表 初始化
+                    M.mainFileList.init();//檔案預覽列表 初始化
                     M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
                     M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
 

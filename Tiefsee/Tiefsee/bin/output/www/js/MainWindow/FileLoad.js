@@ -107,7 +107,7 @@ class FileLoad {
         dirPath = _dirPath;
         let dirParent = Lib.GetDirectoryName(_dirPath);
         if (dirParent === null) {
-          return false;
+          dirParent = _dirPath;
         }
         if (temp_dirParent === dirParent) {
           return false;
@@ -207,8 +207,7 @@ class FileLoad {
           yield initDirList(dirPath2);
           let dirParentPath = Lib.GetDirectoryName(dirPath2);
           if (dirParentPath === null) {
-            console.log("\u8DEF\u5F91\u7570\u5E38: " + dirPath2);
-            return;
+            dirParentPath = dirPath2;
           }
           M.dirSort.setSortType(M.dirSort.getDirSortType(dirParentPath));
           M.dirSort.setDirSortMenu(M.dirSort.getSortType());
@@ -238,9 +237,10 @@ class FileLoad {
             break;
           }
         }
-        M.mainFileList.initFileList();
-        yield showFile();
+        M.mainFileList.setHide(false);
+        M.mainFileList.init();
         M.mainFileList.setStartLocation();
+        yield showFile();
         loadDir(dirPath2);
       });
     }
@@ -260,7 +260,6 @@ class FileLoad {
         } else if ((yield WV_File.Exists(path)) === true) {
           let _dirPath = Lib.GetDirectoryName(path);
           if (_dirPath === null) {
-            console.log("\u8DEF\u5F91\u7570\u5E38");
             return;
           }
           dirPath2 = _dirPath;
@@ -282,9 +281,10 @@ class FileLoad {
             break;
           }
         }
-        M.mainFileList.initFileList();
-        yield showFile();
+        M.mainFileList.setHide(false);
+        M.mainFileList.init();
         M.mainFileList.setStartLocation();
+        yield showFile();
         loadDir(dirPath2);
       });
     }
@@ -326,14 +326,13 @@ class FileLoad {
           });
           return;
         }
-        M.mainFileList.setHide(false);
         M.mainFileList.select();
         M.mainFileList.updataLocation();
         let path = getFilePath();
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
           arFile.splice(flagFile, 1);
-          M.mainFileList.initFileList();
+          M.mainFileList.init();
           showFile(flagFile);
           _showFile = () => __async(this, null, function* () {
           });
@@ -441,7 +440,7 @@ class FileLoad {
               Msgbox.show({ txt: "\u522A\u9664\u5931\u6557" });
             } else {
               yield showFile();
-              M.mainFileList.initFileList();
+              M.mainFileList.init();
               M.mainFileList.select();
               M.mainFileList.updataLocation();
             }
@@ -483,7 +482,7 @@ class FileLoad {
             }
             arFile[flagFile] = newName;
             updateTitle();
-            M.mainFileList.initFileList();
+            M.mainFileList.init();
             M.mainFileList.select();
             M.mainFileList.updataLocation();
             Msgbox.close(dom);

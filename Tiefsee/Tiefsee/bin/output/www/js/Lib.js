@@ -140,6 +140,10 @@ Lib.GetDirectoryName = (path) => {
     }
   }
   let name = path.substring(0, path.lastIndexOf("\\"));
+  count = name.split("\\").length - 1;
+  if (count === 0) {
+    name = name + "\\";
+  }
   return name;
 };
 Lib.GetFileName = (path) => {
