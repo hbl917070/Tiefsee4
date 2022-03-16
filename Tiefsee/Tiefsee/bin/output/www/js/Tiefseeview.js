@@ -492,6 +492,7 @@ class Tieefseeview {
         let p = yield preload(_url);
         setDataType("bigimg");
         if (p === false) {
+          setDataType("img");
           yield preload(errerUrl);
           _url = errerUrl;
           dom_img.src = _url;

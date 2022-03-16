@@ -663,6 +663,7 @@ class Tieefseeview {
             setDataType("bigimg");
 
             if (p === false) {
+                setDataType("img");
                 await preload(errerUrl);
                 _url = errerUrl;
                 dom_img.src = _url;
@@ -1221,7 +1222,7 @@ class Tieefseeview {
                             if (right * -1 < _margin + marginRight + 1) {
                                 context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
                             }
- 
+
                         });
 
                 } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
