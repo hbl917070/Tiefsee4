@@ -63,6 +63,7 @@ class DirSort {
         M.mainDirList.init();
         M.mainDirList.updataLocation();
         setDirSortMenu(_sortType);
+        M.menu.close();
       });
     }
     function setDirSortMenu(_sortType) {
@@ -82,7 +83,6 @@ class DirSort {
       if (_sortType === DirSortType.lastWriteTimeDesc) {
         dom_dirSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
       }
-      M.menu.close();
     }
     function sort(_type) {
       return __async(this, null, function* () {

@@ -1,16 +1,40 @@
 
 class InitMenu {
 
+    public initOpen;
+    public dom_rightMenuImage_zoomRatioTxt;
+
     constructor(M: MainWindow) {
 
-        initOpen();
+        var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement;//右鍵選單的圖片縮放比例
+
+        this.initOpen = initOpen;
+        this.dom_rightMenuImage_zoomRatioTxt = dom_rightMenuImage_zoomRatioTxt;
+
+        //initOpen();
         initCopy();
         initRotate();
+        initRightMenuImage();
+
+
+
+
+        //點擊右鍵時
+        document.body.addEventListener("mousedown", (e) => {
+
+            if (e.button === 2) {
+                var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
+                if (dom_rightClickImage !== null) {
+                    M.menu.open_RightClick(dom_rightClickImage, e.x, e.y, 0, -85);
+                }
+            }
+
+        })
 
         //-----------------
 
         /**
-         * 初始化 menu-開啟
+         * 初始化 menu-開啟檔案
          */
         async function initOpen() {
 
@@ -183,7 +207,7 @@ class InitMenu {
             if (dom_copyName !== null) {
                 dom_copyName.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.copy.copyName();         
+                    M.script.copy.copyName();
                 }
             }
 
@@ -201,7 +225,7 @@ class InitMenu {
             if (dom_copyImg !== null) {
                 dom_copyImg.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.copy.copyImg();                
+                    M.script.copy.copyImg();
                 }
             }
 
@@ -210,7 +234,7 @@ class InitMenu {
             if (dom_copyBase64 !== null) {
                 dom_copyBase64.onclick = async () => {
                     M.menu.close();//關閉menu      
-                    M.script.copy.copyBase64();  
+                    M.script.copy.copyBase64();
                 }
             }
 
@@ -219,7 +243,7 @@ class InitMenu {
             if (dom_copyPng !== null) {
                 dom_copyPng.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.copy.copyPng();  
+                    M.script.copy.copyPng();
                 }
             }
 
@@ -228,7 +252,7 @@ class InitMenu {
             if (dom_copyTxt !== null) {
                 dom_copyTxt.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.copy.copyTxt();  
+                    M.script.copy.copyTxt();
                 }
             }
 
@@ -287,8 +311,81 @@ class InitMenu {
         }
 
 
+        /**
+         *  初始化 menu-圖片的右鍵選單
+         */
+        function initRightMenuImage() {
+
+
+            let dom = document.getElementById("menu-rightMenuImage")
+            if (dom === null) { return; }
+
+            dom.querySelector(".js-prev")?.addEventListener("click", () => {
+                M.script.fileLoad.prevFile();
+            });
+            dom.querySelector(".js-next")?.addEventListener("click", () => {
+                M.script.fileLoad.nextFile();
+            });
+            dom.querySelector(".js-prevDir")?.addEventListener("click", () => {
+                M.script.fileLoad.prevDir();
+            });
+            dom.querySelector(".js-nextDir")?.addEventListener("click", () => {
+                M.script.fileLoad.nextDir();
+            });
+            dom.querySelector(".js-sort")?.addEventListener("click", () => {
+                M.script.menu.close();
+                M.script.menu.showSort();
+            });
+
+            dom.querySelector(".js-rotate")?.addEventListener("click", () => {
+                M.script.menu.close();
+                M.script.menu.showRotate();
+            });
+            dom.querySelector(".js-zoomIn")?.addEventListener("click", () => {
+                M.script.img.zoomIn();
+            });
+            dom.querySelector(".js-zoomOut")?.addEventListener("click", () => {
+                M.script.img.zoomOut();
+            });
+            dom.querySelector(".js-full")?.addEventListener("click", () => {
+                M.script.img.zoomFull();
+            });
+            dom.querySelector(".js-zoomRatio")?.addEventListener("click", () => {
+                M.script.img.zoom100();
+            });
+
+            dom.querySelector(".js-open")?.addEventListener("click", () => {//在檔案總管中顯示
+                M.script.menu.close();
+                M.script.open.showOnExplorer();
+            });
+            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => {//檔案右鍵選單
+                M.script.menu.close();
+                M.script.file.ShowContextMenu();
+            });
+            dom.querySelector(".js-copy")?.addEventListener("click", () => {//複製影像
+                M.script.menu.close();
+                M.script.copy.copyImg();
+            });
+            dom.querySelector(".js-delete")?.addEventListener("click", () => {//刪除圖片
+                M.script.menu.close();
+                M.script.fileLoad.deleteMsg();
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => {//設定
+                M.script.menu.close();
+                M.script.setting.OpenSetting();
+            });
+            dom.querySelector(".js-help")?.addEventListener("click", () => {//說明
+                M.script.menu.close();
+                WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')
+            });
+            dom.querySelector(".js-close")?.addEventListener("click", () => {//關閉程式
+                M.script.menu.close();
+                baseWindow.close();
+            });
+        }
+
+
+
     }
-
-
 
 }

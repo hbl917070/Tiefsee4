@@ -18,16 +18,6 @@ class MainTools {
       addToolsBtn({
         group: GroupType.img,
         name: "file",
-        icon: "tool-sort.svg",
-        func: (btn) => {
-          btn.addEventListener("click", () => {
-            M.script.menu.showSort(btn);
-          });
-        }
-      });
-      addToolsBtn({
-        group: GroupType.img,
-        name: "file",
         icon: "tool-copy.svg",
         func: (btn) => {
           btn.addEventListener("click", () => {

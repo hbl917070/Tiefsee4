@@ -142,9 +142,21 @@ class FileShow {
         tieefseeview.setLoading(false);
         tieefseeview.transformRefresh(false);
         tieefseeview.setEventChangeZoom((ratio) => {
+          let txt = (ratio * 100).toFixed(0) + "%";
           let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);
-          if (dom_btnScale != null) {
-            dom_btnScale.innerHTML = (ratio * 100).toFixed(0) + "%";
+          if (dom_btnScale !== null) {
+            dom_btnScale.innerHTML = txt;
+          }
+          let dom_btnScale2 = M.initMenu.dom_rightMenuImage_zoomRatioTxt;
+          if (dom_btnScale2 !== null) {
+            dom_btnScale2.innerHTML = txt;
+            if (dom_btnScale2.clientWidth !== 0) {
+              let r = 35 / dom_btnScale2.clientWidth;
+              if (r > 1) {
+                r = 1;
+              }
+              dom_btnScale2.style.transform = `scaleX(${r})`;
+            }
           }
         });
         tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);

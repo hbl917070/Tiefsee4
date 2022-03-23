@@ -116,6 +116,9 @@ class ScriptMenu {
   constructor(_M) {
     this.M = _M;
   }
+  close() {
+    this.M.menu.close();
+  }
   showOpen(btn) {
     this.M.menu.open_Button(document.getElementById("menu-open"), btn, "menuActive");
   }
@@ -123,10 +126,18 @@ class ScriptMenu {
     this.M.menu.open_Button(document.getElementById("menu-copy"), btn, "menuActive");
   }
   showRotate(btn) {
-    this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
+    if (btn === void 0) {
+      this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, -20);
+    } else {
+      this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
+    }
   }
   showSort(btn) {
-    this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+    if (btn === void 0) {
+      this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, -20);
+    } else {
+      this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+    }
   }
 }
 class ScriptOpen {

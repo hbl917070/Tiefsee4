@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<path style="fill:var(--color-white)" d="M10.1,24.7L0.8,10.7l16.5,2.6l-6,4.1L10.1,24.7z M2.9,12.1L9.6,22l0.9-5.1l4.3-2.9L2.9,12.1z"/>
+	<rect x="10" y="5" style="fill:var(--color-white)" width="11" height="1"/>
+	<rect x="10" y="9" style="fill:var(--color-white)" width="11" height="1"/>
+	<polygon style="fill:var(--color-white)" points="24,17 23,17 23,2 10,2 10,1 24,1 "/>
+</svg>

@@ -15,7 +15,7 @@
 
             <div class="menu-hor-item" id="menuitem-showOnExplorer">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
+                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item" id="menuitem-showSystemMenu">
                 <div class="menu-hor-icon"></div>
@@ -213,6 +213,104 @@
                 <div class="menu-hor-txt" i18n="">修改日期(逆)</div>
             </div>
 
+        </div>
+
+    </div>
+</div>
+
+
+<div class="menu" active="">
+    <div class="menu-content" id="menu-rightMenuImage">
+
+        <div class="menu-box" style="width:200px">
+            <div class="menu-grid">
+                <div class="menu-grid-item js-prev">
+                    <%- await readFile("./img/default/tool-prev.svg"); %>
+                </div>
+                <div class="menu-grid-item js-next">
+                    <%- await readFile("./img/default/tool-next.svg"); %>
+                </div>
+                <div class="menu-grid-item js-prevDir">
+                    <%- await readFile("./img/default/tool-prevDir.svg"); %>
+                </div>
+                <div class="menu-grid-item js-nextDir">
+                    <%- await readFile("./img/default/tool-nextDir.svg"); %>
+                </div>
+                <div class="menu-grid-item js-sort">
+                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-grid-item js-rotate">
+                    <%- await readFile("./img/default/tool-rotate.svg"); %>
+                </div>
+                <div class="menu-grid-item js-zoomIn">
+                    <%- await readFile("./img/default/tool-zoomIn.svg"); %>
+                </div>
+                <div class="menu-grid-item js-zoomOut">
+                    <%- await readFile("./img/default/tool-zoomOut.svg"); %>
+                </div>
+                <div class="menu-grid-item js-full">
+                    <%- await readFile("./img/default/tool-full.svg"); %>
+                </div>
+                <div class="menu-grid-item js-zoomRatio">
+                    <div class="menu-grid-txt js-zoomRatioTxt">
+                        100%
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="menu-box">
+            <div class="menu-hor-item js-open">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-open.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
+            </div>
+            <div class="menu-hor-item js-rightMenu">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+            </div>
+            <div class="menu-hor-item js-copy">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">複製影像</div>
+            </div>
+            <div class="menu-hor-item js-delete">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-delete.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">刪除圖片</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-setting">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">設定</div>
+            </div>
+            <div class="menu-hor-item js-help">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-help.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">說明</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-close" >
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/no.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="">關閉程式</div>
+            </div>
         </div>
 
     </div>

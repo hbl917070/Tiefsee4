@@ -74,6 +74,7 @@ class FileSort {
       this.M.mainFileList.select();
       this.M.mainFileList.updataLocation();
       this.setFileSortMenu(_sortType);
+      this.M.menu.close();
     });
   }
   setFileSortMenu(_sortType) {
@@ -93,7 +94,6 @@ class FileSort {
     if (_sortType === FileSortType.lastWriteTimeDesc) {
       this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
     }
-    this.M.menu.close();
   }
   sort(arWaitingFile, _type) {
     return __async(this, null, function* () {

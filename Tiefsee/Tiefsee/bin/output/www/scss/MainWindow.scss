@@ -245,7 +245,7 @@
   transform: translateX(1px);
 } */
 .maxBtn svg {
-  max-height: 30px;
+  height: 30px;
 }
 .maxBtnLeft-bottom {
   bottom: 20px;
@@ -311,6 +311,7 @@
   .fileList-title {
     display: flex;
     flex-direction: row;
+    font-size: 14px;
   }
 
   //編號
@@ -318,7 +319,6 @@
     margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    font-size: 14px;
 
     overflow: hidden;
     font-weight: 500;
@@ -332,7 +332,6 @@
     margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    font-size: 14px;
 
     overflow: hidden;
     text-align: center;
@@ -411,6 +410,7 @@
   .dirList-title {
     display: flex;
     flex-direction: row;
+    font-size: 14px;
   }
 
   //編號
@@ -418,7 +418,6 @@
     margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    font-size: 14px;
 
     overflow: hidden;
     font-weight: 500;
@@ -431,7 +430,6 @@
     margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    font-size: 14px;
 
     overflow: hidden;
     text-align: center;

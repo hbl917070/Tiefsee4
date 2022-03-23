@@ -81,7 +81,7 @@ class MainTools {
             });*/
 
             //排序
-            addToolsBtn({
+            /*addToolsBtn({
                 group: GroupType.img,
                 name: "file",
                 icon: "tool-sort.svg",
@@ -90,7 +90,7 @@ class MainTools {
                         M.script.menu.showSort(btn);
                     });
                 },
-            });
+            });*/
 
             //複製
             addToolsBtn({

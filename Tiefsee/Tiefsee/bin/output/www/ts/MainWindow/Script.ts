@@ -165,6 +165,11 @@ class ScriptMenu {
         this.M = _M;
     }
 
+    /** 關閉所有 menu */
+    close() {
+        this.M.menu.close();
+    }
+
     /** 顯示選單 開啟 */
     showOpen(btn: HTMLElement) {
         this.M.menu.open_Button(document.getElementById("menu-open"), btn, "menuActive");
@@ -176,13 +181,21 @@ class ScriptMenu {
     }
 
     /** 顯示選單 旋轉與鏡像 */
-    showRotate(btn: HTMLElement) {
-        this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
+    showRotate(btn?: HTMLElement) {
+        if (btn === undefined) {
+            this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, -20);
+        } else {
+            this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
+        }
     }
 
-    /** 顯示選單 旋轉與鏡像 */
-    showSort(btn: HTMLElement) {
-        this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+    /** 顯示選單 排序 */
+    showSort(btn?: HTMLElement) {
+        if (btn === undefined) {
+            this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, -20);
+        } else {
+            this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+        }
     }
 
 

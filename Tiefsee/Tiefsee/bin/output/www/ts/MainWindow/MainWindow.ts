@@ -15,6 +15,7 @@ class MainWindow {
     public mainFileList;
     public mainDirList;
     public menu;
+    public initMenu;
     public script;
     public applySetting;
     public saveSetting;
@@ -40,6 +41,7 @@ class MainWindow {
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
         var menu = new Menu(this);
+        var initMenu= new InitMenu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
         this.fileLoad = fileLoad;
@@ -49,6 +51,7 @@ class MainWindow {
         this.mainFileList = mainFileList;
         this.mainDirList = mainDirList;
         this.menu = menu;
+        this.initMenu = initMenu;
         this.config = config;
         this.script = script;
         this.applySetting = applySetting;
@@ -131,7 +134,7 @@ class MainWindow {
                 //await sleep(100);
                 // baseWindow.dom_window.style.opacity ="1";
 
-                new InitMenu(this);
+                initMenu.initOpen();//初始化「開啟檔案」的menu
 
                 /*document.body.style.width = baseWindow.width + "px"
                 document.body.style.height = baseWindow.height + "px"

@@ -36,7 +36,7 @@ class DirSort {
             updateSort(DirSortType.nameDesc);
         });
         dom_dirSort_lastWriteTime.addEventListener("click", () => {
-            updateSort(DirSortType.lastWriteTime);
+            updateSort(DirSortType.lastWriteTime);        
         });
         dom_dirSort_lastWriteTimeDesc.addEventListener("click", () => {
             updateSort(DirSortType.lastWriteTimeDesc);
@@ -68,6 +68,8 @@ class DirSort {
             M.mainDirList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
             setDirSortMenu(_sortType);
+
+            M.menu.close();//關閉menu
         }
 
 
@@ -95,7 +97,7 @@ class DirSort {
                 dom_dirSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
             }
 
-            M.menu.close();//關閉menu
+            //M.menu.close();//關閉menu
         }
 
 

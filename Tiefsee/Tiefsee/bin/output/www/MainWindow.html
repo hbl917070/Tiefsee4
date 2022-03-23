@@ -73,7 +73,7 @@
 
             <div class="menu-hor-item" id="menuitem-showOnExplorer">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">開啟檔案位置</div>
+                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item" id="menuitem-showSystemMenu">
                 <div class="menu-hor-icon"></div>
@@ -314,6 +314,216 @@
     </div>
 </div>
 
+
+<div class="menu" active="">
+    <div class="menu-content" id="menu-rightMenuImage">
+
+        <div class="menu-box" style="width:200px">
+            <div class="menu-grid">
+                <div class="menu-grid-item js-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M24.9,12H2.2l11.6-9.3L13.1,2L0.4,12.1c-0.1,0.1-0.2,0.2-0.2,0.4s0.1,0.3,0.2,0.4L13.1,23l0.6-0.8L2.2,13H25v-1H24.9z"/>
+</svg>
+                </div>
+                <div class="menu-grid-item js-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<path style="fill:var(--color-white)" d="M0,13h22.8l-11.6,9.3l0.6,0.7l12.7-10.1c0.1-0.1,0.2-0.2,0.2-0.4s-0.1-0.3-0.2-0.4L11.8,2l-0.6,0.8L22.7,12H0V13z"/>
+</svg>
+                </div>
+                <div class="menu-grid-item js-prevDir">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M21.5,23.8c-0.1,0-0.2,0-0.2-0.1L2.6,12.9c-0.2-0.1-0.2-0.3-0.2-0.4s0.1-0.3,0.2-0.4L21.3,1.3c0.2-0.1,0.3-0.1,0.5,0
+			S22,1.6,22,1.7v21.5c0,0.2-0.1,0.3-0.2,0.4S21.6,23.8,21.5,23.8z M3.8,12.5L21,22.4V2.6L3.8,12.5z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-grid-item js-nextDir">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M3.5,1.2c0.1,0,0.2,0,0.2,0.1l18.7,10.8c0.2,0.1,0.2,0.3,0.2,0.4s-0.1,0.3-0.2,0.4L3.7,23.7c-0.2,0.1-0.3,0.1-0.5,0
+			S3,23.4,3,23.3V1.7c0-0.2,0.1-0.3,0.2-0.4C3.3,1.3,3.4,1.2,3.5,1.2z M21.1,12.5L4,2.6v19.8L21.1,12.5z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-grid-item js-sort">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M23.1,16L17,22.2V1h-1v22.5c0,0.2,0.1,0.4,0.3,0.5c0.1,0,0.1,0,0.2,0s0.3-0.1,0.4-0.2l6.9-7.1L23.1,16z"/>
+		<path d="M8.7,1C8.5,0.9,8.3,1,8.1,1.1L1.2,8.4l0.7,0.7L8,2.7V24h1V1.4C9,1.3,8.9,1.1,8.7,1z"/>
+	</g>
+</svg>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-grid-item js-rotate">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M24.7,20.6l-5.8,1c1.1-0.8,2-1.7,2.7-2.9C24,15.2,24,10.6,21.8,7L21,7.5c2,3.3,1.9,7.5-0.2,10.7c-0.9,1.4-2.3,2.6-3.8,3.4
+			l2.4-7.7l-1-0.3l-2.7,8.7c-0.1,0.2,0,0.4,0.1,0.5s0.3,0.2,0.4,0.2l8.7-1.4L24.7,20.6z"/>
+		<path d="M3.1,9.7C3.6,8.3,4.3,7,5.3,5.9L4.6,5.2c-1.2,1.2-2,2.6-2.5,4.2C2.1,9.5,2,9.6,2,9.7L3,10C3,9.9,3.1,9.8,3.1,9.7z"/>
+		<path d="M19.8,4.5c-1.1-1-2.4-1.7-3.9-2.2c-0.2-0.1-0.5-0.1-0.7-0.2l-0.2,1c0.2,0.1,0.4,0.1,0.6,0.2c1.3,0.4,2.5,1.1,3.5,2
+			L19.8,4.5z"/>
+		<path d="M1.6,13c0,1.7,0.5,3.5,1.3,5l0.9-0.4c-0.8-1.4-1.2-3-1.2-4.6H1.6z"/>
+		<path d="M5.5,19.7l-0.7,0.7c0.8,0.8,1.6,1.4,2.5,1.9c0.6,0.3,1.2,0.6,1.9,0.8l0.3-0.9c-0.6-0.2-1.2-0.5-1.8-0.8
+			C6.9,20.9,6.2,20.4,5.5,19.7z"/>
+		<path d="M7.5,4.2c1.4-0.8,2.9-1.3,4.5-1.4v-1c-1.8,0.1-3.5,0.6-5,1.5L7.5,4.2z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-grid-item js-zoomIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<polygon style="fill:var(--color-white)" points="25,12 13,12 13,0 12,0 12,12 0,12 0,13 12,13 12,25 13,25 13,13 25,13 "/>
+</svg>
+                </div>
+                <div class="menu-grid-item js-zoomOut">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<rect style="fill:var(--color-white)" y="12" width="25" height="1"/>
+</svg>
+                </div>
+                <div class="menu-grid-item js-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white);">
+		<path d="M8,3V2H2.5C2.2,2,2,2.2,2,2.5V8h1V3.7l6.1,6.1l0.7-0.7L3.7,3H8z"/>
+		<path d="M22.5,2H17v1h4.3l-6.1,6.1l0.7,0.7L22,3.7V8h1V2.5C23,2.2,22.8,2,22.5,2z"/>
+		<path d="M22,21.3l-6.1-6.1l-0.7,0.7l6.1,6.1H17v1h5.5c0.3,0,0.5-0.2,0.5-0.5V17h-1V21.3z"/>
+		<path d="M9.1,15.2L3,21.3V17H2v5.5C2,22.8,2.2,23,2.5,23H8v-1H3.7l6.1-6.1L9.1,15.2z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-grid-item js-zoomRatio">
+                    <div class="menu-grid-txt js-zoomRatioTxt">
+                        100%
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="menu-box">
+            <div class="menu-hor-item js-open">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<g style="fill:var(--color-white);">
+		<path d="M24,12.8c-0.3-0.5-0.9-0.8-1.7-0.8h-2.4V8.7c0-1-0.7-1.7-1.6-1.7h-1.7v1h1.7c0.4,0,0.7,0.3,0.7,0.7V12H6.6
+			c-1.2,0-2.4,0.7-2.8,1.6L1,20V8.7C1,8.4,1.2,8.1,1.4,8c0.2,0,0.6,0,1,0L9,8v0h3.2V7H9C8.8,5.7,7.6,4,6.1,4H2.9C1.3,4,0,5.7,0,7.3
+			v1.2l0,0.1l0,0c0,0,0,0.1,0,0.1v13.6c0,0.1,0,0.1,0,0.2c0,0.3,0,0.6,0.2,0.8c0.2,0.3,0.4,0.5,0.8,0.6C1.2,23.9,1.4,24,1.6,24h0.2
+			h15.7h0.7c0.5,0,1-0.3,1.3-0.6c0.4-0.3,0.7-0.6,0.8-0.9L24,14C24.2,13.6,24.2,13.1,24,12.8z M2.9,5H6c0.9,0,1.7,1.2,1.8,2H1.6
+			C1.4,7,1.2,7,1.1,7.1C1.1,6.2,1.9,5,2.9,5z M18.9,22.3c0,0.1,0,0.2-0.1,0.3C18.4,22.8,18,23,17.5,23H1.8c-0.2,0-0.4,0-0.5-0.1
+			c-0.2-0.1-0.3-0.2-0.3-0.4c0,0,0,0,0,0L4.7,14c0.2-0.5,1.1-1,1.9-1h12.2V22.3z M23.1,13.6L19.9,21v-8h2.4c0.5,0,0.7,0.1,0.8,0.3
+			C23.1,13.3,23.2,13.4,23.1,13.6z"/>
+		<path d="M13.9,2.6v7.3h1V2.6L17.3,5L18,4.2L14.8,1c-0.2-0.2-0.5-0.2-0.7,0l-3.2,3.3L11.6,5L13.9,2.6z"/>
+
+		<path class="st0" d="M78.3,66.2v24.5h-3.5V66.2H55.5c-1,0-1.8,0.1-2.5,0.2c-0.6,0.2-1.1,0.4-1.6,0.7c-0.4,0.3-0.8,0.6-1.1,0.8
+			c-0.3,0.3-0.6,0.6-1,0.8s-0.8,0.5-1.4,0.6c-0.5,0.1-1.2,0.2-2.1,0.3H25.8v24.5h24.5v3.5H25.8c-0.5,0-0.9-0.1-1.4-0.3
+			c-0.4-0.2-0.8-0.4-1.1-0.7c-0.3-0.3-0.6-0.7-0.8-1.1c-0.2-0.4-0.3-0.9-0.3-1.4v-35c0-0.5,0.1-0.9,0.3-1.4c0.2-0.4,0.4-0.8,0.7-1.1
+			s0.7-0.6,1.1-0.8c0.4-0.2,0.9-0.3,1.4-0.3h20.1c0.7,0,1.3,0.1,1.9,0.4c0.6,0.2,1.1,0.6,1.6,1c0.5,0.4,0.9,0.9,1.3,1.4
+			c0.4,0.5,0.8,1,1.1,1.6c0.2,0.4,0.5,0.8,0.7,1.1c0.2,0.3,0.5,0.6,0.8,0.8s0.6,0.4,1,0.5c0.3,0.1,0.8,0.2,1.3,0.2h19.3
+			c0.5,0,0.9,0.1,1.4,0.3c0.4,0.2,0.8,0.4,1.1,0.7c0.3,0.3,0.6,0.7,0.8,1.1C78.2,65.3,78.3,65.7,78.3,66.2z M45.9,66.2
+			c0.5,0,0.9-0.1,1.2-0.2c0.3-0.2,0.6-0.4,1-0.6c0.3-0.2,0.6-0.5,0.9-0.8c0.3-0.3,0.7-0.5,1.1-0.8c-0.3-0.3-0.6-0.7-0.8-1.2
+			c-0.3-0.5-0.6-1-1-1.5c-0.4-0.5-0.7-0.9-1.1-1.3c-0.4-0.4-0.8-0.5-1.3-0.5H25.8v7H45.9z M78.3,101.2c0,1-0.2,1.9-0.5,2.7
+			c-0.4,0.8-0.9,1.6-1.5,2.2c-0.6,0.7-1.4,1.2-2.2,1.5s-1.8,0.5-2.7,0.5v-3.5c0.5,0,0.9-0.1,1.4-0.3c0.4-0.2,0.8-0.4,1.1-0.7
+			c0.3-0.3,0.6-0.7,0.8-1.1c0.2-0.4,0.3-0.9,0.3-1.4c0-0.5-0.1-0.9-0.3-1.4c-0.2-0.4-0.4-0.8-0.7-1.1c-0.3-0.3-0.7-0.6-1.1-0.8
+			c-0.4-0.2-0.9-0.3-1.4-0.3h-8l4.4,4.5l-2.5,2.5L56.6,96l8.7-8.7l2.5,2.5l-4.4,4.5h8c1,0,1.9,0.2,2.7,0.5c0.8,0.4,1.6,0.9,2.2,1.5
+			c0.7,0.6,1.2,1.4,1.5,2.2S78.3,100.2,78.3,101.2z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
+            </div>
+            <div class="menu-hor-item js-rightMenu">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
+	<path style="fill:var(--color-white)" d="M10.1,24.7L0.8,10.7l16.5,2.6l-6,4.1L10.1,24.7z M2.9,12.1L9.6,22l0.9-5.1l4.3-2.9L2.9,12.1z"/>
+	<rect x="10" y="5" style="fill:var(--color-white)" width="11" height="1"/>
+	<rect x="10" y="9" style="fill:var(--color-white)" width="11" height="1"/>
+	<polygon style="fill:var(--color-white)" points="24,17 23,17 23,2 10,2 10,1 24,1 "/>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+            </div>
+            <div class="menu-hor-item js-copy">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<polygon points="16,24 1,24 1,5 5,5 5,4 0,4 0,25 17,25 17,23 16,23 	"/>
+		<path d="M19.5,0H7v21h17V4.4L19.5,0z M22.9,20H8V1h10.9L19,1.1V5h3.9L23,5.1V20H22.9z"/>
+		<rect x="10" y="7" width="11" height="1"/>
+		<rect x="10" y="11" width="11" height="1"/>
+		<rect x="10" y="14" width="11" height="1"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">複製影像</div>
+            </div>
+            <div class="menu-hor-item js-delete">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M23.9,4H21l-3,0V3.6C18,2.2,16.8,1,15.3,1L9.5,1C8.1,0.9,7,2.1,7,3.4V4H4.5H1v1h3v14c0,3,2.3,5,5.6,5h5.7
+			c3.4,0,5.6-2,5.6-5V5h3L23.9,4L23.9,4z M8,3.4C7.9,2.5,8.7,1.7,9.5,2h5.7c1-0.3,1.8,0.6,1.8,1.6V4H8V3.4z M19.9,19
+			c0,2.9-2.4,4-4.7,4H9.7C7.4,23,5,21.9,5,19V5h2.7h9.1H20L19.9,19L19.9,19z"/>
+		<rect x="15" y="9" width="1" height="10"/>
+		<rect x="9" y="9" width="1" height="10"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">刪除圖片</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-setting">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M16,24H9v-3.6c-0.8-0.3-1.7-0.7-2.3-1.4l-3.1,1.8l-3-5.1l3.1-1.8c-0.1-0.5-0.1-0.9-0.1-1.4s0-0.9,0.1-1.4L0.6,9.3l3-5.1
+			L6.7,6c0.8-0.6,1.5-1,2.3-1.4V1h7v3.6c0.8,0.3,1.7,0.7,2.3,1.4l3.1-1.8l3,5.1l-3.1,1.8c0.1,0.5,0.1,0.9,0.1,1.4s0,0.9-0.1,1.4
+			l3.1,1.8l-3,5.1L18.3,19c-0.8,0.6-1.5,1-2.3,1.4C16,20.4,16,24,16,24z M10,23h5v-3.3l0.3-0.1c0.9-0.3,1.8-0.8,2.5-1.5l0.3-0.2
+			l2.8,1.7l2-3.5l-2.7-1.7l0.1-0.4c0.1-0.5,0.2-1,0.2-1.5s-0.1-1-0.2-1.5l-0.1-0.4l2.7-1.7l-2-3.5l-2.8,1.7L17.8,7
+			c-0.7-0.7-1.5-1.3-2.5-1.6L15,5.3V2h-5v3.3L9.7,5.4C8.8,5.7,7.9,6.3,7.2,6.9L6.9,7.1L4.1,5.5L2.2,9.1l2.7,1.7l-0.1,0.4
+			c-0.1,0.5-0.2,1-0.2,1.5c0,0.5,0.1,1,0.2,1.5l0.1,0.4l-2.7,1.7l1.9,3.3l2.8-1.7L7.2,18c0.7,0.7,1.6,1.2,2.5,1.5l0.3,0.1V23z"/>
+
+		<path d="M12.5,16C10.6,16,9,14.4,9,12.5S10.6,9,12.5,9s3.5,1.6,3.5,3.5S14.4,16,12.5,16z M12.5,9.8c-1.5,0-2.7,1.2-2.7,2.7
+			s1.2,2.7,2.7,2.7s2.7-1.2,2.7-2.7S14,9.8,12.5,9.8z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">設定</div>
+            </div>
+            <div class="menu-hor-item js-help">
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path d="M13,18v2h-2v-2H13z"/>
+		<path d="M12.6,17H11c0-1.2,0-1.9,0-2.2s0.1-0.6,0.2-0.9c0.1-0.3,0.3-0.5,0.4-0.7s0.6-0.4,1.2-0.8c0.7-0.4,1.1-0.7,1.4-0.9
+			c0.3-0.2,0.5-0.5,0.7-0.9s0.3-0.8,0.3-1.2c0-0.8-0.3-1.5-0.9-2c-0.6-0.5-1.3-0.7-2.2-0.7c-1.9,0-3,1.1-3.4,3.3L7.1,9.7
+			c0.6-3,2.3-4.5,5.2-4.5c1.5,0,2.7,0.4,3.6,1.2c0.9,0.8,1.4,1.8,1.4,3.1c0,1.6-0.9,3-2.8,3.9c-0.8,0.4-1.3,0.8-1.5,1
+			s-0.3,0.6-0.3,1.2L12.6,17z"/>
+		<path d="M12.5,24.5c-6.6,0-12-5.4-12-12c0-6.6,5.4-12,12-12c6.6,0,12,5.4,12,12C24.5,19.1,19.1,24.5,12.5,24.5z M12.5,1.5
+			c-6.1,0-11,4.9-11,11s4.9,11,11,11s11-4.9,11-11S18.6,1.5,12.5,1.5z"/>
+	</g>
+</svg>
+                </div>
+                <div class="menu-hor-txt" i18n="">說明</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-close" >
+                <div class="menu-hor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<polygon style="fill:var(--color-white)" points="21.7,4 21,3.3 12.5,11.8 4,3.3 3.3,4 11.8,12.5 3.3,21 4,21.7 12.5,13.2 21,21.7 21.7,21 13.2,12.5 "/>
+</svg>
+
+                </div>
+                <div class="menu-hor-txt" i18n="">關閉程式</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
         <div class="window">
 
 
@@ -390,197 +600,11 @@
                         <div class="main-L" id="main-L">
 
                             <!-- 資料夾預覽列表 -->
-
                             <div class="main-dirList base-scrollbar" id="main-dirList" active="true">
                                 <div class="main-dirListBody" id="main-dirListBody">
-                                    <div id="main-dirListData">
-
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="dirList-item" data-id="25" >
-                                            <div class="dirList-title">
-                                                <div class="dirList-no">26</div>
-                                                <div class="dirList-name">96054145_p096054145_p0 96054145_p0.jpg</div>
-                                            </div>
-                                            <div class="dirList-imgbox">
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                                <div class="dirList-img"
-                                                    style="background-image: url(http://127.0.0.1:4876/api/getFileIcon?size=128&path=C%3A%5CUsers%5Cwen%5CDesktop%5C96054145_p0.jpg);">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-
-                                    </div>
+                                    <div id="main-dirListData"> </div>
                                 </div>
                             </div>
-
 
 
                             <!-- 檔案預覽列表 -->

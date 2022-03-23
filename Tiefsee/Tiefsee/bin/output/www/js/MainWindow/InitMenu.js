@@ -20,9 +20,20 @@ var __async = (__this, __arguments, generator) => {
 };
 class InitMenu {
   constructor(M) {
-    initOpen();
+    var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt");
+    this.initOpen = initOpen;
+    this.dom_rightMenuImage_zoomRatioTxt = dom_rightMenuImage_zoomRatioTxt;
     initCopy();
     initRotate();
+    initRightMenuImage();
+    document.body.addEventListener("mousedown", (e) => {
+      if (e.button === 2) {
+        var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
+        if (dom_rightClickImage !== null) {
+          M.menu.open_RightClick(dom_rightClickImage, e.x, e.y, 0, -85);
+        }
+      }
+    });
     function initOpen() {
       return __async(this, null, function* () {
         var dom_OpenFile = document.getElementById("menuitem-openFile");
@@ -233,6 +244,73 @@ class InitMenu {
             M.script.img.transformRefresh();
           });
         }
+      });
+    }
+    function initRightMenuImage() {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+      let dom = document.getElementById("menu-rightMenuImage");
+      if (dom === null) {
+        return;
+      }
+      (_a = dom.querySelector(".js-prev")) == null ? void 0 : _a.addEventListener("click", () => {
+        M.script.fileLoad.prevFile();
+      });
+      (_b = dom.querySelector(".js-next")) == null ? void 0 : _b.addEventListener("click", () => {
+        M.script.fileLoad.nextFile();
+      });
+      (_c = dom.querySelector(".js-prevDir")) == null ? void 0 : _c.addEventListener("click", () => {
+        M.script.fileLoad.prevDir();
+      });
+      (_d = dom.querySelector(".js-nextDir")) == null ? void 0 : _d.addEventListener("click", () => {
+        M.script.fileLoad.nextDir();
+      });
+      (_e = dom.querySelector(".js-sort")) == null ? void 0 : _e.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.menu.showSort();
+      });
+      (_f = dom.querySelector(".js-rotate")) == null ? void 0 : _f.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.menu.showRotate();
+      });
+      (_g = dom.querySelector(".js-zoomIn")) == null ? void 0 : _g.addEventListener("click", () => {
+        M.script.img.zoomIn();
+      });
+      (_h = dom.querySelector(".js-zoomOut")) == null ? void 0 : _h.addEventListener("click", () => {
+        M.script.img.zoomOut();
+      });
+      (_i = dom.querySelector(".js-full")) == null ? void 0 : _i.addEventListener("click", () => {
+        M.script.img.zoomFull();
+      });
+      (_j = dom.querySelector(".js-zoomRatio")) == null ? void 0 : _j.addEventListener("click", () => {
+        M.script.img.zoom100();
+      });
+      (_k = dom.querySelector(".js-open")) == null ? void 0 : _k.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.open.showOnExplorer();
+      });
+      (_l = dom.querySelector(".js-rightMenu")) == null ? void 0 : _l.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.file.ShowContextMenu();
+      });
+      (_m = dom.querySelector(".js-copy")) == null ? void 0 : _m.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.copy.copyImg();
+      });
+      (_n = dom.querySelector(".js-delete")) == null ? void 0 : _n.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.fileLoad.deleteMsg();
+      });
+      (_o = dom.querySelector(".js-setting")) == null ? void 0 : _o.addEventListener("click", () => {
+        M.script.menu.close();
+        M.script.setting.OpenSetting();
+      });
+      (_p = dom.querySelector(".js-help")) == null ? void 0 : _p.addEventListener("click", () => {
+        M.script.menu.close();
+        WV_RunApp.OpenUrl("https://github.com/hbl917070/Tiefsee4");
+      });
+      (_q = dom.querySelector(".js-close")) == null ? void 0 : _q.addEventListener("click", () => {
+        M.script.menu.close();
+        baseWindow.close();
       });
     }
   }

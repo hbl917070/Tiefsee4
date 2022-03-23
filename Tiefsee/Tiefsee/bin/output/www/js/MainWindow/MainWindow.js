@@ -38,6 +38,7 @@ class MainWindow {
     var mainFileList = new MainFileList(this);
     var mainDirList = new MainDirList(this);
     var menu = new Menu(this);
+    var initMenu = new InitMenu(this);
     var script = new Script(this);
     let firstRun = true;
     this.fileLoad = fileLoad;
@@ -47,6 +48,7 @@ class MainWindow {
     this.mainFileList = mainFileList;
     this.mainDirList = mainDirList;
     this.menu = menu;
+    this.initMenu = initMenu;
     this.config = config;
     this.script = script;
     this.applySetting = applySetting;
@@ -87,7 +89,7 @@ class MainWindow {
           yield WV_Window.ShowWindow();
           yield WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);
         }
-        new InitMenu(this);
+        initMenu.initOpen();
         let args = json.args;
         if (args.length === 0) {
           fileShow.openWelcome();

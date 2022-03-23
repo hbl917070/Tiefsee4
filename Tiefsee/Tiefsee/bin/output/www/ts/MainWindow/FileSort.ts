@@ -76,6 +76,7 @@ class FileSort {
         this.M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
         this.setFileSortMenu(_sortType);
+        this.M.menu.close();//關閉menu
     }
 
 
@@ -103,7 +104,7 @@ class FileSort {
             this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
         }
 
-        this.M.menu.close();//關閉menu
+
     }
 
 

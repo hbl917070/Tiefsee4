@@ -242,7 +242,7 @@
   transform: translateX(1px);
 } */
 .maxBtn svg {
-  max-height: 30px;
+  height: 30px;
 }
 
 .maxBtnLeft-bottom {
@@ -295,12 +295,12 @@
 .main-fileList .fileList-title {
   display: flex;
   flex-direction: row;
+  font-size: 14px;
 }
 .main-fileList .fileList-no {
   margin-bottom: 2px;
   line-height: 14px;
   height: 14px;
-  font-size: 14px;
   overflow: hidden;
   font-weight: 500;
   color: var(--color-blue);
@@ -310,7 +310,6 @@
   margin-bottom: 2px;
   line-height: 14px;
   height: 14px;
-  font-size: 14px;
   overflow: hidden;
   text-align: center;
   flex: 1;
@@ -367,12 +366,12 @@
 .main-dirList .dirList-title {
   display: flex;
   flex-direction: row;
+  font-size: 14px;
 }
 .main-dirList .dirList-no {
   margin-bottom: 2px;
   line-height: 14px;
   height: 14px;
-  font-size: 14px;
   overflow: hidden;
   font-weight: 500;
   color: var(--color-blue);
@@ -382,7 +381,6 @@
   margin-bottom: 2px;
   line-height: 14px;
   height: 14px;
-  font-size: 14px;
   overflow: hidden;
   text-align: center;
   flex: 1;
