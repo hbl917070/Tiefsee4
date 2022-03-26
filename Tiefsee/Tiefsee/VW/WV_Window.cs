@@ -344,6 +344,11 @@ namespace Tiefsee {
         /// <param name="_type"></param>
         public void WindowDrag(String _type) {
 
+            //避免滑鼠在沒有按下的情況下執行
+            if (System.Windows.Forms.Control.MouseButtons != System.Windows.Forms.MouseButtons.Left) {
+                return;
+            }
+
             var _run = ResizeDirection.Move;
 
             if (_type == "CT") { _run = ResizeDirection.CT; }

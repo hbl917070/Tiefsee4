@@ -142,9 +142,9 @@ class MainWindow {
             }
           }
         }));
-        fileShow.dom_imgview.addEventListener("mousedown", (e) => __async(this, null, function* () {
+        fileShow.dom_imgview.addEventListener("mousedown", (ev) => __async(this, null, function* () {
           if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
-            if (e.button === 0) {
+            if (ev.button === 0) {
               let WindowState = baseWindow.windowState;
               if (WindowState === "Normal") {
                 WV_Window.WindowDrag("move");

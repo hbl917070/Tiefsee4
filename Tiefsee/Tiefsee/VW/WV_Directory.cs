@@ -22,7 +22,12 @@ namespace Tiefsee {
             this.M = m;
         }
 
-
+        /// <summary>
+        /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
+        /// </summary>
+        /// <param name="siblingPath"></param>
+        /// <param name="_arExt"> 副檔名 </param>
+        /// <returns></returns>
         public string GetSiblingDir(string siblingPath, object[] _arExt) {
 
             Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
@@ -50,10 +55,8 @@ namespace Tiefsee {
                     arDir = Directory.GetDirectories(parentPath);//取得所有子資料夾
                 }
 
-
             } catch {
-                arDir = new string[1];
-                arDir[0] = siblingPath;
+                arDir = new string[] { siblingPath };//只處理自己
             }
 
             foreach (var dirPath in arDir) {//所有子資料夾
@@ -64,8 +67,6 @@ namespace Tiefsee {
                 } catch {
                     continue;
                 }
-
-
 
                 for (int i = 0; i < arFile.Length; i++) {
                     arFile[i] = Path.GetFileName(arFile[i]); //把路徑處理成只有檔名，排序比較快
@@ -89,7 +90,6 @@ namespace Tiefsee {
                 }
 
             }
-
 
             return JsonConvert.SerializeObject(output);
         }

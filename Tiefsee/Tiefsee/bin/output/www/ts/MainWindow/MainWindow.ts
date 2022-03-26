@@ -41,7 +41,7 @@ class MainWindow {
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
         var menu = new Menu(this);
-        var initMenu= new InitMenu(this);
+        var initMenu = new InitMenu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
         this.fileLoad = fileLoad;
@@ -218,10 +218,10 @@ class MainWindow {
             });
 
             //圖片區域也允許拖曳視窗
-            fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
+            fileShow.dom_imgview.addEventListener("mousedown", async (ev) => {
                 //圖片沒有出現捲動軸
                 if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
-                    if (e.button === 0) {//滑鼠左鍵
+                    if (ev.button === 0) {//滑鼠左鍵
                         let WindowState = baseWindow.windowState;
                         if (WindowState === "Normal") {
                             WV_Window.WindowDrag("move");
@@ -229,6 +229,7 @@ class MainWindow {
                     }
                 }
             });
+
 
             //double click 最大化或視窗化
             Lib.addEventDblclick(dom_tools, async (e) => {//工具列

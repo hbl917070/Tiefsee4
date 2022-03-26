@@ -240,20 +240,34 @@ class Tieefseeview {
     });
     dom_dpizoom.addEventListener("wheel", (e) => {
       e.preventDefault();
-      e = e || window.event;
       if (e.target !== dom_dpizoom) {
         return;
       }
       $(dom_con).stop(true, false);
-      if (e.deltaX < 0 || e.deltaY < 0) {
-        eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
+      if (Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100) {
+        let posX = e.deltaX;
+        let posY = e.deltaY;
+        window.requestAnimationFrame(() => {
+          setXY(toNumber(dom_con.style.left) - posX, toNumber(dom_con.style.top) - posY, 0);
+          init_point(false);
+        });
       } else {
-        eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
+        if (e.deltaX < 0 || e.deltaY < 0) {
+          eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
+        } else {
+          eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
+        }
       }
     }, true);
     dom_dpizoom.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
       if (getIsOverflowX() === false && getIsOverflowY() === false) {
+        var downEvent = new PointerEvent("pointerup", {
+          pointerId: 1,
+          bubbles: true,
+          pointerType: "mouse"
+        });
+        dom_dpizoom.dispatchEvent(downEvent);
         return;
       }
       if (ev.target !== dom_dpizoom) {
@@ -285,7 +299,7 @@ class Tieefseeview {
       panStartX = toNumber(dom_con.style.left);
       panStartY = toNumber(dom_con.style.top);
     });
-    hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+    hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
     hammerPan.on("pan", (ev) => {
       if (ev.maxPointers > 1) {
         isMoving = false;
@@ -1475,7 +1489,7 @@ class TieefseeviewScroll {
       startLeft = toNumber(dom_box.style.left);
       startTop = toNumber(dom_box.style.top);
     };
-    hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+    hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
     hammer_scroll.on("pan", (ev) => {
       ev.preventDefault();
       let deltaX = ev["deltaX"];

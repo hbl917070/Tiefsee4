@@ -309,28 +309,59 @@ class Tieefseeview {
         dom_dpizoom.addEventListener("wheel", (e: WheelEvent) => {
 
             e.preventDefault();//禁止頁面滾動
-            e = e || window.event;
+            //e = e || window.event;
 
             //避免在捲動軸上面也觸發
             if (e.target !== dom_dpizoom) { return; }
 
             $(dom_con).stop(true, false);
 
-            //縮放計算
-            if (e.deltaX < 0 || e.deltaY < 0) {//往上
-                eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
-            } else { //往下
-                eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
+            //觸控板雙指移動
+            if (Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100) {
+
+                //let scale = 1 + e.deltaY * 0.01;//無法使用
+                let posX = e.deltaX;
+                let posY = e.deltaY;
+
+                window.requestAnimationFrame(() => {
+                    //zoomIn(e.x, e.y, ( scale), TieefseeviewImageRendering["pixelated"]);
+                    setXY(
+                        toNumber(dom_con.style.left) - posX,
+                        toNumber(dom_con.style.top) - posY,
+                        0
+                    );//平移
+                    init_point(false);
+                })
+
+            } else {//一般的滑鼠滾輪
+                //縮放計算
+                if (e.deltaX < 0 || e.deltaY < 0) {//往上
+                    eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
+                } else { //往下
+                    eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
+                }
             }
+
         }, true);
+
 
 
         //拖曳開始
         dom_dpizoom.addEventListener("mousedown", (ev) => {
+
             ev.preventDefault();
 
             //沒有出現捲動條就不要執行拖曳
             if (getIsOverflowX() === false && getIsOverflowY() === false) {
+
+                //模擬送出 mouseup ，避免拖曳視窗後導致touch事件變得異常
+                var downEvent = new PointerEvent("pointerup", {
+                    pointerId: 1,
+                    bubbles: true,
+                    pointerType: "mouse",
+                });
+                dom_dpizoom.dispatchEvent(downEvent);
+
                 return;
             }
 
@@ -371,7 +402,7 @@ class Tieefseeview {
         });
 
         //拖曳
-        hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+        hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
         hammerPan.on("pan", (ev) => {
 
             //避免多指觸發
@@ -2111,7 +2142,7 @@ class TieefseeviewScroll {
 
 
         //拖曳中
-        hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+        hammer_scroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
         hammer_scroll.on("pan", (ev) => {
             ev.preventDefault();
             let deltaX = ev["deltaX"];
