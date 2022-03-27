@@ -119,8 +119,10 @@ class BaseWindow {
                 e.preventDefault();
             }
         }, true);
-        dom_window.addEventListener("touchstart", (e) => {
-            e.preventDefault()
+        dom_window.addEventListener("touchstart", (e) => {   
+            if (e.touches.length > 1) {//多指
+                e.preventDefault();
+            }
         }, false);
 
         //註冊視窗邊框拖曳

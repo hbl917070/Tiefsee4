@@ -97,7 +97,9 @@ class BaseWindow {
       }
     }, true);
     dom_window.addEventListener("touchstart", (e) => {
-      e.preventDefault();
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
     }, false);
     windowBorder(document.querySelector(".window-CT"), "CT");
     windowBorder(document.querySelector(".window-RC"), "RC");
