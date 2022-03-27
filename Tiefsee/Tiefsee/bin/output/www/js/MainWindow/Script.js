@@ -127,17 +127,22 @@ class ScriptMenu {
   }
   showRotate(btn) {
     if (btn === void 0) {
-      this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, -20);
+      this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, 0);
     } else {
       this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
     }
   }
   showSort(btn) {
     if (btn === void 0) {
-      this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, -20);
+      this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, 0);
     } else {
       this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
     }
+  }
+  showRightMenuImage() {
+    var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
+    this.M.menu.open_RightClick(dom_rightClickImage, 0, -85);
+    this.M.initMenu.updateRightMenuImageZoomRatioTxt();
   }
 }
 class ScriptOpen {

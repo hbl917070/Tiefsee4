@@ -91,6 +91,14 @@ class BaseWindow {
         }, 50);
       }
     }));
+    dom_window.addEventListener("wheel", (e) => {
+      if (e.ctrlKey === true) {
+        e.preventDefault();
+      }
+    }, true);
+    dom_window.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+    }, false);
     windowBorder(document.querySelector(".window-CT"), "CT");
     windowBorder(document.querySelector(".window-RC"), "RC");
     windowBorder(document.querySelector(".window-CB"), "CB");

@@ -147,17 +147,7 @@ class FileShow {
           if (dom_btnScale !== null) {
             dom_btnScale.innerHTML = txt;
           }
-          let dom_btnScale2 = M.initMenu.dom_rightMenuImage_zoomRatioTxt;
-          if (dom_btnScale2 !== null) {
-            dom_btnScale2.innerHTML = txt;
-            if (dom_btnScale2.clientWidth !== 0) {
-              let r = 35 / dom_btnScale2.clientWidth;
-              if (r > 1) {
-                r = 1;
-              }
-              dom_btnScale2.style.transform = `scaleX(${r})`;
-            }
-          }
+          M.initMenu.updateRightMenuImageZoomRatioTxt(txt);
         });
         tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
         let dom_size = (_a = getToolsDom(GroupType.img)) == null ? void 0 : _a.querySelector(`[data-name="infoSize"]`);

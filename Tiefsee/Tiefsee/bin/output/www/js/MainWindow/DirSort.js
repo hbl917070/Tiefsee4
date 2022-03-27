@@ -61,7 +61,7 @@ class DirSort {
         setDirSortType(dirParentPath, sortType);
         M.fileLoad.updateTitle();
         M.mainDirList.init();
-        M.mainDirList.updataLocation();
+        M.mainDirList.updateLocation();
         setDirSortMenu(_sortType);
         M.menu.close();
       });

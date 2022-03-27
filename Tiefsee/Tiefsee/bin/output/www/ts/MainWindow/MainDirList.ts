@@ -6,7 +6,7 @@ class MainDirList {
 
     public init;
     public select;
-    public updataLocation;
+    public updateLocation;
     public setStartLocation;
     public setHide;
     public setEnabled;
@@ -19,7 +19,7 @@ class MainDirList {
 
         this.init = init;
         this.select = select;
-        this.updataLocation = updataLocation;
+        this.updateLocation = updateLocation;
         this.setStartLocation = setStartLocation;
         this.setHide = setHide;
         this.setEnabled = setEnabled;
@@ -197,7 +197,7 @@ class MainDirList {
             temp_start = -1;//強制必須重新繪製
             updateItem();
             setStartLocation();//捲到中間
-            //updataLocation()
+            //updateLocation()
         }
 
 
@@ -382,7 +382,7 @@ class MainDirList {
         /**
          * 檔案預覽列表 自動捲動到選中項目的地方
          */
-        function updataLocation() {
+        function updateLocation() {
 
             if (isEnabled === false) { return; }
 

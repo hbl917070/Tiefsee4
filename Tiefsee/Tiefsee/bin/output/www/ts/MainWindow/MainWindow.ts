@@ -229,7 +229,12 @@ class MainWindow {
                     }
                 }
             });
-
+            /*fileShow.dom_imgview.addEventListener("mouseup", async (ev) => {
+                console.log("123654")
+            });*/
+            /*fileShow.dom_imgview.addEventListener("touchcancel", async (ev) => {
+                console.log(ev)
+            });*/
 
             //double click 最大化或視窗化
             Lib.addEventDblclick(dom_tools, async (e) => {//工具列

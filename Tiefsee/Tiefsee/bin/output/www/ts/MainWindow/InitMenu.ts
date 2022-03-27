@@ -2,34 +2,47 @@
 class InitMenu {
 
     public initOpen;
-    public dom_rightMenuImage_zoomRatioTxt;
+    public updateRightMenuImageZoomRatioTxt;
 
     constructor(M: MainWindow) {
 
         var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement;//右鍵選單的圖片縮放比例
 
         this.initOpen = initOpen;
-        this.dom_rightMenuImage_zoomRatioTxt = dom_rightMenuImage_zoomRatioTxt;
+        this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
 
         //initOpen();
         initCopy();
         initRotate();
         initRightMenuImage();
 
-
-
-
         //點擊右鍵時
         document.body.addEventListener("mousedown", (e) => {
-
             if (e.button === 2) {
-                var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
-                if (dom_rightClickImage !== null) {
-                    M.menu.open_RightClick(dom_rightClickImage, e.x, e.y, 0, -85);
-                }
+              M.script.menu.showRightMenuImage();
+            }
+        })
+
+
+        /**
+         * 更新 右鍵選單的圖片縮放比例
+         * @param txt 
+         */
+        function updateRightMenuImageZoomRatioTxt(txt?: string) {
+
+            if (dom_rightMenuImage_zoomRatioTxt === null) { return }
+
+            if (txt !== undefined) {//如果有傳入文字，就更新文字內容
+                dom_rightMenuImage_zoomRatioTxt.innerHTML = txt;
             }
 
-        })
+            if (dom_rightMenuImage_zoomRatioTxt.clientWidth !== 0) {
+                let r = 35 / dom_rightMenuImage_zoomRatioTxt.clientWidth;
+                if (r > 1) { r = 1 }
+                dom_rightMenuImage_zoomRatioTxt.style.transform = `scaleX(${r})`
+            }
+        }
+
 
         //-----------------
 

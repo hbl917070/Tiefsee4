@@ -22,7 +22,7 @@ class MainDirList {
   constructor(M) {
     this.init = init;
     this.select = select;
-    this.updataLocation = updataLocation;
+    this.updateLocation = updateLocation;
     this.setStartLocation = setStartLocation;
     this.setHide = setHide;
     this.setEnabled = setEnabled;
@@ -286,7 +286,7 @@ class MainDirList {
       let f = (dom_dirList.clientHeight - itemHeight) / 2;
       dom_dirList.scrollTop = id * itemHeight - f;
     }
-    function updataLocation() {
+    function updateLocation() {
       if (isEnabled === false) {
         return;
       }

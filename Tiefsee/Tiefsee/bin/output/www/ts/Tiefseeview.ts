@@ -138,7 +138,7 @@ class Tieefseeview {
         var temp_img: HTMLImageElement;//圖片暫存
         var temp_can: HTMLCanvasElement;//canvas暫存
         var temp_canvasSN = 0;//用於判斷canvas是否重複繪製
-
+        var temp_touchPadTime = 0;//用於判斷是否為觸控板
 
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
@@ -305,32 +305,45 @@ class Tieefseeview {
         });
 
 
+
+
         //滑鼠滾輪上下滾動時
         dom_dpizoom.addEventListener("wheel", (e: WheelEvent) => {
 
             e.preventDefault();//禁止頁面滾動
-            //e = e || window.event;
 
             //避免在捲動軸上面也觸發
             if (e.target !== dom_dpizoom) { return; }
 
+            //console.log(e.deltaX, e.deltaY)
+
             $(dom_con).stop(true, false);
 
-            //觸控板雙指移動
-            if (Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100) {
+            let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;//捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
 
-                //let scale = 1 + e.deltaY * 0.01;//無法使用
-                let posX = e.deltaX;
-                let posY = e.deltaY;
+            //觸控板雙指移動
+            if (isTouchPad || temp_touchPadTime + 200 > new Date().getTime()) {
+
+                temp_touchPadTime = new Date().getTime();//記錄當前時間，在200毫秒內的捲動都當做觸控板
 
                 window.requestAnimationFrame(() => {
-                    //zoomIn(e.x, e.y, ( scale), TieefseeviewImageRendering["pixelated"]);
-                    setXY(
-                        toNumber(dom_con.style.left) - posX,
-                        toNumber(dom_con.style.top) - posY,
-                        0
-                    );//平移
-                    init_point(false);
+
+                    if (e.ctrlKey === true) {
+                        let scale = 1 - e.deltaY * 0.01;//無法使用
+                        zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, (scale), TieefseeviewImageRendering["pixelated"]);
+
+                    } else {
+
+                        let posX = e.deltaX;
+                        let posY = e.deltaY;
+                        setXY(
+                            toNumber(dom_con.style.left) - posX,
+                            toNumber(dom_con.style.top) - posY,
+                            0
+                        );//平移
+                        init_point(false);
+                    }
+
                 })
 
             } else {//一般的滑鼠滾輪

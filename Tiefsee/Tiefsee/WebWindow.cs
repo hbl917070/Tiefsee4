@@ -284,7 +284,7 @@ namespace Tiefsee {
             );*/
 
             wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;//是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
-            wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;//觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
+            //wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;//觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
             wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;//自動填充啟用
             wv2.CoreWebView2.Settings.IsZoomControlEnabled = false;//使用者是否能夠影響 Web 視圖的縮放
             //wv2.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;//是否啟用特定於瀏覽器的快速鍵

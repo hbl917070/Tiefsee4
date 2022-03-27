@@ -93,7 +93,7 @@ class Menu {
         /**
          * 開啟 - 滑鼠右鍵
          */
-        function open_RightClick(_domMenu: HTMLElement | null, left: number, top: number, offsetX = 0, offsetY = 0) {
+        function open_RightClick(_domMenu: HTMLElement | null, offsetX = 0, offsetY = 0) {
 
             if (_domMenu === null) { return }
 
@@ -108,6 +108,9 @@ class Menu {
             let bodyHeight = document.body.getBoundingClientRect().height;
             let bodyWidth = document.body.getBoundingClientRect().width;
 
+            let left = mouseX
+            let top = mouseY
+            
             if (menuWidth + left + offsetX > bodyWidth) {
                 left = left - menuWidth + 10
             } else {
@@ -143,7 +146,7 @@ class Menu {
             }
 
             window.onblur = function () { //視窗失去焦點
-                //  func_close();//關閉menu
+                func_close();//關閉menu
             };
 
         }
@@ -182,24 +185,9 @@ class Menu {
             }
             if (top < 0) { top = 0 }
 
-            /*if (menuWidth + left + offsetX > bodyWidth) {
-                left = left - menuWidth + 10
-            } else {
-                left = left + offsetX
-            }
-            if (left < 0) { left = 0 }
-
-            if (menuHeight + top + offsetY > bodyHeight) {
-                top = top - menuHeight + 5
-            } else {
-                top = top + offsetY
-            }
-            if (top < 0) { top = 0 }*/
-
             _domMenu.style.left = left + "px";
             _domMenu.style.top = top + "px";
             _domMenu.style.bottom = "0";
-
 
             let func_close = () => {//關閉menu
                 domMenuBg.setAttribute("active", "");//關閉menu

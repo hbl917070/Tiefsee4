@@ -219,14 +219,14 @@ class FileLoad {
                 //updateFlagDir(dirPath);
                 M.mainDirList.init();//資料夾預覽列表 初始化
                 //M.mainDirList.select();//
-                //M.mainDirList.updataLocation();//
+                //M.mainDirList.updateLocation();//
                 return;
             }
 
             //更新UI
             await updateFlagDir(path);//重新計算 flagDir
             M.mainDirList.select();//
-            M.mainDirList.updataLocation();//
+            M.mainDirList.updateLocation();//
 
             _showDir = async () => {
                 await loadFile(path);
@@ -283,7 +283,7 @@ class FileLoad {
             } else {//直接從 資料夾預覽列表 切換，不需要重新讀取
                 await updateFlagDir(dirPath);//重新計算 flagDir
                 M.mainDirList.select();//
-                M.mainDirList.updataLocation();//
+                M.mainDirList.updateLocation();//
             }
 
         }
@@ -462,7 +462,7 @@ class FileLoad {
             }
 
             M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
-            M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
+            M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
             let path = getFilePath();
             let fileInfo2 = await Lib.GetFileInfo2(path);
@@ -618,7 +618,7 @@ class FileLoad {
 
                         M.mainFileList.init();//檔案預覽列表 初始化
                         M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-                        M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+                        M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
                     }
 
                     //alert(value)
@@ -670,7 +670,7 @@ class FileLoad {
                     updateTitle();
                     M.mainFileList.init();//檔案預覽列表 初始化
                     M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-                    M.mainFileList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+                    M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
 
                     Msgbox.close(dom);
                 }

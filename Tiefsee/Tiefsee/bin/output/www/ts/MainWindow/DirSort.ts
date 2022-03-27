@@ -65,7 +65,7 @@ class DirSort {
 
             M.fileLoad.updateTitle();//更新視窗標題
             M.mainDirList.init();//設定 檔案預覽列表 目前選中的項目
-            M.mainDirList.updataLocation();//檔案預覽列表 自動捲動到選中項目的地方
+            M.mainDirList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
             setDirSortMenu(_sortType);
 

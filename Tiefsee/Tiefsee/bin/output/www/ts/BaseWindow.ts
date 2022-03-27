@@ -113,6 +113,16 @@ class BaseWindow {
             }
         });
 
+        //禁止頁面縮放
+        dom_window.addEventListener("wheel", (e: WheelEvent) => {
+            if (e.ctrlKey === true) {
+                e.preventDefault();
+            }
+        }, true);
+        dom_window.addEventListener("touchstart", (e) => {
+            e.preventDefault()
+        }, false);
+
         //註冊視窗邊框拖曳
         windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");
         windowBorder(<HTMLDivElement>document.querySelector(".window-RC"), "RC");
@@ -160,7 +170,7 @@ class BaseWindow {
                     _dropPath = _dropPath.substr(8);
                 } else if (_dropPath.indexOf("file://") === 0) {//網路路徑，例如 \\Desktop-abc\AA
                     _dropPath = _dropPath.substr(5);
-                } 
+                }
                 break;
             }
             await sleep(10);

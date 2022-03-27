@@ -183,7 +183,7 @@ class ScriptMenu {
     /** 顯示選單 旋轉與鏡像 */
     showRotate(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, -20);
+            this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, 0);
         } else {
             this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
         }
@@ -192,13 +192,18 @@ class ScriptMenu {
     /** 顯示選單 排序 */
     showSort(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, -20);
+            this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, 0);
         } else {
             this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
         }
     }
 
-
+    /** 顯示右鍵選單 圖片 */
+    showRightMenuImage() {
+        var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
+        this.M.menu.open_RightClick(dom_rightClickImage, 0, -85);
+        this.M.initMenu.updateRightMenuImageZoomRatioTxt();//更新 右鍵選單的圖片縮放比例
+    }
 }
 
 

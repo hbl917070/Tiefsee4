@@ -72,7 +72,7 @@ class FileSort {
       this.M.fileLoad.setWaitingFile(ar);
       this.M.fileLoad.updateTitle();
       this.M.mainFileList.select();
-      this.M.mainFileList.updataLocation();
+      this.M.mainFileList.updateLocation();
       this.setFileSortMenu(_sortType);
       this.M.menu.close();
     });

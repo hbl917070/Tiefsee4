@@ -176,7 +176,7 @@ class FileLoad {
         }
         yield updateFlagDir(path);
         M.mainDirList.select();
-        M.mainDirList.updataLocation();
+        M.mainDirList.updateLocation();
         _showDir = () => __async(this, null, function* () {
           yield loadFile(path);
         });
@@ -218,7 +218,7 @@ class FileLoad {
         } else {
           yield updateFlagDir(dirPath2);
           M.mainDirList.select();
-          M.mainDirList.updataLocation();
+          M.mainDirList.updateLocation();
         }
       });
     }
@@ -327,7 +327,7 @@ class FileLoad {
           return;
         }
         M.mainFileList.select();
-        M.mainFileList.updataLocation();
+        M.mainFileList.updateLocation();
         let path = getFilePath();
         let fileInfo2 = yield Lib.GetFileInfo2(path);
         if (fileInfo2.Type === "none") {
@@ -442,7 +442,7 @@ class FileLoad {
               yield showFile();
               M.mainFileList.init();
               M.mainFileList.select();
-              M.mainFileList.updataLocation();
+              M.mainFileList.updateLocation();
             }
           })
         });
@@ -484,7 +484,7 @@ class FileLoad {
             updateTitle();
             M.mainFileList.init();
             M.mainFileList.select();
-            M.mainFileList.updataLocation();
+            M.mainFileList.updateLocation();
             Msgbox.close(dom);
           })
         });

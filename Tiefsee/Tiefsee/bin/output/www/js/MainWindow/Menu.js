@@ -61,7 +61,7 @@ class Menu {
         func_close();
       };
     }
-    function open_RightClick(_domMenu, left, top, offsetX = 0, offsetY = 0) {
+    function open_RightClick(_domMenu, offsetX = 0, offsetY = 0) {
       if (_domMenu === null) {
         return;
       }
@@ -75,6 +75,8 @@ class Menu {
       let menuWidth = _domMenu.getBoundingClientRect().width;
       let bodyHeight = document.body.getBoundingClientRect().height;
       let bodyWidth = document.body.getBoundingClientRect().width;
+      let left = mouseX;
+      let top = mouseY;
       if (menuWidth + left + offsetX > bodyWidth) {
         left = left - menuWidth + 10;
       } else {
@@ -108,6 +110,7 @@ class Menu {
         }
       };
       window.onblur = function() {
+        func_close();
       };
     }
     function open_Origin(_domMenu, offsetX = 0, offsetY = 0) {

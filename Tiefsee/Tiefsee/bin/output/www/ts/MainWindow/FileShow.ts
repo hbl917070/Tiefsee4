@@ -209,21 +209,11 @@ class FileShow {
             tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
             tieefseeview.setEventChangeZoom(((ratio: number) => {
                 let txt = (ratio * 100).toFixed(0) + "%"
+
                 let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);//工具列
                 if (dom_btnScale !== null) { dom_btnScale.innerHTML = txt; }
 
-                let dom_btnScale2 = M.initMenu.dom_rightMenuImage_zoomRatioTxt;//右鍵選單的圖片縮放比例
-                if (dom_btnScale2 !== null) {
-                    dom_btnScale2.innerHTML = txt;
-                    if(dom_btnScale2.clientWidth!==0){
-                        let r = 35/dom_btnScale2.clientWidth;
-                        if(r>1){r=1}
-                        dom_btnScale2.style.transform = `scaleX(${r})`
-                    }
-                 
-                }
-
-
+                M.initMenu.updateRightMenuImageZoomRatioTxt(txt);//更新 右鍵選單的圖片縮放比例
             }))
             tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
 

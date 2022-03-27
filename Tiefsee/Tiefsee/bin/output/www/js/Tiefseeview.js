@@ -86,6 +86,7 @@ class Tieefseeview {
     var temp_img;
     var temp_can;
     var temp_canvasSN = 0;
+    var temp_touchPadTime = 0;
     var eventMouseWheel = (_type, offsetX, offsetY) => {
       if (_type === "up") {
         zoomIn(offsetX, offsetY);
@@ -244,12 +245,19 @@ class Tieefseeview {
         return;
       }
       $(dom_con).stop(true, false);
-      if (Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100) {
-        let posX = e.deltaX;
-        let posY = e.deltaY;
+      let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;
+      if (isTouchPad || temp_touchPadTime + 200 > new Date().getTime()) {
+        temp_touchPadTime = new Date().getTime();
         window.requestAnimationFrame(() => {
-          setXY(toNumber(dom_con.style.left) - posX, toNumber(dom_con.style.top) - posY, 0);
-          init_point(false);
+          if (e.ctrlKey === true) {
+            let scale = 1 - e.deltaY * 0.01;
+            zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, scale, TieefseeviewImageRendering["pixelated"]);
+          } else {
+            let posX = e.deltaX;
+            let posY = e.deltaY;
+            setXY(toNumber(dom_con.style.left) - posX, toNumber(dom_con.style.top) - posY, 0);
+            init_point(false);
+          }
         });
       } else {
         if (e.deltaX < 0 || e.deltaY < 0) {

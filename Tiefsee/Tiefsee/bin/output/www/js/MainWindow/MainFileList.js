@@ -2,7 +2,7 @@ class MainFileList {
   constructor(M) {
     this.init = init;
     this.select = select;
-    this.updataLocation = updataLocation;
+    this.updateLocation = updateLocation;
     this.setStartLocation = setStartLocation;
     this.setHide = setHide;
     this.setEnabled = setEnabled;
@@ -229,7 +229,7 @@ class MainFileList {
       let f = (dom_fileList.clientHeight - itemHeight) / 2 - 0;
       dom_fileList.scrollTop = id * itemHeight - f;
     }
-    function updataLocation() {
+    function updateLocation() {
       if (isEnabled === false) {
         return;
       }

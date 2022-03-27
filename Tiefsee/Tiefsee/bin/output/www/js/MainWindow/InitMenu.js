@@ -22,18 +22,30 @@ class InitMenu {
   constructor(M) {
     var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt");
     this.initOpen = initOpen;
-    this.dom_rightMenuImage_zoomRatioTxt = dom_rightMenuImage_zoomRatioTxt;
+    this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
     initCopy();
     initRotate();
     initRightMenuImage();
     document.body.addEventListener("mousedown", (e) => {
       if (e.button === 2) {
-        var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
-        if (dom_rightClickImage !== null) {
-          M.menu.open_RightClick(dom_rightClickImage, e.x, e.y, 0, -85);
-        }
+        M.script.menu.showRightMenuImage();
       }
     });
+    function updateRightMenuImageZoomRatioTxt(txt) {
+      if (dom_rightMenuImage_zoomRatioTxt === null) {
+        return;
+      }
+      if (txt !== void 0) {
+        dom_rightMenuImage_zoomRatioTxt.innerHTML = txt;
+      }
+      if (dom_rightMenuImage_zoomRatioTxt.clientWidth !== 0) {
+        let r = 35 / dom_rightMenuImage_zoomRatioTxt.clientWidth;
+        if (r > 1) {
+          r = 1;
+        }
+        dom_rightMenuImage_zoomRatioTxt.style.transform = `scaleX(${r})`;
+      }
+    }
     function initOpen() {
       return __async(this, null, function* () {
         var dom_OpenFile = document.getElementById("menuitem-openFile");
