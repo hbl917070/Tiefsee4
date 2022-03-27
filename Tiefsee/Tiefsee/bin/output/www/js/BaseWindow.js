@@ -126,9 +126,9 @@ class BaseWindow {
           _dropPath = temp_dropPath;
           _dropPath = decodeURIComponent(temp_dropPath);
           if (_dropPath.indexOf("file:///") === 0) {
-            _dropPath = _dropPath.substr(8);
+            _dropPath = _dropPath.substring(8);
           } else if (_dropPath.indexOf("file://") === 0) {
-            _dropPath = _dropPath.substr(5);
+            _dropPath = _dropPath.substring(5);
           }
           break;
         }

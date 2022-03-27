@@ -11,7 +11,6 @@ class InitMenu {
         this.initOpen = initOpen;
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
 
-        //initOpen();
         initCopy();
         initRotate();
         initRightMenuImage();
