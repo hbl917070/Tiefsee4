@@ -28,6 +28,7 @@ class FileShow {
     var isLoaded = true;
     var _groupType = GroupType.none;
     this.openImage = openImage;
+    this.openVideo = openVideo;
     this.openPdf = openPdf;
     this.openTxt = openTxt;
     this.openWelcome = openWelcome;
@@ -74,7 +75,7 @@ class FileShow {
         tieefseeview.loadNone();
         return;
       }
-      if (groupType === GroupType.img) {
+      if (groupType === GroupType.img || groupType === GroupType.video) {
         (_c = getToolsDom(GroupType.img)) == null ? void 0 : _c.setAttribute("active", "true");
         M.mainFileList.setHide(false);
         M.mainDirList.setHide(false);
@@ -122,7 +123,6 @@ class FileShow {
     }
     function openImage(fileInfo2) {
       return __async(this, null, function* () {
-        var _a, _b, _c;
         isLoaded = false;
         let _path = fileInfo2.Path;
         setShowType(GroupType.img);
@@ -133,42 +133,64 @@ class FileShow {
           imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         }
         tieefseeview.setLoading(true);
-        yield tieefseeview.preload(imgurl);
+        yield tieefseeview.preloadImg(imgurl);
         if (Lib.IsAnimation(fileInfo2) === true) {
           yield tieefseeview.loadImg(imgurl);
         } else {
           yield tieefseeview.loadBigimg(imgurl);
         }
-        tieefseeview.setLoading(false);
-        tieefseeview.transformRefresh(false);
-        tieefseeview.setEventChangeZoom((ratio) => {
-          let txt = (ratio * 100).toFixed(0) + "%";
-          let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);
-          if (dom_btnScale !== null) {
-            dom_btnScale.innerHTML = txt;
-          }
-          M.initMenu.updateRightMenuImageZoomRatioTxt(txt);
-        });
-        tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
-        let dom_size = (_a = getToolsDom(GroupType.img)) == null ? void 0 : _a.querySelector(`[data-name="infoSize"]`);
-        if (dom_size != null) {
-          dom_size.innerHTML = `${tieefseeview.getOriginalWidth()}<br>${tieefseeview.getOriginalHeight()}`;
-        }
-        let dom_type = (_b = getToolsDom(GroupType.img)) == null ? void 0 : _b.querySelector(`[data-name="infoType"]`);
-        if (dom_type != null) {
-          let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
-          ;
-          let fileLength = getFileLength(fileInfo2.Lenght);
-          dom_type.innerHTML = `${fileType}<br>${fileLength}`;
-        }
-        let dom_writeTime = (_c = getToolsDom(GroupType.img)) == null ? void 0 : _c.querySelector(`[data-name="infoWriteTime"]`);
-        if (dom_writeTime != null) {
-          let timeUtc = fileInfo2.LastWriteTimeUtc;
-          let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
-          dom_writeTime.innerHTML = time;
-        }
+        initTiefseeview(fileInfo2);
         isLoaded = true;
       });
+    }
+    function openVideo(fileInfo2) {
+      return __async(this, null, function* () {
+        isLoaded = false;
+        let _path = fileInfo2.Path;
+        setShowType(GroupType.video);
+        let imgurl = _path;
+        if (M.fileLoad.getGroupType() === GroupType.unknown) {
+          imgurl = yield WV_Image.GetFileIcon(_path, 256);
+        } else {
+          imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        }
+        tieefseeview.setLoading(true);
+        yield tieefseeview.preloadImg(imgurl);
+        yield tieefseeview.loadVideo(imgurl);
+        initTiefseeview(fileInfo2);
+        isLoaded = true;
+      });
+    }
+    function initTiefseeview(fileInfo2) {
+      var _a, _b, _c;
+      tieefseeview.setLoading(false);
+      tieefseeview.transformRefresh(false);
+      tieefseeview.setEventChangeZoom((ratio) => {
+        let txt = (ratio * 100).toFixed(0) + "%";
+        let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);
+        if (dom_btnScale !== null) {
+          dom_btnScale.innerHTML = txt;
+        }
+        M.initMenu.updateRightMenuImageZoomRatioTxt(txt);
+      });
+      tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
+      let dom_size = (_a = getToolsDom(GroupType.img)) == null ? void 0 : _a.querySelector(`[data-name="infoSize"]`);
+      if (dom_size != null) {
+        dom_size.innerHTML = `${tieefseeview.getOriginalWidth()}<br>${tieefseeview.getOriginalHeight()}`;
+      }
+      let dom_type = (_b = getToolsDom(GroupType.img)) == null ? void 0 : _b.querySelector(`[data-name="infoType"]`);
+      if (dom_type != null) {
+        let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
+        ;
+        let fileLength = getFileLength(fileInfo2.Lenght);
+        dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+      }
+      let dom_writeTime = (_c = getToolsDom(GroupType.img)) == null ? void 0 : _c.querySelector(`[data-name="infoWriteTime"]`);
+      if (dom_writeTime != null) {
+        let timeUtc = fileInfo2.LastWriteTimeUtc;
+        let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
+        dom_writeTime.innerHTML = time;
+      }
     }
     function openPdf(fileInfo2) {
       return __async(this, null, function* () {

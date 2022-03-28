@@ -10,9 +10,11 @@ class Tieefseeview {
     public scrollX;//水平滾動條
     public scrollY;//垂直滾動條
 
-    public preload;//預載入
+    public preloadImg;//預載入 圖片
+    public preloadVideo;//預載入 影片
     public loadImg;//載入圖片
     public loadBigimg;
+    public loadVideo;
     public loadNone;//載入空白圖片
     public setLoading;//顯示或隱藏 loading
     public getMargin;//取得 外距
@@ -77,6 +79,7 @@ class Tieefseeview {
                             <img class="view-bigimg-bg" style="display:none">
                         </div>   
                         <img class="view-img" style="display:none">
+                        <video class="view-video" style="display:none" loop muted></video>
                     </div>
                 </div>
             </div>
@@ -95,13 +98,14 @@ class Tieefseeview {
         var dom_data = <HTMLDivElement>dom_tiefseeview.querySelector(".tiefseeview-data");
         var dom_img = <HTMLImageElement>dom_tiefseeview.querySelector(".view-img");
         var dom_bigimg = <HTMLDivElement>dom_tiefseeview.querySelector(".view-bigimg");
+        var dom_video = <HTMLVideoElement>dom_tiefseeview.querySelector(".view-video");
         var dom_bigimg_canvas = <HTMLCanvasElement>dom_tiefseeview.querySelector(".view-bigimg-canvas");
         var dom_loading = <HTMLImageElement>dom_tiefseeview.querySelector(".tiefseeview-loading");
         var scrollX = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
         var scrollY = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
 
         var url: string;//目前的圖片網址
-        var dataType: ("img" | "movie" | "imgs" | "bigimg") = "img";//資料類型
+        var dataType: ("img" | "video" | "imgs" | "bigimg") = "img";//資料類型
         var dpizoom: number = 1;
         var isDpizoomAUto: boolean = true;
         var degNow: number = 0;//目前的角度 0~359
@@ -165,9 +169,11 @@ class Tieefseeview {
         this.dom_img = dom_img;
         this.scrollX = scrollX;
         this.scrollY = scrollY;
-        this.preload = preload;
+        this.preloadImg = preloadImg;
+        this.preloadVideo = preloadVideo;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
+        this.loadVideo = loadVideo;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
         this.getRendering = getRendering;
@@ -604,22 +610,34 @@ class Tieefseeview {
          * @param _type 
          * @returns 
          */
-        function setDataType(_type: ("img" | "movie" | "imgs" | "bigimg")) {
+        function setDataType(_type: ("img" | "video" | "imgs" | "bigimg")) {
 
             dataType = _type;
 
             if (dataType === "img") {
                 dom_img.style.display = "";
                 dom_bigimg.style.display = "none";
+                dom_video.style.display = "none";
+                dom_video.src = "";
                 return;
             }
             if (dataType === "bigimg") {
                 dom_img.style.display = "none";
                 dom_bigimg.style.display = "";
+                dom_video.style.display = "none";
+                dom_img.src = "";
+                dom_video.src = "";
                 return;
             }
-        }
+            if (dataType === "video") {
+                dom_img.style.display = "none";
+                dom_bigimg.style.display = "none";
+                dom_video.style.display = "";
+                dom_img.src = "";
+                return;
+            }
 
+        }
 
 
         /** 
@@ -627,12 +645,13 @@ class Tieefseeview {
          */
         function getUrl() { return url; }
 
+
         /**
          * 預載入圖片資源
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
-        async function preload(_url: string): Promise<boolean> {
+        async function preloadImg(_url: string): Promise<boolean> {
 
             let img = document.createElement("img");
             let p = await new Promise((resolve, reject) => {
@@ -659,6 +678,37 @@ class Tieefseeview {
 
 
         /**
+         * 預載入影片資源
+         * @param _url 網址
+         * @returns true=載入完成、false=載入失敗
+         */
+        async function preloadVideo(_url: string): Promise<boolean> {
+
+            let video = document.createElement("video");
+            let p = await new Promise((resolve, reject) => {
+                video.addEventListener("loadedmetadata", (e) => {
+                    temp_originalWidth = video.videoWidth;//初始化圖片size
+                    temp_originalHeight = video.videoHeight;
+                    resolve(true);//繼續往下執行
+                });
+                video.addEventListener("error", (e) => {
+                    temp_originalWidth = 1;
+                    temp_originalHeight = 1;
+                    resolve(false);//繼續往下執行
+                });
+                video.src = _url;
+            })
+
+            //temp_img = video;
+
+            //img.src = "";
+            //@ts-ignore
+            //img = null;
+            return <boolean>p;
+        }
+
+
+        /**
          * 載入空白圖片
          */
         async function loadNone() {
@@ -667,7 +717,35 @@ class Tieefseeview {
 
 
         /**
-         * 載入並顯示圖片
+         * 載入並顯示 影片
+         * @param _url 
+         * @returns 
+         */
+        async function loadVideo(_url: string): Promise<boolean> {
+
+            //setLoading(true);
+            url = _url;
+            let p = await preloadVideo(_url);
+
+            //setLoading(false);
+            setDataType("video");
+
+            if (p === false) {
+                setDataType("img");
+                await preloadImg(errerUrl);
+                dom_img.src = errerUrl;
+                return false;
+            }
+
+            dom_video.src = _url;
+            dom_video.onloadedmetadata = () => {//載入完成時自動播放
+                dom_video.play();
+            }
+            return true;
+        }
+
+        /**
+         * 載入並顯示 圖片
          * @param _url 
          * @returns 
          */
@@ -675,25 +753,23 @@ class Tieefseeview {
 
             //setLoading(true);
             url = _url;
-            let p = await preload(_url);
+            let p = await preloadImg(_url);
 
             //setLoading(false);
             setDataType("img");
 
             if (p === false) {
-                await preload(errerUrl);
-                _url = errerUrl;
-                dom_img.src = _url;
+                await preloadImg(errerUrl);
+                dom_img.src = errerUrl;
                 return false;
             }
 
             dom_img.src = _url;
             return true;
-
         }
 
         /**
-         * 載入並顯示圖片
+         * 載入並顯示 圖片-canvas
          * @param _url 
          * @returns 
          */
@@ -701,16 +777,15 @@ class Tieefseeview {
 
             //setLoading(true);
             url = _url;
-            let p = await preload(_url);
+            let p = await preloadImg(_url);
 
             //setLoading(false);
             setDataType("bigimg");
 
             if (p === false) {
                 setDataType("img");
-                await preload(errerUrl);
-                _url = errerUrl;
-                dom_img.src = _url;
+                await preloadImg(errerUrl);
+                dom_img.src = errerUrl;
                 return false;
             }
 
@@ -1064,6 +1139,13 @@ class Tieefseeview {
                 let _h = _width * ratio;
                 dom_data.style.width = _w + "px";
                 dom_data.style.height = _h + "px";
+            }
+            if (dataType === "video") {
+                let ratio = getOriginalHeight() / getOriginalWidth();
+                dom_data.style.width = _width + "px";
+                dom_data.style.height = (_width * ratio) + "px";
+                dom_video.style.width = _width + "px";
+                dom_video.style.height = (_width * ratio) + "px";
             }
         }
 

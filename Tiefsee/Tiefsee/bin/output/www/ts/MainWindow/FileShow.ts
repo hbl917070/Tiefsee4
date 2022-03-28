@@ -1,6 +1,7 @@
 class FileShow {
 
     public openImage;
+    public openVideo;
     public openPdf;
     public openTxt;
     public openWelcome;
@@ -23,6 +24,7 @@ class FileShow {
         var _groupType = GroupType.none;//目前顯示的類型
 
         this.openImage = openImage;
+        this.openVideo = openVideo;
         this.openPdf = openPdf;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
@@ -93,7 +95,7 @@ class FileShow {
                 return;
             }
 
-            if (groupType === GroupType.img) {
+            if (groupType === GroupType.img || groupType === GroupType.video) {
 
                 //更換工具列
                 getToolsDom(GroupType.img)?.setAttribute("active", "true");
@@ -172,20 +174,16 @@ class FileShow {
             return isLoaded;
         }
 
+
         /**
-         * 
+         * 載入圖片
          * @param _path 
          */
         async function openImage(fileInfo2: FileInfo2) {
 
-            //if (isLoaded) {
             isLoaded = false;
-            //}
-
             let _path = fileInfo2.Path;
-
             setShowType(GroupType.img);//改變顯示類型
-
             let imgurl = _path;//圖片網址
 
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
@@ -197,14 +195,49 @@ class FileShow {
 
             tieefseeview.setLoading(true);
 
-            await tieefseeview.preload(imgurl);//預載入
-
+            await tieefseeview.preloadImg(imgurl);//預載入
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
                 await tieefseeview.loadImg(imgurl);//使用<img>渲染
             } else {
                 await tieefseeview.loadBigimg(imgurl);//使用canvas渲染
             }
 
+            initTiefseeview(fileInfo2);
+            isLoaded = true;
+        }
+
+
+        /**
+         * 載入影片
+         * @param _path 
+         */
+        async function openVideo(fileInfo2: FileInfo2) {
+
+            isLoaded = false;
+            let _path = fileInfo2.Path;
+            setShowType(GroupType.video);//改變顯示類型
+            let imgurl = _path;//圖片網址
+
+            if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
+                imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
+            } else {
+                //imgurl = APIURL + "/api/getImg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            }
+
+            tieefseeview.setLoading(true);
+            await tieefseeview.preloadImg(imgurl);//預載入
+            await tieefseeview.loadVideo(imgurl);//使用video渲染
+
+            initTiefseeview(fileInfo2);
+            isLoaded = true;
+        }
+
+        /**
+         * 
+         * @param fileInfo2 
+         */
+        function initTiefseeview(fileInfo2: FileInfo2) {
             tieefseeview.setLoading(false);
             tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
             tieefseeview.setEventChangeZoom(((ratio: number) => {
@@ -238,11 +271,6 @@ class FileShow {
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
                 dom_writeTime.innerHTML = time;
             }
-
-            //if (isLoaded === false) {
-            isLoaded = true;
-            //}
-
         }
 
 

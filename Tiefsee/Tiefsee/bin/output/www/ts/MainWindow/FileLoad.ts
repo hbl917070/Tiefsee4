@@ -485,6 +485,9 @@ class FileLoad {
                 if (groupType === GroupType.img || groupType === GroupType.unknown) {
                     await M.fileShow.openImage(fileInfo2);
                 }
+                if (groupType === GroupType.video) {
+                    await M.fileShow.openVideo(fileInfo2);
+                }
                 if (groupType === GroupType.pdf) {
                     await M.fileShow.openPdf(fileInfo2);
                 }

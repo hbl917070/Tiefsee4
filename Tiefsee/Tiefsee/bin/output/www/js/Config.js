@@ -88,6 +88,13 @@ class Config {
         { ext: "svg", type: ["image"] }
       ];
     }
+    if (type === GroupType.video) {
+      return [
+        { ext: "mp4", type: ["video"] },
+        { ext: "webm", type: ["video"] },
+        { ext: "ogv", type: ["video"] }
+      ];
+    }
     if (type === GroupType.pdf) {
       return [
         { ext: "pdf", type: ["pdf"] },
@@ -130,5 +137,5 @@ var GroupType = {
   imgs: "imgs",
   pdf: "pdf",
   txt: "txt",
-  movie: "movie"
+  video: "video"
 };

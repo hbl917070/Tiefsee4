@@ -38,8 +38,15 @@
     </style>
 
     <button onclick="loadurl()">載入</button>
+    <select id="select-type">
+        <option value="img">圖片</option>
+        <option value="bigimg">圖片-canvas</option>
+        <option value="video">影片</option>
+    </select>
+
     <input type="text" id="imgurl"
         value="https://wall.bahamut.com.tw/B/07/7d41a3dde7ab7ad8489d8c116d07ef56_0779698.JPG">
+
     <hr>
     <button onclick="tv.zoomFull(TieefseeviewZoomType['full-100%'])">全滿</button>
     <button onclick="tv.setDegReverse()">逆時針</button>
@@ -51,12 +58,17 @@
     <input id="range_dge" type="range" min="0" max="360" step="1" value="0" style="width:100px">
     <hr>
 
-    <label> <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto'])" checked>
-        平滑 </label>
-    <label> <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['pixelated'])"> 銳利
+    <label>
+        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto'])" checked>
+        平滑
     </label>
-    <label> <input type="radio" name="rendering"
-            onclick="tv.setRendering(TieefseeviewImageRendering['auto-pixelated'])"> 僅放大時銳利 </label>
+    <label>
+        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['pixelated'])"> 銳利
+    </label>
+    <label>
+        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto-pixelated'])">
+        僅放大時銳利
+    </label>
 
 
     <div id="tiefseeview"></div>
@@ -82,7 +94,7 @@
 
     <div id="dd"> </div>
 
-   
+
     <script>
 
         var tv;
@@ -91,8 +103,14 @@
 
             let _url = $('#imgurl').val();
 
-            await tv.loadImg(_url);
-            //await tv.loadBigimg(_url); 
+            let type = $('#select-type').val()
+
+            if (type == "img") {await tv.loadImg(_url); }
+            if (type == "bigimg") {await tv.loadBigimg(_url); }
+            if (type == "video") {await tv.loadVideo(_url); }
+            
+
+
             tv.transformRefresh(false)
             tv.zoomFull(TieefseeviewZoomType['full-100%']);
             $('#output-size').html(`${tv.getOriginalWidth()} , ${tv.getOriginalHeight()}`);

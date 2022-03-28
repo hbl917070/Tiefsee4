@@ -113,6 +113,15 @@ class Config {
             ]
         }
 
+        if (type === GroupType.video) {
+            return [
+                { ext: "mp4", type: ["video"] },
+                { ext: "webm", type: ["video"] },
+                { ext: "ogv", type: ["video"] },
+                //{ ext: "ogg", type: ["video"] },     
+            ]
+        }
+
         if (type === GroupType.pdf) {
             return [
                 { ext: "pdf", type: ["pdf"] },
@@ -179,6 +188,6 @@ var GroupType = {
     /** 純文字 */
     txt: "txt",
 
-    movie: "movie",
+    video: "video",
 
 }

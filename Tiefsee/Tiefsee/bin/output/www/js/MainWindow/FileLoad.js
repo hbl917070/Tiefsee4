@@ -346,6 +346,9 @@ class FileLoad {
           if (groupType === GroupType.img || groupType === GroupType.unknown) {
             yield M.fileShow.openImage(fileInfo2);
           }
+          if (groupType === GroupType.video) {
+            yield M.fileShow.openVideo(fileInfo2);
+          }
           if (groupType === GroupType.pdf) {
             yield M.fileShow.openPdf(fileInfo2);
           }
