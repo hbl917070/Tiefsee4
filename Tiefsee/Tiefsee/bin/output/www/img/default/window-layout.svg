@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path class="st0" d="M19,8v9H6V8H19 M20,7H5v11h15V7L20,7z"/>
+		<path class="st0" d="M10,10v5H8v-5H10 M11,9H7v7h4V9L11,9z"/>
+	</g>
+</svg>

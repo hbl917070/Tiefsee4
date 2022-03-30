@@ -1,9 +1,12 @@
 
 class MainTools {
 
-
+    public setEnabled;
 
     constructor(M: MainWindow) {
+
+
+        this.setEnabled = setEnabled;
 
         initToolsImg();
         initToolsPdf();
@@ -11,6 +14,20 @@ class MainTools {
         initToolsWelcome();
 
         //-----------------
+
+
+        /**
+         * 設定是否啟用
+         * @param val 
+         */
+        function setEnabled(val: boolean) {
+            if (val) {
+                M.dom_tools.style.display = "";
+            } else {
+                M.dom_tools.style.display = "none";
+            }
+            M.config.settings.layout.mainToolsEnabled = val;
+        }
 
 
 

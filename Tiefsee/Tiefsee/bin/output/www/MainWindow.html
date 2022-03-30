@@ -56,7 +56,7 @@
 
 <body>
     <!-- 下拉選單 & 右鍵選單 -->
-    <!-- 檔案 下拉選單 -->
+    <!-- 下拉選單 檔案 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-open">
         <div class="menu-box">
@@ -125,7 +125,7 @@
 </div>
 
 
-<!-- 複製 下拉選單 -->
+<!-- 下拉選單 複製  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-copy">
         <div class="menu-box">
@@ -168,7 +168,7 @@
 </div>
 
 
-<!-- 旋轉 下拉選單 -->
+<!-- 下拉選單 旋轉  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-rotate">
         <div class="menu-box">
@@ -247,7 +247,7 @@
 </div>
 
 
-<!-- 排序 下拉選單 -->
+<!-- 下拉選單 排序  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-sort">
         <div class="menu-box">
@@ -315,6 +315,7 @@
 </div>
 
 
+<!-- 右鍵選單 圖片 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-rightMenuImage">
 
@@ -510,7 +511,7 @@
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item js-close" >
+            <div class="menu-hor-item js-close">
                 <div class="menu-hor-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 	<polygon style="fill:var(--color-white)" points="21.7,4 21,3.3 12.5,11.8 4,3.3 3.3,4 11.8,12.5 3.3,21 4,21.7 12.5,13.2 21,21.7 21.7,21 13.2,12.5 "/>
@@ -518,6 +519,38 @@
 
                 </div>
                 <div class="menu-hor-txt" i18n="">關閉程式</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 下拉選單 layout  -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-layout">
+        <div class="menu-box">
+
+            <div class="menu-hor-item js-topmost">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">視窗固定最上層</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-mainTools" >
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">顯示工具列</div>
+            </div>
+
+            <div class="menu-hor-item js-mainFileList" >
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">顯示檔案預覽列表</div>
+            </div>
+
+            <div class="menu-hor-item js-mainDirList">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">顯示資料夾預覽列表</div>
             </div>
         </div>
 
@@ -547,7 +580,7 @@
 	</g>
 </svg>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-topmost">
+                    <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >
 	<g style="fill:var(--color-white);">
 		<rect x="7" y="18"  width="11" height="1"/>
@@ -556,6 +589,14 @@
 	</g>
 </svg>
 
+                    </div>
+                    <div class="titlebar-tools-btn titlebar-tools-layout" >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<path class="st0" d="M19,8v9H6V8H19 M20,7H5v11h15V7L20,7z"/>
+		<path class="st0" d="M10,10v5H8v-5H10 M11,9H7v7h4V9L11,9z"/>
+	</g>
+</svg>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-minimized">
                         <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" >

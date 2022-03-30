@@ -25,6 +25,7 @@ class InitMenu {
     this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
     initCopy();
     initRotate();
+    this.menu_layout = new Menu_layout(M);
     initRightMenuImage();
     document.body.addEventListener("mousedown", (e) => {
       if (e.button === 2) {
@@ -324,6 +325,88 @@ class InitMenu {
         M.script.menu.close();
         baseWindow.close();
       });
+    }
+  }
+}
+class Menu_layout {
+  constructor(M) {
+    var dom = document.getElementById("menu-layout");
+    var dom_topmost = dom.querySelector(".js-topmost");
+    var dom_mainTools = dom.querySelector(".js-mainTools");
+    var dom_mainDirList = dom.querySelector(".js-mainDirList");
+    var dom_mainFileList = dom.querySelector(".js-mainFileList");
+    var isTopmost = false;
+    var isMainTools = false;
+    var isMainDirList = false;
+    var isMainFileList = false;
+    this.show = show;
+    dom_topmost.addEventListener("click", () => __async(this, null, function* () {
+      setTopmost();
+    }));
+    dom_mainTools.addEventListener("click", () => {
+      setMainTools();
+    });
+    dom_mainDirList.addEventListener("click", () => {
+      setMainDirList();
+    });
+    dom_mainFileList.addEventListener("click", () => {
+      setMainFileList();
+    });
+    function show(btn) {
+      updateData();
+      if (btn === void 0) {
+        M.menu.open_Origin(dom, 0, 0);
+      } else {
+        M.menu.open_Button(dom, btn, "menuActive");
+      }
+    }
+    function updateData() {
+      isMainTools = M.config.settings.layout.mainToolsEnabled;
+      isMainDirList = M.config.settings.layout.dirListEnabled;
+      isMainFileList = M.config.settings.layout.fileListEnabled;
+      setCheckState(dom_mainTools, isMainTools);
+      setCheckState(dom_mainDirList, isMainDirList);
+      setCheckState(dom_mainFileList, isMainFileList);
+    }
+    function setTopmost(bool) {
+      if (bool === void 0) {
+        bool = !isTopmost;
+      }
+      isTopmost = bool;
+      baseWindow.topMost = bool;
+      setCheckState(dom_topmost, bool);
+      WV_Window.TopMost = bool;
+    }
+    function setMainTools(bool) {
+      if (bool === void 0) {
+        bool = !isMainTools;
+      }
+      isMainTools = bool;
+      setCheckState(dom_mainTools, bool);
+      M.mainTools.setEnabled(bool);
+    }
+    function setMainDirList(bool) {
+      if (bool === void 0) {
+        bool = !isMainDirList;
+      }
+      isMainDirList = bool;
+      setCheckState(dom_mainDirList, bool);
+      M.mainDirList.setEnabled(bool);
+    }
+    function setMainFileList(bool) {
+      if (bool === void 0) {
+        bool = !isMainFileList;
+      }
+      isMainFileList = bool;
+      setCheckState(dom_mainFileList, bool);
+      M.mainFileList.setEnabled(bool);
+    }
+    function setCheckState(dom2, bool) {
+      if (bool) {
+        dom2.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["yes.svg"];
+      } else {
+        dom2.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+      }
     }
   }
 }

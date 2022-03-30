@@ -125,6 +125,9 @@ class ScriptMenu {
   showCopy(btn) {
     this.M.menu.open_Button(document.getElementById("menu-copy"), btn, "menuActive");
   }
+  showLayout(btn) {
+    this.M.initMenu.menu_layout.show(btn);
+  }
   showRotate(btn) {
     if (btn === void 0) {
       this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, 0);

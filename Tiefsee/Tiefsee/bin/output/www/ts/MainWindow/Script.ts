@@ -180,6 +180,11 @@ class ScriptMenu {
         this.M.menu.open_Button(document.getElementById("menu-copy"), btn, "menuActive");
     }
 
+    /** 顯示選單 Layout */
+    showLayout(btn?: HTMLElement) {
+       this.M.initMenu.menu_layout.show(btn);
+    }
+
     /** 顯示選單 旋轉與鏡像 */
     showRotate(btn?: HTMLElement) {
         if (btn === undefined) {

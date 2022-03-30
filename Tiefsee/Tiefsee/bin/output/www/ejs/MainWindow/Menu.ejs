@@ -1,4 +1,4 @@
-<!-- 檔案 下拉選單 -->
+<!-- 下拉選單 檔案 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-open">
         <div class="menu-box">
@@ -67,7 +67,7 @@
 </div>
 
 
-<!-- 複製 下拉選單 -->
+<!-- 下拉選單 複製  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-copy">
         <div class="menu-box">
@@ -110,7 +110,7 @@
 </div>
 
 
-<!-- 旋轉 下拉選單 -->
+<!-- 下拉選單 旋轉  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-rotate">
         <div class="menu-box">
@@ -156,7 +156,7 @@
 </div>
 
 
-<!-- 排序 下拉選單 -->
+<!-- 下拉選單 排序  -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-sort">
         <div class="menu-box">
@@ -219,6 +219,7 @@
 </div>
 
 
+<!-- 右鍵選單 圖片 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-rightMenuImage">
 
@@ -305,11 +306,43 @@
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item js-close" >
+            <div class="menu-hor-item js-close">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/no.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="">關閉程式</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 下拉選單 layout  -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-layout">
+        <div class="menu-box">
+
+            <div class="menu-hor-item js-topmost">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">視窗固定最上層</div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-mainTools" >
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="">顯示工具列</div>
+            </div>
+
+            <div class="menu-hor-item js-mainFileList" >
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">顯示檔案預覽列表</div>
+            </div>
+
+            <div class="menu-hor-item js-mainDirList">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="">顯示資料夾預覽列表</div>
             </div>
         </div>
 

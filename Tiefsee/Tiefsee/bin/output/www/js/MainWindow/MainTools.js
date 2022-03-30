@@ -1,9 +1,18 @@
 class MainTools {
   constructor(M) {
+    this.setEnabled = setEnabled;
     initToolsImg();
     initToolsPdf();
     initToolsTxt();
     initToolsWelcome();
+    function setEnabled(val) {
+      if (val) {
+        M.dom_tools.style.display = "";
+      } else {
+        M.dom_tools.style.display = "none";
+      }
+      M.config.settings.layout.mainToolsEnabled = val;
+    }
     function initToolsImg() {
       addToolsBtn({
         group: GroupType.img,

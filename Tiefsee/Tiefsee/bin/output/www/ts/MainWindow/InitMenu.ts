@@ -4,6 +4,8 @@ class InitMenu {
     public initOpen;
     public updateRightMenuImageZoomRatioTxt;
 
+    public menu_layout;
+
     constructor(M: MainWindow) {
 
         var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement;//右鍵選單的圖片縮放比例
@@ -13,12 +15,13 @@ class InitMenu {
 
         initCopy();
         initRotate();
+        this.menu_layout = new Menu_layout(M);
         initRightMenuImage();
 
         //點擊右鍵時
         document.body.addEventListener("mousedown", (e) => {
             if (e.button === 2) {
-              M.script.menu.showRightMenuImage();
+                M.script.menu.showRightMenuImage();
             }
         })
 
@@ -323,11 +326,16 @@ class InitMenu {
         }
 
 
+
+
+
+
+
+
         /**
          *  初始化 menu-圖片的右鍵選單
          */
         function initRightMenuImage() {
-
 
             let dom = document.getElementById("menu-rightMenuImage")
             if (dom === null) { return; }
@@ -400,4 +408,106 @@ class InitMenu {
 
     }
 
+}
+
+
+class Menu_layout {
+
+    public show;
+
+    constructor(M: MainWindow) {
+
+        var dom = document.getElementById("menu-layout") as HTMLElement;
+        var dom_topmost = dom.querySelector(".js-topmost") as HTMLElement;
+        var dom_mainTools = dom.querySelector(".js-mainTools") as HTMLElement;
+        var dom_mainDirList = dom.querySelector(".js-mainDirList") as HTMLElement;
+        var dom_mainFileList = dom.querySelector(".js-mainFileList") as HTMLElement;
+
+        var isTopmost: boolean = false;
+        var isMainTools: boolean = false;
+        var isMainDirList: boolean = false;
+        var isMainFileList: boolean = false;
+
+        this.show = show;
+
+        dom_topmost.addEventListener("click", async () => {
+            setTopmost();
+        });
+        dom_mainTools.addEventListener("click", () => {
+            setMainTools();
+        });
+        dom_mainDirList.addEventListener("click", () => {
+            setMainDirList();
+        });
+        dom_mainFileList.addEventListener("click", () => {
+            setMainFileList();
+        });
+
+
+
+        function show(btn?: HTMLElement) {
+            updateData();
+            if (btn === undefined) {
+                M.menu.open_Origin(dom, 0, 0);
+            } else {
+                M.menu.open_Button(dom, btn, "menuActive");
+            }
+        }
+
+        /**
+         * 判斷哪些選項要被勾選
+         */
+        function updateData() {
+            isMainTools = M.config.settings.layout.mainToolsEnabled;
+            isMainDirList = M.config.settings.layout.dirListEnabled;
+            isMainFileList = M.config.settings.layout.fileListEnabled;
+            setCheckState(dom_mainTools, isMainTools);
+            setCheckState(dom_mainDirList, isMainDirList);
+            setCheckState(dom_mainFileList, isMainFileList);
+        }
+
+        function setTopmost(bool?: boolean) {
+            if (bool === undefined) { bool = !isTopmost }
+
+            isTopmost = bool;
+            baseWindow.topMost = bool;
+            setCheckState(dom_topmost, bool);
+            WV_Window.TopMost = bool;
+        }
+
+        function setMainTools(bool?: boolean) {
+            if (bool === undefined) { bool = !isMainTools }
+
+            isMainTools = bool;
+            setCheckState(dom_mainTools, bool);
+            M.mainTools.setEnabled(bool);
+        }
+
+        function setMainDirList(bool?: boolean) {
+            if (bool === undefined) { bool = !isMainDirList }
+
+            isMainDirList = bool;
+            setCheckState(dom_mainDirList, bool);
+            M.mainDirList.setEnabled(bool);
+        }
+
+
+        function setMainFileList(bool?: boolean) {
+            if (bool === undefined) { bool = !isMainFileList }
+
+            isMainFileList = bool;
+            setCheckState(dom_mainFileList, bool);
+            M.mainFileList.setEnabled(bool);
+        }
+
+
+        function setCheckState(dom: HTMLElement, bool: boolean) {
+            if (bool) {
+                dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["yes.svg"];
+            } else {
+                dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            }
+        }
+
+    }
 }

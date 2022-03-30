@@ -79,6 +79,8 @@ class Config {
             dirListShowName: true,//顯示檔名
             dirListShowWidth: 200,//寬度
             dirListImgNumber: 3,//圖片數量
+
+            mainToolsEnabled: true,//啟用 工具列
         },
 
         /** 記錄程式上次關閉時的位置 */

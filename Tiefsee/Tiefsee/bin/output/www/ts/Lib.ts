@@ -231,7 +231,7 @@ class Lib {
             return "mp4";
         }*/
         if (hex.indexOf("66 74 79 70") === 12) {//00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p)
-            return "mp4";//可能誤判
+            return "mp4";//可能將其他影片格式也誤判成mp4
         }
 
         if (hex.indexOf("1A 45 DF A3") === 0) {//可擴展二進位元語言

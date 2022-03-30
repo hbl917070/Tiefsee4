@@ -8,6 +8,7 @@ class MainWindow {
     public dom_mainL: HTMLElement;
 
     public config;
+    public mainTools;
     public fileLoad;
     public fileShow;
     public fileSort;
@@ -24,10 +25,12 @@ class MainWindow {
 
         baseWindow = new BaseWindow();//初始化視窗
 
-        var dom_tools = <HTMLElement>document.getElementById("main-tools");
-        var dom_maxBtnLeft = <HTMLElement>document.getElementById("maxBtnLeft");
+        var dom_tools = <HTMLElement>document.getElementById("main-tools");//工具列
+        var dom_maxBtnLeft = <HTMLElement>document.getElementById("maxBtnLeft");//上一頁大按鈕
         var dom_maxBtnRight = <HTMLElement>document.getElementById("maxBtnRight");
-        var dom_mainL = <HTMLElement>document.getElementById("main-L");
+        var dom_mainL = <HTMLElement>document.getElementById("main-L");//左邊區域
+        var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-tools-layout");//開啟layout選單
+
         this.dom_tools = dom_tools;
         this.dom_maxBtnLeft = dom_maxBtnLeft;
         this.dom_maxBtnRight = dom_maxBtnRight;
@@ -40,10 +43,13 @@ class MainWindow {
         var dirSort = new DirSort(this);
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
+        var mainTools = new MainTools(this);
         var menu = new Menu(this);
         var initMenu = new InitMenu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
+
+
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.fileSort = fileSort;
@@ -57,7 +63,7 @@ class MainWindow {
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
 
-        new MainTools(this);
+        this.mainTools = mainTools;
         new Hotkey(this);
         init();
 
@@ -194,16 +200,21 @@ class MainWindow {
             }
             initIcon();
 
+            //開啟layout選單
+            btn_layout.addEventListener("click", function (e) {
+                script.menu.showLayout(btn_layout);
+            })
+
             //大型換頁按鈕
-            dom_maxBtnLeft.addEventListener('click', function (e) {
+            dom_maxBtnLeft.addEventListener("click", function (e) {
                 script.fileLoad.prevFile();
             })
-            dom_maxBtnRight.addEventListener('click', function (e) {
+            dom_maxBtnRight.addEventListener("click", function (e) {
                 script.fileLoad.nextFile();
             })
 
             //封鎖原生右鍵選單
-            document.addEventListener('contextmenu', function (e) {
+            document.addEventListener("contextmenu", function (e) {
                 e.preventDefault();
             })
 
@@ -392,17 +403,18 @@ class MainWindow {
 
             //-----------
 
-            mainFileList.setEnabled(config.settings.layout.fileListEnabled);
+            mainTools.setEnabled(config.settings.layout.mainToolsEnabled);//工具列
+
+            mainFileList.setEnabled(config.settings.layout.fileListEnabled);//檔案預覽列表
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
             mainFileList.setShowName(config.settings.layout.fileListShowName);
             if (isStart) { mainFileList.setItemWidth(config.settings.layout.fileListShowWidth); }
 
-            mainDirList.setEnabled(config.settings.layout.dirListEnabled);
+            mainDirList.setEnabled(config.settings.layout.dirListEnabled);//資料夾預覽列表
             mainDirList.setShowNo(config.settings.layout.dirListShowNo);
             mainDirList.setShowName(config.settings.layout.dirListShowName);
             mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
             if (isStart) { mainDirList.setItemWidth(config.settings.layout.dirListShowWidth); }
-
 
             //-----------
 
@@ -445,7 +457,7 @@ class MainWindow {
             config.settings.position.windowState = baseWindow.windowState;
 
             //儲存 setting.json
-            let s = JSON.stringify(config.settings, null, '\t');
+            let s = JSON.stringify(config.settings, null, "\t");
             var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
             path = Lib.Combine([path, "setting.json"]);
             await WV_File.SetText(path, s);

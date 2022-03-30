@@ -39,16 +39,12 @@ class BaseWindow {
     this.closingEvents = [];
     this.sizeChangeEvents = [];
     var dom_window = document.querySelector(".window");
-    var btn_menu = document.querySelector(".titlebar-tools-menu");
-    var btn_topmost = document.querySelector(".titlebar-tools-topmost");
     var btn_normal = document.querySelector(".titlebar-tools-normal");
     var btn_minimized = document.querySelector(".titlebar-tools-minimized");
     var btn_maximized = document.querySelector(".titlebar-tools-maximized");
     var btn_close = document.querySelector(".titlebar-tools-close");
     var dom_titlebarTxt = document.querySelector(".titlebar-txt");
     this.dom_window = dom_window;
-    this.btn_menu = btn_menu;
-    this.btn_topmost = btn_topmost;
     this.btn_normal = btn_normal;
     this.btn_minimized = btn_minimized;
     this.btn_maximized = btn_maximized;
@@ -58,17 +54,6 @@ class BaseWindow {
       this.windowState = yield WV_Window.WindowState;
       this.initWindowState();
     }))();
-    btn_menu == null ? void 0 : btn_menu.addEventListener("click", (e) => {
-    });
-    btn_topmost == null ? void 0 : btn_topmost.addEventListener("click", (e) => __async(this, null, function* () {
-      this.topMost = yield WV_Window.TopMost;
-      if (this.topMost === true) {
-        btn_topmost.setAttribute("active", "");
-      } else {
-        btn_topmost.setAttribute("active", "true");
-      }
-      WV_Window.TopMost = !this.topMost;
-    }));
     btn_normal == null ? void 0 : btn_normal.addEventListener("click", (e) => __async(this, null, function* () {
       this.normal();
     }));

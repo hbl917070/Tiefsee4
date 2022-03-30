@@ -15,8 +15,6 @@ var temp_dropPath = "";//暫存。取得拖曳進視窗的檔案路徑
 class BaseWindow {
 
     public dom_window: HTMLDivElement;
-    public btn_menu: HTMLDivElement;
-    public btn_topmost: HTMLDivElement;
     public btn_normal: HTMLDivElement;
     public btn_minimized: HTMLDivElement;
     public btn_maximized: HTMLDivElement;
@@ -38,8 +36,6 @@ class BaseWindow {
     constructor() {
 
         var dom_window = <HTMLDivElement>document.querySelector('.window');
-        var btn_menu = <HTMLDivElement>document.querySelector(".titlebar-tools-menu");
-        var btn_topmost = <HTMLDivElement>document.querySelector(".titlebar-tools-topmost");
         var btn_normal = <HTMLDivElement>document.querySelector(".titlebar-tools-normal");
         var btn_minimized = <HTMLDivElement>document.querySelector(".titlebar-tools-minimized");
         var btn_maximized = <HTMLDivElement>document.querySelector(".titlebar-tools-maximized");
@@ -47,8 +43,6 @@ class BaseWindow {
         var dom_titlebarTxt = <HTMLDivElement>document.querySelector(".titlebar-txt");
 
         this.dom_window = dom_window;
-        this.btn_menu = btn_menu;
-        this.btn_topmost = btn_topmost;
         this.btn_normal = btn_normal;
         this.btn_minimized = btn_minimized;
         this.btn_maximized = btn_maximized;
@@ -76,26 +70,14 @@ class BaseWindow {
         })()
 
 
-        btn_menu?.addEventListener("click", e => {
-            //alert()
-        });
-        btn_topmost?.addEventListener("click", async e => {
-            this.topMost = await WV_Window.TopMost;
-            if (this.topMost === true) {
-                btn_topmost.setAttribute("active", "");
-            } else {
-                btn_topmost.setAttribute("active", "true");
-            }
-            WV_Window.TopMost = !this.topMost;
-        });
         btn_normal?.addEventListener("click", async e => {
-            this.normal()
+            this.normal();
         });
         btn_minimized?.addEventListener("click", async e => {
-            this.minimized()
+            this.minimized();
         });
         btn_maximized?.addEventListener("click", async e => {
-            this.maximized()
+            this.maximized();
         });
         btn_close?.addEventListener("click", async e => {
             this.close();

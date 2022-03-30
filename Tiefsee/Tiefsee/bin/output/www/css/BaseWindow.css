@@ -61,10 +61,6 @@ select option {
   background: var(--color-black);
 }
 
-.window.window-start {
-  /* opacity: 0.9; */
-}
-
 /* 視窗本體 */
 .window {
   /* transition: transform 0.2s;
@@ -130,22 +126,15 @@ select option {
   height: 100%;
   width: 38px;
   margin-left: 1px;
-  /* background-color: antiquewhite; */
   display: flex;
   justify-content: center;
   align-items: center;
   /* border-radius: 4px; */
 }
 
-/*選取時*/
-.titlebar-tools-btn[active=true] {
-  background-color: var(--color-white20);
-}
-
 .titlebar-tools-btn:hover {
   background-color: var(--color-white20);
   cursor: pointer;
-  /* outline: 1px solid var(--color-white60); */
 }
 
 .titlebar-tools-btn svg {

@@ -26,6 +26,7 @@ class MainWindow {
     var dom_maxBtnLeft = document.getElementById("maxBtnLeft");
     var dom_maxBtnRight = document.getElementById("maxBtnRight");
     var dom_mainL = document.getElementById("main-L");
+    var btn_layout = document.querySelector(".titlebar-tools-layout");
     this.dom_tools = dom_tools;
     this.dom_maxBtnLeft = dom_maxBtnLeft;
     this.dom_maxBtnRight = dom_maxBtnRight;
@@ -37,6 +38,7 @@ class MainWindow {
     var dirSort = new DirSort(this);
     var mainFileList = new MainFileList(this);
     var mainDirList = new MainDirList(this);
+    var mainTools = new MainTools(this);
     var menu = new Menu(this);
     var initMenu = new InitMenu(this);
     var script = new Script(this);
@@ -53,7 +55,7 @@ class MainWindow {
     this.script = script;
     this.applySetting = applySetting;
     this.saveSetting = saveSetting;
-    new MainTools(this);
+    this.mainTools = mainTools;
     new Hotkey(this);
     init();
     baseWindow.sizeChangeEvents.push(() => __async(this, null, function* () {
@@ -125,6 +127,9 @@ class MainWindow {
           });
         }
         initIcon();
+        btn_layout.addEventListener("click", function(e) {
+          script.menu.showLayout(btn_layout);
+        });
         dom_maxBtnLeft.addEventListener("click", function(e) {
           script.fileLoad.prevFile();
         });
@@ -280,6 +285,7 @@ class MainWindow {
       WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]);
       document.body.style.fontWeight = config.settings["theme"]["fontWeight"];
       cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);
+      mainTools.setEnabled(config.settings.layout.mainToolsEnabled);
       mainFileList.setEnabled(config.settings.layout.fileListEnabled);
       mainFileList.setShowNo(config.settings.layout.fileListShowNo);
       mainFileList.setShowName(config.settings.layout.fileListShowName);
