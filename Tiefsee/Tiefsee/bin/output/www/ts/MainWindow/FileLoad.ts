@@ -34,9 +34,6 @@ class FileLoad {
     public renameMsg;
     public updateTitle;
 
-
-    //public setSort;
-
     constructor(M: MainWindow) {
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  movie=影片  imgs=多幀圖片  txt=文字 */
@@ -84,11 +81,8 @@ class FileLoad {
         this.updateTitle = updateTitle;
 
 
-        //this.setSort = setSort;
-
 
         //#region Dir
-
 
         /**
          * 取得當前資料夾
@@ -125,8 +119,6 @@ class FileLoad {
                     return;
                 }
             }
-
-
         }
 
 
@@ -165,7 +157,6 @@ class FileLoad {
 
             arDir = JSON.parse(json);
             arDirKey = Object.keys(arDir);
-
         }
 
 
@@ -230,9 +221,7 @@ class FileLoad {
 
             _showDir = async () => {
                 await loadFile(path);
-
             };
-
 
         }
 
@@ -411,7 +400,6 @@ class FileLoad {
             M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
             await showFile();//載入圖片
 
-
             loadDir(dirPath);//處理資料夾預覽列表
         }
 
@@ -536,7 +524,6 @@ class FileLoad {
          */
         function fileToGroupType(fileInfo2: FileInfo2) {
 
-            //let fileExt = await M.config.getFileType(path)
             let fileExt = Lib.GetFileType(fileInfo2)
 
             for (var type in GroupType) {

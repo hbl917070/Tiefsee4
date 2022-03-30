@@ -21,16 +21,15 @@ var __async = (__this, __arguments, generator) => {
 class Tieefseeview {
   constructor(_dom) {
     _dom.innerHTML = `
-            <div class="tiefseeview-loading" ></div>   
+            <div class="tiefseeview-loading"></div>   
             <div class="tiefseeview-dpizoom">
                 <div class="tiefseeview-container">
                     <div class="tiefseeview-data" style="width:400px;">
                         <div class="view-bigimg">
                             <canvas class="view-bigimg-canvas"></canvas>
-                            <img class="view-bigimg-bg" style="display:none">
                         </div>   
                         <img class="view-img" style="display:none">
-                        <video class="view-video" style="display:none" loop muted></video>
+                        <video class="view-video" style="display:none" loop ></video>
                     </div>
                 </div>
             </div>

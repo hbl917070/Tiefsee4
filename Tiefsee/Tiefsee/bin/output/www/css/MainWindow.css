@@ -112,6 +112,7 @@
   color: var(--color-white);
   overflow-x: hidden;
   overflow-y: hidden;
+  margin-bottom: 3px;
 }
 
 /*捲動軸樣式*/

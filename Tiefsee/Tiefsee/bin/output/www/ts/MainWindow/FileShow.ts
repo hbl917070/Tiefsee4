@@ -259,7 +259,7 @@ class FileShow {
             //檔案類型
             let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
-                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
                 let fileLength = getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }

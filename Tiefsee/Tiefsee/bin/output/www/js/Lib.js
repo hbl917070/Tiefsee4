@@ -105,8 +105,27 @@ const _Lib = class {
     if (hex.indexOf("4C 00 00 00 01 14 02 00") === 0) {
       return "lnk";
     }
+    if (hex.indexOf("66 74 79 70") === 12) {
+      return "mp4";
+    }
+    if (hex.indexOf("1A 45 DF A3") === 0) {
+      if (hex.indexOf("77 65 62 6D 42 87") > 0) {
+        return "webm";
+      }
+    }
+    if (hex.indexOf("4F 67 67 53") === 0) {
+      return "ogv";
+    }
     console.log("\u6A94\u6848\u985E\u578B\u8FA8\u8B58\u5931\u6557: " + fileInfo2.Path);
+    let sum = "";
+    let sum2 = "";
+    hex.split(" ").forEach((item) => {
+      sum += String.fromCharCode(parseInt(item, 16));
+      sum2 += `${item}(${String.fromCharCode(parseInt(item, 16))}) `;
+    });
     console.log(hex);
+    console.log(sum2);
+    console.log(sum);
     return fileExt;
   }
   static pathToURL(path) {

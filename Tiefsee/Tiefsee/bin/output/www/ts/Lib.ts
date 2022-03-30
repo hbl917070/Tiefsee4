@@ -218,8 +218,43 @@ class Lib {
             return "lnk";
         }
 
+        /*if (hex.indexOf("66 74 79 70 69 73 6F") === 12) {//00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 69(i) 73(s) 6F(o)
+            return "mp4";
+        }
+        if (hex.indexOf("66 74 79 70 6D 70 34") === 12) {//00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 70(p) 34(4)
+            return "mp4";
+        }
+        if (hex.indexOf("66 74 79 70 6D 6D 70 34") === 12) {//00() 00() 00() 18(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 6D(m) 70(p) 34(4)
+            return "mp4";
+        }
+        if (hex.indexOf("66 74 79 70 4D 34 56") === 12) {//00() 00() 00() 28(() 66(f) 74(t) 79(y) 70(p) 4D(M) 34(4) 56(V)
+            return "mp4";
+        }*/
+        if (hex.indexOf("66 74 79 70") === 12) {//00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p)
+            return "mp4";//可能誤判
+        }
+
+        if (hex.indexOf("1A 45 DF A3") === 0) {//可擴展二進位元語言
+            if (hex.indexOf("77 65 62 6D 42 87") > 0) {//77(w) 65(e) 62(b) 6D(m) 42(B) 87()
+                return "webm"
+            }
+        }
+        if (hex.indexOf("4F 67 67 53") === 0) {//4F(O) 67(g) 67(g) 53(S)
+            return "ogv";
+        }
+
+       
         console.log("檔案類型辨識失敗: " + fileInfo2.Path);
+
+        let sum = "";
+        let sum2 = "";
+        hex.split(" ").forEach(item => {
+            sum += String.fromCharCode(parseInt(item, 16));
+            sum2 += `${item}(${String.fromCharCode(parseInt(item, 16))}) `;
+        });
         console.log(hex);
+        console.log(sum2);
+        console.log(sum);
 
         return fileExt;
     }

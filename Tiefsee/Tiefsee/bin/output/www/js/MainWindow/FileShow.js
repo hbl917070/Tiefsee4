@@ -181,7 +181,6 @@ class FileShow {
       let dom_type = (_b = getToolsDom(GroupType.img)) == null ? void 0 : _b.querySelector(`[data-name="infoType"]`);
       if (dom_type != null) {
         let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
-        ;
         let fileLength = getFileLength(fileInfo2.Lenght);
         dom_type.innerHTML = `${fileType}<br>${fileLength}`;
       }
