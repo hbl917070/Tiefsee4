@@ -328,10 +328,6 @@ class InitMenu {
 
 
 
-
-
-
-
         /**
          *  初始化 menu-圖片的右鍵選單
          */
@@ -410,7 +406,7 @@ class InitMenu {
 
 }
 
-
+/** 版面的下拉選單 */
 class Menu_layout {
 
     public show;
@@ -443,8 +439,12 @@ class Menu_layout {
             setMainFileList();
         });
 
+        //------------------------
 
-
+        /**
+         * 開啟選單
+         * @param btn 
+         */
         function show(btn?: HTMLElement) {
             updateData();
             if (btn === undefined) {
@@ -454,8 +454,9 @@ class Menu_layout {
             }
         }
 
+
         /**
-         * 判斷哪些選項要被勾選
+         * 判斷哪些選項要被勾選，於開啟選單時呼叫
          */
         function updateData() {
             isMainTools = M.config.settings.layout.mainToolsEnabled;
@@ -466,41 +467,60 @@ class Menu_layout {
             setCheckState(dom_mainFileList, isMainFileList);
         }
 
-        function setTopmost(bool?: boolean) {
-            if (bool === undefined) { bool = !isTopmost }
 
-            isTopmost = bool;
-            baseWindow.topMost = bool;
-            setCheckState(dom_topmost, bool);
-            WV_Window.TopMost = bool;
-        }
-
-        function setMainTools(bool?: boolean) {
-            if (bool === undefined) { bool = !isMainTools }
-
-            isMainTools = bool;
-            setCheckState(dom_mainTools, bool);
-            M.mainTools.setEnabled(bool);
-        }
-
-        function setMainDirList(bool?: boolean) {
-            if (bool === undefined) { bool = !isMainDirList }
-
-            isMainDirList = bool;
-            setCheckState(dom_mainDirList, bool);
-            M.mainDirList.setEnabled(bool);
+        /**
+         * 顯示或隱藏 視窗固定最上層
+         * @param val 
+         */
+        function setTopmost(val?: boolean) {
+            if (val === undefined) { val = !isTopmost }
+            isTopmost = val;
+            baseWindow.topMost = val;
+            setCheckState(dom_topmost, val);
+            WV_Window.TopMost = val;
         }
 
 
-        function setMainFileList(bool?: boolean) {
-            if (bool === undefined) { bool = !isMainFileList }
-
-            isMainFileList = bool;
-            setCheckState(dom_mainFileList, bool);
-            M.mainFileList.setEnabled(bool);
+        /**
+         * 顯示或隱藏 工具列
+         * @param val 
+         */
+        function setMainTools(val?: boolean) {
+            if (val === undefined) { val = !isMainTools }
+            isMainTools = val;
+            setCheckState(dom_mainTools, val);
+            M.mainTools.setEnabled(val);
         }
 
 
+        /**
+         * 顯示或隱藏 資料夾預覽列表
+         */
+        function setMainDirList(val?: boolean) {
+            if (val === undefined) { val = !isMainDirList }
+            isMainDirList = val;
+            setCheckState(dom_mainDirList, val);
+            M.mainDirList.setEnabled(val);
+        }
+
+
+        /**
+         * 顯示或隱藏檔案預覽列表
+         * @param val 
+         */
+        function setMainFileList(val?: boolean) {
+            if (val === undefined) { val = !isMainFileList }
+            isMainFileList = val;
+            setCheckState(dom_mainFileList, val);
+            M.mainFileList.setEnabled(val);
+        }
+
+
+        /**
+         * 設定是否勾選
+         * @param dom 
+         * @param bool 
+         */
         function setCheckState(dom: HTMLElement, bool: boolean) {
             if (bool) {
                 dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["yes.svg"];

@@ -368,38 +368,38 @@ class Menu_layout {
       setCheckState(dom_mainDirList, isMainDirList);
       setCheckState(dom_mainFileList, isMainFileList);
     }
-    function setTopmost(bool) {
-      if (bool === void 0) {
-        bool = !isTopmost;
+    function setTopmost(val) {
+      if (val === void 0) {
+        val = !isTopmost;
       }
-      isTopmost = bool;
-      baseWindow.topMost = bool;
-      setCheckState(dom_topmost, bool);
-      WV_Window.TopMost = bool;
+      isTopmost = val;
+      baseWindow.topMost = val;
+      setCheckState(dom_topmost, val);
+      WV_Window.TopMost = val;
     }
-    function setMainTools(bool) {
-      if (bool === void 0) {
-        bool = !isMainTools;
+    function setMainTools(val) {
+      if (val === void 0) {
+        val = !isMainTools;
       }
-      isMainTools = bool;
-      setCheckState(dom_mainTools, bool);
-      M.mainTools.setEnabled(bool);
+      isMainTools = val;
+      setCheckState(dom_mainTools, val);
+      M.mainTools.setEnabled(val);
     }
-    function setMainDirList(bool) {
-      if (bool === void 0) {
-        bool = !isMainDirList;
+    function setMainDirList(val) {
+      if (val === void 0) {
+        val = !isMainDirList;
       }
-      isMainDirList = bool;
-      setCheckState(dom_mainDirList, bool);
-      M.mainDirList.setEnabled(bool);
+      isMainDirList = val;
+      setCheckState(dom_mainDirList, val);
+      M.mainDirList.setEnabled(val);
     }
-    function setMainFileList(bool) {
-      if (bool === void 0) {
-        bool = !isMainFileList;
+    function setMainFileList(val) {
+      if (val === void 0) {
+        val = !isMainFileList;
       }
-      isMainFileList = bool;
-      setCheckState(dom_mainFileList, bool);
-      M.mainFileList.setEnabled(bool);
+      isMainFileList = val;
+      setCheckState(dom_mainFileList, val);
+      M.mainFileList.setEnabled(val);
     }
     function setCheckState(dom2, bool) {
       if (bool) {
