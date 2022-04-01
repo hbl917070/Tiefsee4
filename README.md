@@ -1,7 +1,7 @@
 # Tiefsee4
 > Tiefsee是圖片檢視軟體。 4.0.0版全面改寫架構，程式UI界面全部以HTML、css、JavaScript渲染，可實現半透明視窗與AERO毛玻璃視窗。目前程式還在測試階段，功能尚未齊全到足以取代Tiefsee 3.0.2
 
-目前版本：Tiefsee 4.0.0-beta.12
+目前版本：Tiefsee 4.0.0-beta.13
 [下載測試版](https://github.com/hbl917070/tiefsee4/releases)
 
 - 專案類型：C# WinForm(net 4.8.0)
@@ -29,8 +29,7 @@
 ## 目前已知問題
 
 ### 1、無法使用觸控拖曳移動程式
-此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。<br>
-這問題大概只有微軟自己能解決吧
+此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。
 
 ### 2、win7無法讓視窗透明化
 無解
