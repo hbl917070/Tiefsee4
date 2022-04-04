@@ -324,9 +324,10 @@ namespace Tiefsee {
         /// 關閉視窗
         /// </summary>
         public void Close() {
-            M.wv2.Visible = false;
-            M.Close();
+            //M.wv2.Visible = false;
+            M.CloseWindow();
         }
+
 
 
         /// <summary>
@@ -365,7 +366,7 @@ namespace Tiefsee {
 
             ReleaseCapture();
             SendMessage(M.Handle, WM_SYSCOMMAND, (int)(_run), 0);
-    
+
             /*IntPtr windowHandle = new System.Windows.Interop.WindowInteropHelper(M.win).Handle;
           
             Adapter.UIThread(() => {

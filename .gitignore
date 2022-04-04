@@ -2,8 +2,8 @@
 # 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
 ################################################################################
 
-/tiefsee/tiefsee/bin/output/tiefsee.exe.WebView2/EBWebView
 /Tiefsee/.vs
+/Tiefsee/packages
 /Tiefsee/Tiefsee/obj
 /Tiefsee/Tiefsee/bin/output/www/node_modules
 /Tiefsee/Tiefsee/bin/output/Tiefsee.exe.WebView2

@@ -32,16 +32,18 @@ namespace Tiefsee {
             try {
                 if (File.Exists(path) == false) { return false; }
 
-                System.Drawing.Bitmap bm_transparent = null;
-                MemoryStream ms = new MemoryStream();
-                bm_transparent = new System.Drawing.Bitmap(path);
-                bm_transparent.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                using (MemoryStream ms = new MemoryStream()) {
+                    using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
+                        bm_transparent.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
 
-                System.Windows.Forms.Clipboard.Clear();//先清理剪貼簿
-                System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
-                data_object.SetData("PNG", false, ms);
-                System.Windows.Forms.Clipboard.SetDataObject(data_object, false);
-                return true;
+                        System.Windows.Forms.Clipboard.Clear();//先清理剪貼簿
+                        System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
+                        data_object.SetData(DataFormats.Bitmap, true, bm_transparent);
+                        data_object.SetData("PNG", true, ms);
+                        System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
+                        return true;
+                    }
+                }
             } catch (Exception e2) {
                 MessageBox.Show(e2.ToString());
                 return false;

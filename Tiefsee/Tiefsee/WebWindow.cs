@@ -71,7 +71,6 @@ namespace Tiefsee {
         /// 
         /// </summary>
         public WebWindow() {
-
         }
 
 
@@ -513,7 +512,16 @@ namespace Tiefsee {
 
             RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
+        }
 
+
+        /// <summary>
+        /// 關閉視窗
+        /// </summary>
+        public void CloseWindow() {
+            DelayRun(1, () => {
+                Close();
+            });
         }
 
 
