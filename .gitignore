@@ -5,10 +5,16 @@
 /Tiefsee/.vs
 /Tiefsee/packages
 /Tiefsee/Tiefsee/obj
-/Tiefsee/Tiefsee/bin/output/www/node_modules
+
 /Tiefsee/Tiefsee/bin/output/Tiefsee.exe.WebView2
 /Tiefsee/Tiefsee/bin/output/Tiefsee.pdb
 /Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Core.xml
 /Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.WinForms.xml
 /Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Wpf.xml
 /Tiefsee/Tiefsee/bin/output/Tiefsee.exe.config
+
+/Tiefsee/Tiefsee/bin/output/www/node_modules
+/Tiefsee/Tiefsee/bin/output/www/js
+/Tiefsee/Tiefsee/bin/output/www/css
+/Tiefsee/Tiefsee/bin/output/www/MainWindow.html
+/Tiefsee/Tiefsee/bin/output/www/SettingWindow.html
