@@ -152,7 +152,8 @@ class FileLoad {
                 arExt.push(ar[i]["ext"]);
             }
 
-            let json = await WV_Directory.GetSiblingDir(dirPath, arExt);
+            let maxCount = M.config.settings.advanced.dirListMaxCount;
+            let json = await WV_Directory.GetSiblingDir(dirPath, arExt, maxCount);
             if (dirPath !== _dirPath) { return; }
 
             arDir = JSON.parse(json);

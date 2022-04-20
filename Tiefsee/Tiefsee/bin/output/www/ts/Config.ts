@@ -91,13 +91,18 @@ class Config {
             height: 600,
             windowState: "Normal"
         },
+
+        /** 進階設定 */
+        advanced: {
+            /**子資料夾數量太多就禁用資料夾預覽列表 */
+            dirListMaxCount: 5000,
+
+        }
     }
 
 
     public getAllowFileTypeItem(type: string, ext: string) {
-
         let ar = this.allowFileType(type);
-
         for (let i = 0; i < ar.length; i++) {
             const item = ar[i];
             if (item.ext === ext) {
@@ -155,7 +160,6 @@ class Config {
                 { ext: "mef", type: ["magick"] },//向量
                 { ext: "wmf", type: ["magick"] },
                 { ext: "mpo", type: ["magick"] },//相機
-                { ext: "dng", type: ["magick"] },
 
                 { ext: "crw", type: ["dcraw"] },
                 { ext: "raf", type: ["dcraw"] },
@@ -170,14 +174,13 @@ class Config {
                 { ext: "erf", type: ["dcraw"] },
                 { ext: "sr2", type: ["dcraw"] },
                 { ext: "srw", type: ["dcraw"] },
-                //{ ext: "dng", type: ["dcraw"] },
+                { ext: "dng", type: ["dcraw"] },
 
                 { ext: "ico", type: ["nconvertPng"] },
                 { ext: "afphoto", type: ["nconvertPng"] },
                 { ext: "afdesign", type: ["nconvertPng"] },
                 { ext: "dcm", type: ["nconvertBmp"] },
                 //{ ext: "iff", type: ["nconvertBmp"] },
-
             ]
         }
 
@@ -226,12 +229,8 @@ class Config {
         return []
     }
 
-
-
-
-
-
 }
+
 
 var GroupType = {
 
@@ -256,6 +255,6 @@ var GroupType = {
     /** 純文字 */
     txt: "txt",
 
+    /** 影片 */
     video: "video",
-
 }

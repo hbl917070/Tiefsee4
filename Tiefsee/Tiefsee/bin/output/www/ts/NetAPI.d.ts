@@ -142,8 +142,13 @@ interface WV_Window {
 
 interface WV_Directory {
 
-
-    GetSiblingDir(path: string, arExt: string[]): string;
+    /**
+     * 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
+     * @param path 
+     * @param arExt 副檔名
+     * @param maxCount 資料夾允許處理的最大數量
+     */
+    GetSiblingDir(path: string, arExt: string[], maxCount: number): string;
 
     /**
      * 檔名陣列 轉 路徑陣列 (用於載入複數檔案

@@ -27,15 +27,18 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="siblingPath"></param>
         /// <param name="_arExt"> 副檔名 </param>
+        /// <param name="maxCount"> 資料夾允許處理的最大數量 </param>
         /// <returns></returns>
-        public string GetSiblingDir(string siblingPath, object[] _arExt) {
+        public string GetSiblingDir(string siblingPath, object[] _arExt, int maxCount) {
 
             Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+            if (maxCount <= -1) { maxCount = int.MaxValue; }
 
             //如果資料夾不存在
             if (Directory.Exists(siblingPath) == false) { return "{}"; }
 
-            //把副檔名轉小寫。例如 JPG => .jph
+            //把副檔名轉小寫。例如 JPG => .jpg
             string[] arExt = new string[_arExt.Length];
             for (int i = 0; i < _arExt.Length; i++) {
                 arExt[i] = "." + ((String)_arExt[i]).ToLower();
@@ -46,15 +49,16 @@ namespace Tiefsee {
 
             string[] arDir = new string[0];
             try { //如果取得所有資料夾失敗，就只處理自己目前的資料夾
-
                 if (parentPath == null) {//如果沒有上一層資料夾
                     arDir = new string[] { siblingPath };//只處理自己
                 } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {//如果開啟的是 user資料夾 裡面的資料(例如桌面
                     arDir = new string[] { siblingPath };//只處理自己
                 } else {
                     arDir = Directory.GetDirectories(parentPath);//取得所有子資料夾
+                    if (arDir.Length > maxCount) {//如果資料夾太多
+                        arDir = new string[] { siblingPath };//只處理自己
+                    }
                 }
-
             } catch {
                 arDir = new string[] { siblingPath };//只處理自己
             }
@@ -63,7 +67,7 @@ namespace Tiefsee {
 
                 string[] arFile;
                 try {
-                    arFile = Directory.GetFiles(dirPath, "*.*");
+                    arFile = Directory.GetFiles(dirPath);
                 } catch {
                     continue;
                 }

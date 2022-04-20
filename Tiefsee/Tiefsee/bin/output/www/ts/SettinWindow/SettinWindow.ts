@@ -30,7 +30,6 @@ class Setting {
         var switch_dirListShowName = document.querySelector("#switch-dirListShowName") as HTMLInputElement;
         var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber") as HTMLInputElement;
 
-
         var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
         var jqselect_fontWeight = $("#select-fontWeight");//文字粗細
         var jqselect_svgWeight = $("#select-svgWeight");//圖示粗細
@@ -49,6 +48,8 @@ class Setting {
         var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
 
         var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
+
+        var select_dirListMaxCount = document.querySelector("#select-dirListMaxCount") as HTMLInputElement;//資料夾數量太多時，禁用資料夾預覽列表
 
 
         init();
@@ -313,7 +314,6 @@ class Setting {
             });
 
 
-
             // 圖片 dpi
             txt_imageDpizoom?.addEventListener("change", () => {
                 let val = txt_imageDpizoom.value;
@@ -351,6 +351,12 @@ class Setting {
             btn_clearBrowserCache?.addEventListener("click", async () => {
                 WV_Window.ClearBrowserCache();
                 Msgbox.show({ txt: "快取資料清理完成" });
+            });
+
+            select_dirListMaxCount?.addEventListener("change", () => {//資料夾數量太多時，禁用資料夾預覽列表
+                let val = Number(select_dirListMaxCount.value);
+                config.settings["advanced"]["dirListMaxCount"] = val;
+                appleSettingOfMain();
             });
         }
 
@@ -414,6 +420,8 @@ class Setting {
             switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"];//顯示編號
             switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"];//顯示檔名
             select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";//圖片數量
+
+            select_dirListMaxCount.value = config.settings["advanced"]["dirListMaxCount"] + "";//資料夾數量太多時，禁用資料夾預覽列表
 
             appleSettingOfMain();//將設定套用至 mainwiwndow
 
