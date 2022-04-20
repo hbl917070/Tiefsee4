@@ -25,11 +25,11 @@ namespace Tiefsee {
                 d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             });*/
             webServer.RouteAddGet("/api/check", ckeck);
-            webServer.RouteAddGet("/api/newWindow", newwindow);
-            webServer.RouteAddGet("/api/getPdf/{*}", getPdf);
+            webServer.RouteAddGet("/api/newWindow", newWindow);
+            webServer.RouteAddGet("/api/getPdf", getPdf);
             webServer.RouteAddGet("/api/getFileIcon", getFileIcon);
 
-            webServer.RouteAddGet("/api/getImg/file/{*}", getImg);
+            //webServer.RouteAddGet("/api/getImg/file/{*}", getImg);
             webServer.RouteAddGet("/api/getImg/magick", magick);
             webServer.RouteAddGet("/api/getImg/dcraw", dcraw);
             webServer.RouteAddGet("/api/getImg/wpf", wpf);
@@ -147,9 +147,10 @@ namespace Tiefsee {
         /// <param name="_url"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private void newwindow(RequestData d) {
+        private void newWindow(RequestData d) {
 
-            string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
+            //string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
+            string arg = Uri.UnescapeDataString((d.args["path"]));//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
@@ -184,7 +185,8 @@ namespace Tiefsee {
         /// <param name="context"></param>
         /// <returns></returns>
         private void getPdf(RequestData d) {
-            string path = d.value;
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = "application/pdf";
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
@@ -296,18 +298,10 @@ namespace Tiefsee {
             string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
             string etag = dt.ToFileTimeUtc().ToString();
 
-            /*
-            d.context.Response.KeepAlive = true;
-            d.context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");//
-            d.context.Response.Headers.Add("Accept-Ranges", "bytes");
-            d.context.Response.Headers.Add("Vary", "Origin");
-            d.context.Response.Headers.Add("Connection", "keep-alive");*/
-
             d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
             d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
             d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
 
-            //Console.WriteLine(inm + " -- " + etag);
             if (d.context.Request.Headers["If-None-Match"] == etag) {
                 d.context.Response.StatusCode = 304;
                 return true;
@@ -372,6 +366,11 @@ namespace Tiefsee {
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="ms"></param>
         void WriteStream(RequestData d, Stream ms) {
 
             using (var input = ms) {

@@ -335,7 +335,9 @@ class FileShow {
 
             setShowType(GroupType.pdf);//改變顯示類型
 
-            let _url = APIURL + "/api/getPdf/" + encodeURIComponent(_path)
+            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            let encodePath = encodeURIComponent(_path);
+            let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
             dom_pdfview.setAttribute("src", _url);
 
             //檔案類型

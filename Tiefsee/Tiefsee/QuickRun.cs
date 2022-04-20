@@ -109,7 +109,6 @@ namespace Tiefsee {
 
             }//foreach
 
-
             return false;
         }
 
@@ -132,7 +131,7 @@ namespace Tiefsee {
             }
 
             //開啟新視窗
-            string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
+            string base64 = Uri.EscapeDataString((sb.ToString()));
             string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
             HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create(uri);
             using (HttpWebResponse response = (HttpWebResponse)request2.GetResponse()) { }
