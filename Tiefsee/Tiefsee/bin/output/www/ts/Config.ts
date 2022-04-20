@@ -94,6 +94,20 @@ class Config {
     }
 
 
+    public getAllowFileTypeItem(type: string, ext: string) {
+
+        let ar = this.allowFileType(type);
+
+        for (let i = 0; i < ar.length; i++) {
+            const item = ar[i];
+            if (item.ext === ext) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * 
      * @param type 
@@ -103,14 +117,67 @@ class Config {
 
         if (type === GroupType.img) {
             return [
-                { ext: "jpg", type: ["image"] },
-                { ext: "png", type: ["image"] },
-                { ext: "gif", type: ["image"] },
-                { ext: "bmp", type: ["image"] },
-                { ext: "webp", type: ["image"] },
-                { ext: "jpeg", type: ["image"] },
-                //{ ext: "tif", type: ["image"] },
-                { ext: "svg", type: ["image"] },
+                { ext: "jpg", type: ["web"] },
+                { ext: "png", type: ["web"] },
+                { ext: "apng", type: ["web"] },
+                { ext: "gif", type: ["web"] },
+                { ext: "bmp", type: ["web"] },
+                { ext: "webp", type: ["web"] },
+                { ext: "jpeg", type: ["web"] },
+                { ext: "svg", type: ["web"] },
+
+                { ext: "tif", type: ["wpf"] },
+                { ext: "tiff", type: ["wpf"] },
+                { ext: "dds", type: ["wpf"] },
+                { ext: "jfif", type: ["wpf"] },
+
+                { ext: "psd", type: ["magick"] },
+                { ext: "psb", type: ["magick"] },
+                { ext: "pcx", type: ["magick"] },
+                { ext: "heic", type: ["magick"] },
+                { ext: "avif", type: ["magick"] },
+                { ext: "fits", type: ["magick"] },
+                { ext: "hdr", type: ["magick"] },
+                { ext: "miff", type: ["magick"] },
+                { ext: "mng", type: ["magick"] },
+                { ext: "otb", type: ["magick"] },
+                { ext: "pfm", type: ["magick"] },
+                { ext: "pgm", type: ["magick"] },
+                { ext: "ppm", type: ["magick"] },
+                { ext: "tga", type: ["magick"] },
+                { ext: "xcf", type: ["magick"] },
+                { ext: "xpm", type: ["magick"] },
+                { ext: "qoi", type: ["magick"] },
+                { ext: "pbm", type: ["magick"] },
+                { ext: "exr", type: ["magick"] },
+                { ext: "jpf", type: ["magick"] },
+                { ext: "sct", type: ["magick"] },
+                { ext: "mef", type: ["magick"] },//向量
+                { ext: "wmf", type: ["magick"] },
+                { ext: "mpo", type: ["magick"] },//相機
+                { ext: "dng", type: ["magick"] },
+
+                { ext: "crw", type: ["dcraw"] },
+                { ext: "raf", type: ["dcraw"] },
+                { ext: "cr2", type: ["dcraw"] },
+                { ext: "mrw", type: ["dcraw"] },
+                { ext: "nef", type: ["dcraw"] },
+                { ext: "x3f", type: ["dcraw"] },
+                { ext: "pef", type: ["dcraw"] },
+                { ext: "orf", type: ["dcraw"] },
+                { ext: "rw2", type: ["dcraw"] },
+                { ext: "arw", type: ["dcraw"] },
+                { ext: "erf", type: ["dcraw"] },
+                { ext: "sr2", type: ["dcraw"] },
+                { ext: "srw", type: ["dcraw"] },
+                //{ ext: "dng", type: ["dcraw"] },
+
+                { ext: "ico", type: ["nconvertPng"] },
+                { ext: "afphoto", type: ["nconvertPng"] },
+                { ext: "afdesign", type: ["nconvertPng"] },
+                { ext: "dcm", type: ["nconvertBmp"] },
+                //{ ext: "iff", type: ["nconvertBmp"] },
+
             ]
         }
 

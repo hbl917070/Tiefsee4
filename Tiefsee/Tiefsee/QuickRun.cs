@@ -101,7 +101,9 @@ namespace Tiefsee {
                         NewWindow(args, port);
                         return true;
                     }
-                } catch { }
+                } catch (Exception e) {
+                    //MessageBox.Show(e.ToString());
+                }
 
                 File.Delete(filePort);//如果這個port超過時間沒有回應，就當做無法使用，將檔案刪除
 
@@ -131,7 +133,7 @@ namespace Tiefsee {
 
             //開啟新視窗
             string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
-            string uri = $"http://127.0.0.1:{port}/api/newWindow/" + base64;
+            string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
             HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create(uri);
             using (HttpWebResponse response = (HttpWebResponse)request2.GetResponse()) { }
         }

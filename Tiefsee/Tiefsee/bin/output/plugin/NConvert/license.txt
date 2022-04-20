@@ -1,0 +1,83 @@
+End-User License Agreement ("Agreement")
+
+Last updated: (2020-01-01)
+
+
+Please read this End-User License Agreement ("Agreement") carefully before clicking the "I Agree" button, downloading or using the apps available by XnSoft (XnView Classic, XnView MP, NConvert, XnConvert, Plugins) ("SOFTWARE").
+
+By clicking the "I Agree" button, downloading or using the SOFTWARE, you are agreeing to be bound by the terms and conditions of this Agreement.
+
+If you do not agree to the terms of this Agreement, do not click on the "I Agree" button and do not download or use the SOFTWARE.
+
+
+1. License
+
+  SOFTWARE is provided as freeware for private (non commercial), or educational use, including non-profit organization. 
+  Company must purchase licenses to be able to use SOFTWARE.
+  
+  * Non commercial license (freeware)
+
+    You are considered as a non-commercial user if you are:
+
+    - using SOFTWARE for personal, research or non-profit use at home or academic institution.
+    - using SOFTWARE at registered non-profit organization.
+	- using SOFTWARE at any government organization.
+
+    i.e. schools, universities, public authorities, police, fire brigade, and hospitals.
+	
+  * Commercial license
+  
+    You are considered as a commercial user if you are: 
+	
+    - using SOFTWARE at your place of business or for commercial purposes
+	
+	  https://www.xnview.com/en/xnview/#downloads
+
+	  Device License Key: A Per-Device License Key may be purchased for a specific quantity of devices. 
+	  User License Key:  A Per-User License Key may be purchased for a specific quantity of users (ie. terminal server)
+
+	  
+2. Modifications to SOFTWARE
+
+  XnSoft reserves the right to modify, suspend or discontinue, temporarily or permanently, the SOFTWARE or any service to which it connects, with or without notice and without liability to you.
+
+
+3. Distribution
+
+  * Freeware
+  
+    You are hereby licensed to make as many copies of the SOFTWARE as you wish and distribute it to anyone provided that all files are intact. You must distribute the install form of the SOFTWARE (not the files resulting of an installation). 
+
+  * Licensed
+  
+    We hereby grant you a perpetual, worldwide, fully paid, non-transferable, non-exclusive license to use the Software solely for your internal business purposes. 
+  
+  
+4. Disclaimer of warranty
+
+  SOFTWARE and any related documentation is provided "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of merchantability or fitness for a particular purpose. 
+
+  In no event shall the author of SOFTWARE be held liable for data loss, damages, loss of profits or any other kind of loss while using or misusing this software.
+
+
+5. Technical support
+
+  Technical support may be provided via e-mail and/or forum. While every effort is made to provide timely technical support no guarantees whatsoever are implied that technical support will be provided or that technical support, when provided, will be accurate.
+
+  
+6. Restrictions
+
+  You may not modify, reverse engineer, decompile, disassemble the SOFTWARE except to the extent you may be expressly permitted by copyright holders. 
+  
+  You may not distribute, rent, sub-license the SOFTWARE, except as expressly permitted in this License without prior written consent from Author. 
+  
+7. Amendments to this Agreement
+
+  XnSoft reserves the right, at its sole discretion, to modify or replace this Agreement at any time. 
+  
+  
+  
+XnView Shell Extension is provided as freeware
+
+
+Copyright (C) 1997-2021 Pierre-e Gougelet. All rights reserved.

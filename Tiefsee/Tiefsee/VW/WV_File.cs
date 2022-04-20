@@ -266,8 +266,6 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool Exists(string path) {
-            // FileInfo d = GetFileInfo("");
-            //  long df= d.Length;
             return File.Exists(path);
         }
 

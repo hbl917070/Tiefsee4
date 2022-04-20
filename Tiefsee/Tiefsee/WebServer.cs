@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Tiefsee {
-
     public class WebServer {
 
         public int port;//當前掛載的port
@@ -17,7 +16,6 @@ namespace Tiefsee {
         public WebServerController controller;
         private HttpListener _httpListener = new HttpListener();
         private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>();//路由
-
 
         public WebServer() {
 
@@ -49,7 +47,7 @@ namespace Tiefsee {
 
             String _url = request.Url.ToString();
             _url = _url.Substring($"http://127.0.0.1:{port}".Length);
-        
+
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");
             if (argStart != -1) {//如果有「?」，就解析傳入參數 
@@ -78,11 +76,18 @@ namespace Tiefsee {
             requestData.context = context;
             requestData.url = _url;
             requestData.args = dirArgs;
-     
-            for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由 
-                if (ArRoute[i](requestData) == true) {//如果匹配網址成功，就離開
-                    break;
+
+            try {
+                for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由 
+                    if (ArRoute[i](requestData) == true) {//如果匹配網址成功，就離開
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                //狀態500、回傳錯誤訊息的文字
+                context.Response.StatusCode = 500;
+                byte[] _responseArray = Encoding.UTF8.GetBytes(e.ToString());
+                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
             }
 
             //context.Response.KeepAlive = true; // set the KeepAlive bool to false

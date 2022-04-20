@@ -1,10 +1,12 @@
-﻿using System;
+﻿using ImageMagick;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace Tiefsee {
     public class WebServerController {
@@ -23,10 +25,16 @@ namespace Tiefsee {
                 d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             });*/
             webServer.RouteAddGet("/api/check", ckeck);
-            webServer.RouteAddGet("/api/newWindow/{*}", newwindow);
-            webServer.RouteAddGet("/api/getImg/{*}", getImg);
+            webServer.RouteAddGet("/api/newWindow", newwindow);
             webServer.RouteAddGet("/api/getPdf/{*}", getPdf);
             webServer.RouteAddGet("/api/getFileIcon", getFileIcon);
+
+            webServer.RouteAddGet("/api/getImg/file/{*}", getImg);
+            webServer.RouteAddGet("/api/getImg/magick", magick);
+            webServer.RouteAddGet("/api/getImg/dcraw", dcraw);
+            webServer.RouteAddGet("/api/getImg/wpf", wpf);
+            webServer.RouteAddGet("/api/getImg/nconvertBmp", nconvertBmp);
+            webServer.RouteAddGet("/api/getImg/nconvertPng", nconvertPng);
 
             webServer.RouteAddGet("/www/{*}", getWww);
             webServer.RouteAddGet("/{*}", getWww);
@@ -34,95 +42,93 @@ namespace Tiefsee {
         }
 
 
-        /// <summary>
-        /// 設定是否對靜態資源使用快取
-        /// </summary>
-        /// <param name="time"> 秒數</param>
-        public void SetCacheTime(int time) {
-            if (time <= 0) { time = 0; }
-            if (time >= 31536000) { time = 31536000; }//一年
-            CacheTime = time;
-        }
+
+
+        #region web API
 
 
         /// <summary>
-        /// 回傳字串
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="str"></param>
-        private void WriteString(RequestData d, string str) {
-            byte[] _responseArray = Encoding.UTF8.GetBytes(str);
-            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-        }
-
-
-
-        /// <summary>
-        /// 回傳檔案
+        /// 
         /// </summary>
         /// <param name="d"></param>
-        /// <param name="path"></param>
-        private void WriteFile(RequestData d, string path) {
+        void nconvertBmp(RequestData d) {
+         
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            //string contentType = "";
+            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //if (is304 == true) { return; }
 
-            using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-
-                d.context.Response.ContentLength64 = input.Length;
-
-                if (d.context.Request.HttpMethod != "HEAD") {
-                    byte[] buffer = new byte[1024 * 16];
-                    int nbytes;
-                    while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
-                        //context.Response.SendChunked = input.Length > 1024 * 16;
-                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
-                    }
-                }
-
-                //context.Response.StatusCode = (int)HttpStatusCode.OK;
-                //context.Response.OutputStream.Flush();
-            }
-
-            /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
-                byte[] _responseArray = new byte[fs.Length];
-                fs.Read(_responseArray, 0, _responseArray.Length);
-                fs.Close();
-                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-            }*/
+            string imgPath = ImgLib.Nconvert_PathToPath(path,false,false);
+            WriteString(d,imgPath);
         }
 
 
         /// <summary>
-        /// 回傳檔案時加入快取的Headers
+        /// 
         /// </summary>
         /// <param name="d"></param>
-        /// <param name="path"></param>
-        /// <returns> true=304 false=正常回傳檔案</returns>
-        private bool HeadersAdd304(RequestData d, string path) {
+        void nconvertPng(RequestData d) {
 
-            DateTime dt = File.GetLastWriteTime(path);
-            string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
-            string etag = dt.ToFileTimeUtc().ToString();
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            //string contentType = "";
+            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //if (is304 == true) { return; }
 
-            /*
-            d.context.Response.KeepAlive = true;
-            d.context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");//
-            d.context.Response.Headers.Add("Accept-Ranges", "bytes");
-            d.context.Response.Headers.Add("Vary", "Origin");
-            d.context.Response.Headers.Add("Connection", "keep-alive");*/
-
-            d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-            d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
-            d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
-
-
-            //Console.WriteLine(inm + " -- " + etag);
-            if (d.context.Request.Headers["If-None-Match"] == etag) {
-                d.context.Response.StatusCode = 304;
-                return true;
-            }
-
-            return false;
+            string imgPath = ImgLib.Nconvert_PathToPath(path, false, true);
+            WriteString(d, imgPath);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        void magick(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            d.context.Response.ContentType = "image/bmp";
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            using (Stream stream = ImgLib.MagickImage_PathToStream(path)) {
+                WriteStream(d, stream); //回傳檔案
+            }
+        }
+
+
+
+        void wpf(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            d.context.Response.ContentType = "image/png";
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            using (Stream stream = ImgLib.Wpf_PathToStream(path)) {
+                WriteStream(d, stream); //回傳檔案
+            }
+        }
+
+        void dcraw(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            d.context.Response.ContentType = "image/bmp";
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
+                WriteStream(d, stream); //回傳檔案
+            }
+        }
 
         /// <summary>
         /// 檢查這個port是否為tiefsee所使用，用於快速啟動
@@ -143,7 +149,7 @@ namespace Tiefsee {
         /// <returns></returns>
         private void newwindow(RequestData d) {
 
-            string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.value));//將字串剖析回命令列參數
+            string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
@@ -188,7 +194,10 @@ namespace Tiefsee {
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
         private void getFileIcon(RequestData d) {
             Dictionary<string, string> args = d.args;
 
@@ -271,6 +280,112 @@ namespace Tiefsee {
             }
         }
 
+
+        #endregion
+
+
+        /// <summary>
+        /// 回傳檔案時加入快取的Headers
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="path"></param>
+        /// <returns> true=304 false=正常回傳檔案</returns>
+        private bool HeadersAdd304(RequestData d, string path) {
+
+            DateTime dt = File.GetLastWriteTime(path);
+            string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
+            string etag = dt.ToFileTimeUtc().ToString();
+
+            /*
+            d.context.Response.KeepAlive = true;
+            d.context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");//
+            d.context.Response.Headers.Add("Accept-Ranges", "bytes");
+            d.context.Response.Headers.Add("Vary", "Origin");
+            d.context.Response.Headers.Add("Connection", "keep-alive");*/
+
+            d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
+            d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
+            d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
+
+            //Console.WriteLine(inm + " -- " + etag);
+            if (d.context.Request.Headers["If-None-Match"] == etag) {
+                d.context.Response.StatusCode = 304;
+                return true;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// 設定是否對靜態資源使用快取
+        /// </summary>
+        /// <param name="time"> 秒數</param>
+        public void SetCacheTime(int time) {
+            if (time <= 0) { time = 0; }
+            if (time >= 31536000) { time = 31536000; }//一年
+            CacheTime = time;
+        }
+
+
+        /// <summary>
+        /// 回傳字串
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="str"></param>
+        private void WriteString(RequestData d, string str) {
+            byte[] _responseArray = Encoding.UTF8.GetBytes(str);
+            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+        }
+
+
+        /// <summary>
+        /// 回傳檔案
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="path"></param>
+        private void WriteFile(RequestData d, string path) {
+
+            using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+
+                d.context.Response.ContentLength64 = input.Length;
+
+                if (d.context.Request.HttpMethod != "HEAD") {
+                    byte[] buffer = new byte[1024 * 16];
+                    int nbytes;
+                    while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                        //context.Response.SendChunked = input.Length > 1024 * 16;
+                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
+                    }
+                }
+
+                //context.Response.StatusCode = (int)HttpStatusCode.OK;
+                //context.Response.OutputStream.Flush();
+            }
+
+            /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
+                byte[] _responseArray = new byte[fs.Length];
+                fs.Read(_responseArray, 0, _responseArray.Length);
+                fs.Close();
+                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+            }*/
+        }
+
+
+        void WriteStream(RequestData d, Stream ms) {
+
+            using (var input = ms) {
+                //回傳檔案
+                d.context.Response.ContentLength64 = input.Length;
+                if (d.context.Request.HttpMethod != "HEAD") {
+                    byte[] buffer = new byte[1024 * 16];
+                    int nbytes;
+                    while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 只允許來自 http://localhost:{port} 的請求，其餘的一律回傳400錯誤
