@@ -150,7 +150,7 @@ namespace Tiefsee {
         private void newWindow(RequestData d) {
 
             //string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
-            string arg = Uri.UnescapeDataString((d.args["path"]));//將字串剖析回命令列參數
+            string arg = Uri.UnescapeDataString(d.args["path"]);//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {

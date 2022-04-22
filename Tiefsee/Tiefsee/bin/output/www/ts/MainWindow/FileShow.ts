@@ -156,7 +156,6 @@ class FileShow {
                 return;
             }
 
-
         }
 
 
@@ -175,49 +174,64 @@ class FileShow {
         }
 
 
-
+        /**
+         * 取得圖片網址並且預載入
+         */
         async function loadImage(fileInfo2: FileInfo2) {
 
             let _path = fileInfo2.Path;
-            let imgurl = _path;//圖片網址
-
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            let imgurl = _path;//圖片網址
+
+            async function getUrl(type: string) {
+                if (type == "web") {
+                    return Lib.pathToURL(_path) + `?${fileTime}`;
+                }
+                if (type == "icon") {
+                    return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(_path)
+                }
+                if (type == "wpf") {
+                    return APIURL + `/api/getImg/wpf?path=${encodePath}&${fileTime}`
+                }
+                if (type == "magick") {
+                    return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
+                }
+                if (type == "dcraw") {
+                    return APIURL + `/api/getImg/dcraw?path=${encodePath}&${fileTime}`
+                }
+                if (type == "nconvertPng") {
+                    let url = APIURL + `/api/getImg/nconvertPng?path=${encodePath}&${fileTime}`
+                    url = Lib.pathToURL(await fetchGet(url));
+                    return url;
+                }
+                if (type == "nconvertBmp") {
+                    let url = APIURL + `/api/getImg/nconvertBmp?path=${encodePath}&${fileTime}`
+                    url = Lib.pathToURL(await fetchGet(url));
+                    return url;
+                }
+                return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
+            }
 
             let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType)
+            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);//取得這種檔案要用什麼方式來解析
             if (fileItem !== null) {
                 let arType = fileItem.type;
                 for (let i = 0; i < arType.length; i++) {
                     const type = arType[i];
-
-                    if (type == "web") {
-                        imgurl = Lib.pathToURL(_path) + `?${fileTime}`;
-                        break;
-                    }
-                    if (type == "wpf") {
-                        imgurl = APIURL + `/api/getImg/wpf?path=${encodePath}&${fileTime}`
-                        break;
-                    }
-                    if (type == "magick") {
-                        imgurl = APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
-                        break;
-                    }
-                    if (type == "dcraw") {
-                        imgurl = APIURL + `/api/getImg/dcraw?path=${encodePath}&${fileTime}`
-                        break;
-                    }
-
-                    if (type == "nconvertPng") {
-                        imgurl = APIURL + `/api/getImg/nconvertPng?path=${encodePath}&${fileTime}`
-                        imgurl = Lib.pathToURL(await fetchGet(imgurl));
-                        break;
-                    }
+                    imgurl = await getUrl(type)
+                    break;
                 }
-
             } else {
+                imgurl = await getUrl("magick")
+            }
 
-                imgurl = APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
+            let bool = await tieefseeview.preloadImg(imgurl);//預載入
+
+            //如果載入失敗就顯示檔案的圖示
+            if (bool == false) {
+                imgurl = await getUrl("icon")
+                await tieefseeview.preloadImg(imgurl);//預載入
             }
 
             return imgurl;
@@ -235,6 +249,7 @@ class FileShow {
             setShowType(GroupType.img);//改變顯示類型
             let imgurl = _path;//圖片網址
 
+            /*
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 //imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
                 imgurl = await loadImage(fileInfo2);
@@ -243,10 +258,14 @@ class FileShow {
                 //imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
                 imgurl = await loadImage(fileInfo2);
             }
+            tieefseeview.setLoading(true);
+            await tieefseeview.preloadImg(imgurl);//預載入
+            */
 
             tieefseeview.setLoading(true);
 
-            await tieefseeview.preloadImg(imgurl);//預載入
+            imgurl = await loadImage(fileInfo2);//取得圖片網址並且預載入
+
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
                 await tieefseeview.loadImg(imgurl);//使用<img>渲染
             } else {

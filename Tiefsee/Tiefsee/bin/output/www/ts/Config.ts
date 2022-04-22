@@ -180,7 +180,9 @@ class Config {
                 { ext: "afphoto", type: ["nconvertPng"] },
                 { ext: "afdesign", type: ["nconvertPng"] },
                 { ext: "dcm", type: ["nconvertBmp"] },
-                //{ ext: "iff", type: ["nconvertBmp"] },
+                //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
+                //{ ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
+
             ]
         }
 
