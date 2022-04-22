@@ -130,6 +130,7 @@ class Config {
                 { ext: "webp", type: ["web"] },
                 { ext: "jpeg", type: ["web"] },
                 { ext: "svg", type: ["web"] },
+                { ext: "ico", type: ["web"] },
 
                 { ext: "tif", type: ["wpf"] },
                 { ext: "tiff", type: ["wpf"] },
@@ -176,7 +177,6 @@ class Config {
                 { ext: "srw", type: ["dcraw"] },
                 { ext: "dng", type: ["dcraw"] },
 
-                { ext: "ico", type: ["nconvertPng"] },
                 { ext: "afphoto", type: ["nconvertPng"] },
                 { ext: "afdesign", type: ["nconvertPng"] },
                 { ext: "dcm", type: ["nconvertBmp"] },

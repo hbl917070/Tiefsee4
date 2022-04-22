@@ -338,17 +338,28 @@ interface WV_Path {
 
 interface WV_System {
 
-    SetClipboard_FileToPng(path: string): bool;
+    /**
+     * 存入剪貼簿 - 傳入base64，儲存成圖片。
+     * isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
+     */
+    SetClipboard_base64ToImage(base64: string, isTransparent: bool): bool;
 
+    /**
+     * 存入剪貼簿 - 傳入檔案路徑，儲存成圖片。
+     * isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
+     */
+    SetClipboard_FileToImage(path: string, isTransparent: bool): bool;
+
+    /** 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字 */
     SetClipboard_FileToTxt(path: string): bool;
 
+    /** 存入剪貼簿 - 傳入檔案路徑，複製成base64 */
     SetClipboard_FileToBase64(path: string): bool;
 
-    SetClipboard_FileToImg(path: string): bool;
-
+    /** 存入剪貼簿 - 檔案 */
     SetClipboard_File(path: string): bool;
 
-    /** 存入剪貼簿 */
+    /** 存入剪貼簿 - 字串 */
     SetClipboard_Txt(txt: string): bool;
 
     /** 取得作業系統所在的槽，例如 「C:\」 */

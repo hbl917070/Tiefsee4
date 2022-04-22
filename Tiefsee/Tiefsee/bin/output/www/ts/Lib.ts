@@ -236,7 +236,7 @@ class Lib {
         /*if (hex.indexOf("66 74 79 70") === 12) {//00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p)
             return "mp4";//可能將其他影片格式也誤判成mp4
         }*/
-    
+
 
         if (hex.indexOf("1A 45 DF A3") === 0) {//可擴展二進位元語言
             if (hex.indexOf("77 65 62 6D 42 87") > 0) {//77(w) 65(e) 62(b) 6D(m) 42(B) 87()
@@ -250,7 +250,7 @@ class Lib {
         if (hex.indexOf("38 42 50 53") === 0) {//38(8) 42(B) 50(P) 53(S)
             return "psd";
         }
-       
+
 
         console.log("檔案類型辨識失敗: " + fileInfo2.Path);
         let sum = "";

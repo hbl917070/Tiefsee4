@@ -249,16 +249,7 @@ class InitMenu {
             if (dom_copyBase64 !== null) {
                 dom_copyBase64.onclick = async () => {
                     M.menu.close();//關閉menu      
-                    M.script.copy.copyBase64();
-                }
-            }
-
-            //複製 影像(含透明色)
-            var dom_copyPng = document.getElementById("menuitem-img-copyPng");
-            if (dom_copyPng !== null) {
-                dom_copyPng.onclick = async () => {
-                    M.menu.close();//關閉menu
-                    M.script.copy.copyPng();
+                    M.script.copy.copyImageBase64();
                 }
             }
 

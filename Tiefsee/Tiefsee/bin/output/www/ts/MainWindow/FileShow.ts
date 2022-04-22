@@ -249,19 +249,6 @@ class FileShow {
             setShowType(GroupType.img);//改變顯示類型
             let imgurl = _path;//圖片網址
 
-            /*
-            if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
-                //imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
-                imgurl = await loadImage(fileInfo2);
-            } else {
-                //imgurl = APIURL + "/api/getImg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                //imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                imgurl = await loadImage(fileInfo2);
-            }
-            tieefseeview.setLoading(true);
-            await tieefseeview.preloadImg(imgurl);//預載入
-            */
-
             tieefseeview.setLoading(true);
 
             imgurl = await loadImage(fileInfo2);//取得圖片網址並且預載入

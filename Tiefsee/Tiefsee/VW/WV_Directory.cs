@@ -53,6 +53,8 @@ namespace Tiefsee {
                     arDir = new string[] { siblingPath };//只處理自己
                 } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {//如果開啟的是 user資料夾 裡面的資料(例如桌面
                     arDir = new string[] { siblingPath };//只處理自己
+                } else if (maxCount == 0) {
+                    arDir = new string[] { siblingPath };//只處理自己
                 } else {
                     arDir = Directory.GetDirectories(parentPath);//取得所有子資料夾
                     if (arDir.Length > maxCount) {//如果資料夾太多

@@ -23,23 +23,66 @@ namespace Tiefsee {
         }
 
 
+        private MemoryStream Base64ToMemoryStream(string base64String) {
+            //去掉開頭的 data:image/png;base64,
+            int x = base64String.IndexOf("base64,");
+            if (x != -1) { base64String = base64String.Substring(x + 7); }
+
+            byte[] Buffer = Convert.FromBase64String(base64String);
+            MemoryStream oMemoryStream = new MemoryStream(Buffer);
+            oMemoryStream.Position = 0;
+            return oMemoryStream;
+        }
+
         /// <summary>
-        /// 存入剪貼簿 - 
+        /// 存入剪貼簿 - 傳入base64，儲存成圖片。
+        /// isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
         /// </summary>
-        /// <param name="txt"></param>
+        /// <param name="base64"></param>
+        /// <param name="isTransparent"> 是否要支援透明色 </param>
         /// <returns></returns>
-        public bool SetClipboard_FileToPng(string path) {
+        public bool SetClipboard_base64ToImage(string base64, bool isTransparent) {
+            try {
+                using (MemoryStream ms = Base64ToMemoryStream(base64)) {
+                    using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
+                        System.Windows.Forms.Clipboard.Clear();//清理剪貼簿
+                        System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
+                        data_object.SetData(DataFormats.Bitmap, true, bm);//無透明色的圖片，所有軟體都支援
+                        if (isTransparent) {
+                            data_object.SetData("PNG", true, ms);//含有透明色，但並非所有軟體都支援
+                        }
+                        System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
+                        return true;
+                    }
+                }
+            } catch (Exception e2) {
+                MessageBox.Show(e2.ToString());
+                return false;
+            }
+
+        }
+
+
+        /// <summary>
+        /// 存入剪貼簿 - 傳入檔案路徑，儲存成圖片。
+        /// isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="isTransparent"> 是否要支援透明色 </param>
+        /// <returns></returns>
+        public bool SetClipboard_FileToImage(string path, bool isTransparent) {
             try {
                 if (File.Exists(path) == false) { return false; }
 
-                using (MemoryStream ms = new MemoryStream()) {
-                    using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
-                        bm_transparent.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                using (Stream ms = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                    using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
 
                         System.Windows.Forms.Clipboard.Clear();//先清理剪貼簿
                         System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
-                        data_object.SetData(DataFormats.Bitmap, true, bm_transparent);
-                        data_object.SetData("PNG", true, ms);
+                        data_object.SetData(DataFormats.Bitmap, true, bm);
+                        if (isTransparent) {
+                            data_object.SetData("PNG", true, ms);//含有透明色，但並非所有軟體都支援
+                        }
                         System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
                         return true;
                     }
@@ -52,7 +95,7 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 存入剪貼簿 - 
+        /// 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
@@ -70,7 +113,7 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 存入剪貼簿 - 
+        /// 存入剪貼簿 - 傳入檔案路徑，複製成base64
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
@@ -119,7 +162,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public bool SetClipboard_FileToImg(string path) {
+        /*public bool SetClipboard_FileToImg(string path) {
             try {
                 using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
                     System.Windows.Forms.Clipboard.SetImage(bm_transparent);
@@ -127,10 +170,9 @@ namespace Tiefsee {
                 }
                 return true;
             } catch (Exception) {
-
                 return false;
             }
-        }
+        }*/
 
 
         /// <summary>
@@ -143,7 +185,6 @@ namespace Tiefsee {
                 System.Windows.Forms.Clipboard.SetDataObject(txt, false, 5, 200);//存入剪貼簿
                 return true;
             } catch (Exception) {
-
                 return false;
             }
         }
@@ -156,7 +197,6 @@ namespace Tiefsee {
         /// <returns></returns>
         public bool SetClipboard_File(string path) {
             try {
-
                 //檔案或資料夾存在才複製
                 if (File.Exists(path) || Directory.Exists(path)) {
                     var f = new System.Collections.Specialized.StringCollection();
@@ -165,10 +205,8 @@ namespace Tiefsee {
                 } else {
                     return false;
                 }
-
                 return true;
             } catch (Exception) {
-
                 return false;
             }
         }
