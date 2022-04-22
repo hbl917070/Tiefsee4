@@ -418,13 +418,6 @@ interface WV_Image {
      * @returns base64
      */
     GetFileIcon(path: string, size: (16 | 32 | 64 | 128 | 256)): string;
-
-    /**
-     * 取得任何檔案的圖示
-     * @param path 
-     * @returns base64
-     */
-    GetExeIcon_32(path: string): string;
 }
 
 interface AppInfo {

@@ -129,7 +129,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WebServer.cs" />
-    <Compile Include="IconHandler.cs" />
     <Compile Include="IniManager.cs" />
     <Compile Include="LnkToExe.cs" />
     <Compile Include="ShellContextMenu.cs" />

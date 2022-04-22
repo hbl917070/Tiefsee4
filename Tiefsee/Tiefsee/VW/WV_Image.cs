@@ -1,5 +1,4 @@
-﻿using IconHandler;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -35,23 +34,6 @@ namespace Tiefsee {
                         );
             string base64 = BitmapToBase64(icon);
             icon.Dispose();
-            return base64;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public string GetExeIcon_32(string path) {
-            string base64 = "";
-            if (File.Exists(path)) {
-                string Dialog = path;
-                System.Drawing.Icon[] GetIcon = IconHandler.IconHandler.IconsFromFile(Dialog, IconSize.Large);
-                if (GetIcon.Length > 0)
-                    base64 = BitmapToBase64(GetIcon[0].ToBitmap());
-            }
             return base64;
         }
 
