@@ -6,7 +6,7 @@ Tiefsee4 專案由2個部分構成，`C# Project` 與 `Web Project`。
 
 # C# Project
 ## 功能簡述
-- 以WinForm窗體承載WebView2
+- 以WinForm窗體來承載WebView2
 - 以HttpListener部署本地伺服器
 - 與WebView2橋接C#函數，讓js具有操作檔案的能力
 ## 開啟方式
@@ -69,19 +69,19 @@ gulp watch
 Tiefsee 具有切換主題的功能，為了讓圖示具有變色功能，因此所有圖示皆使用SVG。  
 執行 `gulp watch` 後， `www/img/default` 裡面的svg檔案會全部封裝成一個js，輸出到 `www/js/SvgList.js`  
 
-- 在svg裡面，可以用```var(--color-white)```來取得當前主題的主顏色，例如
+- 在svg裡面，可以用 `var(--color-white)` 來取得當前主題的主顏色，例如
 	```svg
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
 		<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
 	</svg>
 	```
 
-- 在js裡面，可以透過```SvgList["svg name"]```來取得svg的文字，例如
+- 在js裡面，可以透過 `SvgList["svg name"]` 來取得svg的文字，例如
 	```javascript
 	var svgText = SvgList["window-menu.svg"];
 	```
 
-- 在ejs裡面，不建議直接以`<img>`來載入svg圖片，這會讓svg無法變色，必須直接將svg的文字匯入，例如
+- 在ejs裡面，不建議直接以 `<img>` 來載入svg圖片，這會讓svg無法變色，必須直接將svg的文字匯入，例如
 	```html
 	<div>
 		<%- await readFile("./img/default/tool-rotateCcw.svg"); %>
