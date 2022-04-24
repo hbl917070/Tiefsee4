@@ -41,7 +41,8 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 
 ## 目前已知問題
 ### 1、無法使用觸控拖曳移動程式
-    此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。
+    此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，
+    推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。
 
 ### 2、win7無法讓視窗透明化
     無解
