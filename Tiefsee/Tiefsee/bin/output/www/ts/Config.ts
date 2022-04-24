@@ -96,6 +96,8 @@ class Config {
         advanced: {
             /**子資料夾數量太多就禁用資料夾預覽列表 */
             dirListMaxCount: 5000,
+            /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
+            highQualityLimit: 7000,
         }
     }
 

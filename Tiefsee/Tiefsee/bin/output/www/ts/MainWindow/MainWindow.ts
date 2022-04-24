@@ -418,6 +418,14 @@ class MainWindow {
 
             //-----------
 
+            //圖片面積大於這個數值的平方，就禁用高品質縮放
+            let imageArea = Number(config.settings.advanced.highQualityLimit);
+            if (imageArea == -1) { imageArea = 999999; }
+            imageArea = imageArea * imageArea;
+            fileShow.tieefseeview.setEventHighQualityLimit(() => { return imageArea; })
+
+            //-----------
+
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
 
             initColor("--color-window-background", true);

@@ -67,6 +67,7 @@ class Tieefseeview {
     public setEventLimitMax;
     public getEventLimitMin;//圖片縮小下限
     public setEventLimitMin;
+    public setEventHighQualityLimit;//覆寫 圖片面積大於這個數值，就停止使用高品質縮放
 
     constructor(_dom: HTMLDivElement) {
 
@@ -155,7 +156,7 @@ class Tieefseeview {
         var eventChangeXY = (x: number, y: number) => { }
         var eventLimitMax = (): boolean => { return _eventLimitMax(); }//超出縮放上限，return true表示超過限制    
         var eventLimitMin = (): boolean => { return _eventLimitMin(); }//超出縮放下限，return true表示超過限制
-
+        var eventHighQualityLimit = (): number => { return 7000 * 7000; }//圖片面積大於這個數值，就禁用高品質縮放
 
         var pinch = new Hammer.Pinch();
         var rotate = new Hammer.Rotate();
@@ -202,6 +203,7 @@ class Tieefseeview {
         this.setEventLimitMax = setEventLimitMax;
         this.getEventLimitMin = getEventLimitMin;
         this.setEventLimitMin = setEventLimitMin;
+        this.setEventHighQualityLimit = setEventHighQualityLimit;
         this.setEventChangeZoom = setEventChangeZoom;
         this.getEventChangeZoom = getEventChangeZoom;
         this.setEventChangeDeg = setEventChangeDeg;
@@ -1055,6 +1057,14 @@ class Tieefseeview {
          */
         function setEventLimitMin(_func: () => boolean) { eventLimitMin = _func; }
 
+        /**
+         * 覆寫 圖片面積大於這個數值，就停止使用高品質縮放
+         * @returns 
+         */
+        function setEventHighQualityLimit(_func: () => number) {
+            eventHighQualityLimit = _func;
+        }
+
 
         /**
          * 設定對齊
@@ -1132,7 +1142,6 @@ class Tieefseeview {
             init_point(false);
 
         }
-
 
 
         /**
@@ -1317,14 +1326,13 @@ class Tieefseeview {
 
                 let tc = temp_canvasSN;
 
-
                 //context.clearRect(-100, -100, 2000, 2000);
                 //var time = new Date();
 
                 //
                 let resizeQuality: ResizeQuality = "medium";//medium
 
-                if (getOriginalWidth() * getOriginalHeight() > 8000 * 8000) {
+                if (getOriginalWidth() * getOriginalHeight() > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
 
                     //console.log("drawImage直接渲染");
                     context.drawImage(temp_can,
@@ -1448,6 +1456,7 @@ class Tieefseeview {
 
 
         }
+
 
 
         /**

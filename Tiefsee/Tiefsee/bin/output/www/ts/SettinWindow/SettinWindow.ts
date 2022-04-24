@@ -50,6 +50,7 @@ class Setting {
         var dom_applyThemeBtns = document.querySelector("#applyTheme-btns");
 
         var select_dirListMaxCount = document.querySelector("#select-dirListMaxCount") as HTMLInputElement;//資料夾數量太多時，禁用資料夾預覽列表
+        var select_highQualityLimit = document.querySelector("#select-highQualityLimit") as HTMLInputElement;//圖片面積太大時，禁用高品質縮放
 
 
         init();
@@ -358,6 +359,12 @@ class Setting {
                 config.settings["advanced"]["dirListMaxCount"] = val;
                 appleSettingOfMain();
             });
+
+            select_highQualityLimit?.addEventListener("change", () => {//圖片面積太大時，禁用高品質縮放
+                let val = Number(select_highQualityLimit.value);
+                config.settings["advanced"]["highQualityLimit"] = val;
+                appleSettingOfMain();
+            });
         }
 
 
@@ -422,6 +429,7 @@ class Setting {
             select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";//圖片數量
 
             select_dirListMaxCount.value = config.settings["advanced"]["dirListMaxCount"] + "";//資料夾數量太多時，禁用資料夾預覽列表
+            select_highQualityLimit.value = config.settings["advanced"]["highQualityLimit"] + "";//圖片面積太大時，禁用高品質縮放
 
             appleSettingOfMain();//將設定套用至 mainwiwndow
 
