@@ -1,16 +1,16 @@
 # Tiefsee4
 > Tiefsee是圖片檢視軟體。 4.0.0版全面改寫架構，程式UI界面全部以HTML、css、JavaScript渲染，可實現半透明視窗與AERO毛玻璃視窗。目前程式還在測試階段，功能尚未齊全到足以取代Tiefsee 3.0.2
 
-目前版本：Tiefsee 4.0.0-beta.13
+目前版本：Tiefsee 4.0.0-beta.15
 [下載測試版](https://github.com/hbl917070/tiefsee4/releases)
 
-- 專案類型：C# WinForm(net 4.8.0)
+- 專案類型：C# WinForm(net 4.8)
 - UI渲染方式：WebView2
 - 開發語言：TypeScript 
 
 ## 運行需求
 - 作業系統：win7、win8、win10、win11
-- [.NET Framework 4.7.2](https://dotnet.microsoft.com/download/dotnet-framework/net472) (含、以上
+- [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48) (含、以上
 - [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)
 
 

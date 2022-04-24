@@ -311,7 +311,7 @@ async function initDomImport() {
  * @param url 
  * @returns 
  */
-async function fetchGet(url: string) {
+async function fetchGet_text(url: string) {
 
     let txt = "";
     await fetch(url, {
@@ -325,6 +325,33 @@ async function fetchGet(url: string) {
     });
 
     return txt
+}
+
+
+/**
+ * 取得檔案的base64
+ */
+async function fetchGet_base64(url: string) {
+
+    let base64: string = await new Promise((resolve, reject) => {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                let d = reader.result;
+                if (typeof d === "string") {
+                    resolve(d);//繼續往下執行
+                } else {
+                    resolve("");//繼續往下執行
+                }
+            }
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
+        xhr.send();
+    });
+    return base64;
 }
 
 

@@ -66,7 +66,7 @@ class Config {
             /**圖片dpi縮放 */
             "dpizoom": "-1",
             /** 圖片渲染模式 */
-            "tieefseeviewImageRendering": "0"
+            "tieefseeviewImageRendering": "2"
         },
         layout: {
             fileListEnabled: true,//啟用 檔案預覽列表
@@ -74,7 +74,7 @@ class Config {
             fileListShowName: true,//顯示檔名
             fileListShowWidth: 100,//寬度
 
-            dirListEnabled: true,//啟用 資料夾預覽列表
+            dirListEnabled: false,//啟用 資料夾預覽列表
             dirListShowNo: true,//顯示編號
             dirListShowName: true,//顯示檔名
             dirListShowWidth: 200,//寬度
@@ -96,7 +96,6 @@ class Config {
         advanced: {
             /**子資料夾數量太多就禁用資料夾預覽列表 */
             dirListMaxCount: 5000,
-
         }
     }
 
@@ -177,9 +176,9 @@ class Config {
                 { ext: "srw", type: ["dcraw"] },
                 { ext: "dng", type: ["dcraw"] },
 
-                { ext: "afphoto", type: ["nconvertPng"] },
-                { ext: "afdesign", type: ["nconvertPng"] },
-                { ext: "dcm", type: ["nconvertBmp"] },
+                //{ ext: "afphoto", type: ["nconvertPng"] },
+                //{ ext: "afdesign", type: ["nconvertPng"] },
+                //{ ext: "dcm", type: ["nconvertBmp"] },
                 //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
                 //{ ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
 

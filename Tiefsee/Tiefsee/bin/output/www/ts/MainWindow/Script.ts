@@ -326,8 +326,6 @@ class ScriptCopy {
         if (fileInfo2.Type === "none") { return; }//如果檔案不存在
         let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 
-        var time = new Date();
-
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
                 let base64 = this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
@@ -337,7 +335,8 @@ class ScriptCopy {
             } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
                 WV_System.SetClipboard_FileToImage(filePath, true);
             } else {
-                let base64 = await this.M.fileShow.tieefseeview.getFileBase64();//用圖片網址直接轉成base64
+                let imgUrl = this.M.fileShow.tieefseeview.getUrl();//取得圖片網址
+                let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
                 WV_System.SetClipboard_base64ToImage(base64, true);
             }
         }
@@ -346,14 +345,6 @@ class ScriptCopy {
             let base64 = this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_base64ToImage(base64, false);
         }
-
-        //console.log(base64)
-        //await WV_System.SetClipboard_FileToImg(filePath);
-
-        var int_毫秒 = (new Date()).getTime() - time.getTime();
-        var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
-        console.log(s_輸出時間差)
-        console.log(this.M.fileLoad.getGroupType())
 
     }
 
@@ -366,29 +357,13 @@ class ScriptCopy {
         //let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
-            let base64 = await this.M.fileShow.tieefseeview.getFileBase64();//用圖片網址直接轉成base64
+            let imgUrl = this.M.fileShow.tieefseeview.getUrl();//取得圖片網址
+            let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
             WV_System.SetClipboard_Txt(base64);
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.txt) {
-            let base64: string = await new Promise((resolve, reject) => {//從網址取得base64
-                var xhr = new XMLHttpRequest();
-                xhr.onload = function () {
-                    var reader = new FileReader();
-                    reader.onloadend = function () {
-                        let d = reader.result;
-                        if (typeof d === "string") {
-                            resolve(d);//繼續往下執行
-                        } else {
-                            resolve("");//繼續往下執行
-                        }
-                    }
-                    reader.readAsDataURL(xhr.response);
-                };
-                xhr.open("GET", filePath);
-                xhr.responseType = "blob";
-                xhr.send();
-            });
+            let base64: string = await fetchGet_base64(filePath);//取得檔案的base64
             WV_System.SetClipboard_Txt(base64);
         }
 

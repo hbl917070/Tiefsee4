@@ -202,12 +202,12 @@ class FileShow {
                 }
                 if (type == "nconvertPng") {
                     let url = APIURL + `/api/getImg/nconvertPng?path=${encodePath}&${fileTime}`
-                    url = Lib.pathToURL(await fetchGet(url));
+                    url = Lib.pathToURL(await fetchGet_text(url));
                     return url;
                 }
                 if (type == "nconvertBmp") {
                     let url = APIURL + `/api/getImg/nconvertBmp?path=${encodePath}&${fileTime}`
-                    url = Lib.pathToURL(await fetchGet(url));
+                    url = Lib.pathToURL(await fetchGet_text(url));
                     return url;
                 }
                 return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`

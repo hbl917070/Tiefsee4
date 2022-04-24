@@ -51,7 +51,6 @@ class Tieefseeview {
     public getRendering;//取得渲染模式
     public setRendering;
     public getUrl;//取得當前圖片網址
-    public getFileBase64;
     public getCanvasBase64;
 
     public getEventMouseWheel;//滑鼠滾輪捲動時
@@ -224,7 +223,6 @@ class Tieefseeview {
         this.getErrerUrl = getErrerUrl;
         this.setErrerUrl = setErrerUrl;
         this.getUrl = getUrl;
-        this.getFileBase64 = getFileBase64;//取得檔案的base64
         this.getCanvasBase64 = getCanvasBase64;//從Canvas取得base64
 
 
@@ -814,34 +812,10 @@ class Tieefseeview {
 
         }
 
-        async function getFileBase64() {
-            let url = getUrl();
-            let base64 = "";
 
-            base64 = await new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
-                xhr.onload = function () {
-                    var reader = new FileReader();
-                    reader.onloadend = function () {
-                        let d = reader.result;
-                        if (typeof d === "string") {
-                            resolve(d);//繼續往下執行
-                        } else {
-                            resolve("");//繼續往下執行
-                        }
-                    }
-                    reader.readAsDataURL(xhr.response);
-                };
-                xhr.open("GET", url);
-                xhr.responseType = "blob";
-                xhr.send();
-            })
-
-            return base64;
-        }
-
-
-
+        /**
+         * 從Canvas取得base64
+         */
         function getCanvasBase64() {
 
             if (dataType === "bigimg") {
@@ -854,18 +828,16 @@ class Tieefseeview {
                 temp_can.height = getOriginalHeight();
                 let context0 = temp_can.getContext("2d");
                 context0?.drawImage(dom_img, 0, 0, getOriginalWidth(), getOriginalHeight());
-                return temp_can.toDataURL("image/png", 1)
+                return temp_can.toDataURL("image/png", 1);
             }
 
             if (dataType === "video") {
-
                 temp_can = document.createElement("canvas");
                 temp_can.width = getOriginalWidth();
                 temp_can.height = getOriginalHeight();
                 let context0 = temp_can.getContext("2d");
                 context0?.drawImage(dom_video, 0, 0, getOriginalWidth(), getOriginalHeight());
-
-                return temp_can.toDataURL("image/jpeg", 1)
+                return temp_can.toDataURL("image/jpeg", 1);
             }
             return ""
         }
