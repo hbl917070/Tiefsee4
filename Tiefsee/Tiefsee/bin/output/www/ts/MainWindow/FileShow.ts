@@ -214,22 +214,26 @@ class FileShow {
             }
 
             let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);//取得這種檔案要用什麼方式來解析
+            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);// ex. { ext: "avif", type: ["wpf", "magick"] }
+            let loadOk = false;
             if (fileItem !== null) {
-                let arType = fileItem.type;
+                let arType = fileItem.type;//ex. ["wpf", "magick"]
                 for (let i = 0; i < arType.length; i++) {
                     const type = arType[i];
-                    imgurl = await getUrl(type)
-                    break;
+                    imgurl = await getUrl(type);
+
+                    loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                    if (loadOk) {//如果載入失敗就使用下一種模式來解析
+                        break;
+                    }
                 }
             } else {
-                imgurl = await getUrl("magick")
+                imgurl = await getUrl("magick");
+                loadOk = await tieefseeview.preloadImg(imgurl);//預載入
             }
 
-            let bool = await tieefseeview.preloadImg(imgurl);//預載入
-
-            //如果載入失敗就顯示檔案的圖示
-            if (bool == false) {
+            //如果都載入失敗，就顯示檔案的圖示
+            if (loadOk == false) {
                 imgurl = await getUrl("icon")
                 await tieefseeview.preloadImg(imgurl);//預載入
             }

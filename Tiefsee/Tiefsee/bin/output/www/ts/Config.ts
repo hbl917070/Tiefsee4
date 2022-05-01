@@ -142,8 +142,9 @@ class Config {
                 { ext: "psb", type: ["magick"] },
                 { ext: "pcx", type: ["magick"] },
                 { ext: "heic", type: ["magick"] },
-                { ext: "avif", type: ["magick"] },
+                { ext: "avif", type: ["wpf", "magick"] },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: ["magick"] },
+                //{ ext: "dcm", type: ["magick"] },//多幀
                 { ext: "hdr", type: ["magick"] },
                 { ext: "miff", type: ["magick"] },
                 { ext: "mng", type: ["magick"] },
@@ -178,11 +179,11 @@ class Config {
                 { ext: "srw", type: ["dcraw"] },
                 { ext: "dng", type: ["dcraw"] },
 
-                //{ ext: "afphoto", type: ["nconvertPng"] },
-                //{ ext: "afdesign", type: ["nconvertPng"] },
-                //{ ext: "dcm", type: ["nconvertBmp"] },
+                { ext: "afphoto", type: ["nconvertPng"] },
+                { ext: "afdesign", type: ["nconvertPng"] },
+                { ext: "dcm", type: ["nconvertBmp"] },
                 //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
-                //{ ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
+                { ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
 
             ]
         }
