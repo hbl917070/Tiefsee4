@@ -138,8 +138,8 @@ namespace Tiefsee {
         /// <summary>
         /// 視窗使用毛玻璃效果(只有win10、win11有效
         /// </summary>
-        public void SetAERO() {
-            EnableBlur(M.Handle);
+        public void SetAERO(string type) {
+            EnableBlur(M.Handle, type);
         }
 
         /// <summary>
@@ -329,7 +329,6 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 視窗固定在最上層
         /// </summary>
@@ -361,24 +360,19 @@ namespace Tiefsee {
             if (_type == "LB") { _run = ResizeDirection.LB; }
             if (_type == "RB") { _run = ResizeDirection.RB; }
 
+            /*if (_run== ResizeDirection.Move) {//拖曳視窗
+                int WM_NCLBUTTONDOWN = 161; //  0xA1
+                int HTCAPTION = 2;
+                ReleaseCapture();
+                SendMessage(M.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+                return;
+            }*/
+
             //System.Threading.SynchronizationContext.Current.Post((_) => {    
             //}, null);
 
             ReleaseCapture();
             SendMessage(M.Handle, WM_SYSCOMMAND, (int)(_run), 0);
-
-            /*IntPtr windowHandle = new System.Windows.Interop.WindowInteropHelper(M.win).Handle;
-          
-            Adapter.UIThread(() => {
-                ReleaseCapture();
-                SendMessage(windowHandle, WM_SYSCOMMAND, (int)(_run), 0);
-            });
-
-            new Thread(() => {
-                Adapter.UIThread(() => {
-                });
-                Thread.Sleep(1000);
-            }).Start();*/
 
         }
 
@@ -436,21 +430,34 @@ namespace Tiefsee {
             ACCENT_ENABLE_GRADIENT = 1,
             ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
             ACCENT_ENABLE_BLURBEHIND = 3,
-            ACCENT_INVALID_STATE = 4
+            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
+            ACCENT_INVALID_STATE = 5
         }
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct AccentPolicy {
             public AccentState AccentState;
-            public int AccentFlags;
-            public int GradientColor;
-            public int AnimationId;
+            public uint AccentFlags;
+            public uint GradientColor;
+            public uint AnimationId;
         }
 
-        internal void EnableBlur(IntPtr hwnd) {
+        private uint _blurOpacity = 0;
+        private uint _blurBackgroundColor = 0x010101; /* BGR color format */
+
+        internal void EnableBlur(IntPtr hwnd, string type) {
             var accent = new AccentPolicy();
+
+            if (type.ToLower() == "win10") {
+                //win10
+                accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
+                accent.GradientColor = (_blurOpacity << 24) | (_blurBackgroundColor & 0xFFFFFF);
+            } else {
+                //win7
+                accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
+            }
+       
             var accentStructSize = Marshal.SizeOf(accent);
-            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
 
             var accentPtr = Marshal.AllocHGlobal(accentStructSize);
             Marshal.StructureToPtr(accent, accentPtr, false);

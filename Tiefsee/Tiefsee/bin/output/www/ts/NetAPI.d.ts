@@ -73,7 +73,7 @@ interface WV_Window {
     RunJsOfParent(js: string): string;
 
     /** 啟用AERO毛玻璃效果 */
-    SetAERO(): void;
+    SetAERO(type: ("win7" | "win10")): void;
 
     /** 設定縮放倍率，預設 1.0 */
     SetZoomFactor(d: number): void;

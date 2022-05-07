@@ -482,7 +482,6 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 以js呼叫此函數後才會顯示視窗(系統預設指派的視窗坐標
         /// </summary>
