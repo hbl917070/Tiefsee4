@@ -63,7 +63,7 @@ class Hotkey {
                 M.script.fileLoad.renameMsg();
             }
             if (e.code === "Delete") {
-                M.script.fileLoad.deleteMsg();
+                M.script.fileLoad.showDeleteMsg();
             }
             if (e.code === "KeyO") {
                 M.script.open.showOnExplorer();

@@ -241,7 +241,7 @@ class MainFileList {
             if (temp_loaded.indexOf(i) === -1) {//第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (path !== "") {
                     setTimeout(() => {
-                        if (dom_fileListData.contains(div) === false) { return; }//如果物件不在網頁上，就不載入圖片
+                        if (dom_fileListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
 
                         temp_loaded.push(i);//加到全域變數，表示已經載入過
                         let _url = getImgUrl(path)

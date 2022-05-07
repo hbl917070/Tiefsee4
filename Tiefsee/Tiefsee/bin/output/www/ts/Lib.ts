@@ -12,7 +12,7 @@ class Lib {
             path = path.substring(0, path.length - 1);
         }*/
 
-        if (count === 0) { return null; }// 沒有斜線表示沒有父親目錄
+        if (count === 0) { return null; } // 沒有斜線表示沒有父親目錄
         if (path.length <= 2) { return null; }
 
         if (path.substring(0, 2) === "\\\\") {//網路路徑，例如 \\Desktop-abc\AA
@@ -385,7 +385,7 @@ async function sleep(ms: number) {
  * 轉 number
  */
 function toNumber(t: string | number): number {
-    if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳     
+    if (typeof (t) === "number") { return t } //如果本來就是數字，直接回傳     
     if (typeof t === 'string') { return Number(t.replace('px', '')); } //如果是string，去掉px後轉型成數字
     return 0;
 }

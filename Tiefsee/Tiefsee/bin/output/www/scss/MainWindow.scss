@@ -170,14 +170,19 @@
 
 /*純文字資訊*/
 .main-tools-txt {
-  height: 35px;
-  margin: 0px 5px;
+  height: 35px;  
   font-size: 15px;
-  line-height: 16px;
+  line-height: 17px;
   display: flex;
   align-items: center;
   user-select: none;
   white-space: nowrap;
+
+  //左邊的垂直線
+  padding-right: 5px;
+  padding-left: 8px;
+  border-left: 1px solid var(--color-white20);
+  margin-left: 3px;
 }
 
 /*按鈕*/

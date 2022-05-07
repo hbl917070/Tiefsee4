@@ -185,7 +185,7 @@ class FileSort {
 
         let t = window.localStorage.getItem("sortFile");
 
-        if (t === null) { t = "{}" }//避免從來沒有儲存過
+        if (t === null) { t = "{}" } //避免從來沒有儲存過
         let json = JSON.parse(t);
         let _sortType = json[dirPath];
         if (_sortType !== undefined) {

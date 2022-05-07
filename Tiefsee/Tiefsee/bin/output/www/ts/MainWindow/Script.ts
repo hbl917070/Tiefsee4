@@ -122,7 +122,7 @@ class ScriptFileLoad {
     }
 
     /** 顯示 刪除檔案 的對話方塊 */
-    public deleteMsg() {
+    public showDeleteMsg() {
         this.M.fileLoad.deleteMsg()
     }
 
@@ -147,14 +147,14 @@ class ScriptFile {
     }
 
     /** 快速拖曳(拖出檔案) */
-    public DragDropFile() {
+    public dragDropFile() {
         setTimeout(() => {
             WV_File.DragDropFile(this.M.fileLoad.getFilePath())
         }, 50);
     }
 
     /** 顯示檔案原生右鍵選單 */
-    public ShowContextMenu() {
+    public showContextMenu() {
         WV_File.ShowContextMenu(this.M.fileLoad.getFilePath(), true);
     }
 }
@@ -323,7 +323,7 @@ class ScriptCopy {
 
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         let fileInfo2 = await Lib.GetFileInfo2(filePath);
-        if (fileInfo2.Type === "none") { return; }//如果檔案不存在
+        if (fileInfo2.Type === "none") { return; } //如果檔案不存在
         let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
@@ -353,7 +353,7 @@ class ScriptCopy {
 
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         let fileInfo2 = await Lib.GetFileInfo2(filePath);
-        if (fileInfo2.Type === "none") { return; }//如果檔案不存在
+        if (fileInfo2.Type === "none") { return; } //如果檔案不存在
         //let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
@@ -401,7 +401,7 @@ class ScriptSetting {
     temp_setting: WebWindow | null = null;//用於判斷視窗是否已經開啟
 
     /** 開啟 設定 視窗 */
-    public async OpenSetting() {
+    public async showSetting() {
 
         //如果視窗已經存在，就不再新開
         if (this.temp_setting != null) {

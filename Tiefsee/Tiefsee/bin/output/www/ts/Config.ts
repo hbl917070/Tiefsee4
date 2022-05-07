@@ -46,7 +46,7 @@ class Config {
     public settings = {
         theme: {
             /** 是否啟用毛玻璃 */
-            "aero": false,
+            "aeroType": "none",//none / win7 / win10
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
             /** 文字粗細 */
@@ -92,6 +92,13 @@ class Config {
             windowState: "Normal"
         },
 
+        /** 工具列的順序與是否顯示 */
+        mainTools: { img: [], pdf: [], txt: [] } as {
+            img: { n: string; v: boolean; }[];
+            pdf: { n: string; v: boolean; }[];
+            txt: { n: string; v: boolean; }[];
+        },
+
         /** 進階設定 */
         advanced: {
             /**子資料夾數量太多就禁用資料夾預覽列表 */
@@ -99,18 +106,6 @@ class Config {
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
             highQualityLimit: 7000,
         }
-    }
-
-
-    public getAllowFileTypeItem(type: string, ext: string) {
-        let ar = this.allowFileType(type);
-        for (let i = 0; i < ar.length; i++) {
-            const item = ar[i];
-            if (item.ext === ext) {
-                return item;
-            }
-        }
-        return null;
     }
 
 
@@ -163,6 +158,7 @@ class Config {
                 { ext: "mef", type: ["magick"] },//向量
                 { ext: "wmf", type: ["magick"] },
                 { ext: "mpo", type: ["magick"] },//相機
+                { ext: "jxl", type: ["magick"] }, //JPEG XL，開啟速度很慢
 
                 { ext: "crw", type: ["dcraw"] },
                 { ext: "raf", type: ["dcraw"] },
@@ -184,6 +180,7 @@ class Config {
                 { ext: "dcm", type: ["nconvertBmp"] },
                 //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
                 { ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
+
 
             ]
         }
@@ -232,6 +229,18 @@ class Config {
 
         return []
     }
+
+    public getAllowFileTypeItem(type: string, ext: string) {
+        let ar = this.allowFileType(type);
+        for (let i = 0; i < ar.length; i++) {
+            const item = ar[i];
+            if (item.ext === ext) {
+                return item;
+            }
+        }
+        return null;
+    }
+
 
 }
 

@@ -314,7 +314,7 @@ class MainDirList {
 
             if (arPath.length !== 0) {
                 setTimeout(() => {
-                    if (dom_dirListData.contains(div) === false) { return; }//如果物件不在網頁上，就不載入圖片
+                    if (dom_dirListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
                     for (let i = 0; i < len; i++) {
                         const path = arPath[i];
                         if (temp_loaded.indexOf(n + "-" + i) === -1) {  //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片

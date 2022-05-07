@@ -71,7 +71,7 @@ class Tieefseeview {
 
     constructor(_dom: HTMLDivElement) {
 
-        _dom.innerHTML = `
+        _dom.innerHTML = /*html*/`
             <div class="tiefseeview-loading"></div>   
             <div class="tiefseeview-dpizoom">
                 <div class="tiefseeview-container">
@@ -150,13 +150,13 @@ class Tieefseeview {
             if (_type === "up") { zoomIn(offsetX, offsetY); }
             else { zoomOut(offsetX, offsetY); }
         }
-        var eventChangeZoom = (ratio: number) => { }
-        var eventChangeDeg = (deg: number) => { }
-        var eventChangeMirror = (isMirrorHorizontal: boolean, isMirrorVertica: boolean) => { }
-        var eventChangeXY = (x: number, y: number) => { }
-        var eventLimitMax = (): boolean => { return _eventLimitMax(); }//超出縮放上限，return true表示超過限制    
-        var eventLimitMin = (): boolean => { return _eventLimitMin(); }//超出縮放下限，return true表示超過限制
-        var eventHighQualityLimit = (): number => { return 7000 * 7000; }//圖片面積大於這個數值，就禁用高品質縮放
+        var eventChangeZoom = (ratio: number): void => { }
+        var eventChangeDeg = (deg: number): void => { }
+        var eventChangeMirror = (isMirrorHorizontal: boolean, isMirrorVertica: boolean): void => { }
+        var eventChangeXY = (x: number, y: number): void => { };
+        var eventLimitMax = (): boolean => { return _eventLimitMax(); } //超出縮放上限，return true表示超過限制    
+        var eventLimitMin = (): boolean => { return _eventLimitMin(); } //超出縮放下限，return true表示超過限制
+        var eventHighQualityLimit = (): number => { return 7000 * 7000; } //圖片面積大於這個數值，就禁用高品質縮放
 
         var pinch = new Hammer.Pinch();
         var rotate = new Hammer.Rotate();
@@ -1205,7 +1205,7 @@ class Tieefseeview {
         async function bigimgDraw() {
 
             if (dataType !== "bigimg") { return }
-            if (getOriginalWidth() === 0) { return }//避免圖片尚未載入完成就渲染
+            if (getOriginalWidth() === 0) { return } //避免圖片尚未載入完成就渲染
 
             let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
             let _h = toNumber(dom_data.style.height);
@@ -1442,10 +1442,10 @@ class Tieefseeview {
 
                         });
                 }
-                /*
-                console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
 
-                //
+                //console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
+
+                /*
                 var int_毫秒 = (new Date()).getTime() - time.getTime();
                 var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
                 console.log(s_輸出時間差);*/
@@ -2021,7 +2021,7 @@ class Tieefseeview {
                     complete: () => {//動畫結束時
 
                         //如果角度超過360，就初始化
-                        if (degNow <= 0 || degNow >= 360) { degNow = degNow - Math.floor(degNow / 360) * 360; }//避免超過360               
+                        if (degNow <= 0 || degNow >= 360) { degNow = degNow - Math.floor(degNow / 360) * 360; } //避免超過360               
                         $(dom_data).animate({ "transform_rotate": degNow, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
                         dom_data.style.transform = `rotate(${degNow}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
 
@@ -2074,7 +2074,7 @@ class Tieefseeview {
          * 轉 number
          */
         function toNumber(t: string | number): number {
-            if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳     
+            if (typeof (t) === "number") { return t } //如果本來就是數字，直接回傳     
             if (typeof t === "string") { return Number(t.replace("px", "")); } //如果是string，去掉px後轉型成數字
             return 0;
         }
@@ -2457,8 +2457,8 @@ class TieefseeviewScroll {
          * @returns 
          */
         function toNumber(t: string | number): number {
-            if (typeof (t) === "number") { return t }//如果本來就是數字，直接回傳
-            if (typeof t === "string") { return Number(t.replace("px", "")); }//如果是string，去掉px後轉型成數字
+            if (typeof (t) === "number") { return t } //如果本來就是數字，直接回傳
+            if (typeof t === "string") { return Number(t.replace("px", "")); } //如果是string，去掉px後轉型成數字
             return 0;
         }
 

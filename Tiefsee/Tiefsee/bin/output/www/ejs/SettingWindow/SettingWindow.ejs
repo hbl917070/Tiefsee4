@@ -23,16 +23,21 @@
     <script src="./vender/tippyjs/popper.min.js"></script>
     <script src="./vender/tippyjs/tippy-bundle.umd.min.js"></script>
 
+    <!-- 拖曳排序物件 -->
+    <script src="./vender/Sortable.min.js"></script>
+
     <link rel="stylesheet" href="./css/BaseWindow.css">
     <script src="./js/BaseWindow.js"></script>
     <script src="./js/Lib.js"></script>
 
     <link rel="stylesheet" href="./css/Setting.css">
-    <link rel="stylesheet" href="./css/Menu.css">
+    <!-- <link rel="stylesheet" href="./css/Menu.css"> -->
     <link rel="stylesheet" href="./css/Msgbox.css">
 
     <script src="./js/Config.js"></script>
-    <script src="./js/MainWindow/Menu.js"></script>
+    <script src="./js/SvgList.js"></script>
+    <!-- <script src="./js/MainWindow/Menu.js"></script> -->
+    <script src="./js/MainWindow/MainTools.js"></script>
     <script src="./js/Msgbox.js"></script>
     <script src="./js/SettinWindow/SettinWindow.js"></script>
 
@@ -58,7 +63,7 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-common" i18n="" active="true"> 一般 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n=""> 外觀 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n=""> 版面 </div>
-                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n=""> 設為預設程式 </div>
@@ -262,10 +267,12 @@
 
                         <div class="text-title"> 毛玻璃效果(需重啟程式)</div>
                         <div class="text-content">
-                            <label class="switch">
-                                <input type="checkbox" id="switch-theme-areo">
-                                <span class="slider round"></span>
-                            </label>
+                            <select class="text-input" id="select-aeroType">
+                                <option value="none">不使用</option>
+                                <option value="win7">win7樣式</option>
+                                <option value="win10">win10樣式</option>
+                            </select>
+              
                         </div>
 
                     </div>
@@ -354,8 +361,30 @@
                 <div class="page-tabsPage" id="tabsPage-tools">
                     <div class="page-title" i18b=""> 工具列 </div>
                     <div class="box">
-                        <div class="box-title">
-                            還在做
+                        <div class="box-title">自訂工具列 </div>
+
+                        <div class="text-title"> </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-toolsListType">
+                                <!-- <option value="welcome"></option> -->
+                                <option value="img">圖片</option>
+                                <option value="pdf">PDF</option>
+                                <option value="txt">文字</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title">(可拖曳調整順序) </div>     
+                        <div class="toolsList" id="toolsList-img">
+                            <!-- 
+                            <div class="toolsList-item">
+                                <input class="toolsList-checkbox" type="checkbox">
+                                <%- await readFile("./img/default/tool-rotateCcw.svg"); %>
+                                    <span>好地方官方</span>
+                            </div> -->
+                        </div>
+                        <div class="toolsList" id="toolsList-pdf">
+                        </div>
+                        <div class="toolsList" id="toolsList-txt">
                         </div>
                     </div>
                 </div>
@@ -368,7 +397,7 @@
                         <div class="box-title"> 圖片縮放模式 </div>
                         <div class="text-title"> </div>
                         <div class="text-content">
-                            <select class="text-input" id="image-tieefseeviewImageRendering">
+                            <select class="text-input" id="select-tieefseeviewImageRendering">
                                 <option value="0">平滑</option>
                                 <option value="1">銳利</option>
                                 <option value="2">僅放大時銳利</option>
@@ -381,7 +410,7 @@
 
                         <div class="text-title"> 強制將圖片渲染成更高的解析度 </div>
                         <div class="text-content">
-                            <select class="text-input" id="image-dpizoom">
+                            <select class="text-input" id="select-imageDpizoom">
                                 <option value="-1">auto</option>
                                 <option value="1">100%</option>
                                 <option value="1.25">125%</option>
@@ -443,12 +472,12 @@
 
                         <div class="text-title"> Port (如果已經被使用，則會使用下一號) </div>
                         <div class="text-content">
-                            <input class="text-input" type="text" id="txt-startPort">
+                            <input class="text-input" type="text" id="text-startPort">
                         </div>
 
                         <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
                         <div class="text-content" style="display:none;">
-                            <input class="text-input" type="text" id="txt-serverCache">
+                            <input class="text-input" type="text" id="text-serverCache">
                         </div>
 
                         <div class="text-title"> 清理快取資料 </div>

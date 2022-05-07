@@ -159,9 +159,16 @@ class MainWindow {
                     fileLoad.loadFiles(args[0], args);//載入多張圖片
                 }
 
-                if (config.settings["theme"]["aero"]) {
-                    WV_Window.SetAERO();// aero毛玻璃效果
+
+                // aero毛玻璃效果
+                let aeroType = config.settings["theme"]["aeroType"];
+                if (aeroType == "win10") {
+                    WV_Window.SetAERO("win10");
+                } else if (aeroType == "win7") {
+                    WV_Window.SetAERO("win7");
                 }
+
+
 
             } else {//單純開啟圖片(用於 單一執行個體)
 
@@ -376,10 +383,10 @@ class MainWindow {
 
         }
 
-
         /**
          * 套用設定
          * @param _settings 
+         * @param isStart 是否為第一次呼叫
          */
         function applySetting(_settings: any, isStart = false) {
 
@@ -418,6 +425,25 @@ class MainWindow {
 
             //-----------
 
+            //工具列順序與是否顯示
+            const arGroupName = ["img", "pdf", "txt"];
+            arGroupName.map((gn) => {
+                let groupName = gn as ("img" | "pdf" | "txt");
+
+                let dom_group = dom_tools.querySelector(`.main-tools-group[data-name=${groupName}]`) as HTMLElement;
+                let arMainTools = config.settings.mainTools[groupName];
+                for (let i = 0; i < arMainTools.length; i++) {
+                    const item = arMainTools[i];
+                    let dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
+                    if (dom_btn == null) { continue; }
+                    dom_btn.style.order = i + "";//排序
+                    dom_btn.style.display = (item.v) ? "" : "none";//顯示或隱藏
+                }
+
+            })
+
+            //-----------
+
             //圖片面積大於這個數值的平方，就禁用高品質縮放
             let imageArea = Number(config.settings.advanced.highQualityLimit);
             if (imageArea == -1) { imageArea = 999999; }
@@ -426,15 +452,14 @@ class MainWindow {
 
             //-----------
 
+            //套用顏色
             cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
-
             initColor("--color-window-background", true);
             initColor("--color-window-border", true);
             initColor("--color-white");
             initColor("--color-black");
             initColor("--color-blue");
             //initColor("--color-grey");
-
             function initColor(name: string, opacity: boolean = false) {
                 //@ts-ignore
                 let c = config.settings.theme[name];

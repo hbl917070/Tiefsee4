@@ -178,7 +178,7 @@ class InitMenu {
                     let name = exe.name;//顯示的名稱
                     let imgBase64 = await WV_Image.GetFileIcon(exe.path, 32);//圖示
 
-                    if (imgBase64 === "") { continue; }//如果沒有圖示，表示檔案不存在
+                    if (imgBase64 === "") { continue; } //如果沒有圖示，表示檔案不存在
 
                     let dom = newDiv(`
                         <div class="menu-hor-item">
@@ -367,7 +367,7 @@ class InitMenu {
             });
             dom.querySelector(".js-rightMenu")?.addEventListener("click", () => {//檔案右鍵選單
                 M.script.menu.close();
-                M.script.file.ShowContextMenu();
+                M.script.file.showContextMenu();
             });
             dom.querySelector(".js-copy")?.addEventListener("click", () => {//複製影像
                 M.script.menu.close();
@@ -375,11 +375,11 @@ class InitMenu {
             });
             dom.querySelector(".js-delete")?.addEventListener("click", () => {//刪除圖片
                 M.script.menu.close();
-                M.script.fileLoad.deleteMsg();
+                M.script.fileLoad.showDeleteMsg();
             });
             dom.querySelector(".js-setting")?.addEventListener("click", () => {//設定
                 M.script.menu.close();
-                M.script.setting.OpenSetting();
+                M.script.setting.showSetting();
             });
             dom.querySelector(".js-help")?.addEventListener("click", () => {//說明
                 M.script.menu.close();
