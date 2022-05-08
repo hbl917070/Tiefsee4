@@ -1,4 +1,4 @@
-import { contains } from "jquery";
+//import { contains } from "jquery";
 
 var baseWindow: BaseWindow;
 
@@ -146,10 +146,8 @@ class Setting {
                     let item = arMainTools[i];
                     let d2 = dom_toolsList.querySelector(`[data-name=${item.n}]`);
                     if (d2 === null) { continue; }
-                    if (item.v === true) {
-                        const domCheckbox = d2.querySelector(".toolsList-checkbox") as HTMLInputElement;
-                        domCheckbox.checked = true;
-                    }
+                    const domCheckbox = d2.querySelector(".toolsList-checkbox") as HTMLInputElement;
+                    domCheckbox.checked = item.v;
                 }
 
                 //給每一個checkbox都註冊onchange
@@ -231,7 +229,6 @@ class Setting {
             eventChange();
 
         });
-
 
         //主題
         addLoadEvent(() => {

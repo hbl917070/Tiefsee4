@@ -38,7 +38,7 @@ class FileLoad {
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  video=影片  imgs=多幀圖片  txt=文字 */
         var groupType: string = "img";
-        var fileLoadType: FileLoadType //資料夾或自定名單
+        var fileLoadType: FileLoadType //資料夾或自訂名單
         var arFile: string[] = [];//待載入名單
         var flagFile: number;//目前在哪一張圖片
 
@@ -290,7 +290,7 @@ class FileLoad {
          */
         async function loadFiles(dirPath: string, arName: string[] = []) {
 
-            fileLoadType = FileLoadType.userDefined;//名單類型，自定義
+            fileLoadType = FileLoadType.userDefined;//名單類型，自訂義
 
             //改用C#處理，增加執行效率
             arFile = await WV_Directory.GetFiles2(dirPath, arName);
@@ -466,7 +466,7 @@ class FileLoad {
 
             updateTitle();//更新視窗標題
 
-            if (fileLoadType === FileLoadType.userDefined) { //如果是自定名單
+            if (fileLoadType === FileLoadType.userDefined) { //如果是自訂名單
                 groupType = fileToGroupType(fileInfo2);//根據檔案類型判斷要用什麼方式顯示檔案
             }
 
@@ -688,7 +688,7 @@ enum FileLoadType {
     /** 資料夾內的全部檔案 */
     "dir",
 
-    /** 自定名單 */
+    /** 自訂名單 */
     "userDefined"
 }
 

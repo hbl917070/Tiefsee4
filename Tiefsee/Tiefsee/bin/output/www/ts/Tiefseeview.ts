@@ -1889,7 +1889,7 @@ class Tieefseeview {
 
                     $(dom_con).animate(
                         {
-                            "top": _top,//自定用於動畫的變數
+                            "top": _top,//自訂用於動畫的變數
                             "left": _left,
                         },
                         {
@@ -1979,7 +1979,7 @@ class Tieefseeview {
             await new Promise((resolve, reject) => {
 
                 $(dom_data).animate({
-                    "transform_rotate": degNow,//自定用於動畫的變數
+                    "transform_rotate": degNow,//自訂用於動畫的變數
                     "transform_scaleX": scaleX,
                     "transform_scaleY": scaleY,
                 }, {
