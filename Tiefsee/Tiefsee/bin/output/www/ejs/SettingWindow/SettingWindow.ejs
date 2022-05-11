@@ -218,19 +218,8 @@
 
                     </div>
 
-
                     <div class="box">
-                        <div class="box-title"> 視窗設定 </div>
-
-                        <div class="text-title"> 視窗縮放 (0.5~3.0)</div>
-                        <div class="text-content">
-                            <input class="text-input" type="text" id="text-theme-zoomFactor">
-                        </div>
-
-                        <div class="text-title"> 視窗圓角 (0~15)</div>
-                        <div class="text-content">
-                            <input class="text-input" type="text" id="text-theme-windowBorderRadius">
-                        </div>
+                        <div class="box-title"> 文字與圖示 </div>
 
                         <div class="text-title"> 文字粗細 </div>
                         <div class="text-content">
@@ -246,7 +235,6 @@
                                 <option value="900">9(最粗)</option>
                             </select>
                         </div>
-
 
                         <div class="text-title"> 圖示粗細 </div>
                         <div class="text-content">
@@ -264,17 +252,29 @@
                                 <option value="1px">10(最粗)</option>
                             </select>
                         </div>
+                    </div>
 
-                        <div class="text-title"> 毛玻璃效果(需重啟程式)</div>
+                    <div class="box">
+                        <div class="box-title"> 視窗設定 </div>
+
+                        <div class="text-title"> 視窗縮放 (0.5~3.0)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-theme-zoomFactor">
+                        </div>
+
+                        <div class="text-title"> 視窗圓角 (0~15)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-theme-windowBorderRadius">
+                        </div>
+
+                        <div class="text-title"> 毛玻璃效果 (修改後需重啟程式)</div>
                         <div class="text-content">
                             <select class="text-input" id="select-aeroType">
                                 <option value="none">不使用</option>
                                 <option value="win7">win7樣式</option>
                                 <option value="win10">win10樣式</option>
                             </select>
-
                         </div>
-
                     </div>
 
                 </div>
@@ -342,7 +342,6 @@
                             </label>
                         </div>
 
-
                         <div class="text-title"> 圖片數量 </div>
                         <div class="text-content">
                             <select class="text-input" id="select-dirListImgNumber">
@@ -367,25 +366,16 @@
                         <div class="text-content">
                             <select class="text-input" id="select-toolsListType">
                                 <!-- <option value="welcome"></option> -->
-                                <option value="img">圖片</option>
-                                <option value="pdf">PDF</option>
-                                <option value="txt">文字</option>
+                                <option value="img">圖片工具列</option>
+                                <option value="pdf">PDF工具列</option>
+                                <option value="txt">文字工具列</option>
                             </select>
                         </div>
 
                         <div class="text-title">(可拖曳調整順序) </div>
-                        <div class="toolsList" id="toolsList-img">
-                            <!-- 
-                            <div class="toolsList-item">
-                                <input class="toolsList-checkbox" type="checkbox">
-                                <%- await readFile("./img/default/tool-rotateCcw.svg"); %>
-                                    <span>好地方官方</span>
-                            </div> -->
-                        </div>
-                        <div class="toolsList" id="toolsList-pdf">
-                        </div>
-                        <div class="toolsList" id="toolsList-txt">
-                        </div>
+                        <div class="toolsList" id="toolsList-img"> </div>
+                        <div class="toolsList" id="toolsList-pdf"> </div>
+                        <div class="toolsList" id="toolsList-txt"> </div>
                     </div>
                 </div>
 
@@ -400,14 +390,10 @@
                             <select class="text-input" id="select-tieefseeviewImageRendering">
                                 <option value="0">平滑</option>
                                 <option value="1">銳利</option>
-                                <option value="2">僅放大時銳利</option>
+                                <option value="2">大於100%時銳利</option>
                             </select>
                         </div>
                     </div>
-
-
-
-
 
                 </div>
 
@@ -450,25 +436,15 @@
                     <div class="page-title" i18b=""> 進階設定 </div>
 
                     <div class="box">
-                        <div class="box-title"> Tiefsee localhost server </div>
+                        <div class="box-title"> 清理快取資料 </div>             
 
-                        <div class="text-title"> Port (如果已經被使用，則會使用下一號) </div>
-                        <div class="text-content">
-                            <input class="text-input" type="text" id="text-startPort">
-                        </div>
-
-                        <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
-                        <div class="text-content" style="display:none;">
-                            <input class="text-input" type="text" id="text-serverCache">
-                        </div>
-
-                        <div class="text-title"> 清理快取資料 </div>
+                        <div class="text-title">  </div>
                         <div class="text-content">
                             <div class="btn" id="btn-clearBrowserCache">清理</div>
                         </div>
                     </div>
 
-
+                    
                     <div class="box">
                         <div class="box-title"> 效能 </div>
 
@@ -514,9 +490,22 @@
                                 <option value="3.0">300%</option>
                             </select>
                         </div>
-
                     </div>
 
+
+                    <div class="box">
+                        <div class="box-title"> Tiefsee localhost server </div>
+
+                        <div class="text-title"> Port (如果已經被使用，則會使用下一號) </div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" id="text-startPort">
+                        </div>
+
+                        <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
+                        <div class="text-content" style="display:none;">
+                            <input class="text-input" type="text" id="text-serverCache">
+                        </div>
+                    </div>
 
 
                     <div class="box">
@@ -538,7 +527,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.15</span>
+                            <span> Tiefsee 4.0.0-beta.16</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

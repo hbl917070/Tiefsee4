@@ -78,8 +78,8 @@ class Msgbox {
                     ${htmlRadio}
                 
                     <div class="msgbox-bottom">
-                        <div class="msgbox-btn msgbox-btn__no">取消</div>
                         <div class="msgbox-btn msgbox-btn__yes">確定</div>
+                        <div class="msgbox-btn msgbox-btn__no">取消</div>
                     </div>
                 </div>
             </div>`)

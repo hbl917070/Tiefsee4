@@ -35,7 +35,7 @@ class MainTools {
             initToolsWelcome();
 
             //產生UI
-            if (M === null) { return }            
+            if (M === null) { return }
             for (let i = 0; i < ar.length; i++) {
                 const item = ar[i];
 
@@ -209,6 +209,7 @@ class MainTools {
                             M?.script.file.showContextMenu();
                         }
                     });
+                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
                 },
             })
 
@@ -494,6 +495,7 @@ class MainTools {
                             M?.script.file.showContextMenu();
                         }
                     });
+                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
                 },
             })
 
@@ -684,6 +686,7 @@ class MainTools {
                             M?.script.file.showContextMenu();
                         }
                     });
+                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
                 },
             })
 

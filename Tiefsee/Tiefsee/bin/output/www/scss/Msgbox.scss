@@ -73,6 +73,7 @@
   margin: 0px 10px 20px 10px;
 }
 
+//按鈕
 .msgbox-btn {
   min-width: 80px;
   height: 35px;
@@ -88,7 +89,6 @@
   border-radius: 5px;
   user-select: none;
 }
-
 .msgbox-btn:hover {
   background-color: var(--color-white30);
   cursor: pointer;

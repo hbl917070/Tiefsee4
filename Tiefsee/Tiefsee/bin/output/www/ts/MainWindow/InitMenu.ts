@@ -21,7 +21,11 @@ class InitMenu {
         //點擊右鍵時
         document.body.addEventListener("mousedown", (e) => {
             if (e.button === 2) {
-                M.script.menu.showRightMenuImage();
+                let target = e.target as HTMLElement;
+                let dataMenu = target.getAttribute("data-menu");
+                if (dataMenu != "none") {
+                    M.script.menu.showRightMenuImage();
+                }
             }
         })
 
@@ -315,8 +319,6 @@ class InitMenu {
                 }
             }
         }
-
-
 
 
         /**
