@@ -33,12 +33,10 @@ namespace Tiefsee {
             webServer.RouteAddGet("/api/getImg/magick", magick);
             webServer.RouteAddGet("/api/getImg/dcraw", dcraw);
             webServer.RouteAddGet("/api/getImg/wpf", wpf);
-            webServer.RouteAddGet("/api/getImg/nconvertBmp", nconvertBmp);
-            webServer.RouteAddGet("/api/getImg/nconvertPng", nconvertPng);
+            webServer.RouteAddGet("/api/getImg/nconvert", nconvert);
 
             webServer.RouteAddGet("/www/{*}", getWww);
             webServer.RouteAddGet("/{*}", getWww);
-
         }
 
 
@@ -51,8 +49,9 @@ namespace Tiefsee {
         /// 
         /// </summary>
         /// <param name="d"></param>
-        void nconvertBmp(RequestData d) {
-         
+        void nconvert(RequestData d) {
+
+            string type = d.args["type"];
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
@@ -60,27 +59,16 @@ namespace Tiefsee {
             //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             //if (is304 == true) { return; }
 
-            string imgPath = ImgLib.Nconvert_PathToPath(path,false,false);
-            WriteString(d,imgPath);
+            string imgPath;
+            if (type == "png") {
+                imgPath = ImgLib.Nconvert_PathToPath(path, false, true);
+            } else {
+                imgPath = ImgLib.Nconvert_PathToPath(path, false, false);
+            }
+            WriteString(d, imgPath);//回傳輸出的檔案路徑
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="d"></param>
-        void nconvertPng(RequestData d) {
-
-            string path = d.args["path"];
-            path = Uri.UnescapeDataString(path);
-            if (File.Exists(path) == false) { return; }
-            //string contentType = "";
-            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
-            //if (is304 == true) { return; }
-
-            string imgPath = ImgLib.Nconvert_PathToPath(path, false, true);
-            WriteString(d, imgPath);
-        }
 
         /// <summary>
         /// 
@@ -88,6 +76,7 @@ namespace Tiefsee {
         /// <param name="d"></param>
         void magick(RequestData d) {
 
+            string type = d.args["type"];
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
@@ -95,7 +84,7 @@ namespace Tiefsee {
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
-            using (Stream stream = ImgLib.MagickImage_PathToStream(path)) {
+            using (Stream stream = ImgLib.MagickImage_PathToStream(path, type)) {
                 WriteStream(d, stream); //回傳檔案
             }
         }

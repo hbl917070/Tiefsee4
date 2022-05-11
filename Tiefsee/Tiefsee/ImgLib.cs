@@ -1,4 +1,5 @@
 ﻿using ImageMagick;
+using ImageMagick.Formats;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,14 +63,39 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static Stream MagickImage_PathToStream(string path) {
-            using (MagickImage image = new MagickImage(path)) {
-                MagickFormat imgType = MagickFormat.Bmp;
-                /*if (image.IsOpaque == false) {//包含透明色
-                    imgType = MagickFormat.Png;
-                    d.context.Response.ContentType = "image/png";
+        public static Stream MagickImage_PathToStream(string path, string type) {
+
+            var settings = new MagickReadSettings {
+                BackgroundColor = MagickColors.None,
+                Defines = new DngReadDefines {
+                    OutputColor = DngOutputColor.SRGB,
+                    UseCameraWhitebalance = true,
+                    DisableAutoBrightness = false
+                }
+            };
+            using (MagickImage image = new MagickImage(path, settings)) {
+
+                /*if (image.ColorSpace == ColorSpace.RGB || image.ColorSpace == ColorSpace.sRGB || image.ColorSpace == ColorSpace.scRGB) {
+                    image.SetProfile(ColorProfile.SRGB);
                 }*/
-                return new MemoryStream(image.ToByteArray(imgType));
+                image.AutoOrient();//自動調整方向
+                image.SetProfile(ColorProfile.SRGB);//如果不是RGB格式的圖片，需要更多時間來轉檔
+                MagickFormat imgType;
+                if (type.ToLower() == "png") {
+                    image.Quality = 0;//壓縮品質
+                    imgType = MagickFormat.Png24;
+                } else {
+                    imgType = MagickFormat.Bmp;//bpm也支援透明色
+                }
+
+                var ms = new MemoryStream();
+                //image.Quality = 1;
+                image.Write(ms, imgType);
+                ms.Position = 0;
+
+                image.Dispose();
+
+                return ms;
             }
         }
 
@@ -200,7 +226,7 @@ namespace Tiefsee {
             var thumb = thumbnail ? "-embedded_jpeg" : "";
             string arg = $"-quiet {thumb} -raw_camerabalance -raw_autobright -icc {argOut} -o \"{filePath}\" \"{path}\"";
             var d = RunNconvert(arg, 60 * 1000);
-        
+
             //var ms = new MemoryStream(File.ReadAllBytes(temp));
             return filePath;
         }
@@ -227,7 +253,7 @@ namespace Tiefsee {
         private static string RunNconvert(string arg, int timeout) {
 
             string NconvertExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin\\NConvert\\nconvert.exe");
-         
+
             using (var p = new Process()) {
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;

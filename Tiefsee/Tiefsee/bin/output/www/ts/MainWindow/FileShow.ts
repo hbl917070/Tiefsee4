@@ -185,28 +185,31 @@ class FileShow {
             let imgurl = _path;//圖片網址
 
             async function getUrl(type: string) {
-                if (type == "web") {
+                if (type === "web") {
                     return Lib.pathToURL(_path) + `?${fileTime}`;
                 }
-                if (type == "icon") {
+                if (type === "icon") {
                     return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(_path)
                 }
-                if (type == "wpf") {
+                if (type === "wpf") {
                     return APIURL + `/api/getImg/wpf?path=${encodePath}&${fileTime}`
                 }
-                if (type == "magick") {
-                    return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
+                if (type === "magick" || type === "magickBmp") {
+                    return APIURL + `/api/getImg/magick?type=bmp&path=${encodePath}&${fileTime}`
                 }
-                if (type == "dcraw") {
+                if (type === "magickPng") {
+                    return APIURL + `/api/getImg/magick?type=png&path=${encodePath}&${fileTime}`
+                }
+                if (type === "dcraw") {
                     return APIURL + `/api/getImg/dcraw?path=${encodePath}&${fileTime}`
                 }
-                if (type == "nconvertPng") {
-                    let url = APIURL + `/api/getImg/nconvertPng?path=${encodePath}&${fileTime}`
+                if (type === "nconvert" || type === "nconvertBmp") {
+                    let url = APIURL + `/api/getImg/nconvert?type=bmp&path=${encodePath}&${fileTime}`
                     url = Lib.pathToURL(await fetchGet_text(url));
                     return url;
                 }
-                if (type == "nconvertBmp") {
-                    let url = APIURL + `/api/getImg/nconvertBmp?path=${encodePath}&${fileTime}`
+                if (type === "nconvertPng") {
+                    let url = APIURL + `/api/getImg/nconvert?type=png&path=${encodePath}&${fileTime}`
                     url = Lib.pathToURL(await fetchGet_text(url));
                     return url;
                 }

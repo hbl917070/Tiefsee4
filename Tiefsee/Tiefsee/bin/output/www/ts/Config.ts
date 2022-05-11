@@ -140,7 +140,7 @@ class Config {
                 { ext: "avif", type: ["wpf", "magick"] },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: ["magick"] },
                 //{ ext: "dcm", type: ["magick"] },//多幀
-                { ext: "hdr", type: ["magick"] },
+                { ext: "hdr", type: ["magickPng"] },
                 { ext: "miff", type: ["magick"] },
                 { ext: "mng", type: ["magick"] },
                 { ext: "otb", type: ["magick"] },
@@ -177,7 +177,7 @@ class Config {
 
                 { ext: "afphoto", type: ["nconvertPng"] },
                 { ext: "afdesign", type: ["nconvertPng"] },
-                { ext: "dcm", type: ["nconvertBmp"] },
+                { ext: "dcm", type: ["magick", "nconvertBmp"] },
                 //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
                 { ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
 
