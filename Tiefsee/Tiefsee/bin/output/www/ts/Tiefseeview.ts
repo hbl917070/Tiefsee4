@@ -1282,10 +1282,17 @@ class Tieefseeview {
             let dHeight = viewHeight + _margin * 2;
 
             //避免以浮點數進行運算
-            //sx = Math.floor(sx);
-            //sy = Math.floor(sy);
-            //sWidth = Math.floor(sWidth);
-            //sHeight = Math.floor(sHeight);
+            function toFloor() {
+                sx = Math.floor(sx);
+                sy = Math.floor(sy);
+                sWidth = Math.floor(sWidth);
+                sHeight = Math.floor(sHeight);
+                dx = Math.floor(dx);
+                dy = Math.floor(dy);
+                dWidth = Math.floor(dWidth);
+                dHeight = Math.floor(dHeight);
+            }
+            toFloor();
 
             //圖片如果有旋轉，或是移動超過多餘渲染區塊的1/2，才會再次渲染
             if (
@@ -1307,10 +1314,10 @@ class Tieefseeview {
                 // if (sy < 0) { sy = 0 }
                 //if (sWidth > getOriginalWidth()) { sWidth = getOriginalWidth() }
                 //if (sHeight > getOriginalHeight()) { sWidth = getOriginalHeight() }
-                dom_bigimg_canvas.width = (viewWidth + _margin * 2) / radio_can;
-                dom_bigimg_canvas.height = (viewHeight + _margin * 2) / radio_can;
-                dom_bigimg_canvas.style.width = viewWidth + _margin * 2 + "px";
-                dom_bigimg_canvas.style.height = viewHeight + _margin * 2 + "px";
+                dom_bigimg_canvas.width = Math.floor((viewWidth + _margin * 2) / radio_can);
+                dom_bigimg_canvas.height = Math.floor((viewHeight + _margin * 2) / radio_can);
+                dom_bigimg_canvas.style.width = Math.floor(viewWidth + _margin * 2) + "px";
+                dom_bigimg_canvas.style.height = Math.floor(viewHeight + _margin * 2) + "px";
                 dom_bigimg_canvas.style.left = dx + "px";
                 dom_bigimg_canvas.style.top = dy + "px";
                 let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
@@ -1333,6 +1340,15 @@ class Tieefseeview {
                 let resizeQuality: ResizeQuality = "medium";//medium
 
                 if (getOriginalWidth() * getOriginalHeight() > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
+                    toFloor();
+                    //console.log("drawImage直接渲染");
+                    context.drawImage(temp_can,
+                        sx, sy, sWidth, sHeight,
+                        0, 0, dWidth, dHeight
+                    );
+
+                }
+                /*else if (_scale >= 1) {
 
                     //console.log("drawImage直接渲染");
                     context.drawImage(temp_can,
@@ -1340,15 +1356,31 @@ class Tieefseeview {
                         0, 0, dWidth, dHeight
                     );
 
-                } else if (_scale >= 1) {
+                } */
+
+                else if (_scale >= 1) {
 
                     //console.log("drawImage直接渲染");
-                    context.drawImage(temp_can,
+                    toFloor();
+                    const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個100*100的canvas畫布
+                    const oc2d = oc.getContext("2d"); // canvas 畫筆
+                    if (oc2d == null) { return }
+                    oc2d.drawImage(temp_can,
+                        //-sx, -sy, sWidth, sHeight,
                         sx, sy, sWidth, sHeight,
-                        0, 0, dWidth, dHeight
+                        0, 0, sWidth, sHeight
                     );
 
-                } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
+                    resizeQuality = "high";
+
+                    await createImageBitmap(oc, 0, 0, sWidth, sHeight,
+                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
+                        .then(function (sprites) {
+                            if (tc !== temp_canvasSN) { return; }
+                            context.drawImage(sprites, 0, 0,);
+                        });
+                }
+                else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
 
                     //console.log("寬高跟高度全部渲染");
                     sWidth = getOriginalWidth();
@@ -1357,7 +1389,7 @@ class Tieefseeview {
                     sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     dHeight = getOriginalHeight() * _scale
-
+                    toFloor();
                     await createImageBitmap(temp_can, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1374,6 +1406,7 @@ class Tieefseeview {
                     sy = dy * -1
                     //dWidth = getOriginalWidth() * _scale
                     dHeight = getOriginalHeight() * _scale
+                    toFloor();
                     await createImageBitmap(temp_can, sx, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1399,7 +1432,7 @@ class Tieefseeview {
                     //sy = dy * -1
                     dWidth = getOriginalWidth() * _scale
                     //dHeight = getOriginalHeight() * _scale
-
+                    toFloor();
                     await createImageBitmap(temp_can, 0, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1420,6 +1453,7 @@ class Tieefseeview {
                 } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
 
                     //console.log("局部渲染");
+                    toFloor();
                     await createImageBitmap(temp_can, sx, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {

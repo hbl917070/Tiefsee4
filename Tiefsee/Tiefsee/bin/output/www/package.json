@@ -2,6 +2,7 @@
   "dependencies": {
     "@types/hammerjs": "^2.0.39",
     "@types/jquery": "^3.5.5",
+    "@types/offscreencanvas": "^2019.6.4",
     "gulp": "^4.0.2",
     "gulp-ejs": "^5.1.0",
     "gulp-esbuild": "^0.10.0",
