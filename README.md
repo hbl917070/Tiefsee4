@@ -6,11 +6,11 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.15](https://github.com/hbl917070/tiefsee4/releases)
+[Tiefsee 4.0.0-beta.16](https://github.com/hbl917070/tiefsee4/releases)
 (注意：此為測試版，功能尚未齊全到足以取代Tiefsee 3.0.2  
 
     開發中功能：  
-    瀏覽多幀圖片、大量瀏覽模式、搜圖、多國語言、自定工具列、自定快速鍵、顯示exif
+    瀏覽多幀圖片、大量瀏覽模式、搜圖、多國語言、自定快速鍵、顯示exif
 
 <br>
 
@@ -32,17 +32,39 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 
 <br>
 
-## 專案說明
-- 專案類型：C# WinForm (net 4.8)
-- 開發語言：C#、TypeScript
-- [專案建立步驟](/Building.md)
+# 專案說明
+### 專案類型：C# WinForm (net 4.8)
+### 開發語言：C#、TypeScript
+### [專案建立步驟](/Building.md)
 
 <br>
 
-## 目前已知問題
+# 目前已知問題
 ### 1、無法使用觸控拖曳移動程式
 > 此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。
 
 ### 2、win7無法讓視窗透明化
-> 無解
+> webview2的透明背景不支援win7。
 
+### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
+> 要解決此問題只能改用UWP專案來開發。
+
+### 4、使用毛玻璃視窗後，可能導致Tiefsee的視窗在移動時嚴重延遲
+> Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API，此BUG並非在所有電腦都會發生，要解決此問題只能改用UWP專案來開發。
+
+<br>
+
+# Licenses
+Tiefsee4 source code is open source under the [MIT license](/LICENSE).  
+However, NConvert in the plugin directory is not part of the Tiefsee project.  
+NConvert is only available for free for private or educational use (including non-profit organizations).  
+If you need a license for NConvert, please go to  
+https://www.xnview.com/
+
+<br>
+
+Tiefsee4的原始碼以[MIT授權](/LICENSE)形式開源，  
+但plugin目錄裡面的NConvert並不屬於Tiefsee專案的一部分。  
+NConvert只免費提供給私人用途(非商業)或教育用途，  
+如果需要NConvert的授權，請至  
+https://www.xnview.com/
