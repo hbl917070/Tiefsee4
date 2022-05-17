@@ -791,6 +791,11 @@ class Tieefseeview {
                 dom_img.src = errerUrl;
                 return false;
             }
+            //temp_bigimg_50 = null;
+            //temp_bigimg_25 = null;
+
+            temp_bigimg = [];
+
 
             temp_drawImage = {
                 scale: 1,
@@ -811,7 +816,6 @@ class Tieefseeview {
             setDataSize(getOriginalWidth());
 
             return true;
-
         }
 
 
@@ -1198,6 +1202,102 @@ class Tieefseeview {
             dWidth: 1, dHeight: 1
         }
 
+        //var temp_bigimg_50: null | HTMLCanvasElement | ImageBitmap;
+        //var temp_bigimg_25: null | HTMLCanvasElement | ImageBitmap;
+
+        var temp_bigimg: (undefined | HTMLCanvasElement | ImageBitmap)[] = []
+
+
+
+        function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number) {
+
+            let width = Math.floor(img.width * zoom);
+            let height = Math.floor(img.height * zoom);
+
+            let cs = document.createElement("canvas");
+            cs.width = width;
+            cs.height = height;
+            let context0 = cs.getContext("2d") as CanvasRenderingContext2D;
+            /*if (width > 3000) {
+                context0.filter = `blur(${1}px)`;
+            }*/
+            context0.imageSmoothingQuality = "medium";
+            context0.drawImage(img, 0, 0, width, height);
+            return cs;
+
+            /*const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
+            const oc2d = oc.getContext("2d");
+            if (oc2d == null) { return }
+            oc2d.drawImage(temp_can,
+                sx, sy, sWidth, sHeight,
+                0, 0, sWidth, sHeight
+            );*/
+
+            /*let cs = document.createElement("canvas");
+            cs.width = width
+            cs.height = height;
+            let context0 = cs.getContext("2d");
+         
+            let resizeQuality: ResizeQuality = "medium";
+            let imgb = null;
+            await createImageBitmap(img, 0, 0, img.width, img.height,
+                { resizeWidth: width, resizeHeight: height, resizeQuality: resizeQuality })
+                .then(function (sprites) {
+                    //imgb = sprites
+                    context0?.drawImage(sprites, 0, 0, width, height);
+                });
+
+            return cs;*/
+        }
+
+        function getBigimgTemp() {
+
+            let x = 0.8;//每次縮小的比例
+            let len = 6;//最多縮小幾次
+
+            let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
+            let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
+    
+            //如果不需要縮小，就直接回傳
+            if (_scale > x) {
+                return {
+                    img: temp_can,
+                    scale: 1
+                }
+            }
+
+            //第一次縮小
+            if (temp_bigimg[0] === undefined) {
+                temp_bigimg[0] = getCanvasZoom(temp_can, x)
+            }
+
+            for (let i = 1; i < len; i++) {
+
+                //產生縮小後的圖片
+                if (temp_bigimg[i] === undefined) {
+                    let last = temp_bigimg[i - 1] as HTMLCanvasElement | HTMLImageElement | ImageBitmap;//上一次的圖
+                    temp_bigimg[i] = getCanvasZoom(last, x);
+                    console.log(Math.pow(x, i + 1));
+                }
+
+                //如果下一次縮小會比目標值還小，就回傳目前
+                if (Math.pow(x, i + 2) < _scale) {
+                    return {
+                        img: temp_bigimg[i],
+                        scale: Math.pow(x, i + 1)
+                    }
+                }
+            }
+
+            //回傳最小的圖
+            return {
+                img: temp_bigimg[temp_bigimg.length - 1],
+                scale: Math.pow(x, temp_bigimg.length)
+            }
+
+        }
+
+
         /**
          * bigimg 渲染圖片
          * @returns 
@@ -1206,6 +1306,12 @@ class Tieefseeview {
 
             if (dataType !== "bigimg") { return }
             if (getOriginalWidth() === 0) { return } //避免圖片尚未載入完成就渲染
+
+            let bigimgTemp = getBigimgTemp();//判斷要使用原圖或是縮小後的圖片
+            let can = bigimgTemp.img;
+            if (can == null) { return }
+            let temp_can_width = can.width;
+            let temp_can_height = can.height;
 
             let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
             let _h = toNumber(dom_data.style.height);
@@ -1220,8 +1326,8 @@ class Tieefseeview {
             dom_bigimg.style.height = _h + "px";
 
             //取得顯示範圍左上角的坐標
-            let img_left = -toNumber(dom_con.style.left);
-            let img_top = -toNumber(dom_con.style.top);
+            let img_left = -toNumber(dom_con.style.left) //* bigimgTemp.scale;
+            let img_top = -toNumber(dom_con.style.top) //* bigimgTemp.scale;
 
             //計算顯示範圍的四個角落在圖片旋轉前的位置
             let origPoint1 = getOrigPoint(img_left, img_top, _w, _h, degNow);
@@ -1256,7 +1362,6 @@ class Tieefseeview {
             if (img_top > (origPoint3.y)) { img_top = (origPoint3.y) }
             if (img_top > (origPoint4.y)) { img_top = (origPoint4.y) }
 
-
             //取得圖片旋轉後的width、height
             let viewWidth = 1;
             let viewHeight = 1;
@@ -1271,15 +1376,14 @@ class Tieefseeview {
             viewWidth = viewWidth - img_left
             viewHeight = viewHeight - img_top
 
-
             let sx = (img_left - _margin) / _scale;
             let sy = (img_top - _margin) / _scale;
             let sWidth = (viewWidth + _margin * 2) / _scale * radio_can;
             let sHeight = (viewHeight + _margin * 2) / _scale * radio_can;
             let dx = img_left - _margin;
             let dy = img_top - _margin;
-            let dWidth = viewWidth + _margin * 2;
-            let dHeight = viewHeight + _margin * 2;
+            let dWidth = (viewWidth + _margin * 2);
+            let dHeight = (viewHeight + _margin * 2);
 
             //避免以浮點數進行運算
             function toFloor() {
@@ -1329,6 +1433,7 @@ class Tieefseeview {
                 );
                 return;*/
 
+
                 temp_canvasSN += 1;
 
                 let tc = temp_canvasSN;
@@ -1340,9 +1445,19 @@ class Tieefseeview {
                 let resizeQuality: ResizeQuality = "medium";//medium
 
                 if (getOriginalWidth() * getOriginalHeight() > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
-                    toFloor();
+
                     //console.log("drawImage直接渲染");
-                    context.drawImage(temp_can,
+
+                    sx = sx * bigimgTemp.scale
+                    sy = sy * bigimgTemp.scale
+                    sWidth = sWidth * bigimgTemp.scale
+                    sHeight = sHeight * bigimgTemp.scale
+                    dWidth = dWidth
+                    dHeight = dHeight
+
+                    toFloor();
+                    //context.imageSmoothingQuality = "high";
+                    context.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
                     );
@@ -1362,118 +1477,120 @@ class Tieefseeview {
 
                     //console.log("drawImage直接渲染");
                     toFloor();
-                    const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個100*100的canvas畫布
+                    const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
                     const oc2d = oc.getContext("2d"); // canvas 畫筆
                     if (oc2d == null) { return }
-                    oc2d.drawImage(temp_can,
-                        //-sx, -sy, sWidth, sHeight,
+                    oc2d.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, sWidth, sHeight
                     );
 
-                    resizeQuality = "high";
+                    resizeQuality = "medium";
 
                     await createImageBitmap(oc, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, 0, 0,);
+                            if (tc === temp_canvasSN) {
+                                context.drawImage(sprites, 0, 0,);
+                            }
                         });
                 }
-                else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight()) {
+                else if (sWidth > temp_can_width && sHeight > temp_can_height) {
 
                     //console.log("寬高跟高度全部渲染");
-                    sWidth = getOriginalWidth();
-                    sHeight = getOriginalHeight();
+                    sWidth = temp_can_width;
+                    sHeight = temp_can_height;
                     sx = dx * -1
                     sy = dy * -1
-                    dWidth = getOriginalWidth() * _scale
-                    dHeight = getOriginalHeight() * _scale
+                    dWidth = temp_can_width * _scale / bigimgTemp.scale
+                    dHeight = temp_can_height * _scale / bigimgTemp.scale
                     toFloor();
-                    await createImageBitmap(temp_can, 0, 0, sWidth, sHeight,
+                    await createImageBitmap(can, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
-                            if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, sx, sy,);
+                            if (tc === temp_canvasSN) {
+                                context.drawImage(sprites, sx, sy,);
+                            }
                         });
 
-                } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight()) {
+                } else if (sWidth > temp_can_width == false && sHeight > temp_can_height) {
 
                     //console.log("高度全部渲染");
                     //sWidth = getOriginalWidth();
-                    sHeight = getOriginalHeight();
-                    //sx = dx * -1
+                    sHeight = temp_can_height;
+                    sx = sx * bigimgTemp.scale
                     sy = dy * -1
-                    //dWidth = getOriginalWidth() * _scale
+                    dWidth = dWidth / bigimgTemp.scale
                     dHeight = getOriginalHeight() * _scale
                     toFloor();
-                    await createImageBitmap(temp_can, sx, 0, sWidth, sHeight,
+                    await createImageBitmap(can, sx, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+                            if (tc === temp_canvasSN) {
+                                context.drawImage(sprites, 0, sy);
 
-                            if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, 0, sy);
-
-                            //把多餘的部分清除
-                            if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
-                            let right = ((getOriginalWidth() - sx - sWidth) * _scale);
-                            if (right * -1 < _margin + marginRight + 1) {
-                                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                                //把多餘的部分清除
+                                /*if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
+                                let right = ((temp_can_width - sx - sWidth) * _scale);
+                                if (right * -1 < _margin + marginRight + 1) {
+                                    context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                                }*/
                             }
-
                         });
 
-                } else if (sWidth > getOriginalWidth() && sHeight > getOriginalHeight() == false) {
+                } else if (sWidth > temp_can_width && sHeight > temp_can_height == false) {
 
                     //console.log("寬度全部渲染");
-                    sWidth = getOriginalWidth();
+                    sWidth = temp_can_width;
                     //sHeight = getOriginalHeight();
                     sx = dx * -1
-                    //sy = dy * -1
+                    sy = sy * bigimgTemp.scale
                     dWidth = getOriginalWidth() * _scale
-                    //dHeight = getOriginalHeight() * _scale
+                    dHeight = dHeight / bigimgTemp.scale
                     toFloor();
-                    await createImageBitmap(temp_can, 0, sy, sWidth, sHeight,
+                    await createImageBitmap(can, 0, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+                            if (tc === temp_canvasSN) {
+                                context.drawImage(sprites, sx, 0);
 
-                            if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, sx, 0);
-
-                            //把多餘的部分清除
-                            if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
-                            let bottom = ((getOriginalHeight() - sy - sHeight) * _scale);
-                            if (bottom * -1 < _margin + marginBottom + 1) {
-                                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+                                //把多餘的部分清除
+                                /*if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
+                                let bottom = ((temp_can_height - sy - sHeight) * _scale);
+                                if (bottom * -1 < _margin + marginBottom + 1) {
+                                    context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+                                }*/
                             }
                         });
 
 
-
-                } else if (sWidth > getOriginalWidth() == false && sHeight > getOriginalHeight() == false) {
+                } else if (sWidth > temp_can_width == false && sHeight > temp_can_height == false) {
 
                     //console.log("局部渲染");
+                    sx = sx * bigimgTemp.scale
+                    dWidth = dWidth / bigimgTemp.scale
+                    sy = sy * bigimgTemp.scale
+                    dHeight = dHeight / bigimgTemp.scale
                     toFloor();
-                    await createImageBitmap(temp_can, sx, sy, sWidth, sHeight,
+                    await createImageBitmap(can, sx, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
+                            if (tc === temp_canvasSN) {
+                                context.drawImage(sprites, 0, 0,);
 
-                            if (tc !== temp_canvasSN) { return; }
-                            context.drawImage(sprites, 0, 0,);
-
-                            //把多餘的部分清除
-                            if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
-                            let right = ((getOriginalWidth() - sx - sWidth) * _scale);
-                            if (right * -1 < _margin + marginRight + 1) {
-                                context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                                //把多餘的部分清除
+                                /*if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
+                                let right = ((temp_can_width - sx - sWidth) * _scale);
+                                if (right * -1 < _margin + marginRight + 1) {
+                                    context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
+                                }
+                                //把多餘的部分清除
+                                if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
+                                let bottom = ((temp_can_height - sy - sHeight) * _scale);
+                                if (bottom * -1 < _margin + marginBottom + 1) {
+                                    context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
+                                }*/
                             }
-                            //把多餘的部分清除
-                            if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
-                            let bottom = ((getOriginalHeight() - sy - sHeight) * _scale);
-                            if (bottom * -1 < _margin + marginBottom + 1) {
-                                context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
-                            }
-
                         });
                 }
 
@@ -1481,8 +1598,7 @@ class Tieefseeview {
 
                 /*
                 var int_毫秒 = (new Date()).getTime() - time.getTime();
-                var s_輸出時間差 = (int_毫秒 / 1000) + "秒";
-                console.log(s_輸出時間差);*/
+                console.log(int_毫秒 );*/
 
 
                 //#######/
