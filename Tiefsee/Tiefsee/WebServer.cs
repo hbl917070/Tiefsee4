@@ -88,6 +88,8 @@ namespace Tiefsee {
                 context.Response.StatusCode = 500;
                 byte[] _responseArray = Encoding.UTF8.GetBytes(e.ToString());
                 context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
+                
+                Console.WriteLine(e.ToString());
             }
 
             //context.Response.KeepAlive = true; // set the KeepAlive bool to false

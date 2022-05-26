@@ -14,6 +14,7 @@ class Setting {
 
         var appInfo: AppInfo;
 
+        var i18n = new I18n();
         var config = new Config();
         var mainTools = new MainTools(null);//取得工具列
 
@@ -47,7 +48,7 @@ class Setting {
 
             //拖曳視窗
             document.getElementById("window-left")?.addEventListener("mousedown", async (e) => {
-                let _dom = e.target as HTMLDivElement;
+                let _dom = e.target as HTMLElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
@@ -85,6 +86,13 @@ class Setting {
             //document.querySelector("input")?.focus();
             document.querySelector("input")?.blur();//失去焦點
         }
+
+        //初始化多國語言
+        addLoadEvent(() => {
+            // @ts-ignore
+            i18n.pushList(langData);
+            console.log(i18n.t("t2", "", "en"))
+        })
 
         //初始化頁面分頁
         addLoadEvent(() => {

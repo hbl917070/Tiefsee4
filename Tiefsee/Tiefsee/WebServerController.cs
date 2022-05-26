@@ -33,6 +33,7 @@ namespace Tiefsee {
             webServer.RouteAddGet("/api/getImg/magick", magick);
             webServer.RouteAddGet("/api/getImg/dcraw", dcraw);
             webServer.RouteAddGet("/api/getImg/wpf", wpf);
+            webServer.RouteAddGet("/api/getImg/webIcc", webIcc);
             webServer.RouteAddGet("/api/getImg/nconvert", nconvert);
 
             webServer.RouteAddGet("/www/{*}", getWww);
@@ -80,31 +81,65 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
-            d.context.Response.ContentType = "image/bmp";
+
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
+            //d.context.Response.ContentType = "image/bmp";
             using (Stream stream = ImgLib.MagickImage_PathToStream(path, type)) {
                 WriteStream(d, stream); //回傳檔案
             }
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
         void wpf(RequestData d) {
 
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
-            d.context.Response.ContentType = "image/png";
+
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
+            d.context.Response.ContentType = "image/bmp";
             using (Stream stream = ImgLib.Wpf_PathToStream(path)) {
                 WriteStream(d, stream); //回傳檔案
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        void webIcc(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+   
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            if (ImgLib.IsCMYK(path)) {
+                d.context.Response.ContentType = "image/bmp";
+                using (Stream stream = ImgLib.Wpf_PathToStream(path)) {
+                    WriteStream(d, stream); //回傳檔案
+                }
+            } else {
+                WriteFile(d, path);//回傳檔案
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
         void dcraw(RequestData d) {
 
             string path = d.args["path"];
@@ -118,6 +153,7 @@ namespace Tiefsee {
                 WriteStream(d, stream); //回傳檔案
             }
         }
+
 
         /// <summary>
         /// 檢查這個port是否為tiefsee所使用，用於快速啟動
@@ -291,7 +327,7 @@ namespace Tiefsee {
             d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
             d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
 
-            if (d.context.Request.Headers["If-None-Match"] == etag) {
+            if (d.context.Request.Headers["If-None-Match"] == etag) {//表示瀏覽器還留有暫存，狀態304後，不用回傳任何資料
                 d.context.Response.StatusCode = 304;
                 return true;
             }

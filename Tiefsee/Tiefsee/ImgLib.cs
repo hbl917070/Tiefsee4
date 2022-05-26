@@ -14,12 +14,13 @@ namespace Tiefsee {
     public class ImgLib {
 
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static BitmapSource PathToBitmapSource(String path) {
+        /*public static BitmapSource PathToBitmapSource(String path) {
             using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))) {
                 FileInfo fi = new FileInfo(path);
                 byte[] bytes = reader.ReadBytes((int)fi.Length);
@@ -29,8 +30,20 @@ namespace Tiefsee {
                 reader.Dispose();
                 return bd.Frames[0];
             }
-        }
+        }*/
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="func"></param>
+        public static void PathToBitmapSource(String path, Action<BitmapSource> func) {
+
+            using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                BitmapDecoder bd = BitmapDecoder.Create(sr, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                func(bd.Frames[0]);
+            }
+        }
 
         /// <summary>
         /// 
@@ -106,8 +119,10 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public static Stream Wpf_PathToStream(string path) {
-            BitmapSource bs = ImgLib.PathToBitmapSource(path);
-            Stream stream = ImgLib.BitmapSourceToStream(bs);
+            Stream stream = null;
+            ImgLib.PathToBitmapSource(path, (BitmapSource bs) => {
+                stream = ImgLib.BitmapSourceToStream(bs);
+            });
             return stream;
         }
 
@@ -283,6 +298,39 @@ namespace Tiefsee {
             String s = Convert.ToBase64String(sha1.ComputeHash(Encoding.Default.GetBytes(fileSize + path)));
             return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
         }
+
+
+        /// <summary>
+        /// 檢查圖片的 ICC Profile 是否為 CMYK
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsCMYK(string path) {
+
+            using (var sr = new FileStream(path, FileMode.Open)) {
+
+                int len = (int)sr.Length;
+                if (len > 30000) { len = 30000; }//只讀取前30000個字，避免開啟大檔案讀取很久
+                byte[] bytes = new byte[len];
+                sr.Read(bytes, 0, len);
+                string s = System.Text.Encoding.ASCII.GetString(bytes);
+
+                /*FileStream fs = new FileStream(@"1.txt", FileMode.Create);
+                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+                sw.Write(s);
+                sw.Flush();//清空緩衝區
+                sw.Close();//關閉流
+                sw = null;
+                fs.Close();*/
+
+                if (s.Contains("prtrCMYK")) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
     }
 

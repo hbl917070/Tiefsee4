@@ -1259,7 +1259,7 @@ class Tieefseeview {
             let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
     
             //如果不需要縮小，就直接回傳
-            if (_scale > x) {
+            if (_scale > 0.5) {
                 return {
                     img: temp_can,
                     scale: 1
@@ -1277,7 +1277,7 @@ class Tieefseeview {
                 if (temp_bigimg[i] === undefined) {
                     let last = temp_bigimg[i - 1] as HTMLCanvasElement | HTMLImageElement | ImageBitmap;//上一次的圖
                     temp_bigimg[i] = getCanvasZoom(last, x);
-                    console.log(Math.pow(x, i + 1));
+                    //console.log(Math.pow(x, i + 1));
                 }
 
                 //如果下一次縮小會比目標值還小，就回傳目前

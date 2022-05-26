@@ -188,6 +188,9 @@ class FileShow {
                 if (type === "web") {
                     return Lib.pathToURL(_path) + `?${fileTime}`;
                 }
+                if (type === "webIcc") {
+                    return APIURL + `/api/getImg/webIcc?path=${encodePath}&${fileTime}`
+                }
                 if (type === "icon") {
                     return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(_path)
                 }

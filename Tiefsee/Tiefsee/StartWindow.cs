@@ -105,7 +105,7 @@ namespace Tiefsee {
         /// 檢查是否有執行環境
         /// </summary>
         /// <returns></returns>
-        private  void CheckWebView2() {
+        private void CheckWebView2() {
 
             new Thread(() => {
                 if (IsWebView2Runtime() == true) { //檢查安裝webview2執行環境

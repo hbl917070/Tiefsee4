@@ -66,7 +66,7 @@ class Config {
             /**圖片dpi縮放 */
             "dpizoom": "-1",
             /** 圖片渲染模式 */
-            "tieefseeviewImageRendering": "2"
+            "tieefseeviewImageRendering": "0"
         },
         layout: {
             fileListEnabled: true,//啟用 檔案預覽列表
@@ -118,7 +118,7 @@ class Config {
 
         if (type === GroupType.img) {
             return [
-                { ext: "jpg", type: ["web"] },
+                { ext: "jpg", type: ["webIcc"] },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "png", type: ["web"] },
                 { ext: "apng", type: ["web"] },
                 { ext: "gif", type: ["web"] },
@@ -140,7 +140,7 @@ class Config {
                 { ext: "avif", type: ["wpf", "magick"] },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: ["magick"] },
                 //{ ext: "dcm", type: ["magick"] },//多幀
-                { ext: "hdr", type: ["magickPng"] },
+                { ext: "hdr", type: ["magickPng"] },//必須輸出成png顏色才不會跑掉
                 { ext: "miff", type: ["magick"] },
                 { ext: "mng", type: ["magick"] },
                 { ext: "otb", type: ["magick"] },
