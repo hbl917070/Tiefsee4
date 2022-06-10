@@ -10,8 +10,6 @@ namespace Tiefsee {
     public class FileSort {
 
 
-
-
         /// <summary>
         /// 對檔案進行排序
         /// </summary>
@@ -19,9 +17,6 @@ namespace Tiefsee {
         /// <param name="type"> 排序方式 </param>
         /// <returns></returns>
         public string[] Sort(string[] ar, string type) {
-
-
-
 
             if (type == "name") {//檔名自然排序
                 Array.Sort(ar, new NaturalSort());
@@ -43,6 +38,40 @@ namespace Tiefsee {
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <param name="isAsc"> 是否為遞增排序 </param>
+        /// <returns></returns>
+        private string[] SortLastWriteTime(string[] ar, bool isAsc) {
+
+            //檢查檔案是否存在
+            List<FileSystemInfo> arF = new List<FileSystemInfo>();
+            for (int i = 0; i < ar.Length; i++) {
+                string path = ar[i];
+                FileSystemInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                    arF.Add(fileInfo);
+                }
+            }
+
+            if (isAsc) {
+                arF = arF.OrderBy(f => f.LastWriteTime).ToList();
+            } else {
+                arF = arF.OrderByDescending(f => f.LastWriteTime).ToList();
+            }
+
+            string[] ar2 = new string[arF.Count];
+            for (int i = 0; i < arF.Count; i++) {
+                ar2[i] = arF[i].FullName;
+            }
+
+            return ar2;
+        }
+
+
+        /*
         /// <summary>
         /// 
         /// </summary>
@@ -104,8 +133,7 @@ namespace Tiefsee {
         private class FileInfo2 {
             public DateTime LastWriteTime;
             public string Path = "";
-        }
-
+        }*/
 
 
     }
