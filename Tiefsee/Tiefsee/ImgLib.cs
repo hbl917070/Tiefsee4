@@ -90,11 +90,7 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static Stream MagickImage_PathToStream(string path, string type) {
-
-            type = type.ToLower();
+        public static MagickImage GetMagickImage(string path) {
 
             var settings = new MagickReadSettings {
                 //BackgroundColor = MagickColors.None,
@@ -104,17 +100,32 @@ namespace Tiefsee {
                     DisableAutoBrightness = false
                 }
             };
-            using (MagickImage image = new MagickImage(path, settings)) {
+            MagickImage image = new MagickImage(path, settings) ;
 
-                /*if (image.ColorSpace == ColorSpace.RGB || image.ColorSpace == ColorSpace.sRGB || image.ColorSpace == ColorSpace.scRGB) {
-                    image.SetProfile(ColorProfile.SRGB);
-                }*/
-                image.AutoOrient();//自動調整方向
-                image.SetProfile(ColorProfile.SRGB);//如果不是RGB格式的圖片，需要更多時間來轉檔
+            /*if (image.ColorSpace == ColorSpace.RGB || image.ColorSpace == ColorSpace.sRGB || image.ColorSpace == ColorSpace.scRGB) {
+                image.SetProfile(ColorProfile.SRGB);
+            }*/
+            image.AutoOrient();//自動調整方向
+            image.SetProfile(ColorProfile.SRGB);//如果不是RGB格式的圖片，需要更多時間來轉檔
 
-                if (image.ColorSpace == ColorSpace.RGB) {//用於處理hdr圖片
-                    image.ColorSpace = ColorSpace.sRGB;
-                }
+            if (image.ColorSpace == ColorSpace.RGB) {//用於處理hdr圖片
+                image.ColorSpace = ColorSpace.sRGB;
+            }
+
+            return image;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Stream MagickImage_PathToStream(string path, string type) {
+
+            type = type.ToLower();
+          
+            using (MagickImage image = GetMagickImage(path)) {
 
                 MagickFormat imgType;
 
@@ -500,16 +511,31 @@ namespace Tiefsee {
                 return GetImgInitInfo(path100, "vips");
             }
 
-            if (type == "magick" || type == "magickPng" || type == "magickBmp") {
-                string magickType = "tif";
-                if (type == "magickPng") {
-                    magickType = "png";
+            if (type == "magick" ) {
+                using (MagickImage image = GetMagickImage(path)) {
+                    if (image.IsOpaque) {//如果不透明
+                        image.Write(path100, MagickFormat.Jpeg);
+
+                    } else {
+                        using (var ms = new MemoryStream()) {
+                            //image.Quality = 1;
+                            image.Write(ms, MagickFormat.Tiff);
+                            ms.Position = 0;
+                            using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, "", NetVips.Enums.Access.Random)) {
+                                VipsSave(vImg, path100, "png");
+                            }
+                        }
+                    }
+                    image.Dispose();
                 }
+
+                /*
                 using (var ms = MagickImage_PathToStream(path, magickType)) {
                     using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, "", NetVips.Enums.Access.Random)) {
                         VipsSave(vImg, path100, "auto");
                     }
-                }
+                }*/
+
                 return GetImgInitInfo(path100, "vips");
             }
 
