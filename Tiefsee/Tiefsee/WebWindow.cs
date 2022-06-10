@@ -255,8 +255,11 @@ namespace Tiefsee {
                         firstRunNavigationCompleted = false;
                     } else { return; }
 
-                    this.Show();
-                    this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
+                    DelayRun(10, () => {
+                        this.Show();
+                        this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
+                    });
+
                 };
 
             } else {
@@ -327,7 +330,6 @@ namespace Tiefsee {
                     int x = System.Windows.Forms.Screen.FromHandle(this.Handle).WorkingArea.X
                             - this.RectangleToScreen(new Rectangle()).X;//程式所在的螢幕工作區域-程式目前坐標
                     x = Math.Abs(x) - 1;
-                    //System.Console.WriteLine(x + "");
                     this.Padding = new System.Windows.Forms.Padding(x);
                 } else {
                     this.Padding = new System.Windows.Forms.Padding(0);
@@ -430,6 +432,11 @@ namespace Tiefsee {
             RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
 
+            if (parentWindow != null) {//避免開子視窗後導致父親視窗失去 置頂
+                if (parentWindow.TopMost == true) {
+                    parentWindow.TopMost = true;
+                }
+            }
         }
 
 
@@ -479,6 +486,12 @@ namespace Tiefsee {
 
             RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
+
+            if (parentWindow != null) {//避免開子視窗後導致父親視窗失去 置頂
+                if (parentWindow.TopMost == true) {
+                    parentWindow.TopMost = true;
+                }
+            }
         }
 
 
@@ -511,6 +524,12 @@ namespace Tiefsee {
 
             RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
             SetFocus(); //讓視窗在最上面並且取得焦點
+
+            if (parentWindow != null) {//避免開子視窗後導致父親視窗失去 置頂
+                if (parentWindow.TopMost == true) {
+                    parentWindow.TopMost = true;
+                }
+            }
         }
 
 
