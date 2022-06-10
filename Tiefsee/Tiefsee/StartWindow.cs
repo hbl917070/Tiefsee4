@@ -10,6 +10,10 @@ using System.Windows.Forms;
 
 namespace Tiefsee {
     public class StartWindow : Form {
+
+        /// <summary> 改成true後，定時執行GC </summary>
+        public static bool runGC = false;
+
         public StartWindow() {
 
             Adapter.Initialize();
@@ -32,8 +36,22 @@ namespace Tiefsee {
                 InitWebview();//初始化webview2(常駐在背景
             };
 
-        }
+            //如果有進行圖片運算的話，定時執行GC
+            var tim = new System.Windows.Forms.Timer();
+            tim.Interval = 30 * 1000;
+            tim.Tick += (e, sender) => {
+                if (runGC) {
+                    DateTime time_start = DateTime.Now;//計時開始 取得目前時間
+                    WV_System._Collect();
+                    DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
+                    string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
 
+                    runGC = false;
+                    Console.WriteLine("=============== GC == " + result2);
+                }
+            };
+            tim.Start();
+        }
 
 
         /// <summary>

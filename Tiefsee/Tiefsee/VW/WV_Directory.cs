@@ -31,7 +31,6 @@ namespace Tiefsee {
         /// <returns></returns>
         public string GetSiblingDir(string siblingPath, object[] _arExt, int maxCount) {
 
-            Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
             if (maxCount <= -1) { maxCount = int.MaxValue; }
 

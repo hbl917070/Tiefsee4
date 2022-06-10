@@ -11,7 +11,7 @@ using Microsoft.Web.WebView2.Core;
 namespace Tiefsee {
     public class QuickRun {
 
-        private static int runNumber = 0;//目前的視窗數量
+        public static int runNumber = 0;//目前的視窗數量
 
         /// <summary>
         /// 新建視窗時呼叫

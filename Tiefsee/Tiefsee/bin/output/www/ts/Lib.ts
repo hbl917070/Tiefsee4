@@ -329,6 +329,27 @@ async function fetchGet_text(url: string) {
 
 
 /**
+ * 
+ * @param url 
+ * @returns 
+ */
+async function fetchGet_json(url: string) {
+
+    let json: any = {};
+    await fetch(url, {
+        "method": "get",
+    }).then((response) => {
+        return response.json();
+    }).then((html) => {
+        json = html;
+    }).catch((err) => {
+        console.log("error: ", err);
+    });
+
+    return json
+}
+
+/**
  * 取得檔案的base64
  */
 async function fetchGet_base64(url: string) {

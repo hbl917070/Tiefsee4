@@ -166,16 +166,16 @@ namespace Tiefsee {
         public void SetOwner(object _window) {
             if (_window != null) {
                 WebWindow webwindow = (WebWindow)_window;
-                //webwindow.Owner = M.parentForm;
-                //webwindow.ShowInTaskbar = true;
-                //webwindow.StartPosition = FormStartPosition.CenterParent;
-                if (M.TopMost == true) {
-                    M.TopMost = false;//設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
+           
+                if (TopMost == true) {
+                    TopMost = false;//設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
-                    M.TopMost = true;
+                    TopMost = true;
                 } else {
                     webwindow.Owner = M;
                 }
+
+                //webwindow.Owner = M;
             }
         }
 
@@ -189,7 +189,6 @@ namespace Tiefsee {
             if (M.parentWindow == null) { return ""; }
             if (M.parentWindow.wv2.CoreWebView2 == null) { return ""; }
             string txt = await M.parentWindow.wv2.CoreWebView2.ExecuteScriptAsync(js);
-            //System.Console.WriteLine(AsyncContext);
             return txt;
         }
 
@@ -333,8 +332,15 @@ namespace Tiefsee {
         /// 視窗固定在最上層
         /// </summary>
         public Boolean TopMost {
-            get { return M.TopMost; }
-            set { M.TopMost = value; }
+            get {
+                return M.TopMost;
+            }
+            set {
+                M.TopMost = value;
+                /*if (M.TopLevel) {
+                    M.TopLevel = true;
+                }*/
+            }
         }
 
 
@@ -456,7 +462,7 @@ namespace Tiefsee {
                 //win7
                 accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
             }
-       
+
             var accentStructSize = Marshal.SizeOf(accent);
 
             var accentPtr = Marshal.AllocHGlobal(accentStructSize);

@@ -304,7 +304,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-btn js-noDrag">
-                        <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">1%</div>
+                        <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
                 i18n: "縮放比例",
@@ -318,19 +318,12 @@ class MainTools {
                 },
             })
 
-
-            /*ar.push({
-                group: GroupType.img,
-                type: "hr",
-                html: ``, i18n: "", name: "", icon: "", func: (btn) => { },
-            })*/
-
             //圖片長寬
             ar.push({
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoSize">
-                        100<br>200
+                        <!-- 100<br>200 -->
                     </div>
                 `,
                 i18n: "圖片長寬",
@@ -345,7 +338,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoType">
-                        JPG<br>123.4MB
+                        <!-- jpg<br>123.4MB -->
                     </div>
                 `,
                 i18n: "檔案類型、檔案大小",
@@ -360,7 +353,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoWriteTime">
-                        2021
+                        <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
                 i18n: "檔案修改時間",

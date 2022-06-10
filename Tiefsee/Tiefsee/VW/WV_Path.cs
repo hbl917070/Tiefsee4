@@ -49,7 +49,7 @@ namespace Tiefsee {
                 }
                 ar[i] = name;
             }
-            //Console.WriteLine(path[0]);
+
             return Path.Combine(ar).Replace('/', '\\');
         }
 

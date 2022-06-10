@@ -328,7 +328,7 @@ class ScriptCopy {
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
-                let base64 = this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+                let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
                 WV_System.SetClipboard_base64ToImage(base64, true);
             } else if (imgType === "jpg") {
                 WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
@@ -342,7 +342,7 @@ class ScriptCopy {
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_base64ToImage(base64, false);
         }
 
@@ -368,7 +368,7 @@ class ScriptCopy {
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_Txt(base64);
         }
 

@@ -118,68 +118,69 @@ class Config {
 
         if (type === GroupType.img) {
             return [
-                { ext: "jpg", type: ["webIcc"] },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
-                { ext: "png", type: ["web"] },
-                { ext: "apng", type: ["web"] },
-                { ext: "gif", type: ["web"] },
-                { ext: "bmp", type: ["web"] },
-                { ext: "webp", type: ["web"] },
-                { ext: "jpeg", type: ["web"] },
-                { ext: "svg", type: ["web"] },
-                { ext: "ico", type: ["web"] },
+                { ext: "jpg", type: "vips", vipsType: "jpg" },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
+                { ext: "jpeg", type: "vips", vipsType: "jpg" },
+                { ext: "jfif", type: "vips", vipsType: "jpg" },
+                { ext: "png", type: "vips", vipsType: "vips" },
+                { ext: "webp", type: "vips", vipsType: "vips" },
+                { ext: "bmp", type: "vips", vipsType: "bitmap" },
+                { ext: "apng", type: "web" },
+                { ext: "gif", type: "web" },
+                { ext: "svg", type: "web" },
+                { ext: "ico", type: "web" },
 
-                { ext: "tif", type: ["wpf"] },
-                { ext: "tiff", type: ["wpf"] },
-                { ext: "dds", type: ["wpf"] },
-                { ext: "jfif", type: ["wpf"] },
+                { ext: "tif", type: "vips", vipsType: "tif" },
+                { ext: "tiff", type: "vips", vipsType: "tif" },
+                { ext: "dds", type: "vips", vipsType: "wpf" },
 
-                { ext: "psd", type: ["magick"] },
-                { ext: "psb", type: ["magick"] },
-                { ext: "pcx", type: ["magick"] },
-                { ext: "heic", type: ["magick"] },
-                { ext: "avif", type: ["wpf", "magick"] },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
-                { ext: "fits", type: ["magick"] },
-                //{ ext: "dcm", type: ["magick"] },//多幀
-                { ext: "hdr", type: ["magickPng"] },//必須輸出成png顏色才不會跑掉
-                { ext: "miff", type: ["magick"] },
-                { ext: "mng", type: ["magick"] },
-                { ext: "otb", type: ["magick"] },
-                { ext: "pfm", type: ["magick"] },
-                { ext: "pgm", type: ["magick"] },
-                { ext: "ppm", type: ["magick"] },
-                { ext: "tga", type: ["magick"] },
-                { ext: "xcf", type: ["magick"] },
-                { ext: "xpm", type: ["magick"] },
-                { ext: "qoi", type: ["magick"] },
-                { ext: "pbm", type: ["magick"] },
-                { ext: "exr", type: ["magick"] },
-                { ext: "jpf", type: ["magick"] },
-                { ext: "sct", type: ["magick"] },
-                { ext: "mef", type: ["magick"] },//向量
-                { ext: "wmf", type: ["magick"] },
-                { ext: "mpo", type: ["magick"] },//相機
-                { ext: "jxl", type: ["magick"] }, //JPEG XL，開啟速度很慢
+                { ext: "psd", type: "vips", vipsType: "magick" },
+                { ext: "psb", type: "vips", vipsType: "magick" },
+                { ext: "pcx", type: "vips", vipsType: "magick" },
+                { ext: "heic", type: "vips", vipsType: "magick" },
+                { ext: "avif", type: "vips", vipsType: "wpf,magick" },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
+                { ext: "fits", type: "vips", vipsType: "magick" },
+                //{ ext: "dcm",type:"vips", vipsType:"magick" },//多幀
+                { ext: "hdr", type: "vips", vipsType: "magick" },//必須輸出成png顏色才不會跑掉
+                { ext: "miff", type: "vips", vipsType: "magick" },
+                { ext: "mng", type: "vips", vipsType: "magick" },
+                { ext: "otb", type: "vips", vipsType: "magick" },
+                { ext: "pfm", type: "vips", vipsType: "magick" },
+                { ext: "pgm", type: "vips", vipsType: "magick" },
+                { ext: "ppm", type: "vips", vipsType: "magick" },
+                { ext: "tga", type: "vips", vipsType: "magick" },
+                { ext: "xcf", type: "vips", vipsType: "magick" },
+                { ext: "xpm", type: "vips", vipsType: "magick" },
+                { ext: "qoi", type: "vips", vipsType: "magick" },
+                { ext: "pbm", type: "vips", vipsType: "magick" },
+                { ext: "exr", type: "vips", vipsType: "magick" },
+                { ext: "jpf", type: "vips", vipsType: "magick" },
+                { ext: "jp2", type: "vips", vipsType: "magick" },//開啟速度很慢
+                { ext: "sct", type: "vips", vipsType: "magick" },
+                { ext: "mef", type: "vips", vipsType: "magick" },//向量
+                { ext: "wmf", type: "vips", vipsType: "magick" },
+                { ext: "mpo", type: "vips", vipsType: "magick" },//相機
+                { ext: "jxl", type: "vips", vipsType: "magick" }, //JPEG XL，開啟速度很慢
 
-                { ext: "crw", type: ["dcraw"] },
-                { ext: "raf", type: ["dcraw"] },
-                { ext: "cr2", type: ["dcraw"] },
-                { ext: "mrw", type: ["dcraw"] },
-                { ext: "nef", type: ["dcraw"] },
-                { ext: "x3f", type: ["dcraw"] },
-                { ext: "pef", type: ["dcraw"] },
-                { ext: "orf", type: ["dcraw"] },
-                { ext: "rw2", type: ["dcraw"] },
-                { ext: "arw", type: ["dcraw"] },
-                { ext: "erf", type: ["dcraw"] },
-                { ext: "sr2", type: ["dcraw"] },
-                { ext: "srw", type: ["dcraw"] },
-                { ext: "dng", type: ["dcraw"] },
+                { ext: "crw", type: "vips", vipsType: "dcraw" },
+                { ext: "raf", type: "vips", vipsType: "dcraw" },
+                { ext: "cr2", type: "vips", vipsType: "dcraw" },
+                { ext: "mrw", type: "vips", vipsType: "dcraw" },
+                { ext: "nef", type: "vips", vipsType: "dcraw" },
+                { ext: "x3f", type: "vips", vipsType: "dcraw" },
+                { ext: "pef", type: "vips", vipsType: "dcraw" },
+                { ext: "orf", type: "vips", vipsType: "dcraw" },
+                { ext: "rw2", type: "vips", vipsType: "dcraw" },
+                { ext: "arw", type: "vips", vipsType: "dcraw" },
+                { ext: "erf", type: "vips", vipsType: "dcraw" },
+                { ext: "sr2", type: "vips", vipsType: "dcraw" },
+                { ext: "srw", type: "vips", vipsType: "dcraw" },
+                { ext: "dng", type: "vips", vipsType: "dcraw" },
 
-                { ext: "afphoto", type: ["nconvertPng"] },
-                { ext: "afdesign", type: ["nconvertPng"] },
-                { ext: "dcm", type: ["magick", "nconvertBmp"] },
-                //{ ext: "iff", type: ["nconvertBmp"] }, //必須使用 heif.zip 裡面的dll
-                { ext: "clip", type: ["nconvertBmp"] }, //必須使用 clip.dll
+                { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
+                { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
+                { ext: "dcm", type: "vips", vipsType: "magick,nconvertJpg" },
+                //{ ext: "iff",    type:"vips", vipsType: "nconvertJpg" }, //必須使用 heif.zip 裡面的dll
+                { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
 
 
             ]
@@ -187,43 +188,43 @@ class Config {
 
         if (type === GroupType.video) {
             return [
-                { ext: "mp4", type: ["video"] },
-                { ext: "webm", type: ["video"] },
-                { ext: "ogv", type: ["video"] },
-                //{ ext: "ogg", type: ["video"] },     
+                { ext: "mp4", type: "video" },
+                { ext: "webm", type: "video" },
+                { ext: "ogv", type: "video" },
+                //{ ext: "ogg", type: "video" },     
             ]
         }
 
         if (type === GroupType.pdf) {
             return [
-                { ext: "pdf", type: ["pdf"] },
-                { ext: "ai", type: ["pdf"] },
+                { ext: "pdf", type: "pdf" },
+                { ext: "ai", type: "pdf" },
             ]
         }
 
         if (type === GroupType.txt) {
             return [
-                { ext: "txt", type: ["txt"] },
-                { ext: "css", type: ["css"] },
-                { ext: "scss", type: ["scss"] },
-                { ext: "sass", type: ["sass"] },
-                { ext: "less", type: ["less"] },
-                { ext: "js", type: ["js"] },
-                { ext: "ts", type: ["ts"] },
-                { ext: "xml", type: ["xml"] },
-                { ext: "html", type: ["html"] },
-                { ext: "php", type: ["php"] },
-                { ext: "py", type: ["py"] },
-                { ext: "java", type: ["java"] },
-                { ext: "cs", type: ["cs"] },
-                { ext: "c", type: ["c"] },
-                { ext: "cpp", type: ["cpp"] },
-                { ext: "go", type: ["go"] },
-                { ext: "r", type: ["r"] },
-                { ext: "ini", type: ["ini"] },
-                { ext: "log", type: ["log"] },
-                { ext: "json", type: ["json"] },
-                { ext: "sql", type: ["sql"] },
+                { ext: "txt", type: "txt" },
+                { ext: "css", type: "css" },
+                { ext: "scss", type: "scss" },
+                { ext: "sass", type: "sass" },
+                { ext: "less", type: "less" },
+                { ext: "js", type: "js" },
+                { ext: "ts", type: "ts" },
+                { ext: "xml", type: "xml" },
+                { ext: "html", type: "html" },
+                { ext: "php", type: "php" },
+                { ext: "py", type: "py" },
+                { ext: "java", type: "java" },
+                { ext: "cs", type: "cs" },
+                { ext: "c", type: "c" },
+                { ext: "cpp", type: "cpp" },
+                { ext: "go", type: "go" },
+                { ext: "r", type: "r" },
+                { ext: "ini", type: "ini" },
+                { ext: "log", type: "log" },
+                { ext: "json", type: "json" },
+                { ext: "sql", type: "sql" },
             ]
         }
 

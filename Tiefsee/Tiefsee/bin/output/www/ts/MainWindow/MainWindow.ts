@@ -79,6 +79,7 @@ class MainWindow {
 
         //關閉視窗前觸發
         baseWindow.closingEvents.push(async () => {
+            WV_System.DeleteTemp(100, 300);//刪除圖片暫存
             await saveSetting();//儲存 setting.json
         });
 

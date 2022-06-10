@@ -1,4 +1,5 @@
 ﻿using ImageMagick;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,14 +37,70 @@ namespace Tiefsee {
             webServer.RouteAddGet("/api/getImg/webIcc", webIcc);
             webServer.RouteAddGet("/api/getImg/nconvert", nconvert);
 
+            webServer.RouteAddGet("/api/vips/init", vipsInit);
+            webServer.RouteAddGet("/api/vips/resize", vipsResize);
+
             webServer.RouteAddGet("/www/{*}", getWww);
             webServer.RouteAddGet("/{*}", getWww);
         }
 
 
-
-
         #region web API
+
+
+        void vipsResize(RequestData d) {
+            string path = d.args["path"];
+            double scale = Double.Parse(d.args["scale"]);
+
+            path = Uri.UnescapeDataString(path);
+
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304) { return; }
+
+            string imgPath = ImgLib.VipsResize(path, scale);
+            WriteFile(d, imgPath);//回傳檔案
+        }
+
+        void vipsInit(RequestData d) {
+
+            string json = "";
+            ImgInitInfo imgInfo = new ImgInitInfo();
+
+            string path = d.args["path"];
+            string[] arType = d.args["type"].Split(',');//使用什麼方式處理圖片
+            //string outputOriginalFile = d.args["outputOriginalFile"];//是否直接回傳原檔
+
+            path = Uri.UnescapeDataString(path);
+
+            if (File.Exists(path) == false) {//檔案不存在
+                json = JsonConvert.SerializeObject(new ImgInitInfo());
+                WriteString(d, json);//回傳
+                return;
+            }
+
+            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //if (is304 == true) { return; }
+
+            for (int i = 0; i < arType.Length; i++) {
+                string type = arType[i];
+              
+                try {
+                    imgInfo = ImgLib.GetImgInitInfo(path, type);
+                } catch (Exception e) {
+                    Console.WriteLine("解析圖片失敗-------------");
+                    Console.WriteLine($"type:{type}  path:{path}");
+                    Console.WriteLine(e.Message);
+                }
+
+                if (imgInfo.width != 0) {
+                    break;
+                }
+            }
+
+            json = JsonConvert.SerializeObject(imgInfo);
+            WriteString(d, json);//回傳輸出的檔案路徑
+
+        }
 
 
         /// <summary>
@@ -62,9 +119,9 @@ namespace Tiefsee {
 
             string imgPath;
             if (type == "png") {
-                imgPath = ImgLib.Nconvert_PathToPath(path, false, true);
+                imgPath = ImgLib.Nconvert_PathToPath(path, false, "png");
             } else {
-                imgPath = ImgLib.Nconvert_PathToPath(path, false, false);
+                imgPath = ImgLib.Nconvert_PathToPath(path, false, "bmp");
             }
             WriteString(d, imgPath);//回傳輸出的檔案路徑
         }
@@ -113,7 +170,7 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 
+        /// 如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
         /// </summary>
         /// <param name="d"></param>
         void webIcc(RequestData d) {
@@ -121,11 +178,11 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
-   
+
             bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
-            if (ImgLib.IsCMYK(path)) {
+            if (ImgLib.IsCMYK(path)) {//檢查檔案是否為 CMYK
                 d.context.Response.ContentType = "image/bmp";
                 using (Stream stream = ImgLib.Wpf_PathToStream(path)) {
                     WriteStream(d, stream); //回傳檔案

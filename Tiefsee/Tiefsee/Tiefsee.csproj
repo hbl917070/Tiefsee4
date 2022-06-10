@@ -85,10 +85,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Magick.NET-Q8-OpenMP-x64, Version=11.1.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=AMD64">
-      <HintPath>..\packages\Magick.NET-Q8-OpenMP-x64.11.1.0\lib\net20\Magick.NET-Q8-OpenMP-x64.dll</HintPath>
+      <HintPath>..\packages\Magick.NET-Q8-OpenMP-x64.11.1.2\lib\net20\Magick.NET-Q8-OpenMP-x64.dll</HintPath>
     </Reference>
     <Reference Include="Magick.NET.Core, Version=11.1.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
-      <HintPath>..\packages\Magick.NET.Core.11.1.0\lib\net20\Magick.NET.Core.dll</HintPath>
+      <HintPath>..\packages\Magick.NET.Core.11.1.2\lib\net20\Magick.NET.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.1210.39, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
@@ -100,11 +100,20 @@
     <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.1210.39, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.1210.39\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="NetVips, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetVips.2.1.0\lib\net452\NetVips.dll</HintPath>
+    </Reference>
+    <Reference Include="NetVips.Extensions, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetVips.Extensions.2.1.0\lib\net461\NetVips.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\wen\Desktop\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -196,9 +205,11 @@
     <PropertyGroup>
       <ErrorText>此專案參考這部電腦上所缺少的 NuGet 套件。請啟用 NuGet 套件還原，以下載該套件。如需詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的檔案是 {0}。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Magick.NET-Q8-OpenMP-x64.11.1.0\build\net20\Magick.NET-Q8-OpenMP-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-OpenMP-x64.11.1.0\build\net20\Magick.NET-Q8-OpenMP-x64.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\NetVips.Native.win-x64.8.12.2\build\net45\NetVips.Native.win-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NetVips.Native.win-x64.8.12.2\build\net45\NetVips.Native.win-x64.targets'))" />
+    <Error Condition="!Exists('..\packages\Magick.NET-Q8-OpenMP-x64.11.1.2\build\net20\Magick.NET-Q8-OpenMP-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-OpenMP-x64.11.1.2\build\net20\Magick.NET-Q8-OpenMP-x64.targets'))" />
   </Target>
-  <Import Project="..\packages\Magick.NET-Q8-OpenMP-x64.11.1.0\build\net20\Magick.NET-Q8-OpenMP-x64.targets" Condition="Exists('..\packages\Magick.NET-Q8-OpenMP-x64.11.1.0\build\net20\Magick.NET-Q8-OpenMP-x64.targets')" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1210.39\build\Microsoft.Web.WebView2.targets')" />
+  <Import Project="..\packages\NetVips.Native.win-x64.8.12.2\build\net45\NetVips.Native.win-x64.targets" Condition="Exists('..\packages\NetVips.Native.win-x64.8.12.2\build\net45\NetVips.Native.win-x64.targets')" />
+  <Import Project="..\packages\Magick.NET-Q8-OpenMP-x64.11.1.2\build\net20\Magick.NET-Q8-OpenMP-x64.targets" Condition="Exists('..\packages\Magick.NET-Q8-OpenMP-x64.11.1.2\build\net20\Magick.NET-Q8-OpenMP-x64.targets')" />
 </Project>

@@ -90,8 +90,8 @@ class Setting {
         //初始化多國語言
         addLoadEvent(() => {
             // @ts-ignore
-            i18n.pushList(langData);
-            console.log(i18n.t("t2", "", "en"))
+            //i18n.pushList(langData);
+            //console.log(i18n.t("t2", "", "en"))
         })
 
         //初始化頁面分頁
@@ -542,6 +542,7 @@ class Setting {
         addLoadEvent(() => {
             var btn_openAppData = document.getElementById("btn-openAppData") as HTMLElement;
             var btn_openWww = document.getElementById("btn-openWww") as HTMLElement;
+            var btn_openTemp = document.getElementById("btn-openTemp") as HTMLElement;
 
             //開啟 AppData(使用者資料)
             btn_openAppData.addEventListener("click", async () => {
@@ -553,6 +554,16 @@ class Setting {
             btn_openWww.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDirPath();
                 path = Lib.Combine([path, "www"]);
+                WV_RunApp.OpenUrl(path)
+            });
+
+            //開啟 暫存資料夾
+            btn_openTemp.addEventListener("click", async () => {
+                let path = await WV_Path.GetTempPath();
+                path = Lib.Combine([path, "Tiefsee"]);
+                if (await WV_Directory.Exists(path) === false) {//如果不存在就新建
+                    await WV_Directory.CreateDirectory(path);
+                }
                 WV_RunApp.OpenUrl(path)
             });
         })

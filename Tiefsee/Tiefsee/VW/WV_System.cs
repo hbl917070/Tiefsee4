@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -23,6 +24,55 @@ namespace Tiefsee {
         }
 
 
+        /// <summary>
+        /// 刪除圖片暫存
+        /// </summary>
+        /// <param name="maxImg100"> img100資料夾最多保留的檔案數量 </param>
+        /// <param name="maxImgScale"> imgScale資料夾最多保留的檔案數量 </param>
+        public void DeleteTemp(int maxImg100, int maxImgScale) {
+            new Thread(() => {
+                if (Program.startType == 3 || Program.startType == 5) {//常駐背景
+                    if (QuickRun.runNumber <= 2) {
+                        DeleteTemp(ImgLib.dir_img100, maxImg100);
+                        DeleteTemp(ImgLib.dir_imgScale, maxImgScale);
+                        Console.WriteLine("########## 刪除圖片暫存(常駐背景)");
+                    }
+                    return;
+                }
+
+                string portDir = Path.Combine(Program.appDataPath, "port");
+                if (Directory.Exists(portDir) == false) { return; }
+                int postCount = Directory.GetFiles(portDir).Length;
+                if (postCount == 1) {
+                    if (QuickRun.runNumber <= 1) {
+                        DeleteTemp(ImgLib.dir_img100, maxImg100);
+                        DeleteTemp(ImgLib.dir_imgScale, maxImgScale);
+                        Console.WriteLine("########## 刪除圖片暫存" + QuickRun.runNumber);
+                    }
+                }
+
+            }).Start();
+        }
+        public void DeleteTemp(string path, int max) {
+            if (Directory.Exists(path) == false) { return; }
+            FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos();//取得資料夾內的所有檔案與資料夾
+            if (ar.Length <= max) { return; }//如果檔案數量未達上限，就不做任何事情
+            List<FileSystemInfo> sortedFiles = ar.OrderBy(f => f.LastWriteTime).ToList();
+            for (int i = 0; i < sortedFiles.Count - max; i++) {
+                try {
+                    File.Delete(sortedFiles[i].FullName);
+                } catch { }
+            }
+        }
+
+
+        #region Clipboard 剪貼簿
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="base64String"></param>
+        /// <returns></returns>
         private MemoryStream Base64ToMemoryStream(string base64String) {
             //去掉開頭的 data:image/png;base64,
             int x = base64String.IndexOf("base64,");
@@ -59,7 +109,6 @@ namespace Tiefsee {
                 MessageBox.Show(e2.ToString());
                 return false;
             }
-
         }
 
 
@@ -211,6 +260,8 @@ namespace Tiefsee {
             }
         }
 
+        #endregion
+
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
@@ -228,32 +279,18 @@ namespace Tiefsee {
         /// </summary>
         public int[] GetMousePosition() {
             var p = System.Windows.Forms.Cursor.Position;
-
-            Dictionary<string, int> dic = new Dictionary<string, int>();
-            dic.Add("X", p.X);
-            dic.Add("Y", p.Y);
-
+            //Dictionary<string, int> dic = new Dictionary<string, int>();
+            //dic.Add("X", p.X);
+            //dic.Add("Y", p.Y);
             return new int[2] { p.X, p.Y };
         }
 
-
-        /// <summary>
-        /// 修改桌布用的函數
-        /// </summary>
-        /// <param name="uAction"></param>
-        /// <param name="uParam"></param>
-        /// <param name="lpvParam"></param>
-        /// <param name="uWinlni"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int uWinlni);
-
+    
         /// <summary>
         /// 設定桌布
         /// </summary>
         /// <param name="path"></param>
         public void SetWallpaper(string path) {
-
             if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
                 try {
                     SystemParametersInfo(20, 1, path, 0x1 | 0x2);  //存在成立，修改桌布　　(uActuin 20 參數為修改wallpaper
@@ -261,8 +298,9 @@ namespace Tiefsee {
                     MessageBox.Show("設定桌布失敗：\n" + e2.ToString(), "失敗");
                 }
             }
-
         }
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int uWinlni);
 
 
         /// <summary>
@@ -276,7 +314,6 @@ namespace Tiefsee {
             } catch {
                 return false;
             }
-
         }
 
 
@@ -319,13 +356,19 @@ namespace Tiefsee {
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr proc, int min, int max);
         public void Collect() {
-            try {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-                    SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
-                }
-            } catch { }
+            _Collect();
+        }
+        public static void _Collect() {
+            Task t = new Task(() => {
+                try {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+                        SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+                    }
+                } catch { }
+            });
+            t.Start();
         }
 
 
@@ -381,7 +424,6 @@ namespace Tiefsee {
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
 
-
         /// <summary>
         /// 對檔案進行排序
         /// </summary>
@@ -389,12 +431,10 @@ namespace Tiefsee {
         /// <param name="type"></param>
         /// <returns></returns>
         public string[] Sort(object[] ar, string type) {
-
             string[] arFile = new string[ar.Length];
             for (int i = 0; i < arFile.Length; i++) {
                 arFile[i] = ar[i].ToString();
             }
-
             var filesort = new FileSort();
             return filesort.Sort(arFile, type);
         }

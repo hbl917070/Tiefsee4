@@ -388,13 +388,13 @@
                     <div class="page-title" i18b=""> 影像處理 </div>
 
                     <div class="box">
-                        <div class="box-title"> 圖片縮放模式 </div>
+                        <div class="box-title"> 圖片縮放比例大於100%時 </div>
                         <div class="text-title"> </div>
                         <div class="text-content">
                             <select class="text-input" id="select-tieefseeviewImageRendering">
-                                <option value="0">平滑</option>
-                                <option value="1">銳利</option>
-                                <option value="2">大於100%時銳利</option>
+                                <option value="0">呈現平滑</option>
+                                <!-- <option value="1">銳利</option> -->
+                                <option value="2">呈現像素</option>
                             </select>
                         </div>
                     </div>
@@ -440,9 +440,9 @@
                     <div class="page-title" i18b=""> 進階設定 </div>
 
                     <div class="box">
-                        <div class="box-title"> 清理快取資料 </div>             
+                        <div class="box-title"> 清理快取資料 </div>
 
-                        <div class="text-title">  </div>
+                        <div class="text-title"> </div>
                         <div class="text-content">
                             <div class="btn" id="btn-clearBrowserCache">清理</div>
                         </div>
@@ -511,13 +511,14 @@
                         </div>
                     </div>
 
-
+                    
                     <div class="box">
                         <div class="box-title"> 相關路徑 </div>
                         <div class="text-box">
                             <div class="text-title"> </div>
                             <div class="link" id="btn-openAppData">AppData(使用者資料)</div>
                             <div class="link" id="btn-openWww">www(原始碼)</div>
+                            <div class="link" id="btn-openTemp">暫存資料夾</div>
                         </div>
                     </div>
 
@@ -531,7 +532,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.16</span>
+                            <span> Tiefsee 4.0.0-beta.17</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

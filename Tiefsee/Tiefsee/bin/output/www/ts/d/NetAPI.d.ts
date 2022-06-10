@@ -338,6 +338,14 @@ interface WV_Path {
 
 interface WV_System {
 
+
+    /**
+     * 刪除圖片暫存
+     * @param maxImg100 img100資料夾最多保留的檔案數量
+     * @param maxImgScale imgScale資料夾最多保留的檔案數量
+     */
+    DeleteTemp(maxImg100: number, maxImgScale: number): void;
+
     /**
      * 存入剪貼簿 - 傳入base64，儲存成圖片。
      * isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式

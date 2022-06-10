@@ -14,6 +14,7 @@ class Tieefseeview {
     public preloadVideo;//預載入 影片
     public loadImg;//載入圖片
     public loadBigimg;
+    public loadBigimgscale;
     public loadVideo;
     public loadNone;//載入空白圖片
     public setLoading;//顯示或隱藏 loading
@@ -106,7 +107,7 @@ class Tieefseeview {
         var scrollY = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
 
         var url: string;//目前的圖片網址
-        var dataType: ("img" | "video" | "imgs" | "bigimg") = "img";//資料類型
+        var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img";//資料類型
         var dpizoom: number = 1;
         var isDpizoomAUto: boolean = true;
         var degNow: number = 0;//目前的角度 0~359
@@ -144,6 +145,8 @@ class Tieefseeview {
         var temp_can: HTMLCanvasElement;//canvas暫存
         var temp_canvasSN = 0;//用於判斷canvas是否重複繪製
         var temp_touchPadTime = 0;//用於判斷是否為觸控板
+        /** Bigimgscale 用於儲存圖片網址與比例 */
+        var arBigimgscale: { scale: number, url: string }[] = []
 
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
@@ -173,6 +176,7 @@ class Tieefseeview {
         this.preloadVideo = preloadVideo;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
+        this.loadBigimgscale = loadBigimgscale;
         this.loadVideo = loadVideo;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
@@ -312,8 +316,6 @@ class Tieefseeview {
         hammerPlural.on("pinchend", (ev) => {
             setRendering(rendering);//縮放結束後，把渲染模式改回原本的縮放模式
         });
-
-
 
 
         //滑鼠滾輪上下滾動時
@@ -613,7 +615,7 @@ class Tieefseeview {
          * @param _type 
          * @returns 
          */
-        function setDataType(_type: ("img" | "video" | "imgs" | "bigimg")) {
+        function setDataType(_type: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale")) {
 
             dataType = _type;
 
@@ -624,7 +626,7 @@ class Tieefseeview {
                 dom_video.src = "";
                 return;
             }
-            if (dataType === "bigimg") {
+            if (dataType === "bigimg" || dataType === "bigimgscale") {
                 dom_img.style.display = "none";
                 dom_bigimg.style.display = "";
                 dom_video.style.display = "none";
@@ -654,18 +656,22 @@ class Tieefseeview {
          * @param _url 網址
          * @returns true=載入完成、false=載入失敗
          */
-        async function preloadImg(_url: string): Promise<boolean> {
+        async function preloadImg(_url: string, isInitSize: undefined | boolean = true): Promise<boolean> {
 
             let img = document.createElement("img");
             let p = await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
-                    temp_originalWidth = img.naturalWidth;//初始化圖片size
-                    temp_originalHeight = img.naturalHeight;
+                    if (isInitSize) {
+                        temp_originalWidth = img.naturalWidth;//初始化圖片size
+                        temp_originalHeight = img.naturalHeight;
+                    }
                     resolve(true);//繼續往下執行
                 });
                 img.addEventListener("error", (e) => {
-                    temp_originalWidth = 1;
-                    temp_originalHeight = 1;
+                    if (isInitSize) {
+                        temp_originalWidth = 1;
+                        temp_originalHeight = 1;
+                    }
                     resolve(false);//繼續往下執行
                 });
                 img.src = _url;
@@ -748,7 +754,7 @@ class Tieefseeview {
         }
 
         /**
-         * 載入並顯示 圖片
+         * 載入並顯示 - img
          * @param _url 
          * @returns 
          */
@@ -767,12 +773,17 @@ class Tieefseeview {
                 return false;
             }
 
+            //清空畫布
+            let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
+            context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
+
+
             dom_img.src = _url;
             return true;
         }
 
         /**
-         * 載入並顯示 圖片-canvas
+         * 載入並顯示 - canvas
          * @param _url 
          * @returns 
          */
@@ -798,7 +809,7 @@ class Tieefseeview {
 
 
             temp_drawImage = {
-                scale: 1,
+                scale: -1,
                 sx: 0, sy: 0,
                 sWidth: 1, sHeight: 1,
                 dx: 0, dy: 0,
@@ -807,26 +818,160 @@ class Tieefseeview {
 
             dom_img.src = _url;
 
-            temp_can = document.createElement("canvas");
-            temp_can.width = dom_img.width;
-            temp_can.height = dom_img.height;
-            let context0 = temp_can.getContext("2d");
-            context0?.drawImage(dom_img, 0, 0, dom_img.width, dom_img.height);
+            temp_can = urlToCanvas(_url)
 
-            setDataSize(getOriginalWidth());
+            //setDataSize(getOriginalWidth());
 
             return true;
         }
 
+        /**
+         * 載入已經縮放過的圖片並顯示 - canvas
+         * @param _url 
+         * @returns 
+         */
+        async function loadBigimgscale(
+            _arUrl: { scale: number, url: string }[],
+            _w: number, _h: number,
+            _zoomType: TieefseeviewZoomType, _zoomVal?: number): Promise<boolean> {
+
+
+            temp_originalWidth = _w;//初始化圖片size
+            temp_originalHeight = _h;
+            arBigimgscale = _arUrl;
+
+            url = arBigimgscale[0].url;
+
+            let scale = getZoomFull_scale(_zoomType, _zoomVal);
+            let bigimgscaleItem = getBigimgscaleItem(scale);
+
+            setDataType("bigimgscale");
+            //setLoading(true);
+            let p = await preloadImg(bigimgscaleItem.url, false);
+            //setLoading(false);
+            if (p === false) {
+                setDataType("img");
+                await preloadImg(errerUrl);
+                dom_img.src = errerUrl;
+                return false;
+            }
+
+            temp_bigimgscale = {};
+            temp_bigimgscale[bigimgscaleItem.scale] = urlToCanvas(bigimgscaleItem.url)
+            temp_bigimgscaleKey = [];
+            temp_bigimgscaleKey.push(bigimgscaleItem.scale)
+
+            setDataSize(getZoomFull_width(_zoomType, _zoomVal))
+            temp_drawImage = {
+                scale: -1,
+                sx: 0, sy: 0,
+                sWidth: 1, sHeight: 1,
+                dx: 0, dy: 0,
+                dWidth: 1, dHeight: 1
+            }
+
+            //dom_img.src = url;
+
+            //temp_bigimg = [];
+            //temp_can = urlToCanvas(bigimgscaleItem.url);
+            //setDataSize(getOriginalWidth());
+
+            return true;
+        }
+
+        /**
+         * 取得 Bigimgscale 目前應該載入哪一個比例的圖片
+         * @param scale 
+         * @returns 
+         */
+        function getBigimgscaleItem(scale?: number) {
+
+            let nowScale;
+            if (scale != undefined) {
+                nowScale = scale;
+            } else {
+                nowScale = getScale();
+            }
+
+            let ret = arBigimgscale[0];
+
+            for (let i = arBigimgscale.length - 1; i >= 0; i--) {
+                const item = arBigimgscale[i];
+                if (item.scale >= nowScale) {
+                    ret = item;
+                    break;
+                }
+            }
+
+            return ret;
+        }
+
+
+        /**
+         * url 轉 Canvas 。只能在網址已經載入完成的情況下使用
+         * @param url 
+         * @returns 
+         */
+        function urlToCanvas(url: string) {
+
+            let domImg = document.createElement("img");
+            domImg.src = url;
+
+            let domCan = document.createElement("canvas");
+            domCan.width = domImg.width;
+            domCan.height = domImg.height;
+            let context0 = domCan.getContext("2d");
+            context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+
+            return domCan
+        }
 
         /**
          * 從Canvas取得base64
          */
-        function getCanvasBase64() {
+        async function getCanvasBase64() {
 
             if (dataType === "bigimg") {
                 return temp_can.toDataURL("image/png", 1)
             }
+
+            if (dataType === "bigimgscale") {//未測試
+
+                if (temp_bigimgscale[1] != undefined) {
+                    return temp_bigimgscale[1].toDataURL("image/png", 1);
+
+                } else {
+                    let p = await new Promise((resolve, reject) => {
+
+                        let tempUrl = getUrl();
+                        let domImg = document.createElement("img");
+                        domImg.addEventListener("load", (e) => {
+                            if (tempUrl != getUrl()) {//避免已經切換圖片了
+                                //console.log("old:" + tempUrl + "   new:" + getUrl())
+                                resolve(false);
+                                return;
+                            }
+                            temp_bigimgscale[1] = urlToCanvas(tempUrl)
+                            resolve(true);
+                        });
+                        domImg.addEventListener("error", (e) => {
+                            resolve(false);
+                        })
+                        domImg.src = tempUrl;
+                    })
+
+                    if (p) {
+                        if (temp_bigimgscale[1] != undefined) {
+                            return temp_bigimgscale[1].toDataURL("image/png", 1);
+                        } else {
+                            return ""
+                        }
+                    } else {
+                        return ""
+                    }
+                }
+            }
+
 
             if (dataType === "img") {
                 temp_can = document.createElement("canvas");
@@ -1177,7 +1322,7 @@ class Tieefseeview {
                 dom_img.style.width = _width + "px";
                 dom_img.style.height = (_width * ratio) + "px";
             }
-            if (dataType === "bigimg") {
+            if (dataType === "bigimg" || dataType === "bigimgscale") {
                 let ratio = getOriginalHeight() / getOriginalWidth();
                 let _w = _width;
                 let _h = _width * ratio;
@@ -1195,7 +1340,7 @@ class Tieefseeview {
 
 
         var temp_drawImage = {
-            scale: 1,
+            scale: -1,
             sx: 0, sy: 0,
             sWidth: 1, sHeight: 1,
             dx: 0, dy: 0,
@@ -1250,14 +1395,14 @@ class Tieefseeview {
             return cs;*/
         }
 
-        function getBigimgTemp() {
+
+        function getBigimgTemp_bigimg() {
 
             let x = 0.8;//每次縮小的比例
             let len = 6;//最多縮小幾次
 
-            let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
-            let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
-    
+            let _scale = getScale();//目前的 圖片縮放比例
+
             //如果不需要縮小，就直接回傳
             if (_scale > 0.5) {
                 return {
@@ -1294,7 +1439,109 @@ class Tieefseeview {
                 img: temp_bigimg[temp_bigimg.length - 1],
                 scale: Math.pow(x, temp_bigimg.length)
             }
+        }
 
+        var temp_bigimgscale: { [key: number]: (HTMLCanvasElement | undefined) } = {}
+        var temp_bigimgscaleKey: number[] = []
+
+
+        function getBigimgTemp_bigimgscale() {
+
+            let nowItem = getBigimgscaleItem();
+
+            //有已經處理過的圖片就直接回傳
+            if (temp_bigimgscale[nowItem.scale] != undefined) {
+                console.log("完成 " + nowItem.scale)
+                return {
+                    img: temp_bigimgscale[nowItem.scale],
+                    scale: nowItem.scale
+                }
+            }
+
+            //開始載入新圖片
+            if (temp_bigimgscaleKey.indexOf(nowItem.scale) === -1) {
+                /*let tempUrl = getUrl();
+                let domImg = document.createElement("img");
+
+                domImg.addEventListener("load", (e) => {
+                    if (tempUrl != getUrl()) {
+                        console.log("old:" + tempUrl + "   new:" + getUrl())
+                        return;
+                    }//避免已經切換圖片了
+                    temp_bigimgscale[nowItem.scale] = urlToCanvas(nowItem.url)
+
+                    bigimgDraw(true)
+                });
+                domImg.src = nowItem.url;*/
+
+                worker.postMessage({
+                    url: nowItem.url,
+                    tempUrl: getUrl(),
+                    scale: nowItem.scale,
+                });
+
+                console.log("處理中 " + nowItem.scale)
+            }
+            temp_bigimgscaleKey.push(nowItem.scale)
+
+            //回傳已經處理過的圖片
+            let arKey = Object.keys(temp_bigimgscale)
+            let sc = Number(arKey[0])
+            for (let i = 0; i < arKey.length; i++) {
+                let key = Number(arKey[i])
+                if (key >= sc && key <= nowItem.scale) {
+                    sc = key
+                }
+            }
+
+            return {
+                img: temp_bigimgscale[sc],
+                scale: sc
+            }
+        }
+
+
+
+        //var worker_url = URL.createObjectURL(new Blob([`${worker_js}`]));
+        //var worker = new Worker(worker_url);
+        var worker = new Worker("./js/TiefseeviewWorker.js");
+        worker.addEventListener('message', function (e) {
+
+            let tempUrl = e.data.tempUrl;
+            let url = e.data.url;
+            let scale = e.data.scale;
+
+            let domImg = e.data.img;
+
+            if (tempUrl != getUrl()) {//避免已經切換圖片了
+                console.log("old:" + tempUrl + "   new:" + getUrl())
+                return;
+            }
+
+            let domCan = document.createElement("canvas");
+            domCan.width = domImg.width;
+            domCan.height = domImg.height;
+            let context0 = domCan.getContext("2d");
+            context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+
+            temp_bigimgscale[scale] = domCan;
+
+            bigimgDraw(true)
+
+        }, false);
+
+        /**
+         * 
+         * @returns 
+         */
+        function getBigimgTemp() {
+            if (dataType === "bigimgscale") {
+                return getBigimgTemp_bigimgscale();
+            }
+            if (dataType === "bigimg") {
+                return getBigimgTemp_bigimg();
+            }
+            return null;
         }
 
 
@@ -1302,12 +1549,26 @@ class Tieefseeview {
          * bigimg 渲染圖片
          * @returns 
          */
-        async function bigimgDraw() {
+        async function bigimgDraw(IsImmediatelyRun?: boolean) {
 
-            if (dataType !== "bigimg") { return }
+            if (dataType === "bigimg" || dataType === "bigimgscale") {
+            } else { return }
+
             if (getOriginalWidth() === 0) { return } //避免圖片尚未載入完成就渲染
 
+            if (IsImmediatelyRun === true) {
+                temp_drawImage = {
+                    scale: -123,
+                    sx: 0, sy: 0,
+                    sWidth: 1, sHeight: 1,
+                    dx: 0, dy: 0,
+                    dWidth: 1, dHeight: 1
+                }
+            }
+
             let bigimgTemp = getBigimgTemp();//判斷要使用原圖或是縮小後的圖片
+            if (bigimgTemp === null) { return }
+            //console.log(temp_bigimgscale);
             let can = bigimgTemp.img;
             if (can == null) { return }
             let temp_can_width = can.width;
@@ -1442,7 +1703,7 @@ class Tieefseeview {
                 //var time = new Date();
 
                 //
-                let resizeQuality: ResizeQuality = "medium";//medium
+                let resizeQuality: ResizeQuality = "high";//medium
 
                 if (getOriginalWidth() * getOriginalHeight() > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
 
@@ -1463,20 +1724,31 @@ class Tieefseeview {
                     );
 
                 }
-                /*else if (_scale >= 1) {
+                else if (_scale >= 1 && bigimgTemp.scale < 1) {
 
-                    //console.log("drawImage直接渲染");
-                    context.drawImage(temp_can,
+                    //console.log("drawImage直接渲染 原圖尚未載入完成");
+                    sx = sx * bigimgTemp.scale
+                    sy = sy * bigimgTemp.scale
+                    dWidth = dWidth / bigimgTemp.scale
+                    dHeight = dHeight / bigimgTemp.scale
+                    toFloor();
+                    context.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
                     );
 
-                } */
+                }
 
                 else if (_scale >= 1) {
 
                     //console.log("drawImage直接渲染");
+
+                    sx = sx * bigimgTemp.scale
+                    sy = sy * bigimgTemp.scale
+                    dWidth = dWidth / bigimgTemp.scale
+                    dHeight = dHeight / bigimgTemp.scale
                     toFloor();
+
                     const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
                     const oc2d = oc.getContext("2d"); // canvas 畫筆
                     if (oc2d == null) { return }
@@ -1610,14 +1882,49 @@ class Tieefseeview {
 
 
         /**
-         * 縮放圖片
+         * 目前的 圖片縮放比例
+         */
+        function getScale() {
+            let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
+            let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
+            return _scale;
+        }
+
+
+
+
+        /**
+         * 套用 縮放圖片
          * @param _type 縮放類型
          * @param _val 附加參數，例如以px或%進行縮放時，必須另外傳入number
          */
         function zoomFull(_type: TieefseeviewZoomType, _val?: number): void {
 
+            let _w = getZoomFull_width(_type, _val);
+            setDataSize(_w);
+
+            setXY(
+                (toNumber(dom_con.style.left)) * 0,
+                (toNumber(dom_con.style.top)) * 0,
+                0
+            );
+
+            init_point(false);
+            eventChangeZoom(getZoomRatio());
+
+            setRendering(rendering);
+        }
+        /** 取得縮放圖片後的 縮放比例 */
+        function getZoomFull_scale(_type: TieefseeviewZoomType, _val?: number) {
+            let _w = getZoomFull_width(_type, _val);
+            return _w / getOriginalWidth();
+        }
+        /** 取得縮放圖片都得 寬度 (用於套用設定) */
+        function getZoomFull_width(_type: TieefseeviewZoomType, _val?: number) {
             if (_type === undefined) { _type = TieefseeviewZoomType["full-wh"] }
             if (_val === undefined) { _val = 100 }
+
+            let _w = 1;
 
             //取得圖片在原始大小下，旋轉後的實際長寬(避免圖片經縮放後，長寬比例失去精度)
             let rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, degNow);
@@ -1635,7 +1942,7 @@ class Tieefseeview {
 
             //圖片原始大小
             if (_type === TieefseeviewZoomType["100%"]) {
-                setDataSize(getOriginalWidth());
+                _w = (getOriginalWidth());
             }
             if (_type === TieefseeviewZoomType["full-wh"]) {//縮放至視窗大小
                 let ratio_w = dom_con_offsetWidth / (dom_dpizoom.offsetWidth - marginLeft - marginRight)
@@ -1658,37 +1965,29 @@ class Tieefseeview {
                 let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
-                setDataSize(w * ratio * (_val / 100));
+                _w = (w * ratio * (_val / 100));
             }
             if (_type === TieefseeviewZoomType["%-h"]) {//以視窗高度比例設定
                 let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
-                setDataSize(w * ratio * ratio_xy * (_val / 100));
+                _w = (w * ratio * ratio_xy * (_val / 100));
             }
 
             if (_type === TieefseeviewZoomType["px-w"]) {//以絕對寬度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
-                setDataSize(toNumber(_val) * ratio);
+                _w = (toNumber(_val) * ratio);
             }
             if (_type === TieefseeviewZoomType["px-h"]) {//以絕對高度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
-                setDataSize(toNumber(_val) * ratio * ratio_xy);
+                _w = (toNumber(_val) * ratio * ratio_xy);
             }
 
-            setXY(
-                (toNumber(dom_con.style.left)),
-                (toNumber(dom_con.style.top)),
-                0
-            );
-
-            init_point(false);
-            eventChangeZoom(getZoomRatio());
-            setRendering(rendering);
-
+            return _w;
         }
+
 
         /**
          * 放大
@@ -1871,7 +2170,6 @@ class Tieefseeview {
             } else {
                 setXY(left, top, 0);
             }
-            //bigimgDraw()
         }
 
         /**
@@ -2062,7 +2360,7 @@ class Tieefseeview {
                         });
                 })
             }
-            bigimgDraw()
+            bigimgDraw();
         }
 
 
@@ -2125,6 +2423,17 @@ class Tieefseeview {
             if (mirrorHorizontal === true) { scaleX = -1 }
             let scaleY = 1;
             if (mirrorVertical === true) { scaleY = -1 }
+
+            if (duration <= 0) {
+                //如果角度超過360，就初始化
+                if (degNow <= 0 || degNow >= 360) { degNow = degNow - Math.floor(degNow / 360) * 360; } //避免超過360               
+                $(dom_data).animate({ "transform_rotate": degNow, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
+                dom_data.style.transform = `rotate(${degNow}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
+
+                dom_data.setAttribute("transform_rotate", degNow.toString());
+                init_point(false);
+                return;
+            }
 
             await new Promise((resolve, reject) => {
 
@@ -2413,7 +2722,6 @@ class TieefseeviewScroll {
                 setTop(v - 10, "wheel");
             }
         }
-
 
 
         //拖曳開始

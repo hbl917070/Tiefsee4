@@ -86,9 +86,10 @@ namespace Tiefsee {
             } catch (Exception e) {
                 //狀態500、回傳錯誤訊息的文字
                 context.Response.StatusCode = 500;
+                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");//設定編碼
                 byte[] _responseArray = Encoding.UTF8.GetBytes(e.ToString());
                 context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
-                
+
                 Console.WriteLine(e.ToString());
             }
 

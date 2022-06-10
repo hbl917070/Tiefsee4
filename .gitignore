@@ -14,6 +14,9 @@
 /Tiefsee/Tiefsee/bin/output/Tiefsee.exe.config
 /Tiefsee/Tiefsee/bin/output/Magick.NET-Q8-OpenMP-x64.xml
 /Tiefsee/Tiefsee/bin/output/Magick.NET.Core.xml
+/Tiefsee/Tiefsee/bin/output/System.Buffers.xml
+/Tiefsee/Tiefsee/bin/output/NetVips.xml
+/Tiefsee/Tiefsee/bin/output/NetVips.Extensions.xml
 
 /Tiefsee/Tiefsee/bin/output/www/node_modules
 /Tiefsee/Tiefsee/bin/output/www/js
@@ -22,4 +25,6 @@
 /Tiefsee/Tiefsee/bin/output/www/SettingWindow.html
 
 /Tiefsee/Tiefsee/bin/output/plugin/NConvert
+
+
 

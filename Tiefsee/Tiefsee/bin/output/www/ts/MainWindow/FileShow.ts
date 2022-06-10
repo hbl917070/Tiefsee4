@@ -173,16 +173,68 @@ class FileShow {
             return isLoaded;
         }
 
-
         /**
          * 取得圖片網址並且預載入
          */
-        async function loadImage(fileInfo2: FileInfo2) {
+        /*async function loadImage(fileInfo2: FileInfo2) {
 
             let _path = fileInfo2.Path;
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             let imgurl = _path;//圖片網址
+
+            let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
+            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);// ex. { ext: "avif", type: ["wpf", "magick"] }
+            let loadOk = false;
+            if (fileItem !== null) {
+                let arType = fileItem.type;//ex. ["wpf", "magick"]
+                for (let i = 0; i < arType.length; i++) {
+                    const type = arType[i];
+                    imgurl = await getUrl(type);
+
+                    loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                    if (loadOk) {//如果載入失敗就使用下一種模式來解析
+                        break;
+                    }
+                }
+            } else {
+                imgurl = await getUrl("magick");
+                loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+            }
+
+            //如果都載入失敗，就顯示檔案的圖示
+            if (loadOk == false) {
+                imgurl = await getUrl("icon")
+                await tieefseeview.preloadImg(imgurl);//預載入
+            }
+
+            return imgurl;
+        }*/
+
+
+
+        /**
+         * 載入圖片
+         * @param _path 
+         */
+        async function openImage(fileInfo2: FileInfo2) {
+
+            isLoaded = false;
+            let _path = fileInfo2.Path;
+            setShowType(GroupType.img);//改變顯示類型
+            let imgurl = _path;//圖片網址
+
+            tieefseeview.setLoading(true);
+
+            let encodePath = encodeURIComponent(_path);
+            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+
+            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType);// ex. { ext:"psd", type:"magick" }
+            if (configItem == undefined) {
+                configItem = { ext: "", type:"vips", vipsType: "magick" }
+            }
+            let configType = configItem.type;
 
             async function getUrl(type: string) {
                 if (type === "web") {
@@ -219,54 +271,60 @@ class FileShow {
                 return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
             }
 
-            let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);// ex. { ext: "avif", type: ["wpf", "magick"] }
-            let loadOk = false;
-            if (fileItem !== null) {
-                let arType = fileItem.type;//ex. ["wpf", "magick"]
-                for (let i = 0; i < arType.length; i++) {
-                    const type = arType[i];
-                    imgurl = await getUrl(type);
-
-                    loadOk = await tieefseeview.preloadImg(imgurl);//預載入
-                    if (loadOk) {//如果載入失敗就使用下一種模式來解析
-                        break;
-                    }
-                }
-            } else {
-                imgurl = await getUrl("magick");
-                loadOk = await tieefseeview.preloadImg(imgurl);//預載入
-            }
-
-            //如果都載入失敗，就顯示檔案的圖示
-            if (loadOk == false) {
-                imgurl = await getUrl("icon")
-                await tieefseeview.preloadImg(imgurl);//預載入
-            }
-
-            return imgurl;
-        }
-
-
-        /**
-         * 載入圖片
-         * @param _path 
-         */
-        async function openImage(fileInfo2: FileInfo2) {
-
-            isLoaded = false;
-            let _path = fileInfo2.Path;
-            setShowType(GroupType.img);//改變顯示類型
-            let imgurl = _path;//圖片網址
-
-            tieefseeview.setLoading(true);
-
-            imgurl = await loadImage(fileInfo2);//取得圖片網址並且預載入
 
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
+
+                imgurl = await getUrl("web");//取得圖片網址並且預載入
                 await tieefseeview.loadImg(imgurl);//使用<img>渲染
-            } else {
-                await tieefseeview.loadBigimg(imgurl);//使用canvas渲染
+
+            } else if (configType === "vips") {//
+
+                let encodePath = encodeURIComponent(_path);
+                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                let vipsType = configItem.vipsType;
+                let u = APIURL + `/api/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}`
+
+                let imgInitInfo = await fetchGet_json(u);
+                console.log(imgInitInfo);
+
+                if (imgInitInfo.code == 1) {
+
+                    //設定縮放的比例
+                    let arUrl: { scale: number, url: string }[] = [];    
+                    arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` })
+                    for (let i = 1; i <= 10; i++) {
+                        let scale = Number(Math.pow(0.7, i).toFixed(3));
+                        if (imgInitInfo.width * scale < 600 || imgInitInfo.height * scale < 600) {//如果圖片太小就不處理
+                            break;
+                        }
+                        let imgU = APIURL + `/api/vips/resize?path=${encodePath}&scale=${scale}&${fileTime}`
+                        arUrl.push({ scale: scale, url: imgU })
+                    }
+
+                    await tieefseeview.loadBigimgscale(
+                        arUrl,
+                        imgInitInfo.width, imgInitInfo.height,
+                        TieefseeviewZoomType["full-100%"]
+                    );
+
+                } else {//載入失敗就顯示圖示
+
+                    imgurl = await getUrl("icon");//取得圖片網址
+                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+
+                }
+
+            } else {//使用<canvas>直接開啟網址
+
+                imgurl = await getUrl(configType);//取得圖片網址
+                let loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                if (loadOk) {
+                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                } else {//載入失敗就顯示圖示
+                    imgurl = await getUrl("icon");//取得圖片網址
+                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                }
+
             }
 
             initTiefseeview(fileInfo2);
@@ -304,9 +362,9 @@ class FileShow {
          * 
          * @param fileInfo2 
          */
-        function initTiefseeview(fileInfo2: FileInfo2) {
+        async function initTiefseeview(fileInfo2: FileInfo2) {
             tieefseeview.setLoading(false);
-            tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
+            await tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
             tieefseeview.setEventChangeZoom(((ratio: number) => {
                 let txt = (ratio * 100).toFixed(0) + "%"
 
