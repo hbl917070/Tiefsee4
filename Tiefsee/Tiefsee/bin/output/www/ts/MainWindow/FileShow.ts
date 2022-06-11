@@ -224,7 +224,7 @@ class FileShow {
             setShowType(GroupType.img);//改變顯示類型
             let imgurl = _path;//圖片網址
 
-            tieefseeview.setLoading(true);
+            tieefseeview.setLoading(true, 200);
 
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
@@ -232,7 +232,7 @@ class FileShow {
             let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
             let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType);// ex. { ext:"psd", type:"magick" }
             if (configItem == undefined) {
-                configItem = { ext: "", type:"vips", vipsType: "magick" }
+                configItem = { ext: "", type: "vips", vipsType: "magick" }
             }
             let configType = configItem.type;
 
@@ -290,7 +290,7 @@ class FileShow {
                 if (imgInitInfo.code == 1) {
 
                     //設定縮放的比例
-                    let arUrl: { scale: number, url: string }[] = [];    
+                    let arUrl: { scale: number, url: string }[] = [];
                     arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` })
                     for (let i = 1; i <= 10; i++) {
                         let scale = Number(Math.pow(0.7, i).toFixed(3));
@@ -350,7 +350,7 @@ class FileShow {
                 imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
-            tieefseeview.setLoading(true);
+            tieefseeview.setLoading(true, 200);
             await tieefseeview.preloadImg(imgurl);//預載入
             await tieefseeview.loadVideo(imgurl);//使用video渲染
 

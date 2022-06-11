@@ -139,6 +139,7 @@ class Tieefseeview {
         var temp_pinchCenterX = 0;
         var temp_pinchCenterY = 0;
 
+        var temp_dateShowLoading: number = 0;//控制laoding顯示的延遲
         var temp_originalWidth: number = 1;//用於記錄圖片size 的暫存
         var temp_originalHeight: number = 1;
         var temp_img: HTMLImageElement;//圖片暫存
@@ -147,6 +148,7 @@ class Tieefseeview {
         var temp_touchPadTime = 0;//用於判斷是否為觸控板
         /** Bigimgscale 用於儲存圖片網址與比例 */
         var arBigimgscale: { scale: number, url: string }[] = []
+
 
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
@@ -993,14 +995,27 @@ class Tieefseeview {
             return ""
         }
 
+
         /**
          * 顯示或隱藏 loading
-         * @param _b 
+         * @param val 
+         * @param delay 延遲顯示(ms)
          */
-        function setLoading(_b: boolean) {
-            if (_b) {
+        function setLoading(val: boolean, delay: number = 200) {
+            /*if (_b) {
                 dom_loading.style.display = "block";
             } else {
+                dom_loading.style.display = "none";
+            }*/
+            if (val) {
+                setTimeout(() => {
+                    if ((new Date()).getTime() > temp_dateShowLoading) {
+                        dom_loading.style.display = "block";
+                    }
+                }, delay);
+                temp_dateShowLoading = (new Date()).getTime() + delay - 1;
+            } else {
+                temp_dateShowLoading = 99999999999999;//避免延遲時間到了之後還顯示
                 dom_loading.style.display = "none";
             }
         }
