@@ -1338,64 +1338,25 @@ class Tieefseeview {
             }
         }
 
+        //#region BigimgTemp
 
-        var temp_drawImage = {
-            scale: -1,
-            sx: 0, sy: 0,
-            sWidth: 1, sHeight: 1,
-            dx: 0, dy: 0,
-            dWidth: 1, dHeight: 1
-        }
-
-        //var temp_bigimg_50: null | HTMLCanvasElement | ImageBitmap;
-        //var temp_bigimg_25: null | HTMLCanvasElement | ImageBitmap;
-
-        var temp_bigimg: (undefined | HTMLCanvasElement | ImageBitmap)[] = []
-
-
-
-        function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number) {
-
-            let width = Math.floor(img.width * zoom);
-            let height = Math.floor(img.height * zoom);
-
-            let cs = document.createElement("canvas");
-            cs.width = width;
-            cs.height = height;
-            let context0 = cs.getContext("2d") as CanvasRenderingContext2D;
-            /*if (width > 3000) {
-                context0.filter = `blur(${1}px)`;
-            }*/
-            context0.imageSmoothingQuality = "medium";
-            context0.drawImage(img, 0, 0, width, height);
-            return cs;
-
-            /*const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
-            const oc2d = oc.getContext("2d");
-            if (oc2d == null) { return }
-            oc2d.drawImage(temp_can,
-                sx, sy, sWidth, sHeight,
-                0, 0, sWidth, sHeight
-            );*/
-
-            /*let cs = document.createElement("canvas");
-            cs.width = width
-            cs.height = height;
-            let context0 = cs.getContext("2d");
-         
-            let resizeQuality: ResizeQuality = "medium";
-            let imgb = null;
-            await createImageBitmap(img, 0, 0, img.width, img.height,
-                { resizeWidth: width, resizeHeight: height, resizeQuality: resizeQuality })
-                .then(function (sprites) {
-                    //imgb = sprites
-                    context0?.drawImage(sprites, 0, 0, width, height);
-                });
-
-            return cs;*/
+        /**
+         * 根據目前的縮放比例來取得縮小後的圖片
+         * @returns 
+         */
+        function getBigimgTemp() {
+            if (dataType === "bigimgscale") {
+                return getBigimgTemp_bigimgscale();
+            }
+            if (dataType === "bigimg") {
+                return getBigimgTemp_bigimg();
+            }
+            return null;
         }
 
 
+        var temp_bigimg: (undefined | HTMLCanvasElement | ImageBitmap)[] = [];
+        /** */
         function getBigimgTemp_bigimg() {
 
             let x = 0.8;//每次縮小的比例
@@ -1440,18 +1401,56 @@ class Tieefseeview {
                 scale: Math.pow(x, temp_bigimg.length)
             }
         }
+        /** 取得縮放後的Canvas*/
+        function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number) {
 
-        var temp_bigimgscale: { [key: number]: (HTMLCanvasElement | undefined) } = {}
-        var temp_bigimgscaleKey: number[] = []
+            let width = Math.floor(img.width * zoom);
+            let height = Math.floor(img.height * zoom);
 
+            let cs = document.createElement("canvas");
+            cs.width = width;
+            cs.height = height;
+            let context0 = cs.getContext("2d") as CanvasRenderingContext2D;
 
+            context0.imageSmoothingQuality = "medium";
+            context0.drawImage(img, 0, 0, width, height);
+            return cs;
+
+            /*const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
+            const oc2d = oc.getContext("2d");
+            if (oc2d == null) { return }
+            oc2d.drawImage(temp_can,
+                sx, sy, sWidth, sHeight,
+                0, 0, sWidth, sHeight
+            );*/
+
+            /*let cs = document.createElement("canvas");
+            cs.width = width
+            cs.height = height;
+            let context0 = cs.getContext("2d");
+         
+            let resizeQuality: ResizeQuality = "medium";
+            let imgb = null;
+            await createImageBitmap(img, 0, 0, img.width, img.height,
+                { resizeWidth: width, resizeHeight: height, resizeQuality: resizeQuality })
+                .then(function (sprites) {
+                    //imgb = sprites
+                    context0?.drawImage(sprites, 0, 0, width, height);
+                });
+        
+            return cs;*/
+        }
+
+        var temp_bigimgscale: { [key: number]: (HTMLCanvasElement | undefined) } = {}; //記錄已經載入過的圖片
+        var temp_bigimgscaleKey: number[] = []; //判斷哪些圖片已經載入過了
+        /** */
         function getBigimgTemp_bigimgscale() {
 
             let nowItem = getBigimgscaleItem();
 
             //有已經處理過的圖片就直接回傳
             if (temp_bigimgscale[nowItem.scale] != undefined) {
-                console.log("完成 " + nowItem.scale)
+                //console.log("完成 " + nowItem.scale)
                 return {
                     img: temp_bigimgscale[nowItem.scale],
                     scale: nowItem.scale
@@ -1474,18 +1473,18 @@ class Tieefseeview {
                 });
                 domImg.src = nowItem.url;*/
 
+                //使用worker在背景載入圖片
                 worker.postMessage({
                     url: nowItem.url,
                     tempUrl: getUrl(),
                     scale: nowItem.scale,
                 });
-
-                console.log("處理中 " + nowItem.scale)
+                //console.log("處理中 " + nowItem.scale)
             }
-            temp_bigimgscaleKey.push(nowItem.scale)
+            temp_bigimgscaleKey.push(nowItem.scale);
 
             //回傳已經處理過的圖片
-            let arKey = Object.keys(temp_bigimgscale)
+            let arKey = Object.keys(temp_bigimgscale);
             let sc = Number(arKey[0])
             for (let i = 0; i < arKey.length; i++) {
                 let key = Number(arKey[i])
@@ -1500,54 +1499,53 @@ class Tieefseeview {
             }
         }
 
+        //使用Worker在背景載入圖片
+        try {
 
+            //var worker_url = URL.createObjectURL(new Blob([`${worker_js}`]));
+            //var worker = new Worker(worker_url);
+            var worker = new Worker("./js/TiefseeviewWorker.js");
+            worker.addEventListener('message', function (e) {
 
-        //var worker_url = URL.createObjectURL(new Blob([`${worker_js}`]));
-        //var worker = new Worker(worker_url);
-        var worker = new Worker("./js/TiefseeviewWorker.js");
-        worker.addEventListener('message', function (e) {
+                let tempUrl = e.data.tempUrl;
+                let url = e.data.url;
+                let scale = e.data.scale;
 
-            let tempUrl = e.data.tempUrl;
-            let url = e.data.url;
-            let scale = e.data.scale;
+                let domImg = e.data.img;
 
-            let domImg = e.data.img;
+                if (tempUrl != getUrl()) {//避免已經切換圖片了
+                    //console.log("old:" + tempUrl + "   new:" + getUrl())
+                    return;
+                }
 
-            if (tempUrl != getUrl()) {//避免已經切換圖片了
-                console.log("old:" + tempUrl + "   new:" + getUrl())
-                return;
-            }
+                let domCan = document.createElement("canvas");
+                domCan.width = domImg.width;
+                domCan.height = domImg.height;
+                let context0 = domCan.getContext("2d");
+                context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
 
-            let domCan = document.createElement("canvas");
-            domCan.width = domImg.width;
-            domCan.height = domImg.height;
-            let context0 = domCan.getContext("2d");
-            context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+                temp_bigimgscale[scale] = domCan;
 
-            temp_bigimgscale[scale] = domCan;
+                bigimgDraw(true)
 
-            bigimgDraw(true)
+            }, false);
 
-        }, false);
-
-        /**
-         * 
-         * @returns 
-         */
-        function getBigimgTemp() {
-            if (dataType === "bigimgscale") {
-                return getBigimgTemp_bigimgscale();
-            }
-            if (dataType === "bigimg") {
-                return getBigimgTemp_bigimg();
-            }
-            return null;
+        } catch (e2) {
+            console.log("Worker 載入失敗，無法使用「bigimgscale」")
         }
 
+        //#endregion
+
+        var temp_drawImage = {
+            scale: -1,
+            sx: 0, sy: 0,
+            sWidth: 1, sHeight: 1,
+            dx: 0, dy: 0,
+            dWidth: 1, dHeight: 1
+        }
 
         /**
-         * bigimg 渲染圖片
-         * @returns 
+         * bigimg或bigimgscale 渲染圖片
          */
         async function bigimgDraw(IsImmediatelyRun?: boolean) {
 
@@ -1880,7 +1878,6 @@ class Tieefseeview {
         }
 
 
-
         /**
          * 目前的 圖片縮放比例
          */
@@ -1889,8 +1886,6 @@ class Tieefseeview {
             let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
             return _scale;
         }
-
-
 
 
         /**
@@ -2866,7 +2861,6 @@ class TieefseeviewScroll {
             }
             eventChange(mode);
         }
-
 
 
         /**
