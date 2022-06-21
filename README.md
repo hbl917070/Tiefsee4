@@ -6,7 +6,7 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.16](https://github.com/hbl917070/tiefsee4/releases)
+[Tiefsee 4.0.0-beta.17](https://github.com/hbl917070/tiefsee4/releases)
 (注意：此為測試版，功能尚未齊全到足以取代Tiefsee 3.0.2  
 
     開發中功能：  
@@ -47,10 +47,10 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 > webview2的透明背景不支援win7。
 
 ### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
-> 要解決此問題只能改用UWP專案來開發。
+> 改用UWP專案或winUI 3專案或許可以解決此問題。
 
-### 4、使用毛玻璃視窗後，可能導致Tiefsee的視窗在移動時嚴重延遲
-> Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API，此BUG並非在所有電腦都會發生，要解決此問題只能改用UWP專案來開發。
+### 4、視窗使用毛玻璃效果後，可能導致Tiefsee的視窗在移動時嚴重延遲
+> 此BUG並非在所有電腦都會發生，Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。改用UWP專案或winUI 3專案或許可以解決此問題。
 
 <br>
 
