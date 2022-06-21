@@ -111,7 +111,8 @@ namespace Tiefsee {
         private async void InitWebview() {
             var opts = new CoreWebView2EnvironmentOptions {
                 //AdditionalBrowserArguments = "--allow-file-access-from-files"
-                AdditionalBrowserArguments = "--disable-web-security"
+                //AdditionalBrowserArguments = "--disable-web-security"
+                AdditionalBrowserArguments = @"--disable-web-security --user-agent=""EEEEEEE"""
             };
             Microsoft.Web.WebView2.WinForms.WebView2 wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             var webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);

@@ -17,14 +17,23 @@ class InitMenu {
         initRotate();
         this.menu_layout = new Menu_layout(M);
         initRightMenuImage();
+        initText();
+        initTxt();
 
         //點擊右鍵時
         document.body.addEventListener("mousedown", (e) => {
             if (e.button === 2) {
                 let target = e.target as HTMLElement;
                 let dataMenu = target.getAttribute("data-menu");
-                if (dataMenu != "none") {
-                    M.script.menu.showRightMenuImage();
+                if (dataMenu !== "none") {
+                    e.preventDefault();
+                    if (Lib.isTextFocused()) {//焦點在輸入框上
+                        M.script.menu.showRightMenuText();
+                    } else if (Lib.isTxtSelect()) {//有選取文字的話
+                        M.script.menu.showRightMenuTxt();
+                    } else {
+                        M.script.menu.showRightMenuImage();
+                    }
                 }
             }
         })
@@ -272,7 +281,7 @@ class InitMenu {
         /**
          * 初始化 menu-旋轉與鏡像
          */
-        async function initRotate() {
+        function initRotate() {
 
             //順時針90°
             var dom_rotateCw = document.getElementById("menuitem-img-rotateCw");
@@ -322,7 +331,7 @@ class InitMenu {
 
 
         /**
-         *  初始化 menu-圖片的右鍵選單
+         *  初始化 右鍵選單 - 圖片
          */
         function initRightMenuImage() {
 
@@ -394,7 +403,97 @@ class InitMenu {
         }
 
 
+        /**
+         *  初始化 右鍵選單 - 輸入框
+         */
+        async function initText() {
 
+            var dom_menu = document.getElementById("menu-text");
+            if (dom_menu !== null) {
+                dom_menu.addEventListener("mousedown", (e) => {
+                    e.preventDefault();//避免搶走輸入框的焦點
+                });
+            }
+
+            var dom_cut = document.getElementById("menuitem-text-cut");//剪下
+            if (dom_cut !== null) {
+                dom_cut.onclick = async () => {
+
+                    await WV_System.SendKeys_CtrlAnd("x");
+                    M.menu.close();//關閉menu
+                    /*let dom_input = document.activeElement as HTMLInputElement;
+                    if (dom_input === null) { return; }
+                    let start = dom_input.selectionStart;
+                    let end = dom_input.selectionEnd;
+                    if (start === null || end === null) { return; }
+                    if (start === end) { return; }
+
+                    let txt = dom_input.value;
+                    let select = txt.substring(start, end);
+                    WV_System.SetClipboard_Txt(select);//存入剪貼簿
+
+                    dom_input.value = txt.substring(0, start) + txt.substring(end);//去除中間的文字
+                    dom_input.setSelectionRange(start, start);//把焦點放回開頭*/
+                }
+            }
+
+            var dom_copy = document.getElementById("menuitem-text-copy");//複製
+            if (dom_copy !== null) {
+                dom_copy.onclick = async () => {
+
+                    await WV_System.SendKeys_CtrlAnd("c");
+                    M.menu.close();//關閉menu
+
+                    /*let selection = document.getSelection();
+                    if (selection === null) { return; }
+                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿*/
+                }
+            }
+
+            var dom_paste = document.getElementById("menuitem-text-paste");//貼上
+            if (dom_paste !== null) {
+                dom_paste.onclick = async () => {
+                    await WV_System.SendKeys_CtrlAnd("v");
+                    M.menu.close();//關閉menu
+                }
+            }
+
+            var dom_selectAll = document.getElementById("menuitem-text-selectAll");//全選
+            if (dom_selectAll !== null) {
+                dom_selectAll.onclick = async () => {
+                    await WV_System.SendKeys_CtrlAnd("a");
+                    M.menu.close();//關閉menu
+                }
+            }
+        }
+
+
+        /**
+         *  初始化 右鍵選單 - 一般文字
+         */
+        async function initTxt() {
+
+            var dom_menu = document.getElementById("menu-text");
+            if (dom_menu !== null) {
+                dom_menu.addEventListener("mousedown", (e) => {
+                    e.preventDefault();//避免搶走輸入框的焦點
+                });
+            }
+
+            var dom_copy = document.getElementById("menuitem-txt-copy");//複製
+            if (dom_copy !== null) {
+                dom_copy.onclick = async () => {
+
+                    M.menu.close();//關閉menu
+
+                    let selection = document.getSelection();
+                    if (selection === null) { return; }
+                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿
+                }
+            }
+
+
+        }
     }
 
 }
@@ -411,11 +510,13 @@ class Menu_layout {
         var dom_mainTools = dom.querySelector(".js-mainTools") as HTMLElement;
         var dom_mainDirList = dom.querySelector(".js-mainDirList") as HTMLElement;
         var dom_mainFileList = dom.querySelector(".js-mainFileList") as HTMLElement;
+        var dom_mainExif = dom.querySelector(".js-mainExif") as HTMLElement;
 
         var isTopmost: boolean = false;
         var isMainTools: boolean = false;
         var isMainDirList: boolean = false;
         var isMainFileList: boolean = false;
+        var isMainExif: boolean = false;
 
         this.show = show;
 
@@ -431,7 +532,9 @@ class Menu_layout {
         dom_mainFileList.addEventListener("click", () => {
             setMainFileList();
         });
-
+        dom_mainExif.addEventListener("click", () => {
+            setMainExif();
+        });
         //------------------------
 
         /**
@@ -455,9 +558,11 @@ class Menu_layout {
             isMainTools = M.config.settings.layout.mainToolsEnabled;
             isMainDirList = M.config.settings.layout.dirListEnabled;
             isMainFileList = M.config.settings.layout.fileListEnabled;
+            isMainExif = M.config.settings.layout.mainExifEnabled;
             setCheckState(dom_mainTools, isMainTools);
             setCheckState(dom_mainDirList, isMainDirList);
             setCheckState(dom_mainFileList, isMainFileList);
+            setCheckState(dom_mainExif, isMainExif);
         }
 
 
@@ -498,8 +603,7 @@ class Menu_layout {
 
 
         /**
-         * 顯示或隱藏檔案預覽列表
-         * @param val 
+         * 顯示或隱藏 檔案預覽列表
          */
         function setMainFileList(val?: boolean) {
             if (val === undefined) { val = !isMainFileList }
@@ -508,6 +612,15 @@ class Menu_layout {
             M.mainFileList.setEnabled(val);
         }
 
+        /**
+         * 顯示或隱藏 詳細資料視窗
+         */
+        function setMainExif(val?: boolean) {
+            if (val === undefined) { val = !isMainExif }
+            isMainExif = val;
+            setCheckState(dom_mainExif, val);
+            M.mainExif.setEnabled(val);
+        }
 
         /**
          * 設定是否勾選

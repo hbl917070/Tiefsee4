@@ -42,7 +42,7 @@
 .main-C {
   display: flex;
   flex: 1 1 auto;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .main-B {
@@ -170,7 +170,7 @@
 
 /*純文字資訊*/
 .main-tools-txt {
-  height: 35px;  
+  height: 35px;
   font-size: 15px;
   line-height: 17px;
   display: flex;
@@ -234,6 +234,7 @@
   justify-content: center;
   opacity: 0;
   z-index: 5;
+  user-select: none;
 }
 .maxBtn:hover {
   cursor: pointer;
@@ -515,4 +516,63 @@
 //拖曳時
 .dragbar-v[active="true"] {
   background-color: var(--color-blue);
+}
+
+//-------------------
+
+//exif 視窗
+:root {
+  --mainExif-width: 240px;
+}
+
+.mainExif {
+  display: none;
+  //display: flex;
+  width: var(--mainExif-width);
+  height: 100%;
+  flex-direction: column;
+
+  .mainExifTop {
+  }
+
+  .mainExifList {
+    padding: 0 5px;
+    padding-bottom: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+  }
+  .mainExifItem {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid var(--color-blue20);
+    padding: 3px 0;
+
+    word-wrap: break-word;
+    //word-break: break-all;
+    font-size: 14px;
+  }
+  .mainExifName {
+    flex: 1;
+    min-width: 100px; //寬度不足100時，會自動換行
+    color: var(--color-blue);
+    margin-right: 3px;
+    font-weight: 500;
+  }
+  .mainExifValue {
+    flex: 1;
+    min-width: 100px;
+    color: var(--color-white);
+  }
+}
+
+//啟用
+.mainExif[active="true"] {
+  display: flex;
+}
+//暫時隱藏
+.mainExif[hide="true"] {
+  display: none !important;
 }

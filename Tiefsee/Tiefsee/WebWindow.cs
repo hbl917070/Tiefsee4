@@ -242,6 +242,7 @@ namespace Tiefsee {
             //this.SetSize(400, 300);
             this.Opacity = 0;
             wv2 = new WV2();
+      
             this.Controls.Add(wv2);
 
             if (isDelayInit) {
@@ -275,7 +276,8 @@ namespace Tiefsee {
 
             var opts = new CoreWebView2EnvironmentOptions {
                 //AdditionalBrowserArguments = "--allow-file-access-from-files"
-                AdditionalBrowserArguments = "--disable-web-security"
+                AdditionalBrowserArguments = @"--disable-web-security --user-agent=""EEEEEEE"""
+
             };
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
@@ -285,6 +287,7 @@ namespace Tiefsee {
                 CoreWebView2HostResourceAccessKind.DenyCors
             );*/
 
+            //wv2.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44 QQQQQQQQQ";
             wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;//是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
             //wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;//觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
             wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;//自動填充啟用
@@ -308,6 +311,8 @@ namespace Tiefsee {
             wv2.CoreWebView2.AddHostObjectToScript("WV_Image", WV_Image);
             wv2.CoreWebView2.AddHostObjectToScript("WV_T", new WV_T());
 
+          
+           
             // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
             //開啟時視窗時

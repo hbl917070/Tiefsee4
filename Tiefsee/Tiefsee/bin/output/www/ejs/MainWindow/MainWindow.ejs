@@ -30,11 +30,17 @@
 
     <script src="./js/SvgList.js"></script>
 
+    <!-- 多國語言 -->
+    <script src="./lang/ui.js"></script>
+    <script src="./lang/exif.js"></script>
+    <script src="./js/I18n.js"></script>
+
     <script src="./js/Config.js"></script>
     <script src="./js/MainWindow/MainTools.js"></script>
     <script src="./js/MainWindow/FileLoad.js"></script>
     <script src="./js/MainWindow/MainFileList.js"></script>
     <script src="./js/MainWindow/MainDirList.js"></script>
+    <script src="./js/MainWindow/MainExif.js"></script>
     <script src="./js/MainWindow/FileShow.js"></script>
     <script src="./js/MainWindow/FileSort.js"></script>
     <script src="./js/MainWindow/DirSort.js"></script>
@@ -45,7 +51,7 @@
     <script src="./js/MainWindow/Hotkey.js"></script>
     <script src="./js/MainWindow/Dragbar.js"></script>
     <script src="./js/MainWindow/MainWindow.js"></script>
-    
+
     <script>
         var mainWindow;
         document.addEventListener("DOMContentLoaded", async () => {
@@ -63,6 +69,7 @@
 
             <div class="dragbar-v" id="dragbar-mainFileList"> </div>
             <div class="dragbar-v" id="dragbar-mainDirList"> </div>
+            <div class="dragbar-v" id="dragbar-mainExif"> </div>
 
             <!-- 標題列 -->
             <div class="window-titlebar">
@@ -78,7 +85,7 @@
                     <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
                         <%- await readFile("./img/default/window-topmost.svg"); %>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-layout" >
+                    <div class="titlebar-tools-btn titlebar-tools-layout">
                         <%- await readFile("./img/default/window-layout.svg"); %>
                     </div>
                     <div class="titlebar-tools-btn titlebar-tools-minimized">
@@ -119,7 +126,6 @@
                                 </div>
                             </div>
 
-
                             <!-- 檔案預覽列表 -->
                             <div class="main-fileList base-scrollbar" id="main-fileList">
                                 <div class="main-fileListBody" id="main-fileListBody">
@@ -150,9 +156,22 @@
 
                             <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
                         </div>
-                        <div class="main-R">
 
+                        <div class="main-R" id="main-R">
+
+                            <!-- exif 視窗 -->
+                            <div class="mainExif" id="mainExif">
+                                <div class="mainExifTop">
+
+                                </div>
+                                <div class="mainExifList base-scrollbar" id="mainExifList">
+
+                                </div>
+
+                            </div>
                         </div>
+
+
                     </div>
 
                     <div class="main-B"></div>

@@ -100,7 +100,7 @@ namespace Tiefsee {
                     DisableAutoBrightness = false
                 }
             };
-            MagickImage image = new MagickImage(path, settings) ;
+            MagickImage image = new MagickImage(path, settings);
 
             /*if (image.ColorSpace == ColorSpace.RGB || image.ColorSpace == ColorSpace.sRGB || image.ColorSpace == ColorSpace.scRGB) {
                 image.SetProfile(ColorProfile.SRGB);
@@ -124,7 +124,7 @@ namespace Tiefsee {
         public static Stream MagickImage_PathToStream(string path, string type) {
 
             type = type.ToLower();
-          
+
             using (MagickImage image = GetMagickImage(path)) {
 
                 MagickFormat imgType;
@@ -216,7 +216,7 @@ namespace Tiefsee {
                 try {
                     memoryStream.Position = 0;
                     using (MagickImage image = new MagickImage(memoryStream)) {
-                        var imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Bmp));
+                        MemoryStream imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Jpeg));
                         memoryStream.Close();
                         memoryStream.Dispose();
                         if (thumbnail) {
@@ -238,7 +238,7 @@ namespace Tiefsee {
 
                 //如果無法使用 dcraw ，就改用MagickImage直接讀取
                 using (MagickImage image = new MagickImage(path)) {
-                    var imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Bmp));
+                    var imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Jpeg));
                     Console.WriteLine("Magick ok: " + path);
                     return imgMs;
                 }
@@ -424,7 +424,7 @@ namespace Tiefsee {
                         object val = bmData.GetQuery("/app1/ifd/exif:{uint=274}");//取得exif裡面的旋轉
                         if (val != null) {
                             string orientation = val.ToString();
-                            if (orientation == "6" || orientation == "8") {//1=0  8=90  3=180  6=270
+                            if (orientation == "5" || orientation == "6" || orientation == "7" || orientation == "8") {//1=0  8=90  3=180  6=270
                                 w = img.PixelHeight;
                                 h = img.PixelWidth;
                             }
@@ -511,7 +511,7 @@ namespace Tiefsee {
                 return GetImgInitInfo(path100, "vips");
             }
 
-            if (type == "magick" ) {
+            if (type == "magick") {
                 using (MagickImage image = GetMagickImage(path)) {
                     if (image.IsOpaque) {//如果不透明
                         image.Write(path100, MagickFormat.Jpeg);

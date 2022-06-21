@@ -64,7 +64,8 @@ class FileShow {
 
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
-
+                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
+                
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -83,6 +84,7 @@ class FileShow {
 
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
+                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -102,6 +104,7 @@ class FileShow {
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
 
                 dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
@@ -125,6 +128,7 @@ class FileShow {
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -144,6 +148,7 @@ class FileShow {
 
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";
@@ -272,6 +277,9 @@ class FileShow {
             }
 
 
+
+           
+
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
 
                 imgurl = await getUrl("web");//取得圖片網址並且預載入
@@ -285,16 +293,16 @@ class FileShow {
                 let u = APIURL + `/api/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}`
 
                 let imgInitInfo = await fetchGet_json(u);
-                console.log(imgInitInfo);
+                //console.log(imgInitInfo);
 
                 if (imgInitInfo.code == 1) {
 
                     //設定縮放的比例
                     let arUrl: { scale: number, url: string }[] = [];
                     arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` })
-                    for (let i = 1; i <= 10; i++) {
-                        let scale = Number(Math.pow(0.7, i).toFixed(3));
-                        if (imgInitInfo.width * scale < 600 || imgInitInfo.height * scale < 600) {//如果圖片太小就不處理
+                    for (let i = 1; i <= 15; i++) {
+                        let scale = Number(Math.pow(0.8, i).toFixed(3));
+                        if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) {//如果圖片太小就不處理
                             break;
                         }
                         let imgU = APIURL + `/api/vips/resize?path=${encodePath}&scale=${scale}&${fileTime}`
@@ -326,6 +334,8 @@ class FileShow {
                 }
 
             }
+
+            M.mainExif.init(fileInfo2);//初始化exif
 
             initTiefseeview(fileInfo2);
             isLoaded = true;
@@ -385,7 +395,7 @@ class FileShow {
             let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2);
-                let fileLength = getFileLength(fileInfo2.Lenght);
+                let fileLength = Lib.getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
 
@@ -418,7 +428,7 @@ class FileShow {
             let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
-                let fileLength = getFileLength(fileInfo2.Lenght);
+                let fileLength = Lib.getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
 
@@ -447,7 +457,7 @@ class FileShow {
             let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
-                let fileLength = getFileLength(fileInfo2.Lenght);
+                let fileLength = Lib.getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }
 
@@ -478,27 +488,7 @@ class FileShow {
         }
 
 
-        /**
-         * 取得檔案的大小的文字
-         * @param path 
-         * @returns 
-         */
-        function getFileLength(len: number) {
-
-            //let len = await WV_File.GetFileInfo(path).Length;
-
-            if (len / 1024 < 1) {
-                return len.toFixed(1) + " B";
-
-            } else if (len / (1024 * 1024) < 1) {
-                return (len / (1024)).toFixed(1) + " KB";
-            } else if (len / (1024 * 1024 * 1024) < 1) {
-                return (len / (1024 * 1024)).toFixed(1) + " MB";
-            }
-
-            return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
-        }
-
+ 
 
 
 

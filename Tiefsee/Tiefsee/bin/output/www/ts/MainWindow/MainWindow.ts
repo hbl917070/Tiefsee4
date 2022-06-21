@@ -6,7 +6,9 @@ class MainWindow {
     public dom_maxBtnLeft: HTMLElement;
     public dom_maxBtnRight: HTMLElement;
     public dom_mainL: HTMLElement;
+    public dom_mainR: HTMLElement;
 
+    public i18n;
     public config;
     public mainTools;
     public fileLoad;
@@ -15,6 +17,7 @@ class MainWindow {
     public dirSort;
     public mainFileList;
     public mainDirList;
+    public mainExif;
     public menu;
     public initMenu;
     public script;
@@ -29,12 +32,15 @@ class MainWindow {
         var dom_maxBtnLeft = <HTMLElement>document.getElementById("maxBtnLeft");//上一頁大按鈕
         var dom_maxBtnRight = <HTMLElement>document.getElementById("maxBtnRight");
         var dom_mainL = <HTMLElement>document.getElementById("main-L");//左邊區域
+        var dom_mainR = <HTMLElement>document.getElementById("main-R");//左邊區域
         var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-tools-layout");//開啟layout選單
 
         this.dom_tools = dom_tools;
         this.dom_maxBtnLeft = dom_maxBtnLeft;
         this.dom_maxBtnRight = dom_maxBtnRight;
         this.dom_mainL = dom_mainL;
+        this.dom_mainR = dom_mainR;
+
 
         var config = new Config();
         var fileLoad = new FileLoad(this);
@@ -43,19 +49,25 @@ class MainWindow {
         var dirSort = new DirSort(this);
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
+        var mainExif = new MainExif(this);
         var mainTools = new MainTools(this);
         var menu = new Menu(this);
         var initMenu = new InitMenu(this);
         var script = new Script(this);
         let firstRun = true;//用於判斷是否為第一次執行
 
+        var i18n = new I18n();
+        i18n.pushList(langExif);
+        i18n.pushList(langUi);
 
+        this.i18n = i18n;
         this.fileLoad = fileLoad;
         this.fileShow = fileShow;
         this.fileSort = fileSort;
         this.dirSort = dirSort;
         this.mainFileList = mainFileList;
         this.mainDirList = mainDirList;
+        this.mainExif = mainExif;
         this.menu = menu;
         this.initMenu = initMenu;
         this.config = config;
@@ -223,6 +235,8 @@ class MainWindow {
 
             //封鎖原生右鍵選單
             document.addEventListener("contextmenu", function (e) {
+                //if (Lib.isTextFocused() === false) {//焦點不在輸入框上          
+                //}
                 e.preventDefault();
             })
 
@@ -423,6 +437,9 @@ class MainWindow {
             mainDirList.setShowName(config.settings.layout.dirListShowName);
             mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
             if (isStart) { mainDirList.setItemWidth(config.settings.layout.dirListShowWidth); }
+
+            mainExif.setEnabled(config.settings.layout.mainExifEnabled);//詳細資料視窗
+            if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
 
             //-----------
 

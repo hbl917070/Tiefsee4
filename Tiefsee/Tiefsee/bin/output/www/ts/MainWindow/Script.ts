@@ -209,6 +209,18 @@ class ScriptMenu {
         this.M.menu.open_RightClick(dom_rightClickImage, 0, -85);
         this.M.initMenu.updateRightMenuImageZoomRatioTxt();//更新 右鍵選單的圖片縮放比例
     }
+
+    /** 顯示右鍵選單 輸入框 */
+    showRightMenuText() {
+        var dom = document.getElementById("menu-text");
+        this.M.menu.open_RightClick(dom, 0, 0);
+    }
+
+    /** 顯示右鍵選單 一般文字 */
+    showRightMenuTxt() {
+        var dom = document.getElementById("menu-txt");
+        this.M.menu.open_RightClick(dom, 0, 0);
+    }
 }
 
 
@@ -329,7 +341,7 @@ class ScriptCopy {
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
                 let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
-                WV_System.SetClipboard_base64ToImage(base64, true);
+                WV_System.SetClipboard_Base64ToImage(base64, true);
             } else if (imgType === "jpg") {
                 WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
             } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
@@ -337,13 +349,13 @@ class ScriptCopy {
             } else {
                 let imgUrl = this.M.fileShow.tieefseeview.getUrl();//取得圖片網址
                 let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
-                WV_System.SetClipboard_base64ToImage(base64, true);
+                WV_System.SetClipboard_Base64ToImage(base64, true);
             }
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
             let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
-            WV_System.SetClipboard_base64ToImage(base64, false);
+            WV_System.SetClipboard_Base64ToImage(base64, false);
         }
 
     }

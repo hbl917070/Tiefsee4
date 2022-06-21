@@ -347,10 +347,21 @@ interface WV_System {
     DeleteTemp(maxImg100: number, maxImgScale: number): void;
 
     /**
+     * 模擬鍵盤
+     * @param keys 例如 ^a = ctrl+A
+     */
+    SendKeys_Send(keys: string);
+    /**
+     * 模擬鍵盤 ctrl + ?
+     * @param keys 例如 a = ctrl+A
+     */
+    SendKeys_CtrlAnd(key: string);
+
+    /**
      * 存入剪貼簿 - 傳入base64，儲存成圖片。
      * isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
      */
-    SetClipboard_base64ToImage(base64: string, isTransparent: bool): bool;
+    SetClipboard_Base64ToImage(base64: string, isTransparent: bool): bool;
 
     /**
      * 存入剪貼簿 - 傳入檔案路徑，儲存成圖片。

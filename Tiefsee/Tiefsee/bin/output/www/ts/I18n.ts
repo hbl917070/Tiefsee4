@@ -154,7 +154,7 @@ class I18n {
          * @param {object} value 參數json(選填)
          * @param {string} type 語言(選填)
          */
-        function get(key: string | null, value: any, type: string) {
+        function get(key: string | null, value?: any, type?: string) {
 
             if (key === null) { return ""; }
 
@@ -181,7 +181,7 @@ class I18n {
 
             //什麼都找不到，回傳key
             console.log(`i18n 找不到 "${key}"`);
-            return key;
+            return arkey[arkey.length - 1];
         }
 
 

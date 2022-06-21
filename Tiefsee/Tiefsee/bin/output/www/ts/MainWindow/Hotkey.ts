@@ -25,7 +25,20 @@ class Hotkey {
                 return;
             }
 
-            e.preventDefault();
+            //允許的名單
+            let allow = (e.code === "KeyC" && e.ctrlKey)
+                || (e.code === "KeyD" && e.ctrlKey)
+
+            if (allow === false) {
+                e.preventDefault();
+            }
+
+
+            if (e.code === "KeyC" && e.ctrlKey) {
+                if (Lib.isTxtSelect() === false) {
+                    M.script.copy.copyImg();
+                }
+            }
             if (e.code === "ArrowRight") {
                 M.script.fileLoad.nextFile();
             }
@@ -68,9 +81,7 @@ class Hotkey {
             if (e.code === "KeyO") {
                 M.script.open.showOnExplorer();
             }
-            if (e.code === "KeyC" && e.ctrlKey) {
-                M.script.copy.copyImg();
-            }
+
             if (e.code === "KeyM") {
                 M.script.open.ShowContextMenu();
             }
@@ -85,7 +96,6 @@ class Hotkey {
             }
             if (e.code === "End") {
                 M.script.fileLoad.lastFile();
-
             }
         });
 

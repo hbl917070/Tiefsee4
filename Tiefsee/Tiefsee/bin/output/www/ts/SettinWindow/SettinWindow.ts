@@ -514,6 +514,18 @@ class Setting {
             });
         })
 
+        //詳細資料視窗
+        addLoadEvent(() => {
+            var switch_mainExifEnabled = document.querySelector("#switch-mainExifEnabled") as HTMLInputElement;
+            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"];//啟用 詳細資料視窗
+
+            switch_mainExifEnabled.addEventListener("change", () => {//啟用 詳細資料視窗
+                let val = switch_mainExifEnabled.checked;
+                config.settings["layout"]["mainExifEnabled"] = val;
+                appleSettingOfMain();
+            });
+        })
+
         // 圖片 dpi
         addLoadEvent(() => {
             var select_imageDpizoom = document.querySelector("#select-imageDpizoom") as HTMLInputElement;

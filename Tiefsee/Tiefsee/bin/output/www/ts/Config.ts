@@ -81,6 +81,10 @@ class Config {
             dirListImgNumber: 3,//圖片數量
 
             mainToolsEnabled: true,//啟用 工具列
+
+            mainExifEnabled: false,//啟用 詳細資料視窗
+            mainExifShowWidth: 150,//寬度
+
         },
 
         /** 記錄程式上次關閉時的位置 */
@@ -104,7 +108,7 @@ class Config {
             /**子資料夾數量太多就禁用資料夾預覽列表 */
             dirListMaxCount: 5000,
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
-            highQualityLimit: 7000,
+            highQualityLimit: 4000,
         }
     }
 

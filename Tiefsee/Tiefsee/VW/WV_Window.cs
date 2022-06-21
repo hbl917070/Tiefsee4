@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace Tiefsee {
         /// 清理webview2的暫存
         /// </summary>
         public void ClearBrowserCache() {
+            M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync();
             M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
         }
 
@@ -166,7 +168,7 @@ namespace Tiefsee {
         public void SetOwner(object _window) {
             if (_window != null) {
                 WebWindow webwindow = (WebWindow)_window;
-           
+
                 if (TopMost == true) {
                     TopMost = false;//設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;

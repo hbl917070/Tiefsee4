@@ -1718,9 +1718,9 @@ class Tieefseeview {
                 //
                 let resizeQuality: ResizeQuality = "high";//medium
 
-                if (getOriginalWidth() * getOriginalHeight() > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
+                if (can.width * can.height > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
 
-                    //console.log("drawImage直接渲染");
+                    //console.log("drawImage直接渲染(不使用高品質縮放)");
 
                     sx = sx * bigimgTemp.scale
                     sy = sy * bigimgTemp.scale

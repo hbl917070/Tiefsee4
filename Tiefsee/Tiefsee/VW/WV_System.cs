@@ -66,6 +66,53 @@ namespace Tiefsee {
         }
 
 
+        #region 模擬鍵盤
+
+        [DllImport("user32.dll", EntryPoint = "keybd_event", SetLastError = true)]
+        public static extern void keybd_event(Keys bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+        public const int KEYEVENTF_KEYUP = 2;
+
+        /// <summary>
+        /// 模擬鍵盤 ctrl + ?
+        /// </summary>
+        /// <param name="key"> 例如 A = ctrl+A </param>
+        public void SendKeys_CtrlAnd(string key) {
+            try {
+ 
+                key = key.ToUpper();
+
+                var k = Keys.A;
+                if (key == "A") { k = Keys.A; }
+                if (key == "Z") { k = Keys.Z; }
+                if (key == "X") { k = Keys.X; }
+                if (key == "C") { k = Keys.C; }
+                if (key == "V") { k = Keys.V; }
+                if (key == "F") { k = Keys.F; }
+
+                keybd_event(Keys.ControlKey, 0, 0, 0);
+                keybd_event(k, 0, 0, 0);
+                keybd_event(Keys.ControlKey, 0, KEYEVENTF_KEYUP, 0);
+            } catch (Exception e) {
+                Console.WriteLine("模擬鍵盤失敗");
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 模擬鍵盤
+        /// </summary>
+        /// <param name="keys"> 例如^a = ctrl+A </param>
+        public void SendKeys_Send(string keys) {
+            try {
+                SendKeys.Send(keys);
+            } catch (Exception e) {
+                Console.WriteLine("模擬鍵盤失敗");
+                Console.WriteLine(e.ToString());
+            }
+        }
+        #endregion
+
+
         #region Clipboard 剪貼簿
 
         /// <summary>
@@ -91,7 +138,7 @@ namespace Tiefsee {
         /// <param name="base64"></param>
         /// <param name="isTransparent"> 是否要支援透明色 </param>
         /// <returns></returns>
-        public bool SetClipboard_base64ToImage(string base64, bool isTransparent) {
+        public bool SetClipboard_Base64ToImage(string base64, bool isTransparent) {
             try {
                 using (MemoryStream ms = Base64ToMemoryStream(base64)) {
                     using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
@@ -285,7 +332,7 @@ namespace Tiefsee {
             return new int[2] { p.X, p.Y };
         }
 
-    
+
         /// <summary>
         /// 設定桌布
         /// </summary>

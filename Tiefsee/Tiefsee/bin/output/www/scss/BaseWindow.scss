@@ -65,7 +65,6 @@ select option {
   background: var(--color-black);
 }
 
-
 /* 視窗本體 */
 .window {
   /* transition: transform 0.2s;
@@ -76,7 +75,8 @@ select option {
   background-color: var(--color-window-background);
   border-radius: var(--window-border-radius);
   border: 1px solid var(--color-window-border);
-  /* margin: 5px;  */
+  // margin: 5px;  
+  
   margin-right: 1.5px;
   margin-bottom: 1.5px;
   display: flex;
@@ -133,6 +133,7 @@ select option {
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
   /* border-radius: 4px; */
 }
 
@@ -155,6 +156,7 @@ select option {
 .window-border {
   position: fixed;
   z-index: 9999;
+  user-select: none;
 }
 .window-CT {
   height: var(--window-border);

@@ -268,9 +268,27 @@ class Lib {
 
 
     /**
+      * 取得檔案的大小的文字
+      * @param path 
+      * @returns 
+      */
+    public static getFileLength(len: number) {
+
+        if (len / 1024 < 1) {
+            return len.toFixed(1) + " B";
+
+        } else if (len / (1024 * 1024) < 1) {
+            return (len / (1024)).toFixed(1) + " KB";
+        } else if (len / (1024 * 1024 * 1024) < 1) {
+            return (len / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
+    }
+
+
+    /**
      * 路徑 轉 URL
-     * @param path 
-     * @returns 
      */
     public static pathToURL(path: string): string {
         return "file:///" + encodeURIComponent(path)
@@ -278,6 +296,48 @@ class Lib {
             .replace(/[%]2F/g, "/")
             .replace(/[%]5C/g, "/");
     }
+
+
+    /**
+     * 移除可能破壞html的跳脫符號
+     */
+    public static escape(htmlStr: string) {
+        if (htmlStr === undefined || htmlStr === null) {
+            return "";
+        }
+        return htmlStr.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    /** 
+     * 取得整個頁面目前是否有選取文字
+     */
+    public static isTxtSelect() {
+        let selection = window.getSelection();
+        if (selection === null) { return false; }
+        let isElect = selection.anchorOffset !== selection.focusOffset;
+        return isElect;
+    }
+
+    /**
+     * 取得目前的焦點是否在文字輸入框上
+     */
+    public static isTextFocused() {
+        let dom = document.activeElement;
+        if (dom === null) { return false; }
+        let tag = dom.tagName;  
+        if (tag === "TEXTAREA") {
+            return true;
+        }
+        if (tag === "INPUT" && dom.getAttribute("type") == "text") {
+            return true;
+        }
+        return false;
+    }
+
 
 }
 

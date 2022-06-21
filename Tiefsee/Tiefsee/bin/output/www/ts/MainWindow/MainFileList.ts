@@ -29,7 +29,7 @@ class MainFileList {
         let dom_fileList = document.getElementById("main-fileList") as HTMLElement;//螢幕看得到的區域
         let dom_fileListBody = document.getElementById("main-fileListBody") as HTMLElement;//整體的高
         let dom_fileListData = document.getElementById("main-fileListData") as HTMLElement;//資料
-        var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement;
+        var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement;//拖曳條
 
         var isHide = false;//暫時隱藏
         var isEnabled = true;//啟用 檔案預覽列表
@@ -45,7 +45,7 @@ class MainFileList {
 
         //拖曳改變size
         var dragbar = new Dragbar();
-        dragbar.init(dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
+        dragbar.init("right", dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
         //拖曳開始
         dragbar.setEventStart(() => { })
         //拖曳
@@ -60,6 +60,7 @@ class MainFileList {
         })
         //拖曳 結束
         dragbar.setEventEnd((val: number) => {
+            console.log(val)
             if (val < 10) {//小於10的話，關閉檔案預覽列表
                 setEnabled(false);
             }
@@ -92,9 +93,6 @@ class MainFileList {
 
         /**
          * 設定是否啟用
-         * @param val 
-         * @param onlyRun 單純執行而不儲存設定
-         * @returns 
          */
         function setEnabled(val: boolean) {
 
@@ -119,8 +117,6 @@ class MainFileList {
 
         /**
          * 設定是否顯示編號
-         * @param val 
-         * @returns 
          */
         function setShowNo(val: boolean) {
             if (isShowNo === val) { return; }
@@ -147,7 +143,6 @@ class MainFileList {
 
         /**
          * 設定size
-         * @param val 
          */
         function setItemWidth(val: number) {
 
@@ -174,7 +169,6 @@ class MainFileList {
 
         /**
          * 刷新UI
-         * @returns 
          */
         function updateItem() {
 
