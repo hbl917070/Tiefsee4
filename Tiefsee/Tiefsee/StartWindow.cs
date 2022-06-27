@@ -14,6 +14,7 @@ namespace Tiefsee {
         /// <summary> 改成true後，定時執行GC </summary>
         public static bool runGC = false;
 
+
         public StartWindow() {
 
             Adapter.Initialize();
@@ -109,11 +110,8 @@ namespace Tiefsee {
         /// 初始化webview2
         /// </summary>
         private async void InitWebview() {
-            var opts = new CoreWebView2EnvironmentOptions {
-                //AdditionalBrowserArguments = "--allow-file-access-from-files"
-                //AdditionalBrowserArguments = "--disable-web-security"
-                AdditionalBrowserArguments = @"--disable-web-security --user-agent=""EEEEEEE"""
-            };
+
+            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             Microsoft.Web.WebView2.WinForms.WebView2 wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             var webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);

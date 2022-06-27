@@ -242,7 +242,7 @@ namespace Tiefsee {
             //this.SetSize(400, 300);
             this.Opacity = 0;
             wv2 = new WV2();
-      
+
             this.Controls.Add(wv2);
 
             if (isDelayInit) {
@@ -274,11 +274,7 @@ namespace Tiefsee {
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             wv2.Dock = DockStyle.Fill;
 
-            var opts = new CoreWebView2EnvironmentOptions {
-                //AdditionalBrowserArguments = "--allow-file-access-from-files"
-                AdditionalBrowserArguments = @"--disable-web-security --user-agent=""EEEEEEE"""
-
-            };
+            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
             /*wv2.CoreWebView2.SetVirtualHostNameToFolderMapping(
@@ -311,8 +307,7 @@ namespace Tiefsee {
             wv2.CoreWebView2.AddHostObjectToScript("WV_Image", WV_Image);
             wv2.CoreWebView2.AddHostObjectToScript("WV_T", new WV_T());
 
-          
-           
+
             // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
             //開啟時視窗時

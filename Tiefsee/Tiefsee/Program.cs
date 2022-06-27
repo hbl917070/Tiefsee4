@@ -16,6 +16,10 @@ namespace Tiefsee {
         public static WebServer webServer;//本地伺服器
         public static StartWindow startWindow;//起始視窗，關閉此視窗就會結束程式
 
+        public static string webvviewUserAgent = "Tiefsee";//透過UserAgent來驗證是否能請求localhost server API
+        public static string webvviewArguments;//webview2的啟動參數
+  
+
         /// <summary>
         /// 應用程式的主要進入點。
         /// </summary>
@@ -45,7 +49,11 @@ namespace Tiefsee {
             //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-           
+            //--disable-web-security  允許跨域請求
+            //--disable-backing-store-limit  禁用對後備存儲數量的限制。可以防止具有許多視窗/選項卡和大量記憶體的用戶閃爍
+            //--user-agent  覆寫userAgent
+            webvviewArguments = $@"--disable-web-security --disable-backing-store-limit --user-agent=""{webvviewUserAgent}""";
+         
             WebWindow.Create("MainWindow.html", args, null);
 
             startWindow = new StartWindow();

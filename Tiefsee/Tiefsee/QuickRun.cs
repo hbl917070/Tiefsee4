@@ -73,7 +73,8 @@ namespace Tiefsee {
                     //偵測是否可用
                     String uri = $"http://127.0.0.1:{port}/api/check";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-                    request.Timeout = 1000;
+                    request.Timeout = 1000;//逾時
+                    request.UserAgent = Program.webvviewUserAgent;
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                         using (Stream stream = response.GetResponseStream()) {
                             /*using (StreamReader reader = new StreamReader(stream)) {
@@ -133,8 +134,9 @@ namespace Tiefsee {
             //開啟新視窗
             string base64 = Uri.EscapeDataString(sb.ToString());
             string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
-            HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create(uri);
-            using (HttpWebResponse response = (HttpWebResponse)request2.GetResponse()) { }
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.UserAgent = Program.webvviewUserAgent;
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) { }
         }
 
 

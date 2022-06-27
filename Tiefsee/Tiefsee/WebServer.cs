@@ -23,7 +23,7 @@ namespace Tiefsee {
             origin = "http://127.0.0.1:" + port + "/";
 
             _httpListener.IgnoreWriteExceptions = true;
-            _httpListener.Prefixes.Add("http://localhost:" + port + "/");
+            //_httpListener.Prefixes.Add("http://localhost:" + port + "/");
             _httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
             _httpListener.Start();
             _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
@@ -47,6 +47,17 @@ namespace Tiefsee {
 
             String _url = request.Url.ToString();
             _url = _url.Substring($"http://127.0.0.1:{port}".Length);
+
+            //禁止webview2以外的請求
+            if (request.UserAgent != Program.webvviewUserAgent) {
+                context.Response.StatusCode = 403;//狀態
+                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");//設定編碼
+                byte[] _responseArray = Encoding.UTF8.GetBytes("403");
+                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
+
+                context.Response.Close(); // close the connection
+                return;
+            }
 
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");
