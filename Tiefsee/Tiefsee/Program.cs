@@ -50,9 +50,10 @@ namespace Tiefsee {
             Application.SetCompatibleTextRenderingDefault(false);
 
             //--disable-web-security  允許跨域請求
+            //--disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
             //--disable-backing-store-limit  禁用對後備存儲數量的限制。可以防止具有許多視窗/選項卡和大量記憶體的用戶閃爍
             //--user-agent  覆寫userAgent
-            webvviewArguments = $@"--disable-web-security --disable-backing-store-limit --user-agent=""{webvviewUserAgent}""";
+            webvviewArguments = $@"--disable-web-security --disable-features=""msWebOOUI,msPdfOOUI"" --disable-backing-store-limit --user-agent=""{webvviewUserAgent}""";
          
             WebWindow.Create("MainWindow.html", args, null);
 
