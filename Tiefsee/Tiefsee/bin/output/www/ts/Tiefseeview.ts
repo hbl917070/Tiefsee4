@@ -280,6 +280,7 @@ class Tieefseeview {
             if (temp_touchRotateStarting) {
                 setDeg(_deg, ev.center.x, ev.center.y, false);//無動畫旋轉
             }
+
         });
         hammerPlural.on("rotateend", (ev) => {
             temp_touchRotateStarting = false;
@@ -292,30 +293,35 @@ class Tieefseeview {
             }
         });
 
-
+        /**雙指縮放中 */
+        var isPinching = false;
         //雙指捏合縮放
         hammerPlural.on("pinchstart", (ev) => {
+            isPinching = true;
             temp_pinchZoom = 1;
             temp_pinchCenterX = ev.center.x;
             temp_pinchCenterY = ev.center.y;
         });
         hammerPlural.on("pinch", (ev) => {//pinchin
+            requestAnimationFrame(() => {
 
-            //從兩指的中心進行縮放
-            //縮放前先把渲染模式改成成本較低的 pixelated
-            zoomIn(ev.center.x, ev.center.y, (ev.scale / temp_pinchZoom), TieefseeviewImageRendering["pixelated"]);
+                //從兩指的中心進行縮放
+                //縮放前先把渲染模式改成成本較低的 pixelated
+                zoomIn(ev.center.x, ev.center.y, (ev.scale / temp_pinchZoom), TieefseeviewImageRendering["pixelated"]);
 
-            //根據中心點的位移來拖曳圖片
-            setXY(
-                toNumber(dom_con.style.left) - (temp_pinchCenterX - ev.center.x),
-                toNumber(dom_con.style.top) - (temp_pinchCenterY - ev.center.y),
-                0
-            );
-            temp_pinchZoom = ev.scale;
-            temp_pinchCenterX = ev.center.x;
-            temp_pinchCenterY = ev.center.y;
+                //根據中心點的位移來拖曳圖片
+                setXY(
+                    toNumber(dom_con.style.left) - (temp_pinchCenterX - ev.center.x),
+                    toNumber(dom_con.style.top) - (temp_pinchCenterY - ev.center.y),
+                    0
+                );
+                temp_pinchZoom = ev.scale;
+                temp_pinchCenterX = ev.center.x;
+                temp_pinchCenterY = ev.center.y;
+            })
         });
         hammerPlural.on("pinchend", (ev) => {
+            isPinching = false;
             setRendering(rendering);//縮放結束後，把渲染模式改回原本的縮放模式
         });
 
@@ -430,69 +436,69 @@ class Tieefseeview {
         //拖曳
         hammerPan.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
         hammerPan.on("pan", (ev) => {
-
-            //避免多指觸發
-            if (ev.maxPointers > 1) {
-                isMoving = false;
-                isPaning = false;
-                return;
-            }
-
-            //沒有出現捲動條就不要執行拖曳
-            if (getIsOverflowX() === false && getIsOverflowY() === false) {
-                return;
-            }
-
-            if (isMoving === false) { return; }
-
-            let deltaX = ev["deltaX"];
-            let deltaY = ev["deltaY"];
-            let left = panStartX + deltaX * dpizoom;
-            let top = panStartY + deltaY * dpizoom;
-
-            if (getIsOverflowY()) {//高度大於視窗
-                if (top > marginTop + overflowDistance) {//上
-                    top = marginTop + overflowDistance;
+            requestAnimationFrame(() => {
+                //避免多指觸發
+                if (ev.maxPointers > 1) {
+                    isMoving = false;
+                    isPaning = false;
+                    return;
                 }
-                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
-                if (top < t - overflowDistance) {
-                    top = t - overflowDistance;
-                }
-            } else {
-                let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
-                if (top > t + overflowDistance) {
-                    top = t + overflowDistance;
-                }
-                if (top < t - overflowDistance) {
-                    top = t - overflowDistance;
-                }
-            }
 
-            if (getIsOverflowX()) {//寬度大於視窗
-                if (left > marginLeft + overflowDistance) {//左
-                    left = marginLeft + overflowDistance;
+                //沒有出現捲動條就不要執行拖曳
+                if (getIsOverflowX() === false && getIsOverflowY() === false) {
+                    return;
                 }
-                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
-                if (left < l - overflowDistance) {
-                    left = l - overflowDistance;
-                }
-            } else {
-                let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
-                if (left > l + overflowDistance) {
-                    left = l + overflowDistance;
-                }
-                if (left < l - overflowDistance) {
-                    left = l - overflowDistance;
-                }
-            }
 
-            setXY(left, top, 0);
+                if (isMoving === false) { return; }
 
+                let deltaX = ev["deltaX"];
+                let deltaY = ev["deltaY"];
+                let left = panStartX + deltaX * dpizoom;
+                let top = panStartY + deltaY * dpizoom;
+
+                if (getIsOverflowY()) {//高度大於視窗
+                    if (top > marginTop + overflowDistance) {//上
+                        top = marginTop + overflowDistance;
+                    }
+                    let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
+                    if (top < t - overflowDistance) {
+                        top = t - overflowDistance;
+                    }
+                } else {
+                    let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
+                    if (top > t + overflowDistance) {
+                        top = t + overflowDistance;
+                    }
+                    if (top < t - overflowDistance) {
+                        top = t - overflowDistance;
+                    }
+                }
+
+                if (getIsOverflowX()) {//寬度大於視窗
+                    if (left > marginLeft + overflowDistance) {//左
+                        left = marginLeft + overflowDistance;
+                    }
+                    let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
+                    if (left < l - overflowDistance) {
+                        left = l - overflowDistance;
+                    }
+                } else {
+                    let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
+                    if (left > l + overflowDistance) {
+                        left = l + overflowDistance;
+                    }
+                    if (left < l - overflowDistance) {
+                        left = l - overflowDistance;
+                    }
+                }
+
+                setXY(left, top, 0);
+            })
         });
 
         //拖曳 結束
         hammerPan.on("panend", async (ev) => {
-
+            //console.log(ev)
             //避免在捲動軸上面也觸發
             //if (ev.target !== dom_tiefseeview) { return; }
 
@@ -505,11 +511,27 @@ class Tieefseeview {
             let velocity = ev["velocity"];//加速度
             let velocityX = ev["velocityX"];
             let velocityY = ev["velocityY"];
+            let duration = 10;//動畫時間
 
-            let sp = 150 + 70 * Math.abs(velocity);//動畫時間
-            if (sp > 800) sp = 800;
 
-            //sp = 400;
+            let dpi = getDpizoom();
+            velocity *= dpi;
+            velocityX *= dpi;
+            velocityY *= dpi;
+
+            console.log(velocity, velocityX, velocityY, dpi)
+
+
+            if (ev.pointerType == "touch") {//如果是觸控
+                velocity *= 2;
+                velocityX *= 2;
+                velocityY *= 2;
+            }
+
+
+            duration = 150 + 100 * Math.abs(velocity);//動畫時間
+            if (duration > 1200) duration = 1200;
+
             $(dom_con).stop(true, false);
 
             //速度小於 1 就不使用慣性
@@ -517,13 +539,15 @@ class Tieefseeview {
                 velocity = 0;
                 velocityX = 0;
                 velocityY = 0;
-                sp = 10;
+                duration = 10;
                 init_point(true);
                 isPaning = false;
                 return;
             }
-            let top = toNumber(dom_con.style.top) + (velocityY * 150);
-            let left = toNumber(dom_con.style.left) + (velocityX * 150);
+
+            let speed = 150;//速度
+            let top = toNumber(dom_con.style.top) + (velocityY * speed);
+            let left = toNumber(dom_con.style.left) + (velocityX * speed);
 
             let bool_overflowX = false;
             let bool_overflowY = false;
@@ -573,13 +597,16 @@ class Tieefseeview {
             }
 
             //計算滑行距離
-            let dep = Math.sqrt(Math.pow((toNumber(dom_con.style.top) - top), 2) + Math.pow((toNumber(dom_con.style.left) - left), 2));
+            /*let dep = Math.sqrt(Math.pow((toNumber(dom_con.style.top) - top), 2) + Math.pow((toNumber(dom_con.style.left) - left), 2));
+            //console.log(dep, duration)
+            if ((bool_overflowX || bool_overflowY) && dep < 300 * dpi) {//距離太短就直接限制動畫時間
+                duration = 300;
+                return
+            }*/
 
-            if ((bool_overflowX || bool_overflowY) && dep < 200) {
-                sp = 100;
-            }
 
-            await setXY(left, top, sp);
+
+            await setXY(left, top, duration);
             isPaning = false;
             init_point(true);
         });
@@ -1718,7 +1745,7 @@ class Tieefseeview {
                 //
                 let resizeQuality: ResizeQuality = "high";//medium
 
-                if (can.width * can.height > eventHighQualityLimit()) {//如果圖片面積過大，就不使用高品質縮放
+                if (can.width * can.height > eventHighQualityLimit() || isPinching) {//如果圖片面積過大，或 雙指縮放中 
 
                     //console.log("drawImage直接渲染(不使用高品質縮放)");
 
