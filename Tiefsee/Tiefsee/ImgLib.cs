@@ -54,8 +54,9 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <param name="func"></param>
         public static void PathToBitmapSource(String path, Action<BitmapSource> func) {
-
-            using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+         
+            using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+             
                 BitmapDecoder bd = BitmapDecoder.Create(sr, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
                 func(bd.Frames[0]);
             }
@@ -264,22 +265,13 @@ namespace Tiefsee {
         /// 檢查圖片的 ICC Profile 是否為 CMYK
         /// </summary>
         public static bool IsCMYK(string path) {
-
-            using (var sr = new FileStream(path, FileMode.Open)) {
-
+  
+            using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                 int len = (int)sr.Length;
                 if (len > 30000) { len = 30000; }//只讀取前30000個字，避免開啟大檔案讀取很久
                 byte[] bytes = new byte[len];
                 sr.Read(bytes, 0, len);
                 string s = System.Text.Encoding.ASCII.GetString(bytes);
-
-                /*FileStream fs = new FileStream(@"1.txt", FileMode.Create);
-                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                sw.Write(s);
-                sw.Flush();//清空緩衝區
-                sw.Close();//關閉流
-                sw = null;
-                fs.Close();*/
 
                 if (s.Contains("prtrCMYK")) {
                     return true;
@@ -404,9 +396,9 @@ namespace Tiefsee {
         /// <param name="autoOrientation"> 如果圖片有旋轉90°或270°，就長寬對調 </param>
         /// <returns></returns>
         public static int[] GetImgSize(string path, bool autoOrientation) {
-
+            
             string hash = FileToHash(path);
-
+            
             if (temp_GetImgSize.ContainsKey(hash)) {//如果暫存裡面
                 return temp_GetImgSize[hash];
             }
@@ -450,7 +442,7 @@ namespace Tiefsee {
 
             ImgInitInfo imgInfo = new ImgInitInfo();
             string path100 = PathToImg100(path);
-
+          
             //如果已經處理過了，就改成回傳處理過的檔案
             if (File.Exists(path100)) {
                 File.SetLastWriteTime(path100, DateTime.Now);//調整最後修改時間，延後暫存被清理
@@ -478,7 +470,9 @@ namespace Tiefsee {
             }
 
             if (type == "jpg") {
+        
                 if (IsCMYK(path)) {//如果是CMYK，就先套用顏色
+                  
                     NetVips.Image Vimg = null;
                     using (Vimg = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random)) {
                         //套用顏色
