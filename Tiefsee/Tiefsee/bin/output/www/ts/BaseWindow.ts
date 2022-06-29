@@ -26,12 +26,13 @@ class BaseWindow {
     public top: number = 0;
     public width: number = 0;
     public height: number = 0;
+    public zoomFactor: number = 1;
 
     public windowState: ("Maximized" | "Minimized" | "Normal") = "Normal";
 
     public closingEvents: (() => void)[] = [];//關閉視窗時執行的function
     public sizeChangeEvents: (() => void)[] = [];//sizeChange時執行的function
-
+    public touchDrop = new TouchDrop(this);
 
     constructor() {
 
@@ -101,21 +102,22 @@ class BaseWindow {
                 e.preventDefault();
             }
         }, true);
-        dom_window.addEventListener("touchstart", (e) => {   
+        dom_window.addEventListener("touchstart", (e) => {
             if (e.touches.length > 1) {//多指
                 e.preventDefault();
             }
         }, false);
 
         //註冊視窗邊框拖曳
-        windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-RC"), "RC");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-CB"), "CB");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-LC"), "LC");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-LT"), "LT");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-RT"), "RT");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-LB"), "LB");
-        windowBorder(<HTMLDivElement>document.querySelector(".window-RB"), "RB");
+
+        windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT");//上
+        windowBorder(<HTMLDivElement>document.querySelector(".window-RC"), "RC");//右
+        windowBorder(<HTMLDivElement>document.querySelector(".window-CB"), "CB");//下
+        windowBorder(<HTMLDivElement>document.querySelector(".window-LC"), "LC");//左
+        windowBorder(<HTMLDivElement>document.querySelector(".window-LT"), "LT");//左上
+        windowBorder(<HTMLDivElement>document.querySelector(".window-RT"), "RT");//右上
+        windowBorder(<HTMLDivElement>document.querySelector(".window-LB"), "LB");//左下
+        windowBorder(<HTMLDivElement>document.querySelector(".window-RB"), "RB");//右下
         windowBorder(<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-txt"), "move");
 
         function windowBorder(_dom: HTMLDivElement, _type: ("CT" | "RC" | "CB" | "LC" | "LT" | "RT" | "LB" | "RB" | "move")) {
@@ -131,7 +133,14 @@ class BaseWindow {
                 //e.preventDefault();
                 //e.stopPropagation();
             });
+            _dom.addEventListener("touchstart", async (e) => {
+                baseWindow.touchDrop.start(_dom, e, _type);
+            });
+
+
+            //pointerdown
         }
+
 
     }
 
@@ -197,6 +206,15 @@ class BaseWindow {
             await this.closingEvents[i]();
         }
         WV_Window.Close()
+    }
+
+
+    /**
+     * 設定縮放倍率，預設 1.0
+     */
+    public SetZoomFactor(d: number) {
+        this.zoomFactor = d;
+        WV_Window.SetZoomFactor(d);
     }
 
     /** 最大化 */
@@ -280,6 +298,145 @@ class BaseWindow {
     }*/
 }
 
-//---------------
 
 
+/**
+ * 讓觸控也能拖曳視窗
+ */
+class TouchDrop {
+
+    public start;
+
+    constructor(baseWindow: BaseWindow) {
+        this.start = start;
+
+        var time_touchMoveFunc = async () => { }
+        let temp_touchX = 0;//觸控的坐標
+        let temp_touchY = 0;
+        let temp_touchWindowX = 0;//視窗的坐標
+        let temp_touchWindowY = 0;
+        let temp_touchWindowW = 0;//視窗的size
+        let temp_touchWindowH = 0;
+        let temp_start = false;//是否開始執行了
+
+        //定時執行
+        async function time_touchMove() {
+            await time_touchMoveFunc();
+            setTimeout(() => {
+                time_touchMove();
+            }, 60);
+        }
+        time_touchMove();
+
+        /**
+         * 
+         * @param _dom 
+         */
+        function start(_dom: HTMLElement, e: TouchEvent, _type: ("CT" | "RC" | "CB" | "LC" | "LT" | "RT" | "LB" | "RB" | "move")) {
+
+            touchstart(e);
+            //_dom.addEventListener("touchstart", touchstart);
+
+            async function touchstart(e: TouchEvent) {
+                //e.preventDefault();
+                //e.stopPropagation();
+                console.log("start " + e.changedTouches.length)
+                if (baseWindow.windowState !== "Normal") { return; }//不是視窗化的話
+                if (e.changedTouches.length !== 1) {//觸控點不是一個的話
+                    end();
+                    return;
+                }
+
+                _dom.addEventListener("touchmove", touchmove);
+                _dom.addEventListener("touchend", touchend);
+
+                temp_touchX = e.changedTouches[0].screenX;
+                temp_touchY = e.changedTouches[0].screenY;
+                temp_touchWindowX = baseWindow.left;
+                temp_touchWindowY = baseWindow.top;
+                temp_touchWindowW = baseWindow.width;
+                temp_touchWindowH = baseWindow.height;
+                temp_start = true;
+                //console.log(temp_touchWindowX)
+            }
+
+            async function touchmove(e: TouchEvent) {
+                console.log("move " + e.changedTouches.length)
+                if (temp_start !== true) { return; }
+                if (e.changedTouches.length !== 1) { //觸控點不是一個的話
+                    end();
+                    return;
+                }
+
+                let x = e.changedTouches[0].screenX - temp_touchX;
+                let y = e.changedTouches[0].screenY - temp_touchY;
+
+                time_touchMoveFunc = async () => {
+                    if (_type === "move") {
+                        WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY + y)
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        temp_touchWindowY = temp_touchWindowY + y;
+                    }
+                }
+            }
+
+            async function touchend(e: TouchEvent) {
+
+                if (temp_start === true) {
+                    let x = (e.changedTouches[0].screenX - temp_touchX) * window.devicePixelRatio / baseWindow.zoomFactor;
+                    let y = (e.changedTouches[0].screenY - temp_touchY) * window.devicePixelRatio / baseWindow.zoomFactor;
+
+                    if (_type === "RB") {//右下
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH + y);
+                    }
+                    if (_type === "CB") {//下
+                        await WV_Window.SetSize(temp_touchWindowW, temp_touchWindowH + y);
+                    }
+                    if (_type === "RC") {//右
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH);
+                    }
+                    if (_type === "CT") {//上
+                        await WV_Window.SetPosition(temp_touchWindowX, temp_touchWindowY + y)
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        await WV_Window.SetSize(temp_touchWindowW, temp_touchWindowH - y);
+                    }
+                    if (_type === "LC") {//左
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY)
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH);
+                    }
+                    if (_type === "LT") {//左上
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY + y)
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH - y);
+                    }
+                    if (_type === "LB") {//左下
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY)
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH + y);
+                    }
+                    if (_type === "RT") {//右上
+                        await WV_Window.SetPosition(temp_touchWindowX, temp_touchWindowY + y)
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        //temp_touchWindowX = temp_touchWindowX + x;
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH - y);
+                    }
+                }
+
+                end();
+            }
+
+            // 結束拖曳，並釋放註冊的事件
+            function end() {
+                temp_start = false;
+                time_touchMoveFunc = async () => { }
+                _dom.removeEventListener("touchmove", touchmove);
+                _dom.removeEventListener("touchend", touchend);
+            }
+        }
+
+    }
+
+
+}

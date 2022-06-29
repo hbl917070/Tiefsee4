@@ -251,10 +251,10 @@ class MainWindow {
             });
 
             //圖片區域也允許拖曳視窗
-            fileShow.dom_imgview.addEventListener("mousedown", async (ev) => {
+            fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
                 //圖片沒有出現捲動軸
                 if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
-                    if (ev.button === 0) {//滑鼠左鍵
+                    if (e.button === 0) {//滑鼠左鍵
                         let WindowState = baseWindow.windowState;
                         if (WindowState === "Normal") {
                             WV_Window.WindowDrag("move");
@@ -262,11 +262,14 @@ class MainWindow {
                     }
                 }
             });
-            /*fileShow.dom_imgview.addEventListener("mouseup", async (ev) => {
-                console.log("123654")
-            });*/
-            /*fileShow.dom_imgview.addEventListener("touchcancel", async (ev) => {
-                console.log(ev)
+            /*fileShow.dom_imgview.addEventListener("touchstart", async (e) => {//雙指縮放時可能衝突
+                //圖片沒有出現捲動軸
+                if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
+                    let WindowState = baseWindow.windowState;
+                    if (WindowState === "Normal") {
+                        baseWindow.touchDrop.start(fileShow.dom_imgview, e, "move");
+                    }
+                }
             });*/
 
             //double click 最大化或視窗化
@@ -314,6 +317,16 @@ class MainWindow {
                 }
                 if (e.button === 0) {//滑鼠左鍵
                     await WV_Window.WindowDrag("move");
+                }
+            });
+            dom_tools.addEventListener("touchstart", async (e) => {
+                let _dom = e.target as HTMLDivElement;
+                if (_dom) {
+                    if (_dom.classList.contains("js-noDrag")) { return; }
+                }
+                let isShowScroll = dom_tools.scrollWidth > dom_tools.clientWidth;//判斷當前是否有捲動軸
+                if (isShowScroll === false) {
+                    baseWindow.touchDrop.start(dom_tools, e, "move");
                 }
             });
 
@@ -419,7 +432,7 @@ class MainWindow {
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);//圖片縮放模式
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
 
-            WV_Window.SetZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
+            baseWindow.SetZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
             document.body.style.fontWeight = config.settings["theme"]["fontWeight"];//文字粗細
             cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);//圖示粗細
 
