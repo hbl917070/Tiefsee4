@@ -475,6 +475,7 @@ class FileShow {
 
             setShowType(GroupType.txt);//改變顯示類型
             dom_txtview.value = await WV_File.GetText(_path);
+            dom_txtview.scrollTo(0, 0);//捲到最上面
 
             //檔案類型
             let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);

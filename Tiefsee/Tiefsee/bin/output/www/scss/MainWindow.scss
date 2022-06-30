@@ -554,6 +554,9 @@
     //word-break: break-all;
     font-size: 14px;
   }
+  .mainExifItem:last-child {
+    border-bottom: none;
+  }
   .mainExifName {
     flex: 1;
     min-width: 100px; //寬度不足100時，會自動換行
