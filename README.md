@@ -6,11 +6,11 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.17](https://github.com/hbl917070/tiefsee4/releases)
+[Tiefsee 4.0.0-beta.18](https://github.com/hbl917070/tiefsee4/releases)
 (注意：此為測試版，功能尚未齊全到足以取代Tiefsee 3.0.2  
 
     開發中功能：  
-    瀏覽多幀圖片、大量瀏覽模式、搜圖、多國語言、自定快速鍵、顯示exif
+    瀏覽多幀圖片、大量瀏覽模式、搜圖、多國語言、自定快速鍵
 
 <br>
 
@@ -21,7 +21,10 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 
 <br>
 
+
 ## 程式截圖
+![](https://cdn.discordapp.com/attachments/896768892003823627/992137114324054127/2022-07-01_02-22-15.jpg)
+
 ![](https://cdn.discordapp.com/attachments/803673073621401633/953640384238600312/2022-03-16_01-32-52.jpg)
 
 ![](https://cdn.discordapp.com/attachments/803673073621401633/917208044578951229/2021-12-06_07-56-44.jpg)
@@ -41,7 +44,8 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 
 # 目前已知問題
 ### 1、無法使用觸控拖曳移動程式
-> 此問題在同樣基於webview2開發的win11 Microsoft Teams也存在，推測原因是chromium把touch給完全攔截，導致調用Windows API移動視窗的函數無法順利生效。
+> 此問題在同樣基於webview2開發的win11 Microsoft Teams也存在。<br>
+於4.0.0-beta.18修復此問題，但因為非使用winAPI來拖曳視窗，而是單純透過js來計算視窗坐標，因此功能不完整。
 
 ### 2、win7無法讓視窗透明化
 > webview2的透明背景不支援win7。
