@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
-	<g style="fill:var(--color-white)">
-		<path class="st0" d="M19,8v9H6V8H19 M20,7H5v11h15V7L20,7z"/>
-		<path class="st0" d="M10,10v5H8v-5H10 M11,9H7v7h4V9L11,9z"/>
-	</g>
+	<path style="fill:var(--color-white)" d="M19,8v9H6V8H19 M20,7H5v11h15V7L20,7z"/>
+	<polygon style="fill:var(--color-white)" points="9,8 9,8 9,7 8,7 8,8 8,8 8,17 8,17 8,18 9,18 9,17 9,17 "/>
+	<polygon style="fill:var(--color-white)" points="20,10 19,10 19,10 6,10 6,10 5,10 5,11 6,11 6,11 19,11 19,11 20,11 "/>
 </svg>
