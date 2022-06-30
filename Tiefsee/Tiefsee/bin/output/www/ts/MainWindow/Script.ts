@@ -427,8 +427,6 @@ class ScriptSetting {
 
         //新開視窗
         this.temp_setting = await baseWindow.newWindow("SettingWindow.html");
-
-
     }
 
 }

@@ -334,12 +334,12 @@
 
                         <div class="text-title"> 視窗縮放 (0.5~3.0)</div>
                         <div class="text-content">
-                            <input class="text-input" type="text" id="text-theme-zoomFactor">
+                            <input class="text-input" type="number" id="text-theme-zoomFactor">
                         </div>
 
                         <div class="text-title"> 視窗圓角 (0~15)</div>
                         <div class="text-content">
-                            <input class="text-input" type="text" id="text-theme-windowBorderRadius">
+                            <input class="text-input" type="number" id="text-theme-windowBorderRadius">
                         </div>
 
                         <div class="text-title"> 毛玻璃效果 (修改後需重啟程式)</div>
@@ -537,27 +537,11 @@
                             </select>
                         </div>
 
-                        <div class="text-title"> 圖片面積太大時，禁用高品質縮放 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-highQualityLimit">
-                                <option value="0">一律禁用</option>
-                                <option value="2000">大於2000*2000時禁用</option>
-                                <option value="3000">大於3000*3000時禁用</option>
-                                <option value="4000">大於4000*4000時禁用</option>
-                                <option value="5000">大於5000*5000時禁用</option>
-                                <option value="6000">大於6000*6000時禁用</option>
-                                <option value="7000">大於7000*7000時禁用</option>
-                                <option value="8000">大於8000*8000時禁用</option>
-                                <option value="9000">大於9000*9000時禁用</option>
-                                <option value="-1">一律不禁用</option>
-                            </select>
-                        </div>
-
                     </div>
 
 
                     <div class="box">
-                        <div class="box-title"> Debug </div>
+                        <div class="box-title"> 實驗性功能 </div>
 
                         <div class="text-title"> 圖片DPI </div>
                         <div class="text-content">
@@ -574,19 +558,50 @@
                                 <option value="3.0">300%</option>
                             </select>
                         </div>
+
+                        <div class="text-title"> 圖片面積過大時，停用 createImageBitmap (停用高品質縮放</div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-highQualityLimit">
+                                <option value="0">一律停用</option>
+                                <option value="2000">大於2000*2000時停用</option>
+                                <option value="3000">大於3000*3000時停用</option>
+                                <option value="4000">大於4000*4000時停用</option>
+                                <option value="5000">大於5000*5000時停用</option>
+                                <option value="6000">大於6000*6000時停用</option>
+                                <option value="7000">大於7000*7000時停用</option>
+                                <option value="-1">一律使用</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title">
+                            當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tiefseeviewBigimgscaleRatio">
+                                <option value="0.9">90%^n (90、81、72、65...</option>
+                                <option value="0.85">85%^n (85、72、61、52...</option>
+                                <option value="0.8">80%^n (80、64、51、40...</option>
+                                <option value="0.75">75%^n (75、56、42、31...</option>
+                                <option value="0.7">70%^n (70、49、34、24...</option>
+                                <option value="0.65">65%^n (65、42、27、17...</option>
+                                <option value="0.6">60%^n (60、36、21、12...</option>
+                                <option value="0.55">55%^n (55、30、16、9...</option>
+                                <option value="0.5">50%^n (50、25、12、6...</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="box">
                         <div class="box-title"> Tiefsee localhost server </div>
 
-                        <div class="text-title"> Port (如果已經被使用，則會使用下一號) </div>
+                        <div class="text-title"> Port (如果已經被使用，則會使用下一個號碼 </div>
                         <div class="text-content">
-                            <input class="text-input" type="text" id="text-startPort">
+                            <input class="text-input" type="number" id="text-startPort">
                         </div>
 
                         <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
                         <div class="text-content" style="display:none;">
-                            <input class="text-input" type="text" id="text-serverCache">
+                            <input class="text-input" type="number" id="text-serverCache">
                         </div>
                     </div>
 
@@ -611,7 +626,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.17</span>
+                            <span> Tiefsee 4.0.0-beta.18</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

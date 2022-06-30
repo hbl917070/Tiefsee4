@@ -15,6 +15,8 @@ class MainExif {
 		var dom_mainExif = document.getElementById("mainExif") as HTMLElement;
 		var dom_mainExifList = document.getElementById("mainExifList") as HTMLElement;
 		var dom_dragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement;//拖曳條
+		
+		var fileInfo2: FileInfo2;
 
 		var isHide = false;//暫時隱藏
 		var isEnabled = true;//啟用 檔案預覽列表
@@ -131,27 +133,20 @@ class MainExif {
 		}
 
 
-		function getItem(ar: any, key: string) {
-			for (let i = 0; i < ar.length; i++) {
-				let item = ar[i];
-				if (item.name == key) {
-					return item.value;
-				}
-			}
-			return undefined;
-		}
-
-
-		var fileInfo2: FileInfo2;
+		/**
+		 * 初始化
+		 * @param _fileInfo2 
+		 */
 		function init(_fileInfo2: FileInfo2) {
 			fileInfo2 = _fileInfo2;
 			load();
 		}
 
+
 		/**
-		 * 
+		 * 讀取exif(於初始化後呼叫)
 		 */
-		async function load() {
+	 	async function load() {
 
 			if (isEnabled === false) { return; }
 
@@ -195,8 +190,17 @@ class MainExif {
 
 			dom_mainExifList.innerHTML = html;
 		}
+		function getItem(ar: any, key: string) {
+			for (let i = 0; i < ar.length; i++) {
+				let item = ar[i];
+				if (item.name == key) {
+					return item.value;
+				}
+			}
+			return undefined;
+		}
 
-
+		
 		/**
 		 * 處理value的值
 		 */

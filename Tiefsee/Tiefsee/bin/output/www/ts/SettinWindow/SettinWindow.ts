@@ -611,6 +611,18 @@ class Setting {
             });
         })
 
+        // 縮小至特定比例以下，就使用libvips重新處理圖片
+        addLoadEvent(() => {
+            var select_tiefseeviewBigimgscaleRatio = document.querySelector("#select-tiefseeviewBigimgscaleRatio") as HTMLInputElement;
+            select_tiefseeviewBigimgscaleRatio.value = config.settings["image"]["tiefseeviewBigimgscaleRatio"].toString();
+
+            select_tiefseeviewBigimgscaleRatio.addEventListener("change", () => {
+                let val = select_tiefseeviewBigimgscaleRatio.value;
+                config.settings["image"]["tiefseeviewBigimgscaleRatio"] = Number(val);
+                appleSettingOfMain();
+            });
+        })
+
         // 圖片 縮放模式
         addLoadEvent(() => {
             var select_tieefseeviewImageRendering = document.querySelector("#select-tieefseeviewImageRendering") as HTMLInputElement;

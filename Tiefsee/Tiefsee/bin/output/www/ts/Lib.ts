@@ -318,7 +318,8 @@ class Lib {
     public static isTxtSelect() {
         let selection = window.getSelection();
         if (selection === null) { return false; }
-        let isElect = selection.anchorOffset !== selection.focusOffset;
+        //let isElect = selection.anchorOffset !== selection.focusOffset;
+        let isElect = selection.toString() !== "";
         return isElect;
     }
 
@@ -328,7 +329,7 @@ class Lib {
     public static isTextFocused() {
         let dom = document.activeElement;
         if (dom === null) { return false; }
-        let tag = dom.tagName;  
+        let tag = dom.tagName;
         if (tag === "TEXTAREA") {
             return true;
         }

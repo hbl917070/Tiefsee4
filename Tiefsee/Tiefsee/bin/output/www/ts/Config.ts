@@ -68,11 +68,14 @@ class Config {
             /** 圖片渲染模式 */
             "tieefseeviewImageRendering": "0",
             /** 圖片預設縮放模式 */
-            tieefseeviewZoomType: "",
+            tieefseeviewZoomType: "full-100%",
             /** 圖片預設縮放模式(值) */
             tieefseeviewZoomValue: 100,
             /** 圖片預設對齊位置 */
             tieefseeviewAlignType: "C",
+
+            /** 縮小至特定比例以下，就使用libvips重新處理圖片 */
+            tiefseeviewBigimgscaleRatio: 0.8
         },
         sort: {
             /** 預設檔案排序 */

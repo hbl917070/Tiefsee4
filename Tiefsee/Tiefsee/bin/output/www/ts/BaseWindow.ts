@@ -136,9 +136,8 @@ class BaseWindow {
             _dom.addEventListener("touchstart", async (e) => {
                 baseWindow.touchDrop.start(_dom, e, _type);
             });
-
-
             //pointerdown
+
         }
 
 
@@ -358,6 +357,7 @@ class TouchDrop {
                 temp_touchWindowH = baseWindow.height;
                 temp_start = true;
                 //console.log(temp_touchWindowX)
+
             }
 
             async function touchmove(e: TouchEvent) {
@@ -419,7 +419,6 @@ class TouchDrop {
                     if (_type === "RT") {//右上
                         await WV_Window.SetPosition(temp_touchWindowX, temp_touchWindowY + y)
                         temp_touchWindowY = temp_touchWindowY + y;
-                        //temp_touchWindowX = temp_touchWindowX + x;
                         await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH - y);
                     }
                 }

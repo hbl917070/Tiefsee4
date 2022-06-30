@@ -78,15 +78,9 @@ class Dragbar {
 
 
             //拖曳開始
-            dom_dragbar.addEventListener("mousedown", (ev) => {
+            dom_dragbar.addEventListener("pointerdown", (ev) => {//mousedown + touchstart
                 ev.preventDefault();
                 //etemp_val = toNumber(dom_dragbar.style.left)
-                temp_val = toNumber(dom_dragbar.style.left);
-                temp_width = dom_box.getBoundingClientRect().width;
-                _eventStart();
-            });
-            dom_dragbar.addEventListener("touchstart", (ev) => {
-                ev.preventDefault();
                 temp_val = toNumber(dom_dragbar.style.left);
                 temp_width = dom_box.getBoundingClientRect().width;
                 _eventStart();

@@ -473,7 +473,7 @@ class InitMenu {
          */
         async function initTxt() {
 
-            var dom_menu = document.getElementById("menu-text");
+            var dom_menu = document.getElementById("menu-txt");
             if (dom_menu !== null) {
                 dom_menu.addEventListener("mousedown", (e) => {
                     e.preventDefault();//避免搶走輸入框的焦點
@@ -491,11 +491,9 @@ class InitMenu {
                     WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿
                 }
             }
-
-
         }
-    }
 
+    }
 }
 
 /** 版面的下拉選單 */

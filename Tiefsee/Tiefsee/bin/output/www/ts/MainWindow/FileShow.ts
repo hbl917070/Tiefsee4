@@ -294,11 +294,17 @@ class FileShow {
 
                 if (imgInitInfo.code == 1) {
 
+                    let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
+                    if (isNaN(ratio)) { ratio = 0.8; }
+                    if (ratio > 0.95) { ratio = 0.95; }
+                    if (ratio < 0.5) { ratio = 0.5; }
+
                     //設定縮放的比例
                     let arUrl: { scale: number, url: string }[] = [];
-                    arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` })
-                    for (let i = 1; i <= 15; i++) {
-                        let scale = Number(Math.pow(0.8, i).toFixed(3));
+                    arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` });
+
+                    for (let i = 1; i <= 30; i++) {
+                        let scale = Number(Math.pow(ratio, i).toFixed(3));
                         if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) {//如果圖片太小就不處理
                             break;
                         }
