@@ -47,7 +47,8 @@ class Setting {
             });
 
             //拖曳視窗
-            document.getElementById("window-left")?.addEventListener("mousedown", async (e) => {
+            let domLeftBox = document.getElementById("window-left") as HTMLElement;
+            domLeftBox.addEventListener("mousedown", async (e) => {
                 let _dom = e.target as HTMLElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
@@ -56,6 +57,13 @@ class Setting {
                     await WV_Window.WindowDrag("move");
                 }
             })
+            domLeftBox.addEventListener("touchstart", async (e) => {
+                let _dom = e.target as HTMLDivElement;
+                if (_dom) {
+                    if (_dom.classList.contains("js-noDrag")) { return; }
+                }
+                baseWindow.touchDrop.start(domLeftBox, e, "move");
+            });
 
             tippy(".img-help", {
                 content(reference: HTMLElement) {
@@ -101,7 +109,7 @@ class Setting {
             tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { });
             tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { });
             tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
-            tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
+            //tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
             tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
             tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { });
             tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { });
@@ -345,6 +353,71 @@ class Setting {
                 dom_applyThemeBtns.append(btn);
             }
         });
+
+        //圖片預設 縮放模式、對齊位置
+        addLoadEvent(() => {
+            var select_tieefseeviewZoomType = document.getElementById("select-tieefseeviewZoomType") as HTMLSelectElement;
+            var text_tieefseeviewZoomValue = document.getElementById("text-tieefseeviewZoomValue") as HTMLInputElement;
+            var select_tieefseeviewAlignType = document.getElementById("select-tieefseeviewAlignType") as HTMLSelectElement;
+
+            select_tieefseeviewZoomType.value = config.settings.image["tieefseeviewZoomType"];
+            text_tieefseeviewZoomValue.value = config.settings.image["tieefseeviewZoomValue"].toString();
+            select_tieefseeviewAlignType.value = config.settings.image["tieefseeviewAlignType"];
+            showValue();
+
+            //顯示或隱藏 「圖片預設縮放模式」的附加欄位
+            function showValue() {
+                let val = select_tieefseeviewZoomType.value;
+                let ar = ["px-w", "px-h", "%-w", "%-h"];
+                if (ar.indexOf(val) !== -1) {
+                    text_tieefseeviewZoomValue.style.display = "block";
+                } else {
+                    text_tieefseeviewZoomValue.style.display = "none";
+                }
+            }
+
+            select_tieefseeviewZoomType.addEventListener("change", () => {
+                showValue();
+                let val = select_tieefseeviewZoomType.value;
+                config.settings.image["tieefseeviewZoomType"] = val;
+                appleSettingOfMain();
+            });
+            text_tieefseeviewZoomValue.addEventListener("change", () => {
+                let val = Number(text_tieefseeviewZoomValue.value);
+                if (isNaN(val)) { val = 100; }
+                if (val > 99999) { val = 99999; }
+                if (val < 1) { val = 1; }
+                text_tieefseeviewZoomValue.value = val.toString();
+                config.settings.image["tieefseeviewZoomValue"] = val;
+                appleSettingOfMain();
+            });
+            select_tieefseeviewAlignType.addEventListener("change", () => {
+                let val = select_tieefseeviewAlignType.value;
+                config.settings.image["tieefseeviewAlignType"] = val;
+                appleSettingOfMain();
+            });
+        })
+
+        //預設排序
+        addLoadEvent(() => {
+            var select_fileSort = document.getElementById("select-fileSort") as HTMLSelectElement;
+            var select_dirSort = document.getElementById("select-dirSort") as HTMLSelectElement;
+
+            select_fileSort.value = config.settings.sort["fileSort"];
+            select_dirSort.value = config.settings.sort["dirSort"];
+
+            select_fileSort.addEventListener("change", () => {
+                let val = select_fileSort.value;
+                config.settings.sort["fileSort"] = val;
+                appleSettingOfMain();
+            });
+            select_dirSort.addEventListener("change", () => {
+                let val = select_dirSort.value;
+                config.settings.sort["dirSort"] = val;
+                appleSettingOfMain();
+            });
+        })
+
 
         //關聯副檔名 
         addLoadEvent(() => {

@@ -1,13 +1,11 @@
-
 class DirSort {
 
-
-    public getSortType
-    public setSortType
-    public getDirSortType
-    public setDirSortType
-    public setDirSortMenu
-    public sort
+    public getSortType;
+    public setSortType;
+    public getDirSortType;
+    public setDirSortType;
+    public setDirSortMenu;
+    public sort;
 
     constructor(M: MainWindow) {
 
@@ -17,17 +15,15 @@ class DirSort {
         var dom_dirSort_lastWriteTimeDesc = document.getElementById("menuitem-dirSort-lastWriteTimeDesc") as HTMLInputElement;
 
         var yesSvgTxt = SvgList["yes.svg"];
-        var defaultSort = DirSortType.name;
+        //var defaultSort = DirSortType.name;
         var sortType = DirSortType.name;//排序方式
 
         this.getSortType = () => { return sortType }
         this.setSortType = (val: string) => { sortType = val; }
-        this.getDirSortType = getDirSortType
-        this.setDirSortType = setDirSortType
-        this.setDirSortMenu = setDirSortMenu
-        this.sort = sort
-
-
+        this.getDirSortType = getDirSortType;
+        this.setDirSortType = setDirSortType;
+        this.setDirSortMenu = setDirSortMenu;
+        this.sort = sort;
 
         dom_dirSort_name.addEventListener("click", () => {
             updateSort(DirSortType.name);
@@ -36,13 +32,11 @@ class DirSort {
             updateSort(DirSortType.nameDesc);
         });
         dom_dirSort_lastWriteTime.addEventListener("click", () => {
-            updateSort(DirSortType.lastWriteTime);        
+            updateSort(DirSortType.lastWriteTime);
         });
         dom_dirSort_lastWriteTimeDesc.addEventListener("click", () => {
             updateSort(DirSortType.lastWriteTimeDesc);
         });
-
-
 
 
         /**
@@ -175,6 +169,10 @@ class DirSort {
             if (_sortType !== undefined) {
                 return _sortType;
             } else {
+                let defaultSort = M.config.settings.sort["dirSort"];
+                if (Object.keys(DirSortType).indexOf(defaultSort) === -1) {//如果找不到
+                    defaultSort = DirSortType.name;
+                }
                 return defaultSort;
             }
         }

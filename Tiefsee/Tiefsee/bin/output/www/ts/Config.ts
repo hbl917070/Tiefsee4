@@ -63,10 +63,22 @@ class Config {
             "--color-grey": { r: 30, g: 30, b: 30, },
         },
         image: {
-            /**圖片dpi縮放 */
+            /** 圖片dpi縮放 */
             "dpizoom": "-1",
             /** 圖片渲染模式 */
-            "tieefseeviewImageRendering": "0"
+            "tieefseeviewImageRendering": "0",
+            /** 圖片預設縮放模式 */
+            tieefseeviewZoomType: "",
+            /** 圖片預設縮放模式(值) */
+            tieefseeviewZoomValue: 100,
+            /** 圖片預設對齊位置 */
+            tieefseeviewAlignType: "C",
+        },
+        sort: {
+            /** 預設檔案排序 */
+            fileSort: "name",
+            /** 預設資料夾排序 */
+            dirSort: "name",
         },
         layout: {
             fileListEnabled: true,//啟用 檔案預覽列表
@@ -96,7 +108,7 @@ class Config {
             windowState: "Normal"
         },
 
-        /** 工具列的順序與是否顯示 */
+        /** 工具列按鈕，n=按鈕的key、v=是否顯示 */
         mainTools: { img: [], pdf: [], txt: [] } as {
             img: { n: string; v: boolean; }[];
             pdf: { n: string; v: boolean; }[];

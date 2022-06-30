@@ -6,6 +6,14 @@
   text-decoration: underline;
 }
 
+//隱藏 <input type="number"> 的箭頭
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
 .window {
   display: flex;
   flex-direction: row;

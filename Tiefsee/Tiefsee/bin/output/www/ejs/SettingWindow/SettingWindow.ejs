@@ -69,7 +69,7 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n=""> 外觀 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n=""> 版面 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n=""> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n=""> 進階設定 </div>
@@ -114,6 +114,74 @@
                 <!-- 一般 -->
                 <div class="page-tabsPage" id="tabsPage-common">
                     <div class="page-title" i18b=""> 一般 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 圖片設定 </div>
+
+                        <div class="text-title"> 圖片縮放比例大於100%時 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tieefseeviewImageRendering">
+                                <option value="0">呈現平滑</option>
+                                <!-- <option value="1">銳利</option> -->
+                                <option value="2">呈現像素</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title"> 圖片預設縮放模式 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tieefseeviewZoomType">
+                                <option value="full-wh">填滿視窗</option>
+                                <option value="full-100%">圖片大於視窗時填滿視窗</option>
+                                <option value="100%">圖片原始大小</option>
+                                <option value="px-w">圖片寬度(px)</option>
+                                <option value="px-h">圖片高度(px)</option>
+                                <option value="%-w">視窗寬度(%)</option>
+                                <option value="%-h">視窗高度(%)</option>
+                            </select>
+                            <input class="text-input" id="text-tieefseeviewZoomValue"
+                                style="width:60px; margin-left:5px; flex:0;" type="number">
+                        </div>
+
+                        <div class="text-title"> 圖片預設對齊位置 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tieefseeviewAlignType">
+                                <option value="C">中央</option>
+                                <option value="LT">左上</option>
+                                <option value="T">上</option>
+                                <option value="RT">右上</option>
+                                <option value="R">右</option>
+                                <option value="RB">右下</option>
+                                <option value="B">下</option>
+                                <option value="LB">左下</option>
+                                <option value="L">左</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title"> 預設排序 </div>
+
+                        <div class="text-title"> 檔案預設排序 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-fileSort">
+                                <option value="name">檔名</option>
+                                <option value="nameDesc">檔名(逆)</option>
+                                <option value="lastWriteTime">修改日期</option>
+                                <option value="lastWriteTimeDesc">修改日期(逆)</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title"> 資料夾預設排序 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-dirSort">
+                                <option value="name">檔名</option>
+                                <option value="nameDesc">檔名(逆)</option>
+                                <option value="lastWriteTime">修改日期</option>
+                                <option value="lastWriteTimeDesc">修改日期(逆)</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="box">
                         <div class="box-title"> 啟動模式 </div>
@@ -178,6 +246,8 @@
                         </div>
 
                     </div>
+
+
 
                 </div>
 
@@ -283,7 +353,6 @@
                     </div>
 
                 </div>
-
 
                 <!-- 版面 -->
                 <div class="page-tabsPage" id="tabsPage-layout">
@@ -402,17 +471,7 @@
                 <div class="page-tabsPage" id="tabsPage-image">
                     <div class="page-title" i18b=""> 影像處理 </div>
 
-                    <div class="box">
-                        <div class="box-title"> 圖片縮放比例大於100%時 </div>
-                        <div class="text-title"> </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-tieefseeviewImageRendering">
-                                <option value="0">呈現平滑</option>
-                                <!-- <option value="1">銳利</option> -->
-                                <option value="2">呈現像素</option>
-                            </select>
-                        </div>
-                    </div>
+
 
                 </div>
 
@@ -494,7 +553,13 @@
                             </select>
                         </div>
 
-                        <div class="text-title"> 圖片DPI (如果有修改過Windows的文字大小，可以將此設定改成「100%」來減少運算) </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title"> Debug </div>
+
+                        <div class="text-title"> 圖片DPI </div>
                         <div class="text-content">
                             <select class="text-input" id="select-imageDpizoom">
                                 <option value="-1">auto</option>
@@ -511,7 +576,6 @@
                         </div>
                     </div>
 
-
                     <div class="box">
                         <div class="box-title"> Tiefsee localhost server </div>
 
@@ -526,7 +590,7 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="box">
                         <div class="box-title"> 相關路徑 </div>
                         <div class="text-box">

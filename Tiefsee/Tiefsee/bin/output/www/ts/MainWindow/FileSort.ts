@@ -1,4 +1,3 @@
-
 class FileSort {
 
     dom_fileSort_name = document.getElementById("menuitem-fileSort-name") as HTMLInputElement;
@@ -12,10 +11,7 @@ class FileSort {
     dom_dirSort_lastWriteTimeDesc = document.getElementById("menuitem-dirSort-lastWriteTimeDesc") as HTMLInputElement;
 
     yesSvgTxt: string = "";
-
-    defaultFileSort = FileSortType.name;
-    defaultDirSort = FileSortType.name;
-
+    //defaultFileSort = FileSortType.name;
     sortType = FileSortType.name;//排序方式
 
     M: MainWindow;
@@ -85,7 +81,6 @@ class FileSort {
      * @param _sortType 
      */
     public setFileSortMenu(_sortType: string) {
-
         this.dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
         this.dom_fileSort_nameDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
         this.dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
@@ -103,8 +98,6 @@ class FileSort {
         if (_sortType === FileSortType.lastWriteTimeDesc) {
             this.dom_fileSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = this.yesSvgTxt;
         }
-
-
     }
 
 
@@ -149,7 +142,6 @@ class FileSort {
             });
         }*/
 
-
         return [];
     }
 
@@ -191,7 +183,12 @@ class FileSort {
         if (_sortType !== undefined) {
             return _sortType;
         } else {
-            return this.defaultFileSort;
+            //return this.defaultFileSort;
+            let defaultSort = this.M.config.settings.sort["fileSort"];
+            if (Object.keys(FileSortType).indexOf(defaultSort) === -1) {//如果找不到
+                defaultSort = FileSortType.name;
+            }
+            return defaultSort;
         }
     }
 

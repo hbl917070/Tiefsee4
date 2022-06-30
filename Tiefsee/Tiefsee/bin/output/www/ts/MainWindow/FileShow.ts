@@ -65,7 +65,7 @@ class FileShow {
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
                 M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
-                
+
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -277,9 +277,6 @@ class FileShow {
             }
 
 
-
-           
-
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
 
                 imgurl = await getUrl("web");//取得圖片網址並且預載入
@@ -309,10 +306,17 @@ class FileShow {
                         arUrl.push({ scale: scale, url: imgU })
                     }
 
+                    //縮放方式與對齊方式
+                    let _zoomType: TieefseeviewZoomType = (<any>TieefseeviewZoomType)[M.config.settings.image.tieefseeviewZoomType];
+                    let _zoomVal: number = M.config.settings.image.tieefseeviewZoomValue;
+                    //let _alignType: TieefseeviewAlignType = (<any>TieefseeviewAlignType)[M.config.settings.image.tieefseeviewAlignType];
+                    if (_zoomType === undefined) { _zoomType = TieefseeviewZoomType["full-100%"] }
+                    //if (_alignType === undefined) { _alignType = TieefseeviewAlignType["C"] }
+
                     await tieefseeview.loadBigimgscale(
                         arUrl,
                         imgInitInfo.width, imgInitInfo.height,
-                        TieefseeviewZoomType["full-100%"]
+                        _zoomType, _zoomVal
                     );
 
                 } else {//載入失敗就顯示圖示
@@ -364,9 +368,12 @@ class FileShow {
             await tieefseeview.preloadImg(imgurl);//預載入
             await tieefseeview.loadVideo(imgurl);//使用video渲染
 
+            M.mainExif.init(fileInfo2);//初始化exif
+
             initTiefseeview(fileInfo2);
             isLoaded = true;
         }
+
 
         /**
          * 
@@ -383,7 +390,15 @@ class FileShow {
 
                 M.initMenu.updateRightMenuImageZoomRatioTxt(txt);//更新 右鍵選單的圖片縮放比例
             }))
-            tieefseeview.zoomFull(TieefseeviewZoomType["full-100%"]);
+
+            //縮放方式與對齊方式
+            let _zoomType: TieefseeviewZoomType = (<any>TieefseeviewZoomType)[M.config.settings.image.tieefseeviewZoomType];
+            let _zoomVal: number = M.config.settings.image.tieefseeviewZoomValue;
+            let _alignType: TieefseeviewAlignType = (<any>TieefseeviewAlignType)[M.config.settings.image.tieefseeviewAlignType];
+            if (_zoomType === undefined) { _zoomType = TieefseeviewZoomType["full-100%"] }
+            if (_alignType === undefined) { _alignType = TieefseeviewAlignType["C"] }
+            tieefseeview.zoomFull(_zoomType, _zoomVal);
+            tieefseeview.setAlign(_alignType);
 
             //圖片長寬
             let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
@@ -439,6 +454,8 @@ class FileShow {
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
                 dom_writeTime.innerHTML = time;
             }
+
+            M.mainExif.init(fileInfo2);//初始化exif
         }
 
 
@@ -468,7 +485,10 @@ class FileShow {
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
                 dom_writeTime.innerHTML = time;
             }
+
+            M.mainExif.init(fileInfo2);//初始化exif
         }
+
 
         /**
          * 起始畫面
@@ -488,10 +508,5 @@ class FileShow {
         }
 
 
- 
-
-
-
     }
-
 }

@@ -513,21 +513,18 @@ class Tieefseeview {
             let velocityY = ev["velocityY"];
             let duration = 10;//動畫時間
 
-
             let dpi = getDpizoom();
             velocity *= dpi;
             velocityX *= dpi;
             velocityY *= dpi;
 
-            console.log(velocity, velocityX, velocityY, dpi)
-
+            //console.log(velocity, velocityX, velocityY, dpi)
 
             if (ev.pointerType == "touch") {//如果是觸控
                 velocity *= 2;
                 velocityX *= 2;
                 velocityY *= 2;
             }
-
 
             duration = 150 + 100 * Math.abs(velocity);//動畫時間
             if (duration > 1200) duration = 1200;
@@ -603,8 +600,6 @@ class Tieefseeview {
                 duration = 300;
                 return
             }*/
-
-
 
             await setXY(left, top, duration);
             isPaning = false;
@@ -862,7 +857,7 @@ class Tieefseeview {
         async function loadBigimgscale(
             _arUrl: { scale: number, url: string }[],
             _w: number, _h: number,
-            _zoomType: TieefseeviewZoomType, _zoomVal?: number): Promise<boolean> {
+            _zoomType: TieefseeviewZoomType, _zoomVal: number): Promise<boolean> {
 
 
             temp_originalWidth = _w;//初始化圖片size
@@ -1331,7 +1326,6 @@ class Tieefseeview {
 
             setXY(x, y, 0);
             init_point(false);
-
         }
 
 
