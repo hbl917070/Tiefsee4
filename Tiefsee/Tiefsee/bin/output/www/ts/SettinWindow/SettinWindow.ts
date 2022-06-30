@@ -104,16 +104,22 @@ class Setting {
 
         //初始化頁面分頁
         addLoadEvent(() => {
+
+            //捲到最上面
+            function goTop() {
+                document.getElementById("window-body")?.scrollTo(0, 0)
+            }
+
             var tabs = new Tabs();
-            tabs.add(document.getElementById("tabsBtn-common"), document.getElementById("tabsPage-common"), () => { });
-            tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { });
-            tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { });
-            tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { });
-            //tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { });
-            tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { });
-            tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { });
-            tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { });
-            tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { });
+            tabs.add(document.getElementById("tabsBtn-common"), document.getElementById("tabsPage-common"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { goTop() });
+            //tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { goTop() });
 
             tabs.set(document.getElementById("tabsBtn-common"));//預設選擇的頁面
         })
