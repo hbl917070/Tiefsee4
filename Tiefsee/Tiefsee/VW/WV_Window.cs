@@ -28,7 +28,7 @@ namespace Tiefsee {
         /// 清理webview2的暫存
         /// </summary>
         public void ClearBrowserCache() {
-            M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync();
+            //M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync();
             M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
         }
 
