@@ -228,7 +228,7 @@ class MainTools {
             })
 
             //搜圖
-            /*ar.push({
+            ar.push({
                 type: "button",html:"",
                 i18n: "搜圖",
                 group: GroupType.img,
@@ -236,10 +236,10 @@ class MainTools {
                 icon: "tool-search.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-
+                        M?.script.menu.showImgSearch(btn);
                     });
                 },
-            })*/
+            })
 
             //大量瀏覽模式
             /*ar.push({

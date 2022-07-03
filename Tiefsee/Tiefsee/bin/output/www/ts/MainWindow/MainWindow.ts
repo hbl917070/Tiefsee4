@@ -17,6 +17,7 @@ class MainWindow {
     public dirSort;
     public mainFileList;
     public mainDirList;
+    public imgSearch;
     public mainExif;
     public menu;
     public initMenu;
@@ -49,6 +50,7 @@ class MainWindow {
         var dirSort = new DirSort(this);
         var mainFileList = new MainFileList(this);
         var mainDirList = new MainDirList(this);
+        var imgSearch = new ImgSearch(this);
         var mainExif = new MainExif(this);
         var mainTools = new MainTools(this);
         var menu = new Menu(this);
@@ -67,6 +69,7 @@ class MainWindow {
         this.dirSort = dirSort;
         this.mainFileList = mainFileList;
         this.mainDirList = mainDirList;
+        this.imgSearch = imgSearch;
         this.mainExif = mainExif;
         this.menu = menu;
         this.initMenu = initMenu;

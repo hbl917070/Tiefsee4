@@ -1,7 +1,4 @@
-
 class Menu {
-
-
 
     public open_Button;
     public open_RightClick;
@@ -215,5 +212,3 @@ class Menu {
 
     }
 }
-
-

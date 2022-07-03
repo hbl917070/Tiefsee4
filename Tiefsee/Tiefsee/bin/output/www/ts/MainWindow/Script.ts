@@ -194,6 +194,15 @@ class ScriptMenu {
         }
     }
 
+    /** 顯示選單 搜圖 */
+    showImgSearch(btn?: HTMLElement) {
+        if (btn === undefined) {
+            this.M.menu.open_Origin(document.getElementById("menu-imgSearch"), 0, 0);
+        } else {
+            this.M.menu.open_Button(document.getElementById("menu-imgSearch"), btn, "menuActive");
+        }
+    }
+
     /** 顯示選單 排序 */
     showSort(btn?: HTMLElement) {
         if (btn === undefined) {
@@ -340,7 +349,7 @@ class ScriptCopy {
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
-                let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+                let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
                 WV_System.SetClipboard_Base64ToImage(base64, true);
             } else if (imgType === "jpg") {
                 WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
@@ -354,7 +363,7 @@ class ScriptCopy {
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_Base64ToImage(base64, false);
         }
 
@@ -380,7 +389,7 @@ class ScriptCopy {
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64();//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_Txt(base64);
         }
 

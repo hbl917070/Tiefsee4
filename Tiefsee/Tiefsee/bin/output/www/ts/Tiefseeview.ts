@@ -53,6 +53,7 @@ class Tieefseeview {
     public setRendering;
     public getUrl;//取得當前圖片網址
     public getCanvasBase64;
+    public getCanvasBlob;
 
     public getEventMouseWheel;//滑鼠滾輪捲動時
     public setEventMouseWheel;
@@ -232,7 +233,7 @@ class Tieefseeview {
         this.setErrerUrl = setErrerUrl;
         this.getUrl = getUrl;
         this.getCanvasBase64 = getCanvasBase64;//從Canvas取得base64
-
+        this.getCanvasBlob = getCanvasBlob;
 
         setLoadingUrl(loadingUrl);//初始化 loading 圖片
         setLoading(false);//預設為隱藏
@@ -665,7 +666,6 @@ class Tieefseeview {
                 dom_img.src = "";
                 return;
             }
-
         }
 
 
@@ -950,19 +950,81 @@ class Tieefseeview {
             return domCan
         }
 
+
+        async function getCanvasBlob(zoom: number, quality: "high" | "low" | "medium", type = "png") {
+
+            let can = await getCanvas();
+            if (can === null) { return null; }
+
+            if (zoom < 1) {
+                can = getCanvasZoom(can, zoom, quality);
+            }
+
+            let blob: Blob | null = null;
+
+            await new Promise((resolve, reject) => {
+                if (can === null) { return null; }
+
+                let q = 1;
+                let outputType = "image/png";
+                if (dataType === "video") {
+                    outputType = "image/jpeg";
+                }
+                if (type === "jpg" || type === "jpeg") {
+                    outputType = "image/jpeg";
+                    q = 0.8;
+                }
+
+                can.toBlob((b) => {
+                    blob = b;
+                    resolve(true);
+                }, outputType, q);
+            })
+
+            return blob;
+        }
+
         /**
          * 從Canvas取得base64
          */
-        async function getCanvasBase64() {
+        async function getCanvasBase64(zoom: number, quality: "high" | "low" | "medium") {
+
+            let blob = await getCanvasBlob(zoom, quality);
+            if (blob == null) { return ""; }
+            let base64 = await blobToBase64(blob) as string;
+            console.log("base64");
+            return base64;
+        }
+
+
+        async function getCanvas() {
 
             if (dataType === "bigimg") {
-                return temp_can.toDataURL("image/png", 1)
+                return temp_can;
+            }
+
+            if (dataType === "img") {
+                temp_can = document.createElement("canvas");
+                temp_can.width = getOriginalWidth();
+                temp_can.height = getOriginalHeight();
+                let context0 = temp_can.getContext("2d");
+                context0?.drawImage(dom_img, 0, 0, getOriginalWidth(), getOriginalHeight());
+                return temp_can;
+            }
+
+            if (dataType === "video") {
+                temp_can = document.createElement("canvas");
+                temp_can.width = getOriginalWidth();
+                temp_can.height = getOriginalHeight();
+                let context0 = temp_can.getContext("2d");
+                context0?.drawImage(dom_video, 0, 0, getOriginalWidth(), getOriginalHeight());
+                return temp_can;
             }
 
             if (dataType === "bigimgscale") {//未測試
 
                 if (temp_bigimgscale[1] != undefined) {
-                    return temp_bigimgscale[1].toDataURL("image/png", 1);
+                    return temp_bigimgscale[1];
 
                 } else {
                     let p = await new Promise((resolve, reject) => {
@@ -986,35 +1048,26 @@ class Tieefseeview {
 
                     if (p) {
                         if (temp_bigimgscale[1] != undefined) {
-                            return temp_bigimgscale[1].toDataURL("image/png", 1);
+                            return temp_bigimgscale[1];
                         } else {
-                            return ""
+                            return null;
                         }
                     } else {
-                        return ""
+                        return null;
                     }
                 }
             }
 
 
-            if (dataType === "img") {
-                temp_can = document.createElement("canvas");
-                temp_can.width = getOriginalWidth();
-                temp_can.height = getOriginalHeight();
-                let context0 = temp_can.getContext("2d");
-                context0?.drawImage(dom_img, 0, 0, getOriginalWidth(), getOriginalHeight());
-                return temp_can.toDataURL("image/png", 1);
-            }
+            return null;
+        }
 
-            if (dataType === "video") {
-                temp_can = document.createElement("canvas");
-                temp_can.width = getOriginalWidth();
-                temp_can.height = getOriginalHeight();
-                let context0 = temp_can.getContext("2d");
-                context0?.drawImage(dom_video, 0, 0, getOriginalWidth(), getOriginalHeight());
-                return temp_can.toDataURL("image/jpeg", 1);
-            }
-            return ""
+        async function blobToBase64(blob: Blob) {
+            return new Promise((resolve, _) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
         }
 
 
@@ -1051,10 +1104,6 @@ class Tieefseeview {
         }
         /**
          * 設定 外距
-         * @param _top 
-         * @param _right 
-         * @param _bottom 
-         * @param _left 
          */
         function setMargin(_top: number, _right: number, _bottom: number, _left: number): void {
             marginTop = _top;
@@ -1410,7 +1459,7 @@ class Tieefseeview {
 
             //第一次縮小
             if (temp_bigimg[0] === undefined) {
-                temp_bigimg[0] = getCanvasZoom(temp_can, x)
+                temp_bigimg[0] = getCanvasZoom(temp_can, x, "medium")
             }
 
             for (let i = 1; i < len; i++) {
@@ -1418,7 +1467,7 @@ class Tieefseeview {
                 //產生縮小後的圖片
                 if (temp_bigimg[i] === undefined) {
                     let last = temp_bigimg[i - 1] as HTMLCanvasElement | HTMLImageElement | ImageBitmap;//上一次的圖
-                    temp_bigimg[i] = getCanvasZoom(last, x);
+                    temp_bigimg[i] = getCanvasZoom(last, x, "medium");
                     //console.log(Math.pow(x, i + 1));
                 }
 
@@ -1438,7 +1487,7 @@ class Tieefseeview {
             }
         }
         /** 取得縮放後的Canvas*/
-        function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number) {
+        function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: ("high" | "low" | "medium")) {
 
             let width = Math.floor(img.width * zoom);
             let height = Math.floor(img.height * zoom);
@@ -1448,7 +1497,7 @@ class Tieefseeview {
             cs.height = height;
             let context0 = cs.getContext("2d") as CanvasRenderingContext2D;
 
-            context0.imageSmoothingQuality = "medium";
+            context0.imageSmoothingQuality = quality;
             context0.drawImage(img, 0, 0, width, height);
             return cs;
 
