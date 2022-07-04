@@ -424,7 +424,6 @@ class Setting {
             });
         })
 
-
         //關聯副檔名 
         addLoadEvent(() => {
             var txt_extension = document.querySelector("#txt-extension") as HTMLTextAreaElement;
@@ -601,6 +600,20 @@ class Setting {
             switch_mainExifEnabled.addEventListener("change", () => {//啟用 詳細資料視窗
                 let val = switch_mainExifEnabled.checked;
                 config.settings["layout"]["mainExifEnabled"] = val;
+                appleSettingOfMain();
+            });
+        })
+
+        //大型切換按鈕
+        addLoadEvent(() => {
+            //初始化設定
+            setRadio("[name='largeBtn']", config.settings.layout.largeBtn);
+
+            //變更時
+            let dom = document.getElementById("largeBtn-group") as HTMLElement;
+            dom.addEventListener("change", () => {//
+                let val = getRadio("[name='largeBtn']");
+                config.settings.layout.largeBtn = val;
                 appleSettingOfMain();
             });
         })

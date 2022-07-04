@@ -148,10 +148,11 @@
                             <div id="main-tiefseeview" class="main-tiefseeview"></div>
                             <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
 
-                            <div class="maxBtn maxBtnLeft-bottom" id="maxBtnLeft">
+                            <!-- 大型切換按鈕 -->
+                            <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">
                                 <%- await readFile("./img/default/tool-prev.svg"); %>
                             </div>
-                            <div class="maxBtn maxBtnRight-bottom" id="maxBtnRight">
+                            <div class="largeBtn" data-style="leftRight-R" id="largeBtnRight">
                                 <%- await readFile("./img/default/tool-next.svg"); %>
                             </div>
 

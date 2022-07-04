@@ -4,7 +4,7 @@ class Config {
     constructor() { }
 
 
-    public OtherAppOpenList = {
+    public otherAppOpenList = {
         absolute: [
             { name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
             { name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
@@ -41,6 +41,25 @@ class Config {
             { name: "FotoSketcher", type: ["img"] },
             { name: "PhoXo", type: ["img"] },
         ]
+    }
+
+    /** 搜圖 */
+    public imgSearch = {
+        /** 搜圖用的清單 */
+        list: [
+            { name: "sauceNAO", icon: "./img/imgSearch/saucenao.png", url: "https://saucenao.com/search.php?db=999&url={url}" },
+            { name: "Yandex", icon: "./img/imgSearch/yandex.png", url: "https://yandex.com/images/search?rpt=imageview&url={url}" },
+            { name: "Google", icon: "./img/imgSearch/google.png", url: "https://www.google.com/searchbyimage?image_url={url}" },
+            { name: "Ascii2d", icon: "./img/imgSearch/ascii2d.png", url: "https://ascii2d.net/search/url/{url}" },
+            { name: "Bing", icon: "./img/imgSearch/bing.png", url: "https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIIDP&sbisrc=UrlPaste&idpbck=1&q=imgurl:{url}" },
+            { name: "IQDB", icon: "./img/imgSearch/iqdb.png", url: "https://iqdb.org/?url={url}" },
+        ],
+        /** 上傳圖片的server */
+        imgServer: "https://hbl917070.com/imgSearch/upload",
+        /** api key，使用thumbsnap時才需要用到 */
+        imgServerKey: "",
+        //imgServer: "https://thumbsnap.com/api/upload",
+        //key: "00001bfd3de40a19b62672faeb3fa564",
     }
 
     public settings = {
@@ -83,6 +102,7 @@ class Config {
             /** 預設資料夾排序 */
             dirSort: "name",
         },
+
         layout: {
             fileListEnabled: true,//啟用 檔案預覽列表
             fileListShowNo: true,//顯示編號
@@ -100,6 +120,8 @@ class Config {
             mainExifEnabled: false,//啟用 詳細資料視窗
             mainExifShowWidth: 150,//寬度
 
+            /** 大型切換按鈕 leftRight / bottom / none  */
+            largeBtn:"bottom",
         },
 
         /** 記錄程式上次關閉時的位置 */

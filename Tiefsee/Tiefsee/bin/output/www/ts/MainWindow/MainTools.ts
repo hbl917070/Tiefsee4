@@ -229,7 +229,7 @@ class MainTools {
 
             //搜圖
             ar.push({
-                type: "button",html:"",
+                type: "button", html: "",
                 i18n: "搜圖",
                 group: GroupType.img,
                 name: "file",
@@ -338,7 +338,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoType">
-                        <!-- jpg<br>123.4MB -->
+                        <!-- JPG<br>123.4MB -->
                     </div>
                 `,
                 i18n: "檔案類型、檔案大小",
@@ -528,7 +528,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoType">
-                        JPG<br>123.4MB
+                        <!-- JPG<br>123.4MB -->
                     </div>
                 `,
                 i18n: "檔案類型、檔案大小",
@@ -543,7 +543,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoWriteTime">
-                        2021
+                        <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
                 i18n: "檔案修改時間",
@@ -719,7 +719,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoType">
-                        JPG<br>123.4MB
+                        <!-- JPG<br>123.4MB -->
                     </div>
                 `,
                 i18n: "檔案類型、檔案大小",
@@ -734,7 +734,7 @@ class MainTools {
                 type: "html",
                 html: `
                     <div class="main-tools-txt" data-name="infoWriteTime">
-                        2021
+                        <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
                 i18n: "檔案修改時間",
@@ -831,7 +831,7 @@ class MainTools {
                 <div class="main-tools-btn js-noDrag" data-name="${item.name}">
                     ${SvgList[item.icon]}
                 </div>`);
-
+            div.style.order = "888";//未定義順序的按鈕就放在最後面
             addToolsDom({
                 group: item.group,
                 dom: div,

@@ -3,21 +3,13 @@ class ImgSearch {
 
     constructor(M: MainWindow) {
 
-        let arData = [
-            { name: "sauceNAO", icon: "./img/imgSearch/saucenao.png", url: "https://saucenao.com/search.php?db=999&url={url}" },
-            { name: "Yandex", icon: "./img/imgSearch/yandex.png", url: "https://yandex.com/images/search?rpt=imageview&url={url}" },
-            { name: "Google", icon: "./img/imgSearch/google.png", url: "https://www.google.com/searchbyimage?image_url={url}" },
-            { name: "Ascii2d", icon: "./img/imgSearch/ascii2d.png", url: "https://ascii2d.net/search/url/{url}" },
-            { name: "Bing", icon: "./img/imgSearch/bing.png", url: "https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIIDP&sbisrc=UrlPaste&idpbck=1&q=imgurl:{url}" },
-            { name: "IQDB", icon: "./img/imgSearch/iqdb.png", url: "https://iqdb.org/?url={url}" },
-        ];
+        let arData = M.config.imgSearch.list;
 
         initMenu()
 
         function initMenu() {
 
             var dom_menuImgSearch = document.getElementById("menu-imgSearch-list");
-
 
             for (let i = 0; i < arData.length; i++) {
 
@@ -55,8 +47,10 @@ class ImgSearch {
         }
 
 
-
-
+        /**
+         * 把當前的圖片壓縮後上傳到伺服器，取得圖片的網址
+         * @returns 
+         */
         async function getWebUrl() {
 
             //壓縮圖片
@@ -79,15 +73,22 @@ class ImgSearch {
             return url;
         }
 
-
+        /**
+         * 上傳檔案
+         * @param blob 
+         * @returns 
+         */
         async function updateThumbsnap(blob: Blob) {
 
+            let imgServer = M.config.imgSearch.imgServer;//圖片伺服器的網址
+            let imgServerKey = M.config.imgSearch.imgServerKey;//api key
+
             var formData = new FormData();
-            formData.append("key", "00001bfd3de40a19b62672faeb3fa564");
-            formData.append("media", blob, 'aa.jpg');
+            formData.append("key", imgServerKey);
+            formData.append("media", blob, "aa.jpg");
 
             let json: any;
-            await fetch(`https://thumbsnap.com/api/upload`, {
+            await fetch(imgServer, {
                 "body": formData,
                 "method": "POST",
             }).then((response) => {

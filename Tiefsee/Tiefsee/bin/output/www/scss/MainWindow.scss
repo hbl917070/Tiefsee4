@@ -221,7 +221,7 @@
 
 /* #region 下面的大型換頁按鈕 */
 
-.maxBtn {
+.largeBtn {
   /* backdrop-filter: saturate(180%) blur(20px); */
   position: absolute;
   border-radius: 5px;
@@ -236,41 +236,62 @@
   z-index: 5;
   user-select: none;
 }
-.maxBtn:hover {
+.largeBtn:hover {
   cursor: pointer;
   opacity: 1;
 }
-.maxBtn:active {
+.largeBtn:active {
   /* border: 1px solid var(--color-blue60); */
   /* transform: translateX(-2px); */
 }
-.maxBtn:active svg {
+.largeBtn:active svg {
   transform: scale(1.05);
   /* border: 1px solid var(--color-blue60); */
   /* transform: translateX(-2px); */
 }
-/*.maxBtnLeft-bottom:active {
+/*.largeBtnLeft-bottom:active {
   transform: translateX(-1px);
 }
-.maxBtnRight-bottom:active {
+.largeBtnRight-bottom:active {
   transform: translateX(1px);
 } */
-.maxBtn svg {
+.largeBtn svg {
   height: 30px;
 }
-.maxBtnLeft-bottom {
+//左右兩側
+.largeBtn[data-style="leftRight-L"] {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width: 60px;
+}
+.largeBtn[data-style="leftRight-R"] {
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  width: 60px;
+}
+//下面
+.largeBtn[data-style="bottom-L"] {
   bottom: 20px;
   left: 20px;
   right: 50%;
   height: 60px;
 }
-
-.maxBtnRight-bottom {
+.largeBtn[data-style="bottom-R"] {
   bottom: 20px;
   left: 50%;
   right: 20px;
   height: 60px;
 }
+//不顯示
+.largeBtn[data-style="none-L"] {
+  display: none;
+}
+.largeBtn[data-style="none-R"] {
+  display: none;
+}
+
 /* #endregion */
 
 //-----------------

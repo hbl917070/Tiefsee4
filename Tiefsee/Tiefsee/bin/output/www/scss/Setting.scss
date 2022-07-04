@@ -13,7 +13,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-
 .window {
   display: flex;
   flex-direction: row;
@@ -261,14 +260,13 @@ input:checked + .slider:before {
 
 //自訂工具列
 .toolsList {
-
   margin-left: 30px;
 
   .toolsList-item {
     display: flex;
     align-items: center;
     background-color: var(--color-white10);
-    padding:5px;
+    padding: 5px;
     border-radius: 5px;
     color: var(--color-white);
     position: relative;
@@ -276,18 +274,42 @@ input:checked + .slider:before {
     user-select: none;
     cursor: ns-resize;
   }
-  .toolsList-item input{
+  .toolsList-item input {
     position: absolute;
     top: 0;
     bottom: 0;
     left: -25px;
     margin: auto;
   }
-  .toolsList-item svg{
-    height:25px;
+  .toolsList-item svg {
+    height: 25px;
     margin-right: 5px;
   }
-  .toolsList-item span{
-    
+  .toolsList-item span {
   }
+}
+
+.radioList-h {
+  display: flex;
+}
+.radioList-item {
+  width: 80px;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  color:#FFF;
+   align-items: flex-start;
+}
+.radioList-item input[type="radio"] {
+  margin-bottom: 5px;;
+}
+.radioList-item span {
+  margin-top: 3px;
+  margin-left: 5px;
+}
+.radioList-item img {
+  margin: 0 5px;
+}
+.radioList-item:hover {
+  cursor: pointer;
 }

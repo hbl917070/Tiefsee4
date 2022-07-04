@@ -156,10 +156,10 @@ class InitMenu {
                 let arExe: { path: string, name: string, type: string }[] = [];
 
                 //加入絕對路徑的exe
-                for (let i = 0; i < M.config.OtherAppOpenList.absolute.length; i++) {
-                    let exePath = M.config.OtherAppOpenList.absolute[i].path;
-                    let exeName = M.config.OtherAppOpenList.absolute[i].name;
-                    let type = M.config.OtherAppOpenList.absolute[i].type.join(",");
+                for (let i = 0; i < M.config.otherAppOpenList.absolute.length; i++) {
+                    let exePath = M.config.otherAppOpenList.absolute[i].path;
+                    let exeName = M.config.otherAppOpenList.absolute[i].name;
+                    let type = M.config.otherAppOpenList.absolute[i].type.join(",");
                     exePath = exePath.replace(/[/]/g, "\\");
                     if (arExe.some(e => e.path === exePath) === false) {
                         arExe.push({ path: exePath, name: exeName, type: type });
@@ -173,8 +173,8 @@ class InitMenu {
                     let name = lnk.substr(lnk.lastIndexOf("\\") + 1);//取得檔名
                     name = name.substr(0, name.length - 4);
 
-                    for (let j = 0; j < M.config.OtherAppOpenList.startMenu.length; j++) {
-                        const item = M.config.OtherAppOpenList.startMenu[j];
+                    for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
+                        const item = M.config.otherAppOpenList.startMenu[j];
                         if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
                             let exePath = await WV_System.LnkToExePath(lnk);
                             if (arExe.some(e => e.path === exePath) === false) {

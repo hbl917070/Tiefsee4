@@ -3,8 +3,8 @@ var baseWindow: BaseWindow;
 class MainWindow {
 
     public dom_tools: HTMLElement;
-    public dom_maxBtnLeft: HTMLElement;
-    public dom_maxBtnRight: HTMLElement;
+    public dom_largeBtnLeft: HTMLElement;
+    public dom_largeBtnRight: HTMLElement;
     public dom_mainL: HTMLElement;
     public dom_mainR: HTMLElement;
 
@@ -30,55 +30,41 @@ class MainWindow {
         baseWindow = new BaseWindow();//初始化視窗
 
         var dom_tools = <HTMLElement>document.getElementById("main-tools");//工具列
-        var dom_maxBtnLeft = <HTMLElement>document.getElementById("maxBtnLeft");//上一頁大按鈕
-        var dom_maxBtnRight = <HTMLElement>document.getElementById("maxBtnRight");
+        var dom_largeBtnLeft = <HTMLElement>document.getElementById("largeBtnLeft");//上一頁大按鈕
+        var dom_largeBtnRight = <HTMLElement>document.getElementById("largeBtnRight");
         var dom_mainL = <HTMLElement>document.getElementById("main-L");//左邊區域
         var dom_mainR = <HTMLElement>document.getElementById("main-R");//左邊區域
         var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-tools-layout");//開啟layout選單
 
+        let firstRun = true;//用於判斷是否為第一次執行
+
         this.dom_tools = dom_tools;
-        this.dom_maxBtnLeft = dom_maxBtnLeft;
-        this.dom_maxBtnRight = dom_maxBtnRight;
+        this.dom_largeBtnLeft = dom_largeBtnLeft;
+        this.dom_largeBtnRight = dom_largeBtnRight;
         this.dom_mainL = dom_mainL;
         this.dom_mainR = dom_mainR;
 
+        var config = this.config = new Config();
+        var fileLoad = this.fileLoad = new FileLoad(this);
+        var fileShow = this.fileShow = new FileShow(this);
+        var fileSort = this.fileSort = new FileSort(this);
+        var dirSort = this.dirSort = new DirSort(this);
+        var mainFileList = this.mainFileList = new MainFileList(this);
+        var mainDirList = this.mainDirList = new MainDirList(this);
+        var imgSearch = this.imgSearch = new ImgSearch(this);
+        var mainExif = this.mainExif = new MainExif(this);
+        var mainTools = this.mainTools = new MainTools(this);
+        var menu = this.menu = new Menu(this);
+        var initMenu = this.initMenu = new InitMenu(this);
+        var script = this.script = new Script(this);
 
-        var config = new Config();
-        var fileLoad = new FileLoad(this);
-        var fileShow = new FileShow(this);
-        var fileSort = new FileSort(this);
-        var dirSort = new DirSort(this);
-        var mainFileList = new MainFileList(this);
-        var mainDirList = new MainDirList(this);
-        var imgSearch = new ImgSearch(this);
-        var mainExif = new MainExif(this);
-        var mainTools = new MainTools(this);
-        var menu = new Menu(this);
-        var initMenu = new InitMenu(this);
-        var script = new Script(this);
-        let firstRun = true;//用於判斷是否為第一次執行
-
-        var i18n = new I18n();
+        var i18n = this.i18n = new I18n();
         i18n.pushList(langExif);
         i18n.pushList(langUi);
 
-        this.i18n = i18n;
-        this.fileLoad = fileLoad;
-        this.fileShow = fileShow;
-        this.fileSort = fileSort;
-        this.dirSort = dirSort;
-        this.mainFileList = mainFileList;
-        this.mainDirList = mainDirList;
-        this.imgSearch = imgSearch;
-        this.mainExif = mainExif;
-        this.menu = menu;
-        this.initMenu = initMenu;
-        this.config = config;
-        this.script = script;
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
 
-        this.mainTools = mainTools;
         new Hotkey(this);
         init();
 
@@ -229,10 +215,10 @@ class MainWindow {
             })
 
             //大型換頁按鈕
-            dom_maxBtnLeft.addEventListener("click", function (e) {
+            dom_largeBtnLeft.addEventListener("click", function (e) {
                 script.fileLoad.prevFile();
             })
-            dom_maxBtnRight.addEventListener("click", function (e) {
+            dom_largeBtnRight.addEventListener("click", function (e) {
                 script.fileLoad.nextFile();
             })
 
@@ -475,6 +461,21 @@ class MainWindow {
                 }
 
             })
+
+            //-----------
+            
+            //大型切換按鈕
+            if (config.settings.layout.largeBtn == "leftRight") {
+                dom_largeBtnLeft.setAttribute("data-style","leftRight-L");
+                dom_largeBtnRight.setAttribute("data-style","leftRight-R");
+            }else if (config.settings.layout.largeBtn == "bottom") {
+                dom_largeBtnLeft.setAttribute("data-style","bottom-L");
+                dom_largeBtnRight.setAttribute("data-style","bottom-R");
+            }else {
+                dom_largeBtnLeft.setAttribute("data-style","none-L");
+                dom_largeBtnRight.setAttribute("data-style","none-R");
+            }
+            
 
             //-----------
 

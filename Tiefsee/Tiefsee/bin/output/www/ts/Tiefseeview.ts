@@ -831,7 +831,6 @@ class Tieefseeview {
 
             temp_bigimg = [];
 
-
             temp_drawImage = {
                 scale: -1,
                 sx: 0, sy: 0,
@@ -951,7 +950,19 @@ class Tieefseeview {
         }
 
 
-        async function getCanvasBlob(zoom: number, quality: "high" | "low" | "medium", type = "png") {
+        /**
+         * 從Canvas取得base64
+         */
+        async function getCanvasBase64(zoom: number, quality: "high" | "low" | "medium") {
+            let blob = await getCanvasBlob(zoom, quality);
+            if (blob == null) { return ""; }
+            let base64 = await blobToBase64(blob) as string;
+            return base64;
+        }
+        /**
+         * 從Canvas取得Blob
+         */
+        async function getCanvasBlob(zoom: number, quality: "high" | "low" | "medium", type = "png", q = 0.8) {
 
             let can = await getCanvas();
             if (can === null) { return null; }
@@ -965,38 +976,42 @@ class Tieefseeview {
             await new Promise((resolve, reject) => {
                 if (can === null) { return null; }
 
-                let q = 1;
+             
                 let outputType = "image/png";
                 if (dataType === "video") {
                     outputType = "image/jpeg";
                 }
+                if (type === "webp") {
+                    outputType = "image/webp";
+                }
                 if (type === "jpg" || type === "jpeg") {
                     outputType = "image/jpeg";
-                    q = 0.8;
+ 
+                    //背景色改成白色
+                    let cc = document.createElement("canvas");
+                    cc.width = can.width;
+                    cc.height = can.height;
+                    let context = cc.getContext("2d") as CanvasRenderingContext2D;
+                    context.fillStyle = "#FFFFFF";  //填滿顏色
+                    context.fillRect(0, 0, can.width, can.height);
+                    context.drawImage(can, 0, 0, can.width, can.height);
+                    can = cc;
                 }
 
                 can.toBlob((b) => {
                     blob = b;
                     resolve(true);
                 }, outputType, q);
+
+
+
             })
 
             return blob;
         }
-
         /**
-         * 從Canvas取得base64
+         * 取得縮放比例100%的Canvas
          */
-        async function getCanvasBase64(zoom: number, quality: "high" | "low" | "medium") {
-
-            let blob = await getCanvasBlob(zoom, quality);
-            if (blob == null) { return ""; }
-            let base64 = await blobToBase64(blob) as string;
-            console.log("base64");
-            return base64;
-        }
-
-
         async function getCanvas() {
 
             if (dataType === "bigimg") {
@@ -1061,7 +1076,6 @@ class Tieefseeview {
 
             return null;
         }
-
         async function blobToBase64(blob: Blob) {
             return new Promise((resolve, _) => {
                 const reader = new FileReader();
