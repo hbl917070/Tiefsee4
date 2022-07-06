@@ -256,7 +256,7 @@ namespace Tiefsee {
                         firstRunNavigationCompleted = false;
                     } else { return; }
 
-                    DelayRun(10, () => {
+                    DelayRun(100, () => {
                         this.Show();
                         this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
                     });
@@ -317,7 +317,10 @@ namespace Tiefsee {
                 e2.Handled = true;
                 //}
                 //System.Console.WriteLine(_fileurl);
-                RunJs($"var temp_dropPath = \"{_fileurl}\"");
+                RunJs($@"
+                    var temp_dropPath = ""{_fileurl}"";
+                    if(window.baseWindow !== undefined) baseWindow.onNewWindowRequested(""{_fileurl}"");
+                ");
             };
 
 
