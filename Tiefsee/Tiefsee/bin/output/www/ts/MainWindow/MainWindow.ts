@@ -377,7 +377,6 @@ class MainWindow {
                 let _dropPath = await baseWindow.getDropPath();
                 if (_dropPath === "") { return; }
 
-
                 if (files.length > 1) {
                     let arFile = [];
                     for (let i = 0; i < files.length; i++) {
@@ -395,7 +394,17 @@ class MainWindow {
 
                 e.stopPropagation();
                 e.preventDefault();
+            }
 
+
+            //----------------
+
+            //如果點擊google map的超連結，就用瀏覽器打開
+            baseWindow.onNewWindowRequested = (url: string) => {
+                if (url.indexOf("https://maps.google.com/") === 0) {
+                    WV_RunApp.OpenUrl(url);
+                    temp_dropPath = "";
+                }
             }
 
         }
@@ -463,19 +472,19 @@ class MainWindow {
             })
 
             //-----------
-            
+
             //大型切換按鈕
             if (config.settings.layout.largeBtn == "leftRight") {
-                dom_largeBtnLeft.setAttribute("data-style","leftRight-L");
-                dom_largeBtnRight.setAttribute("data-style","leftRight-R");
-            }else if (config.settings.layout.largeBtn == "bottom") {
-                dom_largeBtnLeft.setAttribute("data-style","bottom-L");
-                dom_largeBtnRight.setAttribute("data-style","bottom-R");
-            }else {
-                dom_largeBtnLeft.setAttribute("data-style","none-L");
-                dom_largeBtnRight.setAttribute("data-style","none-R");
+                dom_largeBtnLeft.setAttribute("data-style", "leftRight-L");
+                dom_largeBtnRight.setAttribute("data-style", "leftRight-R");
+            } else if (config.settings.layout.largeBtn == "bottom") {
+                dom_largeBtnLeft.setAttribute("data-style", "bottom-L");
+                dom_largeBtnRight.setAttribute("data-style", "bottom-R");
+            } else {
+                dom_largeBtnLeft.setAttribute("data-style", "none-L");
+                dom_largeBtnRight.setAttribute("data-style", "none-R");
             }
-            
+
 
             //-----------
 

@@ -295,6 +295,14 @@ class BaseWindow {
     public FormClosing() {
          console.log("FormClosing");
     }*/
+
+    /**
+     * 由C#主動呼叫。wewbview2新建視窗時呼叫。必要時覆寫此函數
+     * @param url 
+     */
+    public onNewWindowRequested(url: string) {
+        console.log("onNewWindowRequested：" + url)
+    }
 }
 
 

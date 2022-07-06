@@ -15,6 +15,7 @@ class Dragbar {
 
     constructor() {
 
+        let dom_windowBody = document.getElementById("window-body") as HTMLElement;
         let dom_box: HTMLElement;//螢幕看得到的區域
         let dom_dragbar: HTMLElement;
         let dom_observe: HTMLElement;
@@ -34,12 +35,12 @@ class Dragbar {
         this.setEventEnd = function (func: (val: number) => void) { _eventEnd = func }
         this.setEnabled = function (val: boolean) {
             if (val) {
-                dom_dragbar.style.display = "block"
+                dom_dragbar.style.display = "block";
             } else {
-                dom_dragbar.style.display = "none"
+                dom_dragbar.style.display = "none";
             }
         }
-        /**修改拉條的位置 */
+        /** 設定 拉條的位置 */
         this.setPosition = function (val: number) {
             if (type === "left") {
                 dom_dragbar.style.left = (dom_box.getBoundingClientRect().left) + "px";
@@ -80,7 +81,7 @@ class Dragbar {
             //拖曳開始
             dom_dragbar.addEventListener("pointerdown", (ev) => {//mousedown + touchstart
                 ev.preventDefault();
-                //etemp_val = toNumber(dom_dragbar.style.left)
+                dom_windowBody.style.pointerEvents = "none";//避免畫面上的iframe造成無法識別滑鼠事件
                 temp_val = toNumber(dom_dragbar.style.left);
                 temp_width = dom_box.getBoundingClientRect().width;
                 _eventStart();
@@ -96,8 +97,8 @@ class Dragbar {
 
             //拖曳 結束
             hammer_dragbar.on("panend", (ev: HammerInput) => {
+                dom_windowBody.style.pointerEvents = "";//解除鎖定
                 dom_dragbar.setAttribute("active", "");
-                console.log("end")
                 let val = update(ev);
                 _eventEnd(val);
             });
@@ -112,8 +113,9 @@ class Dragbar {
                     val = temp_val + ev.deltaX - dom_box.getBoundingClientRect().left;
                 }
                 return val;
-                //console.log(val)    
             }
+
+
         }
     }
 

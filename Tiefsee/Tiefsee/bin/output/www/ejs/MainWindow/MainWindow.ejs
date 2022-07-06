@@ -62,137 +62,134 @@
 </head>
 
 <body>
-    <!-- 下拉選單 & 右鍵選單 -->
-    <%- await include("./Menu.ejs"); %>
 
-        <div class="window">
+    <div class="window">
 
+        <div class="dragbar-v" id="dragbar-mainFileList"> </div>
+        <div class="dragbar-v" id="dragbar-mainDirList"> </div>
+        <div class="dragbar-v" id="dragbar-mainExif"> </div>
 
-            <div class="dragbar-v" id="dragbar-mainFileList"> </div>
-            <div class="dragbar-v" id="dragbar-mainDirList"> </div>
-            <div class="dragbar-v" id="dragbar-mainExif"> </div>
+        <!-- 標題列 -->
+        <div class="window-titlebar">
 
-            <!-- 標題列 -->
-            <div class="window-titlebar">
-
-                <div class="titlebar-txt">
-                    <span>tiefsee 4</span>
-                </div>
-
-                <div class="titlebar-tools">
-                    <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
-                        <%- await readFile("./img/default/window-menu.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
-                        <%- await readFile("./img/default/window-topmost.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-layout">
-                        <%- await readFile("./img/default/window-layout.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-minimized">
-                        <%- await readFile("./img/default/window-minimized.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
-                        <%- await readFile("./img/default/window-normal.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-maximized">
-                        <%- await readFile("./img/default/window-maximized.svg"); %>
-                    </div>
-                    <div class="titlebar-tools-btn titlebar-tools-close">
-                        <%- await readFile("./img/default/window-close.svg"); %>
-                    </div>
-                </div>
-
+            <div class="titlebar-txt">
+                <span>tiefsee 4</span>
             </div>
 
-            <div class="window-body">
-
-                <div class="main-content">
-
-                    <div class="main-T">
-
-                        <!-- 工具列 -->
-                        <div id="main-tools" class="main-tools"> </div>
-
-                    </div>
-
-                    <div class="main-C">
-
-                        <div class="main-L" id="main-L">
-
-                            <!-- 資料夾預覽列表 -->
-                            <div class="main-dirList base-scrollbar" id="main-dirList" active="true">
-                                <div class="main-dirListBody" id="main-dirListBody">
-                                    <div id="main-dirListData"> </div>
-                                </div>
-                            </div>
-
-                            <!-- 檔案預覽列表 -->
-                            <div class="main-fileList base-scrollbar" id="main-fileList">
-                                <div class="main-fileListBody" id="main-fileListBody">
-                                    <div id="main-fileListData"></div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="main-V">
-
-                            <div class="main-welcomeview" id="main-welcomeview">
-                                <div>
-                                    <img class="welcomeview-logo" src="./img/logo.svg">
-                                    <div class="welcomeview-txt">Tiefsee 4.0.0-beta.18</div>
-                                </div>
-                            </div>
-                            <textarea id="main-txtview" class="main-txtview base-scrollbar"></textarea>
-                            <div id="main-tiefseeview" class="main-tiefseeview"></div>
-                            <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
-
-                            <!-- 大型切換按鈕 -->
-                            <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">
-                                <%- await readFile("./img/default/tool-prev.svg"); %>
-                            </div>
-                            <div class="largeBtn" data-style="leftRight-R" id="largeBtnRight">
-                                <%- await readFile("./img/default/tool-next.svg"); %>
-                            </div>
-
-                            <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
-                        </div>
-
-                        <div class="main-R" id="main-R">
-
-                            <!-- exif 視窗 -->
-                            <div class="mainExif" id="mainExif">
-                                <div class="mainExifTop">
-
-                                </div>
-                                <div class="mainExifList base-scrollbar" id="mainExifList">
-
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-
-                    <div class="main-B"></div>
-
+            <div class="titlebar-tools">
+                <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+                    <%- await readFile("./img/default/window-menu.svg"); %>
                 </div>
-
+                <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
+                    <%- await readFile("./img/default/window-topmost.svg"); %>
+                </div>
+                <div class="titlebar-tools-btn titlebar-tools-layout">
+                    <%- await readFile("./img/default/window-layout.svg"); %>
+                </div>
+                <div class="titlebar-tools-btn titlebar-tools-minimized">
+                    <%- await readFile("./img/default/window-minimized.svg"); %>
+                </div>
+                <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                    <%- await readFile("./img/default/window-normal.svg"); %>
+                </div>
+                <div class="titlebar-tools-btn titlebar-tools-maximized">
+                    <%- await readFile("./img/default/window-maximized.svg"); %>
+                </div>
+                <div class="titlebar-tools-btn titlebar-tools-close">
+                    <%- await readFile("./img/default/window-close.svg"); %>
+                </div>
             </div>
-
-            <div class="window-LC window-border"></div>
-            <div class="window-RC window-border"></div>
-            <div class="window-CT window-border"></div>
-            <div class="window-LT window-border"></div>
-            <div class="window-RT window-border"></div>
-            <div class="window-CB window-border"></div>
-            <div class="window-LB window-border"></div>
-            <div class="window-RB window-border"></div>
 
         </div>
 
+        <div class="window-body" id="window-body">
+
+            <div class="main-content">
+
+                <div class="main-T">
+
+                    <!-- 工具列 -->
+                    <div id="main-tools" class="main-tools"> </div>
+
+                </div>
+
+                <div class="main-C">
+
+                    <div class="main-L" id="main-L">
+
+                        <!-- 資料夾預覽列表 -->
+                        <div class="main-dirList base-scrollbar" id="main-dirList" active="true">
+                            <div class="main-dirListBody" id="main-dirListBody">
+                                <div id="main-dirListData"> </div>
+                            </div>
+                        </div>
+
+                        <!-- 檔案預覽列表 -->
+                        <div class="main-fileList base-scrollbar" id="main-fileList">
+                            <div class="main-fileListBody" id="main-fileListBody">
+                                <div id="main-fileListData"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="main-V">
+
+                        <div class="main-welcomeview" id="main-welcomeview">
+                            <div>
+                                <img class="welcomeview-logo" src="./img/logo.svg">
+                                <div class="welcomeview-txt">Tiefsee 4.0.0-beta.19</div>
+                            </div>
+                        </div>
+                        <textarea id="main-txtview" class="main-txtview base-scrollbar"></textarea>
+                        <div id="main-tiefseeview" class="main-tiefseeview"></div>
+                        <iframe id="main-pdfview" class="main-pdfview" src=""></iframe>
+
+                        <!-- 大型切換按鈕 -->
+                        <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">
+                            <%- await readFile("./img/default/tool-prev.svg"); %>
+                        </div>
+                        <div class="largeBtn" data-style="leftRight-R" id="largeBtnRight">
+                            <%- await readFile("./img/default/tool-next.svg"); %>
+                        </div>
+
+                        <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->
+                    </div>
+
+                    <div class="main-R" id="main-R">
+
+                        <!-- exif 視窗 -->
+                        <div class="mainExif" id="mainExif">
+                            <div class="mainExifTop">
+                            </div>
+
+                            <div class="mainExifList base-scrollbar" id="mainExifList">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="main-B"></div>
+
+            </div>
+
+        </div>
+
+        <div class="window-LC window-border"></div>
+        <div class="window-RC window-border"></div>
+        <div class="window-CT window-border"></div>
+        <div class="window-LT window-border"></div>
+        <div class="window-RT window-border"></div>
+        <div class="window-CB window-border"></div>
+        <div class="window-LB window-border"></div>
+        <div class="window-RB window-border"></div>
+
+    </div>
+
+    <!-- 下拉選單 & 右鍵選單 -->
+    <%- await include("./Menu.ejs"); %>
 
 </body>
 
