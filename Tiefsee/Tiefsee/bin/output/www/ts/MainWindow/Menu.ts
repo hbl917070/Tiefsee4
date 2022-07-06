@@ -4,15 +4,17 @@ class Menu {
     public open_RightClick;
     public open_Origin;
     public close;
+    public isShow;
 
     constructor(M: MainWindow) {
 
         this.open_Button = open_Button;
         this.open_RightClick = open_RightClick;
         this.open_Origin = open_Origin;
+        this.isShow = isShow;
+        this.close = close;
 
         var temp_closeList: any[] = [];//記錄所有被開過的menu
-        this.close = close;
 
         var mouseX = 0;
         var mouseY = 0;
@@ -21,6 +23,14 @@ class Menu {
             mouseY = e.y
         });
 
+
+        /**
+         * 判斷目前是否有開啟選單
+         */
+        function isShow() {
+            let bool = temp_closeList.length > 0;
+            return bool;
+        }
 
         /**
          * 關閉 menu
@@ -108,7 +118,7 @@ class Menu {
 
             let left = mouseX
             let top = mouseY
-            
+
             if (menuWidth + left + offsetX > bodyWidth) {
                 left = left - menuWidth + 10
             } else {

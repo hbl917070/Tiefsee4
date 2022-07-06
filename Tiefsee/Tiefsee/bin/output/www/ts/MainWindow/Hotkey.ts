@@ -14,6 +14,14 @@ class Hotkey {
             if (e.code == "F5") { return; }
             if (e.code == "F12") { return; }
 
+            //如果有開啟選單
+            if (M.menu.isShow()) {
+                if (e.code == "Escape") {
+                    M.menu.close();
+                    return;
+                }
+            }
+
             //如果有開啟msg視窗
             if (Msgbox.isShow()) {
                 if (e.code == "Escape") {

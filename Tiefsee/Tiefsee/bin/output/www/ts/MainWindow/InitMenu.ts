@@ -24,7 +24,18 @@ class InitMenu {
         document.body.addEventListener("mousedown", (e) => {
             if (e.button === 2) {
                 let target = e.target as HTMLElement;
-                let dataMenu = target.getAttribute("data-menu");
+                let dom = target as HTMLElement;
+
+                //取得 data-menu ，如果當前的dom沒有設定，則往往上層找
+                let dataMenu = null;
+                while (true) {
+                    dataMenu = dom.getAttribute("data-menu");
+                    dom = dom.parentNode as HTMLElement;
+                    if (dataMenu !== null || dom === document.body) {
+                        break;
+                    }
+                }
+
                 if (dataMenu !== "none") {
                     e.preventDefault();
                     if (Lib.isTextFocused()) {//焦點在輸入框上
