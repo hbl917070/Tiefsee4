@@ -43,24 +43,6 @@ class Config {
         ]
     }
 
-    /** 搜圖 */
-    public imgSearch = {
-        /** 搜圖用的清單 */
-        list: [
-            { name: "sauceNAO", icon: "./img/imgSearch/saucenao.png", url: "https://saucenao.com/search.php?db=999&url={url}" },
-            { name: "Yandex", icon: "./img/imgSearch/yandex.png", url: "https://yandex.com/images/search?rpt=imageview&url={url}" },
-            { name: "Google", icon: "./img/imgSearch/google.png", url: "https://www.google.com/searchbyimage?image_url={url}" },
-            { name: "Ascii2d", icon: "./img/imgSearch/ascii2d.png", url: "https://ascii2d.net/search/url/{url}" },
-            { name: "Bing", icon: "./img/imgSearch/bing.png", url: "https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIIDP&sbisrc=UrlPaste&idpbck=1&q=imgurl:{url}" },
-            { name: "IQDB", icon: "./img/imgSearch/iqdb.png", url: "https://iqdb.org/?url={url}" },
-        ],
-        /** 上傳圖片的server */
-        imgServer: "https://hbl917070.com/imgSearch/upload",
-        /** api key，使用thumbsnap時才需要用到 */
-        imgServerKey: "",
-        //imgServer: "https://thumbsnap.com/api/upload",
-        //key: "00001bfd3de40a19b62672faeb3fa564",
-    }
 
     public settings = {
         theme: {
@@ -121,7 +103,7 @@ class Config {
             mainExifShowWidth: 150,//寬度
 
             /** 大型切換按鈕 leftRight / bottom / none  */
-            largeBtn:"bottom",
+            largeBtn: "bottom",
         },
 
         /** 記錄程式上次關閉時的位置 */
@@ -146,6 +128,25 @@ class Config {
             dirListMaxCount: 5000,
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
             highQualityLimit: 4000,
+        },
+
+        /** 搜圖 */
+        imgSearch: {
+            /** 搜圖用的清單 */
+            list: [
+                { name: "sauceNAO", icon: "./img/imgSearch/saucenao.png", url: "https://saucenao.com/search.php?db=999&url={url}" },
+                { name: "Yandex", icon: "./img/imgSearch/yandex.png", url: "https://yandex.com/images/search?rpt=imageview&url={url}" },
+                { name: "Google", icon: "./img/imgSearch/google.png", url: "https://www.google.com/searchbyimage?image_url={url}" },
+                { name: "Ascii2d", icon: "./img/imgSearch/ascii2d.png", url: "https://ascii2d.net/search/url/{url}" },
+                { name: "Bing", icon: "./img/imgSearch/bing.png", url: "https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIIDP&sbisrc=UrlPaste&idpbck=1&q=imgurl:{url}" },
+                //{ name: "IQDB", icon: "./img/imgSearch/iqdb.png", url: "https://iqdb.org/?url={url}" },
+            ],
+            /** 上傳圖片的server */
+            imgServer: "https://hbl917070.com/imgSearch/upload",
+            /** api key，使用thumbsnap時才需要用到 */
+            imgServerKey: "",
+            //imgServer: "https://thumbsnap.com/api/upload",
+            //key: "00001bfd3de40a19b62672faeb3fa564",
         }
     }
 

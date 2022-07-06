@@ -3,7 +3,7 @@ class ImgSearch {
 
     constructor(M: MainWindow) {
 
-        let arData = M.config.imgSearch.list;
+        let arData = M.config.settings.imgSearch.list;
 
         initMenu()
 
@@ -80,8 +80,8 @@ class ImgSearch {
          */
         async function updateThumbsnap(blob: Blob) {
 
-            let imgServer = M.config.imgSearch.imgServer;//圖片伺服器的網址
-            let imgServerKey = M.config.imgSearch.imgServerKey;//api key
+            let imgServer = M.config.settings.imgSearch.imgServer;//圖片伺服器的網址
+            let imgServerKey = M.config.settings.imgSearch.imgServerKey;//api key
 
             var formData = new FormData();
             formData.append("key", imgServerKey);
