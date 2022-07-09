@@ -15,39 +15,13 @@ class MainExif {
 		var dom_mainExif = document.getElementById("mainExif") as HTMLElement;
 		var dom_mainExifList = document.getElementById("mainExifList") as HTMLElement;
 		var dom_dragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement;//拖曳條
-		
+
 		var fileInfo2: FileInfo2;
 
 		var isHide = false;//暫時隱藏
 		var isEnabled = true;//啟用 檔案預覽列表
 
-		var whitelist = [
-			"Date/Time Original",
-			"Windows XP Keywords",
-			"Rating",
-			"Image Width/Height",
-			"Length",
-			"Windows XP Title",
-			"Artist",
-			"Windows XP Comment",
-			"Make",
-			"Model",
-			"Windows XP Subject",
-			"F-Number",
-			"Exposure Time",
-			"ISO Speed Ratings",
-			"Exposure Bias Value",
-			"Focal Length",
-			"Max Aperture Value",
-			"Metering Mode",
-			"Flash(key)",
-			"Focal Length 35",
-			"Orientation",//旋轉資訊
-			"Software",//軟體
-			//"Color Space",//色彩空間
-			"Crea tionTime",
-			"Last WriteTime",
-		]
+
 
 
 
@@ -146,7 +120,7 @@ class MainExif {
 		/**
 		 * 讀取exif(於初始化後呼叫)
 		 */
-	 	async function load() {
+		async function load() {
 
 			if (isEnabled === false) { return; }
 
@@ -162,30 +136,55 @@ class MainExif {
 			if (json.code != "1") {
 				return;
 			}
-			if (M.fileLoad.getFilePath() != path) {//如果已經在載入期間已經切換到其他檔案
-				console.log("exif已經切換圖片")
+			if (M.fileLoad.getFilePath() !== path) {//如果已經在載入期間已經切換到其他檔案
 				return;
+			}
+
+			//取得經緯度
+			let GPS_lat = getItem(json.data, "GPS Latitude");//緯度
+			let GPS_lng = getItem(json.data, "GPS Longitude");//經度
+			if (GPS_lat === `0° 0' 0"`) { GPS_lat = undefined }
+			if (GPS_lng === `0° 0' 0"`) { GPS_lng = undefined }
+			let hasGPS = GPS_lat !== undefined && GPS_lng !== undefined;
+			if (hasGPS) {//如果經緯度不是空，就新增「Map」欄位
+				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
 			}
 
 			let ar = json.data;
 			let html = "";
+			let whitelist = M.config.settings.exif.whitelist;
 			for (let i = 0; i < whitelist.length; i++) {
 
 				let name = whitelist[i];
 				let value = getItem(ar, name);
-				if (value === undefined) { continue; }
+				if (value === undefined) {
+					continue;
 
-				value = valueToString(name, value);
-				value = Lib.escape(value);
+				} else if (name === "Map") {
+					value = value.replace(/ /g, "").replace(/"/g, "");
+					html += `
+					<div class="mainExifItem">
+						<div class="mainExifMap">
+							<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
+						</div>
+					</div>`
 
-				name = M.i18n.t(`exif.name.${name}`, "zh");
-				name = Lib.escape(name);
+				} else {
+					value = valueToString(name, value);
+					value = Lib.escape(value);
 
-				html += `
-                <div class="mainExifItem">
-                    <div class="mainExifName">${name}</div>
-                    <div class="mainExifValue">${value}</div>
-                </div>`
+					name = M.i18n.t(`exif.name.${name}`, "zh");
+					name = Lib.escape(name);
+
+					html += `
+					<div class="mainExifItem">
+						<div class="mainExifName">${name}</div>
+						<div class="mainExifValue">${value}</div>
+					</div>`
+
+				}
+
+
 			}
 
 			dom_mainExifList.innerHTML = html;
@@ -200,7 +199,7 @@ class MainExif {
 			return undefined;
 		}
 
-		
+
 		/**
 		 * 處理value的值
 		 */

@@ -147,7 +147,38 @@ class Config {
             imgServerKey: "",
             //imgServer: "https://thumbsnap.com/api/upload",
             //key: "00001bfd3de40a19b62672faeb3fa564",
-        }
+        },
+
+        exif: {
+            whitelist: [
+                "Date/Time Original",
+                "Windows XP Keywords",
+                "Rating",
+                "Image Width/Height",
+                "Length",
+                "Windows XP Title",
+                "Artist",
+                "Windows XP Comment",
+                "Make",
+                "Model",
+                "Windows XP Subject",
+                "F-Number",
+                "Exposure Time",
+                "ISO Speed Ratings",
+                "Exposure Bias Value",
+                "Focal Length",
+                "Max Aperture Value",
+                "Metering Mode",
+                "Flash(key)",
+                "Focal Length 35",
+                "Orientation",//旋轉資訊
+                "Software",//軟體
+                //"Color Space",//色彩空間
+                "Crea tionTime",
+                "Last WriteTime",
+                "Map",//Google Map
+            ]
+        },
     }
 
 
