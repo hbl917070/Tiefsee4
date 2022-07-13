@@ -497,8 +497,8 @@ namespace Tiefsee {
             if (is304 == false) {
 
                 try {
-                    System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
-                        path, size, size, ThumbnailOptions.ScaleUp
+                    System.Drawing.Bitmap icon = QuickLook.WindowsThumbnailProvider.GetThumbnail(
+                        path, size, size, QuickLook.ThumbnailOptions.ScaleUp
                     );
 
                     using (System.IO.Stream input = new MemoryStream()) {

@@ -22,14 +22,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 
-/*
- *
- * 
- * 取得任何檔案在Windows檔案總管的圖示 
- * 
- **/
-
-namespace Tiefsee {
+namespace QuickLook {
     [Flags]
     internal enum ThumbnailOptions {
         None = 0x00,
@@ -42,6 +35,9 @@ namespace Tiefsee {
         ScaleUp = 0x100
     }
 
+    /// <summary>
+    /// 取得任何檔案在Windows檔案總管的圖示 
+    /// </summary>
     internal static class WindowsThumbnailProvider {
         private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
