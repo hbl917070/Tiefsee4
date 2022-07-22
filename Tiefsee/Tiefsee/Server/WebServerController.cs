@@ -131,11 +131,6 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
 
-            /*var json = new { 
-                code:1,
-                data:[]
-            };*/
-
             //如果檔案不存在就返回404錯誤
             if (File.Exists(path) == false) {
                 d.context.Response.StatusCode = 404;
@@ -287,7 +282,8 @@ namespace Tiefsee {
                 } catch (Exception e) {
                     Console.WriteLine("解析圖片失敗-------------");
                     Console.WriteLine($"type:{type}  path:{path}");
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.ToString());
+                    //imgInfo.msg = e.ToString();
                 }
 
                 if (imgInfo.width != 0) {
@@ -497,8 +493,8 @@ namespace Tiefsee {
             if (is304 == false) {
 
                 try {
-                    System.Drawing.Bitmap icon = QuickLook.WindowsThumbnailProvider.GetThumbnail(
-                        path, size, size, QuickLook.ThumbnailOptions.ScaleUp
+                    System.Drawing.Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
+                        path, size, size, ThumbnailOptions.ScaleUp
                     );
 
                     using (System.IO.Stream input = new MemoryStream()) {

@@ -116,7 +116,8 @@ class Setting {
             tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { goTop() });
             tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { goTop() });
             //tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { goTop() });
+            //tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { goTop() });
+            tabs.add(document.getElementById("tabsBtn-quickLook"), document.getElementById("tabsPage-quickLook"), () => { goTop() });
             tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { goTop() });
             tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { goTop() });
             tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { goTop() });
@@ -718,7 +719,7 @@ class Setting {
             });
         })
 
-        //進階設定 Port 
+        // 啟動模式 、 Port
         addLoadEvent(() => {
 
             var txt_startPort = document.querySelector("#text-startPort") as HTMLInputElement;
@@ -750,6 +751,61 @@ class Setting {
             });
         })
 
+        //開機後自動啟動
+        addLoadEvent(async () => {
+            var switch_autoStart = document.querySelector("#switch-autoStart") as HTMLInputElement;
+
+            let startupPath = await WV_Path.GetFolderPathStartup();
+            let linkPath = Lib.Combine([startupPath, "Tiefsee.lnk"]);
+            let isAutoStart = await WV_File.Exists(linkPath);
+            switch_autoStart.checked = isAutoStart;
+
+
+            async function newLnk() {
+                let exePath = await WV_Window.GetAppPath();
+                WV_System.NewLnk(exePath, linkPath, "none");
+            }
+
+            async function removeLnk() {
+                WV_File.Delete(linkPath);
+            }
+
+            switch_autoStart.addEventListener("change", () => {
+                let val = switch_autoStart.checked;
+                if (val) {
+                    newLnk();
+                } else {
+                    removeLnk();
+                }
+            });
+
+            // 開啟Windows的「啟動資料夾
+            var btn_openStartup = document.querySelector("#btn-openStartup") as HTMLElement;
+            btn_openStartup.addEventListener("click", async () => {
+                WV_RunApp.OpenUrl(startupPath);
+            });
+        })
+
+        //快速預覽
+        addLoadEvent(() => {
+            var switch_keyboardSpaceRun = document.querySelector("#switch-keyboardSpaceRun") as HTMLInputElement;
+            var switch_mouseMiddleRun = document.querySelector("#switch-mouseMiddleRun") as HTMLInputElement;
+
+            switch_keyboardSpaceRun.checked = config.settings.quickLook.keyboardSpaceRun;
+            switch_mouseMiddleRun.checked = config.settings.quickLook.mouseMiddleRun;
+
+            switch_keyboardSpaceRun.addEventListener("change", () => {
+                let val = switch_keyboardSpaceRun.checked;
+                config.settings.quickLook.keyboardSpaceRun = val;
+                saveSetting();
+            });
+
+            switch_mouseMiddleRun.addEventListener("change", () => {
+                let val = switch_mouseMiddleRun.checked;
+                config.settings.quickLook.mouseMiddleRun = val;
+                saveSetting();
+            });
+        })
 
         /** 
          * dom 交換順序

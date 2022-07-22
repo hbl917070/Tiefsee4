@@ -56,7 +56,7 @@ namespace Tiefsee {
         /// </summary>
         /// <returns></returns>
         public string GetAppInfo() {
-            return WebWindow.GetAppInfo(M.args);
+            return WebWindow.GetAppInfo(M.args, 0);
         }
 
 
@@ -329,6 +329,12 @@ namespace Tiefsee {
             M.CloseWindow();
         }
 
+        /// <summary>
+        /// 隱藏視窗
+        /// </summary>
+        public void Hide() {
+            M.HideWindow();
+        }
 
         /// <summary>
         /// 視窗固定在最上層

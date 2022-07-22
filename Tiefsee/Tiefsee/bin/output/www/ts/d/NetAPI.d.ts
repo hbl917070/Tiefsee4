@@ -78,7 +78,7 @@ interface WV_Window {
     /** 設定縮放倍率，預設 1.0 */
     SetZoomFactor(d: number): void;
 
-    /** 取得碩放倍率 */
+    /** 取得縮放倍率，預設 1.0 */
     GetZoomFactor(): number;
 
     /** 設定視窗最小size */
@@ -104,6 +104,9 @@ interface WV_Window {
 
     /**關閉視窗 */
     Close(): void;
+
+    /** 隱藏視窗 */
+    Hide(): void;
 
     /** 設定視窗的 icon */
     SetIcon(psth: string);
@@ -290,6 +293,9 @@ interface FileInfo2 {
 
 interface WV_Path {
 
+    /** 取得 windows啟動資料夾 的路徑 */
+    GetFolderPathStartup(): string;
+
     /** 變更路徑字串的副檔名 */
     ChangeExtension(path: string);
 
@@ -338,6 +344,22 @@ interface WV_Path {
 
 interface WV_System {
 
+    /** 取得當前按著個按鈕 */
+    GetDownKey(): string;
+
+    /**
+     * 產生捷徑
+     * @param exePath exe路徑
+     * @param lnkPath 要儲存的ink路徑
+     * @param args 啟動參數
+     */
+    NewLnk(exePath: string, lnkPath: string, args: string): void;
+
+    /**
+     * 取得某一個點所在的螢幕資訊
+     * @returns WorkingArea X, Y, Width, Height
+     */
+    GetScreenFromPoint(x: number, y: number): number[4];
 
     /**
      * 刪除圖片暫存
@@ -455,7 +477,7 @@ interface AppInfo {
     /** 命令列參數 */
     args: string[];
 
-    /** 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體 */
+    /** 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐 */
     startType: number;
 
     /** 程式開始的port */
@@ -478,6 +500,16 @@ interface AppInfo {
 
     /** setting.js 的文字 */
     settingTxt: string;
+
+    /** 是否為快速預覽的視窗。 0=不是快速預覽 1=長按空白鍵 2=長按滑鼠中鍵 */
+    quickLookRunType: bool;
+
+    /** 判斷哪些擴充有啟用 */
+    plugin: {
+        NConvert: bool,
+        QuickLook: bool,
+    }
+
 }
 
 //declare let cef_window: cef_window;

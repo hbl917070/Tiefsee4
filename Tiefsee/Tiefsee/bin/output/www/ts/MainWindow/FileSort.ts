@@ -163,8 +163,6 @@ class FileSort {
         //儲存排序
         json[dirPath] = _sortType;
         window.localStorage.setItem("sortFile", JSON.stringify(json));
-
-        console.log(`設定：${dirPath}  + ${_sortType}`)
     }
 
 

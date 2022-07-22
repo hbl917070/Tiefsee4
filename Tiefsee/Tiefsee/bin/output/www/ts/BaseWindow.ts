@@ -347,7 +347,7 @@ class TouchDrop {
             async function touchstart(e: TouchEvent) {
                 //e.preventDefault();
                 //e.stopPropagation();
-                console.log("start " + e.changedTouches.length)
+
                 if (baseWindow.windowState !== "Normal") { return; }//不是視窗化的話
                 if (e.changedTouches.length !== 1) {//觸控點不是一個的話
                     end();
@@ -369,7 +369,6 @@ class TouchDrop {
             }
 
             async function touchmove(e: TouchEvent) {
-                console.log("move " + e.changedTouches.length)
                 if (temp_start !== true) { return; }
                 if (e.changedTouches.length !== 1) { //觸控點不是一個的話
                     end();

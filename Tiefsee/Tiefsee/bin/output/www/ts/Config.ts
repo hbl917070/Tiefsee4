@@ -179,6 +179,15 @@ class Config {
                 "Map",//Google Map
             ]
         },
+
+        /** 快速預覽 */
+        quickLook: {
+            /** 長按空白鍵觸發觸發 */
+            keyboardSpaceRun: true,
+            /** 長按滑鼠中鍵觸發 */
+            mouseMiddleRun: true,
+
+        },
     }
 
 
@@ -298,6 +307,7 @@ class Config {
                 { ext: "log", type: "log" },
                 { ext: "json", type: "json" },
                 { ext: "sql", type: "sql" },
+                { ext: "url", type: "url" },
             ]
         }
 

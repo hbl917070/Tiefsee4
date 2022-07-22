@@ -15,46 +15,17 @@ using System.Windows.Forms;
 namespace Tiefsee {
 
 
-    public class WV2 : WebView2 {
-
-        public bool allowFocus = false;
-
-        // 讓視窗看不到
-        /*protected override CreateParams CreateParams {
-            get {
-                var style = base.CreateParams;
-                //style.ClassStyle |= 200; // NoCloseBtn
-                //style.ExStyle |= 0x8; // TopMost
-                //style.ExStyle |= 0x80000; // Layered
-                //style.ExStyle |= 0x02000000;
-                //style.ExStyle |= 0x8000000; // NoActive
-                style.ExStyle |= 0x00200000;
-                return style;
-            }
-        }*/
-
-        /*protected override void OnGotFocus(EventArgs e) {
-            if (allowFocus) {
-                base.OnGotFocus(e);
-            }
-        }
-
-        public void RunFocus() {
-            OnGotFocus(new EventArgs());
-        }*/
-
-    }
 
 
-    //[ClassInterface(ClassInterfaceType.AutoDual)]
+
     [ComVisible(true)]
     public class WebWindow : FormNone {
 
         //public WebView2 wv2;
-        public WV2 wv2;
+        public WebView2 wv2;
         public WebWindow parentWindow;//父親視窗
         public string[] args;//命令列參數 
-        private static WebWindow tempWindow;//用於快速啟動的暫存視窗
+        public static WebWindow tempWindow;//用於快速啟動的暫存視窗
         private bool isShow = false;//是否已經顯式過視窗(用於單一啟動
         public bool isDelayInit = false;//是否延遲初始化(暫存視窗必須設定成true
 
@@ -92,7 +63,7 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                    ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                    SendOnCreate(ww, _args);
                 };
 
                 return ww;
@@ -107,7 +78,7 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                    ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                    SendOnCreate(ww, _args);
                 };
                 return ww;
             }
@@ -124,20 +95,21 @@ namespace Tiefsee {
                     tempWindow.args = _args;
                     tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
                     tempWindow.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                        tempWindow.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                        SendOnCreate(tempWindow, _args);
                     };
 
                     //如果是 單一執行+快速啟動，則在視窗關閉的時候建立下一個視窗
                     if (Program.startType == 5) {
                         tempWindow.FormClosing += (sender2, e2) => {
                             //新建window，用於下次顯示
-                            DelayRun(10, () => {
+                            /*DelayRun(10, () => {
                                 tempWindow = new WebWindow();
                                 tempWindow.isDelayInit = true;
                                 tempWindow.Init();
                                 tempWindow.args = new string[0] { };
                                 tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
-                            });
+                            });*/
+                            NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
                         };
                     }
 
@@ -146,7 +118,7 @@ namespace Tiefsee {
                     //呼叫先前已經建立的window來執行onCreate
                     tempWindow.parentWindow = _parentWindow;
                     tempWindow.args = _args;
-                    tempWindow.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                    SendOnCreate(tempWindow, _args);
                 }
 
                 return tempWindow;
@@ -155,7 +127,6 @@ namespace Tiefsee {
 
             //第一次開啟
             if (tempWindow == null) {
-
                 var ww = new WebWindow();
                 ww.isDelayInit = false;
                 ww.Init();
@@ -163,15 +134,13 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                    ww.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                    SendOnCreate(ww, _args);
                 };
-
-                //新建window，用於下次顯示
-                NewTempWindow(GetHtmlFilePath("MainWindow.html"));
+            
+                NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
                 Console.WriteLine("第一次開啟:---" + _url);
                 return ww;
             }
-
 
             var temp2 = tempWindow;
             tempWindow = null;
@@ -179,14 +148,11 @@ namespace Tiefsee {
             temp2.parentWindow = _parentWindow;
             temp2.args = _args;
             temp2.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
-                temp2.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
+                SendOnCreate(temp2, _args);
             };
-            if (temp2.wv2.CoreWebView2 != null) {//頁面已經載入完成的話，必須再次注入語法
-                temp2.RunJs($"baseWindow.onCreate({GetAppInfo(_args)});");
-            }
-
-            //新建window，用於下次顯示
-            NewTempWindow(GetHtmlFilePath("MainWindow.html"));
+            SendOnCreate(temp2, _args);
+                  
+            NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
 
             return temp2;//回傳剛剛新建的window
         }
@@ -205,17 +171,19 @@ namespace Tiefsee {
                 temp3.Init();
                 temp3.args = new string[0] { };
                 temp3.wv2.Source = new Uri(url);
+                //如果視窗載入完成時，tempWindow已經被暫用，則釋放這個window
                 void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
-                    //DelayRun(30, () => {
-                    if (tempWindow == null) {
-                        tempWindow = temp3;
-                    } else {
-                        DelayRun(5000, () => {
-                            Console.WriteLine("釋放");
-                            temp3.Close();
-                        });
-                    }
-                    //});
+                    DelayRun(100, () => {
+                        if (tempWindow == null) {
+                            tempWindow = temp3;
+                        } else {
+                            DelayRun(5000, () => {
+                                Console.WriteLine("釋放");
+                                QuickRun.WindowCreate();//避免釋放後，window數量對不起來
+                                temp3.Close();
+                            });
+                        }
+                    });
                     temp3.wv2.NavigationCompleted -= Wv2_NavigationCompleted;
                 }
                 temp3.wv2.NavigationCompleted += Wv2_NavigationCompleted;//網頁載入完成時
@@ -233,6 +201,54 @@ namespace Tiefsee {
         }
 
 
+        public static void SendOnCreate(WebWindow w, string[] args, int quickLookRunType = 0) {
+            w.RunJs($"baseWindow.onCreate({GetAppInfo(args, quickLookRunType)});");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns> json </returns>
+        public static string GetAppInfo(string[] args, int quickLookRunType) {
+
+            AppInfo appInfo = new AppInfo();
+            appInfo.args = args;
+            appInfo.startType = Program.startType;
+            appInfo.startPort = Program.startPort;
+            appInfo.serverCache = Program.serverCache;
+            appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
+            appInfo.appDataPath = Program.appDataPath;
+            appInfo.mainPort = Program.webServer.port;
+            appInfo.settingPath = Path.Combine(Program.appDataPath, "setting.json");
+            appInfo.quickLookRunType = quickLookRunType;
+
+            if (File.Exists(appInfo.settingPath)) {
+                using (StreamReader sr = new StreamReader(appInfo.settingPath, Encoding.UTF8)) {
+                    appInfo.settingTxt = sr.ReadToEnd();
+                }
+            } else {
+                appInfo.settingTxt = "";
+            }
+
+            String json = JsonConvert.SerializeObject(appInfo);
+            return json;
+        }
+
+        public class AppInfo {
+            public string[] args;//命令列參數
+            public int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
+            public int startPort;//程式開始的port
+            public int serverCache;//伺服器對靜態資源使用快取 0=不使用 1=使用 
+            public string appDirPath;// 程式所在的資料夾
+            public string appDataPath;// 程式的暫存資料夾
+            public int mainPort;//目前使用的port
+            public string settingPath;// setting.js 的路徑
+            public string settingTxt;// setting.js 的文字
+            public int quickLookRunType;//是否為快速預覽的視窗。 0=不是快速預覽 1=長按空白鍵 2=長按滑鼠中鍵
+            public DataPlugin plugin = new DataPlugin();//哪些擴充是有啟用的
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -241,7 +257,7 @@ namespace Tiefsee {
 
             //this.SetSize(400, 300);
             this.Opacity = 0;
-            wv2 = new WV2();
+            wv2 = new WebView2();
 
             this.Controls.Add(wv2);
 
@@ -307,7 +323,6 @@ namespace Tiefsee {
             wv2.CoreWebView2.AddHostObjectToScript("WV_Image", WV_Image);
             wv2.CoreWebView2.AddHostObjectToScript("WV_T", new WV_T());
 
-
             // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
             //開啟時視窗時
@@ -349,48 +364,11 @@ namespace Tiefsee {
             //this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };
             //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
 
+            this.FormClosed += (sender, e) => {
+                QuickRun.WindowFreed();
+            };
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static string GetAppInfo(string[] args) {
-
-            AppInfo appInfo = new AppInfo();
-            appInfo.args = args;
-            appInfo.startType = Program.startType;
-            appInfo.startPort = Program.startPort;
-            appInfo.serverCache = Program.serverCache;
-            appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
-            appInfo.appDataPath = Program.appDataPath;
-            appInfo.mainPort = Program.webServer.port;
-            appInfo.settingPath = Path.Combine(Program.appDataPath, "setting.json");
-
-            if (File.Exists(appInfo.settingPath)) {
-                using (StreamReader sr = new StreamReader(appInfo.settingPath, Encoding.UTF8)) {
-                    appInfo.settingTxt = sr.ReadToEnd();
-                }
-            } else {
-                appInfo.settingTxt = "";
-            }
-
-            String json = JsonConvert.SerializeObject(appInfo);
-            return json;
-        }
-        public class AppInfo {
-            public string[] args;//命令列參數
-            public int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
-            public int startPort;//程式開始的port
-            public int serverCache;//伺服器對靜態資源使用快取 0=不使用 1=使用 
-            public string appDirPath;// 程式所在的資料夾
-            public string appDataPath;// 程式的暫存資料夾
-            public int mainPort;//目前使用的port
-            public string settingPath;// setting.js 的路徑
-            public string settingTxt;// setting.js 的文字
-        }
 
 
 
@@ -411,9 +389,6 @@ namespace Tiefsee {
             isShow = true;
 
             QuickRun.WindowCreate();
-            this.FormClosed += (sender, e) => {
-                QuickRun.WindowFreed();
-            };
 
             if (parentWindow != null) {
                 ShowWindow(this.Handle, SW_SHOWDEFAULT);//視窗狀態
@@ -465,9 +440,6 @@ namespace Tiefsee {
             isShow = true;
 
             QuickRun.WindowCreate();
-            this.FormClosed += (sender, e) => {
-                QuickRun.WindowFreed();
-            };
 
             this.SetPosition(x, y);
             this.SetSize(width, height);
@@ -516,9 +488,6 @@ namespace Tiefsee {
             isShow = true;
 
             QuickRun.WindowCreate();
-            this.FormClosed += (sender, e) => {
-                QuickRun.WindowFreed();
-            };
 
             ShowWindow(this.Handle, SW_SHOWDEFAULT);//視窗狀態
             SetPositionInit();
@@ -540,9 +509,23 @@ namespace Tiefsee {
         /// 關閉視窗
         /// </summary>
         public void CloseWindow() {
+
             DelayRun(1, () => {
+                if (tempWindow == this) { tempWindow = null; }
                 Close();
             });
+        }
+
+
+        /// <summary>
+        /// 隱藏視窗
+        /// </summary>
+        public void HideWindow() {
+            if (isShow) {
+                QuickRun.WindowFreed();
+                isShow = false;
+                this.Hide();
+            }
         }
 
 
@@ -551,8 +534,11 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="js"></param>
         public void RunJs(String js) {
-            if (wv2.CoreWebView2 != null)
+            if (wv2 != null && wv2.CoreWebView2 != null) {
                 wv2.CoreWebView2.ExecuteScriptAsync(js);
+            } else {
+                Console.WriteLine("js執行失敗，webview2 尚未初始化。" + js);
+            }
         }
 
 
@@ -579,8 +565,6 @@ namespace Tiefsee {
 
             //this.TopMost = true;
             //this.TopMost = false;
-
-            this.wv2.allowFocus = true;
 
             GlobalActivate(this.Handle);
             this.Activate();

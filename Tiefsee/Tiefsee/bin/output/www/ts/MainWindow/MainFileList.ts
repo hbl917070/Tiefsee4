@@ -60,7 +60,6 @@ class MainFileList {
         })
         //拖曳 結束
         dragbar.setEventEnd((val: number) => {
-            console.log(val)
             if (val < 10) {//小於10的話，關閉檔案預覽列表
                 setEnabled(false);
             }

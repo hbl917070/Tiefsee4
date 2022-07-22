@@ -335,8 +335,6 @@ class Tieefseeview {
             //避免在捲動軸上面也觸發
             if (e.target !== dom_dpizoom) { return; }
 
-            //console.log(e.deltaX, e.deltaY)
-
             $(dom_con).stop(true, false);
 
             let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;//捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
@@ -499,7 +497,7 @@ class Tieefseeview {
 
         //拖曳 結束
         hammerPan.on("panend", async (ev) => {
-            //console.log(ev)
+
             //避免在捲動軸上面也觸發
             //if (ev.target !== dom_tiefseeview) { return; }
 
@@ -801,7 +799,6 @@ class Tieefseeview {
             let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
             context.clearRect(0, 0, dom_bigimg_canvas.width, dom_bigimg_canvas.height);
 
-
             dom_img.src = _url;
             return true;
         }
@@ -976,7 +973,7 @@ class Tieefseeview {
             await new Promise((resolve, reject) => {
                 if (can === null) { return null; }
 
-             
+
                 let outputType = "image/png";
                 if (dataType === "video") {
                     outputType = "image/jpeg";
@@ -986,7 +983,7 @@ class Tieefseeview {
                 }
                 if (type === "jpg" || type === "jpeg") {
                     outputType = "image/jpeg";
- 
+
                     //背景色改成白色
                     let cc = document.createElement("canvas");
                     cc.width = can.width;
@@ -1665,7 +1662,7 @@ class Tieefseeview {
 
             let bigimgTemp = getBigimgTemp();//判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return }
-            //console.log(temp_bigimgscale);
+
             let can = bigimgTemp.img;
             if (can == null) { return }
             let temp_can_width = can.width;

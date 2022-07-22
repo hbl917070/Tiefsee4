@@ -20,6 +20,12 @@ namespace Tiefsee {
             this.M = m;
         }
 
+        /// <summary>
+        /// 取得 windows啟動資料夾 的路徑
+        /// </summary>
+        public string GetFolderPathStartup() {
+            return Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        }
 
         /// <summary>
         /// 變更路徑字串的副檔名

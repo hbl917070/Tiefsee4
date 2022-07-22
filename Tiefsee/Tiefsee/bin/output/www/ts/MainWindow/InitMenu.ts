@@ -72,10 +72,15 @@ class InitMenu {
 
         //-----------------
 
+        let isInit = false;
+
         /**
          * 初始化 menu-開啟檔案
          */
         async function initOpen() {
+
+            if (isInit) { return; }//避免重複執行
+            isInit = true;
 
             //載入檔案
             var dom_OpenFile = document.getElementById("menuitem-openFile");
@@ -194,7 +199,6 @@ class InitMenu {
                         }
                     }
                 }
-                //console.log(arExe)
 
                 for (let i = 0; i < arExe.length; i++) {
 

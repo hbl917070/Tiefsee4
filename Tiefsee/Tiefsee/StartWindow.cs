@@ -7,12 +7,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace Tiefsee {
     public class StartWindow : Form {
 
         /// <summary> 改成true後，定時執行GC </summary>
         public static bool runGC = false;
+
+        
+        /// <summary> 擴充 </summary>
+        public static Plugin plugin;
 
 
         public StartWindow() {
@@ -21,6 +26,12 @@ namespace Tiefsee {
 
             LockPort();//寫入檔案，表示此port已經被佔用
             CheckWebView2();//檢查是否有webview2執行環境
+
+          
+            plugin = new Plugin();
+
+
+            //--------------
 
             this.Opacity = 0;
             this.ShowInTaskbar = false;
@@ -49,6 +60,64 @@ namespace Tiefsee {
 
                     runGC = false;
                     Console.WriteLine("=============== GC == " + result2);
+                }
+            };
+            tim.Start();
+
+            InitQuickLook();//快速預覽
+        }
+
+
+        /// <summary>
+        /// 快速預覽
+        /// </summary>
+        private void InitQuickLook() {
+            if (Program.startType == 1) {
+                return;
+            }
+
+            bool isDown = false;
+
+            var tim = new System.Windows.Forms.Timer();
+            tim.Interval = 50;
+            tim.Tick += (sender2, e2) => {
+                //Console.WriteLine("#### "  + QuickRun.runNumber);
+                bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
+                bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+                int quickLookRunType = 0;
+                if (isKeyboardSpace) { quickLookRunType = 1; }
+                if (isMouseMiddle) { quickLookRunType = 2; }
+
+                if (isMouseMiddle || isKeyboardSpace) {
+
+                    if (isDown) { return; }
+                    isDown = true;
+
+                    String selectedItem = PluginQuickLook.GetCurrentSelection();//取得檔案總管目前選取的檔案
+                    if (selectedItem == "") { return; }
+
+                    if (Program.startType == 2 || Program.startType == 3) {
+                        if (WebWindow.tempWindow == null) { return; }
+                        WebWindow.SendOnCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
+
+                    } else if (Program.startType == 4 || Program.startType == 5) {//單一執行個體，用原來的視窗開啟
+                        WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
+
+                    }
+
+                } else {//放開空白鍵
+
+                    if (isDown) {
+
+                        if (WebWindow.tempWindow != null) {
+                            WebWindow.tempWindow.RunJs($@"
+                                if (window.mainWindow !== undefined)
+                                    if (window.mainWindow.quickLookUp !== undefined)
+                                        mainWindow.quickLookUp();
+                            ");
+                        }
+                    }
+                    isDown = false;
                 }
             };
             tim.Start();
@@ -94,6 +163,8 @@ namespace Tiefsee {
 
             cm.MenuItems.Add("Quit Tiefsee", new EventHandler((sender2, e2) => {
                 nIcon.Visible = false;
+
+                //QuickRun.runNumber = 0;//不論存在幾個視窗都直接關閉
                 QuickRun.WindowFreed();
             }));
 

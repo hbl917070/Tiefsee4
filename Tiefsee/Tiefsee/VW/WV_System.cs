@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace Tiefsee {
 
@@ -23,6 +25,58 @@ namespace Tiefsee {
             this.M = m;
         }
 
+        public string GetDownKey() {
+            bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
+            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+
+            var obj = new {
+                isKeyboardSpace = isKeyboardSpace,
+                isMouseMiddle = isMouseMiddle
+            };
+
+            string json = JsonConvert.SerializeObject(obj);
+            return json;
+        }
+
+        /// <summary>
+        /// 產生捷徑
+        /// </summary>
+        /// <param name="exePath">exe路徑</param>
+        /// <param name="lnkPath">要儲存的ink路徑</param>
+        /// <param name="args">啟動參數</param>
+        public void NewLnk(string exePath, string lnkPath, string args) {
+
+            if (File.Exists(exePath) == false) { return; }
+
+            //產生捷徑
+            using (ShellLink slLinkObject = new ShellLink()) {
+                slLinkObject.WorkPath = Directory.GetParent(exePath).ToString();//工作資料夾
+                slLinkObject.IconLocation = exePath + ",0";   //圖示檔案。 0圖示檔的 Index
+                slLinkObject.ExecuteFile = exePath;
+                slLinkObject.ExecuteArguments = args;
+                slLinkObject.Save(lnkPath);
+
+                slLinkObject.Dispose();
+            }
+        }
+
+
+        /// <summary>
+        /// 取得某一個點所在的螢幕資訊
+        /// </summary>
+        /// <returns> WorkingArea X, Y, Width, Height </returns>
+        public int[] GetScreenFromPoint(int x, int y) {
+
+            var screen = System.Windows.Forms.Screen.FromPoint(new Point(x, y));
+
+            int[] mouse = new int[4];
+            mouse[0] = screen.WorkingArea.X;
+            mouse[1] = screen.WorkingArea.Y;
+            mouse[2] = screen.WorkingArea.Width;
+            mouse[3] = screen.WorkingArea.Height;
+
+            return mouse;
+        }
 
         /// <summary>
         /// 刪除圖片暫存
@@ -78,7 +132,7 @@ namespace Tiefsee {
         /// <param name="key"> 例如 A = ctrl+A </param>
         public void SendKeys_CtrlAnd(string key) {
             try {
- 
+
                 key = key.ToUpper();
 
                 var k = Keys.A;

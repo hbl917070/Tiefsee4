@@ -38,7 +38,6 @@ class ImgSearch {
                         return;
                     }
                     let imgSearchUrl = url.replace("{url}", imgUrl);
-                    console.log(imgUrl)
                     WV_RunApp.OpenUrl(imgSearchUrl)
                 };
                 dom_menuImgSearch?.append(dom);

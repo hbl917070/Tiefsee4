@@ -366,7 +366,8 @@ namespace Tiefsee {
         /// <returns></returns>
         private static string RunNconvert(string arg, int timeout) {
 
-            string NconvertExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin\\NConvert\\nconvert.exe");
+            //string NconvertExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin\\NConvert\\nconvert.exe");
+            string NconvertExe = Plugin.pathNConvert;
 
             using (var p = new Process()) {
                 p.StartInfo.UseShellExecute = false;
@@ -388,6 +389,7 @@ namespace Tiefsee {
 
         #region vips
 
+        private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
 
         /// <summary>
         /// 使用wpf來取得圖片size
@@ -427,11 +429,13 @@ namespace Tiefsee {
             });
 
             int[] ret = new int[] { w, h };
-            temp_GetImgSize.Add(hash, ret);//存入暫存
+            lock (temp_GetImgSize) {
+                temp_GetImgSize.Add(hash, ret);//存入暫存
+            }
+            
             return ret;
         }
-        private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
-
+        
 
         /// <summary>
         /// 取得圖片的size，並且把檔案處理成vips可以載入個格式，寫入到再存資料夾
@@ -679,6 +683,7 @@ namespace Tiefsee {
         public string path = "";
         public int width = 0;
         public int height = 0;
+        //public string msg = "";
     }
 
 }

@@ -71,6 +71,7 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-quickLook" i18n=""> 快速預覽 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n=""> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n=""> 進階設定 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於 </div>
@@ -247,6 +248,23 @@
 
                     </div>
 
+                    <div class="box">
+                        <div class="box-title"> 開機後自動啟動 </div>
+
+                        <div class="text-title"> 電腦開機後，讓 Tiefsss 常駐在背景 (啟動模式必須是「常駐背景」才會生效</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-autoStart">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <!-- <div class="text-title"> 相關路徑 </div> -->
+                        <div style="height:10px"></div>
+                        <div class="text-content">
+                            <div class="link" id="btn-openStartup">Windows的「啟動資料夾」</div>
+                        </div>
+                    </div>
 
 
                 </div>
@@ -457,12 +475,12 @@
                                     <span>不顯示</span>
                                 </label>
                                 <label class="radioList-item">
-                                    <input type="radio" name="largeBtn"  value="bottom">
+                                    <input type="radio" name="largeBtn" value="bottom">
                                     <img src="./img/default/largeBtn-bottom.svg">
                                     <span>下面</span>
                                 </label>
                                 <label class="radioList-item">
-                                    <input type="radio" name="largeBtn"  value="leftRight">
+                                    <input type="radio" name="largeBtn" value="leftRight">
                                     <img src="./img/default/largeBtn-leftRight.svg">
                                     <span>左右兩側</span>
                                 </label>
@@ -501,7 +519,6 @@
                     <div class="page-title" i18b=""> 影像處理 </div>
 
 
-
                 </div>
 
                 <!-- 快速鍵 -->
@@ -513,6 +530,39 @@
                             還在做
                         </div>
                     </div>
+
+                </div>
+
+
+                <!-- 快速預覽 -->
+                <div class="page-tabsPage" id="tabsPage-quickLook">
+                    <div class="page-title" i18b=""> 快速預覽 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 快速預覽桌面或資料夾的檔案 </div>
+
+                        <div class="text-title">「啟動模式」如果為「直接啟動」則無法使用快速預覽 </div>
+
+                        <div style="height:20px"></div>
+
+                        <div class="text-title"> 長按「空白鍵」觸發 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-keyboardSpaceRun">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title"> 長按「滑鼠滾輪」觸發 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mouseMiddleRun">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+
 
                 </div>
 
@@ -603,7 +653,7 @@
                         </div>
 
                         <div class="text-title">
-                            當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
+                            當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-tiefseeviewBigimgscaleRatio">
@@ -637,7 +687,7 @@
 
                     <div class="box">
                         <div class="box-title"> 相關路徑 </div>
-                        <div class="text-box">
+                        <div class="">
                             <div class="text-title"> </div>
                             <div class="link" id="btn-openAppData">AppData(使用者資料)</div>
                             <div class="link" id="btn-openWww">www(原始碼)</div>
@@ -655,7 +705,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span>版本:</span>
-                            <span> Tiefsee 4.0.0-beta.19</span>
+                            <span> Tiefsee 4.0.0-beta.20</span>
                         </div>
                         <div class="box-title">
                             <span>作者:</span>

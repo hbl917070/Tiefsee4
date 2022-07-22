@@ -382,11 +382,6 @@ class FileLoad {
                 arFile = await M.fileSort.sort(arFile, M.fileSort.sortType);
             }
 
-            /*var time = new Date();
-            var int_毫秒 = (new Date()).getTime() - time.getTime();
-            var s_輸出時間差 = (int_毫秒) + "ms";
-            console.log(s_輸出時間差)*/
-
             //目前檔案位置
             flagFile = 0;
             for (let i = 0; i < arFile.length; i++) {
