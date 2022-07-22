@@ -290,7 +290,6 @@ class FileShow {
                 let u = APIURL + `/api/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}`
 
                 let imgInitInfo = await fetchGet_json(u);
-                //console.log(imgInitInfo);
 
                 if (imgInitInfo.code == 1) {
 
@@ -301,7 +300,7 @@ class FileShow {
 
                     //設定縮放的比例
                     let arUrl: { scale: number, url: string }[] = [];
-                    arUrl.push({ scale: 1, url: imgInitInfo.path + `?${fileTime}` });
+                    arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
 
                     for (let i = 1; i <= 30; i++) {
                         let scale = Number(Math.pow(ratio, i).toFixed(3));
