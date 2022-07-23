@@ -176,7 +176,7 @@ namespace Tiefsee {
         /// <returns></returns>
         public static Stream Dcraw_PathToStream(string path, bool thumbnail = true, int minSize = 800) {
 
-            string dcRawExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin", "dcraw.exe");
+            string dcRawExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "data", "dcraw.exe");
             string argThumbnail = "";
             if (thumbnail) { argThumbnail = "-e "; }
             var startInfo = new ProcessStartInfo(dcRawExe) {
