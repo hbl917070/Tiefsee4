@@ -1,7 +1,11 @@
 
 class Config {
 
-    constructor() { }
+    private baseWindow: BaseWindow;
+
+    constructor(_baseWindow: BaseWindow) {
+        this.baseWindow = _baseWindow;
+    }
 
 
     public otherAppOpenList = {
@@ -198,8 +202,10 @@ class Config {
      */
     public allowFileType(type: string) {
 
+        let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
+
         if (type === GroupType.img) {
-            return [
+            let d = [
                 { ext: "jpg", type: "vips", vipsType: "jpg" },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
@@ -257,15 +263,20 @@ class Config {
                 { ext: "sr2", type: "vips", vipsType: "dcraw" },
                 { ext: "srw", type: "vips", vipsType: "dcraw" },
                 { ext: "dng", type: "vips", vipsType: "dcraw" },
-
-                { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
-                { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
-                { ext: "dcm", type: "vips", vipsType: "magick,nconvertJpg" },
-                //{ ext: "iff",    type:"vips", vipsType: "nconvertJpg" }, //必須使用 heif.zip 裡面的dll
-                { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
-
-
             ]
+            
+            //有安裝NConvert才使用
+            if (plugin !== undefined && plugin.NConvert === true) {
+                d.push(
+                    { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
+                    { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
+                    { ext: "dcm", type: "vips", vipsType: "magick,nconvertJpg" },
+                    //{ ext: "iff",    type:"vips", vipsType: "nconvertJpg" }, //必須使用 heif.zip 裡面的dll
+                    { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
+                );
+            }
+
+            return d;
         }
 
         if (type === GroupType.video) {

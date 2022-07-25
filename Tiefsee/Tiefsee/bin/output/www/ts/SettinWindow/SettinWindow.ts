@@ -15,7 +15,7 @@ class Setting {
         var appInfo: AppInfo;
 
         var i18n = new I18n();
-        var config = new Config();
+        var config = new Config(baseWindow);
         var mainTools = new MainTools(null);//取得工具列
 
         var loadEvent: (() => void)[] = [];
@@ -34,6 +34,8 @@ class Setting {
           * @param json 
           */
         baseWindow.onCreate = async (json: AppInfo) => {
+
+            baseWindow.appInfo = json;
 
             await WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
             WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio);//設定視窗最小size
@@ -110,19 +112,25 @@ class Setting {
                 document.getElementById("window-body")?.scrollTo(0, 0)
             }
 
-            var tabs = new Tabs();
-            tabs.add(document.getElementById("tabsBtn-common"), document.getElementById("tabsPage-common"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-theme"), document.getElementById("tabsPage-theme"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-layout"), document.getElementById("tabsPage-layout"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-tools"), document.getElementById("tabsPage-tools"), () => { goTop() });
-            //tabs.add(document.getElementById("tabsBtn-image"), document.getElementById("tabsPage-image"), () => { goTop() });
-            //tabs.add(document.getElementById("tabsBtn-shortcutKeys"), document.getElementById("tabsPage-shortcutKeys"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-quickLook"), document.getElementById("tabsPage-quickLook"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-extension"), document.getElementById("tabsPage-extension"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-advanced"), document.getElementById("tabsPage-advanced"), () => { goTop() });
-            tabs.add(document.getElementById("tabsBtn-about"), document.getElementById("tabsPage-about"), () => { goTop() });
+            function getDom(id: string) {
+                return document.getElementById(id);
+            }
 
-            tabs.set(document.getElementById("tabsBtn-common"));//預設選擇的頁面
+            var tabs = new Tabs();
+            tabs.add(getDom("tabsBtn-common"), getDom("tabsPage-common"), () => { goTop() });//一般
+            tabs.add(getDom("tabsBtn-theme"), getDom("tabsPage-theme"), () => { goTop() });//外觀
+            tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() });//版面
+            tabs.add(getDom("tabsBtn-tools"), getDom("tabsPage-tools"), () => { goTop() });//工具列
+            //tabs.add(getDom("tabsBtn-image"), getDom("tabsPage-image"), () => { goTop() });
+            //tabs.add(getDom("tabsBtn-shortcutKeys"),getDom("tabsPage-hotkey"), () => { goTop() });/快速鍵
+            tabs.add(getDom("tabsBtn-extension"), getDom("tabsPage-extension"), () => { goTop() });//設為預設程式
+            tabs.add(getDom("tabsBtn-advanced"), getDom("tabsPage-advanced"), () => { goTop() });//進階設定
+            tabs.add(getDom("tabsBtn-about"), getDom("tabsPage-about"), () => { goTop() });//關於
+
+            tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() });//擴充套件
+            tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() });//快速預覽
+
+            tabs.set(getDom("tabsBtn-common"));//預設選擇的頁面
         })
 
         //自訂工具列
@@ -786,6 +794,39 @@ class Setting {
             });
         })
 
+        addLoadEvent(() => {
+
+            var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
+            var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
+
+            function getHtml(val: boolean) {
+                if (val) {
+                    return `<div class="pluginLiet-status pluginLiet-status__ok">Installed</div>`;
+                } else {
+                    return `<div class="pluginLiet-status pluginLiet-status__no">Not Installed</div>`;
+                }
+            }
+            if (baseWindow.appInfo !== undefined) {
+                dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
+                dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
+            }
+
+            //開啟「Tiefsee Plugin」頁面
+            document.querySelector("#btn-openPluginDownload")?.addEventListener("click", () => {
+                WV_RunApp.OpenUrl("https://hbl917070.github.io/aeropic/plugin/index.html");
+            });
+
+            //開啟「Plugin」資料夾
+            document.querySelector("#btn-openPluginDir")?.addEventListener("click", async () => {
+                let path = await WV_Window.GetAppDataPath();
+                path = Lib.Combine([path, "Plugin"]);
+                if (await WV_Directory.Exists(path) === false) {//如果不存在就新建
+                    await WV_Directory.CreateDirectory(path);
+                }
+                WV_RunApp.OpenUrl(path);
+            });
+        })
+
         //快速預覽
         addLoadEvent(() => {
             var switch_keyboardSpaceRun = document.querySelector("#switch-keyboardSpaceRun") as HTMLInputElement;
@@ -842,7 +883,7 @@ class Setting {
             //儲存 setting.json
             let s = JSON.stringify(config.settings, null, '\t');
             var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
-            path = Lib.Combine([path, "setting.json"]);
+            path = Lib.Combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
         }
 

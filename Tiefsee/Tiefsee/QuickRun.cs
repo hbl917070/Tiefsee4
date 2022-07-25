@@ -38,7 +38,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="post"></param>
         public static void PortFreed() {
-            string portDir = Path.Combine(Program.appDataPath, "port");
+            string portDir = Path.Combine(Program.appDataPath, "Port");
             string portFile = Path.Combine(portDir, Program.webServer.port.ToString());
             if (File.Exists(portFile) == true) {
                 File.Delete(portFile);
@@ -59,7 +59,7 @@ namespace Tiefsee {
                 return false;
             }
 
-            String portDir = Path.Combine(Program.appDataPath, "port");
+            String portDir = Path.Combine(Program.appDataPath, "Port");
 
             if (Directory.Exists(portDir) == false) {
                 return false;

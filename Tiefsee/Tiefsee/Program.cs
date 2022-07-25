@@ -35,7 +35,7 @@ namespace Tiefsee {
             if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(appDataPath);
             }
-            startIniPath = Path.Combine(appDataPath, "start.ini");
+            startIniPath = Path.Combine(appDataPath, "Start.ini");
             IniManager iniManager = new IniManager(startIniPath);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));

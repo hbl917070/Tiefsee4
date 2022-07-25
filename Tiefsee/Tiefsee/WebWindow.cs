@@ -15,9 +15,6 @@ using System.Windows.Forms;
 namespace Tiefsee {
 
 
-
-
-
     [ComVisible(true)]
     public class WebWindow : FormNone {
 
@@ -220,7 +217,7 @@ namespace Tiefsee {
             appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
             appInfo.appDataPath = Program.appDataPath;
             appInfo.mainPort = Program.webServer.port;
-            appInfo.settingPath = Path.Combine(Program.appDataPath, "setting.json");
+            appInfo.settingPath = Path.Combine(Program.appDataPath, "Setting.json");
             appInfo.quickLookRunType = quickLookRunType;
 
             if (File.Exists(appInfo.settingPath)) {
@@ -246,7 +243,7 @@ namespace Tiefsee {
             public string settingPath;// setting.js 的路徑
             public string settingTxt;// setting.js 的文字
             public int quickLookRunType;//是否為快速預覽的視窗。 0=不是快速預覽 1=長按空白鍵 2=長按滑鼠中鍵
-            public DataPlugin plugin = new DataPlugin();//哪些擴充是有啟用的
+            public DataPlugin plugin = Plugin.dataPlugin;//哪些擴充是有啟用的
         }
 
         /// <summary>

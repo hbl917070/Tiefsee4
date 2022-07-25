@@ -505,11 +505,14 @@ interface AppInfo {
     quickLookRunType: bool;
 
     /** 判斷哪些擴充有啟用 */
-    plugin: {
-        NConvert: bool,
-        QuickLook: bool,
-    }
+    plugin: AppInfoPlugin;
 
 }
+/** 判斷哪些擴充有啟用 */
+interface AppInfoPlugin {
+    NConvert: bool,
+    QuickLook: bool,
+}
+
 
 //declare let cef_window: cef_window;

@@ -368,7 +368,7 @@ namespace Tiefsee {
 
             //string NconvertExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin\\NConvert\\nconvert.exe");
             string NconvertExe = Plugin.pathNConvert;
-
+           
             using (var p = new Process()) {
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;

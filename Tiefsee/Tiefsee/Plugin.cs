@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 
 namespace Tiefsee {
 
-    public class Plugin {
+    public static class Plugin {
         public static string dirPlugin;
         public static string pathNConvert;
         public static string pathQuickLook;
         public static DataPlugin dataPlugin = new DataPlugin();
 
-        public Plugin() {
+        /*public static Plugin() {
             Init();
-        }
+        }*/
 
         /// <summary>
         /// 初始化
         /// </summary>
-        public void Init() {
+        public static void Init() {
             dirPlugin = Path.Combine(Program.appDataPath, "Plugin");
 
             if (Directory.Exists(dirPlugin) == false) {
@@ -41,7 +41,7 @@ namespace Tiefsee {
     /// <summary>
     /// 快速預覽檔案
     /// </summary>
-    public class PluginQuickLook {
+    public static class PluginQuickLook {
 
         private static MethodInfo meth = null;
         private static Object obj = null;

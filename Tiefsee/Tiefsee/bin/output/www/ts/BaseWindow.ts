@@ -20,6 +20,8 @@ class BaseWindow {
     public btn_maximized: HTMLDivElement;
     public btn_close: HTMLDivElement;
     public dom_titlebarTxt: HTMLDivElement;
+    
+    public appInfo: AppInfo | undefined;
 
     public topMost: boolean = false;
     public left: number = 0;
@@ -211,7 +213,7 @@ class BaseWindow {
     /**
      * 設定縮放倍率，預設 1.0
      */
-    public SetZoomFactor(d: number) {
+    public setZoomFactor(d: number) {
         this.zoomFactor = d;
         WV_Window.SetZoomFactor(d);
     }

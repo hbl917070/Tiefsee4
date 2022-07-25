@@ -54,7 +54,7 @@ class MainWindow {
         this.dom_mainL = dom_mainL;
         this.dom_mainR = dom_mainR;
 
-        var config = this.config = new Config();
+        var config = this.config = new Config(baseWindow);
         var fileLoad = this.fileLoad = new FileLoad(this);
         var fileShow = this.fileShow = new FileShow(this);
         var fileSort = this.fileSort = new FileSort(this);
@@ -100,7 +100,8 @@ class MainWindow {
          * @param json 
          */
         baseWindow.onCreate = async (json: AppInfo) => {
-console.log(json)
+
+            baseWindow.appInfo = json;
             startType = json.startType;
 
             if (json.quickLookRunType === 0) {//一般啟動
@@ -500,7 +501,7 @@ console.log(json)
             let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);//圖片縮放模式
             fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
 
-            baseWindow.SetZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
+            baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
             document.body.style.fontWeight = config.settings["theme"]["fontWeight"];//文字粗細
             cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);//圖示粗細
 
@@ -606,7 +607,7 @@ console.log(json)
             //儲存 setting.json
             let s = JSON.stringify(config.settings, null, "\t");
             var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
-            path = Lib.Combine([path, "setting.json"]);
+            path = Lib.Combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
         }
 

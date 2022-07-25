@@ -44,44 +44,53 @@ select {
   padding: 10px 0px;
   /* background-color: var(--color-white10);  */
   border-radius: 10px;
-}
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
 
-.page-tabsBtn {
-  min-width: 150px;
-  max-width: 250px;
-  padding: 0px 12px;
-  height: 35px;
-  line-height: 35px;
-  /* border-radius: 5px; */
-  color: var(--color-white);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  user-select: none;
-  position: relative;
-  /* font-weight: 900; */
-  /* font-size: 20px; */
-}
-.page-tabsBtn:hover {
-  background-color: var(--color-white10);
-  cursor: pointer;
-}
-.page-tabsBtn[active="true"] {
-  background-color: var(--color-white20);
-  /* color:var(--color-blue); */
-}
-.page-tabsBtn[active="true"]::after {
-  width: 0px;
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  background-color: var(--color-blue);
-  color: var(--color-blue);
+  .page-tabsBtn {
+    min-width: 150px;
+    max-width: 250px;
+    padding: 0px 12px;
+    height: 35px;
+    line-height: 35px;
+    /* border-radius: 5px; */
+    color: var(--color-white);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+    /* font-weight: 900; */
+    /* font-size: 20px; */
+  }
+  .page-tabsBtn:hover {
+    background-color: var(--color-white10);
+    cursor: pointer;
+  }
+  .page-tabsBtn[active="true"] {
+    background-color: var(--color-white20);
+    /* color:var(--color-blue); */
+  }
+  .page-tabsBtn[active="true"]::after {
+    width: 0px;
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--color-blue);
+    color: var(--color-blue);
+  }
+  .page-tabsHr {
+    background-color: var(--color-white40);
+    height: 1px;
+    margin: 10px 0;
+  }
 }
 
 /**************/
+
 .window-body {
   flex: 1;
   overflow: auto;
@@ -108,26 +117,29 @@ select {
 .page-tabsPage[active="true"] {
   display: block !important;
 }
+
 /**************/
 
 .box {
   margin-bottom: 40px;
-}
-.box-title {
-  color: var(--color-white);
-  font-size: 20px;
-  margin-bottom: 0px;
+
+  .box-title {
+    color: var(--color-white);
+    font-size: 20px;
+    margin-bottom: 0px;
+  }
+
+  .text-title {
+    color: var(--color-white);
+    margin-bottom: 3px;
+    margin-top: 10px;
+  }
+  .text-content {
+    max-width: 250px;
+    display: flex;
+  }
 }
 
-.text-title {
-  color: var(--color-white);
-  margin-bottom: 3px;
-  margin-top: 10px;
-}
-.text-content {
-  max-width: 250px;
-  display: flex;
-}
 .text-input {
   background-color: rgba(0, 0, 0, 0);
   color: var(--color-white);
@@ -138,6 +150,58 @@ select {
   width: 100%;
   display: block;
   flex: 1;
+}
+/******************/
+
+.pluginLiet {
+  margin-top: 5px;
+  max-width: 800px;
+  // background-color: var(--color-white10);
+  // box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--color-white40);
+
+  .pluginLiet-item {
+    color: var(--color-white);
+    display: flex;
+    border-bottom: 1px solid var(--color-white40);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .pluginLiet-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+  }
+
+  .pluginLiet-L {
+    flex: 1;
+  }
+  .pluginLiet-R {
+    margin-left: 10px;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--color-white40);
+    max-width: 60px;
+  }
+  .pluginLiet-title {
+    font-size: 18px;
+  }
+  .pluginLiet-text {
+    color: var(--color-white60);
+  }
+  .pluginLiet-status {
+ 
+  }
+  .pluginLiet-status__ok {
+    color: rgb(85, 255, 75);
+  }
+  .pluginLiet-status__no {
+    color: rgb(255, 221, 0);
+  }
 }
 
 /******************/

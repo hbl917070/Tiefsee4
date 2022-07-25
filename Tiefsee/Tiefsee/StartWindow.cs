@@ -14,22 +14,18 @@ namespace Tiefsee {
 
         /// <summary> 改成true後，定時執行GC </summary>
         public static bool runGC = false;
-
-        
+  
         /// <summary> 擴充 </summary>
-        public static Plugin plugin;
+        //public static Plugin plugin = new Plugin();
 
 
         public StartWindow() {
 
             Adapter.Initialize();
+            Plugin.Init();
 
             LockPort();//寫入檔案，表示此port已經被佔用
             CheckWebView2();//檢查是否有webview2執行環境
-
-          
-            plugin = new Plugin();
-
 
             //--------------
 
@@ -130,7 +126,7 @@ namespace Tiefsee {
         /// <param name="post"></param>
         public void LockPort() {
             int port = Program.webServer.port;
-            string portDir = Path.Combine(Program.appDataPath, "port");
+            string portDir = Path.Combine(Program.appDataPath, "Port");
             if (Directory.Exists(portDir) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(portDir);
             }

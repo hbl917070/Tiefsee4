@@ -64,17 +64,23 @@
 
             <!-- <img src="/img/logo.svg" style="width:35px;display:block;margin:10px;margin-top:10px"> -->
 
-            <div class="pagetab">
+            <div class="pagetab base-scrollbar">
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-common" i18n="" active="true"> 一般 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-theme" i18n=""> 外觀 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n=""> 版面 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n=""> 工具列</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
-                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-shortcutKeys" i18n=""> 快速鍵</div> -->
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-quickLook" i18n=""> 快速預覽 </div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵</div> -->
+
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n=""> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n=""> 進階設定 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n=""> 關於 </div>
+
+                <div class="page-tabsHr"> </div>
+
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-plugin" i18n=""> 擴充套件 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-quickLook" i18n=""> 快速預覽 </div>
+
             </div>
 
         </div>
@@ -522,7 +528,7 @@
                 </div>
 
                 <!-- 快速鍵 -->
-                <div class="page-tabsPage" id="tabsPage-shortcutKeys">
+                <div class="page-tabsPage" id="tabsPage-hotkey">
                     <div class="page-title" i18b=""> 快速鍵 </div>
 
                     <div class="box">
@@ -530,39 +536,6 @@
                             還在做
                         </div>
                     </div>
-
-                </div>
-
-
-                <!-- 快速預覽 -->
-                <div class="page-tabsPage" id="tabsPage-quickLook">
-                    <div class="page-title" i18b=""> 快速預覽 </div>
-
-                    <div class="box">
-                        <div class="box-title"> 快速預覽桌面或資料夾的檔案 </div>
-
-                        <div class="text-title">「啟動模式」如果為「直接啟動」則無法使用快速預覽 </div>
-
-                        <div style="height:20px"></div>
-
-                        <div class="text-title"> 長按「空白鍵」觸發 </div>
-                        <div class="text-content">
-                            <label class="switch">
-                                <input type="checkbox" id="switch-keyboardSpaceRun">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-
-                        <div class="text-title"> 長按「滑鼠滾輪」觸發 </div>
-                        <div class="text-content">
-                            <label class="switch">
-                                <input type="checkbox" id="switch-mouseMiddleRun">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-
-
 
                 </div>
 
@@ -718,6 +691,96 @@
                                 onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
                         </div>
                     </div>
+                </div>
+
+
+                <!-- 擴充套件 -->
+                <div class="page-tabsPage" id="tabsPage-plugin">
+                    <div class="page-title" i18b=""> 擴充套件 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 擴充套件清單 </div>
+
+                        <div class="pluginLiet">
+                            <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">QuickLook</div>
+                                    <div class="pluginLiet-text">長按空白鍵時，快速預覽桌面或資料夾的檔案</div>
+                                </div>
+                                <div class="pluginLiet-R" id="pluginLiet-QuickLook">
+                                    <div class="pluginLiet-status pluginLiet-status__no">Not Installed</div>
+                                </div>
+                            </div>
+                            <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">NConvert</div>
+                                    <div class="pluginLiet-text">讓Tiefsee支援「Clip Studio Paint」產生的clip檔案</div>
+                                </div>
+                                <div class="pluginLiet-R"  id="pluginLiet-NConvert">
+                                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> 安裝步驟 </div>
+
+                        <div class="text-title">
+                            1、在「Tiefsee Plugin」的網頁將擴充套件的ZIP下載下來
+                        </div>
+                        <div class="btn" id="btn-openPluginDownload">開啟「Tiefsee Plugin」頁面</div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title">
+                            2、把ZIP解壓縮，然後放到「Plugin」資料夾內
+                        </div>
+                        <div class="btn" id="btn-openPluginDir">開啟「Plugin」資料夾</div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title">
+                            3、重新啟動Tiefsee
+                        </div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title">
+                            (示意圖)
+                        </div>
+                        <img src="./img/SettingWindow/plugin-1.jpg" style="max-width:100%;">
+
+                    </div>
+
+                </div>
+
+                <!-- 快速預覽 -->
+                <div class="page-tabsPage" id="tabsPage-quickLook">
+                    <div class="page-title" i18b=""> 快速預覽 </div>
+
+                    <div class="box">
+                        <div class="box-title"> 快速預覽桌面或資料夾的檔案 </div>
+
+                        <div class="text-title">「啟動模式」如果為「直接啟動」則無法使用快速預覽 </div>
+
+                        <div style="height:20px"></div>
+
+                        <div class="text-title"> 長按「空白鍵」觸發 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-keyboardSpaceRun">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title"> 長按「滑鼠滾輪」觸發 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mouseMiddleRun">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
