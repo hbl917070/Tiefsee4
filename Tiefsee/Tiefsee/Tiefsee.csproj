@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapter.cs" />
+    <Compile Include="Lib\Exif.cs" />
     <Compile Include="Lib\FileSort.cs" />
     <Compile Include="Lib\ImgLib.cs" />
     <Compile Include="Lib\ShellLink.cs" />

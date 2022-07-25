@@ -1,7 +1,4 @@
-﻿using ImageMagick;
-using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,83 +46,11 @@ namespace Tiefsee {
         }
 
 
-
         #region web API
 
-        class ImgExif {
-            public string code = "0";
-            public List<ImgExifItem> data = new List<ImgExifItem>();
-        }
-        class ImgExifItem {
-            public string group = "";
-            public string name = "";
-            public string value = "";
-        }
-
-        private string OrientationToString(int orientation) {
-            if (orientation == 1) { return "0°"; }
-            if (orientation == 2) { return "0°, mirrored"; }
-            if (orientation == 3) { return "180°"; }
-            if (orientation == 4) { return "180°, mirrored"; }
-            if (orientation == 5) { return "90, mirrored°"; }
-            if (orientation == 6) { return "270°"; }
-            if (orientation == 7) { return "270°, mirrored"; }
-            if (orientation == 8) { return "90°"; }
-            return "undefined";
-        }
-
-
         /// <summary>
-        /// 曝光時間
+        /// 取得檔案的Exif資訊
         /// </summary>
-        private string ExposureTimeToString(string val) {
-
-            //if (val == "0") { return val; }
-            string[] ar = val.Split('/');
-            if (ar.Length == 1) {
-                return val + " sec";
-            }
-
-            try {
-                double n1 = Double.Parse(ar[0].Trim());
-                double n2 = Double.Parse(ar[1].Trim());
-                double n3 = 1 / (n1 / n2);
-                float n4 = (float)decimal.Round((decimal)n3, 1);//小數兩位
-                return "1/" + n4 + " sec";
-            } catch (Exception) {
-            }
-            return "0";
-        }
-
-        /// <summary>
-        /// 曝光補償
-        /// </summary>
-        private string ExposureBiasToString(string val) {
-
-            //if (val == "0") { return val; }
-            string[] ar = val.Split('/');
-            if (ar.Length == 1) {
-                return val;
-            }
-
-            try {
-                double n1 = Double.Parse(ar[0].Trim());
-                double n2 = Double.Parse(ar[1].Trim());
-                double n3 = n1 / n2;
-                float n4 = (float)decimal.Round((decimal)n3, 2);//小數兩位
-                if (n4 > 0) {
-                    return "+" + n4 + " EV";
-                } else {
-                    return "" + n4 + " EV";
-                }
-            } catch (Exception) {
-            }
-            return "0";
-        }
-
-
-
-
         void getImgExif(RequestData d) {
 
             string path = d.args["path"];
@@ -141,119 +66,15 @@ namespace Tiefsee {
             //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             //if (is304) { return; }
 
-            ImgExif exif = new ImgExif();
-
-            exif.data.Add(new ImgExifItem {//檔案建立時間
-                group = "base",
-                name = "Crea tionTime",
-                value = File.GetCreationTime(path).ToString("yyyy/MM/dd HH:mm:ss")
-            });
-            exif.data.Add(new ImgExifItem {//檔案最後修改時間
-                group = "base",
-                name = "Last WriteTime",
-                value = File.GetLastWriteTime(path).ToString("yyyy/MM/dd HH:mm:ss")
-            });
-            exif.data.Add(new ImgExifItem {//檔案size
-                group = "base",
-                name = "Length",
-                value = new FileInfo(path).Length.ToString()
-            });
-            string w = "";
-            string h = "";
-
-            try {
-                IEnumerable<MetadataExtractor.Directory> directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
-                foreach (var directory in directories) {
-                    foreach (var tag in directory.Tags) {
-
-                        string group = directory.Name;
-                        string name = tag.Name;
-                        string value = tag.Description;
-                        int tagType = tag.Type;
-
-                        if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
-                            continue;
-                        }
-                        //sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
-                        if (tagType == ExifDirectoryBase.TagOrientation) {//旋轉方向
-                            int orientation = directory.TryGetInt32(tag.Type, out int v) ? v : -1;
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = OrientationToString(orientation)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagDateTimeOriginal) {//拍攝時間
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy/MM/dd HH:mm:ss")
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagExposureBias) {//曝光補償
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = ExposureBiasToString(val)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagExposureTime) {//曝光時間
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = ExposureTimeToString(val)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagFlash) {//閃光燈模式
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = "Flash(key)",
-                                value = (val)
-                            });
-                        } else if (name == "Image Width") {
-                            w = directory.GetString(tag.Type);
-                        } else if (name == "Image Height") {
-                            h = directory.GetString(tag.Type);
-                        } else {
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = value
-                            });
-                        }
-
-                    }
-                }
-                if (w != "" && h != "") {
-                    exif.data.Add(new ImgExifItem {
-                        group = "Image",
-                        name = "Image Width/Height",
-                        value = $"{w} x {h}"
-                    });
-                }
-            } catch (Exception) {
-
-            }
-
-            exif.code = "1";
-            string json = JsonConvert.SerializeObject(exif);
+            string json = Exif.GetImgExif(path);
 
             WriteString(d, json);
         }
 
-
-        void vipsResize(RequestData d) {
-            string path = d.args["path"];
-            double scale = Double.Parse(d.args["scale"]);
-
-            path = Uri.UnescapeDataString(path);
-
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
-            if (is304) { return; }
-
-            string imgPath = ImgLib.VipsResize(path, scale);
-            WriteFile(d, imgPath);//回傳檔案
-        }
-
+ 
+        /// <summary>
+        /// 產生圖片暫存並且返回圖片的長寬
+        /// </summary>
         void vipsInit(RequestData d) {
 
             string json = "";
@@ -297,9 +118,25 @@ namespace Tiefsee {
 
 
         /// <summary>
+        /// 縮放圖片，並且存入暫存資料夾(必須於vipsInit之後使用)
+        /// </summary>
+        void vipsResize(RequestData d) {
+            string path = d.args["path"];
+            double scale = Double.Parse(d.args["scale"]);
+
+            path = Uri.UnescapeDataString(path);
+
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304) { return; }
+
+            string imgPath = ImgLib.VipsResize(path, scale);
+            WriteFile(d, imgPath);//回傳檔案
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
-        /// <param name="d"></param>
         void nconvert(RequestData d) {
 
             string type = d.args["type"];
@@ -320,11 +157,9 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="d"></param>
         void magick(RequestData d) {
 
             string type = d.args["type"];
@@ -345,7 +180,6 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="d"></param>
         void wpf(RequestData d) {
 
             string path = d.args["path"];
@@ -365,7 +199,6 @@ namespace Tiefsee {
         /// <summary>
         /// 如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
         /// </summary>
-        /// <param name="d"></param>
         void webIcc(RequestData d) {
 
             string path = d.args["path"];
@@ -389,7 +222,6 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="d"></param>
         void dcraw(RequestData d) {
 
             string path = d.args["path"];
@@ -408,9 +240,6 @@ namespace Tiefsee {
         /// <summary>
         /// 檢查這個port是否為tiefsee所使用，用於快速啟動
         /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private void ckeck(RequestData d) {
             WriteString(d, "tiefsee");
         }
@@ -419,9 +248,6 @@ namespace Tiefsee {
         /// <summary>
         /// 新開一個視窗，用於快速啟動
         /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private void newWindow(RequestData d) {
 
             //string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
@@ -439,9 +265,6 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private void getImg(RequestData d) {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
@@ -456,9 +279,6 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private void getPdf(RequestData d) {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
@@ -474,7 +294,6 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="d"></param>
         private void getFileIcon(RequestData d) {
             Dictionary<string, string> args = d.args;
 
@@ -524,13 +343,9 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 取得 www 目錄裡面的檔案
         /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private void getWww(RequestData d) {
 
             String exeDir = System.AppDomain.CurrentDomain.BaseDirectory;//程式的目錄
