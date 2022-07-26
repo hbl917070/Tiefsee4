@@ -18,7 +18,7 @@ namespace Tiefsee {
 
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
-      
+
         /// <summary> webview2的啟動參數 </summary>
         public static string webvviewArguments;
 
@@ -31,7 +31,16 @@ namespace Tiefsee {
             //修改 工作目錄 為程式資料夾 (如果有傳入args的話，工作目錄會被修改，所以需要改回來
             Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
+            appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
+
+            //把Tiefsee4資料夾轉移成Tiefsee
+            string appDataPath_old = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
+            if (Directory.Exists(appDataPath) == false && Directory.Exists(appDataPath_old) == true) {
+                try {
+                    Directory.Move(appDataPath_old, appDataPath);
+                } catch (Exception) { }
+            }
+
             if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(appDataPath);
             }

@@ -90,7 +90,7 @@ interface WV_Window {
     /** 設定視窗坐標 */
     SetPosition(left: number, top: number): void;
 
-    /** 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee4 */
+    /** 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee */
     GetAppDataPath(): string;
 
     /** 取得執行檔目錄 */
