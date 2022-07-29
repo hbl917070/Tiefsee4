@@ -106,7 +106,7 @@ namespace Tiefsee {
                                 tempWindow.args = new string[0] { };
                                 tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
                             });*/
-                            NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
+                            NewTempWindow(_url);//新建window，用於下次顯示
                         };
                     }
 
@@ -134,7 +134,7 @@ namespace Tiefsee {
                     SendOnCreate(ww, _args);
                 };
             
-                NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
+                NewTempWindow(_url);//新建window，用於下次顯示
                 Console.WriteLine("第一次開啟:---" + _url);
                 return ww;
             }
@@ -149,7 +149,7 @@ namespace Tiefsee {
             };
             SendOnCreate(temp2, _args);
                   
-            NewTempWindow(GetHtmlFilePath(_url));//新建window，用於下次顯示
+            NewTempWindow(_url);//新建window，用於下次顯示
 
             return temp2;//回傳剛剛新建的window
         }
@@ -158,8 +158,10 @@ namespace Tiefsee {
         /// 新建window，用於下次顯示
         /// </summary>
         /// <param name="url"></param>
-        private static void NewTempWindow(string url) {
+        public static void NewTempWindow(string url) {
             if (tempWindow != null) { return; }
+
+            url = GetHtmlFilePath(url);
 
             DelayRun(10, () => {
                 if (tempWindow != null) { return; }

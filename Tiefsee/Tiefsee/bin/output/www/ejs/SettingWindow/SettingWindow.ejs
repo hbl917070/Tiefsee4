@@ -716,7 +716,7 @@
                                     <div class="pluginLiet-title">NConvert</div>
                                     <div class="pluginLiet-text">讓Tiefsee支援「Clip Studio Paint」產生的clip檔案</div>
                                 </div>
-                                <div class="pluginLiet-R"  id="pluginLiet-NConvert">
+                                <div class="pluginLiet-R" id="pluginLiet-NConvert">
                                     <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
                                 </div>
                             </div>
@@ -764,21 +764,31 @@
 
                         <div style="height:20px"></div>
 
-                        <div class="text-title"> 長按「空白鍵」觸發 </div>
-                        <div class="text-content">
-                            <label class="switch">
-                                <input type="checkbox" id="switch-keyboardSpaceRun">
-                                <span class="slider round"></span>
-                            </label>
+                        <!-- 未安裝QuickLook才會顯示此訊息 -->
+                        <div id="quickLook-noInstalled" style="display:none">
+                            <div class="text-title" class="color-warning">
+                                必須安裝擴充套件「QuickLook」才能使用此功能
+                            </div>
+                            <div style="height:20px"></div>
                         </div>
 
-                        <div class="text-title"> 長按「滑鼠滾輪」觸發 </div>
-                        <div class="text-content">
-                            <label class="switch">
-                                <input type="checkbox" id="switch-mouseMiddleRun">
-                                <span class="slider round"></span>
-                            </label>
+                        <div id="quickLook-box">
+                            <div class="text-title"> 長按「空白鍵」觸發 </div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-keyboardSpaceRun">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="text-title"> 長按「滑鼠滾輪」觸發 </div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-mouseMiddleRun">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                         </div>
+
                     </div>
 
                 </div>

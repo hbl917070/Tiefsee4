@@ -76,8 +76,10 @@ namespace Tiefsee {
             //--user-agent  覆寫userAgent
             webvviewArguments = $@"--disable-web-security --disable-features=""msWebOOUI,msPdfOOUI"" --disable-backing-store-limit --user-agent=""{Program.webvviewUserAgent}""";
 
-            if (argsIsNone == false) {//顯示初始視窗，如果args是none，則不顯示視窗
-                WebWindow.Create("MainWindow.html", args, null);
+            if (argsIsNone == false) {
+                WebWindow.Create("MainWindow.html", args, null);//顯示初始視窗
+            } else { //如果args是none
+                WebWindow.NewTempWindow("MainWindow.html");//新增一個看不見的視窗，用於下次顯示
             }
 
             startWindow = new StartWindow();

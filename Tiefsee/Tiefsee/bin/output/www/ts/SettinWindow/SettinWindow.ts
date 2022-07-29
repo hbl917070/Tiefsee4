@@ -794,6 +794,7 @@ class Setting {
             });
         })
 
+        //擴充套件 
         addLoadEvent(() => {
 
             var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
@@ -801,19 +802,34 @@ class Setting {
 
             function getHtml(val: boolean) {
                 if (val) {
-                    return `<div class="pluginLiet-status pluginLiet-status__ok">Installed</div>`;
+                    return `<div class="pluginLiet-status color-success">Installed</div>`;
                 } else {
-                    return `<div class="pluginLiet-status pluginLiet-status__no">Not Installed</div>`;
+                    return `<div class="pluginLiet-status color-warning">Not Installed</div>`;
                 }
             }
             if (baseWindow.appInfo !== undefined) {
+                
+                //初始化 擴充套件清單
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
                 dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
+
+                //如果未安裝QuickLook擴充套件，就顯示提示文字，並且禁止編輯
+                let dom_noInstalled = document.querySelector("#quickLook-noInstalled") as HTMLInputElement;
+                let dom_box = document.querySelector("#quickLook-box") as HTMLInputElement;
+                if (baseWindow.appInfo.plugin.QuickLook) {
+                    dom_noInstalled.style.display = "none";
+                    dom_box.style.opacity = "1";
+                    dom_box.style.pointerEvents = "";
+                } else {
+                    dom_noInstalled.style.display = "block";
+                    dom_box.style.opacity = "0.5";
+                    dom_box.style.pointerEvents = "none";
+                }
             }
 
             //開啟「Tiefsee Plugin」頁面
             document.querySelector("#btn-openPluginDownload")?.addEventListener("click", () => {
-                WV_RunApp.OpenUrl("https://hbl917070.github.io/aeropic/plugin/index.html");
+                WV_RunApp.OpenUrl("https://hbl917070.github.io/aeropic/plugin.html");
             });
 
             //開啟「Plugin」資料夾

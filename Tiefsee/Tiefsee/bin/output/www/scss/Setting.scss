@@ -1,6 +1,26 @@
-.link {
-  color: var(--color-blue);
+:root {
+  --color-primary: rgb(10, 178, 255);
+  --color-success: rgb(85, 255, 75);
+  --color-warning: rgb(255, 221, 0);
+  --color-danger: rgb(255, 75, 75);
+  --color-link: rgb(0, 200, 255);
 }
+.color-primary {
+  color: var(--color-primary);
+}
+.color-success {
+  color: var(--color-success);
+}
+.color-warning {
+  color: var(--color-warning);
+}
+.color-danger {
+  color: var(--color-danger);
+}
+.link {
+  color: var(--color-link);
+}
+
 .link:hover {
   cursor: pointer;
   text-decoration: underline;
@@ -152,7 +172,7 @@ select {
   flex: 1;
 }
 /******************/
-
+//擴充套件清單
 .pluginLiet {
   margin-top: 5px;
   max-width: 800px;
@@ -194,13 +214,6 @@ select {
     color: var(--color-white60);
   }
   .pluginLiet-status {
- 
-  }
-  .pluginLiet-status__ok {
-    color: rgb(85, 255, 75);
-  }
-  .pluginLiet-status__no {
-    color: rgb(255, 221, 0);
   }
 }
 
@@ -269,10 +282,8 @@ select {
   }
 
   input:checked + .slider {
-    //background-color: var(--color-blue);
-    //border: 1px solid var(--color-blue);
-    background-color: rgb(31, 158, 255);
-    border: 1px solid rgb(31, 158, 255);
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
   }
   input:checked + .slider:before {
     background-color: var(--color-white);
@@ -319,7 +330,7 @@ select {
   pointer-events: none;
 }
 .img-help svg path {
-  fill: var(--color-blue);
+  fill: var(--color-primary);
 }
 
 /* #endregion */
