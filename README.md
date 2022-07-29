@@ -6,11 +6,11 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.19](https://github.com/hbl917070/tiefsee4/releases)
+[Tiefsee 4.0.0-beta.20](https://github.com/hbl917070/tiefsee4/releases)
 (注意：此為測試版，有某些功能是Tiefsee 3.0.2有但是測試版沒有的
 
     開發中功能：  
-    瀏覽多幀圖片、大量瀏覽模式、多國語言、自定快速鍵、空白鍵預覽檔案
+    瀏覽多幀圖片、大量瀏覽模式、多國語言、自定快速鍵
 
 <br>
 
@@ -51,24 +51,21 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 > webview2的透明背景不支援win7。
 
 ### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
-> 改用UWP專案或winUI 3專案或許可以解決此問題。
+> 改用UWP專案或winUI 3專案，或許可以解決此問題。
 
 ### 4、視窗使用毛玻璃效果後，可能導致Tiefsee的視窗在移動時嚴重延遲
-> 此BUG並非在所有電腦都會發生，Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。改用UWP專案或winUI 3專案或許可以解決此問題。
+> 此BUG並非在所有電腦都會發生，Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。改用UWP專案或winUI 3專案，或許可以解決此問題。
 
 <br>
 
 # Licenses
-Tiefsee4 source code is open source under the [MIT license](/LICENSE).  
-However, NConvert in the plugin directory is not part of the Tiefsee project.  
-NConvert is only available for free for private or educational use (including non-profit organizations).  
-If you need a license for NConvert, please go to  
-https://www.xnview.com/
+
+The Tiefsee4 project is open source under the [MIT license](/LICENSE).<br>
+However, the extensions that are installed separately are not part of the Tiefsee4 project.<br>
+They all have their own licenses!
 
 <br>
 
-Tiefsee4的原始碼以[MIT授權](/LICENSE)形式開源，  
-但plugin目錄裡面的NConvert並不屬於Tiefsee專案的一部分。  
-NConvert只免費提供給私人用途(非商業)或教育用途，  
-如果需要NConvert的授權，請至  
-https://www.xnview.com/
+Tiefsee4的原始碼以[MIT授權](/LICENSE)形式開源，<br>
+但另外安裝那些的擴充套件，並不屬於Tiefsee4專案的一部分，<br>
+他們都有各自的授權條款！
