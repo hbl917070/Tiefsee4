@@ -221,6 +221,19 @@ class ScriptMenu {
 
     /** 顯示右鍵選單 輸入框 */
     showRightMenuText() {
+        let domInput = document.activeElement;
+        if (domInput === null) { return false; }
+        let isReadonly = domInput.getAttribute("readonly") != null;
+        var dom_cut = document.getElementById("menuitem-text-cut") as HTMLElement;//剪下
+        var dom_paste = document.getElementById("menuitem-text-paste") as HTMLElement;//貼上
+        if (isReadonly) {
+            dom_cut.style.display = "none";
+            dom_paste.style.display = "none";
+        } else {
+            dom_cut.style.display = "flex";
+            dom_paste.style.display = "flex";
+        }
+
         var dom = document.getElementById("menu-text");
         this.M.menu.open_RightClick(dom, 0, 0);
     }
