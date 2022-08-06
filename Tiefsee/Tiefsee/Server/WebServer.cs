@@ -14,21 +14,42 @@ namespace Tiefsee {
         public int port;//當前掛載的port
         public string origin;
         public WebServerController controller;
-        private HttpListener _httpListener = new HttpListener();
+        private HttpListener _httpListener;
         private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>();//路由
 
-        public WebServer() {
+        public WebServer() { }
+
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <returns> 初始化成功或失敗 </returns>
+        public bool Init() {
 
             port = GetAllowPost();//取得能使用的port
-            origin = "http://127.0.0.1:" + port + "/";
 
-            _httpListener.IgnoreWriteExceptions = true;
-            //_httpListener.Prefixes.Add("http://localhost:" + port + "/");
-            _httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
-            _httpListener.Start();
-            _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
+            for (int i = 0; i < 100; i++) {
+                try {
+                    port += i;
+                    origin = "http://127.0.0.1:" + port + "/";
 
-            controller = new WebServerController(this);
+                    _httpListener = new HttpListener();
+                    _httpListener.IgnoreWriteExceptions = true;
+                    _httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+                    _httpListener.Start();
+                    _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
+                    controller = new WebServerController(this);
+                  
+                    break;
+
+                } catch (Exception) { }
+
+                if (i == 99) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
 

@@ -65,6 +65,11 @@ namespace Tiefsee {
 
             //在本地端建立server
             webServer = new WebServer();
+            bool webServerState = webServer.Init();
+            if (webServerState == false) {
+                System.Windows.Forms.MessageBox.Show("Tiefsee localhost server error");
+                return;
+            }
             webServer.controller.SetCacheTime(serverCache);
 
             //Application.EnableVisualStyles();
