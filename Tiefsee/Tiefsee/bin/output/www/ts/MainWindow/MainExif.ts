@@ -22,9 +22,6 @@ class MainExif {
 		var isEnabled = true;//啟用 檔案預覽列表
 
 
-
-
-
 		//拖曳改變size
 		var dragbar = new Dragbar();
 		dragbar.init("left", dom_mainExif, dom_dragbar_mainFileList, M.dom_mainR);
@@ -143,16 +140,24 @@ class MainExif {
 			//取得經緯度
 			let GPS_lat = getItem(json.data, "GPS Latitude");//緯度
 			let GPS_lng = getItem(json.data, "GPS Longitude");//經度
-			if (GPS_lat === `0° 0' 0"`) { GPS_lat = undefined }
-			if (GPS_lng === `0° 0' 0"`) { GPS_lng = undefined }
+			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) {//避免空白資料
+				GPS_lat = undefined;
+				GPS_lng = undefined;
+			}
 			let hasGPS = GPS_lat !== undefined && GPS_lng !== undefined;
 			if (hasGPS) {//如果經緯度不是空，就新增「Map」欄位
 				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
 			}
 
+			//更新舊資料，Flash(key) 改為 Flash
+			/*let flashIndex = M.config.exif.whitelist.indexOf("Flash(key)");
+			if (flashIndex !== -1) {
+				M.config.exif.whitelist[flashIndex] = "Flash";
+			}*/
+
 			let ar = json.data;
 			let html = "";
-			let whitelist = M.config.settings.exif.whitelist;
+			let whitelist = M.config.exif.whitelist;
 			for (let i = 0; i < whitelist.length; i++) {
 
 				let name = whitelist[i];
@@ -181,9 +186,7 @@ class MainExif {
 						<div class="mainExifName">${name}</div>
 						<div class="mainExifValue">${value}</div>
 					</div>`
-
 				}
-
 
 			}
 
@@ -204,18 +207,16 @@ class MainExif {
 		 * 處理value的值
 		 */
 		function valueToString(name: string, value: string) {
-
 			let lang = "zh";
 			if (name === "Metering Mode") {
 				return M.i18n.t(`exif.value.${name}.${value}`, lang);
 			}
-			if (name === "Flash(key)") {
+			if (name === "Flash") {
 				return M.i18n.t(`exif.value.${name}.${value}`, lang);
 			}
 			if (name === "Length") {
 				return Lib.getFileLength(Number(value));
 			}
-
 			return value;
 		}
 

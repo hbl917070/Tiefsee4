@@ -48,6 +48,38 @@ class Config {
     }
 
 
+    public exif = {
+        whitelist: [
+            "Date/Time Original",//拍攝日期
+            "Windows XP Keywords",//標籤
+            "Rating",//評等
+            "Image Width/Height",//圖片尺寸
+            "Length",//檔案大小
+            "Windows XP Title",//標題
+            "Artist",//作者
+            "Windows XP Comment",//註解
+            "Make",//相機型號
+            "Model",//相機製造商
+            "Windows XP Subject",//主旨
+            "F-Number",//光圈孔徑
+            "Exposure Time",//曝光時間
+            "ISO Speed Ratings",//ISO速度
+            "Exposure Bias Value",//曝光補償
+            "Focal Length",//焦距
+            "Max Aperture Value",//最大光圈
+            "Metering Mode",//測光模式
+            "Flash",//閃光燈模式
+            "Focal Length 35",//35mm焦距
+            "Orientation",//旋轉資訊
+            "Software",//軟體
+            //"Color Space",//色彩空間
+            "Creation Time",//建立日期
+            "Last Write Time",//修改日期
+            "Map",//Google Map
+        ]
+    }
+
+    
     public settings = {
         theme: {
             /** 是否啟用毛玻璃 */
@@ -153,36 +185,7 @@ class Config {
             //key: "00001bfd3de40a19b62672faeb3fa564",
         },
 
-        exif: {
-            whitelist: [
-                "Date/Time Original",
-                "Windows XP Keywords",
-                "Rating",
-                "Image Width/Height",
-                "Length",
-                "Windows XP Title",
-                "Artist",
-                "Windows XP Comment",
-                "Make",
-                "Model",
-                "Windows XP Subject",
-                "F-Number",
-                "Exposure Time",
-                "ISO Speed Ratings",
-                "Exposure Bias Value",
-                "Focal Length",
-                "Max Aperture Value",
-                "Metering Mode",
-                "Flash(key)",
-                "Focal Length 35",
-                "Orientation",//旋轉資訊
-                "Software",//軟體
-                //"Color Space",//色彩空間
-                "Crea tionTime",
-                "Last WriteTime",
-                "Map",//Google Map
-            ]
-        },
+
 
         /** 快速預覽 */
         quickLook: {
@@ -190,7 +193,6 @@ class Config {
             keyboardSpaceRun: true,
             /** 長按滑鼠中鍵觸發 */
             mouseMiddleRun: true,
-
         },
     }
 
@@ -264,7 +266,7 @@ class Config {
                 { ext: "srw", type: "vips", vipsType: "dcraw" },
                 { ext: "dng", type: "vips", vipsType: "dcraw" },
             ]
-            
+
             //有安裝NConvert才使用
             if (plugin !== undefined && plugin.NConvert === true) {
                 d.push(

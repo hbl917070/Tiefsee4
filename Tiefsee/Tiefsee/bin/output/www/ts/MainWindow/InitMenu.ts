@@ -456,12 +456,13 @@ class InitMenu {
             if (dom_copy !== null) {
                 dom_copy.onclick = async () => {
 
-                    await WV_System.SendKeys_CtrlAnd("c");
-                    M.menu.close();//關閉menu
+                    //await WV_System.SendKeys_CtrlAnd("c");
 
-                    /*let selection = document.getSelection();
+                    let selection = document.getSelection();
                     if (selection === null) { return; }
-                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿*/
+                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿
+
+                    M.menu.close();//關閉menu
                 }
             }
 
@@ -476,8 +477,13 @@ class InitMenu {
             var dom_selectAll = document.getElementById("menuitem-text-selectAll");//全選
             if (dom_selectAll !== null) {
                 dom_selectAll.onclick = async () => {
-                    await WV_System.SendKeys_CtrlAnd("a");
+
+                    //await WV_System.SendKeys_CtrlAnd("a");
                     M.menu.close();//關閉menu
+
+                    let dom_input = document.activeElement as HTMLInputElement;
+                    if (dom_input === null) { return; }
+                    dom_input.setSelectionRange(0, dom_input.value.length)
                 }
             }
         }

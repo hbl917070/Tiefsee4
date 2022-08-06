@@ -9,7 +9,7 @@ var langExif = {
             },
             "Windows XP Keywords": {
                 "zh": "標籤",
-                "en": "Windows XP Keywords",
+                "en": "XP Keywords",
             },
             "Rating": {
                 "zh": "評等",
@@ -27,7 +27,7 @@ var langExif = {
             },
             "Windows XP Title": {
                 "zh": "標題",
-                "en": "Windows XP Title",
+                "en": "XP Title",
             },
             "Artist": {
                 "zh": "作者",
@@ -35,7 +35,7 @@ var langExif = {
             },
             "Windows XP Comment": {
                 "zh": "註解",
-                "en": "Windows XP Comment",
+                "en": "XP Comment",
             },
             "Make": {
                 "zh": "相機型號",
@@ -47,43 +47,43 @@ var langExif = {
             },
             "Windows XP Subject": {
                 "zh": "主旨",
-                "en": "",
+                "en": "XP Subject",
             },
             "F-Number": {
                 "zh": "光圈孔徑",
-                "en": "",
+                "en": "F-Number",
             },
             "Exposure Time": {
                 "zh": "曝光時間",
-                "en": "",
+                "en": "Exposure Time",
             },
             "ISO Speed Ratings": {
                 "zh": "ISO速度",
-                "en": "",
+                "en": "ISO Speed Ratings",
             },
             "Exposure Bias Value": {
                 "zh": "曝光補償",
-                "en": "",
+                "en": "Exposure Bias Value",
             },
             "Focal Length": {
                 "zh": "焦距",
-                "en": "",
+                "en": "Focal Length",
             },
             "Max Aperture Value": {
                 "zh": "最大光圈",
-                "en": "",
+                "en": "Max Aperture Value",
             },
             "Metering Mode": {
                 "zh": "測光模式",
-                "en": "",
+                "en": "Metering Mode",
             },
-            "Flash(key)": {
+            "Flash": {
                 "zh": "閃光燈模式",
-                "en": "",
+                "en": "Flash",
             },
             "Focal Length 35": {
                 "zh": "35mm焦距",
-                "en": "",
+                "en": "Focal Length 35",
             },
             "Orientation": {
                 "zh": "旋轉資訊",
@@ -93,13 +93,13 @@ var langExif = {
                 "zh": "軟體",
                 "en": "Software",
             },
-            "Crea tionTime": {
+            "Creation Time": {
                 "zh": "建立日期",
-                "en": "Crea tionTime",
+                "en": "Creation Time",
             },
-            "Last WriteTime": {
+            "Last Write Time": {
                 "zh": "修改日期",
-                "en": "Last WriteTime",
+                "en": "Last Write Time",
             },
         },
 
@@ -137,7 +137,7 @@ var langExif = {
             },
 
 
-            "Flash(key)": {
+            "Flash": {
 
                 "0": {
                     "zh": "無閃光燈",
