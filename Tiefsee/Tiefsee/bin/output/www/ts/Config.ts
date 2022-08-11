@@ -79,7 +79,7 @@ class Config {
         ]
     }
 
-    
+
     public settings = {
         theme: {
             /** 是否啟用毛玻璃 */
@@ -205,6 +205,7 @@ class Config {
     public allowFileType(type: string) {
 
         let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
+        if (plugin == null) { return []; }
 
         if (type === GroupType.img) {
             let d = [
@@ -268,7 +269,7 @@ class Config {
             ]
 
             //有安裝NConvert才使用
-            if (plugin !== undefined && plugin.NConvert === true) {
+            if (plugin.NConvert === true) {
                 d.push(
                     { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
                     { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
@@ -291,10 +292,21 @@ class Config {
         }
 
         if (type === GroupType.pdf) {
-            return [
+            let d = [
                 { ext: "pdf", type: "pdf" },
                 { ext: "ai", type: "pdf" },
             ]
+            if (plugin.PDFTronWebviewer) {
+                d.push(
+                    { ext: "doc", type: "PDFTronWebviewer" },
+                    { ext: "docx", type: "PDFTronWebviewer" },
+                    { ext: "ppt", type: "PDFTronWebviewer" },
+                    { ext: "pptx", type: "PDFTronWebviewer" },
+                    { ext: "odt", type: "PDFTronWebviewer" },
+                    { ext: "odp", type: "PDFTronWebviewer" }
+                );
+            }
+            return d;
         }
 
         if (type === GroupType.txt) {
@@ -361,6 +373,9 @@ var GroupType = {
 
     /** pdf 或 ai */
     pdf: "pdf",
+
+    /** pdf、ai、doc、docx、ppt、pptx、odt、odp */
+    office: "office",
 
     /** 純文字 */
     txt: "txt",

@@ -475,6 +475,9 @@ class FileLoad {
                 if (groupType === GroupType.pdf) {
                     await M.fileShow.openPdf(fileInfo2);
                 }
+                if (groupType === GroupType.office) {
+                    await M.fileShow.openOffice(fileInfo2);
+                }
                 if (groupType === GroupType.txt) {
                     await M.fileShow.openTxt(fileInfo2);
                 }

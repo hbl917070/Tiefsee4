@@ -489,7 +489,7 @@ interface AppInfo {
     /** 程式所在的資料夾 */
     appDirPath: string;
 
-    /** 程式的暫存資料夾 */
+    /** AppData(使用者資料) */
     appDataPath: string;
 
     /** 目前使用的port */
@@ -512,6 +512,7 @@ interface AppInfo {
 interface AppInfoPlugin {
     NConvert: bool,
     QuickLook: bool,
+    PDFTronWebviewer: bool,
 }
 
 

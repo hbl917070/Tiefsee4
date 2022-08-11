@@ -256,8 +256,8 @@ class MainWindow {
         function quickLookUp() {
             //如果是單一執行個體，就不關閉視窗
             if (startType === 2 || startType === 3) {
-                WV_Window.Hide();
                 fileShow.openNone();
+                WV_Window.Hide();
             }
         }
 

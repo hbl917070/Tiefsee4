@@ -12,6 +12,7 @@ namespace Tiefsee {
         public static string dirPlugin;
         public static string pathNConvert;
         public static string pathQuickLook;
+        public static string pathPDFTronWebviewer;
         public static DataPlugin dataPlugin = new DataPlugin();
 
         /*public static Plugin() {
@@ -30,9 +31,11 @@ namespace Tiefsee {
 
             pathNConvert = Path.Combine(dirPlugin, "NConvert/nconvert.exe");
             pathQuickLook = Path.Combine(dirPlugin, "QuickLook/Tiefsee.QuickLook.dll");
+            pathPDFTronWebviewer = Path.Combine(dirPlugin, "WebViewer/lib/webviewer.min.js");
 
             dataPlugin.NConvert = File.Exists(pathNConvert);
             dataPlugin.QuickLook = File.Exists(pathQuickLook);
+            dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
         }
 
     }
@@ -73,6 +76,7 @@ namespace Tiefsee {
     public class DataPlugin {
         public bool NConvert = false;
         public bool QuickLook = false;
+        public bool PDFTronWebviewer = false;
     }
 
 }

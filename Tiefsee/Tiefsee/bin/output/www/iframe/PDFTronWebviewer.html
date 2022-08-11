@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFTronWebviewer</title>
+
+    <!-- <script src="C:/Users/wen/AppData/Local/Tiefsee/Plugin/WebViewer/lib/webviewer.min.js"></script> -->
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div id="viewer"></div>
+
+    <script>
+        var instance;
+        var pathLib;
+        var pathJs;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+          await  initJs();
+          initPDFTronWebviewer();
+            setTimeout(() => {
+            }, 1);
+             
+           
+        });
+
+
+        async function getAppDataPath() {
+            const WV2 = window.chrome.webview.hostObjects;
+            return await WV2.WV_Window.GetAppDataPath();
+        }
+
+        function closeDocument() {
+            instance.UI.closeDocument();
+        }
+
+        async function loadFile(path) {
+            instance.UI.loadDocument(path);
+        }
+
+
+
+
+        async function initJs() {
+            var getUrlString = location.href;
+            var url = new URL(getUrlString);
+            var appInfo = url.searchParams.get("appInfo"); // 回傳 21
+            appInfo = JSON.parse(appInfo);
+            let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
+
+            pathLib = "file:///" + appDataPath + "/Plugin/WebViewer/lib";
+            pathJs = pathLib + "/webviewer.min.js";
+
+            console.log(pathJs)
+            var script = document.createElement("script");
+            script.src = pathJs;
+            document.head.appendChild(script);
+
+            await new Promise((resolve, reject) => {
+                script.onload = function () {
+                    resolve(1);
+                };
+            })
+
+        }
+
+        async function initPDFTronWebviewer() {
+
+
+            WebViewer(
+                {
+                    path: pathLib,
+                    //licenseKey: "Insert commercial license key here after purchase",
+                    //initialDoc: "C:\\Users\\wen\\Desktop\\需求說明.docx",
+                },
+                document.getElementById("viewer")
+            ).then(_instance => {
+                instance = _instance;
+
+                console.log("初始化完成")
+
+                //告知父物件 已經初始化完成
+                let json = {
+                    type: "initFinishPDFTronWebviewer",
+                    data: "",
+                };
+                postMsg(json);
+
+            });
+        }
+
+        window.addEventListener("message", (e) => {
+
+            console.log(e)
+
+            //只開放特定網域呼叫
+            /*if (e.origin !== "null") {
+                console.error("錯誤的請求來源：" + e.origin)
+                return;
+            }*/
+
+            //接收到的資料
+            let type = e.data.type;
+            let data = e.data.data;
+
+            if (type === "load") {
+                loadFile(data);
+            }
+            if (type === "closeDocument") {
+                closeDocument()
+            }
+
+        });
+
+
+        /**
+         * 傳送資料給父物件
+         */
+        function postMsg(json) {
+            parent.postMessage(json, "*");
+        }
+
+    </script>
+</body>
+
+</html>

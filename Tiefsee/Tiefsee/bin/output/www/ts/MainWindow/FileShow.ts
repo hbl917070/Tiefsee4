@@ -3,6 +3,7 @@ class FileShow {
     public openImage;
     public openVideo;
     public openPdf;
+    public openOffice;
     public openTxt;
     public openWelcome;
     public openNone;
@@ -16,16 +17,22 @@ class FileShow {
     constructor(M: MainWindow) {
 
         var tieefseeview: Tieefseeview = new Tieefseeview(<HTMLDivElement>document.querySelector("#main-tiefseeview"));
-        var dom_imgview = <HTMLDivElement>document.querySelector("#main-tiefseeview")
-        var dom_pdfview = <HTMLDivElement>document.querySelector("#main-pdfview")
-        var dom_txtview = <HTMLTextAreaElement>document.querySelector("#main-txtview")
-        var dom_welcomeview = <HTMLDivElement>document.querySelector("#main-welcomeview")
+        var dom_imgview = document.querySelector("#main-tiefseeview") as HTMLDivElement;
+        var dom_pdfview = document.querySelector("#main-pdfview") as HTMLIFrameElement;
+        var dom_pdftronWebviewer = document.querySelector("#mView-pdftronWebviewer") as HTMLIFrameElement;
+
+        var dom_txtview = document.querySelector("#main-txtview") as HTMLTextAreaElement;
+        var dom_welcomeview = document.querySelector("#main-welcomeview") as HTMLDivElement;
         var isLoaded = true;
         var _groupType = GroupType.none;//目前顯示的類型
+
+        /** PDFTronWebviewer 是否初始化完成 */
+        var isInitPDFTronWebviewer = false;
 
         this.openImage = openImage;
         this.openVideo = openVideo;
         this.openPdf = openPdf;
+        this.openOffice = openOffice;
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
         this.openNone = openNone;
@@ -34,7 +41,6 @@ class FileShow {
         this.dom_welcomeview = dom_welcomeview;
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
-
 
         /** 
          * 取得 目前顯示的類型
@@ -69,11 +75,13 @@ class FileShow {
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
+                dom_pdftronWebviewer.style.display = "none";
                 dom_welcomeview.style.display = "none";
 
                 dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
                 tieefseeview.loadNone();
+                officeCloseDocument();
                 return;
             }
 
@@ -89,11 +97,13 @@ class FileShow {
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
+                dom_pdftronWebviewer.style.display = "none";
                 dom_welcomeview.style.display = "flex";
 
                 dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
                 tieefseeview.loadNone();
+                officeCloseDocument();
                 return;
             }
 
@@ -109,11 +119,13 @@ class FileShow {
                 dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
+                dom_pdftronWebviewer.style.display = "none";
                 dom_welcomeview.style.display = "none";
 
                 dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
                 //view_image.loadNone();
+                officeCloseDocument();
                 return;
             }
 
@@ -133,11 +145,13 @@ class FileShow {
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "block";
+                dom_pdftronWebviewer.style.display = "none";
                 dom_welcomeview.style.display = "none";
 
                 dom_pdfview.setAttribute("src", "");
                 //dom_txtview.value = "";
                 tieefseeview.loadNone();
+                officeCloseDocument();
                 return;
             }
 
@@ -153,14 +167,37 @@ class FileShow {
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";
                 dom_txtview.style.display = "none";
+                dom_pdftronWebviewer.style.display = "none";
                 dom_welcomeview.style.display = "none";
 
                 //dom_pdfview.setAttribute("src", "");
                 dom_txtview.value = "";
                 tieefseeview.loadNone();
+                officeCloseDocument();
                 return;
             }
 
+            if (groupType === GroupType.office) {
+
+                //更換工具列
+                getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
+
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+
+                dom_imgview.style.display = "none";
+                dom_pdfview.style.display = "none";
+                dom_txtview.style.display = "none";
+                dom_pdftronWebviewer.style.display = "block";
+                dom_welcomeview.style.display = "none";
+
+                dom_pdfview.setAttribute("src", "");
+                dom_txtview.value = "";
+                tieefseeview.loadNone();
+                //officeCloseDocument();
+                return;
+            }
         }
 
 
@@ -437,12 +474,47 @@ class FileShow {
 
             let _path = fileInfo2.Path;
 
-            setShowType(GroupType.pdf);//改變顯示類型
+            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.pdf, fileType);// ex. { ext:"psd", type:"magick" }
+            if (configItem == undefined) {
+                configItem = { ext: "", type: "pdf" }
+            }
+            let configType = configItem.type;
 
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let encodePath = encodeURIComponent(_path);
-            let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
-            dom_pdfview.setAttribute("src", _url);
+            if (configType == "pdf") {
+                setShowType(GroupType.pdf);//改變顯示類型
+
+                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                let encodePath = encodeURIComponent(_path);
+                let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
+                dom_pdfview.setAttribute("src", _url);
+            }
+
+            if (configType == "PDFTronWebviewer") {
+
+                setShowType(GroupType.office);//改變顯示類型
+
+                if (dom_pdftronWebviewer.src == "") {
+                    let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
+                    dom_pdftronWebviewer.src = "./iframe/PDFTronWebviewer.html?appInfo=" + appInfoJson;
+                }
+
+                for (let i = 0; i < 2000; i++) {//等待套件初始化
+                    if (isInitPDFTronWebviewer === true) {
+                        break;
+                    }
+                    await sleep(10);
+                }
+
+                let json = {
+                    type: "load",
+                    data: _path,
+                };
+                dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+            }
+
+
+
 
             //檔案類型
             let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
@@ -463,6 +535,80 @@ class FileShow {
             M.mainExif.init(fileInfo2);//初始化exif
         }
 
+
+
+
+        window.addEventListener("message", (e) => {
+
+            //console.log(e)
+
+            //只開放特定網域呼叫
+            /*if (e.origin !== "null") {
+                console.error("錯誤的請求來源：" + e.origin)
+                return;
+            }*/
+
+            //接收到的資料
+            let type = e.data.type;
+            let data = e.data.data;
+
+            if (type === "initFinishPDFTronWebviewer") {
+                isInitPDFTronWebviewer = true;
+            }
+
+        });
+
+        function officeCloseDocument() {
+            if (isInitPDFTronWebviewer === false) { return; }
+            let json = {
+                type: "closeDocument",
+                data: "",
+            };
+            dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+        }
+
+        async function openOffice(fileInfo2: FileInfo2) {
+
+            setShowType(GroupType.office);//改變顯示類型
+
+            if (dom_pdftronWebviewer.src == "") {
+                dom_pdftronWebviewer.src = "./iframe/PDFTronWebviewer.html";
+            }
+
+            for (let i = 0; i < 1000; i++) {
+                if (isInitPDFTronWebviewer === true) {
+                    break;
+                }
+                await sleep(10);
+            }
+
+            let _path = fileInfo2.Path;
+
+            let json = {
+                type: "load",
+                data: _path,
+            };
+            dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+
+
+            //檔案類型
+            let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
+            if (dom_type != null) {
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
+                let fileLength = Lib.getFileLength(fileInfo2.Lenght);
+                dom_type.innerHTML = `${fileType}<br>${fileLength}`;
+            }
+
+            //檔案修改時間
+            let dom_writeTime = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
+            if (dom_writeTime != null) {
+                let timeUtc = fileInfo2.LastWriteTimeUtc;
+                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                dom_writeTime.innerHTML = time;
+            }
+
+            M.mainExif.init(fileInfo2);//初始化exif
+        }
 
         /**
          * 純文字
