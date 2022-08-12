@@ -97,23 +97,36 @@
                 var editorArray = [];
                 var defaultCode = `
                     function helloWorld() {
-                       console.log('Hello world!');
+                       console.log("Hello world!");
                     }
                 `;
 
                 // 定義編輯器主題
-                /*monaco.editor.defineTheme("myTheme", {
-                    base: "vs",
+                monaco.editor.defineTheme("myTheme", {
+                    base: "vs-dark",
                     inherit: true,
-                    rules: [{ background: "EDF9FA" }],
+                    rules: [{
+                        background: "1f272b"
+                    }],
+                    colors: {
+                        //"editor.foreground": "#FF00FF",
+                        "editor.background": "#00000000",
+                        //"editorCursor.foreground": "#8B0000",
+                        //"editor.lineHighlightBackground": "#0000FF20",
+                        //"editorLineNumber.foreground": "#008800",
+                        //"editor.selectionBackground": "#88000030",
+                        //"editor.inactiveSelectionBackground": "#88000015"
+                    }
                 });
-                monaco.editor.setTheme("myTheme");*/
-
-                monaco.editor.setTheme("vs-dark");
+                monaco.editor.setTheme("myTheme");
+                //monaco.editor.setTheme("vs-dark");
 
                 editor = monaco.editor.create(document.getElementById("viewer"), {
-                    //model: model,
+                    mouseWheelZoom: true,//允許使用ctrl+滑鼠滾輪來縮放文字
+                    fontSize: 18,//預設文字大小
+                    automaticLayout: true,//自動縮放版面
                 });
+
 
                 //告知父物件 已經初始化完成
                 let json = {

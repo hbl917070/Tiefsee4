@@ -251,7 +251,7 @@ class Lib {
             return "psd";
         }
 
-        console.log("檔案類型辨識失敗: " + fileInfo2.Path);
+        /*console.log("檔案類型辨識失敗: " + fileInfo2.Path);
         let sum = "";
         let sum2 = "";
         hex.split(" ").forEach(item => {
@@ -260,7 +260,7 @@ class Lib {
         });
         console.log(hex);
         console.log(sum2);
-        console.log(sum);
+        console.log(sum);*/
 
         return fileExt;
     }
