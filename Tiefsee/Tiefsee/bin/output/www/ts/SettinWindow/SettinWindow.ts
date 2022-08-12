@@ -797,9 +797,7 @@ class Setting {
         //擴充套件 
         addLoadEvent(() => {
 
-            var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
-            var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
-
+           
             function getHtml(val: boolean) {
                 if (val) {
                     return `<div class="pluginLiet-status color-success">Installed</div>`;
@@ -810,8 +808,15 @@ class Setting {
             if (baseWindow.appInfo !== undefined) {
                 
                 //初始化 擴充套件清單
+                var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
+                var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
+                var dom_PDFTronWebviewer = document.querySelector("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
+                var dom_MonacoEditor = document.querySelector("#pluginLiet-MonacoEditor") as HTMLInputElement;
+        
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
                 dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
+                dom_PDFTronWebviewer.innerHTML = getHtml(baseWindow.appInfo.plugin.PDFTronWebviewer);
+                dom_MonacoEditor.innerHTML = getHtml(baseWindow.appInfo.plugin.MonacoEditor);
 
                 //如果未安裝QuickLook擴充套件，就顯示提示文字，並且禁止編輯
                 let dom_noInstalled = document.querySelector("#quickLook-noInstalled") as HTMLInputElement;

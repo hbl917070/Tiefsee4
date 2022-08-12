@@ -513,6 +513,7 @@ interface AppInfoPlugin {
     NConvert: bool,
     QuickLook: bool,
     PDFTronWebviewer: bool,
+    MonacoEditor: bool,
 }
 
 

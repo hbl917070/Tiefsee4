@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PDFTronWebviewer</title>
+    <title>MonacoEditor</title>
 
     <style>
         html,
@@ -28,8 +28,8 @@
     <div id="viewer"></div>
 
     <script>
-        var instance;
-        var documentViewer;
+
+        var editor;
         var pathLib;
         var pathJs;
 
@@ -51,7 +51,7 @@
             let data = e.data.data;
 
             if (type === "load") {
-                loadFile(data);
+                loadFile(data.path, data.txt);
             }
             if (type === "closeDocument") {
                 closeDocument()
@@ -69,8 +69,8 @@
             appInfo = JSON.parse(appInfo);
             let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
 
-            pathLib = "file:///" + appDataPath + "/Plugin/WebViewer/lib";
-            pathJs = pathLib + "/webviewer.min.js";
+            pathLib = "file:///" + appDataPath + "/Plugin/monaco-editor/min/vs";
+            pathJs = pathLib + "/loader.js";
 
             var script = document.createElement("script");
             script.src = pathJs;
@@ -89,25 +89,41 @@
          */
         async function initPDFTronWebviewer() {
 
-            WebViewer(
-                {
-                    path: pathLib,
-                    //licenseKey: "Insert commercial license key here after purchase",
-                },
-                document.getElementById("viewer")
-            ).then(_instance => {
-                instance = _instance;
-                //documentViewer = instance.Core;
-            
+            require.config({ paths: { "vs": pathLib } });
+            require(["vs/editor/editor.main"], () => {
+
+                // 初始化變量
+                var fileCounter = 0;
+                var editorArray = [];
+                var defaultCode = `
+                    function helloWorld() {
+                       console.log('Hello world!');
+                    }
+                `;
+
+                // 定義編輯器主題
+                /*monaco.editor.defineTheme("myTheme", {
+                    base: "vs",
+                    inherit: true,
+                    rules: [{ background: "EDF9FA" }],
+                });
+                monaco.editor.setTheme("myTheme");*/
+
+                monaco.editor.setTheme("vs-dark");
+
+                editor = monaco.editor.create(document.getElementById("viewer"), {
+                    //model: model,
+                });
 
                 //告知父物件 已經初始化完成
                 let json = {
-                    type: "initFinishPDFTronWebviewer",
+                    type: "initFinishMonacoEditor",
                     data: "",
                 };
                 postMsg(json);
 
             });
+
         }
 
 
@@ -122,10 +138,10 @@
         /**
          * 載入檔案
          */
-        async function loadFile(path) {
-            instance.UI.loadDocument(path);
-            instance.UI.setFitMode("FitWidth");//縮放模式為寬度全滿
-            instance.UI.setToolbarGroup('toolbarGroup-View');//工具列預設選擇為view
+        async function loadFile(path, txt) {
+            monaco.editor.getModels().forEach(model => model.dispose());//清除所有已存在的 Model
+            var model = monaco.editor.createModel(txt, undefined, monaco.Uri.file(path));
+            editor.setModel(model);
         }
 
 

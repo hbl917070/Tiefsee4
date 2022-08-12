@@ -380,6 +380,8 @@ var GroupType = {
     /** 純文字 */
     txt: "txt",
 
+    monacoEditor: "monacoEditor",
+
     /** 影片 */
     video: "video",
 }
