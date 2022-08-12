@@ -6,7 +6,7 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.20](https://github.com/hbl917070/tiefsee4/releases)
+[Tiefsee 4.0.0-beta.20](https://github.com/hbl917070/Tiefsee4/releases)
 (注意：此為測試版，有某些功能是Tiefsee 3.0.2有但是測試版沒有的
 
     開發中功能：  

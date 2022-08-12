@@ -44,12 +44,17 @@ www
 <br>
 
 ## 初始安裝
-1. 安裝nodejs
-2. 開啟到 Tiefsee 裡面的 www 目錄
+1. 安裝nodejs<br>
+	https://nodejs.org/en/
+2. 安裝Gulp
+	``` 
+	npm install gulp -g
+	```
+3. 開啟到 Tiefsee 裡面的 www 目錄
 	```
 	cd www
 	```
-3. 更新npm套件。 
+4. 更新npm套件。 
 	```
 	npm i
 	```
