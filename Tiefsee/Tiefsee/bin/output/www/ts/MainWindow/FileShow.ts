@@ -73,6 +73,7 @@ class FileShow {
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
                 M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -96,6 +97,7 @@ class FileShow {
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
                 M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -119,6 +121,7 @@ class FileShow {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(false);//解除隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "block";
                 dom_pdfview.style.display = "none";
@@ -146,6 +149,7 @@ class FileShow {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -169,6 +173,7 @@ class FileShow {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
@@ -192,6 +197,7 @@ class FileShow {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
 
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "block";
@@ -215,7 +221,8 @@ class FileShow {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
+                
                 dom_imgview.style.display = "none";
                 dom_pdfview.style.display = "none";
                 dom_txtview.style.display = "none";
@@ -304,7 +311,7 @@ class FileShow {
 
             let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
             let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType);// ex. { ext:"psd", type:"magick" }
-            if (configItem == undefined) {
+            if (configItem == null) {
                 configItem = { ext: "", type: "vips", vipsType: "magick" }
             }
             let configType = configItem.type;

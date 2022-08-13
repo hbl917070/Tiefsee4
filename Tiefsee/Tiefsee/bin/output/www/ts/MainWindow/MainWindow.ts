@@ -10,8 +10,7 @@ class MainWindow {
     public quickLookUp;
 
     public dom_tools: HTMLElement;
-    public dom_largeBtnLeft: HTMLElement;
-    public dom_largeBtnRight: HTMLElement;
+
     public dom_mainL: HTMLElement;
     public dom_mainR: HTMLElement;
 
@@ -28,6 +27,7 @@ class MainWindow {
     public mainExif;
     public menu;
     public initMenu;
+    public largeBtn;
     public script;
     public applySetting;
     public saveSetting;
@@ -39,8 +39,6 @@ class MainWindow {
         this.quickLookUp = quickLookUp;
 
         var dom_tools = <HTMLElement>document.getElementById("main-tools");//工具列
-        var dom_largeBtnLeft = <HTMLElement>document.getElementById("largeBtnLeft");//上一頁大按鈕
-        var dom_largeBtnRight = <HTMLElement>document.getElementById("largeBtnRight");
         var dom_mainL = <HTMLElement>document.getElementById("main-L");//左邊區域
         var dom_mainR = <HTMLElement>document.getElementById("main-R");//左邊區域
         var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-tools-layout");//開啟layout選單
@@ -49,8 +47,6 @@ class MainWindow {
         let startType = 0;//1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
 
         this.dom_tools = dom_tools;
-        this.dom_largeBtnLeft = dom_largeBtnLeft;
-        this.dom_largeBtnRight = dom_largeBtnRight;
         this.dom_mainL = dom_mainL;
         this.dom_mainR = dom_mainR;
 
@@ -66,6 +62,7 @@ class MainWindow {
         var mainTools = this.mainTools = new MainTools(this);
         var menu = this.menu = new Menu(this);
         var initMenu = this.initMenu = new InitMenu(this);
+        var largeBtn = this.largeBtn = new LargeBtn(this);
         var script = this.script = new Script(this);
 
         var i18n = this.i18n = new I18n();
@@ -283,13 +280,7 @@ class MainWindow {
                 script.menu.showLayout(btn_layout);
             })
 
-            //大型換頁按鈕
-            dom_largeBtnLeft.addEventListener("click", function (e) {
-                script.fileLoad.prevFile();
-            })
-            dom_largeBtnRight.addEventListener("click", function (e) {
-                script.fileLoad.nextFile();
-            })
+
 
             //封鎖原生右鍵選單
             document.addEventListener("contextmenu", function (e) {
@@ -545,17 +536,7 @@ class MainWindow {
             //-----------
 
             //大型切換按鈕
-            if (config.settings.layout.largeBtn == "leftRight") {
-                dom_largeBtnLeft.setAttribute("data-style", "leftRight-L");
-                dom_largeBtnRight.setAttribute("data-style", "leftRight-R");
-            } else if (config.settings.layout.largeBtn == "bottom") {
-                dom_largeBtnLeft.setAttribute("data-style", "bottom-L");
-                dom_largeBtnRight.setAttribute("data-style", "bottom-R");
-            } else {
-                dom_largeBtnLeft.setAttribute("data-style", "none-L");
-                dom_largeBtnRight.setAttribute("data-style", "none-R");
-            }
-
+            largeBtn.setShowType(config.settings.layout.largeBtn);
 
             //-----------
 
@@ -611,6 +592,8 @@ class MainWindow {
             await WV_File.SetText(path, s);
         }
 
+
+    
 
     }
 }
