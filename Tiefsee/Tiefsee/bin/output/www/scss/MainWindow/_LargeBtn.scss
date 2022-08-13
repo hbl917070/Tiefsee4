@@ -1,0 +1,80 @@
+/* #region 在下面或兩側的 大型切換按鈕 */
+
+.largeBtn {
+    /* backdrop-filter: saturate(180%) blur(20px); */
+    position: absolute;
+    border-radius: 5px;
+    background-color: var(--color-black40);
+    /* border: 1px solid var(--color-blue40); */
+    border: 1px solid var(--color-white20);
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 5;
+    user-select: none;
+  }
+  .largeBtn:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
+  .largeBtn:active {
+    /* border: 1px solid var(--color-blue60); */
+    /* transform: translateX(-2px); */
+  }
+  .largeBtn:active svg {
+    transform: scale(1.05);
+    /* border: 1px solid var(--color-blue60); */
+    /* transform: translateX(-2px); */
+  }
+  /*.largeBtnLeft-bottom:active {
+    transform: translateX(-1px);
+  }
+  .largeBtnRight-bottom:active {
+    transform: translateX(1px);
+  } */
+  .largeBtn svg {
+    height: 30px;
+  }
+  
+  //暫時隱藏
+  .largeBtn[hide="true"] {
+    display: none !important;
+  }
+  //左右兩側
+  .largeBtn[data-style="leftRight-L"] {
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 60px;
+  }
+  .largeBtn[data-style="leftRight-R"] {
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    width: 60px;
+  }
+  //下面
+  .largeBtn[data-style="bottom-L"] {
+    bottom: 20px;
+    left: 20px;
+    right: 50%;
+    height: 60px;
+  }
+  .largeBtn[data-style="bottom-R"] {
+    bottom: 20px;
+    left: 50%;
+    right: 20px;
+    height: 60px;
+  }
+  //不顯示
+  .largeBtn[data-style="none-L"] {
+    display: none;
+  }
+  .largeBtn[data-style="none-R"] {
+    display: none;
+  }
+  
+  /* #endregion */
+  

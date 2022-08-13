@@ -10,7 +10,6 @@ class MainWindow {
     public quickLookUp;
 
     public dom_tools: HTMLElement;
-
     public dom_mainL: HTMLElement;
     public dom_mainR: HTMLElement;
 
@@ -593,8 +592,5 @@ class MainWindow {
         }
 
 
-    
-
     }
 }
-

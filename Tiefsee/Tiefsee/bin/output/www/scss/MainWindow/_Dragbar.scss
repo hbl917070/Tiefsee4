@@ -1,0 +1,22 @@
+/* #region 拖曳條 */
+
+.dragbar-v {
+  width: 4px;
+  height: 600px;
+  background-color: rgba(0, 0, 0, 0);
+  top: 40px;
+  left: 60px;
+  position: absolute;
+  z-index: 10;
+}
+//滑鼠移入時
+.dragbar-v:hover {
+  background-color: var(--color-blue);
+  cursor: e-resize;
+}
+//拖曳時
+.dragbar-v[active="true"] {
+  background-color: var(--color-blue);
+}
+
+/* #endregion */

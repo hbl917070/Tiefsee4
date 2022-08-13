@@ -2,6 +2,11 @@
 
 var baseWindow: BaseWindow;
 
+var setting;
+document.addEventListener("DOMContentLoaded", async () => {
+    setting = new Setting();
+});
+
 class Setting {
 
     public saveData;

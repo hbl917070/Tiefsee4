@@ -1,0 +1,122 @@
+/* #region 資料夾預覽列表 */
+
+:root {
+  --dirList-width: 200px;
+}
+.main-dirList {
+  display: none;
+
+  overflow-x: hidden;
+  overflow-y: overlay !important;
+  height: 100%;
+  width: var(--dirList-width);
+
+  .main-dirListBody {
+    overflow: hidden;
+    padding-top: 4px;
+  }
+
+  .dirList-item {
+    user-select: none;
+    margin-bottom: 5px;
+    //padding: 3px;
+    white-space: nowrap;
+    margin-left: 5px;
+    margin-right: 15px;
+    //width: calc(100%);
+  }
+
+  .dirList-item:hover {
+    // background-color: var(--color-white20);
+    outline: 2px solid var(--color-white40);
+    outline-offset: 2px;
+    cursor: pointer;
+  }
+
+  //選中
+  .dirList-item[active="true"] {
+    outline: 2px solid var(--color-blue);
+    // background-color: var(--color-white20);
+    outline-offset: 2px;
+  }
+
+  //
+  .dirList-title {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+  }
+
+  //編號
+  .dirList-no {
+    margin-bottom: 2px;
+    line-height: 14px;
+    height: 14px;
+
+    overflow: hidden;
+    font-weight: 500;
+    color: var(--color-blue);
+    margin-right: 3px;
+  }
+
+  //檔名
+  .dirList-name {
+    margin-bottom: 2px;
+    line-height: 14px;
+    height: 14px;
+
+    overflow: hidden;
+    text-align: center;
+    flex: 1;
+    white-space: nowrap;
+    color: var(--color-white);
+  }
+
+  .dirList-imgbox {
+    display: flex;
+    flex-direction: row;
+  }
+
+  //圖片
+  .dirList-img {
+    margin-right: 3px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+  .dirList-img__1 {
+    width: calc((var(--dirList-width) - 1 * 4px) / 1);
+    height: calc((var(--dirList-width) - 1 * 4px) / 1);
+  }
+  .dirList-img__2 {
+    width: calc((var(--dirList-width) - 2 * 4px) / 2);
+    height: calc((var(--dirList-width) - 2 * 4px) / 2);
+  }
+  .dirList-img__3 {
+    width: calc((var(--dirList-width) - 3 * 4px) / 3);
+    height: calc((var(--dirList-width) - 3 * 4px) / 3);
+  }
+  .dirList-img__4 {
+    width: calc((var(--dirList-width) - 4 * 4px) / 4);
+    height: calc((var(--dirList-width) - 4 * 4px) / 4);
+  }
+  .dirList-img__5 {
+    width: calc((var(--dirList-width) - 5 * 4px) / 5);
+    height: calc((var(--dirList-width) - 5 * 4px) / 5);
+  }
+
+  .dirList-img:last-child {
+    margin-right: 0px;
+  }
+}
+
+//啟用
+.main-dirList[active="true"] {
+  display: block;
+}
+//暫時隱藏
+.main-dirList[hide="true"] {
+  display: none !important;
+}
+
+/* #endregion */

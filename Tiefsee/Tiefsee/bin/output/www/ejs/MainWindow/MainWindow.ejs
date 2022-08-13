@@ -14,9 +14,14 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100&display=swap" rel="stylesheet"> -->
 
+    <link rel="stylesheet" href="./css/MainWindow/MainWindow.css">
+    <link rel="stylesheet" href="./css/Menu.css">
+    <link rel="stylesheet" href="./css/Msgbox.css">
+
     <link rel="stylesheet" href="./css/BaseWindow.css">
     <script src="./js/BaseWindow.js"></script>
     <script src="./js/Lib.js"></script>
+    <script src="./js/SvgList.js"></script>
 
     <script src="./vender/hammer.min.js"></script>
     <script src="./vender/jquery-3.6.0.min.js"></script>
@@ -24,11 +29,6 @@
 
     <script src="./js/Tiefseeview.js"></script>
     <link rel="stylesheet" href="./css/Tiefseeview.css">
-    <link rel="stylesheet" href="./css/MainWindow.css">
-    <link rel="stylesheet" href="./css/Menu.css">
-    <link rel="stylesheet" href="./css/Msgbox.css">
-
-    <script src="./js/SvgList.js"></script>
 
     <!-- 多國語言 -->
     <script src="./lang/ui.js"></script>
@@ -47,18 +47,13 @@
     <script src="./js/MainWindow/ImgSearch.js"></script>
     <script src="./js/MainWindow/InitMenu.js"></script>
     <script src="./js/MainWindow/Menu.js"></script>
+    <script src="./js/MainWindow/LargeBtn.js"></script>
     <script src="./js/Msgbox.js"></script>
     <script src="./js/MainWindow/Script.js"></script>
     <script src="./js/MainWindow/Hotkey.js"></script>
     <script src="./js/MainWindow/Dragbar.js"></script>
     <script src="./js/MainWindow/MainWindow.js"></script>
 
-    <script>
-        /*var mainWindow;
-        document.addEventListener("DOMContentLoaded", async () => {
-            mainWindow = new MainWindow();
-        });*/
-    </script>
 </head>
 
 <body>
@@ -135,17 +130,17 @@
 
                     <div class="main-V">
 
-                        <div id="mView-welcome" class="main-welcomeview">
+                        <div id="mView-welcome" class="mView-welcome">
                             <div>
-                                <img class="welcomeview-logo" src="./img/logo.svg">
-                                <div class="welcomeview-txt">Tiefsee 4.0.0-beta.20</div>
+                                <img class="mView-welcome-logo" src="./img/logo.svg">
+                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.20</div>
                             </div>
                         </div>
-                        <textarea id="mView-txt" class="main-txtview base-scrollbar" readonly="readonly"></textarea>
-                        <div id="mView-tiefseeview" class="main-tiefseeview"></div>
-                        <iframe id="mView-pdf" class="main-pdfview"></iframe>
-                        <iframe id="mView-pdftronWebviewer" class="main-pdfview"></iframe>
-                        <iframe id="mView-monacoEditor" class="main-pdfview"></iframe>
+                        <textarea id="mView-txt" class="mView-txt base-scrollbar" readonly="readonly"></textarea>
+                        <div id="mView-tiefseeview" class="mView-tiefseeview"></div>
+                        <iframe id="mView-pdf" class="mView-iframe"></iframe>
+                        <iframe id="mView-pdftronWebviewer" class="mView-iframe"></iframe>
+                        <iframe id="mView-monacoEditor" class="mView-iframe"></iframe>
 
                         <!-- 大型切換按鈕 -->
                         <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">
