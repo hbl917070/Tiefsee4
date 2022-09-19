@@ -86,13 +86,18 @@ class Dragbar {
                 temp_width = dom_box.getBoundingClientRect().width;
                 _eventStart();
             });
+            //拖曳 結束
+            dom_dragbar.addEventListener("pointerup", () => {
+                dom_windowBody.style.pointerEvents = "";//解除鎖定
+            })
 
             //拖曳
-            hammer_dragbar.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_VERTICAL });
+            hammer_dragbar.get("pan").set({ pointers: 0, threshold: 0, direction: Hammer.DIRECTION_ALL });
             hammer_dragbar.on("pan", (ev: HammerInput) => {
                 dom_dragbar.setAttribute("active", "true");
                 let val = update(ev);
                 _eventMove(val);
+
             });
 
             //拖曳 結束
