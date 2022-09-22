@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CherryMarkdown</title>
+
+    <base id="root" href="">
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #markdown-container img {
+            max-width: 100%;
+        }
+
+        .cherry-bubble {
+            display: none !important;
+        }
+    </style>
+    <script src="./../js/LibIframe.js"></script>
+
+</head>
+
+<body>
+
+    <div id="markdown-container"></div>
+
+    <link rel="stylesheet" href="./../vender/cherry-markdown/cherry-markdown.min.css">
+    <script src="./../vender/cherry-markdown/tex-svg.js"></script>
+    <script src="./../vender/cherry-markdown/cherry-markdown.min.js"></script>
+
+    <script>
+
+
+        window.addEventListener("message", (e) => {
+
+            //只開放特定網域呼叫
+            /*if (e.origin !== "null") {
+                console.error("錯誤的請求來源：" + e.origin)
+                return;
+            }*/
+
+            //接收到的資料
+            let type = e.data.type;
+            let data = e.data.data;
+
+            if (type === "loadTxt") {
+                setRoot("");
+                setTxt(data.txt);
+            }
+            if (type === "loadFile") {//載入檔案並且設定目錄
+                setRoot(data.dir);
+                setTxt(data.txt);
+            }
+            if (type === "loadNone") {
+                setTxt("");
+            }
+            if (type === "setReadonly") {
+                libIframe.setReadonly(data.val);
+            }
+            if (type === "getTxt") {
+                let t = getTxt();
+                let json = {
+                    type: "getTxt",
+                    data: t,
+                };
+                postMsg(json);
+            }
+            if (type === "setTheme") {
+                setTheme();
+            }
+        });
+
+
+        /**
+         * 告知父物件 已經初始化完成
+         */
+        function initFinish() {
+            let json = {
+                type: "CherryMarkdown.initFinish",
+                data: "",
+            };
+            postMsg(json);
+        }
+
+        /**
+         * 傳送資料給父物件
+         */
+        function postMsg(json) {
+            parent.postMessage(json, "*");
+        }
+    </script>
+
+    <script>
+
+        var libIframe = new LibIframe();
+        const cherryObj = initCherry();
+        initFinish();
+
+        /**
+         * 初始化 Cherry
+         */
+        function initCherry() {
+
+            //自訂選單
+            let customMenuImg = Cherry.createMenuHook('Image', {
+                iconName: 'image',
+                onClick: function (selection) {
+                    // 獲取用戶選中的文字，調用getSelection方法後，如果用戶沒有選中任何文字，會嘗試獲取光標所在位置的單詞或句子
+                    let $selection = this.getSelection(selection) || 'url';
+                    this.registerAfterClickCb(() => {
+                        this.setLessSelection('![](', ')');
+                    });
+                    return $selection.replace(/(^)([^\n]+)($)/gm, '$1![]($2)$3');
+                }
+            });
+
+            let cherryObj = new Cherry({
+                id: "markdown-container",
+                value: "",
+                externals: { // 第三方包
+                    //echarts: window.echarts,
+                    MathJax: window.MathJax,
+                },
+                toolbars: {
+                    theme: "light", // light or dark                                                                            
+                    codeBlock: {
+                        theme: "dark", // 默認為深色主題
+                        wrap: true, // 超出長度是否換行，false則顯示捲軸
+                        lineNumber: true, // 默認顯示行號
+                    },
+
+                    toolbar: [
+                        "togglePreview",
+                        "|",
+                        "header",
+                        "list",
+                        //"bold",
+                        //"italic",
+                        //"strikethrough", "underline", "sub", "sup", "ruby",
+                        { bold: ["bold", "italic", "strikethrough", "underline", "sub", "sup", "ruby"], },
+                        "|",
+                        {
+                            insert: [
+                                "table",
+                                "customMenuImg",
+                                "link",
+                                "hr",
+                                "br",
+                                "formula",
+                                "code",
+                                "toc",
+                                //"line-table",
+                                //"bar-table",
+                                //"image",
+                                //"audio",
+                                //"video",
+                                //"pdf",
+                                //"word",
+                            ],
+                        },
+                        "graph",
+                    ],
+                    //bubble: false, // 選中文字彈出工具列
+                    bubble: [], // 選中文字彈出工具列
+                    float: false, // 建立新行彈出工具列
+                    customMenu: { //自定義的按鈕
+                        customMenuImg: customMenuImg,
+                    },
+                }
+            });
+
+            return cherryObj;
+        }
+
+
+
+        /**
+         * get md
+         */
+        function getTxt() {
+            return cherryObj.getMarkdown();
+        }
+
+        /**
+         * set md
+         */
+        function setTxt(s) {
+            cherryObj.setMarkdown(s);
+            cherryObj.editor.editor.clearHistory();//清空歷史資料
+        }
+
+        /**
+         * get html
+         */
+        function getHtml() {
+            return cherryObj.getHtml();
+        }
+
+        /**
+         * 設定md檔所在的目錄，好讓圖片跟超連結找得到
+         */
+        function setRoot(path) {
+            document.getElementById("root").href = path;
+        }
+
+        /**
+         * 套用主題
+         */
+        function setTheme() {
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

@@ -52,10 +52,12 @@ class MainTools {
                 }
 
                 if (item.type === "button") {
+
                     addToolsBtn({
                         group: item.group,
                         name: item.name,
                         icon: item.icon,
+                        i18n: item.i18n,
                         func: item.func
                     })
                 }
@@ -605,6 +607,20 @@ class MainTools {
                 },
             })
 
+            // 儲存檔案
+            ar.push({
+                type: "button", html: "",
+                i18n: "儲存檔案",
+                group: GroupType.txt,
+                name: "showSave",
+                icon: "tool-save.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.file.save(btn);
+                    });
+                },
+            })
+
             //上一個資料夾
             ar.push({
                 type: "button", html: "",
@@ -822,13 +838,16 @@ class MainTools {
          * @param item 
          */
         function addToolsBtn(item: {
-            group: string, name: string, icon: string,
+            group: string,
+            name: string,
+            icon: string,
+            i18n: string,
             func: (domBtn: HTMLElement) => void,
         }) {
 
             //產生按鈕
             let div = newDiv(`
-                <div class="main-tools-btn js-noDrag" data-name="${item.name}">
+                <div class="main-tools-btn js-noDrag" data-name="${item.name}" title="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
             div.style.order = "888";//未定義順序的按鈕就放在最後面

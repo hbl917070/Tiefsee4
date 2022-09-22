@@ -13,24 +13,21 @@ class FileShow {
     public dom_imgview;
     public dom_welcomeview;
 
+    public iframes;
+
     constructor(M: MainWindow) {
 
         var dom_imgview = document.querySelector("#mView-tiefseeview") as HTMLDivElement;
         var dom_pdfview = document.querySelector("#mView-pdf") as HTMLIFrameElement;
-        var dom_pdftronWebviewer = document.querySelector("#mView-pdftronWebviewer") as HTMLIFrameElement;
-        var dom_monacoEditor = document.querySelector("#mView-monacoEditor") as HTMLIFrameElement;
         var dom_txtview = document.querySelector("#mView-txt") as HTMLTextAreaElement;
         var dom_welcomeview = document.querySelector("#mView-welcome") as HTMLDivElement;
 
         var tieefseeview: Tieefseeview = new Tieefseeview(dom_imgview);
+
+        var iframes = new Iframes(M);
         var isLoaded = true;
         var _groupType = GroupType.none;//目前顯示的類型
 
-        /** PDFTronWebviewer 是否初始化完成 */
-        var isInitPDFTronWebviewer = false;
-
-        /** MonacoEditor 是否初始化完成 */
-        var isInitMonacoEditor = false;
 
         this.openImage = openImage;
         this.openVideo = openVideo;
@@ -44,6 +41,7 @@ class FileShow {
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
 
+        this.iframes = iframes;
         /** 
          * 取得 目前顯示的類型
          */
@@ -65,177 +63,87 @@ class FileShow {
                 item.setAttribute("active", "");
             }
 
-            if (groupType === GroupType.none) {
 
-                //更換工具列
-                getToolsDom(GroupType.none)?.setAttribute("active", "true");
-
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
                 M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
                 M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
                 M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "none";
-                dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "none";
-
-                dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                tieefseeview.loadNone();
-                officeCloseDocument();
-                return;
-            }
-
-            if (groupType === GroupType.welcome) {
-
-                //更換工具列
-                getToolsDom(GroupType.welcome)?.setAttribute("active", "true");
-
-                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
-                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
-                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "none";
-                dom_welcomeview.style.display = "flex";
-                dom_monacoEditor.style.display = "none";
-
-                dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                tieefseeview.loadNone();
-                officeCloseDocument();
-                return;
-            }
-
-            if (groupType === GroupType.img || groupType === GroupType.video) {
-
-                //更換工具列
-                getToolsDom(GroupType.img)?.setAttribute("active", "true");
-
+            } else if (groupType === GroupType.img || groupType === GroupType.imgs || groupType === GroupType.video) {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
                 M.largeBtn.setHide(false);//解除隱藏 大型切換按鈕
+            } else {
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
+            }
 
-                dom_imgview.style.display = "block";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "none";
+
+            if (groupType === GroupType.none) {
+                setShowTools(GroupType.none); //更換工具列
+            }
+
+            if (groupType === GroupType.welcome) {
+                setShowTools(GroupType.welcome);
+                dom_welcomeview.style.display = "flex";
+            } else {
                 dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "none";
+            }
 
-                dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                //view_image.loadNone();
-                officeCloseDocument();
-                return;
+            if (groupType === GroupType.img || groupType === GroupType.video) {
+                setShowTools(GroupType.img);
+                dom_imgview.style.display = "block";
+            } else {
+                dom_imgview.style.display = "none";
+                tieefseeview.loadNone();
             }
 
             if (groupType === GroupType.imgs) {
-                return;
             }
 
             if (groupType === GroupType.txt) {
-
-                //更換工具列
-                getToolsDom(GroupType.txt)?.setAttribute("active", "true");
-
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
+                setShowTools(GroupType.txt);
                 dom_txtview.style.display = "block";
-                dom_pdftronWebviewer.style.display = "none";
-                dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "none";
-
-                dom_pdfview.setAttribute("src", "");
-                //dom_txtview.value = "";
-                tieefseeview.loadNone();
-                officeCloseDocument();
-                return;
+            } else {
+                dom_txtview.style.display = "none";
+                dom_txtview.value = "";
             }
 
             if (groupType === GroupType.monacoEditor) {
-
-                //更換工具列
-                getToolsDom(GroupType.txt)?.setAttribute("active", "true");
-
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "none";
-                dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "block";
-
-                dom_pdfview.setAttribute("src", "");
-                //dom_txtview.value = "";
-                tieefseeview.loadNone();
-                officeCloseDocument();
-                return;
+                setShowTools(GroupType.txt);
+                iframes.monacoEditor.visible(true);
+            } else {
+                iframes.monacoEditor.visible(false);
+                iframes.monacoEditor.loadNone();
             }
 
             if (groupType === GroupType.pdf) {
-
-                //更換工具列
-                getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
-
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-
-                dom_imgview.style.display = "none";
+                setShowTools(GroupType.pdf);
                 dom_pdfview.style.display = "block";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "none";
-                dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "none";
-
-                //dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                tieefseeview.loadNone();
-                officeCloseDocument();
-                return;
+            } else {
+                dom_pdfview.setAttribute("src", "");
+                dom_pdfview.style.display = "none";
             }
 
             if (groupType === GroupType.office) {
-
-                //更換工具列
-                getToolsDom(GroupType.pdf)?.setAttribute("active", "true");
-
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
-                
-                dom_imgview.style.display = "none";
-                dom_pdfview.style.display = "none";
-                dom_txtview.style.display = "none";
-                dom_pdftronWebviewer.style.display = "block";
-                dom_welcomeview.style.display = "none";
-                dom_monacoEditor.style.display = "none";
-
-                dom_pdfview.setAttribute("src", "");
-                dom_txtview.value = "";
-                tieefseeview.loadNone();
-                //officeCloseDocument();
-                return;
+                setShowTools(GroupType.pdf);
+                iframes.pDFTronWebviewer.visible(true);
+            } else {
+                iframes.pDFTronWebviewer.loadNone();
+                iframes.pDFTronWebviewer.visible(false);
             }
+
+            if (groupType === GroupType.md) {
+                setShowTools(GroupType.txt);
+                iframes.cherryMarkdown.visible(true);
+            } else {
+                iframes.cherryMarkdown.visible(false);
+                iframes.cherryMarkdown.loadNone();
+            }
+
         }
 
 
@@ -248,6 +156,20 @@ class FileShow {
             return M.dom_tools.querySelector(`.main-tools-group[data-name="${type}"]`);
         }
 
+
+        /**
+         * 更換工具列
+         * @param type 
+         */
+        function setShowTools(type: string) {
+            let arToolsGroup = document.querySelectorAll(".main-tools-group");
+            for (let i = 0; i < arToolsGroup.length; i++) {
+                const item = arToolsGroup[i];
+                item.setAttribute("active", "");
+            }
+
+            getToolsDom(type)?.setAttribute("active", "true"); //更換工具列
+        }
 
         function getIsLoaded() {
             return isLoaded;
@@ -311,7 +233,7 @@ class FileShow {
 
             let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
             let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType);// ex. { ext:"psd", type:"magick" }
-            if (configItem == null) {
+            if (configItem === null) {
                 configItem = { ext: "", type: "vips", vipsType: "magick" }
             }
             let configType = configItem.type;
@@ -506,7 +428,6 @@ class FileShow {
 
         /**
          * pdf 或 ai
-         * @param _url 
          */
         async function openPdf(fileInfo2: FileInfo2) {
 
@@ -531,24 +452,8 @@ class FileShow {
             if (configType == "PDFTronWebviewer") {
 
                 setShowType(GroupType.office);//改變顯示類型
-
-                if (dom_pdftronWebviewer.src == "") {
-                    let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                    dom_pdftronWebviewer.src = "./iframe/PDFTronWebviewer.html?appInfo=" + appInfoJson;
-                }
-
-                for (let i = 0; i < 2000; i++) {//等待套件初始化
-                    if (isInitPDFTronWebviewer === true) {
-                        break;
-                    }
-                    await sleep(10);
-                }
-
-                let json = {
-                    type: "load",
-                    data: _path,
-                };
-                dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+                iframes.setTheme();
+                await iframes.pDFTronWebviewer.load(_path);
             }
 
 
@@ -571,104 +476,53 @@ class FileShow {
             M.mainExif.init(fileInfo2);//初始化exif
         }
 
-        window.addEventListener("message", (e) => {
-
-            //console.log(e)
-
-            //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
-                console.error("錯誤的請求來源：" + e.origin)
-                return;
-            }*/
-
-            //接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
-
-            if (type === "initFinishPDFTronWebviewer") {
-                isInitPDFTronWebviewer = true;
-            }
-
-        });
-
-        function officeCloseDocument() {
-            if (isInitPDFTronWebviewer === false) { return; }
-            let json = {
-                type: "closeDocument",
-                data: "",
-            };
-            dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
-        }
-
-        window.addEventListener("message", (e) => {
-
-            //console.log(e)
-
-            //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
-                console.error("錯誤的請求來源：" + e.origin)
-                return;
-            }*/
-
-            //接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
-
-            if (type === "initFinishMonacoEditor") {
-                isInitMonacoEditor = true;
-            }
-
-        });
-
 
         /**
          * 純文字
-         * @param _path 
          */
         async function openTxt(fileInfo2: FileInfo2) {
 
             let _path = fileInfo2.Path;
 
-
+            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.txt, fileType);// ex. { ext:"psd", type:"magick" }
+            if (configItem == undefined) {
+                configItem = { ext: "", type: "auto" }
+            }
+            let configType = configItem.type;
 
             if (baseWindow.appInfo === undefined) { return; }
 
-            if (baseWindow.appInfo.plugin.MonacoEditor) {
+            let txt = await WV_File.GetText(_path);
+
+
+            if (configType === "md") {
+
+                setShowType(GroupType.md);//改變顯示類型
+                iframes.setTheme();
+                let dir = Lib.GetDirectoryName(_path) as string;
+                dir = Lib.pathToURL(dir) + "/";
+                await iframes.cherryMarkdown.setReadonly(M.getIsQuickLook());
+                await iframes.cherryMarkdown.loadFile(txt, dir);
+
+            } else if (baseWindow.appInfo.plugin.MonacoEditor) {
 
                 setShowType(GroupType.monacoEditor);//改變顯示類型
-
-                if (dom_monacoEditor.src == "") {
-                    let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                    dom_monacoEditor.src = "./iframe/MonacoEditor.html?appInfo=" + appInfoJson;
+                iframes.setTheme();
+                await iframes.monacoEditor.setReadonly(M.getIsQuickLook());
+                if (configType == "auto") {
+                    await iframes.monacoEditor.loadFile(txt, _path);
+                } else {
+                    await iframes.monacoEditor.loadTxt(txt, configType);
                 }
-
-                for (let i = 0; i < 2000; i++) {//等待套件初始化
-                    if (isInitMonacoEditor === true) {
-                        break;
-                    }
-                    await sleep(10);
-                }
-
-                let json = {
-                    type: "load",
-                    data: {
-                        path: _path,
-                        txt: await WV_File.GetText(_path),
-                    },
-                };
-                dom_monacoEditor.contentWindow?.postMessage(json, "*");
 
             } else {
 
                 setShowType(GroupType.txt);//改變顯示類型
-
+                iframes.setTheme();
                 dom_txtview.value = await WV_File.GetText(_path);
                 dom_txtview.scrollTo(0, 0);//捲到最上面
-
             }
-
-
-
 
             //檔案類型
             let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
@@ -710,3 +564,4 @@ class FileShow {
 
     }
 }
+

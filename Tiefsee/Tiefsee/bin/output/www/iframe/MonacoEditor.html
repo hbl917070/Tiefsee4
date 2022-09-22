@@ -21,6 +21,8 @@
             height: 100%;
         }
     </style>
+    <script src="./../js/LibIframe.js"></script>
+
 </head>
 
 <body>
@@ -28,15 +30,6 @@
     <div id="viewer"></div>
 
     <script>
-
-        var editor;
-        var pathLib;
-        var pathJs;
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            await initJs();
-            initPDFTronWebviewer();
-        });
 
         window.addEventListener("message", (e) => {
 
@@ -50,44 +43,73 @@
             let type = e.data.type;
             let data = e.data.data;
 
-            if (type === "load") {
-                loadFile(data.path, data.txt);
+            if (type === "loadFile") {
+                loadFile(data.txt, data.path);
             }
-            if (type === "closeDocument") {
-                closeDocument()
+            if (type === "loadTxt") {
+                loadTxt(data.txt, data.fileType);
             }
+            if (type === "loadNone") {
+                loadNone();
+            }
+            if (type === "setReadonly") {
+                libIframe.setReadonly(data.val);
+            }
+            if (type === "getTxt") {
+                let t = getTxt();
+                let json = {
+                    type: "getTxt",
+                    data: t,
+                };
+                postMsg(json);
+            }
+            if (type === "setTheme") {
+                setTheme();
+            }
+
         });
 
 
         /**
-         * 初始化載入js
+         * 告知父物件 已經初始化完成
          */
-        async function initJs() {
-            var getUrlString = location.href;
-            var url = new URL(getUrlString);
-            var appInfo = url.searchParams.get("appInfo");
-            appInfo = JSON.parse(appInfo);
-            let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
-
-            pathLib = "file:///" + appDataPath + "/Plugin/monaco-editor/min/vs";
-            pathJs = pathLib + "/loader.js";
-
-            var script = document.createElement("script");
-            script.src = pathJs;
-            document.head.appendChild(script);
-
-            await new Promise((resolve, reject) => {
-                script.onload = function () {
-                    resolve(1);
-                };
-            })
+        function initFinish() {
+            let json = {
+                type: "MonacoEditor.initFinish",
+                data: "",
+            };
+            postMsg(json);
         }
+
+        /**
+         * 傳送資料給父物件
+         */
+        function postMsg(json) {
+            parent.postMessage(json, "*");
+        }
+    </script>
+
+    <script>
+
+        var libIframe = new LibIframe();
+        var editor;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            initFinishMonacoEditor();
+        });
 
 
         /**
          *   初始化套件
          */
-        async function initPDFTronWebviewer() {
+        async function initFinishMonacoEditor() {
+
+            let pluginPath = libIframe.getPluginPath();
+            let pathLib = pluginPath + "/monaco-editor/min/vs";
+            let pathJs = pathLib + "/loader.js";
+            await libIframe.addScript(pathJs);
+
+            //-------------
 
             require.config({ paths: { "vs": pathLib } });
             require(["vs/editor/editor.main"], () => {
@@ -95,31 +117,9 @@
                 // 初始化變量
                 var fileCounter = 0;
                 var editorArray = [];
-                var defaultCode = `
-                    function helloWorld() {
-                       console.log("Hello world!");
-                    }
-                `;
+                var defaultCode = ``;
 
-                // 定義編輯器主題
-                monaco.editor.defineTheme("myTheme", {
-                    base: "vs-dark",
-                    inherit: true,
-                    rules: [{
-                        background: "1f272b"
-                    }],
-                    colors: {
-                        //"editor.foreground": "#FF00FF",
-                        "editor.background": "#00000000",
-                        //"editorCursor.foreground": "#8B0000",
-                        //"editor.lineHighlightBackground": "#0000FF20",
-                        //"editorLineNumber.foreground": "#008800",
-                        //"editor.selectionBackground": "#88000030",
-                        //"editor.inactiveSelectionBackground": "#88000015"
-                    }
-                });
-                monaco.editor.setTheme("myTheme");
-                //monaco.editor.setTheme("vs-dark");
+                setTheme();//編輯器主題
 
                 editor = monaco.editor.create(document.getElementById("viewer"), {
                     mouseWheelZoom: true,//允許使用ctrl+滑鼠滾輪來縮放文字
@@ -127,14 +127,7 @@
                     automaticLayout: true,//自動縮放版面
                 });
 
-
-                //告知父物件 已經初始化完成
-                let json = {
-                    type: "initFinishMonacoEditor",
-                    data: "",
-                };
-                postMsg(json);
-
+                initFinish();
             });
 
         }
@@ -143,27 +136,70 @@
         /**
          * 清空文件
          */
-        function closeDocument() {
-            instance.UI.closeDocument();
+        function loadNone() {
+            loadTxt("", "txt");
         }
-
 
         /**
          * 載入檔案
          */
-        async function loadFile(path, txt) {
+        async function loadFile(txt, path) {
             monaco.editor.getModels().forEach(model => model.dispose());//清除所有已存在的 Model
             var model = monaco.editor.createModel(txt, undefined, monaco.Uri.file(path));
             editor.setModel(model);
         }
 
+        /**
+         * 載入文字
+         */
+        function loadTxt(txt, fileType) {
+            monaco.editor.getModels().forEach(model => model.dispose());//清除所有已存在的 Model
+            var model = monaco.editor.createModel(txt, fileType);
+            editor.setModel(model);
+        }
 
         /**
-         * 傳送資料給父物件
+         * 取得文字
          */
-        function postMsg(json) {
-            parent.postMessage(json, "*");
+        function getTxt() {
+            return editor.getValue();
         }
+
+
+        /**
+         * 套用主題
+         */
+        function setTheme() {
+
+            //判斷是深色還是淺色主題
+            let theme = libIframe.initTheme();
+            let themeName = "vs";
+            if (theme["theme"] === "dark") {
+                themeName = "vs-dark";
+            }
+
+            let bgColor = libIframe.colorToHex(theme["windowBackground"]);
+
+            monaco.editor.defineTheme("myTheme", {
+                base: themeName,
+                inherit: true,
+                rules: [{
+                    background: bgColor
+                }],
+                colors: {
+                    //"editor.foreground": "#FF00FF",
+                    "editor.background": "#00000000",
+                    //"editorCursor.foreground": "#8B0000",
+                    //"editor.lineHighlightBackground": "#0000FF20",
+                    //"editorLineNumber.foreground": "#008800",
+                    //"editor.selectionBackground": "#88000030",
+                    //"editor.inactiveSelectionBackground": "#88000015"
+                }
+            });
+            monaco.editor.setTheme("myTheme");
+            //monaco.editor.setTheme("vs-dark");
+        }
+
 
     </script>
 </body>

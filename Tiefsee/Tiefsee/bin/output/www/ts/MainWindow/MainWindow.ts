@@ -28,8 +28,10 @@ class MainWindow {
     public initMenu;
     public largeBtn;
     public script;
+
     public applySetting;
     public saveSetting;
+    public getIsQuickLook;
 
     constructor() {
 
@@ -44,6 +46,9 @@ class MainWindow {
 
         let firstRun = true;//用於判斷是否為第一次執行
         let startType = 0;//1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
+
+        /** 是否為快速預覽 */
+        var isQuickLook = false;
 
         this.dom_tools = dom_tools;
         this.dom_mainL = dom_mainL;
@@ -70,6 +75,7 @@ class MainWindow {
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
+        this.getIsQuickLook = getIsQuickLook;
 
         new Hotkey(this);
         init();
@@ -99,6 +105,8 @@ class MainWindow {
 
             baseWindow.appInfo = json;
             startType = json.startType;
+
+            isQuickLook = false;
 
             if (json.quickLookRunType === 0) {//一般啟動
 
@@ -134,6 +142,7 @@ class MainWindow {
                         WV_Window.ShowWindow();//顯示視窗 
                         initLoad(json.args);//初始載入檔案
                     } else {
+                        isQuickLook = true;
                         await initQuickLookPosition();//初始 快速啟動的坐標
                         initMenu.initOpen();//初始化「開啟檔案」的menu
                         initLoad(json.args);//初始 載入檔案
@@ -471,6 +480,13 @@ class MainWindow {
         }
 
         /**
+         * 目前是否為快速預覽
+         */
+        function getIsQuickLook() {
+            return isQuickLook;
+        }
+
+        /**
          * 套用設定
          * @param _settings 
          * @param isStart 是否為第一次呼叫
@@ -569,6 +585,7 @@ class MainWindow {
                 }
             }
 
+            fileShow.iframes.setTheme();
         }
 
 

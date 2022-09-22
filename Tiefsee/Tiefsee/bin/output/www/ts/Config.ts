@@ -302,8 +302,9 @@ class Config {
                     { ext: "docx", type: "PDFTronWebviewer" },
                     { ext: "ppt", type: "PDFTronWebviewer" },
                     { ext: "pptx", type: "PDFTronWebviewer" },
-                    { ext: "odt", type: "PDFTronWebviewer" },
-                    { ext: "odp", type: "PDFTronWebviewer" }
+                    //{ ext: "odt", type: "PDFTronWebviewer" },
+                    //{ ext: "odp", type: "PDFTronWebviewer" },
+                    //{ ext: "xlsx", type: "PDFTronWebviewer" },
                 );
             }
             return d;
@@ -316,11 +317,12 @@ class Config {
                 { ext: "scss", type: "auto" },
                 { ext: "sass", type: "auto" },
                 { ext: "less", type: "auto" },
-                { ext: "js", type: "auto" },
-                { ext: "ts", type: "auto" },
+                { ext: "js", type: "javascript" },
+                { ext: "ts", type: "typescript" },
                 { ext: "xml", type: "auto" },
                 { ext: "html", type: "auto" },
                 { ext: "ejs", type: "html" },
+                { ext: "jsx", type: "auto" },
                 { ext: "php", type: "auto" },
                 { ext: "py", type: "auto" },
                 { ext: "java", type: "auto" },
@@ -329,13 +331,17 @@ class Config {
                 { ext: "cpp", type: "auto" },
                 { ext: "go", type: "auto" },
                 { ext: "r", type: "auto" },
-                { ext: "ini", type: "ini" },
-                { ext: "log", type: "log" },
+                { ext: "ini", type: "auto" },
+                { ext: "log", type: "auto" },
                 { ext: "config", type: "auto" },
                 { ext: "json", type: "auto" },
                 { ext: "sql", type: "auto" },
-                { ext: "url", type: "url" },
-                { ext: "md", type: "auto" },
+                { ext: "url", type: "auto" },
+                { ext: "md", type: "md" },
+                { ext: "gitignore", type: "auto" },
+                { ext: "bat", type: "auto" },
+
+
             ]
         }
 
@@ -377,12 +383,16 @@ var GroupType = {
     /** pdf 或 ai */
     pdf: "pdf",
 
-    /** pdf、ai、doc、docx、ppt、pptx、odt、odp */
+    /** doc、docx、ppt、pptx */
     office: "office",
 
     /** 純文字 */
     txt: "txt",
 
+    /** Markdown */
+    md: "md",
+
+    /** 純文字(monacoEditor) */
     monacoEditor: "monacoEditor",
 
     /** 影片 */

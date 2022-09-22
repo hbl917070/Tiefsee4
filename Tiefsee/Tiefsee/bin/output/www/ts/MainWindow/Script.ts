@@ -157,6 +157,21 @@ class ScriptFile {
     public showContextMenu() {
         WV_File.ShowContextMenu(this.M.fileLoad.getFilePath(), true);
     }
+
+    public async save(btn: HTMLElement) {
+        let t = await this.M.fileShow.iframes.getTxt();
+        let path = this.M.fileLoad.getFilePath();
+        if (t == null) {
+            Msgbox.show({ txt: "儲存失敗", });
+            return;
+        }
+        try {
+            await WV_File.SetText(path, t);
+        } catch (e) {
+            Msgbox.show({ txt: "儲存失敗：\n" + e, });
+        }
+        //console.log(t)
+    }
 }
 
 class ScriptMenu {

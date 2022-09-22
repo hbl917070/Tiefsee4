@@ -21,6 +21,8 @@
             height: 100%;
         }
     </style>
+    <script src="./../js/LibIframe.js"></script>
+
 </head>
 
 <body>
@@ -28,15 +30,6 @@
     <div id="viewer"></div>
 
     <script>
-        var instance;
-        var documentViewer;
-        var pathLib;
-        var pathJs;
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            await initJs();
-            initPDFTronWebviewer();
-        });
 
         window.addEventListener("message", (e) => {
 
@@ -53,41 +46,54 @@
             if (type === "load") {
                 loadFile(data);
             }
-            if (type === "closeDocument") {
+            if (type === "loadNone") {
                 closeDocument()
+            }
+            if (type === "setTheme") {
+                setTheme();
             }
         });
 
 
         /**
-         * 初始化載入js
+         * 告知父物件 已經初始化完成
          */
-        async function initJs() {
-            var getUrlString = location.href;
-            var url = new URL(getUrlString);
-            var appInfo = url.searchParams.get("appInfo");
-            appInfo = JSON.parse(appInfo);
-            let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
-
-            pathLib = "file:///" + appDataPath + "/Plugin/WebViewer/lib";
-            pathJs = pathLib + "/webviewer.min.js";
-
-            var script = document.createElement("script");
-            script.src = pathJs;
-            document.head.appendChild(script);
-
-            await new Promise((resolve, reject) => {
-                script.onload = function () {
-                    resolve(1);
-                };
-            })
+        function initFinish() {
+            let json = {
+                type: "PDFTronWebviewer.initFinish",
+                data: "",
+            };
+            postMsg(json);
         }
 
+        /**
+         * 傳送資料給父物件
+         */
+        function postMsg(json) {
+            parent.postMessage(json, "*");
+        }
+    </script>
+
+    <script>
+
+        var libIframe = new LibIframe();
+        var instance;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            initPDFTronWebviewer();
+        });
 
         /**
          *   初始化套件
          */
         async function initPDFTronWebviewer() {
+
+            let pluginPath = libIframe.getPluginPath();
+            let pathLib = pluginPath + "/WebViewer/lib";
+            let pathJs = pathLib + "/webviewer.min.js";
+            await libIframe.addScript(pathJs);
+
+            //-------------
 
             WebViewer(
                 {
@@ -97,19 +103,24 @@
                 document.getElementById("viewer")
             ).then(_instance => {
                 instance = _instance;
-                //documentViewer = instance.Core;
-            
 
-                //告知父物件 已經初始化完成
-                let json = {
-                    type: "initFinishPDFTronWebviewer",
-                    data: "",
-                };
-                postMsg(json);
+                setTheme()
+                initFinish();//告知父物件 已經初始化完成
 
             });
         }
 
+        /**
+         * 套用主題
+         */
+        function setTheme() {
+            let theme = libIframe.initTheme();
+            if (theme["theme"] === "dark") {
+                instance.UI.setTheme("dark");
+            } else {
+                instance.UI.setTheme("light");
+            }
+        }
 
         /**
          * 清空文件
@@ -118,7 +129,6 @@
             instance.UI.closeDocument();
         }
 
-
         /**
          * 載入檔案
          */
@@ -126,14 +136,6 @@
             instance.UI.loadDocument(path);
             instance.UI.setFitMode("FitWidth");//縮放模式為寬度全滿
             instance.UI.setToolbarGroup('toolbarGroup-View');//工具列預設選擇為view
-        }
-
-
-        /**
-         * 傳送資料給父物件
-         */
-        function postMsg(json) {
-            parent.postMessage(json, "*");
         }
 
     </script>
