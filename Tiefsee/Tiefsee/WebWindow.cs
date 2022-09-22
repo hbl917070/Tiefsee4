@@ -133,7 +133,7 @@ namespace Tiefsee {
                 ww.wv2.NavigationCompleted += (sender, e) => {//網頁載入完成時
                     SendOnCreate(ww, _args);
                 };
-            
+
                 NewTempWindow(_url);//新建window，用於下次顯示
                 Console.WriteLine("第一次開啟:---" + _url);
                 return ww;
@@ -148,7 +148,7 @@ namespace Tiefsee {
                 SendOnCreate(temp2, _args);
             };
             SendOnCreate(temp2, _args);
-                  
+
             NewTempWindow(_url);//新建window，用於下次顯示
 
             return temp2;//回傳剛剛新建的window
@@ -257,7 +257,6 @@ namespace Tiefsee {
             //this.SetSize(400, 300);
             this.Opacity = 0;
             wv2 = new WebView2();
-
             this.Controls.Add(wv2);
 
             if (isDelayInit) {
