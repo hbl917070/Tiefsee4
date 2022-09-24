@@ -72,7 +72,7 @@
                     type: "getTxt",
                     data: t,
                 };
-                postMsg(json);
+                libIframe.postMsg(json);
             }
             if (type === "setTheme") {
                 setTheme();
@@ -88,20 +88,16 @@
                 type: "CherryMarkdown.initFinish",
                 data: "",
             };
-            postMsg(json);
+            libIframe.postMsg(json);
         }
 
-        /**
-         * 傳送資料給父物件
-         */
-        function postMsg(json) {
-            parent.postMessage(json, "*");
-        }
     </script>
 
     <script>
 
         var libIframe = new LibIframe();
+        libIframe.initEventDrop(window);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
+
         const cherryObj = initCherry();
         initFinish();
 
@@ -129,6 +125,30 @@
                 externals: { // 第三方包
                     //echarts: window.echarts,
                     MathJax: window.MathJax,
+                },
+                // 解析引擎組態
+                engine: {
+                    // 全域組態
+                    global: {
+                        /**
+                         * 全域的URL處理器
+                         * @param {string} url 來源url
+                         * @param {'image'|'audio'|'video'|'autolink'|'link'} srcType 來源類型
+                         * @returns
+                         */
+                        urlProcessor: (url) => {
+                            //console.log(url)
+                            if (url.indexOf("http:") == 0 || url.indexOf("https:") == 0 || url.indexOf("mailto:") == 0) {
+                                return url;
+                            } else if (url.length > 2 && url.substr(1, 1) === ":") { // C:\123.jppg
+                                return url;
+                            } else if (url.length > 2 && url.substr(0, 2) === "\\\\") { // \\Desktop-abc\AA
+                                return url;
+                            } else {
+                                return getRoot() + url;
+                            }
+                        },
+                    }
                 },
                 toolbars: {
                     theme: "light", // light or dark                                                                            
@@ -182,7 +202,6 @@
         }
 
 
-
         /**
          * get md
          */
@@ -205,11 +224,17 @@
             return cherryObj.getHtml();
         }
 
+        var _root = "";
         /**
          * 設定md檔所在的目錄，好讓圖片跟超連結找得到
          */
         function setRoot(path) {
-            document.getElementById("root").href = path;
+            _root = path;
+            //document.getElementById("root").href = path;
+        }
+        function getRoot() {
+            return _root;
+            //return document.getElementById("root").href;
         }
 
         /**
@@ -219,6 +244,48 @@
 
         }
 
+
+        document.querySelector("body").addEventListener("click", function (e) {
+            //alert("NOPE!, I won't take you there haha");
+
+            let dom = e.target;
+            let tagname = dom.tagName;
+            console.log(tagname);
+
+            if (tagname !== "A") { return; }
+            let href = dom.href;
+
+            if (href === undefined || href === null || href === "") { return; }
+
+            //如果是錨點超連結，就允許執行
+            let hrefURL = new URL(href);
+            let locationURL = new URL(href);
+            if (hrefURL.pathname === locationURL.pathname) {
+                if (hrefURL.hash != "") {
+                    return;
+                }
+            }
+
+            if (href.indexOf("http:") === 0 || href.indexOf("https:") === 0) {
+                //開啟網址
+                let json = {
+                    type: "openUrl",
+                    data: href,
+                };
+                libIframe.postMsg(json);
+            } else {
+                //開啟檔案
+                let json = {
+                    type: "openFile",
+                    data: href,
+                };
+                libIframe.postMsg(json);
+            }
+
+            e.preventDefault();
+            //prevent event action
+
+        });
     </script>
 
 

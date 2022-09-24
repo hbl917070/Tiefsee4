@@ -18,7 +18,7 @@ class Iframes {
         this.cherryMarkdown = cherryMarkdown;
         this.setTheme = setTheme;
 
-        window.addEventListener("message", (e) => {
+        window.addEventListener("message", async (e) => {
 
             //console.log(e)
 
@@ -36,6 +36,24 @@ class Iframes {
                 _txt = data;
             }
 
+            if (type === "openUrl") {
+                WV_RunApp.OpenUrl(data);
+            }
+            if (type === "openFile") {
+                let exePath = await WV_Window.GetAppPath();
+                let filePath = Lib.URLToPath(data);
+
+                if (await WV_File.Exists(filePath)) {
+                    WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
+                } else {
+                    Msgbox.show({ txt: "找不到<br>" + filePath });
+                }
+            }
+            if (type === "loadDropFile") {
+
+                await M.fileLoad.loadDropFile(data);
+
+            }
         });
 
         var _txt: null | string = null;

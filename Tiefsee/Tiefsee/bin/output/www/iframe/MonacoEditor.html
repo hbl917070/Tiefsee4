@@ -61,7 +61,7 @@
                     type: "getTxt",
                     data: t,
                 };
-                postMsg(json);
+                libIframe.postMsg(json);
             }
             if (type === "setTheme") {
                 setTheme();
@@ -78,20 +78,16 @@
                 type: "MonacoEditor.initFinish",
                 data: "",
             };
-            postMsg(json);
+            libIframe.postMsg(json);
         }
 
-        /**
-         * 傳送資料給父物件
-         */
-        function postMsg(json) {
-            parent.postMessage(json, "*");
-        }
     </script>
 
     <script>
 
         var libIframe = new LibIframe();
+        libIframe.initEventDrop(window);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
+
         var editor;
 
         document.addEventListener("DOMContentLoaded", async () => {

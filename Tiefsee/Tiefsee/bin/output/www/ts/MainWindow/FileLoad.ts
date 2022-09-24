@@ -9,17 +9,18 @@ class FileLoad {
     public getFlagFile: () => number;
     public setFlagFile: (n: number) => void;
 
-    public showDir
-    public prevDir
-    public nextDir
-    public getWaitingDir
-    public setWaitingDir
-    public getFlagDir
-    public setFlagDir
-    public getWaitingDirKey
-    public updateFlagDir
-    public getDirPath
+    public showDir;
+    public prevDir;
+    public nextDir;
+    public getWaitingDir;
+    public setWaitingDir;
+    public getFlagDir;
+    public setFlagDir;
+    public getWaitingDirKey;
+    public updateFlagDir;
+    public getDirPath;
 
+    public loadDropFile;
     public loadFile;
     public loadFiles;
 
@@ -67,6 +68,7 @@ class FileLoad {
         this.updateFlagDir = updateFlagDir;
         this.getDirPath = getDirPath;
 
+        this.loadDropFile = loadDropFile;
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
         this.nextFile = nextFile;
@@ -282,6 +284,32 @@ class FileLoad {
         //#endregion ---------------------
 
 
+        /**
+         * 用於拖曳開啟檔案
+         * @param files 檔名陣列
+         */
+        async function loadDropFile(files: string[]) {
+
+            //取得拖曳進來的檔案路徑
+            let _dropPath = await baseWindow.getDropPath();
+            console.log(_dropPath)
+            if (_dropPath === "") { return; }
+
+            Msgbox.closeAll();//關閉所有訊息視窗
+            M.menu.close();
+
+            let dirPath = Lib.GetDirectoryName(_dropPath);
+            if (dirPath === null) { return; }       
+            if (files.length > 1) {
+                if (dirPath !== null) {
+                    await loadFiles(dirPath, files);
+                }
+            } else {
+                let filePath = Lib.Combine([dirPath, files[0]]);
+                await loadFile(filePath);
+            }
+        }
+
 
         /**
          * 載入檔案陣列
@@ -474,9 +502,6 @@ class FileLoad {
                 }
                 if (groupType === GroupType.pdf) {
                     await M.fileShow.openPdf(fileInfo2);
-                }
-                if (groupType === GroupType.office) {
-                    await M.fileShow.openOffice(fileInfo2);
                 }
                 if (groupType === GroupType.txt) {
                     await M.fileShow.openTxt(fileInfo2);

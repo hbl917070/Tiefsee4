@@ -440,27 +440,13 @@ class MainWindow {
 
                 let files = e.dataTransfer.files;
 
-                //取得拖曳進來的檔案路徑
-                let _dropPath = await baseWindow.getDropPath();
-                if (_dropPath === "") { return; }
-
-                Msgbox.closeAll();//關閉所有訊息視窗
-                menu.close();
-
-                if (files.length > 1) {
-                    let arFile = [];
-                    for (let i = 0; i < files.length; i++) {
-                        const item = files[i];
-                        arFile.push(item.name);
-                    }
-                    let dirPath = Lib.GetDirectoryName(_dropPath);
-                    if (dirPath !== null) {
-                        await fileLoad.loadFiles(dirPath, arFile);
-                    }
-                } else {
-
-                    await fileLoad.loadFile(_dropPath);
+                let arFile = [];
+                for (let i = 0; i < files.length; i++) {
+                    const item = files[i];
+                    arFile.push(item.name);
                 }
+
+                await fileLoad.loadDropFile(arFile);
 
                 e.stopPropagation();
                 e.preventDefault();

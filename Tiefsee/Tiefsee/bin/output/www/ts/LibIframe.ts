@@ -13,8 +13,57 @@ class LibIframe {
                 e.preventDefault();
             }
         })
+
+
+
     }
 
+
+    /**
+     * 註冊 drop 事件，拖曳檔案進來時 開啟檔案
+     */
+    public initEventDrop(dom: HTMLElement) {
+
+        dom.addEventListener("dragenter", (e: DragEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+        }, false);
+
+        dom.addEventListener("dragover", (e: DragEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+        }, false);
+
+        dom.addEventListener("drop", (e: DragEvent) => {
+
+            if (e.dataTransfer === null) { return; }
+
+            let files = e.dataTransfer.files;
+
+            let arFile = [];
+            for (let i = 0; i < files.length; i++) {
+                const item = files[i];
+                arFile.push(item.name);
+            }
+            console.log(arFile)
+            let json = {
+                type: "loadDropFile",
+                data: arFile,
+            };
+            this.postMsg(json);
+
+            //  e.stopPropagation();
+            //  e.preventDefault();
+        }, false);
+    }
+
+
+    /**
+     * 傳送資料給父物件
+     */
+    public postMsg(json: any) {
+        parent.postMessage(json, "*");
+    }
 
     /**
      * 取得 Plugin 的路徑

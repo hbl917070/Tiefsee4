@@ -63,15 +63,9 @@
                 type: "PDFTronWebviewer.initFinish",
                 data: "",
             };
-            postMsg(json);
+            libIframe.postMsg(json);
         }
 
-        /**
-         * 傳送資料給父物件
-         */
-        function postMsg(json) {
-            parent.postMessage(json, "*");
-        }
     </script>
 
     <script>
@@ -106,6 +100,9 @@
 
                 setTheme()
                 initFinish();//告知父物件 已經初始化完成
+
+                let iframeWindow = document.body.querySelector("iframe").contentWindow;
+                libIframe.initEventDrop(iframeWindow);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
 
             });
         }

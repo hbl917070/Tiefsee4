@@ -20,7 +20,7 @@ class BaseWindow {
     public btn_maximized: HTMLDivElement;
     public btn_close: HTMLDivElement;
     public dom_titlebarTxt: HTMLDivElement;
-    
+
     public appInfo: AppInfo | undefined;
 
     public topMost: boolean = false;
@@ -156,15 +156,8 @@ class BaseWindow {
 
         let _dropPath: string = "";
         for (let i = 0; i < 100; i++) {
-
             if (temp_dropPath !== "") {
-                _dropPath = temp_dropPath;
-                _dropPath = decodeURIComponent(temp_dropPath)
-                if (_dropPath.indexOf("file:///") === 0) {//一般檔案
-                    _dropPath = _dropPath.substring(8);
-                } else if (_dropPath.indexOf("file://") === 0) {//網路路徑，例如 \\Desktop-abc\AA
-                    _dropPath = _dropPath.substring(5);
-                }
+                _dropPath = Lib.URLToPath(temp_dropPath);
                 break;
             }
             await sleep(10);

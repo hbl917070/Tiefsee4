@@ -287,6 +287,23 @@ class Lib {
 
 
     /**
+     * URL 轉 路徑
+     */
+    public static URLToPath(path: string): string {
+
+        if (path.indexOf("file:///") === 0) {//一般檔案
+            path = path.substring(8);
+        } else if (path.indexOf("file://") === 0) {//網路路徑，例如 \\Desktop-abc\AA
+            path = path.substring(5);
+        }
+
+        path = decodeURIComponent(path)
+            .replace(/[/]/g, "\\");
+
+        return path;
+    }
+
+    /**
      * 路徑 轉 URL
      */
     public static pathToURL(path: string): string {
