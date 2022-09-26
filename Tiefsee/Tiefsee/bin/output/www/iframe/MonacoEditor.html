@@ -34,10 +34,10 @@
         window.addEventListener("message", (e) => {
 
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
@@ -55,10 +55,10 @@
             if (type === "setReadonly") {
                 libIframe.setReadonly(data.val);
             }
-            if (type === "getTxt") {
-                let t = getTxt();
+            if (type === "getText") {
+                let t = getText();
                 let json = {
-                    type: "getTxt",
+                    type: "getText",
                     data: t,
                 };
                 libIframe.postMsg(json);
@@ -94,6 +94,10 @@
             initFinishMonacoEditor();
         });
 
+        //點擊超連結時
+        window.open = function (href) {
+            libIframe.openUrl(href);//開啟網址或檔案
+        }
 
         /**
          *   初始化套件
@@ -128,7 +132,6 @@
 
         }
 
-
         /**
          * 清空文件
          */
@@ -157,10 +160,9 @@
         /**
          * 取得文字
          */
-        function getTxt() {
+        function getText() {
             return editor.getValue();
         }
-
 
         /**
          * 套用主題
@@ -195,7 +197,6 @@
             monaco.editor.setTheme("myTheme");
             //monaco.editor.setTheme("vs-dark");
         }
-
 
     </script>
 </body>

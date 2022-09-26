@@ -355,7 +355,7 @@ class MainWindow {
                     }, 50);
                 }
             });
-            Lib.addEventDblclick(fileShow.dom_welcomeview, async () => {//歡迎頁面
+            Lib.addEventDblclick(fileShow.iframes.welcomeview.dom, async () => {//歡迎頁面
                 let WindowState = baseWindow.windowState
                 if (WindowState === "Maximized") {
                     baseWindow.normal();
@@ -404,7 +404,7 @@ class MainWindow {
 
 
             //讓歡迎畫面允許拖曳視窗
-            fileShow.dom_welcomeview.addEventListener("mousedown", async (e) => {
+            fileShow.iframes.welcomeview.dom.addEventListener("mousedown", async (e) => {
 
                 //排除不允許拖拉的物件
                 let _dom = e.target as HTMLDivElement;

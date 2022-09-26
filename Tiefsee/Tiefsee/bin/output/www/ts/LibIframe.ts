@@ -45,7 +45,7 @@ class LibIframe {
                 const item = files[i];
                 arFile.push(item.name);
             }
-            console.log(arFile)
+
             let json = {
                 type: "loadDropFile",
                 data: arFile,
@@ -64,6 +64,7 @@ class LibIframe {
     public postMsg(json: any) {
         parent.postMessage(json, "*");
     }
+
 
     /**
      * 取得 Plugin 的路徑
@@ -114,6 +115,7 @@ class LibIframe {
         return theme;
     }
 
+
     /**
      * {r, g, b} to 16進制
      */
@@ -123,6 +125,8 @@ class LibIframe {
             + this.decimalToHex(color.b, 2);
         return c;
     }
+
+
     /**
      * 10進制 to 16進制
      */
@@ -162,4 +166,24 @@ class LibIframe {
     }
 
 
+    /**
+     * 開啟網址或檔案
+     */
+    public openUrl(url: string) {
+        if (url.indexOf("http:") === 0 || url.indexOf("https:") === 0) {
+            //開啟網址
+            let json = {
+                type: "openUrl",
+                data: url,
+            };
+            this.postMsg(json);
+        } else {
+            //開啟檔案
+            let json = {
+                type: "openFile",
+                data: url,
+            };
+            this.postMsg(json);
+        }
+    }
 }

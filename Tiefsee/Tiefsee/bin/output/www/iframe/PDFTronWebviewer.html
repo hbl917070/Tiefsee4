@@ -34,16 +34,16 @@
         window.addEventListener("message", (e) => {
 
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
-            if (type === "load") {
+            if (type === "loadFile") {
                 loadFile(data);
             }
             if (type === "loadNone") {
@@ -77,6 +77,8 @@
             initPDFTronWebviewer();
         });
 
+
+
         /**
          *   初始化套件
          */
@@ -103,7 +105,11 @@
 
                 let iframeWindow = document.body.querySelector("iframe").contentWindow;
                 libIframe.initEventDrop(iframeWindow);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
-
+               
+                //點擊超連結時
+                iframeWindow.open = function (href) {
+                    libIframe.openUrl(href);//開啟網址或檔案
+                }
             });
         }
 

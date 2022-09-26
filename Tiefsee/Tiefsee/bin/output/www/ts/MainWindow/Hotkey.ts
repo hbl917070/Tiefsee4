@@ -5,7 +5,6 @@ class Hotkey {
 
     constructor(M: MainWindow) {
 
-
         //快速鍵處理(暫時)
         window.addEventListener("keydown", async (e) => {
 
@@ -31,6 +30,13 @@ class Hotkey {
                     Msgbox.clickYes();
                 }
                 return;
+            }
+
+            //如果顯示的類型是 文字編輯器，則不使用快速鍵
+            if (M.fileShow.getGroupType() == GroupType.txt) {
+                if (Lib.isTextFocused()) {
+                    return;
+                }
             }
 
             //允許的名單

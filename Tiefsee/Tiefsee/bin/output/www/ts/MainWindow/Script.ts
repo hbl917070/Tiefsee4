@@ -159,7 +159,7 @@ class ScriptFile {
     }
 
     public async save(btn: HTMLElement) {
-        let t = await this.M.fileShow.iframes.getTxt();
+        let t = await this.M.fileShow.iframes.getText();
         let path = this.M.fileLoad.getFilePath();
         if (t == null) {
             Msgbox.show({ txt: "儲存失敗", });
@@ -167,6 +167,7 @@ class ScriptFile {
         }
         try {
             await WV_File.SetText(path, t);
+            Msgbox.show({ txt: "儲存完成", });
         } catch (e) {
             Msgbox.show({ txt: "儲存失敗：\n" + e, });
         }

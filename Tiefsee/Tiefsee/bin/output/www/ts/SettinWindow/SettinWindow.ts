@@ -677,14 +677,14 @@ class Setting {
             //開啟 AppData(使用者資料)
             btn_openAppData.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDataPath();
-                WV_RunApp.OpenUrl(path)
+                WV_RunApp.OpenUrl(path);
             });
 
             //開啟 www(原始碼)
             btn_openWww.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDirPath();
                 path = Lib.Combine([path, "www"]);
-                WV_RunApp.OpenUrl(path)
+                WV_RunApp.OpenUrl(path);
             });
 
             //開啟 暫存資料夾
@@ -694,7 +694,7 @@ class Setting {
                 if (await WV_Directory.Exists(path) === false) {//如果不存在就新建
                     await WV_Directory.CreateDirectory(path);
                 }
-                WV_RunApp.OpenUrl(path)
+                WV_RunApp.OpenUrl(path);
             });
         })
 

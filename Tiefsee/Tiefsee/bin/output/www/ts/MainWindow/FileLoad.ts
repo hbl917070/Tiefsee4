@@ -292,14 +292,13 @@ class FileLoad {
 
             //取得拖曳進來的檔案路徑
             let _dropPath = await baseWindow.getDropPath();
-            console.log(_dropPath)
             if (_dropPath === "") { return; }
 
             Msgbox.closeAll();//關閉所有訊息視窗
             M.menu.close();
 
             let dirPath = Lib.GetDirectoryName(_dropPath);
-            if (dirPath === null) { return; }       
+            if (dirPath === null) { return; }
             if (files.length > 1) {
                 if (dirPath !== null) {
                     await loadFiles(dirPath, files);

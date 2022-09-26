@@ -11,17 +11,12 @@ class FileShow {
 
     public tieefseeview;
     public dom_imgview;
-    public dom_welcomeview;
 
     public iframes;
 
     constructor(M: MainWindow) {
 
         var dom_imgview = document.querySelector("#mView-tiefseeview") as HTMLDivElement;
-        var dom_pdfview = document.querySelector("#mView-pdf") as HTMLIFrameElement;
-        var dom_txtview = document.querySelector("#mView-txt") as HTMLTextAreaElement;
-        var dom_welcomeview = document.querySelector("#mView-welcome") as HTMLDivElement;
-
         var tieefseeview: Tieefseeview = new Tieefseeview(dom_imgview);
 
         var iframes = new Iframes(M);
@@ -37,7 +32,6 @@ class FileShow {
         this.openNone = openNone;
         this.getIsLoaded = getIsLoaded;
         this.getGroupType = getGroupType;
-        this.dom_welcomeview = dom_welcomeview;
         this.dom_imgview = dom_imgview;
         this.tieefseeview = tieefseeview;
 
@@ -88,9 +82,9 @@ class FileShow {
 
             if (groupType === GroupType.welcome) {
                 setShowTools(GroupType.welcome);
-                dom_welcomeview.style.display = "flex";
+                iframes.welcomeview.visible(true);
             } else {
-                dom_welcomeview.style.display = "none";
+                iframes.welcomeview.visible(false);
             }
 
             if (groupType === GroupType.img || groupType === GroupType.video) {
@@ -106,10 +100,10 @@ class FileShow {
 
             if (groupType === GroupType.txt) {
                 setShowTools(GroupType.txt);
-                dom_txtview.style.display = "block";
+                iframes.textView.visible(true);
             } else {
-                dom_txtview.style.display = "none";
-                dom_txtview.value = "";
+                iframes.textView.visible(false);
+                iframes.textView.loadNone();
             }
 
             if (groupType === GroupType.monacoEditor) {
@@ -122,10 +116,9 @@ class FileShow {
 
             if (groupType === GroupType.pdf) {
                 setShowTools(GroupType.pdf);
-                dom_pdfview.style.display = "block";
+                iframes.pdfview.visible(true);
             } else {
-                dom_pdfview.setAttribute("src", "");
-                dom_pdfview.style.display = "none";
+                iframes.pdfview.visible(false);
             }
 
             if (groupType === GroupType.office) {
@@ -442,18 +435,13 @@ class FileShow {
 
             if (configType == "pdf") {
                 setShowType(GroupType.pdf);//改變顯示類型
-
-                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                let encodePath = encodeURIComponent(_path);
-                let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
-                dom_pdfview.setAttribute("src", _url);
+                iframes.pdfview.loadFile(fileInfo2);
             }
 
             if (configType == "PDFTronWebviewer") {
-
                 setShowType(GroupType.office);//改變顯示類型
                 iframes.setTheme();
-                await iframes.pDFTronWebviewer.load(_path);
+                await iframes.pDFTronWebviewer.loadFile(_path);
             }
 
 
@@ -520,8 +508,8 @@ class FileShow {
 
                 setShowType(GroupType.txt);//改變顯示類型
                 iframes.setTheme();
-                dom_txtview.value = await WV_File.GetText(_path);
-                dom_txtview.scrollTo(0, 0);//捲到最上面
+                iframes.textView.setReadonly(M.getIsQuickLook());
+                iframes.textView.loadTxt(txt);
             }
 
             //檔案類型

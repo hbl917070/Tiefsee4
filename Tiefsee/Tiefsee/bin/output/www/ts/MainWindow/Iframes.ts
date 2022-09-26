@@ -1,9 +1,12 @@
 class Iframes {
 
-    public getTxt;
     public monacoEditor;
     public pDFTronWebviewer;
     public cherryMarkdown;
+    public textView;
+    public pdfview;
+    public welcomeview;
+    public getText;
     public setTheme;
 
     constructor(M: MainWindow) {
@@ -11,28 +14,32 @@ class Iframes {
         var monacoEditor = new MonacoEditor(M);
         var pDFTronWebviewer = new PDFTronWebviewer(M);
         var cherryMarkdown = new CherryMarkdown(M);
+        var textview = new Textview(M);
+        var pdfview = new Pdfview(M);
+        var welcomeview = new Welcomeview(M);
 
-        this.getTxt = getTxt;
         this.monacoEditor = monacoEditor;
         this.pDFTronWebviewer = pDFTronWebviewer;
         this.cherryMarkdown = cherryMarkdown;
+        this.textView = textview;
+        this.pdfview = pdfview;
+        this.welcomeview = welcomeview;
+        this.getText = getText;
         this.setTheme = setTheme;
 
         window.addEventListener("message", async (e) => {
 
-            //console.log(e)
-
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
-            if (type === "getTxt") {
+            if (type === "getText") {
                 _txt = data;
             }
 
@@ -57,16 +64,16 @@ class Iframes {
         });
 
         var _txt: null | string = null;
-        async function getTxt() {
+        async function getText() {
 
             let groupType = M.fileShow.getGroupType()
 
             if (groupType === GroupType.txt) {
-
+                _txt = textview.getText();
             } else if (groupType === GroupType.monacoEditor) {
-                monacoEditor.getTxt();
+                monacoEditor.getText();
             } else if (groupType === GroupType.md) {
-                cherryMarkdown.getTxt();
+                cherryMarkdown.getText();
             } else {
                 return "";
             }
@@ -111,7 +118,7 @@ class Iframes {
 
 class PDFTronWebviewer {
     public visible;
-    public load;
+    public loadFile;
     public loadNone;
     public setTheme;
 
@@ -123,19 +130,17 @@ class PDFTronWebviewer {
         var isInitPDFTronWebviewer = false;
 
         this.visible = visible;
-        this.load = load;
+        this.loadFile = loadFile;
         this.loadNone = loadNone;
         this.setTheme = setTheme;
 
         window.addEventListener("message", (e) => {
 
-            //console.log(e)
-
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
@@ -161,7 +166,7 @@ class PDFTronWebviewer {
         /**
          * 載入檔案
          */
-        async function load(path: string) {
+        async function loadFile(path: string) {
 
             if (dom_pdftronWebviewer.src == "") {
                 let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
@@ -176,7 +181,7 @@ class PDFTronWebviewer {
             }
 
             let json = {
-                type: "load",
+                type: "loadFile",
                 data: path,
             };
             dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
@@ -208,8 +213,6 @@ class PDFTronWebviewer {
         function postMsg(json: any) {
             if (isInitPDFTronWebviewer) {
                 dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
-            } else {
-                console.log("PDFTronWebviewer 尚未載入完成");
             }
         }
     }
@@ -223,7 +226,7 @@ class MonacoEditor {
     public loadTxt;
     public loadNone;
     public setReadonly;
-    public getTxt;
+    public getText;
     public setTheme;
 
     constructor(M: MainWindow) {
@@ -238,18 +241,16 @@ class MonacoEditor {
         this.loadTxt = loadTxt;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
-        this.getTxt = getTxt;
+        this.getText = getText;
         this.setTheme = setTheme;
 
         window.addEventListener("message", (e) => {
 
-            //console.log(e)
-
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
@@ -309,15 +310,15 @@ class MonacoEditor {
 
         /**
          * 載入文字
-         * @param txt 
+         * @param text 
          * @param fileType 檔案類型，例如 javascript / html
          */
-        async function loadTxt(txt: string, fileType: string) {
+        async function loadTxt(text: string, fileType: string) {
             await awaitInit();
             let json = {
                 type: "loadTxt",
                 data: {
-                    txt: txt,
+                    txt: text,
                     fileType: fileType,
                 },
             };
@@ -350,11 +351,11 @@ class MonacoEditor {
         }
 
         /**
-         * 送出 getTxt 的請求
+         * 送出 getText 的請求
          */
-        function getTxt() {
+        function getText() {
             let json = {
-                type: "getTxt",
+                type: "getText",
                 data: null,
             };
             postMsg(json);
@@ -374,8 +375,6 @@ class MonacoEditor {
         function postMsg(json: any) {
             if (isInitMonacoEditor) {
                 dom_monacoEditor.contentWindow?.postMessage(json, "*");
-            } else {
-                console.log("monacoEditor 尚未載入完成");
             }
         }
 
@@ -389,7 +388,7 @@ class CherryMarkdown {
     public loadTxt;
     public loadNone;
     public setReadonly;
-    public getTxt;
+    public getText;
     public setTheme;
 
     constructor(M: MainWindow) {
@@ -404,18 +403,16 @@ class CherryMarkdown {
         this.loadTxt = loadTxt;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
-        this.getTxt = getTxt;
+        this.getText = getText;
         this.setTheme = setTheme;
 
         window.addEventListener("message", (e) => {
 
-            //console.log(e)
-
             //只開放特定網域呼叫
-            /*if (e.origin !== "null") {
+            if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
-            }*/
+            }
 
             //接收到的資料
             let type = e.data.type;
@@ -511,11 +508,11 @@ class CherryMarkdown {
         }
 
         /**
-         * 送出 getTxt 的請求
+         * 送出 getText 的請求
          */
-        function getTxt() {
+        function getText() {
             let json = {
-                type: "getTxt",
+                type: "getText",
                 data: null,
             };
             postMsg(json);
@@ -535,10 +532,162 @@ class CherryMarkdown {
         function postMsg(json: any) {
             if (isInitCherryMarkdown) {
                 dom_iframe.contentWindow?.postMessage(json, "*");
-            } else {
-                console.log("CherryMarkdown 尚未載入完成");
             }
         }
 
+    }
+}
+
+
+class Textview {
+    public visible;
+    //public loadFile;
+    public loadTxt;
+    public loadNone;
+    public setReadonly;
+    public getText;
+    //public setTheme;
+
+    constructor(M: MainWindow) {
+
+        var dom_text = document.querySelector("#mView-txt") as HTMLTextAreaElement;
+
+        this.visible = visible;
+        //this.loadFile = loadFile;
+        this.loadTxt = loadText;
+        this.loadNone = loadNone;
+        this.setReadonly = setReadonly;
+        this.getText = getText;
+        //this.setTheme = setTheme;
+
+
+        //處理唯讀
+        dom_text.addEventListener("keydown", (e) => {
+            if (isReadonly === false) { return; }
+
+            //只允許 Ctrl+C 跟 Ctrl+A ，其餘的按鍵都攔截
+            if (e.code == "KeyC" && e.ctrlKey === true) {
+            } else if (e.code == "KeyA" && e.ctrlKey === true) {
+            } else {
+                e.preventDefault();
+            }
+        })
+
+        /** 
+          * 顯示或隱藏dom
+          */
+        function visible(val: boolean) {
+            if (val === true) {
+                dom_text.style.display = "block";
+            } else {
+                dom_text.style.display = "none";
+            }
+        }
+
+
+        /**
+         * 載入文字
+         */
+        async function loadText(text: string) {
+            dom_text.scrollTo(0, 0);//捲到最上面
+            dom_text.value = text;
+        }
+
+        var isReadonly = false;//是否為唯讀
+        /**
+          * 設定是否唯讀
+          */
+        async function setReadonly(val: boolean) {
+            isReadonly = val;
+            if (val) {
+                dom_text.setAttribute("readonly", "readonly");
+            } else {
+                dom_text.removeAttribute("readonly");
+            }
+        }
+
+        /**
+         * 清空內容
+         */
+        function loadNone() {
+            loadText("");
+        }
+
+        function getText() {
+            return dom_text.value;
+        }
+
+    }
+
+
+}
+
+
+class Pdfview {
+    public visible;
+    public loadFile;
+    public loadNone;
+
+    constructor(M: MainWindow) {
+
+        var dom_iframe = document.querySelector("#mView-pdf") as HTMLTextAreaElement;
+
+        this.visible = visible;
+        this.loadFile = loadFile;
+        this.loadNone = loadNone;
+
+        /** 
+          * 顯示或隱藏dom
+          */
+        function visible(val: boolean) {
+            if (val === true) {
+                dom_iframe.style.display = "block";
+            } else {
+                dom_iframe.style.display = "none";
+            }
+        }
+
+        /**
+         * 載入檔案
+         */
+        async function loadFile(fileInfo2: FileInfo2) {
+            let _path = fileInfo2.Path;
+            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            let encodePath = encodeURIComponent(_path);
+            let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
+            dom_iframe.setAttribute("src", _url);
+        }
+
+        /**
+         * 清空內容
+         */
+        function loadNone() {
+            dom_iframe.setAttribute("src", "");
+        }
+    }
+}
+
+
+class Welcomeview {
+
+    public visible;
+    public dom;
+
+    constructor(M: MainWindow) {
+
+        var dom_welcomeview = document.querySelector("#mView-welcome") as HTMLDivElement;
+        this.visible = visible;
+        this.dom = dom_welcomeview;
+
+        /** 
+        * 顯示或隱藏dom
+        */
+        function visible(val: boolean) {
+            if (val === true) {
+                dom_welcomeview.style.display = "flex";
+            } else {
+                dom_welcomeview.style.display = "none";
+            }
+        }
     }
 }

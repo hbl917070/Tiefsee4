@@ -340,7 +340,8 @@ class Config {
                 { ext: "md", type: "md" },
                 { ext: "gitignore", type: "auto" },
                 { ext: "bat", type: "auto" },
-
+                { ext: "csv", type: "auto" },
+                // monaco.languages.getLanguages()
 
             ]
         }
