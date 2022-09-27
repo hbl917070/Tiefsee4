@@ -92,8 +92,22 @@ class MainWindow {
 
         //關閉視窗前觸發
         baseWindow.closingEvents.push(async () => {
-            WV_System.DeleteTemp(100, 300);//刪除圖片暫存
-            await saveSetting();//儲存 setting.json
+
+            if (getIsQuickLook() === false) {//正常視窗(不是快速預覽)
+                if (script.setting.temp_setting != null) {//如果有開啟 設定視窗
+                    if (await script.setting.temp_setting.Visible === true) {
+                        await script.setting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
+                        await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
+                    }
+                }
+                WV_System.DeleteTemp(100, 300);//刪除圖片暫存
+                await saveSetting();//儲存 setting.json
+                return true;
+
+            } else {
+                quickLookUp();//關閉 快速預覽
+                return false;
+            }
         });
 
 
@@ -250,13 +264,13 @@ class MainWindow {
             if ((json.isKeyboardSpace && keyboardSpaceRun) || (json.isMouseMiddle && mouseMiddleRun)) {
 
             } else {
-                quickLookUp();//關閉 快速啟動
+                quickLookUp();//關閉 快速預覽
                 //console.log("checkDownKey")
             }
         }
 
         /**
-         * 關閉 快速啟動 (由C#呼叫)
+         * 關閉 快速預覽 (由C#呼叫)
          */
         function quickLookUp() {
             //如果是單一執行個體，就不關閉視窗
@@ -297,15 +311,6 @@ class MainWindow {
                 e.preventDefault();
             })
 
-            //關閉視窗前觸發
-            baseWindow.closingEvents.push(async () => {
-                if (script.setting.temp_setting != null) {//如果有開啟 設定視窗
-                    if (await script.setting.temp_setting.Visible === true) {
-                        await script.setting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
-                        await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
-                    }
-                }
-            });
 
             //圖片區域也允許拖曳視窗
             fileShow.dom_imgview.addEventListener("mousedown", async (e) => {

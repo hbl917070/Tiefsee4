@@ -196,10 +196,14 @@ class BaseWindow {
      * 關閉視窗
      */
     public async close() {
+        let isClose = true;
         for (let i = 0; i < this.closingEvents.length; i++) {
-            await this.closingEvents[i]();
+            let val: any = await this.closingEvents[i]();
+            if (val === false) { isClose = false; }
         }
-        WV_Window.Close()
+        if (isClose) {//只要其中一個 closingEvents return false，就不關閉視窗
+            WV_Window.Close();
+        }
     }
 
 
