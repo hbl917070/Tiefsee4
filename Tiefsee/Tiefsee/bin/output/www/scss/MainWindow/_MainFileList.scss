@@ -17,30 +17,44 @@
   }
 
   .fileList-item {
-    margin-left: 5px;
+    padding-left: 5px;
     margin-right: 15px;
     user-select: none;
     color: var(--color-white);
     margin-bottom: 5px;
-
-    //  border-radius: 5px;
-    //padding: 2px 20px 2px 2px;
     white-space: nowrap;
-    // width: calc(100%);
-  }
-
-  .fileList-item:hover {
-    // background-color: var(--color-white20);
-    outline: 2px solid var(--color-white40);
-    outline-offset: 2px;
+    position: relative;
     cursor: pointer;
   }
 
+  .fileList-item:hover::before {
+    //outline: 2px solid var(--color-white40);
+    //outline-offset: 2px;
+    position: absolute;
+    top: -4px;
+    left: 1px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid var(--color-white40);
+    pointer-events: none;
+    z-index: 1;
+    content: "";
+  }
+
   //選中
-  .fileList-item[active="true"] {
-    outline: 2px solid var(--color-blue);
-    // background-color: var(--color-white20);
-    outline-offset: 2px;
+  .fileList-item[active="true"]::before {
+    position: absolute;
+    top: -4px;
+    left: 1px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid var(--color-blue);
+    pointer-events: none;
+    z-index: 1;
+    content: "";
+    //outline: 2px solid var(--color-blue);
+    //background-color: var(--color-white20);
+    //outline-offset: 2px;
   }
 
   .fileList-title {
