@@ -23,7 +23,6 @@ class FileShow {
         var isLoaded = true;
         var _groupType = GroupType.none;//目前顯示的類型
 
-
         this.openImage = openImage;
         this.openVideo = openVideo;
         this.openPdf = openPdf;
@@ -537,6 +536,7 @@ class FileShow {
          */
         async function openWelcome() {
             baseWindow.setTitle("Tiefsee 4");
+            M.fileLoad.setGroupType(GroupType.welcome);
             setShowType(GroupType.welcome);//改變顯示類型
         }
 
@@ -546,6 +546,7 @@ class FileShow {
          */
         function openNone() {
             baseWindow.setTitle("Tiefsee 4");
+            M.fileLoad.setGroupType(GroupType.none);
             setShowType(GroupType.none);//改變顯示類型
         }
 

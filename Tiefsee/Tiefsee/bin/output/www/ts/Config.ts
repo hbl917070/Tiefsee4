@@ -185,14 +185,17 @@ class Config {
             //key: "00001bfd3de40a19b62672faeb3fa564",
         },
 
-
-
         /** 快速預覽 */
         quickLook: {
             /** 長按空白鍵觸發觸發 */
             keyboardSpaceRun: true,
             /** 長按滑鼠中鍵觸發 */
             mouseMiddleRun: true,
+        },
+
+        other: {
+            /** 刪除前顯示詢問視窗 */
+            fileDeletingShowCheckMsg: true,
         },
     }
 

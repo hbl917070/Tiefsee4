@@ -342,7 +342,7 @@ class Setting {
                 { r: 255, g: 255, b: 255, a: 0.25 },
                 { r: 255, g: 255, b: 255, },
                 { r: 0, g: 0, b: 0, },
-                { r: 0, g: 200, b: 255, } ,
+                { r: 0, g: 200, b: 255, },
             )
             applyThemeAddBtn(
                 `<div class="btn">淺色主題</div>`,
@@ -350,7 +350,7 @@ class Setting {
                 { r: 112, g: 112, b: 112, a: 0.25 },
                 { r: 0, g: 0, b: 0, },
                 { r: 238, g: 238, b: 238, },
-                { r: 0, g: 135, b: 220, } ,
+                { r: 0, g: 135, b: 220, },
             )
 
             //產生 套用主題 的按鈕
@@ -802,7 +802,7 @@ class Setting {
         //擴充套件 
         addLoadEvent(() => {
 
-           
+
             function getHtml(val: boolean) {
                 if (val) {
                     return `<div class="pluginLiet-status color-success">Installed</div>`;
@@ -811,13 +811,13 @@ class Setting {
                 }
             }
             if (baseWindow.appInfo !== undefined) {
-                
+
                 //初始化 擴充套件清單
                 var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
                 var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
                 var dom_PDFTronWebviewer = document.querySelector("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
                 var dom_MonacoEditor = document.querySelector("#pluginLiet-MonacoEditor") as HTMLInputElement;
-        
+
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
                 dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
                 dom_PDFTronWebviewer.innerHTML = getHtml(baseWindow.appInfo.plugin.PDFTronWebviewer);
@@ -874,6 +874,18 @@ class Setting {
             });
         })
 
+        //其他
+        addLoadEvent(() => {
+            //檔案刪除前顯示確認視窗
+            var switch_fileDeletingShowCheckMsg = document.querySelector("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
+            switch_fileDeletingShowCheckMsg.checked = config.settings["other"]["fileDeletingShowCheckMsg"];
+
+            switch_fileDeletingShowCheckMsg.addEventListener("change", () => {
+                let val = switch_fileDeletingShowCheckMsg.checked;
+                config.settings["other"]["fileDeletingShowCheckMsg"] = val;
+                appleSettingOfMain();
+            });
+        })
         /** 
          * dom 交換順序
          */

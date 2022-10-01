@@ -601,42 +601,53 @@ class FileLoad {
          */
         async function deleteMsg() {
 
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
+
+            //執行刪除
+            async function runDelete(value: string) {
+                let state = true;
+                if (value == "1") {
+                    state = await WV_File.MoveToRecycle(path);
+                }
+                if (value == "2") {
+                    state = await WV_File.Delete(path);
+                }
+
+                if (state === false) {
+                    Msgbox.show({ txt: "刪除失敗" })
+                } else {
+                    await showFile();
+
+                    M.mainFileList.init();//檔案預覽列表 初始化
+                    M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
+                    M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+                }
+            }
+
             let path = getFilePath();
 
-            Msgbox.show({
-                type: "radio",
-                txt: `刪除檔案` + "<br>" + Lib.GetFileName(path),
-                arRadio: [
-                    { value: "1", name: "移至資源回收桶" },
-                    { value: "2", name: "永久刪除檔案" },
-                ],
-                radioValue: "1",
-                funcYes: async (dom: HTMLElement, value: string) => {
-
-                    Msgbox.close(dom);
-
-                    let state = true;
-                    if (value == "1") {
-                        state = await WV_File.MoveToRecycle(path);
+            if (M.config.settings.other.fileDeletingShowCheckMsg) {
+                Msgbox.show({
+                    type: "radio",
+                    txt: `刪除檔案` + "<br>" + Lib.GetFileName(path),
+                    arRadio: [
+                        { value: "1", name: "移至資源回收桶" },
+                        { value: "2", name: "永久刪除檔案" },
+                    ],
+                    radioValue: "1",
+                    funcYes: async (dom: HTMLElement, value: string) => {
+                        Msgbox.close(dom);
+                        await runDelete(value);//
                     }
-                    if (value == "2") {
-                        state = await WV_File.Delete(path);
-                    }
+                });
 
+            } else {
 
-                    if (state === false) {
-                        Msgbox.show({ txt: "刪除失敗" })
-                    } else {
-                        await showFile();
+                await runDelete("1");
 
-                        M.mainFileList.init();//檔案預覽列表 初始化
-                        M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-                        M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
-                    }
-
-                    //alert(value)
-                }
-            });
+            }
 
         }
 
