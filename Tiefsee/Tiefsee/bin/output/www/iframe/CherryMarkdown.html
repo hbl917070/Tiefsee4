@@ -33,6 +33,7 @@
 
     <div id="markdown-container"></div>
 
+
     <link rel="stylesheet" href="./../vender/cherry-markdown/cherry-markdown.min.css">
     <script src="./../vender/cherry-markdown/tex-svg.js"></script>
     <script src="./../vender/cherry-markdown/cherry-markdown.min.js"></script>
@@ -101,7 +102,9 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
             cherryObj = initCherry();
+            await libIframe.closeIME();//嘗試關閉輸入法
             initFinish();
+            libIframe.setReadonly(true);
         });
 
         //點擊超連結時

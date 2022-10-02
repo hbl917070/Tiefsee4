@@ -112,7 +112,7 @@
             //-------------
 
             require.config({ paths: { "vs": pathLib } });
-            require(["vs/editor/editor.main"], () => {
+            require(["vs/editor/editor.main"], async () => {
 
                 // 初始化變量
                 var fileCounter = 0;
@@ -127,6 +127,7 @@
                     automaticLayout: true,//自動縮放版面
                 });
 
+                await libIframe.closeIME();//嘗試關閉輸入法
                 initFinish();
             });
 

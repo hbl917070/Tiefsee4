@@ -4,6 +4,7 @@ class LibIframe {
 
         //處理唯讀
         window.addEventListener("keydown", (e) => {
+
             if (this.isReadonly === false) { return; }
 
             //只允許 Ctrl+C 跟 Ctrl+A ，其餘的按鍵都攔截
@@ -12,9 +13,36 @@ class LibIframe {
             } else {
                 e.preventDefault();
             }
+        }, true)
+
+    }
+
+    /**
+     * 嘗試關閉輸入法
+     */
+    public async closeIME() {
+
+        var domFocus = document.activeElement;//當前擁有焦點的dom
+
+        var text = document.createElement("input");
+        text.setAttribute("type", "url");
+        text.style.position = "relative";
+        text.style.opacity = "0";
+        text.style.pointerEvents = "none";
+
+        document.body.appendChild(text);
+        text.focus();
+
+        await new Promise((resolve, reject) => {
+            setTimeout(() => {
+                text.blur();
+                document.body.removeChild(text);
+                if (domFocus !== null) {
+                    domFocus.focus();//把焦點設定回去
+                }
+                resolve(0);//繼續往下執行
+            }, 10);
         })
-
-
 
     }
 

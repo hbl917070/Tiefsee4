@@ -91,7 +91,7 @@ class FileLoad {
          * @returns 
          */
         function getDirPath() {
-            return arDirKey[flagDir]
+            return arDirKey[flagDir];
         }
 
 
@@ -190,6 +190,10 @@ class FileLoad {
          * @returns 
          */
         async function showDir(_flag?: number) {
+
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
 
             if (_flag !== undefined) { flagDir = _flag; }
             if (flagDir < 0) { flagDir = 0; }
@@ -514,6 +518,9 @@ class FileLoad {
          * 載入下一個檔案
          */
         async function nextFile() {
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
             flagFile += 1;
             if (flagFile >= arFile.length) { flagFile = 0; }
             showFile();
@@ -524,6 +531,9 @@ class FileLoad {
          * 載入上一個檔案
          */
         async function prevFile() {
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
             flagFile -= 1;
             if (flagFile < 0) { flagFile = arFile.length - 1; }
             showFile();
@@ -656,6 +666,10 @@ class FileLoad {
          * 顯示 重新命名檔案 的對話方塊
          */
         async function renameMsg() {
+
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
 
             let path = getFilePath();
             let fileName = Lib.GetFileName(path);
