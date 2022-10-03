@@ -496,12 +496,12 @@ class FileShow {
 
                 setShowType(GroupType.monacoEditor);//改變顯示類型
                 iframes.setTheme();
-                await iframes.monacoEditor.setReadonly(M.getIsQuickLook());
                 if (configType == "auto") {
                     await iframes.monacoEditor.loadFile(txt, _path);
                 } else {
                     await iframes.monacoEditor.loadTxt(txt, configType);
                 }
+                await iframes.monacoEditor.setReadonly(M.getIsQuickLook());
 
             } else {
 

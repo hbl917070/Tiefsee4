@@ -20,6 +20,11 @@
             width: 100%;
             height: 100%;
         }
+
+        /* 隱藏唯讀的提示文字「cannot edit in read-only editor」*/
+        /* .monaco-editor-overlaymessage {
+            display: none !important;
+        } */
     </style>
     <script src="./../js/LibIframe.js"></script>
 
@@ -53,7 +58,7 @@
                 loadNone();
             }
             if (type === "setReadonly") {
-                libIframe.setReadonly(data.val);
+                setReadonly(data.val)
             }
             if (type === "getText") {
                 let t = getText();
@@ -129,6 +134,7 @@
 
                 await libIframe.closeIME();//嘗試關閉輸入法
                 initFinish();
+
             });
 
         }
@@ -197,6 +203,22 @@
             });
             monaco.editor.setTheme("myTheme");
             //monaco.editor.setTheme("vs-dark");
+        }
+
+        /**
+         * 設定唯讀
+         */
+        function setReadonly(val) {
+            if (val === true) {
+                libIframe.setReadonly(true);//攔截鍵盤
+                editor.updateOptions({ readOnly: true });//文字編輯器設定成唯讀
+                document.querySelector("textarea").setAttribute("readonly", "readonly");//直接鎖死編輯功能
+            } else {
+                libIframe.setReadonly(false);//攔截鍵盤
+                editor.updateOptions({ readOnly: false });//文字編輯器設定成唯讀
+                document.querySelector("textarea").removeAttribute("readonly", "readonly");
+            }
+
         }
 
     </script>

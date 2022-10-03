@@ -167,6 +167,7 @@ class MainWindow {
 
             }
 
+            document.body.focus();
         }
 
 

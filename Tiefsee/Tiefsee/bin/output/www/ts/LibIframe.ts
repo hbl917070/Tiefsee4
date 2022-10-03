@@ -12,6 +12,7 @@ class LibIframe {
             } else if (e.code == "KeyA" && e.ctrlKey === true) {
             } else {
                 e.preventDefault();
+                e.stopPropagation();
             }
         }, true)
 

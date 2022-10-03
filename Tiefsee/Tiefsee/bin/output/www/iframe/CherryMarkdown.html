@@ -64,7 +64,7 @@
                 setText("");
             }
             if (type === "setReadonly") {
-                libIframe.setReadonly(data.val);
+                setReadonly(data.val);
             }
             if (type === "getText") {
                 let t = getText();
@@ -104,7 +104,6 @@
             cherryObj = initCherry();
             await libIframe.closeIME();//嘗試關閉輸入法
             initFinish();
-            libIframe.setReadonly(true);
         });
 
         //點擊超連結時
@@ -283,6 +282,18 @@
 
         }
 
+        /**
+         * 設定唯讀
+         */
+        function setReadonly(val) {
+            if (val === true) {
+                val = true;
+            } else {
+                val = false;
+            }
+            libIframe.setReadonly(val);//攔截鍵盤
+            cherryObj.editor.editor.options.readOnly = val;//文字編輯器設定成唯讀
+        }
     </script>
 
 
