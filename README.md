@@ -1,13 +1,13 @@
-# Tiefsee4
+﻿# Tiefsee4
 
 ## 簡述
-Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 (例如psd、heic、avif、qoi
+Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特殊格式 (例如psd、heic、avif、qoi
 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.20](https://github.com/hbl917070/Tiefsee4/releases)
-(注意：此為測試版，有某些功能是Tiefsee 3.0.2有但是測試版沒有的
+[Tiefsee 4.0.0-beta.21](https://github.com/hbl917070/Tiefsee4/releases)
+(注意：此為測試版
 
     開發中功能：  
     瀏覽多幀圖片、大量瀏覽模式、多國語言、自定快速鍵
@@ -29,9 +29,9 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 
 ![](https://cdn.discordapp.com/attachments/803673073621401633/917208044578951229/2021-12-06_07-56-44.jpg)
 
-![](https://cdn.discordapp.com/attachments/803673073621401633/917208044847366223/2021-12-06_08-04-22.jpg)
+![](https://cdn.discordapp.com/attachments/896768892003823627/1026908356125933649/2022-10-05_00-37-08.jpg)
 
-![](https://cdn.discordapp.com/attachments/803673073621401633/917208044360830986/2021-12-06_07-53-54.jpg)
+![](https://cdn.discordapp.com/attachments/896768892003823627/1026908355274481776/2022-10-05_01-24-29.jpg)
 
 <br>
 
@@ -47,14 +47,17 @@ Tiefsee是一個強調簡約設計的圖片檢視器，支援各種特殊格式 
 > 此問題在同樣基於webview2開發的win11 Microsoft Teams也存在。<br>
 於4.0.0-beta.18修復此問題，但因為非使用winAPI來拖曳視窗，而是單純透過js來計算視窗坐標，因此功能不完整。
 
-### 2、win7無法讓視窗透明化
-> webview2的透明背景不支援win7。
+### 2、無法於 Windows 7 運行
+> 讓視窗透明化的程式碼會導致Tiefsee無法運行於 Windows 7，暫時無解決方案。
 
 ### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
 > 改用UWP專案或winUI 3專案，或許可以解決此問題。
 
 ### 4、視窗使用毛玻璃效果後，可能導致Tiefsee的視窗在移動時嚴重延遲
 > 此BUG並非在所有電腦都會發生，Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。改用UWP專案或winUI 3專案，或許可以解決此問題。
+
+### 5、不支援長路經
+> 理論上改用 .net 6 來編譯可以解決此問題，但 .net 6 的運行環境並非系統內建，因此暫時不考慮調整專案類型。
 
 <br>
 
