@@ -1,7 +1,7 @@
 /**
  * 圖片瀏覽器
  */
-class Tieefseeview {
+class Tiefseeview {
 
     public dom_tiefseeview: HTMLDivElement;//整體的div
     public dom_con: HTMLDivElement;//表示整體佔位的容器，用於設定left、topo
@@ -104,8 +104,8 @@ class Tieefseeview {
         var dom_video = <HTMLVideoElement>dom_tiefseeview.querySelector(".view-video");
         var dom_bigimg_canvas = <HTMLCanvasElement>dom_tiefseeview.querySelector(".view-bigimg-canvas");
         var dom_loading = <HTMLImageElement>dom_tiefseeview.querySelector(".tiefseeview-loading");
-        var scrollX = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
-        var scrollY = new TieefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
+        var scrollX = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
+        var scrollY = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
 
         var url: string;//目前的圖片網址
         var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img";//資料類型
@@ -116,7 +116,7 @@ class Tieefseeview {
         var transformDuration: number = 200;//transform 動畫時間(毫秒)
         var mirrorHorizontal: boolean = false;//水平鏡像
         var mirrorVertical: boolean = false;//垂直鏡像
-        var rendering: TieefseeviewImageRendering = TieefseeviewImageRendering["auto"];//圖片渲染模式
+        var rendering: TiefseeviewImageRendering = TiefseeviewImageRendering["auto"];//圖片渲染模式
         var overflowDistance: number = 0;//溢位距離
         var marginTop: number = 10;//外距
         var marginLeft: number = 10;
@@ -308,7 +308,7 @@ class Tieefseeview {
 
                 //從兩指的中心進行縮放
                 //縮放前先把渲染模式改成成本較低的 pixelated
-                zoomIn(ev.center.x, ev.center.y, (ev.scale / temp_pinchZoom), TieefseeviewImageRendering["pixelated"]);
+                zoomIn(ev.center.x, ev.center.y, (ev.scale / temp_pinchZoom), TiefseeviewImageRendering["pixelated"]);
 
                 //根據中心點的位移來拖曳圖片
                 setXY(
@@ -348,7 +348,7 @@ class Tieefseeview {
 
                     if (e.ctrlKey === true) {
                         let scale = 1 - e.deltaY * 0.01;//無法使用
-                        zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, (scale), TieefseeviewImageRendering["pixelated"]);
+                        zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, (scale), TiefseeviewImageRendering["pixelated"]);
 
                     } else {
 
@@ -855,7 +855,7 @@ class Tieefseeview {
         async function loadBigimgscale(
             _arUrl: { scale: number, url: string }[],
             _w: number, _h: number,
-            _zoomType: TieefseeviewZoomType, _zoomVal: number): Promise<boolean> {
+            _zoomType: TiefseeviewZoomType, _zoomVal: number): Promise<boolean> {
 
 
             temp_originalWidth = _w;//初始化圖片size
@@ -1163,25 +1163,25 @@ class Tieefseeview {
          * 取得 圖片的渲染模式
          * @returns 
          */
-        function getRendering(): TieefseeviewImageRendering { return rendering; }
+        function getRendering(): TiefseeviewImageRendering { return rendering; }
         /**
          * 設定 圖片的渲染模式
          * @param _renderin 
          * @param isOnlyRun 單純執行而不設定
          */
-        function setRendering(_renderin: TieefseeviewImageRendering, isOnlyRun: boolean = false) {
+        function setRendering(_renderin: TiefseeviewImageRendering, isOnlyRun: boolean = false) {
 
             if (isOnlyRun === false) {
                 rendering = _renderin;
             }
 
-            if (_renderin === TieefseeviewImageRendering["auto"]) {
+            if (_renderin === TiefseeviewImageRendering["auto"]) {
                 dom_data.style.imageRendering = "auto";
 
-            } else if (_renderin === TieefseeviewImageRendering["pixelated"]) {
+            } else if (_renderin === TiefseeviewImageRendering["pixelated"]) {
                 dom_data.style.imageRendering = "pixelated";
 
-            } else if (_renderin === TieefseeviewImageRendering["auto-pixelated"]) {
+            } else if (_renderin === TiefseeviewImageRendering["auto-pixelated"]) {
                 if (getZoomRatio() > 1) {
                     dom_data.style.imageRendering = "pixelated";
                 } else {
@@ -1319,49 +1319,49 @@ class Tieefseeview {
          * @param _type 
          * @returns 
          */
-        function setAlign(_type: TieefseeviewAlignType) {
+        function setAlign(_type: TiefseeviewAlignType) {
 
             let type_horizontal: ("left" | "center" | "right") = "center";//水平對齊方式
             let type_vertical: ("top" | "center" | "bottom") = "center";//垂直對齊方式
             let x: number = 0;
             let y: number = 0;
 
-            if (_type === TieefseeviewAlignType["none"]) {
+            if (_type === TiefseeviewAlignType["none"]) {
                 return;
             }
-            if (_type === TieefseeviewAlignType["T"]) {
+            if (_type === TiefseeviewAlignType["T"]) {
                 type_horizontal = "center";
                 type_vertical = "top";
             }
-            if (_type === TieefseeviewAlignType["R"]) {
+            if (_type === TiefseeviewAlignType["R"]) {
                 type_horizontal = "right";
                 type_vertical = "center";
             }
-            if (_type === TieefseeviewAlignType["L"]) {
+            if (_type === TiefseeviewAlignType["L"]) {
                 type_horizontal = "left";
                 type_vertical = "center";
             }
-            if (_type === TieefseeviewAlignType["B"]) {
+            if (_type === TiefseeviewAlignType["B"]) {
                 type_horizontal = "center";
                 type_vertical = "bottom";
             }
-            if (_type === TieefseeviewAlignType["RT"]) {
+            if (_type === TiefseeviewAlignType["RT"]) {
                 type_horizontal = "right";
                 type_vertical = "top";
             }
-            if (_type === TieefseeviewAlignType["RB"]) {
+            if (_type === TiefseeviewAlignType["RB"]) {
                 type_horizontal = "right";
                 type_vertical = "bottom";
             }
-            if (_type === TieefseeviewAlignType["LT"]) {
+            if (_type === TiefseeviewAlignType["LT"]) {
                 type_horizontal = "left";
                 type_vertical = "top";
             }
-            if (_type === TieefseeviewAlignType["LB"]) {
+            if (_type === TiefseeviewAlignType["LB"]) {
                 type_horizontal = "left";
                 type_vertical = "bottom";
             }
-            if (_type === TieefseeviewAlignType["C"]) {
+            if (_type === TiefseeviewAlignType["C"]) {
                 type_horizontal = "center";
                 type_vertical = "center";
             }
@@ -1991,7 +1991,7 @@ class Tieefseeview {
          * @param _type 縮放類型
          * @param _val 附加參數，例如以px或%進行縮放時，必須另外傳入number
          */
-        function zoomFull(_type: TieefseeviewZoomType, _val?: number): void {
+        function zoomFull(_type: TiefseeviewZoomType, _val?: number): void {
 
             let _w = getZoomFull_width(_type, _val);
             setDataSize(_w);
@@ -2008,13 +2008,13 @@ class Tieefseeview {
             setRendering(rendering);
         }
         /** 取得縮放圖片後的 縮放比例 */
-        function getZoomFull_scale(_type: TieefseeviewZoomType, _val?: number) {
+        function getZoomFull_scale(_type: TiefseeviewZoomType, _val?: number) {
             let _w = getZoomFull_width(_type, _val);
             return _w / getOriginalWidth();
         }
         /** 取得縮放圖片都得 寬度 (用於套用設定) */
-        function getZoomFull_width(_type: TieefseeviewZoomType, _val?: number) {
-            if (_type === undefined) { _type = TieefseeviewZoomType["full-wh"] }
+        function getZoomFull_width(_type: TiefseeviewZoomType, _val?: number) {
+            if (_type === undefined) { _type = TiefseeviewZoomType["full-wh"] }
             if (_val === undefined) { _val = 100 }
 
             let _w = 1;
@@ -2024,43 +2024,43 @@ class Tieefseeview {
             let dom_con_offsetWidth = rect.rectWidth;
             let dom_con_offsetHeight = rect.rectHeight;
 
-            if (_type === TieefseeviewZoomType["full-100%"]) {
+            if (_type === TiefseeviewZoomType["full-100%"]) {
                 if (getOriginalWidth() > (dom_dpizoom.offsetWidth - marginLeft - marginRight) ||
                     getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
-                    _type = TieefseeviewZoomType["full-wh"];//縮放至視窗大小
+                    _type = TiefseeviewZoomType["full-wh"];//縮放至視窗大小
                 } else {
-                    _type = TieefseeviewZoomType["100%"];//圖片原始大小
+                    _type = TiefseeviewZoomType["100%"];//圖片原始大小
                 }
             }
 
             //圖片原始大小
-            if (_type === TieefseeviewZoomType["100%"]) {
+            if (_type === TiefseeviewZoomType["100%"]) {
                 _w = (getOriginalWidth());
             }
-            if (_type === TieefseeviewZoomType["full-wh"]) {//縮放至視窗大小
+            if (_type === TiefseeviewZoomType["full-wh"]) {//縮放至視窗大小
                 let ratio_w = dom_con_offsetWidth / (dom_dpizoom.offsetWidth - marginLeft - marginRight)
                 let ratio_h = dom_con_offsetHeight / (dom_dpizoom.offsetHeight - marginTop - marginBottom)
                 if (ratio_w > ratio_h) {
-                    _type = TieefseeviewZoomType["full-w"]
+                    _type = TiefseeviewZoomType["full-w"]
                 } else {
-                    _type = TieefseeviewZoomType["full-h"]
+                    _type = TiefseeviewZoomType["full-h"]
                 }
             }
-            if (_type === TieefseeviewZoomType["full-w"]) {//寬度全滿
+            if (_type === TiefseeviewZoomType["full-w"]) {//寬度全滿
                 _val = 100;
-                _type = TieefseeviewZoomType["%-w"];
+                _type = TiefseeviewZoomType["%-w"];
             }
-            if (_type === TieefseeviewZoomType["full-h"]) {//高度全滿
+            if (_type === TiefseeviewZoomType["full-h"]) {//高度全滿
                 _val = 100;
-                _type = TieefseeviewZoomType["%-h"];
+                _type = TiefseeviewZoomType["%-h"];
             }
-            if (_type === TieefseeviewZoomType["%-w"]) {//以視窗寬度比例設定
+            if (_type === TiefseeviewZoomType["%-w"]) {//以視窗寬度比例設定
                 let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (w * ratio * (_val / 100));
             }
-            if (_type === TieefseeviewZoomType["%-h"]) {//以視窗高度比例設定
+            if (_type === TiefseeviewZoomType["%-h"]) {//以視窗高度比例設定
                 let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
@@ -2068,11 +2068,11 @@ class Tieefseeview {
                 _w = (w * ratio * ratio_xy * (_val / 100));
             }
 
-            if (_type === TieefseeviewZoomType["px-w"]) {//以絕對寬度設定
+            if (_type === TiefseeviewZoomType["px-w"]) {//以絕對寬度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (toNumber(_val) * ratio);
             }
-            if (_type === TieefseeviewZoomType["px-h"]) {//以絕對高度設定
+            if (_type === TiefseeviewZoomType["px-h"]) {//以絕對高度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
                 _w = (toNumber(_val) * ratio * ratio_xy);
@@ -2088,7 +2088,7 @@ class Tieefseeview {
          * @param _y 
          * @param _zoomRatio 渲染模式 (僅套用css，不會覆寫設定
          */
-        function zoomIn(_x?: number, _y?: number, _zoomRatio?: number, _rendering?: TieefseeviewImageRendering) {
+        function zoomIn(_x?: number, _y?: number, _zoomRatio?: number, _rendering?: TiefseeviewImageRendering) {
 
             //未填入參數則從中央進行縮放
             if (_x === undefined) { _x = dom_dpizoom.offsetWidth / 2; }
@@ -2765,7 +2765,7 @@ class Tieefseeview {
 /**
  * 捲動軸元件
  */
-class TieefseeviewScroll {
+class TiefseeviewScroll {
 
     public getEventChange;
     public setEventChange;
@@ -3020,7 +3020,7 @@ class TieefseeviewScroll {
 /**
  * 對齊位置
  */
-enum TieefseeviewAlignType {
+enum TiefseeviewAlignType {
     "T", //上
     "R", //右
     "B", //下
@@ -3037,7 +3037,7 @@ enum TieefseeviewAlignType {
 /**
  * 圖片縮放模式
  */
-enum TieefseeviewZoomType {
+enum TiefseeviewZoomType {
     /**縮放到特定視窗寬度% */
     "%-w",
     /**縮放到特定視窗高度% */
@@ -3065,7 +3065,7 @@ enum TieefseeviewZoomType {
 /**
  * 圖片渲染模式
  */
-enum TieefseeviewImageRendering {
+enum TiefseeviewImageRendering {
 
     /**預設值，運算成本較高 */
     "auto" = 0,

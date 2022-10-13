@@ -54,14 +54,14 @@ class ImgSearch {
 
             //壓縮圖片
             let max = 1000;//圖片最大面積不可以超過這個值的平方
-            let w = M.fileShow.tieefseeview.getOriginalWidth();
-            let h = M.fileShow.tieefseeview.getOriginalHeight();
+            let w = M.fileShow.tiefseeview.getOriginalWidth();
+            let h = M.fileShow.tiefseeview.getOriginalHeight();
             let zoom = 1;
             if (w * h > max * max) {
                 zoom = Math.sqrt((max * max) / (w * h));
             }
 
-            let blob = await M.fileShow.tieefseeview.getCanvasBlob(zoom, "medium", "jpg");
+            let blob = await M.fileShow.tiefseeview.getCanvasBlob(zoom, "medium", "jpg");
             if (blob === null) { return ""; }
 
             let json = await updateThumbsnap(blob);

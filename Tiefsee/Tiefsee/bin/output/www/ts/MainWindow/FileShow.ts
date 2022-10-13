@@ -9,7 +9,7 @@ class FileShow {
     public getIsLoaded;
     public getGroupType;
 
-    public tieefseeview;
+    public tiefseeview;
     public dom_imgview;
 
     public iframes;
@@ -17,7 +17,7 @@ class FileShow {
     constructor(M: MainWindow) {
 
         var dom_imgview = document.querySelector("#mView-tiefseeview") as HTMLDivElement;
-        var tieefseeview: Tieefseeview = new Tieefseeview(dom_imgview);
+        var tiefseeview: Tiefseeview = new Tiefseeview(dom_imgview);
 
         var iframes = new Iframes(M);
         var isLoaded = true;
@@ -32,7 +32,7 @@ class FileShow {
         this.getIsLoaded = getIsLoaded;
         this.getGroupType = getGroupType;
         this.dom_imgview = dom_imgview;
-        this.tieefseeview = tieefseeview;
+        this.tiefseeview = tiefseeview;
 
         this.iframes = iframes;
         /** 
@@ -91,7 +91,7 @@ class FileShow {
                 dom_imgview.style.display = "block";
             } else {
                 dom_imgview.style.display = "none";
-                tieefseeview.loadNone();
+                tiefseeview.loadNone();
             }
 
             if (groupType === GroupType.imgs) {
@@ -186,20 +186,20 @@ class FileShow {
                     const type = arType[i];
                     imgurl = await getUrl(type);
 
-                    loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                    loadOk = await tiefseeview.preloadImg(imgurl);//預載入
                     if (loadOk) {//如果載入失敗就使用下一種模式來解析
                         break;
                     }
                 }
             } else {
                 imgurl = await getUrl("magick");
-                loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                loadOk = await tiefseeview.preloadImg(imgurl);//預載入
             }
 
             //如果都載入失敗，就顯示檔案的圖示
             if (loadOk == false) {
                 imgurl = await getUrl("icon")
-                await tieefseeview.preloadImg(imgurl);//預載入
+                await tiefseeview.preloadImg(imgurl);//預載入
             }
 
             return imgurl;
@@ -218,7 +218,7 @@ class FileShow {
             setShowType(GroupType.img);//改變顯示類型
             let imgurl = _path;//圖片網址
 
-            tieefseeview.setLoading(true, 200);
+            tiefseeview.setLoading(true, 200);
 
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
@@ -269,7 +269,7 @@ class FileShow {
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
 
                 imgurl = await getUrl("web");//取得圖片網址並且預載入
-                await tieefseeview.loadImg(imgurl);//使用<img>渲染
+                await tiefseeview.loadImg(imgurl);//使用<img>渲染
 
             } else if (configType === "vips") {//
 
@@ -301,13 +301,13 @@ class FileShow {
                     }
 
                     //縮放方式與對齊方式
-                    let _zoomType: TieefseeviewZoomType = (<any>TieefseeviewZoomType)[M.config.settings.image.tieefseeviewZoomType];
-                    let _zoomVal: number = M.config.settings.image.tieefseeviewZoomValue;
-                    //let _alignType: TieefseeviewAlignType = (<any>TieefseeviewAlignType)[M.config.settings.image.tieefseeviewAlignType];
-                    if (_zoomType === undefined) { _zoomType = TieefseeviewZoomType["full-100%"] }
-                    //if (_alignType === undefined) { _alignType = TieefseeviewAlignType["C"] }
+                    let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
+                    let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
+                    //let _alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[M.config.settings.image.tiefseeviewAlignType];
+                    if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["full-100%"] }
+                    //if (_alignType === undefined) { _alignType = TiefseeviewAlignType["C"] }
 
-                    await tieefseeview.loadBigimgscale(
+                    await tiefseeview.loadBigimgscale(
                         arUrl,
                         imgInitInfo.width, imgInitInfo.height,
                         _zoomType, _zoomVal
@@ -316,19 +316,19 @@ class FileShow {
                 } else {//載入失敗就顯示圖示
 
                     imgurl = await getUrl("icon");//取得圖片網址
-                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
 
                 }
 
             } else {//使用<canvas>直接開啟網址
 
                 imgurl = await getUrl(configType);//取得圖片網址
-                let loadOk = await tieefseeview.preloadImg(imgurl);//預載入
+                let loadOk = await tiefseeview.preloadImg(imgurl);//預載入
                 if (loadOk) {
-                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
                 } else {//載入失敗就顯示圖示
                     imgurl = await getUrl("icon");//取得圖片網址
-                    await tieefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
                 }
 
             }
@@ -358,9 +358,9 @@ class FileShow {
                 imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             }
 
-            tieefseeview.setLoading(true, 200);
-            await tieefseeview.preloadImg(imgurl);//預載入
-            await tieefseeview.loadVideo(imgurl);//使用video渲染
+            tiefseeview.setLoading(true, 200);
+            await tiefseeview.preloadImg(imgurl);//預載入
+            await tiefseeview.loadVideo(imgurl);//使用video渲染
 
             M.mainExif.init(fileInfo2);//初始化exif
 
@@ -374,9 +374,9 @@ class FileShow {
          * @param fileInfo2 
          */
         async function initTiefseeview(fileInfo2: FileInfo2) {
-            tieefseeview.setLoading(false);
-            await tieefseeview.transformRefresh(false);//初始化 旋轉、鏡像
-            tieefseeview.setEventChangeZoom(((ratio: number) => {
+            tiefseeview.setLoading(false);
+            await tiefseeview.transformRefresh(false);//初始化 旋轉、鏡像
+            tiefseeview.setEventChangeZoom(((ratio: number) => {
                 let txt = (ratio * 100).toFixed(0) + "%"
 
                 let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);//工具列
@@ -386,18 +386,18 @@ class FileShow {
             }))
 
             //縮放方式與對齊方式
-            let _zoomType: TieefseeviewZoomType = (<any>TieefseeviewZoomType)[M.config.settings.image.tieefseeviewZoomType];
-            let _zoomVal: number = M.config.settings.image.tieefseeviewZoomValue;
-            let _alignType: TieefseeviewAlignType = (<any>TieefseeviewAlignType)[M.config.settings.image.tieefseeviewAlignType];
-            if (_zoomType === undefined) { _zoomType = TieefseeviewZoomType["full-100%"] }
-            if (_alignType === undefined) { _alignType = TieefseeviewAlignType["C"] }
-            tieefseeview.zoomFull(_zoomType, _zoomVal);
-            tieefseeview.setAlign(_alignType);
+            let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
+            let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
+            let _alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[M.config.settings.image.tiefseeviewAlignType];
+            if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["full-100%"] }
+            if (_alignType === undefined) { _alignType = TiefseeviewAlignType["C"] }
+            tiefseeview.zoomFull(_zoomType, _zoomVal);
+            tiefseeview.setAlign(_alignType);
 
             //圖片長寬
             let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
             if (dom_size != null) {
-                dom_size.innerHTML = `${tieefseeview.getOriginalWidth()}<br>${tieefseeview.getOriginalHeight()}`;
+                dom_size.innerHTML = `${tiefseeview.getOriginalWidth()}<br>${tiefseeview.getOriginalHeight()}`;
             }
 
             //檔案類型

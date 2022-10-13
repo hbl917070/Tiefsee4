@@ -34,52 +34,52 @@ class ScriptImg {
 
     /** 全滿 */
     public zoomFull() {
-        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['full-wh']);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['full-wh']);
     }
 
     /** 原始大小 */
     public zoom100() {
-        this.M.fileShow.tieefseeview.zoomFull(TieefseeviewZoomType['100%']);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['100%']);
     }
 
     /** 順時針90° */
     public degForward() {
-        this.M.fileShow.tieefseeview.setDegForward(undefined, undefined);
+        this.M.fileShow.tiefseeview.setDegForward(undefined, undefined);
     }
 
     /** 逆時針90° */
     public degReverse() {
-        this.M.fileShow.tieefseeview.setDegReverse(undefined, undefined);
+        this.M.fileShow.tiefseeview.setDegReverse(undefined, undefined);
     }
 
     /** 水平鏡像 */
     public mirrorHorizontal() {
-        this.M.fileShow.tieefseeview.setMirrorHorizontal(!this.M.fileShow.tieefseeview.getMirrorHorizontal());
+        this.M.fileShow.tiefseeview.setMirrorHorizontal(!this.M.fileShow.tiefseeview.getMirrorHorizontal());
     }
 
     /** 垂直鏡像 */
     public mirrorVertica() {
-        this.M.fileShow.tieefseeview.setMirrorVertica(!this.M.fileShow.tieefseeview.getMirrorVertica())
+        this.M.fileShow.tiefseeview.setMirrorVertica(!this.M.fileShow.tiefseeview.getMirrorVertica())
     }
 
     /** 初始化旋轉 */
     public transformRefresh() {
-        this.M.fileShow.tieefseeview.transformRefresh(true);
+        this.M.fileShow.tiefseeview.transformRefresh(true);
     }
 
     /** 放大 */
     public zoomIn() {
-        this.M.fileShow.tieefseeview.zoomIn();
+        this.M.fileShow.tiefseeview.zoomIn();
     }
 
     /** 縮小 */
     public zoomOut() {
-        this.M.fileShow.tieefseeview.zoomOut();
+        this.M.fileShow.tiefseeview.zoomOut();
     }
 
     /** 向特定方向移動圖片 */
     public move(type: "up" | "right" | "down" | "left", distance?: number) {
-        this.M.fileShow.tieefseeview.move(type, distance);
+        this.M.fileShow.tiefseeview.move(type, distance);
     }
 
 
@@ -378,21 +378,21 @@ class ScriptCopy {
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
-                let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
+                let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
                 WV_System.SetClipboard_Base64ToImage(base64, true);
             } else if (imgType === "jpg") {
                 WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
             } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
                 WV_System.SetClipboard_FileToImage(filePath, true);
             } else {
-                let imgUrl = this.M.fileShow.tieefseeview.getUrl();//取得圖片網址
+                let imgUrl = this.M.fileShow.tiefseeview.getUrl();//取得圖片網址
                 let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
                 WV_System.SetClipboard_Base64ToImage(base64, true);
             }
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_Base64ToImage(base64, false);
         }
 
@@ -407,7 +407,7 @@ class ScriptCopy {
         //let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
-            let imgUrl = this.M.fileShow.tieefseeview.getUrl();//取得圖片網址
+            let imgUrl = this.M.fileShow.tiefseeview.getUrl();//取得圖片網址
             let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
             WV_System.SetClipboard_Txt(base64);
         }
@@ -418,7 +418,7 @@ class ScriptCopy {
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = await this.M.fileShow.tieefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
             WV_System.SetClipboard_Txt(base64);
         }
 

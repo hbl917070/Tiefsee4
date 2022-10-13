@@ -316,7 +316,7 @@ class MainWindow {
             //圖片區域也允許拖曳視窗
             fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
                 //圖片沒有出現捲動軸
-                if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
+                if (fileShow.tiefseeview.getIsOverflowX() === false && fileShow.tiefseeview.getIsOverflowY() === false) {
                     if (e.button === 0) {//滑鼠左鍵
                         let WindowState = baseWindow.windowState;
                         if (WindowState === "Normal") {
@@ -327,7 +327,7 @@ class MainWindow {
             });
             /*fileShow.dom_imgview.addEventListener("touchstart", async (e) => {//雙指縮放時可能衝突
                 //圖片沒有出現捲動軸
-                if (fileShow.tieefseeview.getIsOverflowX() === false && fileShow.tieefseeview.getIsOverflowY() === false) {
+                if (fileShow.tiefseeview.getIsOverflowX() === false && fileShow.tiefseeview.getIsOverflowY() === false) {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Normal") {
                         baseWindow.touchDrop.start(fileShow.dom_imgview, e, "move");
@@ -494,10 +494,10 @@ class MainWindow {
 
             let dpizoom = Number(config.settings["image"]["dpizoom"]);//圖片DPI縮放
             if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
-            fileShow.tieefseeview.setDpizoom(dpizoom);
+            fileShow.tiefseeview.setDpizoom(dpizoom);
 
-            let tieefseeviewImageRendering = Number(config.settings["image"]["tieefseeviewImageRendering"]);//圖片縮放模式
-            fileShow.tieefseeview.setRendering(tieefseeviewImageRendering);
+            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]);//圖片縮放模式
+            fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
             document.body.style.fontWeight = config.settings["theme"]["fontWeight"];//文字粗細
@@ -551,7 +551,7 @@ class MainWindow {
             let imageArea = Number(config.settings.advanced.highQualityLimit);
             if (imageArea == -1) { imageArea = 999999; }
             imageArea = imageArea * imageArea;
-            fileShow.tieefseeview.setEventHighQualityLimit(() => { return imageArea; })
+            fileShow.tiefseeview.setEventHighQualityLimit(() => { return imageArea; })
 
             //-----------
 

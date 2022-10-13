@@ -103,13 +103,13 @@ class Config {
             /** 圖片dpi縮放 */
             "dpizoom": "-1",
             /** 圖片渲染模式 */
-            "tieefseeviewImageRendering": "0",
+            "tiefseeviewImageRendering": "0",
             /** 圖片預設縮放模式 */
-            tieefseeviewZoomType: "full-100%",
+            tiefseeviewZoomType: "full-100%",
             /** 圖片預設縮放模式(值) */
-            tieefseeviewZoomValue: 100,
+            tiefseeviewZoomValue: 100,
             /** 圖片預設對齊位置 */
-            tieefseeviewAlignType: "C",
+            tiefseeviewAlignType: "C",
 
             /** 縮小至特定比例以下，就使用libvips重新處理圖片 */
             tiefseeviewBigimgscaleRatio: 0.8

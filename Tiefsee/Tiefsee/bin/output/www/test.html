@@ -48,7 +48,7 @@
         value="https://wall.bahamut.com.tw/B/07/7d41a3dde7ab7ad8489d8c116d07ef56_0779698.JPG">
 
     <hr>
-    <button onclick="tv.zoomFull(TieefseeviewZoomType['full-100%'])">全滿</button>
+    <button onclick="tv.zoomFull(TiefseeviewZoomType['full-100%'])">全滿</button>
     <button onclick="tv.setDegReverse()">逆時針</button>
     <button onclick="tv.setDegForward()">順時針</button>
     <button onclick="tv.setMirrorHorizontal(!tv.getMirrorHorizontal())">水平鏡像</button>
@@ -59,14 +59,14 @@
     <hr>
 
     <label>
-        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto'])" checked>
+        <input type="radio" name="rendering" onclick="tv.setRendering(TiefseeviewImageRendering['auto'])" checked>
         平滑
     </label>
     <label>
-        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['pixelated'])"> 銳利
+        <input type="radio" name="rendering" onclick="tv.setRendering(TiefseeviewImageRendering['pixelated'])"> 銳利
     </label>
     <label>
-        <input type="radio" name="rendering" onclick="tv.setRendering(TieefseeviewImageRendering['auto-pixelated'])">
+        <input type="radio" name="rendering" onclick="tv.setRendering(TiefseeviewImageRendering['auto-pixelated'])">
         僅放大時銳利
     </label>
 
@@ -112,7 +112,7 @@
 
 
             tv.transformRefresh(false)
-            tv.zoomFull(TieefseeviewZoomType['full-100%']);
+            tv.zoomFull(TiefseeviewZoomType['full-100%']);
             $('#output-size').html(`${tv.getOriginalWidth()} , ${tv.getOriginalHeight()}`);
         }
 
@@ -121,7 +121,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
 
-            tv = new Tieefseeview(document.querySelector('#tiefseeview'));
+            tv = new Tiefseeview(document.querySelector('#tiefseeview'));
             //tv.setOverflowDistance(0);
             loadurl()
 

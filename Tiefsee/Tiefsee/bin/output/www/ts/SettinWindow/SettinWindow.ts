@@ -376,44 +376,44 @@ class Setting {
 
         //圖片預設 縮放模式、對齊位置
         addLoadEvent(() => {
-            var select_tieefseeviewZoomType = document.getElementById("select-tieefseeviewZoomType") as HTMLSelectElement;
-            var text_tieefseeviewZoomValue = document.getElementById("text-tieefseeviewZoomValue") as HTMLInputElement;
-            var select_tieefseeviewAlignType = document.getElementById("select-tieefseeviewAlignType") as HTMLSelectElement;
+            var select_tiefseeviewZoomType = document.getElementById("select-tiefseeviewZoomType") as HTMLSelectElement;
+            var text_tiefseeviewZoomValue = document.getElementById("text-tiefseeviewZoomValue") as HTMLInputElement;
+            var select_tiefseeviewAlignType = document.getElementById("select-tiefseeviewAlignType") as HTMLSelectElement;
 
-            select_tieefseeviewZoomType.value = config.settings.image["tieefseeviewZoomType"];
-            text_tieefseeviewZoomValue.value = config.settings.image["tieefseeviewZoomValue"].toString();
-            select_tieefseeviewAlignType.value = config.settings.image["tieefseeviewAlignType"];
+            select_tiefseeviewZoomType.value = config.settings.image["tiefseeviewZoomType"];
+            text_tiefseeviewZoomValue.value = config.settings.image["tiefseeviewZoomValue"].toString();
+            select_tiefseeviewAlignType.value = config.settings.image["tiefseeviewAlignType"];
             showValue();
 
             //顯示或隱藏 「圖片預設縮放模式」的附加欄位
             function showValue() {
-                let val = select_tieefseeviewZoomType.value;
+                let val = select_tiefseeviewZoomType.value;
                 let ar = ["px-w", "px-h", "%-w", "%-h"];
                 if (ar.indexOf(val) !== -1) {
-                    text_tieefseeviewZoomValue.style.display = "block";
+                    text_tiefseeviewZoomValue.style.display = "block";
                 } else {
-                    text_tieefseeviewZoomValue.style.display = "none";
+                    text_tiefseeviewZoomValue.style.display = "none";
                 }
             }
 
-            select_tieefseeviewZoomType.addEventListener("change", () => {
+            select_tiefseeviewZoomType.addEventListener("change", () => {
                 showValue();
-                let val = select_tieefseeviewZoomType.value;
-                config.settings.image["tieefseeviewZoomType"] = val;
+                let val = select_tiefseeviewZoomType.value;
+                config.settings.image["tiefseeviewZoomType"] = val;
                 appleSettingOfMain();
             });
-            text_tieefseeviewZoomValue.addEventListener("change", () => {
-                let val = Number(text_tieefseeviewZoomValue.value);
+            text_tiefseeviewZoomValue.addEventListener("change", () => {
+                let val = Number(text_tiefseeviewZoomValue.value);
                 if (isNaN(val)) { val = 100; }
                 if (val > 99999) { val = 99999; }
                 if (val < 1) { val = 1; }
-                text_tieefseeviewZoomValue.value = val.toString();
-                config.settings.image["tieefseeviewZoomValue"] = val;
+                text_tiefseeviewZoomValue.value = val.toString();
+                config.settings.image["tiefseeviewZoomValue"] = val;
                 appleSettingOfMain();
             });
-            select_tieefseeviewAlignType.addEventListener("change", () => {
-                let val = select_tieefseeviewAlignType.value;
-                config.settings.image["tieefseeviewAlignType"] = val;
+            select_tiefseeviewAlignType.addEventListener("change", () => {
+                let val = select_tiefseeviewAlignType.value;
+                config.settings.image["tiefseeviewAlignType"] = val;
                 appleSettingOfMain();
             });
         })
@@ -658,12 +658,12 @@ class Setting {
 
         // 圖片 縮放模式
         addLoadEvent(() => {
-            var select_tieefseeviewImageRendering = document.querySelector("#select-tieefseeviewImageRendering") as HTMLInputElement;
-            select_tieefseeviewImageRendering.value = config.settings["image"]["tieefseeviewImageRendering"];
+            var select_tiefseeviewImageRendering = document.querySelector("#select-tiefseeviewImageRendering") as HTMLInputElement;
+            select_tiefseeviewImageRendering.value = config.settings["image"]["tiefseeviewImageRendering"];
 
-            select_tieefseeviewImageRendering.addEventListener("change", () => {
-                let val = select_tieefseeviewImageRendering.value;
-                config.settings["image"]["tieefseeviewImageRendering"] = val;
+            select_tiefseeviewImageRendering.addEventListener("change", () => {
+                let val = select_tiefseeviewImageRendering.value;
+                config.settings["image"]["tiefseeviewImageRendering"] = val;
                 appleSettingOfMain();
             });
         })
