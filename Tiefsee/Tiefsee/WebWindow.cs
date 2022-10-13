@@ -163,7 +163,7 @@ namespace Tiefsee {
 
             url = GetHtmlFilePath(url);
 
-            DelayRun(10, () => {
+            Adapter.DelayRun(10, () => {
                 if (tempWindow != null) { return; }
                 WebWindow temp3 = new WebWindow();
                 temp3.isDelayInit = true;
@@ -172,11 +172,11 @@ namespace Tiefsee {
                 temp3.wv2.Source = new Uri(url);
                 //如果視窗載入完成時，tempWindow已經被暫用，則釋放這個window
                 void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
-                    DelayRun(100, () => {
+                    Adapter.DelayRun(100, () => {
                         if (tempWindow == null) {
                             tempWindow = temp3;
                         } else {
-                            DelayRun(5000, () => {
+                            Adapter.DelayRun(5000, () => {
                                 Console.WriteLine("釋放");
                                 QuickRun.WindowCreate();//避免釋放後，window數量對不起來
                                 temp3.Close();
@@ -270,7 +270,7 @@ namespace Tiefsee {
                         firstRunNavigationCompleted = false;
                     } else { return; }
 
-                    DelayRun(100, () => {
+                    Adapter.DelayRun(100, () => {
                         this.Show();
                         this.Hide();//等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
                     });
@@ -508,7 +508,7 @@ namespace Tiefsee {
         /// </summary>
         public void CloseWindow() {
 
-            DelayRun(1, () => {
+            Adapter.DelayRun(1, () => {
                 if (tempWindow == this) { tempWindow = null; }
                 Close();
             });
@@ -537,22 +537,6 @@ namespace Tiefsee {
             } else {
                 Console.WriteLine("js執行失敗，webview2 尚未初始化。" + js);
             }
-        }
-
-
-        /// <summary>
-        /// 延遲執行
-        /// </summary>
-        /// <param name="interval"></param>
-        /// <param name="func"></param>
-        private static void DelayRun(int interval, Action func) {
-            var tim = new System.Windows.Forms.Timer();
-            tim.Interval = interval;
-            tim.Tick += (sender, e) => {
-                func();
-                tim.Stop();
-            };
-            tim.Start();
         }
 
 

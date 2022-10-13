@@ -27,6 +27,7 @@ namespace Tiefsee {
             runNumber -= 1;
 
             if (runNumber <= 0) {
+                Adapter.Shutdown();
                 PortFreed();
                 Program.startWindow.Close();//關閉此視窗，程式就會完全結束
             }

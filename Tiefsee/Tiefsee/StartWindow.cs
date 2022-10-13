@@ -13,8 +13,9 @@ namespace Tiefsee {
     public class StartWindow : Form {
 
         /// <summary> 改成true後，定時執行GC </summary>
-        public static bool runGC = false;
-  
+        public static bool isRunGC = false;
+
+
         /// <summary> 擴充 </summary>
         //public static Plugin plugin = new Plugin();
 
@@ -45,20 +46,18 @@ namespace Tiefsee {
             };
 
             //如果有進行圖片運算的話，定時執行GC
-            var tim = new System.Windows.Forms.Timer();
-            tim.Interval = 30 * 1000;
-            tim.Tick += (e, sender) => {
-                if (runGC) {
+            Adapter.LoopRun(30 * 1000, () => {
+                if (isRunGC) {
                     DateTime time_start = DateTime.Now;//計時開始 取得目前時間
                     WV_System._Collect();
                     DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
                     string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
 
-                    runGC = false;
+                    isRunGC = false;
                     Console.WriteLine("=============== GC == " + result2);
                 }
-            };
-            tim.Start();
+            }, true);
+
 
             InitQuickLook();//快速預覽
         }
@@ -74,10 +73,9 @@ namespace Tiefsee {
 
             bool isDown = false;
 
-            var tim = new System.Windows.Forms.Timer();
-            tim.Interval = 50;
-            tim.Tick += (sender2, e2) => {
-                //Console.WriteLine("#### "  + QuickRun.runNumber);
+
+            Adapter.LoopRun(50, () => {
+
                 bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
                 bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
                 int quickLookRunType = 0;
@@ -86,19 +84,19 @@ namespace Tiefsee {
 
                 if (isMouseMiddle || isKeyboardSpace) {
 
-                    if (isDown) { return; }
-                    isDown = true;
+                    if (isDown == false) {
+                        isDown = true;
 
-                    String selectedItem = PluginQuickLook.GetCurrentSelection();//取得檔案總管目前選取的檔案
-                    if (selectedItem == "") { return; }
+                        String selectedItem = PluginQuickLook.GetCurrentSelection();//取得檔案總管目前選取的檔案
+                        if (selectedItem == "") { return; }
 
-                    if (Program.startType == 2 || Program.startType == 3) {
-                        if (WebWindow.tempWindow == null) { return; }
-                        WebWindow.SendOnCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
+                        if (Program.startType == 2 || Program.startType == 3) {
+                            if (WebWindow.tempWindow == null) { return; }
+                            WebWindow.SendOnCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
 
-                    } else if (Program.startType == 4 || Program.startType == 5) {//單一執行個體，用原來的視窗開啟
-                        WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
-
+                        } else if (Program.startType == 4 || Program.startType == 5) {//單一執行個體，用原來的視窗開啟
+                            WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
+                        }
                     }
 
                 } else {//放開空白鍵
@@ -115,8 +113,8 @@ namespace Tiefsee {
                     }
                     isDown = false;
                 }
-            };
-            tim.Start();
+            });
+
         }
 
 
