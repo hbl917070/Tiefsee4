@@ -368,7 +368,7 @@ namespace Tiefsee {
 
             //string NconvertExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin\\NConvert\\nconvert.exe");
             string NconvertExe = Plugin.pathNConvert;
-           
+
             using (var p = new Process()) {
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.CreateNoWindow = true;
@@ -390,6 +390,52 @@ namespace Tiefsee {
         #region vips
 
         private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
+
+        /// <summary> vips的暫存 </summary>
+        class DataVips {
+            public string key;
+            public NetVips.Image vips;
+        }
+
+        /// <summary> vips的暫存 </summary>
+        static List<DataVips> tempArNewVips = new List<DataVips>();
+
+
+        /// <summary>
+        /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要using
+        /// </summary>
+        public static NetVips.Image GetNetVips(string path) {
+
+            string key = FileToHash(path);
+            for (int i = 0; i < tempArNewVips.Count; i++) {
+                if (tempArNewVips[i].key == key) {
+                    return tempArNewVips[i].vips;
+                }
+            }
+
+            NetVips.Cache.MaxFiles = 0;//避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，也無法讀取到新的檔案
+            NetVips.Image im;
+
+            if (Path.GetExtension(path).ToLower() == ".webp") {//如果是webp就從steam讀取，否則vips會有鎖住檔案的BUG
+                using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                    im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
+                }
+            } else {
+                im = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
+            }
+
+            tempArNewVips.Add(new DataVips {
+                key = key, vips = im
+            });
+
+            if (tempArNewVips.Count > 5) {//最多保留5個檔案
+                using (tempArNewVips[0].vips) { }
+                tempArNewVips[0].vips = null;
+                tempArNewVips.RemoveAt(0);
+            }
+            return im;
+        }
+
 
         /// <summary>
         /// 使用wpf來取得圖片size
@@ -432,10 +478,10 @@ namespace Tiefsee {
             lock (temp_GetImgSize) {
                 temp_GetImgSize.Add(hash, ret);//存入暫存
             }
-            
+
             return ret;
         }
-        
+
 
         /// <summary>
         /// 取得圖片的size，並且把檔案處理成vips可以載入個格式，寫入到再存資料夾
@@ -460,16 +506,15 @@ namespace Tiefsee {
                 imgInfo.code = "1";
                 imgInfo.path = path;
             } else {
-                StartWindow.runGC = true;//定時執行GC
+                StartWindow.isRunGC = true;//定時執行GC
             }
 
             if (type == "tif" || type == "tiff") {
-                NetVips.Image vImg = null;
-                using (vImg = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random)) {
-                    //套用顏色
-                    //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual);
-                    VipsSave(vImg, path100, "auto");
-                }
+                NetVips.Image vImg = GetNetVips(path);
+
+                //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual);//套用顏色
+                VipsSave(vImg, path100, "auto");
+
                 return GetImgInitInfo(path100, "vips");
             }
 
@@ -477,11 +522,9 @@ namespace Tiefsee {
 
                 if (IsCMYK(path)) {//如果是CMYK，就先套用顏色
 
-                    NetVips.Image Vimg = null;
-                    using (Vimg = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random)) {
-                        //套用顏色
-                        Vimg = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual);
-                        Vimg.Jpegsave(path100);
+                    NetVips.Image Vimg = GetNetVips(path);
+                    using (var Vimg2 = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { //套用顏色
+                        Vimg2.Jpegsave(path100);
                     }
                     return GetImgInitInfo(path100, "vips");
                 } else {//直接回傳
@@ -585,29 +628,11 @@ namespace Tiefsee {
                 img100 = path;//直接只用原檔
             }
 
-            //NetVips.Image im = null;
-
-            /*if (Path.GetExtension(img100).ToLower() == ".bmp") {
-                using (Bitmap bmp = new Bitmap(path)) {
-                    using (im = bmp.ToVips()) {
-                        im = im.Resize(scale);
-                        VipsSave(im, filePath, "auto");
-                    }
-                }
-            } else {
-                using (im = NetVips.Image.NewFromFile(img100, true, NetVips.Enums.Access.Random)) {
-                    im = im.Resize(scale);
-                    VipsSave(im, filePath, "auto");
-                }
-            }*/
-
-            using (NetVips.Image im = NetVips.Image.NewFromFile(img100, true, NetVips.Enums.Access.Random)) {
-                using (NetVips.Image imR = im.Resize(scale)) {
-                    VipsSave(imR, filePath, "auto");
-                }
+            NetVips.Image im = GetNetVips(img100);
+            using (NetVips.Image imR = im.Resize(scale)) {
+                VipsSave(imR, filePath, "auto");
             }
-
-            StartWindow.runGC = true;//定時執行GC
+            StartWindow.isRunGC = true;//定時執行GC
 
             return filePath;
         }
