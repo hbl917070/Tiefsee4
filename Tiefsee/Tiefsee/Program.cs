@@ -15,6 +15,7 @@ namespace Tiefsee {
         public static int serverCache;//伺服器對靜態資源快取的時間(秒)
         public static WebServer webServer;//本地伺服器
         public static StartWindow startWindow;//起始視窗，關閉此視窗就會結束程式
+        private static string lockPath;
 
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
@@ -44,6 +45,8 @@ namespace Tiefsee {
             if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
                 Directory.CreateDirectory(appDataPath);
             }
+
+            lockPath = Path.Combine(appDataPath, "lock");
             startIniPath = Path.Combine(appDataPath, "Start.ini");
             IniManager iniManager = new IniManager(startIniPath);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
@@ -62,6 +65,11 @@ namespace Tiefsee {
 
             //如果允許快速啟動，就不開啟新個體
             if (QuickRun.Check(args)) { return; }
+
+            //「直接啟動」之外的，都要避免連續啟動
+            if (startType != 1) {
+                if (AppLock(true)) { return; }
+            }
 
             //在本地端建立server
             webServer = new WebServer();
@@ -87,9 +95,54 @@ namespace Tiefsee {
                 WebWindow.NewTempWindow("MainWindow.html");//新增一個看不見的視窗，用於下次顯示
             }
 
-            startWindow = new StartWindow();
+            if (startType != 1) { AppLock(false); }//解除鎖定
+            startWindow = new StartWindow();     
             Application.Run(startWindow);
         }
+
+
+        /// <summary>
+        /// 在程式完全啟動前，禁止再次啟動
+        /// </summary>
+        /// <param name="val"> true=鎖定，false=解除鎖定 </param>
+        /// <returns> 回傳true表示程式目前鎖定中，不要啟動程式 </returns>
+        private static bool AppLock(bool val) {
+            if (val) {
+
+                if (File.Exists(lockPath)) {
+                    try {
+                        long ticks = 0;
+                        using (StreamReader sr = new StreamReader(lockPath, System.Text.Encoding.UTF8)) {
+                            ticks = long.Parse(sr.ReadToEnd());
+                        }
+
+                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) {//在5秒內連續啟動，就禁止啟動
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } catch {
+                        return false;
+                    }
+                } else {
+                    //using (File.Create(lockPath)) { }
+                    using (FileStream fs = new FileStream(lockPath, FileMode.Create)) {
+                        using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) {
+                            sw.Write(DateTime.Now.Ticks.ToString());
+                        }
+                    }
+                    return false;
+                }
+
+            } else {
+                if (File.Exists(lockPath)) {
+                    File.Delete(lockPath);
+                }
+            }
+            return false;
+        }
+
+
 
     }
 }
