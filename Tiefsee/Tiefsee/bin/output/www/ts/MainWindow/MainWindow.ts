@@ -160,14 +160,22 @@ class MainWindow {
                         await initQuickLookPosition();//初始 快速啟動的坐標
                         initMenu.initOpen();//初始化「開啟檔案」的menu
                         initLoad(json.args);//初始 載入檔案
-                        //initAERO();//初始 套用aero毛玻璃效果
+                        initAERO();//初始 套用aero毛玻璃效果
                     }
                     checkDownKey();
                 }
 
             }
 
-            document.body.focus();
+            window.focus();
+
+
+            setTimeout(() => {//延遲執行，避免剛啟動視窗時，因被搶走焦點導致右鍵選單被關閉
+                window.onblur = function () { //視窗失去焦點
+                    menu.close();//關閉menu
+                };
+            }, 1000);
+
         }
 
 
@@ -246,13 +254,20 @@ class MainWindow {
             applySetting(config.settings, true);
         }
 
+        var isInitAERO = false;//避免重複套用AERO
+
         /** 初始 套用aero毛玻璃效果 */
         function initAERO() {
+            if (isInitAERO) { return; }
+
+
             let aeroType = config.settings["theme"]["aeroType"];
             if (aeroType == "win10") {
                 WV_Window.SetAERO("win10");
+                isInitAERO = true;
             } else if (aeroType == "win7") {
                 WV_Window.SetAERO("win7");
+                isInitAERO = true;
             }
         }
 
@@ -324,6 +339,7 @@ class MainWindow {
                         }
                     }
                 }
+                window.focus();
             });
             /*fileShow.dom_imgview.addEventListener("touchstart", async (e) => {//雙指縮放時可能衝突
                 //圖片沒有出現捲動軸
