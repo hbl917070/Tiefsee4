@@ -158,20 +158,21 @@ class ScriptFile {
         WV_File.ShowContextMenu(this.M.fileLoad.getFilePath(), true);
     }
 
-    public async save(btn: HTMLElement) {
+    /** 儲存文字檔 */
+    public async save(btn?: HTMLElement) {
         let t = await this.M.fileShow.iframes.getText();
         let path = this.M.fileLoad.getFilePath();
+        Msgbox.closeAll();//關閉所有訊息視窗
         if (t == null) {
-            Msgbox.show({ txt: "儲存失敗", });
+            Toast.show("儲存失敗", 1000 * 3);
             return;
         }
         try {
             await WV_File.SetText(path, t);
-            Msgbox.show({ txt: "儲存完成", });
+            Toast.show("儲存完成", 1000 * 3);
         } catch (e) {
-            Msgbox.show({ txt: "儲存失敗：\n" + e, });
+            Toast.show("儲存失敗：\n" + e, 1000 * 3);
         }
-        //console.log(t)
     }
 }
 

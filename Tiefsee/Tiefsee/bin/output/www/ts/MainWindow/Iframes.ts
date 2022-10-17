@@ -57,9 +57,10 @@ class Iframes {
                 }
             }
             if (type === "loadDropFile") {
-
                 await M.fileLoad.loadDropFile(data);
-
+            }
+            if (type === "saveText") {
+                await M.script.file.save();
             }
         });
 

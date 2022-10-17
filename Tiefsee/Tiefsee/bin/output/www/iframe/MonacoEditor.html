@@ -92,6 +92,7 @@
 
         var libIframe = new LibIframe();
         libIframe.initEventDrop(window);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
+        libIframe.initTextHotkey();//按 ctrl + S 時，儲存文字檔
 
         var editor;
 
@@ -138,6 +139,9 @@
             });
 
         }
+
+
+    
 
         /**
          * 清空文件

@@ -25,9 +25,11 @@ class Hotkey {
             if (Msgbox.isShow()) {
                 if (e.code == "Escape") {
                     Msgbox.closeNow();
+                    e.preventDefault();
                 }
                 if (e.code == "Enter" || e.code == "NumpadEnter") {
                     Msgbox.clickYes();
+                    e.preventDefault();
                 }
                 return;
             }
@@ -35,6 +37,9 @@ class Hotkey {
             //如果顯示的類型是 文字編輯器，則不使用快速鍵
             if (M.fileShow.getGroupType() == GroupType.txt) {
                 if (Lib.isTextFocused()) {
+                    if (e.code === "KeyS" && e.ctrlKey) {
+                        M.script.file.save();
+                    }
                     return;
                 }
             }

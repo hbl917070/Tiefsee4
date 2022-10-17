@@ -88,6 +88,21 @@ class LibIframe {
 
 
     /**
+     * 按 ctrl + S 時，儲存文字檔
+     */
+    public initTextHotkey() {
+        window.addEventListener("keydown", async (e) => {
+            if (e.code === "KeyS" && e.ctrlKey) {
+                let json = {
+                    type: "saveText",
+                };
+                this.postMsg(json);
+            }
+        }, true);
+    }
+
+
+    /**
      * 傳送資料給父物件
      */
     public postMsg(json: any) {
