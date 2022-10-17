@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 45">
+	<style type="text/css">
+		.st0{fill:#FFFFFF;}
+		.st1{fill:#27BCEE;}
+		.st2{fill:none;stroke:#27BCEE;stroke-miterlimit:10;}
+	</style>
+	<path class="st0" d="M59,1v43H1V1H59 M60,0H0v45h60V0L60,0z"/>
+	<path class="st1" d="M15.4,5v35h-10V5H15.4 M16.4,4h-12v37h12V4L16.4,4z"/>
+	<polyline class="st2" points="10.9,26.2 7.2,22.5 10.9,18.8 	"/>
+	<line class="st2" x1="13.5" y1="22.5" x2="7.2" y2="22.5"/>
+	<path class="st1" d="M54.3,5v35h-10V5H54.3 M55.3,4h-12v37h12V4L55.3,4z"/>
+	<polyline class="st2" points="48.7,18.8 52.4,22.5 48.7,26.2 	"/>
+	<line class="st2" x1="46.1" y1="22.5" x2="52.4" y2="22.5"/>
+</svg>

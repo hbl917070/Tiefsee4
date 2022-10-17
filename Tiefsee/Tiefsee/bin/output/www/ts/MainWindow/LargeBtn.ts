@@ -33,6 +33,9 @@ class LargeBtn {
             if (type == "leftRight") {
                 dom_largeBtnLeft.setAttribute("data-style", "leftRight-L");
                 dom_largeBtnRight.setAttribute("data-style", "leftRight-R");
+            } else if (type == "leftRight2") {
+                dom_largeBtnLeft.setAttribute("data-style", "leftRight2-L");
+                dom_largeBtnRight.setAttribute("data-style", "leftRight2-R");
             } else if (type == "bottom") {
                 dom_largeBtnLeft.setAttribute("data-style", "bottom-L");
                 dom_largeBtnRight.setAttribute("data-style", "bottom-R");

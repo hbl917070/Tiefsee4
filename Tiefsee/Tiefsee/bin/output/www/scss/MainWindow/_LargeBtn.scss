@@ -55,6 +55,19 @@
     right: 0px;
     width: 60px;
   }
+   //左右兩側2(內縮)
+   .largeBtn[data-style="leftRight2-L"] {
+    top: 20px;
+    bottom: 20px;
+    left: 20px;
+    width: 60px;
+  }
+  .largeBtn[data-style="leftRight2-R"] {
+    top: 20px;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+  }
   //下面
   .largeBtn[data-style="bottom-L"] {
     bottom: 20px;

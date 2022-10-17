@@ -368,6 +368,7 @@ select {
 
 .radioList-h {
   display: flex;
+  flex-wrap: wrap;
 }
 .radioList-item {
   width: 80px;
@@ -376,6 +377,8 @@ select {
   flex-direction: column;
   color: #fff;
   align-items: flex-start;
+  flex-shrink: 0;
+  margin-bottom: 10px;
 }
 .radioList-item input[type="radio"] {
   margin-bottom: 5px;
