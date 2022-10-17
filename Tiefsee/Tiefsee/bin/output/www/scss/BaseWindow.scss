@@ -75,8 +75,8 @@ select option {
   background-color: var(--color-window-background);
   border-radius: var(--window-border-radius);
   border: 1px solid var(--color-window-border);
-  // margin: 5px;  
-  
+  // margin: 5px;
+
   margin-right: 1.5px;
   margin-bottom: 1.5px;
   display: flex;
@@ -238,18 +238,22 @@ select option {
 .base-scrollbar:hover::-webkit-scrollbar {
   background-color: var(--color-black60);
 }
-/*.base-scrollbar::-webkit-scrollbar:hover {
-  background-color: var(--color-black60);
-}*/
 
 /*滾動條軌道*/
 .base-scrollbar::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);
 }
+
+
 /*拖曳區塊*/
 .base-scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--color-white40);
+
+  //產生透明框線並且剪裁掉
+  border: 3px solid rgba(0, 0, 0, 0);
+  background-clip: content-box;
 }
+
 /*右下角交匯處*/
 .base-scrollbar::-webkit-scrollbar-corner {
   background-color: rgba(0, 0, 0, 0);

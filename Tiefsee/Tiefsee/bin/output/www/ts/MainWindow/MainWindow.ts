@@ -254,12 +254,11 @@ class MainWindow {
             applySetting(config.settings, true);
         }
 
-        var isInitAERO = false;//避免重複套用AERO
 
+        var isInitAERO = false;//避免重複套用AERO
         /** 初始 套用aero毛玻璃效果 */
         function initAERO() {
             if (isInitAERO) { return; }
-
 
             let aeroType = config.settings["theme"]["aeroType"];
             if (aeroType == "win10") {
@@ -281,7 +280,6 @@ class MainWindow {
 
             } else {
                 quickLookUp();//關閉 快速預覽
-                //console.log("checkDownKey")
             }
         }
 
@@ -317,7 +315,6 @@ class MainWindow {
             btn_layout.addEventListener("click", function (e) {
                 script.menu.showLayout(btn_layout);
             })
-
 
 
             //封鎖原生右鍵選單

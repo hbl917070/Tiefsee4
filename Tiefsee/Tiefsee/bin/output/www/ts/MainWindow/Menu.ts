@@ -85,7 +85,7 @@ class Menu {
 
             domMenuBg.onmousedown = (sender) => {
                 let domClick = sender.target as HTMLElement;
-                if (domClick.classList.contains("menu") || domClick.classList.contains("menu-content")) {//點擊透明背景時
+                if (domClick.classList.contains("menu")) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu
                 }
@@ -148,7 +148,7 @@ class Menu {
 
             domMenuBg.onmousedown = (sender) => {
                 let domClick = sender.target as HTMLElement;
-                if (domClick.classList.contains("menu") || domClick.classList.contains("menu-content")) {//點擊透明背景時
+                if (domClick.classList.contains("menu")) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu
                 }
