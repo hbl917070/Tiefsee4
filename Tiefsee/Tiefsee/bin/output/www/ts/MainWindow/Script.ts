@@ -154,8 +154,10 @@ class ScriptFile {
     }
 
     /** 顯示檔案原生右鍵選單 */
-    public showContextMenu() {
-        WV_File.ShowContextMenu(this.M.fileLoad.getFilePath(), true);
+    public async showContextMenu() {
+        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
+        if (await WV_File.Exists(filePath) === false) { return; }
+        WV_File.ShowContextMenu(filePath, true);
     }
 
     /** 儲存文字檔 */
@@ -348,25 +350,25 @@ class ScriptCopy {
     public async copyFile() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
-
-        WV_System.SetClipboard_File(filePath);
+        await WV_System.SetClipboard_File(filePath);
+        Toast.show("已將「檔案」複製至剪貼簿", 1000 * 3);
     }
 
     /** 複製 檔名 */
     public async copyName() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
-
         let name = Lib.GetFileName(filePath)
-        WV_System.SetClipboard_Txt(name);
+        await WV_System.SetClipboard_Txt(name);
+        Toast.show("已將「檔名」複製至剪貼簿", 1000 * 3);
     }
 
     /** 複製 完整路徑 */
     public async copyPath() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
-
-        WV_System.SetClipboard_Txt(filePath);
+        await WV_System.SetClipboard_Txt(filePath);
+        Toast.show("已將「路徑」複製至剪貼簿", 1000 * 3);
     }
 
     /** 複製 影像 */
@@ -376,26 +378,37 @@ class ScriptCopy {
         let fileInfo2 = await Lib.GetFileInfo2(filePath);
         if (fileInfo2.Type === "none") { return; } //如果檔案不存在
         let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
+        let msg = "已將「影像」複製至剪貼簿";
 
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             if (imgType === "apng" || imgType === "webp" || imgType === "svg") {//只有瀏覽器支援的圖片格式
                 let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
-                WV_System.SetClipboard_Base64ToImage(base64, true);
+                await WV_System.SetClipboard_Base64ToImage(base64, true);
             } else if (imgType === "jpg") {
-                WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
+                await WV_System.SetClipboard_FileToImage(filePath, false);//直接用C#讀取圖片
             } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
-                WV_System.SetClipboard_FileToImage(filePath, true);
+                await WV_System.SetClipboard_FileToImage(filePath, true);
             } else {
                 let imgUrl = this.M.fileShow.tiefseeview.getUrl();//取得圖片網址
                 let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
-                WV_System.SetClipboard_Base64ToImage(base64, true);
+                await WV_System.SetClipboard_Base64ToImage(base64, true);
             }
+            Toast.show(msg, 1000 * 3);
+        }
+
+        if (this.M.fileLoad.getGroupType() === GroupType.unknown) {
+            let imgUrl = this.M.fileShow.tiefseeview.getUrl();//取得圖片網址
+            let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
+            await WV_System.SetClipboard_Base64ToImage(base64, true);
+            Toast.show(msg, 1000 * 3);
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
             let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
-            WV_System.SetClipboard_Base64ToImage(base64, false);
+            await WV_System.SetClipboard_Base64ToImage(base64, false);
+            Toast.show(msg, 1000 * 3);
         }
+
 
     }
 
@@ -410,18 +423,19 @@ class ScriptCopy {
         if (this.M.fileLoad.getGroupType() === GroupType.img) {
             let imgUrl = this.M.fileShow.tiefseeview.getUrl();//取得圖片網址
             let base64: string = await fetchGet_base64(imgUrl);//取得檔案的base64
-            WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Txt(base64);
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.txt) {
             let base64: string = await fetchGet_base64(filePath);//取得檔案的base64
-            WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Txt(base64);
         }
 
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
             let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium");//把圖片繪製到canvas上面，再取得base64
-            WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Txt(base64);
         }
+        Toast.show("已將「影像base64」複製至剪貼簿", 1000 * 3);
 
     }
 
@@ -436,8 +450,9 @@ class ScriptCopy {
     public async copyTxt() {
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
         if (await WV_File.Exists(filePath) === false) { return; }
+        await WV_System.SetClipboard_FileToTxt(filePath);
+        Toast.show("已將「文字」複製至剪貼簿", 1000 * 3);
 
-        WV_System.SetClipboard_FileToTxt(filePath);
     }
 }
 

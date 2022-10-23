@@ -471,6 +471,7 @@ class FileLoad {
             if (flagFile >= arFile.length) { flagFile = arFile.length - 1; }
 
             if (arFile.length === 0) {//如果資料夾裡面沒有圖片
+                Toast.show("未找到圖片", 1000 * 3);
                 M.fileShow.openWelcome();
                 _showFile = async () => { }
                 return;
@@ -560,8 +561,9 @@ class FileLoad {
             let fileExt = Lib.GetFileType(fileInfo2)
 
             for (var type in GroupType) {
-                for (let j = 0; j < M.config.allowFileType(type).length; j++) {
-                    const fileType = M.config.allowFileType(type)[j];
+                let allowFileType = M.config.allowFileType(type);
+                for (let j = 0; j < allowFileType.length; j++) {
+                    const fileType = allowFileType[j];
                     if (fileExt == fileType["ext"]) {
                         return type;
                     }
@@ -591,9 +593,9 @@ class FileLoad {
 
                 let path = arFile[i];
                 let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
-
-                for (let j = 0; j < M.config.allowFileType(groupType).length; j++) {
-                    const fileType = M.config.allowFileType(groupType)[j];
+                let allowFileType = M.config.allowFileType(groupType);
+                for (let j = 0; j < allowFileType.length; j++) {
+                    const fileType = allowFileType[j];
                     if (fileExt == "." + fileType["ext"]) {
                         ar.push(path);
                         break;
@@ -626,10 +628,15 @@ class FileLoad {
                 }
 
                 if (state === false) {
-                    Msgbox.show({ txt: "刪除失敗" })
+                    Msgbox.show({ txt: "檔案刪除失敗" })
                 } else {
                     await showFile();
 
+                    if (value == "1") {
+                        Toast.show("已將檔案「移至資源回收桶」", 1000 * 3);
+                    } else {
+                        Toast.show("已將檔案「永久刪除」", 1000 * 3);
+                    }
                     M.mainFileList.init();//檔案預覽列表 初始化
                     M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
                     M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
