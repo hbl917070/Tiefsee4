@@ -200,18 +200,21 @@ class Config {
     }
 
 
-    /**
-     * 
-     * @param type 
-     * @returns 
+    private _allowFile_img: { ext: string; type: string; vipsType?: string; }[] = [];
+    private _allowFile_video: { ext: string; type: string; vipsType?: string; }[] = [];
+    private _allowFile_pdf: { ext: string; type: string; vipsType?: string; }[] = [];
+    private _allowFile_txt: { ext: string; type: string; vipsType?: string; }[] = [];
+    /** 
+     * 初始化 檔案關聯列表
      */
-    public allowFileType(type: string) {
+    private initAllowFileType() {
 
         let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
-        if (plugin == null) { return []; }
+        if (plugin == null) { return; }
 
-        if (type === GroupType.img) {
-            let d = [
+        //img
+        (() => {
+            this._allowFile_img = [
                 { ext: "jpg", type: "vips", vipsType: "jpg" },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
@@ -273,7 +276,7 @@ class Config {
 
             //有安裝NConvert才使用
             if (plugin.NConvert === true) {
-                d.push(
+                this._allowFile_img.push(
                     { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
                     { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
                     { ext: "dcm", type: "vips", vipsType: "magick,nconvertJpg" },
@@ -281,26 +284,28 @@ class Config {
                     { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
                 );
             }
+        })();
 
-            return d;
-        }
 
-        if (type === GroupType.video) {
-            return [
+        //video
+        (() => {
+            this._allowFile_video = [
                 { ext: "mp4", type: "video" },
                 { ext: "webm", type: "video" },
                 { ext: "ogv", type: "video" },
                 //{ ext: "ogg", type: "video" },     
             ]
-        }
+        })();
 
-        if (type === GroupType.pdf) {
-            let d = [
+
+        //pdf
+        (() => {
+            this._allowFile_pdf = [
                 { ext: "pdf", type: "pdf" },
                 { ext: "ai", type: "pdf" },
             ]
             if (plugin.PDFTronWebviewer) {
-                d.push(
+                this._allowFile_pdf.push(
                     { ext: "doc", type: "PDFTronWebviewer" },
                     { ext: "docx", type: "PDFTronWebviewer" },
                     { ext: "ppt", type: "PDFTronWebviewer" },
@@ -310,48 +315,88 @@ class Config {
                     //{ ext: "xlsx", type: "PDFTronWebviewer" },
                 );
             }
-            return d;
-        }
+        })();
 
-        if (type === GroupType.txt) {
-            return [
-                { ext: "txt", type: "txt" },
-                { ext: "css", type: "auto" },
-                { ext: "scss", type: "auto" },
+
+        //txt
+        (() => {
+            this._allowFile_txt = [
                 { ext: "sass", type: "auto" },
-                { ext: "less", type: "auto" },
                 { ext: "js", type: "javascript" },
                 { ext: "ts", type: "typescript" },
-                { ext: "xml", type: "auto" },
-                { ext: "html", type: "auto" },
                 { ext: "ejs", type: "html" },
-                { ext: "jsx", type: "auto" },
-                { ext: "php", type: "auto" },
-                { ext: "py", type: "auto" },
-                { ext: "java", type: "auto" },
-                { ext: "cs", type: "auto" },
-                { ext: "c", type: "auto" },
-                { ext: "cpp", type: "auto" },
-                { ext: "go", type: "auto" },
-                { ext: "r", type: "auto" },
-                { ext: "ini", type: "auto" },
                 { ext: "log", type: "auto" },
-                { ext: "config", type: "auto" },
-                { ext: "json", type: "auto" },
-                { ext: "sql", type: "auto" },
                 { ext: "url", type: "auto" },
                 { ext: "md", type: "md" },
                 { ext: "gitignore", type: "auto" },
-                { ext: "bat", type: "auto" },
                 { ext: "csv", type: "auto" },
-                // monaco.languages.getLanguages()
-
             ]
+
+            // monaco.languages.getLanguages()
+            let arExt = ["txt", "abap", "cls", "azcli", "bat", "cmd", "bicep", "mligo", "clj",
+                "cljs", "cljc", "edn", "coffee", "c", "h", "cpp", "cc", "cxx", "hpp", "hh",
+                "hxx", "cs", "csx", "cake", "css", "cypher", "cyp", "dart", "dockerfile", "ecl",
+                "ex", "exs", "flow", "fs", "fsi", "ml", "mli", "fsx", "fsscript", "ftl", "ftlh",
+                "ftlx", "go", "graphql", "gql", "handlebars", "hbs", "tf", "tfvars", "hcl", "html",
+                "htm", "shtml", "xhtml", "mdoc", "jsp", "asp", "aspx", "jshtm", "ini", "properties",
+                "gitconfig", "java", "jav", "js", "es6", "jsx", "mjs", "cjs", "jl", "kt", "less", "lex",
+                "lua", "liquid", "html.liquid", "m3", "i3", "mg", "ig", "markdown", "mdown", "mkdn",
+                "mkd", "mdwn", "mdtxt", "mdtext", "s", "dax", "msdax", "m", "pas", "p", "pp", "ligo",
+                "pl", "php", "php4", "php5", "phtml", "ctp", "pla", "dats", "sats", "hats", "pq", "pqm",
+                "ps1", "psm1", "psd1", "proto", "jade", "pug", "py", "rpy", "pyw", "cpy", "gyp", "gypi",
+                "qs", "r", "rhistory", "rmd", "rprofile", "rt", "cshtml", "redis", "rst", "rb", "rbx",
+                "rjs", "gemspec", "pp", "rs", "rlib", "sb", "scala", "sc", "sbt", "scm", "ss", "sch",
+                "rkt", "scss", "sh", "bash", "sol", "aes", "rq", "sql", "st", "iecst", "iecplc", "lc3lib",
+                "swift", "sv", "svh", "v", "vh", "tcl", "twig", "ts", "tsx", "vb", "xml", "dtd", "ascx",
+                "csproj", "config", "wxi", "wxl", "wxs", "xaml", "svg", "svgz", "opf", "xsl", "yaml", "yml",
+                "json", "bowerrc", "jshintrc", "jscsrc", "eslintrc", "babelrc", "har"
+            ]
+            for (let i = 0; i < arExt.length; i++) {
+                this._allowFile_txt.push({ ext: arExt[i], type: "auto" })
+            }
+
+        })();
+
+    }
+
+
+    /**
+     * 取得 檔案關聯列表
+     * @param type 例如 GroupType.img
+     */
+    public allowFileType(type: string) {
+
+        let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
+        if (plugin == null) { return []; }
+
+        //首次執行進行初始化
+        if (this._allowFile_img.length === 0) {
+            this.initAllowFileType();
+        }
+
+        if (type === GroupType.img) {
+            return this._allowFile_img;
+        }
+        if (type === GroupType.video) {
+            return this._allowFile_video;
+        }
+        if (type === GroupType.pdf) {
+            return this._allowFile_pdf;
+        }
+        if (type === GroupType.txt) {
+            return this._allowFile_txt;
         }
 
         return []
     }
 
+
+    /**
+     * 取得 檔案關聯列表
+     * @param type 例如 GroupType.img
+     * @param ext 例如 jpg
+     * @returns 例如 { ext: "jfif", type: "vips", vipsType: "jpg" }
+     */
     public getAllowFileTypeItem(type: string, ext: string) {
         let ar = this.allowFileType(type);
         for (let i = 0; i < ar.length; i++) {
