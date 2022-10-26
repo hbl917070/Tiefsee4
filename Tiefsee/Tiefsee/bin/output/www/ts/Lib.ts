@@ -355,6 +355,19 @@ class Lib {
         return false;
     }
 
+
+    /**
+     * 判斷物件目前是否有捲動軸
+     * @param type X | Y
+     */
+    public static isScrollbarVisible(element: HTMLElement, type = "Y") {
+        if (type === "y" || type === "Y") {
+            return element.scrollHeight > element.clientHeight;
+        } else {
+            return element.scrollWidth > element.clientWidth;
+        }
+    }
+
 }
 
 

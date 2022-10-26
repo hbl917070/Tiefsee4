@@ -80,219 +80,6 @@ class MainWindow {
         new Hotkey(this);
         init();
 
-        //視窗改變大小時觸發
-        baseWindow.sizeChangeEvents.push(async () => {
-            //必須在視窗化的狀態下記錄size，不可以在最大化的時候記錄size
-            if (baseWindow.windowState === "Normal") {
-                config.settings.position.width = baseWindow.width;
-                config.settings.position.height = baseWindow.height;
-            }
-        });
-
-
-        //關閉視窗前觸發
-        baseWindow.closingEvents.push(async () => {
-
-            if (getIsQuickLook() === false) {//正常視窗(不是快速預覽)
-                if (script.setting.temp_setting != null) {//如果有開啟 設定視窗
-                    if (await script.setting.temp_setting.Visible === true) {
-                        await script.setting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
-                        await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
-                    }
-                }
-                WV_System.DeleteTemp(100, 300);//刪除圖片暫存
-                await saveSetting();//儲存 setting.json
-                return true;
-
-            } else {
-                quickLookUp();//關閉 快速預覽
-                return false;
-            }
-        });
-
-
-        /**
-         * 覆寫 onCreate (由C#呼叫)
-         * @param json 
-         */
-        baseWindow.onCreate = async (json: AppInfo) => {
-
-            baseWindow.appInfo = json;
-            startType = json.startType;
-
-            isQuickLook = false;
-
-            if (json.quickLookRunType === 0) {//一般啟動
-
-                if (firstRun === true) { //首次開啟視窗
-
-                    firstRun = false;
-
-                    initSetting(json.settingTxt);//初始讀取設定
-                    await initLastPosition();//初始 套用上次的視窗狀態與坐標
-                    initMenu.initOpen();//初始化「開啟檔案」的menu
-                    initLoad(json.args);//初始 載入檔案
-                    initAERO();//初始 套用aero毛玻璃效果
-
-                } else {//單純開啟圖片(用於 單一執行個體)
-
-                    WV_Window.ShowWindow();//顯示視窗 
-                    initLoad(json.args);//初始載入檔案
-                }
-
-            }
-
-            if (json.quickLookRunType !== 0) {//快速啟動
-
-                initSetting(json.settingTxt);//初始讀取設定
-
-                let isKeyboardSpace = json.quickLookRunType === 1;//按著空白鍵
-                let isMouseMiddle = json.quickLookRunType === 2;//按著滑鼠中鍵(滾輪)
-                let keyboardSpaceRun = config.settings.quickLook.keyboardSpaceRun;
-                let mouseMiddleRun = config.settings.quickLook.mouseMiddleRun;
-
-                if ((isKeyboardSpace && keyboardSpaceRun) || (isMouseMiddle && mouseMiddleRun)) {
-                    if (startType == 4 || startType == 5) {//單純開啟圖片(用於 單一執行個體)
-                        WV_Window.ShowWindow();//顯示視窗 
-                        initLoad(json.args);//初始載入檔案
-                    } else {
-                        isQuickLook = true;
-                        await initQuickLookPosition();//初始 快速啟動的坐標
-                        initMenu.initOpen();//初始化「開啟檔案」的menu
-                        initLoad(json.args);//初始 載入檔案
-                        initAERO();//初始 套用aero毛玻璃效果
-                    }
-                    checkDownKey();
-                }
-
-            }
-
-            window.focus();
-
-
-            setTimeout(() => {//延遲執行，避免剛啟動視窗時，因被搶走焦點導致右鍵選單被關閉
-                window.onblur = function () { //視窗失去焦點
-                    menu.close();//關閉menu
-                };
-            }, 1000);
-
-        }
-
-
-        /** 初始 快速預覽的視窗坐標 */
-        async function initQuickLookPosition() {
-
-            //取得滑鼠所在的螢幕資訊
-            let mousePosition = await WV_System.GetMousePosition();
-            let screen = await WV_System.GetScreenFromPoint(mousePosition[0], mousePosition[1]);
-            let screenX = screen[0];
-            let screenY = screen[1];
-            let screenW = screen[2];
-            let screenH = screen[3];
-
-            let rate = 0.8;//全螢幕的80%
-
-            //置中的坐標與size
-            let width = screenW * rate;
-            let height = screenH * rate;
-            let left = screenX + ((screenW - width) / 2);
-            let top = screenY + ((screenH - height) / 2);
-
-            await WV_Window.ShowWindow_SetSize(left, top, width, height, "Normal");//顯示視窗 
-        }
-
-        /** 初始 套用上次的視窗狀態與坐標 */
-        async function initLastPosition() {
-            let txtPosition = config.settings.position;
-            if (txtPosition.left !== -9999) {
-                if (txtPosition.windowState == "Maximized") {
-                    await WV_Window.ShowWindow_SetSize(
-                        txtPosition.left, txtPosition.top,
-                        //800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
-                        txtPosition.width, txtPosition.height,
-                        "Maximized"
-                    );//顯示視窗 
-                } else if (txtPosition.windowState == "Normal") {
-                    await WV_Window.ShowWindow_SetSize(
-                        txtPosition.left, txtPosition.top,
-                        txtPosition.width, txtPosition.height,
-                        "Normal"
-                    );//顯示視窗 
-                } else {
-                    await WV_Window.ShowWindow();//顯示視窗 
-                    await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
-                }
-
-            } else {
-
-                await WV_Window.ShowWindow();//顯示視窗 
-                await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
-
-            }
-        }
-
-        /** 初始 載入檔案 */
-        function initLoad(args: string[]) {
-            Msgbox.closeAll();//關閉所有訊息視窗
-            menu.close();
-            if (args.length === 0) {
-                fileShow.openWelcome();
-            } else if (args.length === 1) {
-                fileLoad.loadFile(args[0]);//載入單張圖片
-            } else {
-                fileLoad.loadFiles(args[0], args);//載入多張圖片
-            }
-        }
-
-        /** 初始 讀取設定 */
-        function initSetting(settingTxt: string) {
-            var userSetting = {};
-            try {
-                userSetting = JSON.parse(settingTxt);
-            } catch (e) { }
-            $.extend(true, config.settings, userSetting);
-            applySetting(config.settings, true);
-        }
-
-
-        var isInitAERO = false;//避免重複套用AERO
-        /** 初始 套用aero毛玻璃效果 */
-        function initAERO() {
-            if (isInitAERO) { return; }
-
-            let aeroType = config.settings["theme"]["aeroType"];
-            if (aeroType == "win10") {
-                WV_Window.SetAERO("win10");
-                isInitAERO = true;
-            } else if (aeroType == "win7") {
-                WV_Window.SetAERO("win7");
-                isInitAERO = true;
-            }
-        }
-
-        /** 再次檢查目前是否按著空白鍵或滑鼠中鍵 */
-        async function checkDownKey() {
-
-            let json = JSON.parse(await WV_System.GetDownKey());
-            let keyboardSpaceRun = config.settings.quickLook.keyboardSpaceRun;
-            let mouseMiddleRun = config.settings.quickLook.mouseMiddleRun;
-            if ((json.isKeyboardSpace && keyboardSpaceRun) || (json.isMouseMiddle && mouseMiddleRun)) {
-
-            } else {
-                quickLookUp();//關閉 快速預覽
-            }
-        }
-
-        /**
-         * 關閉 快速預覽 (由C#呼叫)
-         */
-        function quickLookUp() {
-            //如果是單一執行個體，就不關閉視窗
-            if (startType === 2 || startType === 3) {
-                fileShow.openNone();
-                WV_Window.Hide();
-            }
-        }
 
         /**
          * 
@@ -303,6 +90,37 @@ class MainWindow {
             initDomImport();
 
             WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio);//設定視窗最小size
+
+            fileShow.tiefseeview.setMargin(0, 10, 10, 0);
+
+            //視窗改變大小時觸發
+            baseWindow.sizeChangeEvents.push(async () => {
+                //必須在視窗化的狀態下記錄size，不可以在最大化的時候記錄size
+                if (baseWindow.windowState === "Normal") {
+                    config.settings.position.width = baseWindow.width;
+                    config.settings.position.height = baseWindow.height;
+                }
+            });
+
+            //關閉視窗前觸發
+            baseWindow.closingEvents.push(async () => {
+
+                if (getIsQuickLook() === false) {//正常視窗(不是快速預覽)
+                    if (script.setting.temp_setting != null) {//如果有開啟 設定視窗
+                        if (await script.setting.temp_setting.Visible === true) {
+                            await script.setting.temp_setting.RunJs("setting.saveData();");//關閉前先儲存設定
+                            await sleep(30);// js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
+                        }
+                    }
+                    WV_System.DeleteTemp(100, 300);//刪除圖片暫存
+                    await saveSetting();//儲存 setting.json
+                    return true;
+
+                } else {
+                    quickLookUp();//關閉 快速預覽
+                    return false;
+                }
+            });
 
             //設定icon
             async function initIcon() {
@@ -316,14 +134,12 @@ class MainWindow {
                 script.menu.showLayout(btn_layout);
             })
 
-
             //封鎖原生右鍵選單
             document.addEventListener("contextmenu", function (e) {
                 //if (Lib.isTextFocused() === false) {//焦點不在輸入框上          
                 //}
                 e.preventDefault();
             })
-
 
             //圖片區域也允許拖曳視窗
             fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
@@ -484,12 +300,220 @@ class MainWindow {
 
         }
 
+
+        /**
+         * 覆寫 onCreate (由C#呼叫)
+         * @param json 
+         */
+        baseWindow.onCreate = async (json: AppInfo) => {
+
+            baseWindow.appInfo = json;
+            startType = json.startType;
+
+            isQuickLook = false;
+
+            if (json.quickLookRunType === 0) {//一般啟動
+
+                if (firstRun === true) { //首次開啟視窗
+
+                    firstRun = false;
+
+                    initSetting(json.settingTxt);//初始讀取設定
+                    await initLastPosition();//初始 套用上次的視窗狀態與坐標
+                    initMenu.initOpen();//初始化「開啟檔案」的menu
+                    initLoad(json.args);//初始 載入檔案
+                    initAERO();//初始 套用aero毛玻璃效果
+
+                } else {//單純開啟圖片(用於 單一執行個體)
+
+                    WV_Window.ShowWindow();//顯示視窗 
+                    initLoad(json.args);//初始載入檔案
+                }
+
+            }
+
+            if (json.quickLookRunType !== 0) {//快速啟動
+
+                initSetting(json.settingTxt);//初始讀取設定
+
+                let isKeyboardSpace = json.quickLookRunType === 1;//按著空白鍵
+                let isMouseMiddle = json.quickLookRunType === 2;//按著滑鼠中鍵(滾輪)
+
+                if ((isKeyboardSpace && config.settings.quickLook.keyboardSpaceRun) ||
+                    (isMouseMiddle && config.settings.quickLook.mouseMiddleRun)) {
+
+                    if (startType == 4 || startType == 5) {//單純開啟圖片(用於 單一執行個體)
+                        WV_Window.ShowWindow();//顯示視窗 
+                        initLoad(json.args);//初始載入檔案
+                    } else {
+                        isQuickLook = true;
+                        fileShow.openNone();//避免卡在上一張圖片
+                        await initQuickLookPosition();//初始 快速啟動的坐標
+                        initMenu.initOpen();//初始化「開啟檔案」的menu    
+                        initLoad(json.args);//初始 載入檔案
+                        initAERO();//初始 套用aero毛玻璃效果
+                    }
+                    checkDownKey();
+                }
+
+            }
+
+            window.focus();
+
+            setTimeout(() => {//延遲執行，避免剛啟動視窗時，因被搶走焦點導致右鍵選單被關閉
+                window.onblur = function () { //視窗失去焦點
+                    menu.close();//關閉menu
+                };
+            }, 1000);
+
+        }
+
+
+        /**
+         * 關閉 快速預覽 (由C#呼叫)
+         */
+        function quickLookUp() {
+            //如果是單一執行個體，就不關閉視窗
+            if (startType === 2 || startType === 3) {
+                fileShow.openNone();
+                WV_Window.Hide();
+            }
+        }
+
+
+        /** 
+         * 初始 快速預覽的視窗坐標
+         */
+        async function initQuickLookPosition() {
+
+            //取得滑鼠所在的螢幕資訊
+            let mousePosition = await WV_System.GetMousePosition();
+            let screen = await WV_System.GetScreenFromPoint(mousePosition[0], mousePosition[1]);
+            let screenX = screen[0];
+            let screenY = screen[1];
+            let screenW = screen[2];
+            let screenH = screen[3];
+
+            let rate = 0.8;//全螢幕的80%
+
+            //置中的坐標與size
+            let width = screenW * rate;
+            let height = screenH * rate;
+            let left = screenX + ((screenW - width) / 2);
+            let top = screenY + ((screenH - height) / 2);
+
+            await WV_Window.ShowWindow_SetSize(left, top, width, height, "Normal");//顯示視窗 
+        }
+
+
+        /** 
+         * 初始 套用上次的視窗狀態與坐標
+         */
+        async function initLastPosition() {
+            let txtPosition = config.settings.position;
+            if (txtPosition.left !== -9999) {
+                if (txtPosition.windowState == "Maximized") {
+                    await WV_Window.ShowWindow_SetSize(
+                        txtPosition.left, txtPosition.top,
+                        //800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
+                        txtPosition.width, txtPosition.height,
+                        "Maximized"
+                    );//顯示視窗 
+                } else if (txtPosition.windowState == "Normal") {
+                    await WV_Window.ShowWindow_SetSize(
+                        txtPosition.left, txtPosition.top,
+                        txtPosition.width, txtPosition.height,
+                        "Normal"
+                    );//顯示視窗 
+                } else {
+                    await WV_Window.ShowWindow();//顯示視窗 
+                    await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
+                }
+
+            } else {
+
+                await WV_Window.ShowWindow();//顯示視窗 
+                await WV_Window.SetSize(800 * window.devicePixelRatio, 600 * window.devicePixelRatio);//初始化視窗大小
+
+            }
+        }
+
+
+        /** 
+         * 初始 載入檔案
+         */
+        function initLoad(args: string[]) {
+            Msgbox.closeAll();//關閉所有訊息視窗
+            menu.close();
+
+            if (args.length === 0) {
+                fileShow.openWelcome();
+            } else if (args.length === 1) {
+                if (args[0] !== "") {
+                    fileLoad.loadFile(args[0]);//載入單張圖片
+                } else {
+                    fileShow.openWelcome();
+                }
+            } else {
+                fileLoad.loadFiles(args[0], args);//載入多張圖片
+            }
+        }
+
+
+        /** 
+         * 初始 讀取設定
+         */
+        function initSetting(settingTxt: string) {
+            var userSetting = {};
+            try {
+                userSetting = JSON.parse(settingTxt);
+            } catch (e) { }
+            $.extend(true, config.settings, userSetting);
+            applySetting(config.settings, true);
+        }
+
+
+        var isInitAERO = false;//避免重複套用AERO
+        /** 
+         * 初始 套用aero毛玻璃效果
+         */
+        function initAERO() {
+            if (isInitAERO) { return; }
+
+            let aeroType = config.settings["theme"]["aeroType"];
+            if (aeroType == "win10") {
+                WV_Window.SetAERO("win10");
+                isInitAERO = true;
+            } else if (aeroType == "win7") {
+                WV_Window.SetAERO("win7");
+                isInitAERO = true;
+            }
+        }
+
+
+        /**
+         * 再次檢查目前是否按著空白鍵或滑鼠中鍵
+         */
+        async function checkDownKey() {
+
+            let json = JSON.parse(await WV_System.GetDownKey());
+            let keyboardSpaceRun = config.settings.quickLook.keyboardSpaceRun;
+            let mouseMiddleRun = config.settings.quickLook.mouseMiddleRun;
+            if ((json.isKeyboardSpace && keyboardSpaceRun) || (json.isMouseMiddle && mouseMiddleRun)) {
+
+            } else {
+                quickLookUp();//關閉 快速預覽
+            }
+        }
+
+
         /**
          * 目前是否為快速預覽
          */
         function getIsQuickLook() {
             return isQuickLook;
         }
+
 
         /**
          * 套用設定

@@ -81,7 +81,7 @@
                 <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
                     <%- await readFile("./img/default/window-topmost.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-layout">
+                <div class="titlebar-tools-btn titlebar-tools-layout" title="版面選單">
                     <%- await readFile("./img/default/window-layout.svg"); %>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-minimized">
@@ -116,14 +116,14 @@
                     <div class="main-L" id="main-L">
 
                         <!-- 資料夾預覽列表 -->
-                        <div class="main-dirList base-scrollbar" id="main-dirList" active="true">
+                        <div class="main-dirList base-scrollbar-mini" id="main-dirList" active="true">
                             <div class="main-dirListBody" id="main-dirListBody">
                                 <div id="main-dirListData"> </div>
                             </div>
                         </div>
 
                         <!-- 檔案預覽列表 -->
-                        <div class="main-fileList base-scrollbar" id="main-fileList">
+                        <div class="main-fileList base-scrollbar-mini" id="main-fileList">
                             <div class="main-fileListBody" id="main-fileListBody">
                                 <div id="main-fileListData"></div>
                             </div>
@@ -136,7 +136,7 @@
                         <div id="mView-welcome" class="mView-welcome">
                             <div>
                                 <img class="mView-welcome-logo" src="./img/logo.svg">
-                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.21</div>
+                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.22</div>
                             </div>
                         </div>
                         <textarea id="mView-txt" class="mView-text base-scrollbar" readonly2=""></textarea>

@@ -63,7 +63,7 @@ class DirSort {
 
             setDirSortMenu(_sortType);
 
-            M.menu.close();//關閉menu
+            //M.menu.close();//關閉menu
         }
 
 

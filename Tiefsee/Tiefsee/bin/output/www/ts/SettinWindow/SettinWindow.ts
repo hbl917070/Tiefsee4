@@ -54,8 +54,12 @@ class Setting {
             });
 
             //拖曳視窗
-            let domLeftBox = document.getElementById("window-left") as HTMLElement;
+            let domLeftBox = document.querySelector("#window-left .pagetab") as HTMLElement;
             domLeftBox.addEventListener("mousedown", async (e) => {
+
+                //如果有捲動軸，就禁止拖曳(避免無法點擊捲動軸)
+                if (Lib.isScrollbarVisible(domLeftBox)) { return; }
+
                 let _dom = e.target as HTMLElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
@@ -65,6 +69,10 @@ class Setting {
                 }
             })
             domLeftBox.addEventListener("touchstart", async (e) => {
+
+                //如果有捲動軸，就禁止拖曳(避免無法點擊捲動軸)
+                if (Lib.isScrollbarVisible(domLeftBox)) { return; }
+
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }

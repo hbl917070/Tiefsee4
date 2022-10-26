@@ -73,11 +73,11 @@ namespace Tiefsee {
 
             bool isDown = false;
 
-
             Adapter.LoopRun(50, () => {
 
                 bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
                 bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+
                 int quickLookRunType = 0;
                 if (isKeyboardSpace) { quickLookRunType = 1; }
                 if (isMouseMiddle) { quickLookRunType = 2; }
@@ -89,6 +89,11 @@ namespace Tiefsee {
 
                         String selectedItem = PluginQuickLook.GetCurrentSelection();//取得檔案總管目前選取的檔案
                         if (selectedItem == "") { return; }
+
+                        //再次檢查是否按著空白鍵或滑鼠中鍵
+                        isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
+                        isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+                        if (isMouseMiddle == false && isKeyboardSpace == false) { return; }
 
                         if (Program.startType == 2 || Program.startType == 3) {
                             if (WebWindow.tempWindow == null) { return; }
@@ -102,7 +107,6 @@ namespace Tiefsee {
                 } else {//放開空白鍵
 
                     if (isDown) {
-
                         if (WebWindow.tempWindow != null) {
                             WebWindow.tempWindow.RunJs($@"
                                 if (window.mainWindow !== undefined)

@@ -413,10 +413,10 @@ namespace Tiefsee {
                 }
             }
 
-            NetVips.Cache.MaxFiles = 0;//避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，也無法讀取到新的檔案
+            NetVips.Cache.MaxFiles = 0;//避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
             NetVips.Image im;
 
-            if (Path.GetExtension(path).ToLower() == ".webp") {//如果是webp就從steam讀取，否則vips會有鎖住檔案的BUG
+            if (Path.GetExtension(path).ToLower() == ".webp") {//如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
                 using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                     im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
                 }

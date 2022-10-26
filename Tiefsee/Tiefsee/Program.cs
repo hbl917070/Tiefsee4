@@ -96,7 +96,7 @@ namespace Tiefsee {
             }
 
             if (startType != 1) { AppLock(false); }//解除鎖定
-            startWindow = new StartWindow();     
+            startWindow = new StartWindow();
             Application.Run(startWindow);
         }
 

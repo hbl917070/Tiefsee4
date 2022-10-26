@@ -85,7 +85,7 @@ class Menu {
 
             domMenuBg.onmousedown = (sender) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = (_domMenu.scrollHeight > _domMenu.clientHeight);//判斷是否有捲軸
+                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu
@@ -145,7 +145,7 @@ class Menu {
 
             domMenuBg.onmousedown = (sender) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = (_domMenu.scrollHeight > _domMenu.clientHeight);//判斷是否有捲軸
+                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu
@@ -204,7 +204,7 @@ class Menu {
 
             domMenuBg.onmousedown = (sender) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = (_domMenu.scrollHeight > _domMenu.clientHeight);//判斷是否有捲軸
+                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu

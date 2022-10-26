@@ -43,6 +43,7 @@ class MainTools {
                     addToolsHtml({
                         group: item.group,
                         html: item.html,
+                        i18n: item.i18n,
                         func: item.func
                     })
                 }
@@ -805,10 +806,13 @@ class MainTools {
          * @param item 
          */
         function addToolsHtml(item: {
-            group: string, html: string,
+            group: string,
+            html: string,
+            i18n: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = newDiv(item.html)
+            let div = newDiv(item.html);
+            div.setAttribute("title", item.i18n);
             div.style.order = "999";
             addToolsDom({
                 group: item.group,

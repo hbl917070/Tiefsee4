@@ -72,7 +72,7 @@ class FileSort {
         this.M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
 
         this.setFileSortMenu(_sortType);
-        this.M.menu.close();//關閉menu
+        //this.M.menu.close();//關閉menu
     }
 
 

@@ -418,6 +418,7 @@ class FileShow {
         }
 
 
+
         /**
          * pdf 或 ai
          */
@@ -548,6 +549,14 @@ class FileShow {
             baseWindow.setTitle("Tiefsee 4");
             M.fileLoad.setGroupType(GroupType.none);
             setShowType(GroupType.none);//改變顯示類型
+
+            tiefseeview.zoomFull(TiefseeviewZoomType["100%"]);
+            let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);  //圖片長寬
+            let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);  //檔案類型
+            let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   //檔案修改時間
+            if (dom_size) { dom_size.innerHTML = ""; }
+            if (dom_type) { dom_type.innerHTML = ""; }
+            if (dom_writeTime) { dom_writeTime.innerHTML = ""; }
         }
 
 
