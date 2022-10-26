@@ -101,8 +101,8 @@ namespace Tiefsee {
 
                 info.Type = "dir";
                 info.Lenght = 0;
-                info.CreationTimeUtc = toUnix(Directory.GetLastWriteTimeUtc(path));
-                info.LastWriteTimeUtc = toUnix(Directory.GetLastWriteTimeUtc(path));
+                info.CreationTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
+                info.LastWriteTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
                 info.HexValue = "";
                 //return info;
 
@@ -307,7 +307,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>
-        long toUnix(DateTime time) {
+        long ToUnix(DateTime time) {
             var t = time.Subtract(new DateTime(1970, 1, 1));
             String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
             return long.Parse(unixTimestamp);
@@ -322,7 +322,7 @@ namespace Tiefsee {
         public long GetCreationTimeUtc(string path) {
             if (File.Exists(path) == false) { return 0; }
             var time = File.GetCreationTimeUtc(path);
-            long unixTimestamp = toUnix(time);
+            long unixTimestamp = ToUnix(time);
             return unixTimestamp;
         }
 
@@ -335,7 +335,7 @@ namespace Tiefsee {
         public long GetLastWriteTimeUtc(string path) {
             if (File.Exists(path) == false) { return 0; }
             var time = File.GetLastWriteTimeUtc(path);
-            long unixTimestamp = toUnix(time);
+            long unixTimestamp = ToUnix(time);
             return unixTimestamp;
         }
 
