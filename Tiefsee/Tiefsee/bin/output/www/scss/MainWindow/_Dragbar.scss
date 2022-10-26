@@ -8,11 +8,13 @@
   left: 60px;
   position: absolute;
   z-index: 10;
-  transform: translate(-2px, -1px);//讓拖曳條在中間
+  transform: translate(-2px, -1px); //讓拖曳條在中間
+  transition: background-color 0.2s;
 }
 //滑鼠移入時
 .dragbar-v:hover {
   background-color: var(--color-blue);
+  transition-delay: 0.2s; //滑鼠停留一段時間才顯示
   cursor: e-resize;
 }
 //拖曳時

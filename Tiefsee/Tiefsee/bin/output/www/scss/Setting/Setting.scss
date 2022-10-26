@@ -62,8 +62,6 @@ select {
 .pagetab {
   margin: 0px;
   padding: 10px 0px;
-  /* background-color: var(--color-white10);  */
-  border-radius: 10px;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
@@ -74,15 +72,12 @@ select {
     padding: 0px 12px;
     height: 35px;
     line-height: 35px;
-    /* border-radius: 5px; */
     color: var(--color-white);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     user-select: none;
     position: relative;
-    /* font-weight: 900; */
-    /* font-size: 20px; */
   }
   .page-tabsBtn:hover {
     background-color: var(--color-white10);
@@ -116,9 +111,9 @@ select {
   overflow: auto;
   position: absolute;
   left: 0;
-  right: 5px;
+  right: 0px;
   top: 30px;
-  bottom: 5px;
+  bottom: 0px;
 }
 .page-tabsPage {
   padding-top: 0px;
