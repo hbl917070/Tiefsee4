@@ -75,6 +75,7 @@ class Config {
             //"Color Space",//色彩空間
             "Creation Time",//建立日期
             "Last Write Time",//修改日期
+            "Textual Data",// PNG tEXt
             "Map",//Google Map
         ]
     }

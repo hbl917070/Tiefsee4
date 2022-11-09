@@ -235,7 +235,7 @@ class MainTools {
                 type: "button", html: "",
                 i18n: "搜圖",
                 group: GroupType.img,
-                name: "file",
+                name: "searchImage",
                 icon: "tool-search.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -246,10 +246,10 @@ class MainTools {
 
             //大量瀏覽模式
             /*ar.push({
-                type: "button",html:"",
+                type: "button", html: "",
                 i18n: "大量瀏覽模式",
                 group: GroupType.img,
-                name: "file",
+                name: "allBrowse",
                 icon: "tool-allBrowse.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {

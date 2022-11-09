@@ -158,11 +158,15 @@ class MainExif {
 			let ar = json.data;
 			let html = "";
 			let whitelist = M.config.exif.whitelist;
-			for (let i = 0; i < whitelist.length; i++) {
 
+			for (let i = 0; i < whitelist.length; i++) {
 				let name = whitelist[i];
 				let value = getItem(ar, name);
+
 				if (value === undefined) {
+					continue;
+
+				} else if (value.length > 5000) {//某些圖片可能把二進制資訊封裝進去
 					continue;
 
 				} else if (name === "Map") {
@@ -174,24 +178,117 @@ class MainExif {
 						</div>
 					</div>`
 
+				} else if (name === "Textual Data") {// PNG tEXt
+
+					let vals = getItems(ar, name);
+					for (let i = 0; i < vals.length; i++) {
+						let val = vals[i];
+						let x = val.indexOf(": "); //資料格式通常為 aaaaa: xxxxxx
+						if (x === -1) {
+							html += getItemHtml(name, val);
+
+						} else {
+
+							name = val.substring(0, x);
+							val = val.substring(x + 1);
+
+							if (name === "Comment") { // NovelAI 才有的欄位
+								try {
+									//val = JSON.stringify(JSON.parse(val), null, 2);//格式化json再顯示
+									//html += getItemHtml(name, val);
+									if (val.indexOf(`"steps": `) !== -1) {
+										let jsonComment = JSON.parse(val); //把json裡面的每一筆資料進行剖析
+										let arCommentkey = Object.keys(jsonComment);
+										for (let i = 0; i < arCommentkey.length; i++) {
+											let keyComment = arCommentkey[i];
+											let valComment = jsonComment[keyComment];
+											html += getItemHtml(keyComment, valComment);
+										}
+									} else {
+										html += getItemHtml(name, val);
+									}
+								} catch (e) {
+									html += getItemHtml(name, val);
+								}
+
+							} else if (name === "parameters") { // Stable Diffusion 才有的欄位
+
+								let promptSplit = val.indexOf("Negative prompt: ");//負面提示
+								let otherSplit = val.indexOf("Steps: ");//其他參數
+								if (promptSplit != -1 && otherSplit != -1) {
+									html += getItemHtml("Prompt", val.substring(0, promptSplit));//提示
+									html += getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit));//負面提示
+									//html += getItemHtml("Other", val.substring(otherSplit));
+									let arOther = val.substring(otherSplit).split(", ");//其他參數
+									for (let i = 0; i < arOther.length; i++) {
+										const itemOther = arOther[i];
+										let itemOtherSplit = itemOther.split(": ");
+										if (itemOtherSplit.length > 0) {
+											html += getItemHtml(itemOtherSplit[0], itemOtherSplit[1]);
+										} else {
+											html += getItemHtml("", itemOther);
+										}
+									}
+
+								} else {
+									html += getItemHtml(name, val);
+								}
+
+							} else {
+								html += getItemHtml(name, val);
+							}
+
+						}
+
+					}
+
 				} else {
 					value = valueToString(name, value);
-					value = Lib.escape(value);
-
 					name = M.i18n.t(`exif.name.${name}`, "zh");
-					name = Lib.escape(name);
-
-					html += `
-					<div class="mainExifItem">
-						<div class="mainExifName">${name}</div>
-						<div class="mainExifValue">${value}</div>
-					</div>`
+					html += getItemHtml(name, value);
 				}
-
 			}
 
 			dom_mainExifList.innerHTML = html;
 		}
+
+		/** 
+		 * exif項目的html
+		 */
+		function getItemHtml(name: string, value: string) {
+
+			name = name.toString();
+			value = value.toString();
+			name = Lib.escape(name);//移除可能破壞html的跳脫符號
+			value = Lib.escape(value);
+
+			value = value.replace(/\n/g, "<br>");//處理換行
+
+			let html = `
+				<div class="mainExifItem">
+					<div class="mainExifName">${name}</div>
+					<div class="mainExifValue">${value}</div>
+				</div>`
+			return html;
+		}
+
+		/** 
+		 * 從exif裡面取得全部的value
+		 */
+		function getItems(ar: any, key: string) {
+			let arOutput = [];
+			for (let i = 0; i < ar.length; i++) {
+				let item = ar[i];
+				if (item.name == key) {
+					arOutput.push(item.value);
+				}
+			}
+			return arOutput;
+		}
+
+		/**
+		 * 從exif裡面取得第一筆的value
+		 */
 		function getItem(ar: any, key: string) {
 			for (let i = 0; i < ar.length; i++) {
 				let item = ar[i];
@@ -201,7 +298,6 @@ class MainExif {
 			}
 			return undefined;
 		}
-
 
 		/**
 		 * 處理value的值
