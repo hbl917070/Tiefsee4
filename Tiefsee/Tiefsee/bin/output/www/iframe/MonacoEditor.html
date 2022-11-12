@@ -120,28 +120,35 @@
             require.config({ paths: { "vs": pathLib } });
             require(["vs/editor/editor.main"], async () => {
 
-                // 初始化變量
-                var fileCounter = 0;
-                var editorArray = [];
-                var defaultCode = ``;
-
                 setTheme();//編輯器主題
 
                 editor = monaco.editor.create(document.getElementById("viewer"), {
-                    mouseWheelZoom: true,//允許使用ctrl+滑鼠滾輪來縮放文字
-                    fontSize: 18,//預設文字大小
-                    automaticLayout: true,//自動縮放版面
+                    mouseWheelZoom: true, //允許使用ctrl+滑鼠滾輪來縮放文字
+                    fontSize: 18, //預設文字大小
+                    automaticLayout: true, //自動縮放版面
+                    //wordWrap: true, // 是否自動換行
+                });
+
+                //alt + Z 切換自動換行
+                var isWordWrap = false;
+                editor.addAction({
+                    id: 'my-toggleWordWrap',
+                    label: 'toggleWordWrap',
+                    keybindings: [
+                        monaco.KeyMod.Alt | monaco.KeyCode.KeyZ,
+                    ],
+                    run: function (ed) {
+                        isWordWrap = !isWordWrap;
+                        editor.updateOptions({ wordWrap: isWordWrap })
+                    }
                 });
 
                 await libIframe.closeIME();//嘗試關閉輸入法
                 initFinish();
-
             });
 
         }
 
-
-    
 
         /**
          * 清空文件
