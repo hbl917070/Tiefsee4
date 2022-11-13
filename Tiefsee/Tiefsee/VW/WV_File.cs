@@ -199,7 +199,7 @@ namespace Tiefsee {
                    );
                 }
             } catch {
-                MessageBox.Show("error");
+                MessageBox.Show("ShowContextMenu error");
             }
         }
 
@@ -217,7 +217,7 @@ namespace Tiefsee {
                 pr.StartInfo.Verb = "Print";
                 pr.Start();
             } catch (Exception e2) {
-                MessageBox.Show("找不到對應開啟的程式：\n" + e2.ToString(), "列印失敗");
+                MessageBox.Show(e2.ToString(), "Print failed");
             }
         }
 

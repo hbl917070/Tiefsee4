@@ -10,11 +10,12 @@ class Config {
 
     public otherAppOpenList = {
         absolute: [
-            { name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
-            { name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
-            { name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: ["img"] },
+            //{ name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
+            //{ name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
+            //{ name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: ["img"] },
         ],
         startMenu: [
+            { name: "mspaint", type: ["img"] },
             { name: "photoshop", type: ["img"] },
             { name: "illustrator", type: ["img"] },
             { name: "Lightroom", type: ["img"] },
@@ -50,33 +51,35 @@ class Config {
 
     public exif = {
         whitelist: [
-            "Date/Time Original",//拍攝日期
-            "Windows XP Keywords",//標籤
-            "Rating",//評等
-            "Image Width/Height",//圖片尺寸
-            "Length",//檔案大小
-            "Windows XP Title",//標題
-            "Artist",//作者
-            "Windows XP Comment",//註解
-            "Make",//相機型號
-            "Model",//相機製造商
-            "Windows XP Subject",//主旨
-            "F-Number",//光圈孔徑
-            "Exposure Time",//曝光時間
-            "ISO Speed Ratings",//ISO速度
-            "Exposure Bias Value",//曝光補償
-            "Focal Length",//焦距
-            "Max Aperture Value",//最大光圈
-            "Metering Mode",//測光模式
-            "Flash",//閃光燈模式
-            "Focal Length 35",//35mm焦距
-            "Orientation",//旋轉資訊
-            "Software",//軟體
-            //"Color Space",//色彩空間
-            "Creation Time",//建立日期
-            "Last Write Time",//修改日期
-            "Textual Data",// PNG tEXt
-            "Map",//Google Map
+            "Date/Time Original", //拍攝日期
+            "Windows XP Keywords", //標籤
+            "Rating", //評等
+            "Image Width/Height", //圖片尺寸
+            "Length", //檔案大小
+            "Windows XP Title", //標題
+            "Artist", //作者
+            "Windows XP Comment", //註解
+            "User Comment", //註解
+            "Make", //相機型號
+            "Model", //相機製造商
+            "Windows XP Subject", //主旨
+            "F-Number", //光圈孔徑
+            "Exposure Time", //曝光時間
+            "ISO Speed Ratings", //ISO速度
+            "Exposure Bias Value", //曝光補償
+            "Focal Length", //焦距
+            "Max Aperture Value", //最大光圈
+            "Metering Mode", //測光模式
+            "Flash", //閃光燈模式
+            "Focal Length 35", //35mm焦距
+            "Orientation", //旋轉資訊
+            "Software", //軟體
+            //"Color Space", //色彩空間
+            "Creation Time", //建立日期
+            "Last Write Time", //修改日期
+            //"Last Access Time", //存取時間
+            "Textual Data", //PNG tEXt
+            "Map", //Google Map
         ]
     }
 

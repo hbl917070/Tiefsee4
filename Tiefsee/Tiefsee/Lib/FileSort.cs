@@ -21,7 +21,6 @@ namespace Tiefsee {
             if (type == "name") {//檔名自然排序
                 Array.Sort(ar, new NaturalSort());
             }
-
             if (type == "nameDesc") {//檔名自然排序(逆) 
                 Array.Sort(ar, new NaturalSortDesc());
             }
@@ -29,17 +28,41 @@ namespace Tiefsee {
             if (type == "lastWriteTime") {//修改時間排序 
                 ar = SortLastWriteTime(ar, true);
             }
-
             if (type == "lastWriteTimeDesc") {//修改時間排序(逆)  
                 ar = SortLastWriteTime(ar, false);
             }
 
+            if (type == "length") {//檔案大小排序  
+                ar = SortLength(ar, true);
+            }
+            if (type == "lengthDesc") {//檔案大小排序(逆)  
+                ar = SortLength(ar, false);
+            }
+
+            if (type == "lastAccessTime") {//檔案存取時間排序  
+                ar = SortLastAccessTime(ar, true);
+            }
+            if (type == "lastAccessTimeDesc") {//檔案存取時間排序(逆)  
+                ar = SortLastAccessTime(ar, false);
+            }
+
+            if (type == "creationTime") {//檔案建立時間排序  
+                ar = SortCreationTime(ar, true);
+            }
+            if (type == "creationTimeDesc") {//檔案建立時間排序(逆)  
+                ar = SortCreationTime(ar, false);
+            }
+
+            if (type == "random") {//隨機排序  
+                 ar = ar.OrderBy(a => Guid.NewGuid()).ToArray();
+            }
+ 
             return ar;
         }
 
 
         /// <summary>
-        /// 
+        /// 以寫入時間(最後修改時間)進行排序
         /// </summary>
         /// <param name="ar"></param>
         /// <param name="isAsc"> 是否為遞增排序 </param>
@@ -69,6 +92,106 @@ namespace Tiefsee {
 
             return ar2;
         }
+
+
+        /// <summary>
+        /// 以存取時間進行排序
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <param name="isAsc"> 是否為遞增排序 </param>
+        /// <returns></returns>
+        private string[] SortLastAccessTime(string[] ar, bool isAsc) {
+
+            //檢查檔案是否存在
+            List<FileSystemInfo> arF = new List<FileSystemInfo>();
+            for (int i = 0; i < ar.Length; i++) {
+                string path = ar[i];
+                FileSystemInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                    arF.Add(fileInfo);
+                }
+            }
+
+            if (isAsc) {
+                arF = arF.OrderBy(f => f.LastAccessTime).ToList();
+            } else {
+                arF = arF.OrderByDescending(f => f.LastAccessTime).ToList();
+            }
+
+            string[] ar2 = new string[arF.Count];
+            for (int i = 0; i < arF.Count; i++) {
+                ar2[i] = arF[i].FullName;
+            }
+
+            return ar2;
+        }
+
+
+        /// <summary>
+        /// 以建立時間進行排序
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <param name="isAsc"> 是否為遞增排序 </param>
+        /// <returns></returns>
+        private string[] SortCreationTime(string[] ar, bool isAsc) {
+
+            //檢查檔案是否存在
+            List<FileSystemInfo> arF = new List<FileSystemInfo>();
+            for (int i = 0; i < ar.Length; i++) {
+                string path = ar[i];
+                FileSystemInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                    arF.Add(fileInfo);
+                }
+            }
+
+            if (isAsc) {
+                arF = arF.OrderBy(f => f.CreationTime).ToList();
+            } else {
+                arF = arF.OrderByDescending(f => f.CreationTime).ToList();
+            }
+
+            string[] ar2 = new string[arF.Count];
+            for (int i = 0; i < arF.Count; i++) {
+                ar2[i] = arF[i].FullName;
+            }
+
+            return ar2;
+        }
+
+
+        /// <summary>
+        /// 以檔案大小進行排序
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <param name="isAsc"> 是否為遞增排序 </param>
+        /// <returns></returns>
+        private string[] SortLength(string[] ar, bool isAsc) {
+
+            //檢查檔案是否存在
+            List<FileInfo> arF = new List<FileInfo>();
+            for (int i = 0; i < ar.Length; i++) {
+                string path = ar[i];
+                FileInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                    arF.Add(fileInfo);
+                }
+            }
+
+            if (isAsc) {
+                arF = arF.OrderBy(f => f.Length).ToList();
+            } else {
+                arF = arF.OrderByDescending(f => f.Length).ToList();
+            }
+
+            string[] ar2 = new string[arF.Count];
+            for (int i = 0; i < arF.Count; i++) {
+                ar2[i] = arF[i].FullName;
+            }
+
+            return ar2;
+        }
+
 
 
         /*

@@ -347,9 +347,9 @@ class FileLoad {
 
             let path = arFile[0];//以拖曳進來的第一個檔案為開啟對象
 
-            M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
-            M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
-            arFile = await M.fileSort.sort(arFile, M.fileSort.sortType);
+            M.fileSort.setSortType ( M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
+            M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
+            arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
 
             //目前檔案位置
             flagFile = 0;
@@ -385,9 +385,9 @@ class FileLoad {
                 dirPath = path;
                 arFile = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
 
-                M.fileSort.sortType = M.fileSort.getFileSortType(path);//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
-                arFile = await M.fileSort.sort(arFile, M.fileSort.sortType);
+                M.fileSort.setSortType(M.fileSort.getFileSortType(path));//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
+                arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
                 groupType = GroupType.img;
                 //groupType = await fileToGroupType(arWaitingList[0])
                 arFile = await filter();
@@ -408,9 +408,9 @@ class FileLoad {
                     arFile.splice(0, 0, path);
                 }
 
-                M.fileSort.sortType = M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu(M.fileSort.sortType);//更新menu選單
-                arFile = await M.fileSort.sort(arFile, M.fileSort.sortType);
+                M.fileSort.setSortType(M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
+                arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
             }
 
             //目前檔案位置

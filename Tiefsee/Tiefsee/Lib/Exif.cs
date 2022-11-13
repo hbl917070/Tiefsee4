@@ -81,16 +81,21 @@ namespace Tiefsee {
 
             ImgExif exif = new ImgExif();
 
-            exif.data.Add(new ImgExifItem {//檔案建立時間
+            exif.data.Add(new ImgExifItem {//建立時間
                 group = "base",
                 name = "Creation Time",
-                value = File.GetCreationTime(path).ToString("yyyy/MM/dd HH:mm:ss")
+                value = File.GetCreationTime(path).ToString("yyyy-MM-dd HH:mm:ss")
             });
-            exif.data.Add(new ImgExifItem {//檔案最後修改時間
+            exif.data.Add(new ImgExifItem {//最後修改時間
                 group = "base",
                 name = "Last Write Time",
-                value = File.GetLastWriteTime(path).ToString("yyyy/MM/dd HH:mm:ss")
+                value = File.GetLastWriteTime(path).ToString("yyyy-MM-dd HH:mm:ss")
             });
+            /*exif.data.Add(new ImgExifItem {//上次存取時間
+                group = "base",
+                name = "Last Access Time",
+                value = File.GetLastAccessTime(path).ToString("yyyy-MM-dd HH:mm:ss")
+            });*/
             exif.data.Add(new ImgExifItem {//檔案size
                 group = "base",
                 name = "Length",

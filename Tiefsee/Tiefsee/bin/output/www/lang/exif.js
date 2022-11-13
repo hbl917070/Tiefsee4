@@ -37,6 +37,10 @@ var langExif = {
                 "zh": "註解",
                 "en": "XP Comment",
             },
+            "User Comment": {
+                "zh": "註解",
+                "en": "XP Comment",
+            },       
             "Make": {
                 "zh": "相機型號",
                 "en": "Make",
@@ -100,6 +104,10 @@ var langExif = {
             "Last Write Time": {
                 "zh": "修改日期",
                 "en": "Last Write Time",
+            },
+            "Last Access Time": {
+                "zh": "存取日期",
+                "en": "Last Access Time",
             },
         },
 

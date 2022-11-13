@@ -14,6 +14,12 @@ class DirSort {
         var dom_dirSort_lastWriteTime = document.getElementById("menuitem-dirSort-lastWriteTime") as HTMLInputElement;
         var dom_dirSort_lastWriteTimeDesc = document.getElementById("menuitem-dirSort-lastWriteTimeDesc") as HTMLInputElement;
 
+        var dom_dirSort_lastAccessTime = document.getElementById("menuitem-dirSort-lastAccessTime") as HTMLInputElement;
+        var dom_dirSort_lastAccessTimeDesc = document.getElementById("menuitem-dirSort-lastAccessTimeDesc") as HTMLInputElement;
+        var dom_dirSort_creationTime = document.getElementById("menuitem-dirSort-creationTime") as HTMLInputElement;
+        var dom_dirSort_creationTimeDesc = document.getElementById("menuitem-dirSort-creationTimeDesc") as HTMLInputElement;
+        var dom_dirSort_random = document.getElementById("menuitem-dirSort-random") as HTMLInputElement;
+
         var yesSvgTxt = SvgList["yes.svg"];
         //var defaultSort = DirSortType.name;
         var sortType = DirSortType.name;//排序方式
@@ -38,6 +44,21 @@ class DirSort {
             updateSort(DirSortType.lastWriteTimeDesc);
         });
 
+        dom_dirSort_lastAccessTime.addEventListener("click", () => {
+            updateSort(DirSortType.lastAccessTime);
+        });
+        dom_dirSort_lastAccessTimeDesc.addEventListener("click", () => {
+            updateSort(DirSortType.lastAccessTimeDesc);
+        });
+        dom_dirSort_creationTime.addEventListener("click", () => {
+            updateSort(DirSortType.creationTime);
+        });
+        dom_dirSort_creationTimeDesc.addEventListener("click", () => {
+            updateSort(DirSortType.creationTimeDesc);
+        });
+        dom_dirSort_random.addEventListener("click", () => {
+            updateSort(DirSortType.random);
+        });
 
         /**
          * 不重新載入圖片，只更新排序(用於排序選單的按鈕
@@ -78,6 +99,12 @@ class DirSort {
             dom_dirSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
             dom_dirSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
+            dom_dirSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            dom_dirSort_lastAccessTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            dom_dirSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            dom_dirSort_creationTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            dom_dirSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+
             if (_sortType === DirSortType.name) {
                 dom_dirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
             }
@@ -91,6 +118,23 @@ class DirSort {
                 dom_dirSort_lastWriteTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
             }
 
+            if (_sortType === DirSortType.lastAccessTime) {
+                dom_dirSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            }
+            if (_sortType === DirSortType.lastAccessTimeDesc) {
+                dom_dirSort_lastAccessTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            }
+
+            if (_sortType === DirSortType.creationTime) {
+                dom_dirSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            }
+            if (_sortType === DirSortType.creationTimeDesc) {
+                dom_dirSort_creationTimeDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            }
+
+            if (_sortType === DirSortType.random) {
+                dom_dirSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            }
             //M.menu.close();//關閉menu
         }
 
@@ -116,6 +160,21 @@ class DirSort {
             }
             if (_type === DirSortType.lastWriteTimeDesc) {
                 arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "lastWriteTimeDesc");
+            }
+            if (_type === DirSortType.lastAccessTime) {
+                arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "lastAccessTime");
+            }
+            if (_type === DirSortType.lastAccessTimeDesc) {
+                arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "lastAccessTimeDesc");
+            }
+            if (_type === DirSortType.creationTime) {
+                arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "creationTime");
+            }
+            if (_type === DirSortType.creationTimeDesc) {
+                arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "creationTimeDesc");
+            }
+            if (_type === DirSortType.random) {
+                arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "random");
             }
 
             //排序後把資料放回 WaitingDir
@@ -194,4 +253,19 @@ var DirSortType = {
 
     /** 修改時間排序(逆) */
     lastWriteTimeDesc: "lastWriteTimeDesc",
+
+    /** 檔案存取時間排序 */
+    lastAccessTime: "lastAccessTime",
+
+    /** 檔案存取時間排序(逆)   */
+    lastAccessTimeDesc: "lastAccessTimeDesc",
+
+    /** 檔案建立時間排序 */
+    creationTime: "creationTime",
+
+    /** 檔案建立時間排序(逆)  */
+    creationTimeDesc: "creationTimeDesc",
+
+    /** 隨機排序 */
+    random: "random",
 }
