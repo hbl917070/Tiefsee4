@@ -70,22 +70,26 @@ select option {
   /* transition: transform 0.2s;
   transform: translateY(10px) scale(0.98); */
   flex: 1;
-  position: relative;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 1.5px;
+  bottom: 1.5px;
   overflow: hidden;
   background-color: var(--color-window-background);
   border-radius: var(--window-border-radius);
   border: 1px solid var(--color-window-border);
-  // margin: 5px;
 
-  margin-right: 1.5px;
-  margin-bottom: 1.5px;
+  //margin-right: 1.5px;
+  //margin-bottom: 1.5px;
   display: flex;
   flex-direction: column;
 }
 
 /*視窗最大化時*/
 .window.maximized {
-  margin: 0px;
+  right: 0px;
+  bottom: 0px;
   box-shadow: none;
   border: none;
   border-radius: 0px;

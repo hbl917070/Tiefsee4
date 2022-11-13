@@ -6,7 +6,7 @@
   right: 0;
   bottom: 0;
   z-index: 100;
-  pointer-events: none;
+  //pointer-events: none;
   display: none;
   //opacity: 0;
   //transition: opacity 5s;
@@ -14,7 +14,7 @@
 }
 
 .menu[active="true"] {
-  pointer-events: inherit;
+  //pointer-events: inherit;
   display: block;
   //transition: opacity 5s;
   //opacity: 1;

@@ -80,7 +80,7 @@
     margin-bottom: 2px;
     line-height: 14px;
     height: 14px;
-    
+
     overflow: hidden;
     text-align: center;
     flex: 1;
@@ -147,7 +147,7 @@
   background-clip: content-box;
 }
 
-/*右下角交匯處*/
+//右下角交匯處
 .base-scrollbar-mini::-webkit-scrollbar-corner {
   background-color: rgba(0, 0, 0, 0);
 }
