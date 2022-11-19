@@ -1,9 +1,8 @@
 class ImgSearch {
 
-
     constructor(M: MainWindow) {
 
-        let arData = M.config.settings.imgSearch.list;
+        let arData = M.config.imgSearch.list;
 
         initMenu()
 
@@ -32,17 +31,63 @@ class ImgSearch {
                     //if (await WV_File.Exists(filePath) === false) { return; }
                     M.menu.close();//關閉menu
 
-                    let imgUrl = await getWebUrl();
-                    if (imgUrl == "") {
-                        alert("error");
-                        return;
+                    if (url == "googleSearch") {
+                        let imgSearchUrl = await googleSearch();
+                        if (imgSearchUrl === "") {
+                            Msgbox.show({ txt: "圖片搜尋失敗" });
+                            return;
+                        }
+                        WV_RunApp.OpenUrl(imgSearchUrl);
+
+                    } else {
+                        let imgUrl = await getWebUrl();
+                        if (imgUrl === "") {
+                            Msgbox.show({ txt: "圖片搜尋失敗" });
+                            return;
+                        }
+                        let imgSearchUrl = url.replace("{url}", imgUrl);
+                        WV_RunApp.OpenUrl(imgSearchUrl);
                     }
-                    let imgSearchUrl = url.replace("{url}", imgUrl);
-                    WV_RunApp.OpenUrl(imgSearchUrl)
                 };
                 dom_menuImgSearch?.append(dom);
             }
 
+        }
+
+
+        /**
+         * Google搜圖
+         */
+        async function googleSearch() {
+
+            //壓縮圖片
+            let max = 1000;//圖片最大面積不可以超過這個值的平方
+            let w = M.fileShow.tiefseeview.getOriginalWidth();
+            let h = M.fileShow.tiefseeview.getOriginalHeight();
+            let zoom = 1;
+            if (w * h > max * max) {
+                zoom = Math.sqrt((max * max) / (w * h));
+            }
+
+            let blob = await M.fileShow.tiefseeview.getCanvasBlob(zoom, "medium", "jpg");
+            if (blob === null) { return ""; }
+
+            let formData = new FormData();
+            formData.append("encoded_image", blob, "image.jpg");
+            let rsp = await fetch("https://www.google.com/searchbyimage/upload", {
+                "body": formData,
+                "method": "POST",
+            });
+
+            let retUrl = "";
+            if (rsp.status === 200) {
+                retUrl = rsp.url;
+                let q = retUrl.indexOf("?");
+                if (q !== -1) {
+                    retUrl = "https://www.google.com/search" + retUrl.substring(q);
+                }
+            }
+            return retUrl;
         }
 
 
@@ -79,12 +124,12 @@ class ImgSearch {
          */
         async function updateThumbsnap(blob: Blob) {
 
-            let imgServer = M.config.settings.imgSearch.imgServer;//圖片伺服器的網址
-            let imgServerKey = M.config.settings.imgSearch.imgServerKey;//api key
+            let imgServer = M.config.imgSearch.imgServer;//圖片伺服器的網址
+            let imgServerKey = M.config.imgSearch.imgServerKey;//api key
 
             var formData = new FormData();
             formData.append("key", imgServerKey);
-            formData.append("media", blob, "aa.jpg");
+            formData.append("media", blob, "image.jpg");
 
             let json: any;
             await fetch(imgServer, {
