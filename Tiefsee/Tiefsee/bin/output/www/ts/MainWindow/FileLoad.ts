@@ -115,7 +115,7 @@ class FileLoad {
 
             //如果找不到資料夾，就重新讀取名單
             await initDirList(dirPath);//取得資料夾名單
-            await M.dirSort.sort(M.dirSort.getSortType());
+            await M.dirSort.sort();
             M.mainDirList.init();
 
             for (let i = 0; i < arDirKey.length; i++) {
@@ -272,9 +272,9 @@ class FileLoad {
                 if (dirParentPath === null) {
                     dirParentPath = dirPath;
                 }
-                M.dirSort.setSortType(M.dirSort.getDirSortType(dirParentPath));//取得該資料夾設定的檔案排序方式
-                M.dirSort.setDirSortMenu(M.dirSort.getSortType());//更新menu選單
-                await M.dirSort.sort(M.dirSort.getSortType());
+                M.dirSort.getDirSortType(dirParentPath);//取得該資料夾設定的檔案排序方式
+                M.dirSort.setDirSortMenu();//更新menu選單
+                await M.dirSort.sort();
 
                 await updateFlagDir(dirPath);//重新計算 flagDir
                 M.mainDirList.init();
@@ -351,9 +351,9 @@ class FileLoad {
 
             let path = arFile[0];//以拖曳進來的第一個檔案為開啟對象
 
-            M.fileSort.setSortType(M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
-            M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
-            arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
+            M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
+            M.fileSort.setFileSortMenu();//更新menu選單
+            arFile = await M.fileSort.sort(arFile);
 
             //目前檔案位置
             flagFile = 0;
@@ -400,9 +400,10 @@ class FileLoad {
                 dirPath = path;
                 arFile = await WebAPI.Directory.getFiles(path, "*.*");//取得資料夾內所有檔案
 
-                M.fileSort.setSortType(M.fileSort.getFileSortType(path));//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
-                arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
+                M.fileSort.getFileSortType(path);//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu();//更新menu選單
+                arFile = await M.fileSort.sort(arFile);
+
                 groupType = GroupType.img;
                 //groupType = await fileToGroupType(arWaitingList[0])
                 arFile = await filter();
@@ -426,9 +427,9 @@ class FileLoad {
                     arFile.splice(0, 0, path);
                 }
 
-                M.fileSort.setSortType(M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
-                arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
+                M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
+                M.fileSort.setFileSortMenu();//更新menu選單
+                arFile = await M.fileSort.sort(arFile);
             }
 
             //目前檔案位置

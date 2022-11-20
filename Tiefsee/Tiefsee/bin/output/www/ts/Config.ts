@@ -13,7 +13,7 @@ class Config {
             //{ name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
             //{ name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
             //{ name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: ["img"] },
-        ],
+        ] as { name: string, path: string, type: string[], }[],
         startMenu: [
             { name: "mspaint", type: ["img"] },
             { name: "photoshop", type: ["img"] },
