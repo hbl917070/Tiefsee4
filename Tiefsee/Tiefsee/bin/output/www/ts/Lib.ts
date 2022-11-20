@@ -134,20 +134,6 @@ class Lib {
 
     }
 
-
-
-
-    /**
-     * 取得檔案基本資料
-     * @param path 
-     * @returns FileInfo2   
-     */
-    public static async GetFileInfo2(path: string) {
-        let s = await WV_File.GetFileInfo2(path);
-        let json: FileInfo2 = JSON.parse(s);
-        return json;
-    }
-
     /**
      * 判斷是否為動圖(gif、apng、webp動圖、svg)
      * @param fileInfo2 

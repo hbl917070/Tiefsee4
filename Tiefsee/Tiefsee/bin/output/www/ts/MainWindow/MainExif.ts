@@ -19,7 +19,7 @@ class MainExif {
 		var fileInfo2: FileInfo2;
 
 		var isHide = false;//暫時隱藏
-		var isEnabled = true;//啟用 檔案預覽列表
+		var isEnabled = true;//啟用 檔案預覽視窗
 
 
 		//拖曳改變size
@@ -39,7 +39,7 @@ class MainExif {
 		})
 		//拖曳 結束
 		dragbar.setEventEnd((val: number) => {
-			if (val < 10) {//小於10的話，關閉檔案預覽列表
+			if (val < 10) {//小於10的話，關閉檔案預覽視窗
 				setEnabled(false);
 			}
 		})
@@ -107,36 +107,36 @@ class MainExif {
 		/**
 		 * 初始化
 		 * @param _fileInfo2 
+		 * @param noCheckPath true=不在載入完成後檢查是否已經切換到其他檔案
 		 */
-		function init(_fileInfo2: FileInfo2) {
+		function init(_fileInfo2: FileInfo2, noCheckPath = false) {
 			fileInfo2 = _fileInfo2;
-			load();
+			load(noCheckPath);
 		}
 
 
 		/**
 		 * 讀取exif(於初始化後呼叫)
 		 */
-		async function load() {
+		async function load(noCheckPath = false) {
 
 			if (isEnabled === false) { return; }
 
 			dom_mainExifList.innerHTML = "";
 
 			let path = fileInfo2.Path;
-			let encodePath = encodeURIComponent(path);
-			let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-			let url = APIURL + `/api/getImgExif?path=${encodePath}&${fileTime}`;
-
-			let json = await fetchGet_json(url);
+			let json = await WebAPI.getExif(fileInfo2);
 
 			if (json.code != "1") {
 				return;
 			}
-			if (M.fileLoad.getFilePath() !== path) {//如果已經在載入期間已經切換到其他檔案
-				return;
+			if (noCheckPath === false) {
+				if (M.fileLoad.getFilePath() !== path) {//如果已經在載入期間已經切換到其他檔案
+					console.log(999)
+					console.log(M.fileLoad.getFilePath(), path)
+					return;
+				}
 			}
-
 			//取得經緯度
 			let GPS_lat = getItem(json.data, "GPS Latitude");//緯度
 			let GPS_lng = getItem(json.data, "GPS Longitude");//經度

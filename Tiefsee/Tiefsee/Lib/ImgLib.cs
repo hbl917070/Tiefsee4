@@ -484,7 +484,7 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 取得圖片的size，並且把檔案處理成vips可以載入個格式，寫入到再存資料夾
+        /// 取得圖片的size，然後把檔案處理成vips可以載入的格式，寫入到暫存資料夾
         /// </summary>
         public static ImgInitInfo GetImgInitInfo(string path, string type) {
 

@@ -39,15 +39,20 @@ class FileLoad {
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  video=影片  imgs=多幀圖片  txt=文字 */
         var groupType: string = "img";
-        var fileLoadType: FileLoadType //資料夾或自訂名單
-        var arFile: string[] = [];//待載入名單
-        var flagFile: number;//目前在哪一張圖片
+        /** 資料夾或自訂名單 */
+        var fileLoadType: FileLoadType;
+        /** 待載入檔案名單 */
+        var arFile: string[] = [];
+        /** 目前在哪一張圖片 */
+        var flagFile: number;
+        /** loadFile是否正在處理中 */
+        var isLoadFileFinish = true;
 
         var dirPath: string = "";
         var arDir: { [key: string]: string[] } = {};
         var arDirKey: string[] = [];
         var flagDir: number;//目前在哪一個資料夾
-        var temp_dirParent = ""
+        var temp_dirParent = "";
 
         this.getWaitingFile = () => { return arFile; };
         this.setWaitingFile = (ar: string[]) => { arFile = ar };
@@ -81,7 +86,6 @@ class FileLoad {
         this.deleteMsg = deleteMsg;
         this.renameMsg = renameMsg;
         this.updateTitle = updateTitle;
-
 
 
         //#region Dir
@@ -137,14 +141,14 @@ class FileLoad {
             let dirParent = Lib.GetDirectoryName(_dirPath);
             if (dirParent === null) { dirParent = _dirPath }
             if (temp_dirParent === dirParent) { return false; }
-            temp_dirParent = dirParent
+            temp_dirParent = dirParent;
 
             return true;
         }
 
 
         /**
-         * 檔案預覽列表初始化 (重新讀取列表
+         * 檔案預覽視窗初始化 (重新讀取列表
          */
         async function initDirList(_dirPath: string) {
 
@@ -155,16 +159,16 @@ class FileLoad {
             }
 
             let maxCount = M.config.settings.advanced.dirListMaxCount;
-            let json = await WV_Directory.GetSiblingDir(dirPath, arExt, maxCount);
+            let json = await WebAPI.Directory.getSiblingDir(dirPath, arExt, maxCount);
             if (dirPath !== _dirPath) { return; }
 
-            arDir = JSON.parse(json);
+            arDir = json;
             arDirKey = Object.keys(arDir);
         }
 
 
         /**
-         * 清空 檔案預覽列表
+         * 清空 檔案預覽視窗
          */
         function clearDir() {
             arDir = {};
@@ -215,7 +219,7 @@ class FileLoad {
                 showDir(_flag);
                 //_showDir = async () => { };
                 //updateFlagDir(dirPath);
-                M.mainDirList.init();//資料夾預覽列表 初始化
+                M.mainDirList.init();//資料夾預覽視窗 初始化
                 //M.mainDirList.select();//
                 //M.mainDirList.updateLocation();//
                 return;
@@ -254,7 +258,7 @@ class FileLoad {
 
 
         /**
-         * 處理資料夾預覽列表
+         * 處理資料夾預覽視窗
          * @param dirPath 
          */
         async function loadDir(dirPath: string) {
@@ -274,9 +278,9 @@ class FileLoad {
 
                 await updateFlagDir(dirPath);//重新計算 flagDir
                 M.mainDirList.init();
-                M.mainDirList.setStartLocation();//資料夾預覽列表 捲動到選中項目的中間
+                M.mainDirList.setStartLocation();//資料夾預覽視窗 捲動到選中項目的中間
 
-            } else {//直接從 資料夾預覽列表 切換，不需要重新讀取
+            } else {//直接從 資料夾預覽視窗 切換，不需要重新讀取
                 await updateFlagDir(dirPath);//重新計算 flagDir
                 M.mainDirList.select();//
                 M.mainDirList.updateLocation();//
@@ -324,7 +328,7 @@ class FileLoad {
             fileLoadType = FileLoadType.userDefined;//名單類型，自訂義
 
             //改用C#處理，增加執行效率
-            arFile = await WV_Directory.GetFiles2(dirPath, arName);
+            arFile = await WebAPI.Directory.getFiles2(dirPath, arName);
 
             /*if (await WV_File.Exists(DirPath) === true) {
                 DirPath = await WV_Path.GetDirectoryName(DirPath);
@@ -347,7 +351,7 @@ class FileLoad {
 
             let path = arFile[0];//以拖曳進來的第一個檔案為開啟對象
 
-            M.fileSort.setSortType ( M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
+            M.fileSort.setSortType(M.fileSort.getFileSortType(dirPath));//取得該資料夾設定的檔案排序方式
             M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
             arFile = await M.fileSort.sort(arFile, M.fileSort.getSortType());
 
@@ -360,12 +364,12 @@ class FileLoad {
                 }
             }
 
-            M.mainFileList.setHide(false);//顯示檔案預覽列表(必須顯示出物件才能計算高度)
-            M.mainFileList.init();//檔案預覽列表 初始化
-            M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
+            M.mainFileList.setHide(false);//顯示檔案預覽視窗(必須顯示出物件才能計算高度)
+            M.mainFileList.init();//檔案預覽視窗 初始化
+            M.mainFileList.setStartLocation();//檔案預覽視窗 捲動到選中項目的中間
             await showFile();//載入圖片
 
-            loadDir(dirPath);//處理資料夾預覽列表
+            loadDir(dirPath);//處理資料夾預覽視窗
         }
 
 
@@ -375,15 +379,26 @@ class FileLoad {
          */
         async function loadFile(path: string) {
 
+            if (isLoadFileFinish === false) {
+                console.log("loadFile處理中");
+                return;
+            }
+            isLoadFileFinish = false;
+
             fileLoadType = FileLoadType.dir;//名單類型，資料夾內所有檔案
 
+            let fileInfo2 = await WebAPI.getFileInfo2(path);
             let dirPath = "";
             arFile = [];
 
-            if (await WV_Directory.Exists(path) === true) {//如果是資料夾
+            let isFile = true;
+
+            if (fileInfo2.Type === "dir") {//如果是資料夾
+
+                isFile = false;
 
                 dirPath = path;
-                arFile = await WV_Directory.GetFiles(path, "*.*");//取得資料夾內所有檔案
+                arFile = await WebAPI.Directory.getFiles(path, "*.*");//取得資料夾內所有檔案
 
                 M.fileSort.setSortType(M.fileSort.getFileSortType(path));//取得該資料夾設定的檔案排序方式
                 M.fileSort.setFileSortMenu(M.fileSort.getSortType());//更新menu選單
@@ -392,17 +407,20 @@ class FileLoad {
                 //groupType = await fileToGroupType(arWaitingList[0])
                 arFile = await filter();
 
-            } else if (await WV_File.Exists(path) === true) {//如果是檔案
+            } else if (fileInfo2.Type === "file") {//如果是檔案
 
                 let _dirPath = Lib.GetDirectoryName(path);//取得檔案所在的資料夾路徑
-                if (_dirPath === null) {
-                    return;
-                }
+                if (_dirPath === null) { return; }
                 dirPath = _dirPath;
-                arFile = await WV_Directory.GetFiles(dirPath, "*.*");
+                groupType = fileToGroupType(fileInfo2);
 
-                let fileInfo2 = await Lib.GetFileInfo2(path);
-                groupType = fileToGroupType(fileInfo2)
+                arFile = [path];
+                flagFile = 0;
+                //M.mainFileList.init();//檔案預覽視窗 初始化 
+                await showFileUpdataImg(fileInfo2);
+                M.mainExif.init(fileInfo2, true);//初始化exif
+
+                arFile = await WebAPI.Directory.getFiles(dirPath, "*.*");
                 arFile = await filter();
                 if (arFile.indexOf(path) === -1) {
                     arFile.splice(0, 0, path);
@@ -416,18 +434,25 @@ class FileLoad {
             //目前檔案位置
             flagFile = 0;
             for (let i = 0; i < arFile.length; i++) {
-                if (arFile[i] == path) {
+                if (arFile[i] === path) {
                     flagFile = i;
                     break;
                 }
             }
+            isLoadFileFinish = true;
+            M.mainFileList.setHide(false);//顯示檔案預覽視窗(必須顯示出物件才能計算高度)
+            M.mainFileList.init();//檔案預覽視窗 初始化
+            M.mainFileList.setStartLocation();//檔案預覽視窗 捲動到選中項目的中間
+            //await showFile();//載入圖片
+            if (isFile) {
+                await showFileUpdataUI();//載入圖片(僅更新檔案列表)
+            } else {
+                await showFile();//載入圖片
+            }
 
-            M.mainFileList.setHide(false);//顯示檔案預覽列表(必須顯示出物件才能計算高度)
-            M.mainFileList.init();//檔案預覽列表 初始化
-            M.mainFileList.setStartLocation();//檔案預覽列表 捲動到選中項目的中間
-            await showFile();//載入圖片
+            loadDir(dirPath);//處理資料夾預覽視窗
 
-            loadDir(dirPath);//處理資料夾預覽列表
+
         }
 
 
@@ -436,7 +461,7 @@ class FileLoad {
          * @returns 
          */
         function getFilePath() {
-            var p = arFile[flagFile];
+            let p = arFile[flagFile];
             return p;
         }
 
@@ -460,16 +485,16 @@ class FileLoad {
         }
         timerFile();
 
+
         /**
-         * 
+         * 載入圖片
          * @param _flag 
          */
         async function showFile(_flag?: number) {
-
-            if (_flag !== undefined) { flagFile = _flag; }
-            if (flagFile < 0) { flagFile = 0; }
-            if (flagFile >= arFile.length) { flagFile = arFile.length - 1; }
-
+            if (isLoadFileFinish === false) {
+                console.log("loadFile處理中");
+                return;
+            }
             if (arFile.length === 0) {//如果資料夾裡面沒有圖片
                 Toast.show("未找到圖片", 1000 * 3);
                 M.fileShow.openWelcome();
@@ -477,27 +502,42 @@ class FileLoad {
                 return;
             }
 
-            M.mainFileList.select();//設定檔案預覽列表 目前選中的項目
-            M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
+            if (_flag !== undefined) { flagFile = _flag; }
+            if (flagFile < 0) { flagFile = 0; }
+            if (flagFile >= arFile.length) { flagFile = arFile.length - 1; }
 
             let path = getFilePath();
-            let fileInfo2 = await Lib.GetFileInfo2(path);
+            let fileInfo2 = await WebAPI.getFileInfo2(path);
+            M.mainExif.init(fileInfo2); //初始化exif
 
-            if (fileInfo2.Type === "none") {//如果檔案不存在
-                arFile.splice(flagFile, 1);//刪除此筆
-                M.mainFileList.init();//檔案預覽列表 初始化
+            await showFileUpdataUI();
+            await showFileUpdataImg(fileInfo2);
+        }
+        /** 更新 檔案預覽視窗 */
+        async function showFileUpdataUI() {
+            updateTitle(); //更新視窗標題
+            M.mainFileList.select(); //設定檔案預覽視窗 目前選中的項目
+            M.mainFileList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
+        }
+        /** 更新 圖片 */
+        async function showFileUpdataImg(fileInfo2: FileInfo2) {
+
+            if (fileInfo2.Type === "none") { //如果檔案不存在
+                arFile.splice(flagFile, 1); //刪除此筆
+                M.mainFileList.init(); //檔案預覽視窗 初始化
                 showFile(flagFile);
                 _showFile = async () => { }
                 return;
             }
 
-            updateTitle();//更新視窗標題
+            updateTitle(); //更新視窗標題
 
             if (fileLoadType === FileLoadType.userDefined) { //如果是自訂名單
-                groupType = fileToGroupType(fileInfo2);//根據檔案類型判斷要用什麼方式顯示檔案
+                groupType = fileToGroupType(fileInfo2); //從檔案類型判斷，要使用什麼用什麼類型來顯示
             }
 
             _showFile = async () => {
+
                 if (groupType === GroupType.img || groupType === GroupType.unknown) {
                     await M.fileShow.openImage(fileInfo2);
                 }
@@ -510,8 +550,10 @@ class FileLoad {
                 if (groupType === GroupType.txt) {
                     await M.fileShow.openTxt(fileInfo2);
                 }
+                /*if (path !== getFilePath()) {
+                    console.error(`${path}  ${getFilePath()}`);
+                }*/
             }
-
         }
 
 
@@ -519,6 +561,10 @@ class FileLoad {
          * 載入下一個檔案
          */
         async function nextFile() {
+            if (isLoadFileFinish === false) {
+                console.log("loadFile處理中");
+                return;
+            }
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
             }
@@ -532,6 +578,10 @@ class FileLoad {
          * 載入上一個檔案
          */
         async function prevFile() {
+            if (isLoadFileFinish === false) {
+                console.log("loadFile處理中");
+                return;
+            }
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
             }
@@ -545,8 +595,8 @@ class FileLoad {
           * 更新視窗標題
           */
         function updateTitle() {
-            let filePath = getFilePath()
-            if (filePath === undefined) { return }
+            let filePath = getFilePath();
+            if (filePath === undefined) { return; }
             let title = `「${flagFile + 1}/${arFile.length}」 ${Lib.GetFileName(filePath)}`;
             baseWindow.setTitle(title);
         }
@@ -586,11 +636,8 @@ class FileLoad {
          * @returns 
          */
         async function filter() {
-
             let ar = [];
-
             for (let i = 0; i < arFile.length; i++) {
-
                 let path = arFile[i];
                 let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
                 let allowFileType = M.config.allowFileType(groupType);
@@ -602,9 +649,7 @@ class FileLoad {
                     }
                 }
             }
-
             return ar;
-
         }
 
 
@@ -637,9 +682,9 @@ class FileLoad {
                     } else {
                         Toast.show("已將檔案「永久刪除」", 1000 * 3);
                     }
-                    M.mainFileList.init();//檔案預覽列表 初始化
-                    M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-                    M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+                    M.mainFileList.init();//檔案預覽視窗 初始化
+                    M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+                    M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
                 }
             }
 
@@ -713,9 +758,9 @@ class FileLoad {
 
                     arFile[flagFile] = newName;
                     updateTitle();
-                    M.mainFileList.init();//檔案預覽列表 初始化
-                    M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-                    M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方  
+                    M.mainFileList.init();//檔案預覽視窗 初始化
+                    M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+                    M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
 
                     Msgbox.close(dom);
                 }
@@ -724,9 +769,6 @@ class FileLoad {
             const len = fileName.length - Lib.GetExtension(path).length;
             msg.domInput.setSelectionRange(0, len);
         }
-
-
-
 
 
     }

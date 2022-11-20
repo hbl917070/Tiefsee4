@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -538,6 +539,19 @@ namespace Tiefsee {
             }
             var filesort = new FileSort();
             return filesort.Sort(arFile, type);
+        }
+
+
+        /// <summary>
+        /// 對檔案進行排序。同一資料夾內的檔案就不傳入與回傳完整路徑，減少傳輸成本
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="ar"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public string[] Sort2(string dir, object[] ar, string type) {
+            var filesort = new FileSort();
+            return filesort.Sort2(dir, ar, type);
         }
 
     }

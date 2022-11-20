@@ -375,7 +375,7 @@ class ScriptCopy {
     public async copyImg() {
 
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        let fileInfo2 = await Lib.GetFileInfo2(filePath);
+        let fileInfo2 = await WebAPI.getFileInfo2(filePath);
         if (fileInfo2.Type === "none") { return; } //如果檔案不存在
         let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
         let msg = "已將「影像」複製至剪貼簿";
@@ -416,7 +416,7 @@ class ScriptCopy {
     public async copyImageBase64() {
 
         let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        let fileInfo2 = await Lib.GetFileInfo2(filePath);
+        let fileInfo2 = await WebAPI.getFileInfo2(filePath);
         if (fileInfo2.Type === "none") { return; } //如果檔案不存在
         //let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
 

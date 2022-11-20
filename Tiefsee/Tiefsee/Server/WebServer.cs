@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+
 namespace Tiefsee {
     public class WebServer {
 
@@ -39,7 +40,7 @@ namespace Tiefsee {
                     _httpListener.Start();
                     _httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), _httpListener);
                     controller = new WebServerController(this);
-                  
+
                     break;
 
                 } catch (Exception) { }
@@ -135,7 +136,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="_urlFormat">網址匹配規則，無視大小寫，允許在結尾使用「{*}」，表示任何字串</param>
         /// <param name="_func"></param>
-        public void RouteAddGet(string _urlFormat, Action<RequestData> _func) {
+        public void RouteAdd(string _urlFormat, Action<RequestData> _func) {
 
             var func2 = new Func<RequestData, bool>((RequestData requestData) => {
 
@@ -219,5 +220,13 @@ namespace Tiefsee {
         public string value = "";//取得網址結尾「{*}」實際的字串
         public Dictionary<string, string> args = new Dictionary<string, string>();//「?」後面的參數
         public HttpListenerContext context;
+        public string postData {
+            get {
+                using (var reader = new StreamReader(context.Request.InputStream, Encoding.UTF8)) {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
     }
 }

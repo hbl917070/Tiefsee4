@@ -21,6 +21,8 @@ namespace Tiefsee {
         public WV_Directory(WebWindow m) {
             this.M = m;
         }
+        public WV_Directory() { }
+
 
         /// <summary>
         /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
@@ -30,7 +32,6 @@ namespace Tiefsee {
         /// <param name="maxCount"> 資料夾允許處理的最大數量 </param>
         /// <returns></returns>
         public string GetSiblingDir(string siblingPath, object[] _arExt, int maxCount) {
-
 
             if (maxCount <= -1) { maxCount = int.MaxValue; }
 

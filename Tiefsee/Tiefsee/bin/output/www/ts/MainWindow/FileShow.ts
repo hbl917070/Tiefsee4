@@ -58,18 +58,18 @@ class FileShow {
 
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
-                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽列表
-                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽列表
+                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽視窗
+                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽視窗
                 M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
                 M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
             } else if (groupType === GroupType.img || groupType === GroupType.imgs || groupType === GroupType.video) {
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
                 M.largeBtn.setHide(false);//解除隱藏 大型切換按鈕
             } else {
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽列表
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽列表
+                M.mainFileList.setHide(false);//解除隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
                 M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
             }
@@ -220,7 +220,6 @@ class FileShow {
 
             tiefseeview.setLoading(true, 200);
 
-            let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
             let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
@@ -230,57 +229,17 @@ class FileShow {
             }
             let configType = configItem.type;
 
-            async function getUrl(type: string) {
-                if (type === "web") {
-                    return Lib.pathToURL(_path) + `?${fileTime}`;
-                }
-                if (type === "webIcc") {
-                    return APIURL + `/api/getImg/webIcc?path=${encodePath}&${fileTime}`
-                }
-                if (type === "icon") {
-                    return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(_path)
-                }
-                if (type === "wpf") {
-                    return APIURL + `/api/getImg/wpf?path=${encodePath}&${fileTime}`
-                }
-                if (type === "magick" || type === "magickBmp") {
-                    return APIURL + `/api/getImg/magick?type=bmp&path=${encodePath}&${fileTime}`
-                }
-                if (type === "magickPng") {
-                    return APIURL + `/api/getImg/magick?type=png&path=${encodePath}&${fileTime}`
-                }
-                if (type === "dcraw") {
-                    return APIURL + `/api/getImg/dcraw?path=${encodePath}&${fileTime}`
-                }
-                if (type === "nconvert" || type === "nconvertBmp") {
-                    let url = APIURL + `/api/getImg/nconvert?type=bmp&path=${encodePath}&${fileTime}`
-                    url = Lib.pathToURL(await fetchGet_text(url));
-                    return url;
-                }
-                if (type === "nconvertPng") {
-                    let url = APIURL + `/api/getImg/nconvert?type=png&path=${encodePath}&${fileTime}`
-                    url = Lib.pathToURL(await fetchGet_text(url));
-                    return url;
-                }
-                return APIURL + `/api/getImg/magick?path=${encodePath}&${fileTime}`
-            }
-
-
             if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
 
-                imgurl = await getUrl("web");//取得圖片網址並且預載入
+                imgurl = await WebAPI.Img.getUrl("web", fileInfo2);//取得圖片網址並且預載入
                 await tiefseeview.loadImg(imgurl);//使用<img>渲染
 
             } else if (configType === "vips") {//
+                
+                let vipsType = configItem.vipsType as string;
+                let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
 
-                let encodePath = encodeURIComponent(_path);
-                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                let vipsType = configItem.vipsType;
-                let u = APIURL + `/api/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}`
-
-                let imgInitInfo = await fetchGet_json(u);
-
-                if (imgInitInfo.code == 1) {
+                if (imgInitInfo.code == "1") {
 
                     let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
                     if (isNaN(ratio)) { ratio = 0.8; }
@@ -296,7 +255,7 @@ class FileShow {
                         if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) {//如果圖片太小就不處理
                             break;
                         }
-                        let imgU = APIURL + `/api/vips/resize?path=${encodePath}&scale=${scale}&${fileTime}`
+                        let imgU =  WebAPI.Img.vipsResize(scale, fileInfo2);
                         arUrl.push({ scale: scale, url: imgU })
                     }
 
@@ -315,25 +274,23 @@ class FileShow {
 
                 } else {//載入失敗就顯示圖示
 
-                    imgurl = await getUrl("icon");//取得圖片網址
+                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2);//取得圖片網址
                     await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
 
                 }
 
             } else {//使用<canvas>直接開啟網址
 
-                imgurl = await getUrl(configType);//取得圖片網址
+                imgurl = await WebAPI.Img.getUrl(configType, fileInfo2);//取得圖片網址
                 let loadOk = await tiefseeview.preloadImg(imgurl);//預載入
                 if (loadOk) {
                     await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
                 } else {//載入失敗就顯示圖示
-                    imgurl = await getUrl("icon");//取得圖片網址
+                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2);//取得圖片網址
                     await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
                 }
 
             }
-
-            M.mainExif.init(fileInfo2);//初始化exif
 
             initTiefseeview(fileInfo2);
             isLoaded = true;
@@ -354,15 +311,12 @@ class FileShow {
             if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
             } else {
-                //imgurl = APIURL + "/api/getImg/" + encodeURIComponent(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                imgurl = Lib.pathToURL(_path) + `?LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                imgurl = await WebAPI.Img.getUrl("web", fileInfo2);
             }
 
             tiefseeview.setLoading(true, 200);
             await tiefseeview.preloadImg(imgurl);//預載入
             await tiefseeview.loadVideo(imgurl);//使用video渲染
-
-            M.mainExif.init(fileInfo2);//初始化exif
 
             initTiefseeview(fileInfo2);
             isLoaded = true;
@@ -461,7 +415,6 @@ class FileShow {
                 dom_writeTime.innerHTML = time;
             }
 
-            M.mainExif.init(fileInfo2);//初始化exif
         }
 
 
@@ -481,7 +434,7 @@ class FileShow {
 
             if (baseWindow.appInfo === undefined) { return; }
 
-            let txt = await WV_File.GetText(_path);
+            let txt = await WebAPI.getText(_path);
 
 
             if (configType === "md") {
@@ -528,7 +481,6 @@ class FileShow {
                 dom_writeTime.innerHTML = time;
             }
 
-            M.mainExif.init(fileInfo2);//初始化exif
         }
 
 

@@ -555,16 +555,16 @@ class Setting {
             });
         })
 
-        //檔案預覽列表
+        //檔案預覽視窗
         addLoadEvent(() => {
             var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
             var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo") as HTMLInputElement;
             var switch_fileListShowName = document.querySelector("#switch-fileListShowName") as HTMLInputElement;
-            switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];//啟用 檔案預覽列表
+            switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];//啟用 檔案預覽視窗
             switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];//顯示編號
             switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];//顯示檔名
 
-            switch_fileListEnabled.addEventListener("change", () => {//啟用 檔案預覽列表
+            switch_fileListEnabled.addEventListener("change", () => {//啟用 檔案預覽視窗
                 let val = switch_fileListEnabled.checked;
                 config.settings["layout"]["fileListEnabled"] = val;
                 appleSettingOfMain();
@@ -581,18 +581,18 @@ class Setting {
             });
         })
 
-        //資料夾預覽列表
+        //資料夾預覽視窗
         addLoadEvent(() => {
             var switch_dirListEnabled = document.querySelector("#switch-dirListEnabled") as HTMLInputElement;
             var switch_dirListShowNo = document.querySelector("#switch-dirListShowNo") as HTMLInputElement;
             var switch_dirListShowName = document.querySelector("#switch-dirListShowName") as HTMLInputElement;
             var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber") as HTMLInputElement;
-            switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"];//啟用 資料夾預覽列表
+            switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"];//啟用 資料夾預覽視窗
             switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"];//顯示編號
             switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"];//顯示檔名
             select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";//圖片數量
 
-            switch_dirListEnabled.addEventListener("change", () => {//啟用 資料夾預覽列表
+            switch_dirListEnabled.addEventListener("change", () => {//啟用 資料夾預覽視窗
                 let val = switch_dirListEnabled.checked;
                 config.settings["layout"]["dirListEnabled"] = val;
                 appleSettingOfMain();
@@ -716,7 +716,7 @@ class Setting {
             });
         })
 
-        //資料夾數量太多時，禁用資料夾預覽列表
+        //資料夾數量太多時，禁用資料夾預覽視窗
         addLoadEvent(() => {
             var select_dirListMaxCount = document.querySelector("#select-dirListMaxCount") as HTMLInputElement;
             select_dirListMaxCount.value = config.settings["advanced"]["dirListMaxCount"] + "";

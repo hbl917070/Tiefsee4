@@ -75,9 +75,10 @@ namespace Tiefsee {
         }
 
 
-   
-
-        public static string GetImgExif(string path) {
+        /// <summary>
+        /// 
+        /// </summary>
+        public static string GetExif(string path) {
 
             ImgExif exif = new ImgExif();
 

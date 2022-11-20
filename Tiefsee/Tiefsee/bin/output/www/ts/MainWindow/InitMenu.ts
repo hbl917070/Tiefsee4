@@ -162,12 +162,15 @@ class InitMenu {
                     M.menu.close();//關閉menu
                     M.script.open.Open3DMSPaint();
                 }
+                if (await WV_System.IsWindows10() === false) {//不是win10就隱藏
+                    dom_Open3DMSPaint.style.display = "none";
+                }
             }
+
 
             //以第三方程式開啟
             var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
             (async () => {
-
 
                 let arExe: { path: string, name: string, type: string }[] = [];
 
@@ -611,7 +614,7 @@ class Menu_layout {
 
 
         /**
-         * 顯示或隱藏 資料夾預覽列表
+         * 顯示或隱藏 資料夾預覽視窗
          */
         function setMainDirList(val?: boolean) {
             if (val === undefined) { val = !isMainDirList }
@@ -622,7 +625,7 @@ class Menu_layout {
 
 
         /**
-         * 顯示或隱藏 檔案預覽列表
+         * 顯示或隱藏 檔案預覽視窗
          */
         function setMainFileList(val?: boolean) {
             if (val === undefined) { val = !isMainFileList }

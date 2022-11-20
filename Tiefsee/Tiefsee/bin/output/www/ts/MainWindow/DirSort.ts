@@ -79,8 +79,8 @@ class DirSort {
             setDirSortType(dirParentPath, sortType);
 
             M.fileLoad.updateTitle();//更新視窗標題
-            M.mainDirList.init();//設定 檔案預覽列表 目前選中的項目
-            M.mainDirList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
+            M.mainDirList.init();//設定 檔案預覽視窗 目前選中的項目
+            M.mainDirList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 
             setDirSortMenu(_sortType);
 
@@ -148,7 +148,10 @@ class DirSort {
 
             let path = M.fileLoad.getDirPath();
             let arDir = M.fileLoad.getWaitingDir();
-            let arKey
+            
+            let arKey = await WebAPI.sort2(M.fileLoad.getWaitingDirKey(), _type)
+           
+            /*let arKey
             if (_type === DirSortType.name) {
                 arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "name");
             }
@@ -175,7 +178,7 @@ class DirSort {
             }
             if (_type === DirSortType.random) {
                 arKey = await WV_System.Sort(M.fileLoad.getWaitingDirKey(), "random");
-            }
+            }*/
 
             //排序後把資料放回 WaitingDir
             let ar: { [key: string]: string[] } = {}

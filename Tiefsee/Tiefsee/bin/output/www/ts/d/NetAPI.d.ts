@@ -435,6 +435,9 @@ interface WV_System {
 
     /** 對檔案進行排序 */
     Sort(ar: string[], type: string)
+
+    /**  對檔案進行排序。同一資料夾內的檔案就不傳入與回傳完整路徑，減少傳輸成本 */
+    Sort2(dir: string, ar: string[], type: string)
 }
 
 interface WV_RunApp {

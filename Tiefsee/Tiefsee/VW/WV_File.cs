@@ -39,6 +39,7 @@ namespace Tiefsee {
         public WV_File(WebWindow m) {
             this.M = m;
         }
+        public WV_File() { }
 
         /// <summary>
         /// 檔案移到資源回收桶

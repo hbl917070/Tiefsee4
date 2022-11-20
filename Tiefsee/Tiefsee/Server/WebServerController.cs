@@ -1,12 +1,15 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+
 
 namespace Tiefsee {
     public class WebServerController {
@@ -24,25 +27,34 @@ namespace Tiefsee {
                 byte[] _responseArray = Encoding.UTF8.GetBytes("-" + d.value + "-");
                 d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             });*/
-            webServer.RouteAddGet("/api/check", ckeck);
-            webServer.RouteAddGet("/api/newWindow", newWindow);
-            webServer.RouteAddGet("/api/getPdf", getPdf);
-            webServer.RouteAddGet("/api/getFileIcon", getFileIcon);
+            webServer.RouteAdd("/api/check", ckeck);
+            webServer.RouteAdd("/api/newWindow", newWindow);
+
+            webServer.RouteAdd("/api/getExif", getExif);
+            webServer.RouteAdd("/api/getPdf", getPdf);
+            webServer.RouteAdd("/api/getText", getText);
+            webServer.RouteAdd("/api/getFileIcon", getFileIcon);
+            webServer.RouteAdd("/api/getFileInfo2", getFileInfo2);
+
+            webServer.RouteAdd("/api/sort", sort);
+            webServer.RouteAdd("/api/sort2", sort2);
+
+            webServer.RouteAdd("/api/directory/getSiblingDir", getSiblingDir);
+            webServer.RouteAdd("/api/directory/getFiles2", getFiles2);
+            webServer.RouteAdd("/api/directory/getFiles", getFiles);
+            webServer.RouteAdd("/api/directory/getDirectories", getDirectories);
 
             //webServer.RouteAddGet("/api/getImg/file/{*}", getImg);
-            webServer.RouteAddGet("/api/getImg/magick", magick);
-            webServer.RouteAddGet("/api/getImg/dcraw", dcraw);
-            webServer.RouteAddGet("/api/getImg/wpf", wpf);
-            webServer.RouteAddGet("/api/getImg/webIcc", webIcc);
-            webServer.RouteAddGet("/api/getImg/nconvert", nconvert);
-
-            webServer.RouteAddGet("/api/vips/init", vipsInit);
-            webServer.RouteAddGet("/api/vips/resize", vipsResize);
-
-            webServer.RouteAddGet("/api/getImgExif", getImgExif);
-
-            webServer.RouteAddGet("/www/{*}", getWww);
-            webServer.RouteAddGet("/{*}", getWww);
+            webServer.RouteAdd("/api/img/magick", magick);
+            webServer.RouteAdd("/api/img/dcraw", dcraw);
+            webServer.RouteAdd("/api/img/wpf", wpf);
+            webServer.RouteAdd("/api/img/webIcc", webIcc);
+            webServer.RouteAdd("/api/img/nconvert", nconvert);
+            webServer.RouteAdd("/api/img/vipsInit", vipsInit);
+            webServer.RouteAdd("/api/img/vipsResize", vipsResize);
+    
+            webServer.RouteAdd("/www/{*}", getWww);
+            webServer.RouteAdd("/{*}", getWww);
         }
 
 
@@ -51,7 +63,7 @@ namespace Tiefsee {
         /// <summary>
         /// 取得檔案的Exif資訊
         /// </summary>
-        void getImgExif(RequestData d) {
+        void getExif(RequestData d) {
 
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
@@ -66,12 +78,12 @@ namespace Tiefsee {
             //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             //if (is304) { return; }
 
-            string json = Exif.GetImgExif(path);
+            string json = Exif.GetExif(path);
 
             WriteString(d, json);
         }
 
- 
+
         /// <summary>
         /// 產生圖片暫存並且返回圖片的長寬
         /// </summary>
@@ -219,11 +231,11 @@ namespace Tiefsee {
 
         }
 
+
         /// <summary>
         /// 
         /// </summary>
         void dcraw(RequestData d) {
-
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
@@ -250,7 +262,6 @@ namespace Tiefsee {
         /// </summary>
         private void newWindow(RequestData d) {
 
-            //string arg = Encoding.UTF8.GetString(Convert.FromBase64String(d.args["path"]));//將字串剖析回命令列參數
             string arg = Uri.UnescapeDataString(d.args["path"]);//將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
@@ -288,6 +299,33 @@ namespace Tiefsee {
             if (is304 == false) {
                 WriteFile(d, path);//回傳檔案
             }
+        }
+
+
+        /// <summary>
+        /// 取得檔案的Exif資訊
+        /// </summary>
+        void getText(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+
+            //如果檔案不存在就返回404錯誤
+            if (File.Exists(path) == false) {
+                d.context.Response.StatusCode = 404;
+                WriteString(d, JsonConvert.SerializeObject(new ImgExif()));
+                return;
+            }
+
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304) { return; }
+
+            string ret = "";
+            using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
+                ret = sr.ReadToEnd();
+            }
+
+            WriteString(d, ret);
         }
 
 
@@ -341,6 +379,137 @@ namespace Tiefsee {
 
             }
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void getFileInfo2(RequestData d) {
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+
+            WV_File wvf=  new WV_File();
+            string srtStrJson = wvf.GetFileInfo2(path);
+            //string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void sort(RequestData d) {
+            string postData = d.postData;
+            var json = JObject.Parse(postData);
+            string[] ar = json["ar"].ToObject<string[]>();
+            string type = json["type"].ToString();
+
+            var filesort = new FileSort();
+            string[] retAr = filesort.Sort(ar, type);
+            string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void sort2(RequestData d) {
+            string postData = d.postData;
+            var json = JObject.Parse(postData);
+            string dir = json["dir"].ToString();
+            string[] ar = json["ar"].ToObject<string[]>();
+            string type = json["type"].ToString();
+
+            var filesort = new FileSort();
+            string[] retAr = filesort.Sort2(dir, ar, type);
+            string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        #region Directory
+
+        /// <summary>
+        /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
+        /// </summary>
+        private void getSiblingDir(RequestData d) {
+       
+            var json = JObject.Parse(d.postData);
+            string path = json["path"].ToString();
+            string[] arExt = json["arExt"].ToObject<string[]>();
+            int maxCount = json["maxCount"].ToObject<int>();
+
+            var wvdir = new WV_Directory();
+            string srtStrJson = wvdir.GetSiblingDir(path, arExt, maxCount);
+
+            //string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        /// <summary>
+        /// 檔名陣列 轉 路徑陣列 (用於載入複數檔案
+        /// </summary>
+        private void getFiles2(RequestData d) {
+
+            var json = JObject.Parse(d.postData);
+            string dirPath = json["dirPath"].ToString();
+            string[] arName = json["arName"].ToObject<string[]>();
+
+            var wvdir = new WV_Directory();
+            string[] retAr = wvdir.GetFiles2(dirPath, arName);
+            int pathLen = dirPath.Length;//只回傳檔名，減少傳輸成本
+            for (int i = 0; i < retAr.Length; i++) {
+                retAr[i] = retAr[i].Substring(pathLen);
+            }
+
+            string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        /// <summary>
+        /// 回傳資料夾裡面的檔案
+        /// </summary>
+        private void getFiles(RequestData d) {
+
+            var json = JObject.Parse(d.postData);
+            string path = json["path"].ToString();
+            string searchPattern = json["searchPattern"].ToString();
+
+            string[] retAr = Directory.GetFiles(path, searchPattern);
+            int pathLen = path.Length;//只回傳檔名，減少傳輸成本
+            for (int i = 0; i < retAr.Length; i++) {
+                retAr[i] = retAr[i].Substring(pathLen);
+            }
+
+            string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        /// <summary>
+        /// 回傳資料夾裡面的子資料夾
+        /// </summary>
+        private void getDirectories(RequestData d) {
+
+            var json = JObject.Parse(d.postData);
+            string path = (json["path"]).ToString();
+            string searchPattern = json["searchPattern"].ToString();
+
+            string[] retAr = Directory.GetDirectories(path, searchPattern);
+            int pathLen = path.Length;//只回傳檔名，減少傳輸成本
+            for (int i = 0; i < retAr.Length; i++) {
+                retAr[i] = retAr[i].Substring(pathLen);
+            }
+
+            string srtStrJson = JsonConvert.SerializeObject(retAr);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+
+        #endregion
 
 
         /// <summary>
@@ -477,41 +646,6 @@ namespace Tiefsee {
             }
         }
 
-        /// <summary>
-        /// 只允許來自 http://localhost:{port} 的請求，其餘的一律回傳400錯誤
-        /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        /*private bool get400(String _url, HttpListenerContext context) {
-
-            HttpListenerRequest request = context.Request;
-            String headersReferer = request.Headers.Get("Referer");
-
-            if (headersReferer != null && (headersReferer.IndexOf("http://localhost:" + webServer.port + "/") != 0)) {
-                //Console.WriteLine("非法請求，400錯誤：" + headersReferer);
-                context.Response.StatusCode = 400;
-
-                byte[] _responseArray = Encoding.UTF8.GetBytes("400");
-                context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-                return true;
-            }
-
-            return false;
-        }
-
-
-        /// <summary>
-        /// 找不到檔案
-        /// </summary>
-        /// <param name="_url"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private void get404(RequestData d) {
-            d.context.Response.StatusCode = 404;
-            byte[] _responseArray = Encoding.UTF8.GetBytes("404");
-            d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-        }*/
 
 
         private IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {

@@ -652,10 +652,7 @@ class Pdfview {
          * 載入檔案
          */
         async function loadFile(fileInfo2: FileInfo2) {
-            let _path = fileInfo2.Path;
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let encodePath = encodeURIComponent(_path);
-            let _url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
+            let _url =WebAPI.getPdf(fileInfo2);
             dom_iframe.setAttribute("src", _url);
         }
 

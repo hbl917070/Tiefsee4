@@ -147,12 +147,12 @@ class Config {
         },
 
         layout: {
-            fileListEnabled: true,//啟用 檔案預覽列表
+            fileListEnabled: true,//啟用 檔案預覽視窗
             fileListShowNo: true,//顯示編號
             fileListShowName: true,//顯示檔名
             fileListShowWidth: 100,//寬度
 
-            dirListEnabled: false,//啟用 資料夾預覽列表
+            dirListEnabled: false,//啟用 資料夾預覽視窗
             dirListShowNo: true,//顯示編號
             dirListShowName: true,//顯示檔名
             dirListShowWidth: 200,//寬度
@@ -185,7 +185,7 @@ class Config {
 
         /** 進階設定 */
         advanced: {
-            /**子資料夾數量太多就禁用資料夾預覽列表 */
+            /**子資料夾數量太多就禁用資料夾預覽視窗 */
             dirListMaxCount: 5000,
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
             highQualityLimit: 4000,

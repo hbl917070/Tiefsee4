@@ -544,12 +544,12 @@ class MainWindow {
 
             mainTools.setEnabled(config.settings.layout.mainToolsEnabled);//工具列
 
-            mainFileList.setEnabled(config.settings.layout.fileListEnabled);//檔案預覽列表
+            mainFileList.setEnabled(config.settings.layout.fileListEnabled);//檔案預覽視窗
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
             mainFileList.setShowName(config.settings.layout.fileListShowName);
             if (isStart) { mainFileList.setItemWidth(config.settings.layout.fileListShowWidth); }
 
-            mainDirList.setEnabled(config.settings.layout.dirListEnabled);//資料夾預覽列表
+            mainDirList.setEnabled(config.settings.layout.dirListEnabled);//資料夾預覽視窗
             mainDirList.setShowNo(config.settings.layout.dirListShowNo);
             mainDirList.setShowName(config.settings.layout.dirListShowName);
             mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);

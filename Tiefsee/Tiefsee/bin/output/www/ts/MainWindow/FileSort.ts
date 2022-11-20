@@ -107,8 +107,8 @@ class FileSort {
 
             M.fileLoad.setWaitingFile(ar);
             M.fileLoad.updateTitle();//更新視窗標題
-            M.mainFileList.select();//設定 檔案預覽列表 目前選中的項目
-            M.mainFileList.updateLocation();//檔案預覽列表 自動捲動到選中項目的地方
+            M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+            M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 
             setFileSortMenu(_sortType);
             //M.menu.close();//關閉menu
@@ -179,42 +179,8 @@ class FileSort {
          * @returns 排序後的陣列
          */
         async function sort(arWaitingFile: string[], _type: string): Promise<string[]> {
-
-            if (_type === FileSortType.name) {
-                return await WV_System.Sort(arWaitingFile, "name");
-            }
-            if (_type === FileSortType.nameDesc) {
-                return await WV_System.Sort(arWaitingFile, "nameDesc");
-            }
-            if (_type === FileSortType.lastWriteTime) {
-                return await WV_System.Sort(arWaitingFile, "lastWriteTime");
-            }
-            if (_type === FileSortType.lastWriteTimeDesc) {
-                return await WV_System.Sort(arWaitingFile, "lastWriteTimeDesc");
-            }
-            if (_type === FileSortType.length) {
-                return await WV_System.Sort(arWaitingFile, "length");
-            }
-            if (_type === FileSortType.lengthDesc) {
-                return await WV_System.Sort(arWaitingFile, "lengthDesc");
-            }
-            if (_type === FileSortType.lastAccessTime) {
-                return await WV_System.Sort(arWaitingFile, "lastAccessTime");
-            }
-            if (_type === FileSortType.lastAccessTimeDesc) {
-                return await WV_System.Sort(arWaitingFile, "lastAccessTimeDesc");
-            }
-            if (_type === FileSortType.creationTime) {
-                return await WV_System.Sort(arWaitingFile, "creationTime");
-            }
-            if (_type === FileSortType.creationTimeDesc) {
-                return await WV_System.Sort(arWaitingFile, "creationTimeDesc");
-            }
-            if (_type === FileSortType.random) {
-                return await WV_System.Sort(arWaitingFile, "random");
-            }
-
-            return [];
+            arWaitingFile = await WebAPI.sort2(arWaitingFile, _type);
+            return arWaitingFile;
         }
 
 

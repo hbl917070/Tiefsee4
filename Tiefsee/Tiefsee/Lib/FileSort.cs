@@ -62,6 +62,29 @@ namespace Tiefsee {
 
 
         /// <summary>
+        /// 對檔案進行排序。同一資料夾內的檔案就不傳入與回傳完整路徑，減少傳輸成本
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="ar"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public string[] Sort2(string dir, object[] ar, string type) {
+
+            string[] arFile = new string[ar.Length];
+            for (int i = 0; i < arFile.Length; i++) {
+                arFile[i] = dir + ar[i].ToString();
+            }
+
+            int dirLen = dir.Length;
+            string[] ret_ar = Sort(arFile, type);
+            for (int i = 0; i < ret_ar.Length; i++) {
+                ret_ar[i] = ret_ar[i].Substring(dirLen);
+            }
+
+            return ret_ar;
+        }
+
+        /// <summary>
         /// 以寫入時間(最後修改時間)進行排序
         /// </summary>
         /// <param name="ar"></param>

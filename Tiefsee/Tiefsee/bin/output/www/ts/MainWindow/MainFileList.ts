@@ -1,6 +1,6 @@
 
 /**
- * 檔案預覽列表
+ * 檔案預覽視窗
  */
 class MainFileList {
 
@@ -32,7 +32,7 @@ class MainFileList {
         var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement;//拖曳條
 
         var isHide = false;//暫時隱藏
-        var isEnabled = true;//啟用 檔案預覽列表
+        var isEnabled = true;//啟用 檔案預覽視窗
         var isShowNo = true;//顯示編號
         var isShowName = true;//顯示檔名
         var itemWidth = 1;//單個項目的寬度
@@ -60,7 +60,7 @@ class MainFileList {
         })
         //拖曳 結束
         dragbar.setEventEnd((val: number) => {
-            if (val < 10) {//小於10的話，關閉檔案預覽列表
+            if (val < 10) {//小於10的話，關閉檔案預覽視窗
                 setEnabled(false);
             }
         })
@@ -280,12 +280,12 @@ class MainFileList {
             if (Lib.GetExtension(path) === ".svg") {
                 return Lib.pathToURL(path);
             }
-            return APIURL + "/api/getFileIcon?size=256&path=" + encodeURIComponent(path).replace(/[']/g, "\\'");
+            return WebAPI.Img.fileIcon(path).replace(/[']/g, "\\'");
         }
 
 
         /**
-         * 檔案預覽列表初始化 (重新讀取列表
+         * 檔案預覽視窗初始化 (重新讀取列表
          */
         function init() {
             temp_start = -999;
@@ -296,7 +296,7 @@ class MainFileList {
 
 
         /**
-         * 設定 檔案預覽列表 目前選中的項目
+         * 設定 檔案預覽視窗 目前選中的項目
          * @returns 
          */
         function select() {
@@ -315,7 +315,7 @@ class MainFileList {
 
 
         /**
-         * 檔案預覽列表 捲動到選中項目的中間
+         * 檔案預覽視窗 捲動到選中項目的中間
          */
         function setStartLocation() {
 
@@ -328,7 +328,7 @@ class MainFileList {
 
 
         /**
-         * 檔案預覽列表 自動捲動到選中項目的地方
+         * 檔案預覽視窗 自動捲動到選中項目的地方
          */
         function updateLocation() {
 
