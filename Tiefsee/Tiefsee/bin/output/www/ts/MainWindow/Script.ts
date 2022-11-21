@@ -12,7 +12,6 @@ class Script {
     public setting: ScriptSetting;
 
     constructor(M: MainWindow) {
-
         this.img = new ScriptImg(M);
         this.fileLoad = new ScriptFileLoad(M);
         this.fileShow = new ScriptFileShow(M);
@@ -81,7 +80,6 @@ class ScriptImg {
     public move(type: "up" | "right" | "down" | "left", distance?: number) {
         this.M.fileShow.tiefseeview.move(type, distance);
     }
-
 
 }
 
@@ -475,6 +473,17 @@ class ScriptSetting {
                 this.temp_setting.WindowState = 0;//視窗化
                 return;
             }
+        }
+
+        //顯示loading畫面，避免短時間內重複開啟setting
+        let domLoading = document.querySelector("#loadingSetting") as HTMLElement;
+        if (domLoading.getAttribute("active") == "true") {
+            return;
+        } else {
+            domLoading.setAttribute("active", "true");
+            setTimeout(() => {
+                domLoading.setAttribute("active", "");
+            }, 1000);
         }
 
         await this.M.saveSetting();//先儲存目前的設定值

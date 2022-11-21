@@ -132,8 +132,6 @@ class MainExif {
 			}
 			if (noCheckPath === false) {
 				if (M.fileLoad.getFilePath() !== path) {//如果已經在載入期間已經切換到其他檔案
-					console.log(999)
-					console.log(M.fileLoad.getFilePath(), path)
 					return;
 				}
 			}

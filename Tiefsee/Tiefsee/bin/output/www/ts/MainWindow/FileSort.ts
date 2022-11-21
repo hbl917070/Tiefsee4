@@ -23,7 +23,7 @@ class FileSort {
         this.setFileSortMenu = setFileSortMenu;
         this.sort = sort;
 
-        
+
         dom_fileSort_name.addEventListener("click", () => {
             sortType = FileSortType.name;
             updateSort();
@@ -180,7 +180,7 @@ class FileSort {
             json[dirPath] = sortType;
             window.localStorage.setItem("sortFile", JSON.stringify(json));
 
-            console.log(`set ` + sortType)
+            //console.log(`set ` + sortType)
         }
 
 
@@ -207,7 +207,7 @@ class FileSort {
                 sortType = defaultSort;
             }
 
-            console.log(`get ` + sortType)
+            //console.log(`get ` + sortType)
             if (sortType.indexOf("Desc") !== -1) {
                 orderbyType = FileOrderbyType.desc;
             } else {

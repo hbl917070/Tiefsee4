@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./css/Menu.css">
     <link rel="stylesheet" href="./css/Msgbox.css">
     <link rel="stylesheet" href="./css/Toast.css">
-    
+
     <link rel="stylesheet" href="./css/BaseWindow.css">
     <script src="./js/BaseWindow.js"></script>
     <script src="./js/Lib.js"></script>
@@ -36,7 +36,7 @@
     <script src="./lang/exif.js"></script>
     <script src="./js/I18n.js"></script>
 
-    
+
     <script src="./js/WebAPI.js"></script>
     <script src="./js/Config.js"></script>
     <script src="./js/MainWindow/MainTools.js"></script>
@@ -191,8 +191,17 @@
 
     </div>
 
+    <!-- 開啟setting視窗時的loading -->
+    <div id="loadingSetting">
+        <div class="loadingSetting-box">
+            <%- await readFile("./img/default/tool-setting.svg"); %>
+        </div>
+    </div>
+
     <!-- 下拉選單 & 右鍵選單 -->
     <%- await include("./Menu.ejs"); %>
+
+
 
 </body>
 

@@ -6,7 +6,7 @@ Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特�
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.22](https://github.com/hbl917070/Tiefsee4/releases)
+[Tiefsee 4.0.0-beta.23](https://github.com/hbl917070/Tiefsee4/releases)
 (注意：此為測試版
 
     開發中功能：  
@@ -23,9 +23,7 @@ Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特�
 
 
 ## 程式截圖
-![](https://cdn.discordapp.com/attachments/896768892003823627/992137114324054127/2022-07-01_02-22-15.jpg)
-
-![](https://cdn.discordapp.com/attachments/803673073621401633/953640384238600312/2022-03-16_01-32-52.jpg)
+![](https://cdn.discordapp.com/attachments/896768892003823627/1044270942026727536/2022-11-21_23-19-27.jpg)
 
 ![](https://cdn.discordapp.com/attachments/803673073621401633/917208044578951229/2021-12-06_07-56-44.jpg)
 
@@ -51,16 +49,16 @@ Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特�
 > 讓視窗透明化的程式碼會導致Tiefsee無法運行於 Windows 7，暫時無解決方案。
 
 ### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
-> 改用UWP專案或winUI 3專案，或許可以解決此問題。
+> 將專案移植到UWP或winUI 3，或許可以解決此問題，但改動幅度極大，因此目前無此計劃。
 
 ### 4、視窗使用毛玻璃效果後，可能導致Tiefsee的視窗在移動時嚴重延遲
-> 此BUG並非在所有電腦都會發生，Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。改用UWP專案或winUI 3專案，或許可以解決此問題。
+> 此BUG並非所有電腦都會發生。Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。
 
 ### 5、無法開啟長路經的檔案
-> 理論上改用 .net 6 來編譯可以解決此問題，但 .net 6 的運行環境並非系統內建，因此暫時不考慮調整專案類型。
+> 理論上改用 .net 6 來編譯可以解決此問題，但 .net 6 的運行環境並非Windows內建的環境，因此暫時不考慮調整專案類型。
 
-### 6、Tiefsee.exe的路徑只能是英文或數字
-> 在某些電腦上，只要Tiefsee.exe的路徑含有非英文數字的文字(像是中文、日文)，就會導致程式啟動失敗。此為WebView2本身的BUG。
+### 6、Tiefsee.exe的路徑不能含有中文日文之類的特殊字元
+> 此BUG並非所有電腦都會發生。如果確定已經安裝Webview2了但依然顯示「必須安裝Webview2才能運行Tiefsee」，嘗試把Tiefsee放在沒有中文的路徑裡面執行。依然不行的話，嘗試以系統管理員身份執行Webview2的安裝程式。
 
 <br>
 

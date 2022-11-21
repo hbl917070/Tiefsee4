@@ -4,6 +4,7 @@
 @import "./MainExif";
 @import "./MainFileList";
 @import "./MainTools";
+@import "./LoadingSetting";
 
 /*---------------------------*/
 
@@ -102,7 +103,6 @@
 /*---------------------------*/
 //歡迎畫面
 .mView-welcome {
-
   height: 100%;
   width: 100%;
   display: flex;
@@ -126,3 +126,4 @@
   }
 }
 /*---------------------------*/
+

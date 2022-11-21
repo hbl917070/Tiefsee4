@@ -372,12 +372,13 @@ class MainWindow {
         /**
          * 關閉 快速預覽 (由C#呼叫)
          */
-        function quickLookUp() {
+        async function quickLookUp() {
             //如果是單一執行個體，就不關閉視窗
             if (startType === 2 || startType === 3) {
                 fileShow.openNone();
-                WV_Window.Hide();
+                await WV_Window.Hide();
             }
+            //console.log("關閉 快速預覽")
         }
 
 
