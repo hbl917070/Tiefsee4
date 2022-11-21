@@ -107,6 +107,7 @@ namespace Tiefsee {
 
             try {
                 IEnumerable<MetadataExtractor.Directory> directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
+
                 foreach (var directory in directories) {
                     foreach (var tag in directory.Tags) {
 
@@ -118,6 +119,27 @@ namespace Tiefsee {
                         if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
                             continue;
                         }
+
+                        if (value != null && value.Length > 5000) {//某些圖片可能把二進制資訊封裝進去
+                            continue;
+                        }
+
+                        //判斷是否為 iso-8859-1 ，是的話就轉成utf8
+                        try {
+                            if (name == "Textual Data" && value != null) {
+                                Console.WriteLine(value);
+                                byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
+                                if (Encoding.GetEncoding(28591).GetString(unknow) == value) {
+                                    value = Encoding.UTF8.GetString(unknow);
+                                    //Console.WriteLine("yes iso-8859-1");
+                                } else {
+                                    //Console.WriteLine("no iso-8859-1");
+                                }
+                            }
+                        } catch (Exception ee) {
+                            Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
+                        }
+
                         //sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
                         if (tagType == ExifDirectoryBase.TagOrientation) {//旋轉方向
                             int orientation = directory.TryGetInt32(tag.Type, out int v) ? v : -1;

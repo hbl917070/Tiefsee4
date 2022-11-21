@@ -164,9 +164,6 @@ class MainExif {
 				if (value === undefined) {
 					continue;
 
-				} else if (value.length > 5000) {//某些圖片可能把二進制資訊封裝進去
-					continue;
-
 				} else if (name === "Map") {
 					value = value.replace(/ /g, "").replace(/"/g, "");
 					html += `
@@ -176,7 +173,7 @@ class MainExif {
 						</div>
 					</div>`
 
-				} else if (name === "Textual Data") {// PNG tEXt
+				} else if (name === "Textual Data") {//PNG iTXt / zTXt / tEXt
 
 					let vals = getItems(ar, name);
 					for (let i = 0; i < vals.length; i++) {
