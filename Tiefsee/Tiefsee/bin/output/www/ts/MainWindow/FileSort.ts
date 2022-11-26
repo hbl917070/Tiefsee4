@@ -99,7 +99,8 @@ class FileSort {
 
             M.fileLoad.setWaitingFile(ar);
             M.fileLoad.updateTitle();//更新視窗標題
-            M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+       
+            M.mainFileList.init();//檔案預覽視窗 初始化
             M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 
             setFileSortMenu();
