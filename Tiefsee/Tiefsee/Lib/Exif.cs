@@ -16,13 +16,13 @@ namespace Tiefsee {
         /// </summary>
         private static string OrientationToString(int orientation) {
             if (orientation == 1) { return "0°"; }
-            if (orientation == 2) { return "0°, mirrored"; }
+            if (orientation == 2) { return "Mirror horizontal"; }
             if (orientation == 3) { return "180°"; }
-            if (orientation == 4) { return "180°, mirrored"; }
-            if (orientation == 5) { return "90, mirrored°"; }
-            if (orientation == 6) { return "270°"; }
-            if (orientation == 7) { return "270°, mirrored"; }
-            if (orientation == 8) { return "90°"; }
+            if (orientation == 4) { return "Mirror vertical"; }
+            if (orientation == 5) { return "270°, Mirror horizontal"; }
+            if (orientation == 6) { return "90°"; }
+            if (orientation == 7) { return "90°, Mirror horizontal"; }
+            if (orientation == 8) { return "270°"; }
             return "undefined";
         }
 
@@ -152,7 +152,7 @@ namespace Tiefsee {
                             exif.data.Add(new ImgExifItem {
                                 group = group,
                                 name = name,
-                                value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy/MM/dd HH:mm:ss")
+                                value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy-MM-dd HH:mm:ss")
                             });
                         } else if (tagType == ExifDirectoryBase.TagExposureBias) {//曝光補償
                             string val = directory.GetString(tag.Type);
