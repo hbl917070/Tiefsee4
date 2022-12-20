@@ -32,10 +32,8 @@
     <link rel="stylesheet" href="./css/Tiefseeview.css">
 
     <!-- 多國語言 -->
-    <script src="./lang/ui.js"></script>
-    <script src="./lang/exif.js"></script>
+    <script src="./lang/langData.js"></script>
     <script src="./js/I18n.js"></script>
-
 
     <script src="./js/WebAPI.js"></script>
     <script src="./js/Config.js"></script>
@@ -58,7 +56,6 @@
     <script src="./js/MainWindow/Hotkey.js"></script>
     <script src="./js/MainWindow/Dragbar.js"></script>
     <script src="./js/MainWindow/MainWindow.js"></script>
-
 </head>
 
 <body>
@@ -83,7 +80,7 @@
                 <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
                     <%- await readFile("./img/default/window-topmost.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-layout" title="版面選單">
+                <div class="titlebar-tools-btn titlebar-tools-layout" title="版面" i18n="menu.layout">
                     <%- await readFile("./img/default/window-layout.svg"); %>
                 </div>
                 <div class="titlebar-tools-btn titlebar-tools-minimized">

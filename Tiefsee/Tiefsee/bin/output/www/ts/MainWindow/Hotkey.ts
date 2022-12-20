@@ -22,9 +22,9 @@ class Hotkey {
             }
 
             //如果有開啟msg視窗
-            if (Msgbox.isShow()) {
+            if (M.msgbox.isShow()) {
                 if (e.code == "Escape") {
-                    Msgbox.closeNow();
+                    M.msgbox.closeNow();
                     e.preventDefault();
                 }
                 if (e.code == "Enter" || e.code == "NumpadEnter") {
@@ -77,7 +77,7 @@ class Hotkey {
                 M.script.img.degForward();
             }
             if (e.code === "KeyF") {
-                M.script.img.zoomFull();
+                M.script.img.zoomToFit();
             }
             if (e.code === "KeyH") {
                 M.script.img.mirrorHorizontal();
@@ -98,11 +98,11 @@ class Hotkey {
                 M.script.fileLoad.showDeleteMsg();
             }
             if (e.code === "KeyO") {
-                M.script.open.showOnExplorer();
+                M.script.open.revealInFileExplorer();
             }
 
             if (e.code === "KeyM") {
-                M.script.open.ShowContextMenu();
+                M.script.open.systemContextMenu();
             }
             if (e.code === "Comma") {
                 M.script.fileLoad.prevDir();

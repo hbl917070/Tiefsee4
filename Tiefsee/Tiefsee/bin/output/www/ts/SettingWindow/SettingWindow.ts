@@ -18,10 +18,12 @@ class Setting {
         this.saveData = saveSetting;
 
         var appInfo: AppInfo;
-
-        var i18n = new I18n();
         var config = new Config(baseWindow);
         var mainTools = new MainTools(null);//取得工具列
+        var i18n = new I18n();
+        i18n.initNone(); //有翻譯的地方都顯示空白(用於翻譯前)
+        i18n.pushData(langData);
+        var msgbox = new Msgbox(i18n);
 
         var loadEvent: (() => void)[] = [];
         /**
@@ -42,9 +44,9 @@ class Setting {
 
             baseWindow.appInfo = json;
 
-            await WV_Window.ShowWindow_Center(550 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
+            await WV_Window.ShowWindow_Center(600 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
             WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio);//設定視窗最小size
-            WV_Window.Text = "設定";
+            WV_Window.Text = "Setting";
             let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
             WV_Window.SetIcon(iconPath);
 
@@ -81,13 +83,24 @@ class Setting {
             });
 
             tippy(".img-help", {
-                content(reference: HTMLElement) {
+                /*content(reference: HTMLElement) {
                     const id = reference.getAttribute("data-tooltip");
                     if (id === null) { return ""; }
                     const template = document.getElementById(id);
                     return template?.innerHTML;
+                },*/
+                onShow(instance: any) {
+                    const dataI18n = instance.reference.getAttribute("data-i18n");
+                    let t = dataI18n;
+                    if (t !== null) {
+                        t = i18n.t(dataI18n)
+                    }
+                    instance.setContent(t);
                 },
                 allowHTML: true,
+                animation: "tippyMyAnimation",
+                theme: "tippyMyTheme",
+                arrow: false, //箭頭
             });
 
             //-------------
@@ -112,9 +125,23 @@ class Setting {
 
         //初始化多國語言
         addLoadEvent(() => {
-            // @ts-ignore
-            //i18n.pushList(langData);
-            //console.log(i18n.t("t2", "", "en"))
+
+            let dom_select = document.querySelector("#select-lang") as HTMLSelectElement;
+
+            let configLang = config.settings.other.lang;
+            if (configLang == "") {
+                configLang = Lib.getBrowserLang();
+            }
+            dom_select.value = configLang;
+            i18n.setLang(configLang); //更新畫面的語言
+
+            dom_select.addEventListener("change", () => {
+                let val = dom_select.value;
+                config.settings.other.lang = val;
+                appleSettingOfMain();
+                i18n.setLang(val); //更新畫面的語言
+            });
+
         })
 
         //初始化頁面分頁
@@ -122,7 +149,7 @@ class Setting {
 
             //捲到最上面
             function goTop() {
-                document.getElementById("window-body")?.scrollTo(0, 0)
+                document.querySelector("#window-body")?.scrollTo(0, 0)
             }
 
             function getDom(id: string) {
@@ -130,8 +157,8 @@ class Setting {
             }
 
             var tabs = new Tabs();
-            tabs.add(getDom("tabsBtn-common"), getDom("tabsPage-common"), () => { goTop() });//一般
-            tabs.add(getDom("tabsBtn-theme"), getDom("tabsPage-theme"), () => { goTop() });//外觀
+            tabs.add(getDom("tabsBtn-general"), getDom("tabsPage-general"), () => { goTop() });//一般
+            tabs.add(getDom("tabsBtn-appearance"), getDom("tabsPage-appearance"), () => { goTop() });//外觀
             tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() });//版面
             tabs.add(getDom("tabsBtn-tools"), getDom("tabsPage-tools"), () => { goTop() });//工具列
             //tabs.add(getDom("tabsBtn-image"), getDom("tabsPage-image"), () => { goTop() });
@@ -143,7 +170,7 @@ class Setting {
             tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() });//擴充套件
             tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() });//快速預覽
 
-            tabs.set(getDom("tabsBtn-common"));//預設選擇的頁面
+            tabs.set(getDom("tabsBtn-general"));//預設選擇的頁面
         })
 
         //自訂工具列
@@ -155,7 +182,7 @@ class Setting {
             arGroupName.map((gn) => {
 
                 let groupName = gn as ("img" | "pdf" | "txt");
-                var dom_toolsList = document.getElementById(`toolsList-${groupName}`) as HTMLElement;
+                var dom_toolsList = document.querySelector(`#toolsList-${groupName}`) as HTMLElement;
 
                 //產生html
                 var html = "";
@@ -167,7 +194,7 @@ class Setting {
                         <div class="toolsList-item" data-name="${item.name}">
                             <input class="toolsList-checkbox" type="checkbox" data-name="${item.name}" checked>
                             ${SvgList[item.icon]}
-                            <span>${item.i18n}</span>
+                            ${i18n.tSpan(item.i18n)}
                         </div>`
                     if (item.group == groupName) { html += h; }
                 }
@@ -221,7 +248,7 @@ class Setting {
             function getToolsListData() {
                 function getItem(type: string) {
                     let ar = [];
-                    let dom_toolsList = document.getElementById(`toolsList-${type}`) as HTMLElement;
+                    let dom_toolsList = document.querySelector(`#toolsList-${type}`) as HTMLElement;
                     let domAr = dom_toolsList.querySelectorAll(".toolsList-checkbox");
 
                     for (let i = 0; i < domAr.length; i++) {
@@ -247,10 +274,10 @@ class Setting {
             //------------
 
             //切換下拉選單時，顯示對應的內容
-            var select_toolsListType = document.getElementById("select-toolsListType") as HTMLSelectElement;
-            var dom_toolsList_img = document.getElementById("toolsList-img") as HTMLElement;
-            var dom_toolsList_pdf = document.getElementById("toolsList-pdf") as HTMLElement;
-            var dom_toolsList_txt = document.getElementById("toolsList-txt") as HTMLElement;
+            var select_toolsListType = document.querySelector("#select-toolsListType") as HTMLSelectElement;
+            var dom_toolsList_img = document.querySelector("#toolsList-img") as HTMLElement;
+            var dom_toolsList_pdf = document.querySelector("#toolsList-pdf") as HTMLElement;
+            var dom_toolsList_txt = document.querySelector("#toolsList-txt") as HTMLElement;
             let eventChange = () => {
                 let val = select_toolsListType.value;
                 if (val == "img") {
@@ -278,19 +305,19 @@ class Setting {
         addLoadEvent(() => {
 
             //var cssRoot = document.documentElement;
-            var jqtxt_colorWindowBackground = $("#text-theme-colorWindowBackground");//視窗顏色
-            var jqtxt_colorWindowBorder = $("#text-theme-colorWindowBorder");//邊框顏色
-            var jqtxt_colorWhite = $("#text-theme-colorWhite");//文字顏色
-            var jqtxt_colorBlack = $("#text-theme-colorBlack");//區塊底色
-            var jqtxt_colorBlue = $("#text-theme-colorBlue");//主顏色
+            var jq_colorWindowBackground = $("#text-colorWindowBackground");//視窗顏色
+            var jq_colorWindowBorder = $("#text-colorWindowBorder");//邊框顏色
+            var jq_colorWhite = $("#text-colorWhite");//文字顏色
+            var jq_colorBlack = $("#text-colorBlack");//區塊底色
+            var jq_colorBlue = $("#text-colorBlue");//主顏色
             var dom_applyThemeBtns = document.querySelector("#applyTheme-btns") as HTMLElement;
 
             //初始化顏色選擇器物件
-            addEvent(jqtxt_colorWindowBackground, "--color-window-background", true);
-            addEvent(jqtxt_colorWindowBorder, "--color-window-border", true);
-            addEvent(jqtxt_colorWhite, "--color-white", false);
-            addEvent(jqtxt_colorBlack, "--color-black", false);
-            addEvent(jqtxt_colorBlue, "--color-blue", false);
+            addEvent(jq_colorWindowBackground, "--color-window-background", true);
+            addEvent(jq_colorWindowBorder, "--color-window-border", true);
+            addEvent(jq_colorWhite, "--color-white", false);
+            addEvent(jq_colorBlack, "--color-black", false);
+            addEvent(jq_colorBlue, "--color-blue", false);
             //add(jQdom_theme_colorGrey, "--color-grey", false);
 
             applyTheme()
@@ -334,26 +361,26 @@ class Setting {
                     jqdom.minicolors("value", `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`);
                 }
                 //修改輸入框的文字
-                setRgba(jqtxt_colorWindowBackground, config.settings.theme["--color-window-background"]);
-                setRgba(jqtxt_colorWindowBorder, config.settings.theme["--color-window-border"]);
-                setRgb(jqtxt_colorWhite, config.settings.theme["--color-white"]);
-                setRgb(jqtxt_colorBlack, config.settings.theme["--color-black"]);
-                setRgb(jqtxt_colorBlue, config.settings.theme["--color-blue"]);
+                setRgba(jq_colorWindowBackground, config.settings.theme["--color-window-background"]);
+                setRgba(jq_colorWindowBorder, config.settings.theme["--color-window-border"]);
+                setRgb(jq_colorWhite, config.settings.theme["--color-white"]);
+                setRgb(jq_colorBlack, config.settings.theme["--color-black"]);
+                setRgb(jq_colorBlue, config.settings.theme["--color-blue"]);
             }
 
             //-------------
 
             //初始化主題按鈕
-            applyThemeAddBtn(
-                `<div class="btn">深色主題</div>`,
+            applyThemeAddBtn( //深色主題
+                `<div class="btn" i18n="sw.theme.darkTheme">${i18n.t("sw.theme.darkTheme")}</div>`,
                 { r: 31, g: 39, b: 43, a: 0.97 },
                 { r: 255, g: 255, b: 255, a: 0.25 },
                 { r: 255, g: 255, b: 255, },
                 { r: 0, g: 0, b: 0, },
                 { r: 0, g: 200, b: 255, },
             )
-            applyThemeAddBtn(
-                `<div class="btn">淺色主題</div>`,
+            applyThemeAddBtn( //深色主題
+                `<div class="btn" i18n="sw.theme.lightTheme">${i18n.t("sw.theme.lightTheme")}</div>`,
                 { r: 255, g: 255, b: 255, a: 0.97 },
                 { r: 112, g: 112, b: 112, a: 0.25 },
                 { r: 0, g: 0, b: 0, },
@@ -384,9 +411,9 @@ class Setting {
 
         //圖片預設 縮放模式、對齊位置
         addLoadEvent(() => {
-            var select_tiefseeviewZoomType = document.getElementById("select-tiefseeviewZoomType") as HTMLSelectElement;
-            var text_tiefseeviewZoomValue = document.getElementById("text-tiefseeviewZoomValue") as HTMLInputElement;
-            var select_tiefseeviewAlignType = document.getElementById("select-tiefseeviewAlignType") as HTMLSelectElement;
+            var select_tiefseeviewZoomType = document.querySelector("#select-tiefseeviewZoomType") as HTMLSelectElement;
+            var text_tiefseeviewZoomValue = document.querySelector("#text-tiefseeviewZoomValue") as HTMLInputElement;
+            var select_tiefseeviewAlignType = document.querySelector("#select-tiefseeviewAlignType") as HTMLSelectElement;
 
             select_tiefseeviewZoomType.value = config.settings.image["tiefseeviewZoomType"];
             text_tiefseeviewZoomValue.value = config.settings.image["tiefseeviewZoomValue"].toString();
@@ -428,8 +455,8 @@ class Setting {
 
         //預設排序
         addLoadEvent(() => {
-            var select_fileSort = document.getElementById("select-fileSort") as HTMLSelectElement;
-            var select_dirSort = document.getElementById("select-dirSort") as HTMLSelectElement;
+            var select_fileSort = document.querySelector("#select-fileSort") as HTMLSelectElement;
+            var select_dirSort = document.querySelector("#select-dirSort") as HTMLSelectElement;
 
             select_fileSort.value = config.settings.sort["fileSort"];
             select_dirSort.value = config.settings.sort["dirSort"];
@@ -448,30 +475,34 @@ class Setting {
 
         //關聯副檔名 
         addLoadEvent(() => {
-            var txt_extension = document.querySelector("#txt-extension") as HTMLTextAreaElement;
+            var text_extension = document.querySelector("#text-extension") as HTMLTextAreaElement;
             var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
 
             let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
-            txt_extension.value = s_extension.join("\n");//預設顯示的文字
+            text_extension.value = s_extension.join("\n");//預設顯示的文字
+
             btn_extension.addEventListener("mousedown", async (e) => {
 
-                Msgbox.show({
-                    txt: "確定用Tiefsee來開啟這些檔案嗎？<br>" + s_extension.join(", "),
+                let ar_extension = text_extension.value.split("\n");
+                let ar: string[] = [];
+                for (let i = 0; i < ar_extension.length; i++) {
+                    const item = ar_extension[i].toLocaleLowerCase().trim();
+                    if (item !== "" && ar.indexOf(item) === -1) {
+                        ar.push(item);
+                    }
+                }
+
+                msgbox.show({
+                    txt: i18n.t("msg.associatedFiles") + "<br>" //確定用Tiefsee來開啟這些檔案嗎？
+                        + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
-                        Msgbox.close(dom);
+                        msgbox.close(dom);
                         //let msgboxLoading = Msgbox.show({ txt: "處理中...", isAllowClose: false, isShowBtn: false });
-                        let ar_extension = txt_extension.value.split("\n");
-                        let ar = [];
-                        for (let i = 0; i < ar_extension.length; i++) {
-                            const item = ar_extension[i].toLocaleLowerCase().trim();
-                            if (item !== "" && ar.indexOf(item) === -1) {
-                                ar.push(item);
-                            }
-                        }
+
                         let appPath = await WV_Window.GetAppPath();
                         await WV_System.SetAssociationExtension(ar, appPath);
                         //Msgbox.close(msgboxLoading);
-                        Msgbox.show({ txt: "關聯完成", });
+                        msgbox.show({ txt: i18n.t("msg.done"), }); //處理完成
                     }
                 });
 
@@ -480,9 +511,9 @@ class Setting {
 
         //開啟 系統設定
         addLoadEvent(() => {
-            var btn_openSystemSetting = document.getElementById("btn-openSystemSetting") as HTMLElement;
+            let btn = document.querySelector("#btn-openSystemSettings") as HTMLElement;
 
-            btn_openSystemSetting.addEventListener("click", async () => {
+            btn.addEventListener("click", async () => {
                 let path = "ms-settings:defaultapps";
                 WV_RunApp.OpenUrl(path)
             });
@@ -490,11 +521,11 @@ class Setting {
 
         //視窗 圓角
         addLoadEvent(() => {
-            var jqtxt_windowBorderRadius = $("#text-theme-windowBorderRadius");
-            jqtxt_windowBorderRadius.val(config.settings.theme["--window-border-radius"]);
+            var jq_windowBorderRadius = $("#text-windowBorderRadius");
+            jq_windowBorderRadius.val(config.settings.theme["--window-border-radius"]);
 
-            jqtxt_windowBorderRadius.change(() => {
-                let val = Number(jqtxt_windowBorderRadius.val());
+            jq_windowBorderRadius.change(() => {
+                let val = Number(jq_windowBorderRadius.val());
                 if (val < 0) { val = 0; }
                 if (val > 15) { val = 15; }
 
@@ -505,11 +536,11 @@ class Setting {
 
         //視窗 縮放比例
         addLoadEvent(() => {
-            var jqtxt_zoomFactor = $("#text-theme-zoomFactor");
-            jqtxt_zoomFactor.val(config.settings.theme["zoomFactor"]);
+            var jq_zoomFactor = $("#text-zoomFactor");
+            jq_zoomFactor.val(config.settings.theme["zoomFactor"]);
 
-            jqtxt_zoomFactor.change(() => {
-                let val = Number(jqtxt_zoomFactor.val());
+            jq_zoomFactor.change(() => {
+                let val = Number(jq_zoomFactor.val());
                 if (isNaN(val)) { val = 1; }
                 if (val === 0) { val = 1; }
                 if (val < 0.5) { val = 0.5; }
@@ -632,8 +663,8 @@ class Setting {
             setRadio("[name='largeBtn']", config.settings.layout.largeBtn);
 
             //變更時
-            let dom = document.getElementById("largeBtn-group") as HTMLElement;
-            dom.addEventListener("change", () => {//
+            let domRadio = document.querySelector("#largeBtn-group") as HTMLElement;
+            domRadio.addEventListener("change", () => {//
                 let val = getRadio("[name='largeBtn']");
                 config.settings.layout.largeBtn = val;
                 appleSettingOfMain();
@@ -666,21 +697,35 @@ class Setting {
 
         // 圖片 縮放模式
         addLoadEvent(() => {
-            var select_tiefseeviewImageRendering = document.querySelector("#select-tiefseeviewImageRendering") as HTMLInputElement;
+
+            /*var select_tiefseeviewImageRendering = document.querySelector("#select-tiefseeviewImageRendering") as HTMLInputElement;
             select_tiefseeviewImageRendering.value = config.settings["image"]["tiefseeviewImageRendering"];
 
             select_tiefseeviewImageRendering.addEventListener("change", () => {
                 let val = select_tiefseeviewImageRendering.value;
                 config.settings["image"]["tiefseeviewImageRendering"] = val;
                 appleSettingOfMain();
+            });*/
+
+            var switch_imageShowPixels = document.querySelector("#switch-imageShowPixels") as HTMLInputElement;
+            switch_imageShowPixels.checked = config.settings["image"]["tiefseeviewImageRendering"] == "2"
+
+            switch_imageShowPixels.addEventListener("change", () => {
+                let val = switch_imageShowPixels.checked;
+                if (val) {
+                    config.settings["image"]["tiefseeviewImageRendering"] = "2";
+                } else {
+                    config.settings["image"]["tiefseeviewImageRendering"] = "0";
+                }
+                appleSettingOfMain();
             });
         })
 
         //相關路徑
         addLoadEvent(() => {
-            var btn_openAppData = document.getElementById("btn-openAppData") as HTMLElement;
-            var btn_openWww = document.getElementById("btn-openWww") as HTMLElement;
-            var btn_openTemp = document.getElementById("btn-openTemp") as HTMLElement;
+            var btn_openAppData = document.querySelector("#btn-openAppData") as HTMLElement;
+            var btn_openWww = document.querySelector("#btn-openWww") as HTMLElement;
+            var btn_openTemp = document.querySelector("#btn-openTemp") as HTMLElement;
 
             //開啟 AppData(使用者資料)
             btn_openAppData.addEventListener("click", async () => {
@@ -706,13 +751,13 @@ class Setting {
             });
         })
 
-        //清理快取資料
+        //清理暫存資料
         addLoadEvent(() => {
-            var btn_clearBrowserCache = document.getElementById("btn-clearBrowserCache") as HTMLElement;
+            var btn_clearBrowserCache = document.querySelector("#btn-clearBrowserCache") as HTMLElement;
 
             btn_clearBrowserCache.addEventListener("click", async () => {
                 WV_Window.ClearBrowserCache();
-                Msgbox.show({ txt: "快取資料清理完成" });
+                msgbox.show({ txt: i18n.t("msg.tempDeleteCompleted") }); //暫存資料清理完成
             });
         })
 
@@ -743,19 +788,19 @@ class Setting {
         // 啟動模式 、 Port
         addLoadEvent(() => {
 
-            var txt_startPort = document.querySelector("#text-startPort") as HTMLInputElement;
-            var txt_serverCache = document.querySelector("#text-serverCache") as HTMLInputElement;
+            var text_startPort = document.querySelector("#text-startPort") as HTMLInputElement;
+            var text_serverCache = document.querySelector("#text-serverCache") as HTMLInputElement;
 
             setRadio("[name='radio-startType']", appInfo.startType.toString())
-            txt_startPort.value = appInfo.startPort.toString();
-            txt_serverCache.value = appInfo.serverCache.toString();
+            text_startPort.value = appInfo.startPort.toString();
+            text_serverCache.value = appInfo.serverCache.toString();
 
             //關閉視窗前觸發
             baseWindow.closingEvents.push(async () => {
                 //儲存 start.ini
-                let startPort = parseInt(txt_startPort.value);
+                let startPort = parseInt(text_startPort.value);
                 let startType: any = getRadio("[name='radio-startType']");
-                let serverCache = parseInt(txt_serverCache.value);
+                let serverCache = parseInt(text_serverCache.value);
 
                 if (isNaN(startPort)) { startPort = 4876; }
                 if (startPort > 65535) { startPort = 65535; }

@@ -1,57 +1,61 @@
 <!-- 下拉選單 檔案 -->
 <div class="menu" active="">
-    <div class="menu-content" id="menu-open">
+    <div class="menu-content" id="menu-file">
+
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-openFile">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">載入檔案</div>
+                <div class="menu-hor-txt" i18n="menu.openFile">載入檔案</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-newWindow">
+        </div>
+
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-openNewWindow">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">另開視窗</div>
+                <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
             </div>
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item" id="menuitem-showOnExplorer">
+            <div class="menu-hor-item" id="menuitem-RevealInFileExplorer">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
+                <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-showSystemMenu">
+            <div class="menu-hor-item" id="menuitem-systemContextMenu">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+                <div class="menu-hor-txt" i18n="menu.systemContextMenu">檔案右鍵選單</div>
             </div>
             <div class="menu-hor-item" id="menuitem-renameFile">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">重新命名檔案</div>
+                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
             </div>
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item" id="menuitem-printFile">
+            <div class="menu-hor-item" id="menuitem-print">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">列印</div>
+                <div class="menu-hor-txt" i18n="menu.print">列印</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-setWallpaper">
+            <div class="menu-hor-item" id="menuitem-setAsDesktop">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">設成桌布</div>
+                <div class="menu-hor-txt" i18n="menu.setAsDesktop">設成桌布</div>
             </div>
 
 
         </div>
 
         <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-runApp">
+            <div class="menu-hor-item" id="menuitem-openWith">
                 <div class="menu-hor-icon">
                 </div>
-                <div class="menu-hor-txt" i18n="">選擇其他應用程式</div>
+                <div class="menu-hor-txt" i18n="menu.openWith">用其他程式開啟</div>
             </div>
 
             <div class="menu-hor-item" id="menuitem-open3DMSPaint">
                 <div class="menu-hor-icon">
                     <img src="./img/icon-Paint3D.png">
                 </div>
-                <div class="menu-hor-txt" i18n="">3D 小畫家</div>
+                <div class="menu-hor-txt">3D MS Paint</div>
             </div>
 
             <div id="menu-otherAppOpen">
@@ -70,29 +74,29 @@
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-img-copyFile">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 檔案</div>
+                <div class="menu-hor-txt" i18n="menu.copyFile">複製 檔案</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-copyName">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 檔名</div>
+                <div class="menu-hor-txt" i18n="menu.copyFileName">複製 檔名</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-copyPath">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 完整路徑</div>
+                <div class="menu-hor-txt" i18n="menu.copyFilePath">複製 完整路徑</div>
             </div>
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item" id="menuitem-img-copyImg">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 影像</div>
+                <div class="menu-hor-txt" i18n="menu.copyImage">複製 影像</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-copyBase64">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 影像base64</div>
+                <div class="menu-hor-txt" i18n="menu.copyImageBase64">複製 影像base64</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-copyTxt">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">複製 文字</div>
+                <div class="menu-hor-txt" i18n="menu.copyText">複製 文字</div>
             </div>
         </div>
 
@@ -108,13 +112,13 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rotateCw.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">順時針90°</div>
+                <div class="menu-hor-txt" i18n="menu.rotateCw">順時針90°</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-rotateCcw">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rotateCcw.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">逆時針90°</div>
+                <div class="menu-hor-txt" i18n="menu.rotateCcw">逆時針90°</div>
             </div>
 
             <div class="menu-hor-hr"></div>
@@ -123,13 +127,13 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-mirroringH.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">水平鏡像</div>
+                <div class="menu-hor-txt" i18n="menu.flipHorizontal">水平鏡像</div>
             </div>
             <div class="menu-hor-item" id="menuitem-img-mirroringV">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-mirroringV.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">垂直鏡像</div>
+                <div class="menu-hor-txt" i18n="menu.flipVertical">垂直鏡像</div>
             </div>
 
             <div class="menu-hor-hr"></div>
@@ -138,7 +142,7 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-initRotate.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">初始化旋轉</div>
+                <div class="menu-hor-txt" i18n="menu.initialRotation">初始化旋轉</div>
             </div>
         </div>
 
@@ -151,82 +155,82 @@
     <div class="menu-content" id="menu-sort">
         <div class="menu-box">
 
-            <div class="menu-hor-title" i18n=""> 檔案排序方式 </div>
+            <div class="menu-hor-title" i18n="menu.fileSortBy"> 檔案排序方式 </div>
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item" id="menuitem-fileSort-name">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/yes.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">檔名</div>
+                <div class="menu-hor-txt" i18n="menu.name">檔名</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-lastWriteTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">修改日期</div>
+                <div class="menu-hor-txt" i18n="menu.lastWriteTime">修改日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-lastAccessTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">存取日期</div>
+                <div class="menu-hor-txt" i18n="menu.lastAccessTime">存取日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-creationTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">建立日期</div>
+                <div class="menu-hor-txt" i18n="menu.creationTime">建立日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-length">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">檔案大小</div>
+                <div class="menu-hor-txt" i18n="menu.length">檔案大小</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-random">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">隨機</div>
+                <div class="menu-hor-txt" i18n="menu.random">隨機</div>
             </div>
 
             <div class="menu-hor-hr"></div>
             <div class="menu-hor-item" id="menuitem-fileSort-asc">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">遞增</div>
+                <div class="menu-hor-txt" i18n="menu.asc">遞增</div>
             </div>
             <div class="menu-hor-item" id="menuitem-fileSort-desc">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">遞減</div>
+                <div class="menu-hor-txt" i18n="menu.desc">遞減</div>
             </div>
 
         </div>
 
         <div class="menu-box">
 
-            <div class="menu-hor-title" i18n=""> 資料夾排序方式 </div>
+            <div class="menu-hor-title" i18n="menu.directorySortBy"> 資料夾排序方式 </div>
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item" id="menuitem-dirSort-name">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">檔名</div>
+                <div class="menu-hor-txt" i18n="menu.name">檔名</div>
             </div>
             <div class="menu-hor-item" id="menuitem-dirSort-lastWriteTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">修改日期</div>
+                <div class="menu-hor-txt" i18n="menu.lastWriteTime">修改日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-dirSort-lastAccessTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">存取日期</div>
+                <div class="menu-hor-txt" i18n="menu.lastAccessTime">存取日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-dirSort-creationTime">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">建立日期</div>
+                <div class="menu-hor-txt" i18n="menu.creationTime">建立日期</div>
             </div>
             <div class="menu-hor-item" id="menuitem-dirSort-random">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">隨機</div>
+                <div class="menu-hor-txt" i18n="menu.random">隨機</div>
             </div>
 
             <div class="menu-hor-hr"></div>
             <div class="menu-hor-item" id="menuitem-dirSort-asc">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">遞增</div>
+                <div class="menu-hor-txt" i18n="menu.asc">遞增</div>
             </div>
             <div class="menu-hor-item" id="menuitem-dirSort-desc">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">遞減</div>
+                <div class="menu-hor-txt" i18n="menu.desc">遞減</div>
             </div>
 
         </div>
@@ -241,36 +245,36 @@
 
         <div class="menu-box" style="width:200px">
             <div class="menu-grid">
-                <div class="menu-grid-item js-prev">
+                <div class="menu-grid-item js-prev" title="" i18n="menu.prevFile">
                     <%- await readFile("./img/default/tool-prev.svg"); %>
                 </div>
-                <div class="menu-grid-item js-next">
+                <div class="menu-grid-item js-next" title="" i18n="menu.nextFile">
                     <%- await readFile("./img/default/tool-next.svg"); %>
                 </div>
-                <div class="menu-grid-item js-prevDir">
+                <div class="menu-grid-item js-prevDir" title="" i18n="menu.prevDir">
                     <%- await readFile("./img/default/tool-prevDir.svg"); %>
                 </div>
-                <div class="menu-grid-item js-nextDir">
+                <div class="menu-grid-item js-nextDir" title="" i18n="menu.nextDir">
                     <%- await readFile("./img/default/tool-nextDir.svg"); %>
                 </div>
-                <div class="menu-grid-item js-sort">
+                <div class="menu-grid-item js-sort" title="" i18n="menu.showMenuSort">
                     <%- await readFile("./img/default/tool-sort.svg"); %>
                 </div>
             </div>
             <div class="menu-grid">
-                <div class="menu-grid-item js-rotate">
+                <div class="menu-grid-item js-rotate" title="" i18n="menu.showMenuRotation">
                     <%- await readFile("./img/default/tool-rotate.svg"); %>
                 </div>
-                <div class="menu-grid-item js-zoomIn">
+                <div class="menu-grid-item js-zoomIn" title="" i18n="menu.zoomIn">
                     <%- await readFile("./img/default/tool-zoomIn.svg"); %>
                 </div>
-                <div class="menu-grid-item js-zoomOut">
+                <div class="menu-grid-item js-zoomOut" title="" i18n="menu.zoomOut">
                     <%- await readFile("./img/default/tool-zoomOut.svg"); %>
                 </div>
-                <div class="menu-grid-item js-full">
+                <div class="menu-grid-item js-full" title="" i18n="menu.zoomToFit">
                     <%- await readFile("./img/default/tool-full.svg"); %>
                 </div>
-                <div class="menu-grid-item js-zoomRatio">
+                <div class="menu-grid-item js-zoomRatio" title="" i18n="menu.infoZoomRatio">
                     <div class="menu-grid-txt js-zoomRatioTxt">
                         100%
                     </div>
@@ -284,25 +288,25 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-open.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">在檔案總管中顯示</div>
+                <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item js-rightMenu">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rightMenu.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">檔案右鍵選單</div>
+                <div class="menu-hor-txt" i18n="menu.systemContextMenu">檔案右鍵選單</div>
             </div>
             <div class="menu-hor-item js-copy">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-copy.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">複製影像</div>
+                <div class="menu-hor-txt" i18n="menu.copyImage">複製影像</div>
             </div>
             <div class="menu-hor-item js-delete">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-delete.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">刪除圖片</div>
+                <div class="menu-hor-txt" i18n="menu.delete">刪除圖片</div>
             </div>
 
             <div class="menu-hor-hr"></div>
@@ -311,13 +315,13 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-setting.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">設定</div>
+                <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
             <div class="menu-hor-item js-help">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-help.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">說明</div>
+                <div class="menu-hor-txt" i18n="menu.help">說明</div>
             </div>
 
             <div class="menu-hor-hr"></div>
@@ -326,7 +330,7 @@
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/no.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="">關閉程式</div>
+                <div class="menu-hor-txt" i18n="menu.exit">關閉程式</div>
             </div>
         </div>
 
@@ -341,31 +345,31 @@
 
             <div class="menu-hor-item js-topmost">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">視窗固定最上層</div>
+                <div class="menu-hor-txt" i18n="menu.topmost">視窗固定最上層</div>
             </div>
 
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item js-mainTools">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt" i18n="">顯示工具列</div>
+                <div class="menu-hor-txt" i18n="menu.showToolbar">顯示工具列</div>
             </div>
 
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item js-mainFileList">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">顯示檔案預覽視窗</div>
+                <div class="menu-hor-txt" i18n="menu.showFilePanel">顯示檔案預覽視窗</div>
             </div>
 
             <div class="menu-hor-item js-mainDirList">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">顯示資料夾預覽視窗</div>
+                <div class="menu-hor-txt" i18n="menu.showDirectoryPanel">顯示資料夾預覽視窗</div>
             </div>
 
             <div class="menu-hor-item js-mainExif">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">顯示詳細資料視窗</div>
+                <div class="menu-hor-txt" i18n="menu.showInformationPanel">顯示詳細資料視窗</div>
             </div>
         </div>
 
@@ -388,19 +392,19 @@
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-text-cut">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">剪下</div>
+                <div class="menu-hor-txt" i18n="menu.cut">剪下</div>
             </div>
             <div class="menu-hor-item" id="menuitem-text-copy">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">複製</div>
+                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
             </div>
             <div class="menu-hor-item" id="menuitem-text-paste">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">貼上</div>
+                <div class="menu-hor-txt" i18n="menu.paste">貼上</div>
             </div>
             <div class="menu-hor-item" id="menuitem-text-selectAll">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">全選</div>
+                <div class="menu-hor-txt" i18n="menu.selectAll">全選</div>
             </div>
         </div>
 
@@ -414,7 +418,7 @@
 
             <div class="menu-hor-item" id="menuitem-txt-copy">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="">複製</div>
+                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
             </div>
 
         </div>

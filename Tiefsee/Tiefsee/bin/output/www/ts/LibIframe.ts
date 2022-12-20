@@ -23,7 +23,7 @@ class LibIframe {
      */
     public async closeIME() {
 
-        var domFocus = document.activeElement;//當前擁有焦點的dom
+        var domFocus = document.activeElement as HTMLElement | null;//當前擁有焦點的dom
 
         var text = document.createElement("input");
         text.setAttribute("type", "url");

@@ -354,6 +354,28 @@ class Lib {
         }
     }
 
+
+    /**
+     * 從瀏覽器取得使用者當前使用的語言
+     */
+    public static getBrowserLang() {
+        let browserLang = navigator.language.toLowerCase();
+
+        if (browserLang == "zh" || browserLang.indexOf("zh-") === 0) {
+            return "zh-TW";
+        }
+        if (browserLang.indexOf("ja") === 0) {//日本
+            return "ja";
+        }
+        /*if (browserLang.indexOf("ko") === 0) {//韓文
+            return "ko";
+        }*/
+        /*if (browserLang == "en" || browserLang.indexOf("en-") === 0) {
+            return "en";
+        }*/
+        return "en";
+    }
+
 }
 
 

@@ -202,6 +202,9 @@ class Config {
         other: {
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
+
+            /** 語言 */
+            lang: "",
         },
     }
 

@@ -302,7 +302,7 @@ class FileLoad {
             let _dropPath = await baseWindow.getDropPath();
             if (_dropPath === "") { return; }
 
-            Msgbox.closeAll();//關閉所有訊息視窗
+            M.msgbox.closeAll();//關閉所有訊息視窗
             M.menu.close();
 
             let dirPath = Lib.GetDirectoryName(_dropPath);
@@ -497,7 +497,7 @@ class FileLoad {
                 return;
             }
             if (arFile.length === 0) {//如果資料夾裡面沒有圖片
-                Toast.show("未找到圖片", 1000 * 3);
+                Toast.show(M.i18n.t("msg.imageNotFound"), 1000 * 3); //未找到圖片
                 M.fileShow.openWelcome();
                 _showFile = async () => { }
                 return;
@@ -674,14 +674,14 @@ class FileLoad {
                 }
 
                 if (state === false) {
-                    Msgbox.show({ txt: "檔案刪除失敗" })
+                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") }); //檔案刪除失敗
                 } else {
                     await showFile();
 
                     if (value == "1") {
-                        Toast.show("已將檔案「移至資源回收桶」", 1000 * 3);
+                        Toast.show(M.i18n.t("msg.fileToRecycleBinCompleted"), 1000 * 3); //已將檔案「移至資源回收桶」
                     } else {
-                        Toast.show("已將檔案「永久刪除」", 1000 * 3);
+                        Toast.show(M.i18n.t("msg.fileToPermanentlyDeleteCompleted"), 1000 * 3); //已將檔案「永久刪除」
                     }
                     M.mainFileList.init();//檔案預覽視窗 初始化
                     M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
@@ -692,16 +692,17 @@ class FileLoad {
             let path = getFilePath();
 
             if (M.config.settings.other.fileDeletingShowCheckMsg) {
-                Msgbox.show({
+                M.msgbox.show({
                     type: "radio",
-                    txt: `刪除檔案` + "<br>" + Lib.GetFileName(path),
+                    txt: M.i18n.t("msg.deleteFile") + "<br>" +
+                        `<span style="word-break:break-all;">${Lib.GetFileName(path)}</span>`, //刪除檔案
                     arRadio: [
-                        { value: "1", name: "移至資源回收桶" },
-                        { value: "2", name: "永久刪除檔案" },
+                        { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, //移至資源回收桶
+                        { value: "2", name: M.i18n.t("msg.fileToPermanentlyDelete") }, //永久刪除檔案
                     ],
                     radioValue: "1",
                     funcYes: async (dom: HTMLElement, value: string) => {
-                        Msgbox.close(dom);
+                        M.msgbox.close(dom);
                         await runDelete(value);//
                     }
                 });
@@ -727,33 +728,33 @@ class FileLoad {
             let path = getFilePath();
             let fileName = Lib.GetFileName(path);
 
-            let msg = Msgbox.show({
-                txt: "重新命名檔案",
+            let msg = M.msgbox.show({
+                txt: M.i18n.t("msg.renameFile"), //重新命名檔案
                 type: "text",
                 inputTxt: fileName,
                 funcYes: async (dom: HTMLElement, inputTxt: string) => {
                     if (inputTxt.trim() == "") {
-                        Msgbox.show({ txt: "必須輸入檔名" });
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameIsEmpty") }); //必須輸入檔名
                         return;
                     }
                     if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) != -1) {
-                        Msgbox.show({ txt: "檔案名稱不可以包含下列任意字元：" + "<br>" + "\\ / : * ? \" < > |" });
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "<br>" + "\\ / : * ? \" < > |" }); //檔案名稱不可以包含下列任意字元
                         return;
                     }
                     if (fileName == inputTxt) {
-                        Msgbox.close(dom);
+                        M.msgbox.close(dom);
                         return;
                     }
                     let dirPath = Lib.GetDirectoryName(path);
                     if (dirPath === null) {
-                        Msgbox.show({ txt: "重新命名失敗：路徑異常" });
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + M.i18n.t("msg.wrongPath") }); //重新命名失敗：路徑異常
                         return;
                     }
 
                     let newName = Lib.Combine([dirPath, inputTxt]);
                     let err = await WV_File.Move(path, newName);
                     if (err != "") {
-                        Msgbox.show({ txt: "重新命名失敗：" + "<br>" + err });
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "<br>" + err }); //重新命名失敗：
                         return;
                     }
 
@@ -763,7 +764,7 @@ class FileLoad {
                     M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
                     M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
 
-                    Msgbox.close(dom);
+                    M.msgbox.close(dom);
                 }
             });
 

@@ -28,6 +28,7 @@ class MainWindow {
     public initMenu;
     public largeBtn;
     public script;
+    public msgbox;
 
     public applySetting;
     public saveSetting;
@@ -68,10 +69,9 @@ class MainWindow {
         var initMenu = this.initMenu = new InitMenu(this);
         var largeBtn = this.largeBtn = new LargeBtn(this);
         var script = this.script = new Script(this);
-
         var i18n = this.i18n = new I18n();
-        i18n.pushList(langExif);
-        i18n.pushList(langUi);
+        i18n.pushData(langData);
+        var msgbox = this.msgbox = new Msgbox(i18n);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
@@ -444,20 +444,34 @@ class MainWindow {
          * 初始 載入檔案
          */
         function initLoad(args: string[]) {
-            Msgbox.closeAll();//關閉所有訊息視窗
+            msgbox.closeAll();//關閉所有訊息視窗
             menu.close();
+
+            if (args.length > 0 && args[0] === "none") {
+                args.shift();//把陣列的第一個元素從其中刪除
+            }
 
             if (args.length === 0) {
                 fileShow.openWelcome();
+
             } else if (args.length === 1) {
-                if (args[0] !== "") {
-                    fileLoad.loadFile(args[0]);//載入單張圖片
-                } else {
+                if (args[0] === "") {
                     fileShow.openWelcome();
+                } else {
+                    fileLoad.loadFile(args[0]);//載入單張圖片
                 }
+
             } else {
-                fileLoad.loadFiles(args[0], args);//載入多張圖片
+                let arFile = [];
+                for (let i = 0; i < args.length; i++) {
+                    arFile.push(Lib.GetFileName(args[i]));
+                }
+                let dirPath = Lib.GetDirectoryName(args[0]);
+                if (dirPath != null) {
+                    fileLoad.loadFiles(dirPath, arFile);//載入多張圖片
+                }
             }
+            
         }
 
 
@@ -525,11 +539,18 @@ class MainWindow {
 
             let cssRoot = document.body;
 
-            //@ts-ignore
             config.settings = _settings;
 
             //-----------
 
+            //語言
+            let lang = config.settings.other.lang;
+            if (lang === "") { //如果未設定過語言
+                lang = Lib.getBrowserLang(); //從瀏覽器取得使用者當前使用的語言
+            }
+            i18n.setLang(lang);
+
+            //-----------
             let dpizoom = Number(config.settings["image"]["dpizoom"]);//圖片DPI縮放
             if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
             fileShow.tiefseeview.setDpizoom(dpizoom);

@@ -22,7 +22,7 @@ class ImgSearch {
                         <div class="menu-hor-icon">
                             <img src="${icon}">
                         </div>
-                        <div class="menu-hor-txt" i18n="">${name}</div>
+                        <div class="menu-hor-txt">${name}</div>
                     </div>
                 `);
 
@@ -34,7 +34,7 @@ class ImgSearch {
                     if (url == "googleSearch") {
                         let imgSearchUrl = await googleSearch();
                         if (imgSearchUrl === "") {
-                            Msgbox.show({ txt: "圖片搜尋失敗" });
+                            M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); //圖片搜尋失敗
                             return;
                         }
                         WV_RunApp.OpenUrl(imgSearchUrl);
@@ -42,7 +42,7 @@ class ImgSearch {
                     } else {
                         let imgUrl = await getWebUrl();
                         if (imgUrl === "") {
-                            Msgbox.show({ txt: "圖片搜尋失敗" });
+                            M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); //圖片搜尋失敗
                             return;
                         }
                         let imgSearchUrl = url.replace("{url}", imgUrl);
@@ -74,6 +74,7 @@ class ImgSearch {
 
             let formData = new FormData();
             formData.append("encoded_image", blob, "image.jpg");
+            formData.append("sbisrc", "Google Chrome 107.0.5304.107 (Official) Windows");
             let rsp = await fetch("https://www.google.com/searchbyimage/upload", {
                 "body": formData,
                 "method": "POST",
@@ -141,7 +142,7 @@ class ImgSearch {
                 json = html;
                 //console.log(html);
             }).catch((err) => {
-                console.log('錯誤:', err);
+                console.log('error:', err);
             });
 
             return json;

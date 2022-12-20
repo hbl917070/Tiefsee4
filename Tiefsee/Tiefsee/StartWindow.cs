@@ -159,7 +159,7 @@ namespace Tiefsee {
                 WebWindow.Create("MainWindow.html", new string[0], null);
             }));
 
-            cm.MenuItems.Add("Quit Tiefsee", new EventHandler((sender2, e2) => {
+            cm.MenuItems.Add("Exit Tiefsee", new EventHandler((sender2, e2) => {
                 nIcon.Visible = false;
 
                 //QuickRun.runNumber = 0;//不論存在幾個視窗都直接關閉
@@ -198,7 +198,7 @@ namespace Tiefsee {
                     return;
                 }
                 Adapter.UIThread(() => {//如果沒有執行環境，就用瀏覽器開啟下載頁面
-                    MessageBox.Show("必須安裝Webview2才能運行Tiefsee");
+                    MessageBox.Show("Webview2 must be installed to run this application");
                     System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
                     this.Close();
                 });

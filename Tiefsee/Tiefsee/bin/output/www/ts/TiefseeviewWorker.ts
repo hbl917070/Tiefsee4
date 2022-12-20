@@ -8,11 +8,11 @@ self.addEventListener("message", async (e) => {
         (r) => r.blob()
     );
 
-    var time = new Date();
+    //var time = new Date();
 
     const img = await createImageBitmap(imgBlob);
 
-    var ms = (new Date()).getTime() - time.getTime();
+    //var ms = (new Date()).getTime() - time.getTime();
     //console.log(`worker 載入圖片:${scale}   耗時：${ms}`)
 
     //@ts-ignore

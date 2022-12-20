@@ -743,7 +743,7 @@ class Tiefseeview {
          * 載入空白圖片
          */
         async function loadNone() {
-            
+
             await loadBigimg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
             //await loadImg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
         }
@@ -2669,6 +2669,7 @@ class Tiefseeview {
                 div = document.createElement("div");
                 div.style.position = "fixed";
                 div.style.pointerEvents = "none";
+                div.style.zIndex = "-9999";
                 div.setAttribute("class", "js--tiefseeview-temporary");
                 div.innerHTML = `<div class="js--tiefseeview-temporary_sub"></div>`;
                 document.body.appendChild(div);

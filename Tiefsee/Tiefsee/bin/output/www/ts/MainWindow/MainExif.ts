@@ -124,6 +124,10 @@ class MainExif {
 
 			dom_mainExifList.innerHTML = "";
 
+			if (fileInfo2.Type === "none") {//如果檔案不存在
+				return;
+			}
+
 			let path = fileInfo2.Path;
 			let json = await WebAPI.getExif(fileInfo2);
 
@@ -165,7 +169,9 @@ class MainExif {
 					continue;
 
 				} else if (name === "Map") {
-					value = value.replace(/ /g, "").replace(/"/g, "");
+
+					value = encodeURIComponent(value);//移除可能破壞html的跳脫符號
+
 					html += `
 					<div class="mainExifItem">
 						<div class="mainExifMap">
@@ -206,13 +212,29 @@ class MainExif {
 									html += getItemHtml(name, val);
 								}
 
-							} else if (name === "parameters") { // Stable Diffusion 才有的欄位
+							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 
 								let promptSplit = val.indexOf("Negative prompt: ");//負面提示
 								let otherSplit = val.indexOf("Steps: ");//其他參數
-								if (promptSplit != -1 && otherSplit != -1) {
+								if (promptSplit !== -1 && otherSplit !== -1) {
 									html += getItemHtml("Prompt", val.substring(0, promptSplit));//提示
 									html += getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit));//負面提示
+									//html += getItemHtml("Other", val.substring(otherSplit));
+									let arOther = val.substring(otherSplit).split(", ");//其他參數
+									for (let i = 0; i < arOther.length; i++) {
+										const itemOther = arOther[i];
+										let itemOtherSplit = itemOther.split(": ");
+										if (itemOtherSplit.length > 0) {
+											html += getItemHtml(itemOtherSplit[0], itemOtherSplit[1]);
+										} else {
+											html += getItemHtml("", itemOther);
+										}
+									}
+
+								} else if (promptSplit === -1 && otherSplit !== -1) {//沒有輸入負面詞的情況
+
+									html += getItemHtml("Prompt", val.substring(0, otherSplit));//提示
+									//html += getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit));//負面提示
 									//html += getItemHtml("Other", val.substring(otherSplit));
 									let arOther = val.substring(otherSplit).split(", ");//其他參數
 									for (let i = 0; i < arOther.length; i++) {
@@ -238,9 +260,24 @@ class MainExif {
 					}
 
 				} else {
-					value = valueToString(name, value);
-					name = M.i18n.t(`exif.name.${name}`, "zh");
-					html += getItemHtml(name, value);
+
+					let nameI18n = `exif.name.${name}`;
+					let valueI18n = "";
+
+					//處理value的值
+					if (name === "Metering Mode") {
+						value = M.i18n.t(`exif.value.${name}.${value}`);
+						valueI18n = `exif.value.${name}.${value}`;
+					}
+					if (name === "Flash") {
+						value = M.i18n.t(`exif.value.${name}.${value}`);
+						valueI18n = `exif.value.${name}.${value}`
+					}
+					if (name === "Length") {
+						value = Lib.getFileLength(Number(value));
+					}
+					name = M.i18n.t(`exif.name.${name}`);
+					html += getItemHtml(name, value, nameI18n, valueI18n);
 				}
 			}
 
@@ -250,7 +287,7 @@ class MainExif {
 		/** 
 		 * exif項目的html
 		 */
-		function getItemHtml(name: string, value: string) {
+		function getItemHtml(name: string, value: string, nameI18n = "", valueI18n = "") {
 
 			name = name.toString();
 			value = value.toString();
@@ -261,8 +298,8 @@ class MainExif {
 
 			let html = `
 				<div class="mainExifItem">
-					<div class="mainExifName">${name}</div>
-					<div class="mainExifValue">${value}</div>
+					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
+					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
 				</div>`
 			return html;
 		}
@@ -294,23 +331,9 @@ class MainExif {
 			return undefined;
 		}
 
-		/**
-		 * 處理value的值
-		 */
-		function valueToString(name: string, value: string) {
-			let lang = "zh";
-			if (name === "Metering Mode") {
-				return M.i18n.t(`exif.value.${name}.${value}`, lang);
-			}
-			if (name === "Flash") {
-				return M.i18n.t(`exif.value.${name}.${value}`, lang);
-			}
-			if (name === "Length") {
-				return Lib.getFileLength(Number(value));
-			}
-			return value;
-		}
+
 
 	}
 
 }
+

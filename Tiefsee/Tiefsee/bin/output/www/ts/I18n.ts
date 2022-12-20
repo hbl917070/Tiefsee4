@@ -1,13 +1,15 @@
 
 class I18n {
 
-    public getList;//取得 翻譯json
-    public setList;//設定 翻譯json
-    public pushList;//加入 翻譯json
+    public getData;//取得 翻譯json
+    public setData;//設定 翻譯json
+    public pushData;//加入 翻譯json
 
     public t;//取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+    public tSpan;//取得 <span i18n="key">翻譯</span> 
     public get;//取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
     public setAll;//翻譯整個html頁面。 type=語言(選填)
+    public initNone;//有翻譯的地方都顯示空白(用於翻譯前)
 
     public getDefaultLang;//取得預設語言
     public setDefaultLang;//設定預設語言
@@ -20,13 +22,15 @@ class I18n {
 
     constructor() {
 
-        this.getList = getList;//取得 翻譯json
-        this.setList = setList;//設定 翻譯json
-        this.pushList = pushList;//加入 翻譯json
+        this.getData = getData;//取得 翻譯json
+        this.setData = setData;//設定 翻譯json
+        this.pushData = pushData;//加入 翻譯json
 
         this.t = get;//取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+        this.tSpan = tSpan;
         this.get = get;//取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
         this.setAll = setAll;//翻譯整個html頁面。 type=語言(選填)
+        this.initNone = initNone;
 
         this.getDefaultLang = getDefaultLang;//取得預設語言
         this.setDefaultLang = setDefaultLang;//設定預設語言
@@ -36,7 +40,7 @@ class I18n {
         this.getEventRun = getEventRun;//取得 回調函數（翻譯時觸發
         this.setEventRun = setEventRun;//
 
-        var lang = "zh";//目前的語言
+        var lang = "";//目前的語言
         var defaultLang = "en";//預設語言
         var eventRun = (lang: string) => { };//回調函數，翻譯時觸發
 
@@ -95,21 +99,21 @@ class I18n {
         /**
          * 取得 翻譯json
          */
-        function getList() { return list; }
+        function getData() { return data; }
 
         /**
          * 設定 翻譯json
          * @param {object} json 
          */
-        function setList(json: any) { list = json }
+        function setData(json: any) { data = json }
 
         /**
          * 加入新的 翻譯json
          * @param {object} json 
          */
-        function pushList(json: any) {
-            mergeJSON(list, json);//合併json
-            list = json
+        function pushData(json: any) {
+            mergeJSON(data, json);//合併json
+            data = json
         }
 
         /**
@@ -159,7 +163,7 @@ class I18n {
             if (key === null) { return ""; }
 
             let arkey = key.split(".");
-            let d = list;
+            let d = data;
 
             for (let i = 0; i < arkey.length; i++) {
                 let k = arkey[i];
@@ -171,7 +175,6 @@ class I18n {
             //未填入語言的話，就是用預設語言
             if (type === undefined) { type = lang }
 
-
             if (d.hasOwnProperty(type) && d[type] !== null) {  //翻譯存在的話就回傳
                 return applyValue(d[type], value);
 
@@ -180,8 +183,25 @@ class I18n {
             }
 
             //什麼都找不到，回傳key
-            console.log(`i18n 找不到 "${key}"`);
+            if (key !== "") {
+                console.log(`i18n missing: "${key}"`);
+            }
             return arkey[arkey.length - 1];
+        }
+
+
+        /**
+         * 取得 <span i18n="key">翻譯</span> 
+         * @param {string} key 
+         * @param {object} value 參數json(選填)
+         * @param {string} type 語言(選填)
+         */
+        function tSpan(key: string | null, value?: any, type?: string) {
+            if (key == null) {
+                return `<span></span>`
+            }
+            let t = key.replace(/["]/g, `\\"`);
+            return `<span i18n="${t}">${get(key, value, type)}</span>`
         }
 
 
@@ -198,27 +218,60 @@ class I18n {
             for (let i = 0; i < ar_i18n.length; i++) {
                 const item = ar_i18n[i];
                 let key = item.getAttribute("i18n");
-                let t = get(key, {}, type);
-
-                if (item.getAttribute("placeholder") !== null) {//翻譯input裡面的初始提示文字
-
-                    item.setAttribute("placeholder", t);
-
-                } else if (item.tagName == "TD" && item.getAttribute("data-th") !== null) {//翻譯響應式table裡面的文字 data-th
-
-                    item.setAttribute("data-th", t);
-
+                let val = item.getAttribute("i18n-v");
+                let t = "";
+                if (val !== null) {
+                    t = get(key, JSON.parse(val), type);
                 } else {
-
-                    item.innerHTML = t;
-
+                    t = get(key, {}, type);
                 }
+
+                updateDom(item,t);
             }
 
             eventRun(type);//執行回調函數
 
         }
 
+
+        /**
+         * 有翻譯的地方都顯示空白(用於翻譯前)
+         */
+        function initNone() {
+            var ar_i18n = document.querySelectorAll("[i18n]");
+            for (let i = 0; i < ar_i18n.length; i++) {
+                const item = ar_i18n[i];
+                updateDom(item,"");
+            }
+        }
+
+
+        /**
+         * 對dom進行翻譯
+         */
+        function updateDom(dom:Element,t:string){
+            if (dom.getAttribute("i18n") === "") {//
+
+                return;
+
+            } else if (dom.getAttribute("placeholder") !== null) {//翻譯輸入框的提示文字
+
+                dom.setAttribute("placeholder", t);
+
+            } else if (dom.tagName == "TD" && dom.getAttribute("data-th") !== null) {//翻譯響應式table裡面的文字 data-th
+
+                dom.setAttribute("data-th", t);
+
+            } else if (dom.getAttribute("title") !== null) {
+
+                dom.setAttribute("title", t);
+
+            } else {
+
+                dom.innerHTML = t;
+
+            }
+        }
 
         /**
          * 合併json
@@ -253,7 +306,7 @@ class I18n {
 
 
 
-        var list: any = {
+        var data: any = {
 
             //單層範例
             /*"sss": {

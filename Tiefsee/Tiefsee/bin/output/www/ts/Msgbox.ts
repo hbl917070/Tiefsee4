@@ -3,24 +3,41 @@
  */
 class Msgbox {
 
-    private static _isShow = false;
+    private _isShow = false;
+    private i18n: I18n;
 
-    constructor() { }
+    constructor(_i18n: I18n | undefined) {
+
+        if (_i18n === undefined) {
+            this.i18n = new I18n();
+            this.i18n.pushData({
+                msg: {
+                    yes: { "en": "Yes", },
+                    no: { "en": "No", },
+                }
+            });
+        } else {
+
+            this.i18n = _i18n
+        }
+
+    }
 
 
     /**
      * 判斷目前是否有任何顯示中的訊息方塊
      */
-    public static isShow(): boolean {
+    public isShow(): boolean {
         return this._isShow;
     }
+
 
 
     /**
      * 顯示
      * @param json 
      */
-    public static show(json: {
+    public show(json: {
         txt?: string,
         type?: ("txt" | "text" | "radio"),
         inputTxt?: string,
@@ -78,8 +95,8 @@ class Msgbox {
                     ${htmlRadio}
                 
                     <div class="msgbox-bottom">
-                        <div class="msgbox-btn msgbox-btn__yes">確定</div>
-                        <div class="msgbox-btn msgbox-btn__no">取消</div>
+                        <div class="msgbox-btn msgbox-btn__yes" i18n="msg.yes">${this.i18n.t("msg.yes")}</div>
+                        <div class="msgbox-btn msgbox-btn__no" i18n="msg.no">${this.i18n.t("msg.no")}</div>
                     </div>
                 </div>
             </div>`)
@@ -147,7 +164,7 @@ class Msgbox {
      * 關閉特定的訊息方塊
      * @param dom 
      */
-    public static close(dom: HTMLElement) {
+    public close(dom: HTMLElement) {
         dom.parentNode?.removeChild(dom);//移除dom
 
         //判斷是否還有其他的 訊息方塊
@@ -166,7 +183,7 @@ class Msgbox {
     /**
      * 關閉全部
      */
-    public static closeAll() {
+    public closeAll() {
         let arMsgbox = document.querySelectorAll(".msgbox");
         for (let i = 0; i < arMsgbox.length; i++) {
             const dom = arMsgbox[i];
@@ -179,7 +196,7 @@ class Msgbox {
     /**
     * 當前的Msg 關閉
     */
-    public static closeNow() {
+    public closeNow() {
 
         let arMsgbox = document.querySelectorAll(".msgbox");
 

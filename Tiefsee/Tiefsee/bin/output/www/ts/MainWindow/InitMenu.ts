@@ -93,65 +93,65 @@ class InitMenu {
 
 
             //另開視窗
-            var dom_newWindow = document.getElementById("menuitem-newWindow");
+            var dom_newWindow = document.getElementById("menuitem-openNewWindow");
             if (dom_newWindow !== null) {
                 dom_newWindow.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.newWindow();
+                    M.script.open.openNewWindow();
                 }
             }
 
             //開啟檔案位置
-            var dom_ShowOnExplorer = document.getElementById("menuitem-showOnExplorer");
-            if (dom_ShowOnExplorer !== null) {
-                dom_ShowOnExplorer.onclick = async () => {
+            var dom_RevealInFileExplorer = document.getElementById("menuitem-RevealInFileExplorer");
+            if (dom_RevealInFileExplorer !== null) {
+                dom_RevealInFileExplorer.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.showOnExplorer();
+                    M.script.open.revealInFileExplorer();
                 }
             }
 
             //顯示檔案右鍵選單
-            var dom_ShowSystemMenu = document.getElementById("menuitem-showSystemMenu");
-            if (dom_ShowSystemMenu !== null) {
-                dom_ShowSystemMenu.onclick = async () => {
+            var dom_systemContextMenu = document.getElementById("menuitem-systemContextMenu");
+            if (dom_systemContextMenu !== null) {
+                dom_systemContextMenu.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.ShowContextMenu();
+                    M.script.open.systemContextMenu();
                 }
             }
 
             //重新命名檔案
-            var dom_ShowSystemMenu = document.getElementById("menuitem-renameFile");
-            if (dom_ShowSystemMenu !== null) {
-                dom_ShowSystemMenu.onclick = async () => {
+            var dom_renameFile = document.getElementById("menuitem-renameFile");
+            if (dom_renameFile !== null) {
+                dom_renameFile.onclick = async () => {
                     M.menu.close();//關閉menu
                     M.script.fileLoad.renameMsg();
                 }
             }
 
             //列印
-            var dom_PrintFile = document.getElementById("menuitem-printFile");
-            if (dom_PrintFile !== null) {
-                dom_PrintFile.onclick = async () => {
+            var dom_print = document.getElementById("menuitem-print");
+            if (dom_print !== null) {
+                dom_print.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.PrintFile();
+                    M.script.open.print();
                 }
             }
 
             //設成桌布
-            var dom_SetWallpaper = document.getElementById("menuitem-setWallpaper");
-            if (dom_SetWallpaper !== null) {
-                dom_SetWallpaper.onclick = async () => {
+            var dom_setAsDesktop = document.getElementById("menuitem-setAsDesktop");
+            if (dom_setAsDesktop !== null) {
+                dom_setAsDesktop.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.SetWallpaper();
+                    M.script.open.setAsDesktop();
                 }
             }
 
             //選擇其他應用程式
-            var dom_RunApp = document.getElementById("menuitem-runApp");
-            if (dom_RunApp !== null) {
-                dom_RunApp.onclick = async () => {
+            var dom_openWith = document.getElementById("menuitem-openWith");
+            if (dom_openWith !== null) {
+                dom_openWith.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.open.RunApp();
+                    M.script.open.openWith();
                 }
             }
 
@@ -216,7 +216,7 @@ class InitMenu {
                             <div class="menu-hor-icon">
                                 <img src="${imgBase64}">
                             </div>
-                            <div class="menu-hor-txt" i18n="">${name}</div>
+                            <div class="menu-hor-txt">${name}</div>
                         </div>
                     `);
 
@@ -370,12 +370,12 @@ class InitMenu {
             });
             dom.querySelector(".js-sort")?.addEventListener("click", () => {
                 M.script.menu.close();
-                M.script.menu.showSort();
+                M.script.menu.showMenuSort();
             });
 
             dom.querySelector(".js-rotate")?.addEventListener("click", () => {
                 M.script.menu.close();
-                M.script.menu.showRotate();
+                M.script.menu.showMenuRotation();
             });
             dom.querySelector(".js-zoomIn")?.addEventListener("click", () => {
                 M.script.img.zoomIn();
@@ -384,15 +384,15 @@ class InitMenu {
                 M.script.img.zoomOut();
             });
             dom.querySelector(".js-full")?.addEventListener("click", () => {
-                M.script.img.zoomFull();
+                M.script.img.zoomToFit();
             });
             dom.querySelector(".js-zoomRatio")?.addEventListener("click", () => {
-                M.script.img.zoom100();
+                M.script.img.zoomTo100();
             });
 
             dom.querySelector(".js-open")?.addEventListener("click", () => {//在檔案總管中顯示
                 M.script.menu.close();
-                M.script.open.showOnExplorer();
+                M.script.open.revealInFileExplorer();
             });
             dom.querySelector(".js-rightMenu")?.addEventListener("click", () => {//檔案右鍵選單
                 M.script.menu.close();

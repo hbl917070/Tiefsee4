@@ -95,10 +95,10 @@ class MainTools {
          */
         function initToolsImg() {
 
-            //上一張
+            //上一個檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "上一張",
+                i18n: "menu.prevFile",
                 group: GroupType.img,
                 name: "prevFile",
                 icon: "tool-prev.svg",
@@ -109,10 +109,10 @@ class MainTools {
                 },
             })
 
-            //下一張
+            //下一個檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "下一張",
+                i18n: "menu.nextFile",
                 group: GroupType.img,
                 name: "nextFile",
                 icon: "tool-next.svg",
@@ -124,16 +124,16 @@ class MainTools {
             })
 
 
-            // 開啟檔案
+            // 檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "開啟檔案",
+                i18n: "menu.showMenuFile",
                 group: GroupType.img,
-                name: "showOpen",
+                name: "showMenuFile",
                 icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showOpen(btn);
+                        M?.script.menu.showMenuFile(btn);
                     });
                 },
             })
@@ -141,7 +141,7 @@ class MainTools {
             //上一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "上一個資料夾",
+                i18n: "menu.prevDir",
                 group: GroupType.img,
                 name: "prevDir",
                 icon: "tool-prevDir.svg",
@@ -155,7 +155,7 @@ class MainTools {
             //下一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "下一個資料夾",
+                i18n: "menu.nextDir",
                 group: GroupType.img,
                 name: "nextDir",
                 icon: "tool-nextDir.svg",
@@ -169,13 +169,13 @@ class MainTools {
             //排序
             ar.push({
                 type: "button", html: "",
-                i18n: "排序",
+                i18n: "menu.showMenuSort",
                 group: GroupType.img,
-                name: "showSort",
+                name: "showMenuSort",
                 icon: "tool-sort.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showSort(btn);
+                        M?.script.menu.showMenuSort(btn);
                     });
                 },
             })
@@ -183,13 +183,13 @@ class MainTools {
             //複製
             ar.push({
                 type: "button", html: "",
-                i18n: "複製",
+                i18n: "menu.showMenuCopy",
                 group: GroupType.img,
-                name: "showCopy",
+                name: "showMenuCopy",
                 icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showCopy(btn);
+                        M?.script.menu.showMenuCopy(btn);
                     });
                 },
             })
@@ -197,7 +197,7 @@ class MainTools {
             //快速拖曳
             ar.push({
                 type: "button", html: "",
-                i18n: "快速拖曳",
+                i18n: "menu.dragDropFile",
                 group: GroupType.img,
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
@@ -219,7 +219,7 @@ class MainTools {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "刪除",
+                i18n: "menu.showDeleteMsg",
                 group: GroupType.img,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -233,13 +233,13 @@ class MainTools {
             //搜圖
             ar.push({
                 type: "button", html: "",
-                i18n: "搜圖",
+                i18n: "menu.showMenuImageSearch",
                 group: GroupType.img,
-                name: "searchImage",
+                name: "showMenuImageSearch",
                 icon: "tool-search.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showImgSearch(btn);
+                        M?.script.menu.showMenuImageSearch(btn);
                     });
                 },
             })
@@ -247,10 +247,10 @@ class MainTools {
             //大量瀏覽模式
             /*ar.push({
                 type: "button", html: "",
-                i18n: "大量瀏覽模式",
+                i18n: "menu.bulkView",
                 group: GroupType.img,
-                name: "allBrowse",
-                icon: "tool-allBrowse.svg",
+                name: "bulkView",
+                icon: "tool-bulkView.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
 
@@ -261,7 +261,7 @@ class MainTools {
             //設定
             ar.push({
                 type: "button", html: "",
-                i18n: "設定",
+                i18n: "menu.showSetting",
                 group: GroupType.img,
                 name: "showSetting",
                 icon: "tool-setting.svg",
@@ -275,27 +275,27 @@ class MainTools {
             //旋轉與鏡像
             ar.push({
                 type: "button", html: "",
-                i18n: "旋轉與鏡像",
+                i18n: "menu.showMenuRotation",
                 group: GroupType.img,
-                name: "showRotate",
+                name: "showMenuRotation",
                 icon: "tool-rotate.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showRotate(btn);
+                        M?.script.menu.showMenuRotation(btn);
                     });
                 },
             })
 
-            //全滿
+            //縮放至適合視窗
             ar.push({
                 type: "button", html: "",
-                i18n: "全滿",
+                i18n: "menu.zoomToFit",
                 group: GroupType.img,
-                name: "zoomFull",
+                name: "zoomToFit",
                 icon: "tool-full.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.img.zoomFull();
+                        M?.script.img.zoomToFit();
                     });
                 },
             })
@@ -310,13 +310,13 @@ class MainTools {
                         <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
-                i18n: "縮放比例",
+                i18n: "menu.infoZoomRatio",
                 group: GroupType.img,
-                name: "zoomTxt",
+                name: "infoZoomRatio",
                 icon: "",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.img.zoom100();
+                        M?.script.img.zoomTo100();
                     });
                 },
             })
@@ -329,7 +329,7 @@ class MainTools {
                         <!-- 100<br>200 -->
                     </div>
                 `,
-                i18n: "圖片長寬",
+                i18n: "menu.infoSize",
                 group: GroupType.img,
                 name: "infoSize",
                 icon: "",
@@ -344,7 +344,7 @@ class MainTools {
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
-                i18n: "檔案類型、檔案大小",
+                i18n: "menu.infoType",
                 group: GroupType.img,
                 name: "infoType",
                 icon: "",
@@ -359,7 +359,7 @@ class MainTools {
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
-                i18n: "檔案修改時間",
+                i18n: "menu.infoWriteTime",
                 group: GroupType.img,
                 name: "infoWriteTime",
                 icon: "",
@@ -378,7 +378,7 @@ class MainTools {
             //上一張
             ar.push({
                 type: "button", html: "",
-                i18n: "上一張",
+                i18n: "menu.prevFile",
                 group: GroupType.pdf,
                 name: "prevFile",
                 icon: "tool-prev.svg",
@@ -392,7 +392,7 @@ class MainTools {
             //下一張
             ar.push({
                 type: "button", html: "",
-                i18n: "下一張",
+                i18n: "menu.nextFile",
                 group: GroupType.pdf,
                 name: "nextFile",
                 icon: "tool-next.svg",
@@ -406,13 +406,13 @@ class MainTools {
             // 開啟檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "開啟檔案",
+                i18n: "menu.showMenuFile",
                 group: GroupType.pdf,
-                name: "showOpen",
+                name: "showMenuFile",
                 icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showOpen(btn);
+                        M?.script.menu.showMenuFile(btn);
                     });
                 },
             })
@@ -420,7 +420,7 @@ class MainTools {
             //上一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "上一個資料夾",
+                i18n: "menu.prevDir",
                 group: GroupType.pdf,
                 name: "prevDir",
                 icon: "tool-prevDir.svg",
@@ -434,7 +434,7 @@ class MainTools {
             //下一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "下一個資料夾",
+                i18n: "menu.nextDir",
                 group: GroupType.pdf,
                 name: "nextDir",
                 icon: "tool-nextDir.svg",
@@ -448,13 +448,13 @@ class MainTools {
             //排序
             ar.push({
                 type: "button", html: "",
-                i18n: "排序",
+                i18n: "menu.showMenuSort",
                 group: GroupType.pdf,
-                name: "showSort",
+                name: "showMenuSort",
                 icon: "tool-sort.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showSort(btn);
+                        M?.script.menu.showMenuSort(btn);
                     });
                 },
             })
@@ -462,13 +462,13 @@ class MainTools {
             //複製
             ar.push({
                 type: "button", html: "",
-                i18n: "複製",
+                i18n: "menu.showMenuCopy",
                 group: GroupType.pdf,
-                name: "showCopy",
+                name: "showMenuCopy",
                 icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showCopy(btn);
+                        M?.script.menu.showMenuCopy(btn);
                     });
                 },
             })
@@ -476,7 +476,7 @@ class MainTools {
             //快速拖曳
             ar.push({
                 type: "button", html: "",
-                i18n: "快速拖曳",
+                i18n: "menu.dragDropFile",
                 group: GroupType.pdf,
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
@@ -498,7 +498,7 @@ class MainTools {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "刪除",
+                i18n: "menu.showDeleteMsg",
                 group: GroupType.pdf,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -512,7 +512,7 @@ class MainTools {
             //設定
             ar.push({
                 type: "button", html: "",
-                i18n: "設定",
+                i18n: "menu.showSetting",
                 group: GroupType.pdf,
                 name: "showSetting",
                 icon: "tool-setting.svg",
@@ -534,7 +534,7 @@ class MainTools {
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
-                i18n: "檔案類型、檔案大小",
+                i18n: "menu.infoType",
                 group: GroupType.pdf,
                 name: "infoType",
                 icon: "",
@@ -549,7 +549,7 @@ class MainTools {
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
-                i18n: "檔案修改時間",
+                i18n: "menu.infoWriteTime",
                 group: GroupType.pdf,
                 name: "infoWriteTime",
                 icon: "",
@@ -561,14 +561,14 @@ class MainTools {
 
 
         /**
-        * 初始化 工具列 txt
+        * 初始化 工具列 txt "tools.
         */
         function initToolsTxt() {
 
-            //上一張
+            //上一個檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "上一張",
+                i18n: "menu.prevFile",
                 group: GroupType.txt,
                 name: "prevFile",
                 icon: "tool-prev.svg",
@@ -579,10 +579,10 @@ class MainTools {
                 },
             })
 
-            //下一張
+            //下一個檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "下一張",
+                i18n: "menu.nextFile",
                 group: GroupType.txt,
                 name: "nextFile",
                 icon: "tool-next.svg",
@@ -594,16 +594,16 @@ class MainTools {
             })
 
 
-            // 開啟檔案
+            // 檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "開啟檔案",
+                i18n: "menu.showMenuFile",
                 group: GroupType.txt,
-                name: "showOpen",
+                name: "showMenuFile",
                 icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showOpen(btn);
+                        M?.script.menu.showMenuFile(btn);
                     });
                 },
             })
@@ -611,7 +611,7 @@ class MainTools {
             // 儲存檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "儲存檔案",
+                i18n: "menu.showSave",
                 group: GroupType.txt,
                 name: "showSave",
                 icon: "tool-save.svg",
@@ -625,7 +625,7 @@ class MainTools {
             //上一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "上一個資料夾",
+                i18n: "menu.prevDir",
                 group: GroupType.txt,
                 name: "prevDir",
                 icon: "tool-prevDir.svg",
@@ -639,7 +639,7 @@ class MainTools {
             //下一個資料夾
             ar.push({
                 type: "button", html: "",
-                i18n: "下一個資料夾",
+                i18n: "menu.nextDir",
                 group: GroupType.txt,
                 name: "nextDir",
                 icon: "tool-nextDir.svg",
@@ -653,13 +653,13 @@ class MainTools {
             //排序
             ar.push({
                 type: "button", html: "",
-                i18n: "排序",
+                i18n: "menu.showMenuSort",
                 group: GroupType.txt,
-                name: "showSort",
+                name: "showMenuSort",
                 icon: "tool-sort.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showSort(btn);
+                        M?.script.menu.showMenuSort(btn);
                     });
                 },
             })
@@ -667,13 +667,13 @@ class MainTools {
             //複製
             ar.push({
                 type: "button", html: "",
-                i18n: "複製",
+                i18n: "menu.showMenuCopy",
                 group: GroupType.txt,
-                name: "showCopy",
+                name: "showMenuCopy",
                 icon: "tool-copy.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showCopy(btn);
+                        M?.script.menu.showMenuCopy(btn);
                     });
                 },
             })
@@ -681,7 +681,7 @@ class MainTools {
             //快速拖曳
             ar.push({
                 type: "button", html: "",
-                i18n: "快速拖曳",
+                i18n: "menu.dragDropFile",
                 group: GroupType.txt,
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
@@ -703,7 +703,7 @@ class MainTools {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "刪除",
+                i18n: "menu.showDeleteMsg",
                 group: GroupType.txt,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -717,7 +717,7 @@ class MainTools {
             //設定
             ar.push({
                 type: "button", html: "",
-                i18n: "設定",
+                i18n: "menu.showSetting",
                 group: GroupType.txt,
                 name: "showSetting",
                 icon: "tool-setting.svg",
@@ -739,7 +739,7 @@ class MainTools {
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
-                i18n: "檔案類型、檔案大小",
+                i18n: "menu.infoType",
                 group: GroupType.txt,
                 name: "infoType",
                 icon: "",
@@ -754,7 +754,7 @@ class MainTools {
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
-                i18n: "檔案修改時間",
+                i18n: "menu.infoWriteTime",
                 group: GroupType.txt,
                 name: "infoWriteTime",
                 icon: "",
@@ -769,10 +769,10 @@ class MainTools {
         */
         function initToolsWelcome() {
 
-            // 開啟檔案
+            // 載入檔案
             ar.push({
                 type: "button", html: "",
-                i18n: "開啟檔案",
+                i18n: "menu.openFile",
                 group: GroupType.welcome,
                 name: "openFile",
                 icon: "tool-open.svg",
@@ -786,7 +786,7 @@ class MainTools {
             //設定
             ar.push({
                 type: "button", html: "",
-                i18n: "設定",
+                i18n: "menu.showSetting",
                 group: GroupType.welcome,
                 name: "showSetting",
                 icon: "tool-setting.svg",
@@ -813,6 +813,7 @@ class MainTools {
         }) {
             let div = newDiv(item.html);
             div.setAttribute("title", item.i18n);
+            div.setAttribute("i18n", item.i18n);
             div.style.order = "999";
             addToolsDom({
                 group: item.group,
@@ -851,7 +852,7 @@ class MainTools {
 
             //產生按鈕
             let div = newDiv(`
-                <div class="main-tools-btn js-noDrag" data-name="${item.name}" title="${item.i18n}">
+                <div class="main-tools-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
             div.style.order = "888";//未定義順序的按鈕就放在最後面
