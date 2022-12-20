@@ -211,7 +211,7 @@ class Msgbox {
     /**
      * 當前的Msg 按下
      */
-    public static clickYes() {
+    public clickYes() {
 
         let arMsgbox = document.querySelectorAll(".msgbox");
 
@@ -220,6 +220,6 @@ class Msgbox {
         const dom = arMsgbox[arMsgbox.length - 1];
         const btnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;
         btnYes.click();
-
     }
+
 }

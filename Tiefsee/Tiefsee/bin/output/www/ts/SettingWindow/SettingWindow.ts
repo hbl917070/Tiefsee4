@@ -481,7 +481,7 @@ class Setting {
             let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
             text_extension.value = s_extension.join("\n");//預設顯示的文字
 
-            btn_extension.addEventListener("mousedown", async (e) => {
+            btn_extension.addEventListener("click", async (e) => {
 
                 let ar_extension = text_extension.value.split("\n");
                 let ar: string[] = [];
@@ -501,7 +501,6 @@ class Setting {
 
                         let appPath = await WV_Window.GetAppPath();
                         await WV_System.SetAssociationExtension(ar, appPath);
-                        //Msgbox.close(msgboxLoading);
                         msgbox.show({ txt: i18n.t("msg.done"), }); //處理完成
                     }
                 });
@@ -575,17 +574,30 @@ class Setting {
             });
         })
 
-        // 視窗 aero毛玻璃
+        // 視窗效果 (aero毛玻璃)
         addLoadEvent(() => {
+
+
             var switch_areo = document.querySelector("#select-aeroType") as HTMLSelectElement;
             switch_areo.value = config.settings["theme"]["aeroType"];
+
 
             switch_areo.addEventListener("change", () => {
                 let val = switch_areo.value;
                 config.settings["theme"]["aeroType"] = val;
             });
-        })
 
+            //調整選項後，顯示「重新啟動」的按鈕
+            var btn_restart = document.querySelector("#btn-windowAero-restart") as HTMLButtonElement;
+            btn_restart.style.display = "none";
+            switch_areo.addEventListener("change", () => {
+                btn_restart.style.display = "";
+            });
+            btn_restart.addEventListener("click", () => {
+                restartTiefsee();
+            });
+        })
+      
         //檔案預覽視窗
         addLoadEvent(() => {
             var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
@@ -790,10 +802,17 @@ class Setting {
 
             var text_startPort = document.querySelector("#text-startPort") as HTMLInputElement;
             var text_serverCache = document.querySelector("#text-serverCache") as HTMLInputElement;
+            var btn_restart = document.querySelector("#btn-startupMode-restart") as HTMLButtonElement;
 
             setRadio("[name='radio-startType']", appInfo.startType.toString())
             text_startPort.value = appInfo.startPort.toString();
             text_serverCache.value = appInfo.serverCache.toString();
+
+            //調整選項後，顯示「重新啟動」的按鈕
+            btn_restart.style.display = "none";
+            $("[name='radio-startType']").on("change", () => {
+                btn_restart.style.display = "";
+            });
 
             //關閉視窗前觸發
             baseWindow.closingEvents.push(async () => {
@@ -814,7 +833,14 @@ class Setting {
                 if (serverCache < 0) { serverCache = 0; }
 
                 await WV_Window.SetStartIni(startPort, startType, serverCache);
+
             });
+
+            //重新啟動Tiefsee
+            btn_restart.addEventListener("click", async () => {
+                restartTiefsee();
+            })
+
         })
 
         //開機後自動啟動
@@ -854,7 +880,6 @@ class Setting {
 
         //擴充套件 
         addLoadEvent(() => {
-
 
             function getHtml(val: boolean) {
                 if (val) {
@@ -904,6 +929,12 @@ class Setting {
                 }
                 WV_RunApp.OpenUrl(path);
             });
+
+            //重新啟動
+            let btn_restart = document.querySelector("#btn-plugin-restart") as HTMLButtonElement;
+            btn_restart.addEventListener("click", () => {
+                restartTiefsee();
+            });
         })
 
         //快速預覽
@@ -939,6 +970,7 @@ class Setting {
                 appleSettingOfMain();
             });
         })
+
         /** 
          * dom 交換順序
          */
@@ -977,6 +1009,27 @@ class Setting {
             path = Lib.Combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
         }
+
+
+        /**
+         * 重新啟動 Tiefsee
+         */
+        async function restartTiefsee() {
+
+            //儲存ini、Setting.json
+            let arFunc = baseWindow.closingEvents;
+            for (let i = 0; i < arFunc.length; i++) {
+                await arFunc[i]();
+            }
+
+            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`);
+            if (imgPath === "null") { imgPath = "" }
+            let exePath = await WV_Window.GetAppPath();
+            WV_RunApp.ProcessStart(exePath, imgPath, true, false);
+            WV_Window.CloseAllWindow();
+
+        }
+
 
     }
 }

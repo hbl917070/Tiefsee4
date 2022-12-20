@@ -20,6 +20,7 @@ namespace Tiefsee {
             runNumber += 1;
         }
 
+
         /// <summary>
         /// 關閉視窗時呼叫
         /// </summary>
@@ -112,6 +113,15 @@ namespace Tiefsee {
             }//foreach
 
             return false;
+        }
+
+
+        /// <summary>
+        /// 關閉全部的視窗(結束程式)
+        /// </summary>
+        public static void CloseAllWindow() {
+            runNumber = 0;
+            WindowFreed();
         }
 
 

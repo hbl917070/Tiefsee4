@@ -28,7 +28,7 @@ class Hotkey {
                     e.preventDefault();
                 }
                 if (e.code == "Enter" || e.code == "NumpadEnter") {
-                    Msgbox.clickYes();
+                    M.msgbox.clickYes();
                     e.preventDefault();
                 }
                 return;

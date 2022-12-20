@@ -207,7 +207,7 @@
                     <div class="box">
                         <div class="box-title" i18n="sw.startupMode.title"> 啟動模式 </div>
 
-                        <div class="text-title">(修改後需重啟程式) </div>
+                        <!-- <div class="text-title">(修改後需重啟程式) </div> -->
 
                         <div class="radioList-v">
                             <label>
@@ -257,6 +257,9 @@
                             </label>
                         </div>
 
+                        <div class="text-content">
+                            <div class="btn" id="btn-startupMode-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                        </div>
                     </div>
 
 
@@ -407,7 +410,9 @@
                                 <option value="win10" i18n="sw.windowSetting.aeroWin10">win10 樣式</option>
                             </select>
                         </div>
-
+                        <div class="text-content">
+                            <div class="btn" id="btn-windowAero-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                        </div>
 
                     </div>
 
@@ -741,7 +746,7 @@
                     <div class="page-title" i18n="sw.tabs.plugin"> 擴充套件 </div>
 
                     <div class="box">
-                        <div class="box-title" i18n="sw.plugin."> 擴充套件清單 </div>
+                        <div class="box-title" i18n="sw.plugin.pluginList"> 擴充套件清單 </div>
 
                         <div class="pluginLiet">
                             <div class="pluginLiet-item">
@@ -808,6 +813,9 @@
                         <div class="text-title" i18n="sw.plugin.step3">
                             3、重新啟動Tiefsee
                         </div>
+                        <div class="text-content">
+                            <div class="btn" id="btn-plugin-restart" i18n="sw.plugin.restartTiefsee"> 重新啟動 Tiefsee</div>
+                        </div>
                         <div style="height:20px"></div>
 
                         <div class="text-title" i18n="sw.plugin.example"> (示意圖) </div>
@@ -831,7 +839,7 @@
                         <!-- 未安裝QuickLook才會顯示此訊息 -->
                         <div id="quickLook-noInstalled" style="display:none">
                             <div class="text-title">
-                                <span class="color-warning" i18n="sw.quickLook.">
+                                <span class="color-warning" i18n="sw.quickLook.notInstalledQuickLook">
                                     必須安裝擴充套件「QuickLook」才能使用此功能
                                 </span>
                             </div>

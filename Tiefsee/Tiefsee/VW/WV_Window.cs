@@ -75,6 +75,12 @@ namespace Tiefsee {
             return w;
         }
 
+        /// <summary>
+        /// 關閉全部的視窗(結束程式)
+        /// </summary>
+        public void CloseAllWindow() {
+            QuickRun.CloseAllWindow();
+        }
 
         /// <summary>
         /// 網頁載入完成後，呼叫此函數才會顯示視窗

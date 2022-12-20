@@ -3,10 +3,10 @@ var langData = {
     //setting window
     sw: {
 
-        restart: {
-            "zh-TW": "重新啟動 Tiefsee",
-            "en": "Restart Tiefsee",
-            "ja": "リスタート Tiefsee",
+        reloadRequired: {
+            "zh-TW": "需要重新載入",
+            "en": "Reload Required",
+            "ja": "再読み込みが必要です",
         },
 
         //#region tabs
@@ -819,6 +819,11 @@ var langData = {
 
         //#region 擴充套件
         plugin: {
+            pluginList: {
+                "zh-TW": "擴充套件清單",
+                "en": "Plugin List",
+                "ja": "プラグイン一覧",
+            },
             quickLook: {
                 "zh-TW": "在桌面或資料夾選中任一檔案，然後長按空白鍵，即可預覽檔案",
                 "en": "Select a file on the desktop or in a folder and then press and hold the spacebar to preview the file",
@@ -865,9 +870,14 @@ var langData = {
                 "ja": "「Plugin」フォルダを開く",
             },
             step3: {
-                "zh-TW": "3、重新啟動Tiefsee",
+                "zh-TW": "3、重新啟動 Tiefsee",
                 "en": "3. Restart Tiefsee",
                 "ja": "3. Tiefseeを再起動する",
+            },
+            restartTiefsee: {
+                "zh-TW": "重新啟動 Tiefsee",
+                "en": "Restart Tiefsee",
+                "ja": "Tiefseeを再起動する",
             },
             example: {
                 "zh-TW": "(示意圖)",
@@ -1283,9 +1293,15 @@ var langData = {
         },
 
         imageNotFound: {
-            "zh-TW": "未找到圖片",
+            "zh-TW": "未檢測到圖片",
             "en": "Image not found",
-            "ja": "画像が見つかりません",
+            "ja": "画像が検出されない",
+        },
+
+        notFound: {
+            "zh-TW": "未找到",
+            "en": "Not found",
+            "ja": "検出されない",
         },
 
 
@@ -1719,5 +1735,6 @@ var langData = {
         },
 
     },
+
 }
 

@@ -53,7 +53,7 @@ class Iframes {
                 if (await WV_File.Exists(filePath)) {
                     WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
                 } else {
-                    Msgbox.show({ txt: "找不到<br>" + filePath });
+                    M.msgbox.show({ txt: M.i18n.t("msg.notFound") + "<br>" + filePath });
                 }
             }
             if (type === "loadDropFile") {
@@ -652,7 +652,7 @@ class Pdfview {
          * 載入檔案
          */
         async function loadFile(fileInfo2: FileInfo2) {
-            let _url =WebAPI.getPdf(fileInfo2);
+            let _url = WebAPI.getPdf(fileInfo2);
             dom_iframe.setAttribute("src", _url);
         }
 

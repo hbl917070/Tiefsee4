@@ -54,17 +54,24 @@ namespace Tiefsee {
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
             bool argsIsNone = (args.Length == 1 && args[0] == "none");//啟動參數是 none
+       
+            if (args.Length >= 1 && args[0] == "restart") {//啟動參數是 restart
 
-            // 啟動模式不是常駐背景，就直接離開
-            if (argsIsNone) {
-                if (startType == 3 || startType == 5) {
-                } else {
-                    return;
+                args = args.Skip(1).ToArray();//刪除陣列的第一筆
+
+            } else {
+
+                // 啟動模式不是常駐背景，就直接離開
+                if (argsIsNone) {
+                    if (startType == 3 || startType == 5) {
+                    } else {
+                        return;
+                    }
                 }
-            }
 
-            //如果允許快速啟動，就不開啟新個體
-            if (QuickRun.Check(args)) { return; }
+                //如果允許快速啟動，就不開啟新個體
+                if (QuickRun.Check(args)) { return; }
+            }
 
             //「直接啟動」之外的，都要避免連續啟動
             if (startType != 1) {

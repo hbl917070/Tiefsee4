@@ -66,6 +66,9 @@ interface WV_Window {
      */
     NewWindow(url: string, args: string[]): WebWindow;
 
+    /** 關閉全部的視窗(結束程式) */
+    CloseAllWindow();
+
     /** 傳入 webWindow，將其設為目前視窗的子視窗*/
     SetOwner(webwindow: WebWindow);
 
@@ -450,7 +453,6 @@ interface WV_RunApp {
 
     /** 以3D小畫家開啟 */
     Open3DMSPaint(path: string): void;
-
 
     /**
      * 執行其他程式
