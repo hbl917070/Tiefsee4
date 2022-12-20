@@ -255,8 +255,9 @@ namespace Tiefsee {
         /// </summary>
         public static String FileToHash(String path) {
             var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-            long fileSize = new FileInfo(path).Length;
-            String s = Convert.ToBase64String(sha1.ComputeHash(Encoding.Default.GetBytes(fileSize + path)));
+            long fileSize = new FileInfo(path).Length;//檔案大小
+            long ticks = new FileInfo(path).LastWriteTime.Ticks;//檔案最後修改時間
+            String s = Convert.ToBase64String(sha1.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
             return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
         }
 
