@@ -172,8 +172,12 @@ class WebAPI {
      */
     static async sort2(ar: string[], type: string) {
 
+        if (ar.length === 0) { return [] }
+
         //取得共同的開頭(通常是資料夾路徑)
         let dirPath = Lib.GetDirectoryName(ar[0]) as string;
+        if (dirPath === null) { return [] }
+
         for (let i = 0; i < ar.length; i++) {
             const path = ar[i];
             if (path.indexOf(dirPath) !== 0) {
