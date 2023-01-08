@@ -462,14 +462,16 @@ namespace Tiefsee {
                 if (autoOrientation) {
                     var bmData = (BitmapMetadata)img.Metadata;
                     if (bmData != null) {
-                        object val = bmData.GetQuery("/app1/ifd/exif:{uint=274}");//取得exif裡面的旋轉
-                        if (val != null) {
-                            string orientation = val.ToString();
-                            if (orientation == "5" || orientation == "6" || orientation == "7" || orientation == "8") {//1=0  8=90  3=180  6=270
-                                w = img.PixelHeight;
-                                h = img.PixelWidth;
+                        try {
+                            object val = bmData.GetQuery("/app1/ifd/exif:{uint=274}");//取得exif裡面的旋轉
+                            if (val != null) {
+                                string orientation = val.ToString();
+                                if (orientation == "5" || orientation == "6" || orientation == "7" || orientation == "8") {//1=0  8=90  3=180  6=270
+                                    w = img.PixelHeight;
+                                    h = img.PixelWidth;
+                                }
                             }
-                        }
+                        } catch { }
                     }
                 }
 
