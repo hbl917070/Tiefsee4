@@ -650,6 +650,22 @@ class FileLoad {
                     }
                 }
             }
+
+            //如果是「office文件臨時檔」，就從名單內排除
+            if (groupType === GroupType.pdf) {
+                let arOfficeExt = [".doc", ".docx", ".ppt", ".pptx"]
+                for (let i = ar.length - 1; i >= 0; i--) {
+                    let path = ar[i];
+                    let fileExt = (Lib.GetExtension(path)).toLocaleLowerCase();
+                    let fileName = Lib.GetFileName(path);
+                    if (arOfficeExt.indexOf(fileExt) !== -1) {
+                        if (fileName.substring(0, 2) === "~$") {
+                            ar.splice(i, 1);
+                        }
+                    }
+                }
+            }
+
             return ar;
         }
 
