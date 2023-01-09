@@ -19,7 +19,7 @@ class Setting {
 
         var appInfo: AppInfo;
         var config = new Config(baseWindow);
-        var mainTools = new MainTools(null);//取得工具列
+        var mainToolbar = new MainToolbar(null);//取得工具列
         var i18n = new I18n();
         i18n.initNone(); //有翻譯的地方都顯示空白(用於翻譯前)
         i18n.pushData(langData);
@@ -160,13 +160,12 @@ class Setting {
             tabs.add(getDom("tabsBtn-general"), getDom("tabsPage-general"), () => { goTop() });//一般
             tabs.add(getDom("tabsBtn-appearance"), getDom("tabsPage-appearance"), () => { goTop() });//外觀
             tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() });//版面
-            tabs.add(getDom("tabsBtn-tools"), getDom("tabsPage-tools"), () => { goTop() });//工具列
+            tabs.add(getDom("tabsBtn-toolbar"), getDom("tabsPage-toolbar"), () => { goTop() });//工具列
             //tabs.add(getDom("tabsBtn-image"), getDom("tabsPage-image"), () => { goTop() });
             //tabs.add(getDom("tabsBtn-shortcutKeys"),getDom("tabsPage-hotkey"), () => { goTop() });/快速鍵
             tabs.add(getDom("tabsBtn-extension"), getDom("tabsPage-extension"), () => { goTop() });//設為預設程式
             tabs.add(getDom("tabsBtn-advanced"), getDom("tabsPage-advanced"), () => { goTop() });//進階設定
             tabs.add(getDom("tabsBtn-about"), getDom("tabsPage-about"), () => { goTop() });//關於
-
             tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() });//擴充套件
             tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() });//快速預覽
 
@@ -176,68 +175,68 @@ class Setting {
         //自訂工具列
         addLoadEvent(() => {
 
-            var mainToolsArray = mainTools.getArrray();
+            var mainToolbarArray = mainToolbar.getArrray();
 
             const arGroupName = ["img", "pdf", "txt"];
             arGroupName.map((gn) => {
 
                 let groupName = gn as ("img" | "pdf" | "txt");
-                var dom_toolsList = document.querySelector(`#toolsList-${groupName}`) as HTMLElement;
+                var dom_toolbarList = document.querySelector(`#toolbarList-${groupName}`) as HTMLElement;
 
                 //產生html
                 var html = "";
-                for (let i = 0; i < mainToolsArray.length; i++) {
-                    const item = mainToolsArray[i];
+                for (let i = 0; i < mainToolbarArray.length; i++) {
+                    const item = mainToolbarArray[i];
 
                     if (item.type !== "button") { continue; }
                     let h = `
-                        <div class="toolsList-item" data-name="${item.name}">
-                            <input class="toolsList-checkbox" type="checkbox" data-name="${item.name}" checked>
+                        <div class="toolbarList-item" data-name="${item.name}">
+                            <input class="toolbarList-checkbox" type="checkbox" data-name="${item.name}" checked>
                             ${SvgList[item.icon]}
                             ${i18n.tSpan(item.i18n)}
                         </div>`
                     if (item.group == groupName) { html += h; }
                 }
-                dom_toolsList.innerHTML = html;
+                dom_toolbarList.innerHTML = html;
 
                 //初始化 排序
-                let arMainTools = config.settings.mainTools[groupName];
-                for (let i = 0; i < arMainTools.length; i++) {
-                    let item = arMainTools[i];
-                    let ardomToolsList = dom_toolsList.querySelectorAll(".toolsList-item");
-                    let d1 = ardomToolsList[i];
-                    let d2 = dom_toolsList.querySelector(`[data-name=${item.n}]`);
+                let arMainToolbar = config.settings.mainToolbar[groupName];
+                for (let i = 0; i < arMainToolbar.length; i++) {
+                    let item = arMainToolbar[i];
+                    let ardomToolbarList = dom_toolbarList.querySelectorAll(".toolbarList-item");
+                    let d1 = ardomToolbarList[i];
+                    let d2 = dom_toolbarList.querySelector(`[data-name=${item.n}]`);
                     if (d1 == undefined) { break; }
                     if (d2 === null) { continue; }
                     swapDom(d1, d2); //dom 交換順序
                 }
 
                 //初始化 checkbox狀態
-                for (let i = 0; i < arMainTools.length; i++) {
-                    let item = arMainTools[i];
-                    let d2 = dom_toolsList.querySelector(`[data-name=${item.n}]`);
+                for (let i = 0; i < arMainToolbar.length; i++) {
+                    let item = arMainToolbar[i];
+                    let d2 = dom_toolbarList.querySelector(`[data-name=${item.n}]`);
                     if (d2 === null) { continue; }
-                    const domCheckbox = d2.querySelector(".toolsList-checkbox") as HTMLInputElement;
+                    const domCheckbox = d2.querySelector(".toolbarList-checkbox") as HTMLInputElement;
                     domCheckbox.checked = item.v;
                 }
 
                 //給每一個checkbox都註冊onchange
-                let domAr_checkbox = dom_toolsList.querySelectorAll(".toolsList-checkbox");
+                let domAr_checkbox = dom_toolbarList.querySelectorAll(".toolbarList-checkbox");
                 for (let i = 0; i < domAr_checkbox.length; i++) {
                     const domCheckbox = domAr_checkbox[i] as HTMLInputElement;
                     domCheckbox.onchange = () => {
-                        let data = getToolsListData();
-                        config.settings.mainTools = data;
+                        let data = getToolbarListData();
+                        config.settings.mainToolbar = data;
                         appleSettingOfMain();
                     }
                 }
 
                 //初始化拖曳功能
-                new Sortable(dom_toolsList, {
+                new Sortable(dom_toolbarList, {
                     animation: 150,
                     onEnd: (evt) => {
-                        let data = getToolsListData();
-                        config.settings.mainTools = data;
+                        let data = getToolbarListData();
+                        config.settings.mainToolbar = data;
                         appleSettingOfMain();
                     }
                 });
@@ -245,11 +244,11 @@ class Setting {
             })
 
             /** 取得排序與顯示狀態 */
-            function getToolsListData() {
+            function getToolbarListData() {
                 function getItem(type: string) {
                     let ar = [];
-                    let dom_toolsList = document.querySelector(`#toolsList-${type}`) as HTMLElement;
-                    let domAr = dom_toolsList.querySelectorAll(".toolsList-checkbox");
+                    let dom_toolbarList = document.querySelector(`#toolbarList-${type}`) as HTMLElement;
+                    let domAr = dom_toolbarList.querySelectorAll(".toolbarList-checkbox");
 
                     for (let i = 0; i < domAr.length; i++) {
                         const domCheckbox = domAr[i] as HTMLInputElement;
@@ -274,29 +273,29 @@ class Setting {
             //------------
 
             //切換下拉選單時，顯示對應的內容
-            var select_toolsListType = document.querySelector("#select-toolsListType") as HTMLSelectElement;
-            var dom_toolsList_img = document.querySelector("#toolsList-img") as HTMLElement;
-            var dom_toolsList_pdf = document.querySelector("#toolsList-pdf") as HTMLElement;
-            var dom_toolsList_txt = document.querySelector("#toolsList-txt") as HTMLElement;
+            var select_toolbarListType = document.querySelector("#select-toolbarListType") as HTMLSelectElement;
+            var dom_toolbarList_img = document.querySelector("#toolbarList-img") as HTMLElement;
+            var dom_toolbarList_pdf = document.querySelector("#toolbarList-pdf") as HTMLElement;
+            var dom_toolbarList_txt = document.querySelector("#toolbarList-txt") as HTMLElement;
             let eventChange = () => {
-                let val = select_toolsListType.value;
+                let val = select_toolbarListType.value;
                 if (val == "img") {
-                    dom_toolsList_img.style.display = "block";
-                    dom_toolsList_pdf.style.display = "none";
-                    dom_toolsList_txt.style.display = "none";
+                    dom_toolbarList_img.style.display = "block";
+                    dom_toolbarList_pdf.style.display = "none";
+                    dom_toolbarList_txt.style.display = "none";
                 }
                 if (val == "pdf") {
-                    dom_toolsList_img.style.display = "none";
-                    dom_toolsList_pdf.style.display = "block";
-                    dom_toolsList_txt.style.display = "none";
+                    dom_toolbarList_img.style.display = "none";
+                    dom_toolbarList_pdf.style.display = "block";
+                    dom_toolbarList_txt.style.display = "none";
                 }
                 if (val == "txt") {
-                    dom_toolsList_img.style.display = "none";
-                    dom_toolsList_pdf.style.display = "none";
-                    dom_toolsList_txt.style.display = "block";
+                    dom_toolbarList_img.style.display = "none";
+                    dom_toolbarList_pdf.style.display = "none";
+                    dom_toolbarList_txt.style.display = "block";
                 }
             }
-            select_toolsListType.onchange = eventChange;
+            select_toolbarListType.onchange = eventChange;
             eventChange();
 
         });
@@ -1022,12 +1021,11 @@ class Setting {
                 await arFunc[i]();
             }
 
-            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`);
+            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`);//取得目前顯示的圖片
             if (imgPath === "null") { imgPath = "" }
             let exePath = await WV_Window.GetAppPath();
             WV_RunApp.ProcessStart(exePath, imgPath, true, false);
             WV_Window.CloseAllWindow();
-
         }
 
 

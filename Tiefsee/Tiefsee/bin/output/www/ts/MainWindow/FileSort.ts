@@ -59,7 +59,6 @@ class FileSort {
         });
 
 
-
         /**
          * 不重新載入圖片，只更新排序(用於排序選單的按鈕
          * @param _sortType 
@@ -99,7 +98,7 @@ class FileSort {
 
             M.fileLoad.setWaitingFile(ar);
             M.fileLoad.updateTitle();//更新視窗標題
-       
+
             M.mainFileList.init();//檔案預覽視窗 初始化
             M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 

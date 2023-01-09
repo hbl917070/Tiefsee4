@@ -529,13 +529,13 @@ class Menu_layout {
 
         var dom = document.getElementById("menu-layout") as HTMLElement;
         var dom_topmost = dom.querySelector(".js-topmost") as HTMLElement;
-        var dom_mainTools = dom.querySelector(".js-mainTools") as HTMLElement;
+        var dom_mainToolbar = dom.querySelector(".js-mainToolbar") as HTMLElement;
         var dom_mainDirList = dom.querySelector(".js-mainDirList") as HTMLElement;
         var dom_mainFileList = dom.querySelector(".js-mainFileList") as HTMLElement;
         var dom_mainExif = dom.querySelector(".js-mainExif") as HTMLElement;
 
         var isTopmost: boolean = false;
-        var isMainTools: boolean = false;
+        var isMainToolbar: boolean = false;
         var isMainDirList: boolean = false;
         var isMainFileList: boolean = false;
         var isMainExif: boolean = false;
@@ -545,8 +545,8 @@ class Menu_layout {
         dom_topmost.addEventListener("click", async () => {
             setTopmost();
         });
-        dom_mainTools.addEventListener("click", () => {
-            setMainTools();
+        dom_mainToolbar.addEventListener("click", () => {
+            setMainToolbar();
         });
         dom_mainDirList.addEventListener("click", () => {
             setMainDirList();
@@ -577,11 +577,11 @@ class Menu_layout {
          * 判斷哪些選項要被勾選，於開啟選單時呼叫
          */
         function updateData() {
-            isMainTools = M.config.settings.layout.mainToolsEnabled;
+            isMainToolbar = M.config.settings.layout.mainToolbarEnabled;
             isMainDirList = M.config.settings.layout.dirListEnabled;
             isMainFileList = M.config.settings.layout.fileListEnabled;
             isMainExif = M.config.settings.layout.mainExifEnabled;
-            setCheckState(dom_mainTools, isMainTools);
+            setCheckState(dom_mainToolbar, isMainToolbar);
             setCheckState(dom_mainDirList, isMainDirList);
             setCheckState(dom_mainFileList, isMainFileList);
             setCheckState(dom_mainExif, isMainExif);
@@ -605,11 +605,11 @@ class Menu_layout {
          * 顯示或隱藏 工具列
          * @param val 
          */
-        function setMainTools(val?: boolean) {
-            if (val === undefined) { val = !isMainTools }
-            isMainTools = val;
-            setCheckState(dom_mainTools, val);
-            M.mainTools.setEnabled(val);
+        function setMainToolbar(val?: boolean) {
+            if (val === undefined) { val = !isMainToolbar }
+            isMainToolbar = val;
+            setCheckState(dom_mainToolbar, val);
+            M.mainToolbar.setEnabled(val);
         }
 
 

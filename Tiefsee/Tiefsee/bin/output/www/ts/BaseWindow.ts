@@ -39,10 +39,10 @@ class BaseWindow {
     constructor() {
 
         var dom_window = <HTMLDivElement>document.querySelector('.window');
-        var btn_normal = <HTMLDivElement>document.querySelector(".titlebar-tools-normal");
-        var btn_minimized = <HTMLDivElement>document.querySelector(".titlebar-tools-minimized");
-        var btn_maximized = <HTMLDivElement>document.querySelector(".titlebar-tools-maximized");
-        var btn_close = <HTMLDivElement>document.querySelector(".titlebar-tools-close");
+        var btn_normal = <HTMLDivElement>document.querySelector(".titlebar-toolbar-normal");
+        var btn_minimized = <HTMLDivElement>document.querySelector(".titlebar-toolbar-minimized");
+        var btn_maximized = <HTMLDivElement>document.querySelector(".titlebar-toolbar-maximized");
+        var btn_close = <HTMLDivElement>document.querySelector(".titlebar-toolbar-close");
         var dom_titlebarTxt = <HTMLDivElement>document.querySelector(".titlebar-txt");
 
         this.dom_window = dom_window;

@@ -1,5 +1,5 @@
 
-class MainTools {
+class MainToolbar {
 
     public setEnabled;
     public getArrray;
@@ -29,10 +29,10 @@ class MainTools {
          */
         function init() {
 
-            initToolsImg();
-            initToolsPdf();
-            initToolsTxt();
-            initToolsWelcome();
+            initToolbarImg();
+            initToolbarPdf();
+            initToolbarTxt();
+            initToolbarWelcome();
 
             //產生UI
             if (M === null) { return }
@@ -40,7 +40,7 @@ class MainTools {
                 const item = ar[i];
 
                 if (item.type === "html") {
-                    addToolsHtml({
+                    addToolbarHtml({
                         group: item.group,
                         html: item.html,
                         i18n: item.i18n,
@@ -49,12 +49,12 @@ class MainTools {
                 }
 
                 if (item.type === "hr") {
-                    addToolsHr({ group: item.group, })
+                    addToolbarHr({ group: item.group, })
                 }
 
                 if (item.type === "button") {
 
-                    addToolsBtn({
+                    addToolbarBtn({
                         group: item.group,
                         name: item.name,
                         icon: item.icon,
@@ -82,18 +82,18 @@ class MainTools {
         function setEnabled(val: boolean) {
             if (M == null) { return; }
             if (val) {
-                M.dom_tools.style.display = "";
+                M.dom_toolbar.style.display = "";
             } else {
-                M.dom_tools.style.display = "none";
+                M.dom_toolbar.style.display = "none";
             }
-            M.config.settings.layout.mainToolsEnabled = val;
+            M.config.settings.layout.mainToolbarEnabled = val;
         }
 
 
         /**
          * 初始化 工具列 圖片
          */
-        function initToolsImg() {
+        function initToolbarImg() {
 
             //上一個檔案
             ar.push({
@@ -306,7 +306,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-btn js-noDrag">
+                    <div class="main-toolbar-btn js-noDrag">
                         <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
@@ -325,7 +325,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoSize">
+                    <div class="main-toolbar-txt" data-name="infoSize">
                         <!-- 100<br>200 -->
                     </div>
                 `,
@@ -340,7 +340,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoType">
+                    <div class="main-toolbar-txt" data-name="infoType">
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
@@ -355,7 +355,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoWriteTime">
+                    <div class="main-toolbar-txt" data-name="infoWriteTime">
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
@@ -373,7 +373,7 @@ class MainTools {
         /**
         * 初始化 工具列 pdf
         */
-        function initToolsPdf() {
+        function initToolbarPdf() {
 
             //上一張
             ar.push({
@@ -530,7 +530,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoType">
+                    <div class="main-toolbar-txt" data-name="infoType">
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
@@ -545,7 +545,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoWriteTime">
+                    <div class="main-toolbar-txt" data-name="infoWriteTime">
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
@@ -561,9 +561,9 @@ class MainTools {
 
 
         /**
-        * 初始化 工具列 txt "tools.
-        */
-        function initToolsTxt() {
+         * 初始化 工具列 txt
+         */
+        function initToolbarTxt() {
 
             //上一個檔案
             ar.push({
@@ -735,7 +735,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoType">
+                    <div class="main-toolbar-txt" data-name="infoType">
                         <!-- JPG<br>123.4MB -->
                     </div>
                 `,
@@ -750,7 +750,7 @@ class MainTools {
             ar.push({
                 type: "html",
                 html: `
-                    <div class="main-tools-txt" data-name="infoWriteTime">
+                    <div class="main-toolbar-txt" data-name="infoWriteTime">
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
@@ -767,7 +767,7 @@ class MainTools {
         /**
         * 初始化 工具列 welcome
         */
-        function initToolsWelcome() {
+        function initToolbarWelcome() {
 
             // 載入檔案
             ar.push({
@@ -805,7 +805,7 @@ class MainTools {
          * 新增 html
          * @param item 
          */
-        function addToolsHtml(item: {
+        function addToolbarHtml(item: {
             group: string,
             html: string,
             i18n: string,
@@ -815,7 +815,7 @@ class MainTools {
             div.setAttribute("title", item.i18n);
             div.setAttribute("i18n", item.i18n);
             div.style.order = "999";
-            addToolsDom({
+            addToolbarDom({
                 group: item.group,
                 dom: div,
                 func: item.func,
@@ -827,10 +827,10 @@ class MainTools {
          * 新增 垂直線
          * @param item 
          */
-        function addToolsHr(item: { group: string, }) {
-            let div = newDiv(`<div class="main-tools-hr"> </div>`);
+        function addToolbarHr(item: { group: string, }) {
+            let div = newDiv(`<div class="main-toolbar-hr"> </div>`);
             div.style.order = "999";
-            addToolsDom({
+            addToolbarDom({
                 group: item.group,
                 dom: div,
                 func: () => { },
@@ -842,7 +842,7 @@ class MainTools {
          * 新增 button
          * @param item 
          */
-        function addToolsBtn(item: {
+        function addToolbarBtn(item: {
             group: string,
             name: string,
             icon: string,
@@ -852,11 +852,11 @@ class MainTools {
 
             //產生按鈕
             let div = newDiv(`
-                <div class="main-tools-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
+                <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
             div.style.order = "888";//未定義順序的按鈕就放在最後面
-            addToolsDom({
+            addToolbarDom({
                 group: item.group,
                 dom: div,
                 func: item.func,
@@ -868,7 +868,7 @@ class MainTools {
          * 
          * @param item 
          */
-        function addToolsDom(item: {
+        function addToolbarDom(item: {
             group: string, dom: HTMLElement,
             func: (domBtn: HTMLElement) => void,
         }) {
@@ -876,11 +876,11 @@ class MainTools {
             if (M === null) { return }
 
             //如果群組不存在，就先產生群組
-            let dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
+            let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (dom_group === null) {
-                let div = newDiv(`<div class="main-tools-group" data-name="${item.group}">  </div>`);
-                M.dom_tools.appendChild(div);
-                dom_group = M.dom_tools.querySelector(`.main-tools-group[data-name=${item.group}]`);
+                let div = newDiv(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
+                M.dom_toolbar.appendChild(div);
+                dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }
 
             item.func(item.dom)

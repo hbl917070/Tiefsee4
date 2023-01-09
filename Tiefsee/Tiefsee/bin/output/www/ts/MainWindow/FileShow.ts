@@ -50,9 +50,9 @@ class FileShow {
 
             _groupType = groupType;
 
-            let arToolsGroup = document.querySelectorAll(".main-tools-group");
-            for (let i = 0; i < arToolsGroup.length; i++) {
-                const item = arToolsGroup[i];
+            let arToolbarGroup = document.querySelectorAll(".main-toolbar-group");
+            for (let i = 0; i < arToolbarGroup.length; i++) {
+                const item = arToolbarGroup[i];
                 item.setAttribute("active", "");
             }
 
@@ -76,18 +76,18 @@ class FileShow {
 
 
             if (groupType === GroupType.none) {
-                setShowTools(GroupType.none); //更換工具列
+                setShowToolbar(GroupType.none); //更換工具列
             }
 
             if (groupType === GroupType.welcome) {
-                setShowTools(GroupType.welcome);
+                setShowToolbar(GroupType.welcome);
                 iframes.welcomeview.visible(true);
             } else {
                 iframes.welcomeview.visible(false);
             }
 
             if (groupType === GroupType.img || groupType === GroupType.video) {
-                setShowTools(GroupType.img);
+                setShowToolbar(GroupType.img);
                 dom_imgview.style.display = "block";
             } else {
                 dom_imgview.style.display = "none";
@@ -98,7 +98,7 @@ class FileShow {
             }
 
             if (groupType === GroupType.txt) {
-                setShowTools(GroupType.txt);
+                setShowToolbar(GroupType.txt);
                 iframes.textView.visible(true);
             } else {
                 iframes.textView.visible(false);
@@ -106,7 +106,7 @@ class FileShow {
             }
 
             if (groupType === GroupType.monacoEditor) {
-                setShowTools(GroupType.txt);
+                setShowToolbar(GroupType.txt);
                 iframes.monacoEditor.visible(true);
             } else {
                 iframes.monacoEditor.visible(false);
@@ -114,14 +114,14 @@ class FileShow {
             }
 
             if (groupType === GroupType.pdf) {
-                setShowTools(GroupType.pdf);
+                setShowToolbar(GroupType.pdf);
                 iframes.pdfview.visible(true);
             } else {
                 iframes.pdfview.visible(false);
             }
 
             if (groupType === GroupType.office) {
-                setShowTools(GroupType.pdf);
+                setShowToolbar(GroupType.pdf);
                 iframes.pDFTronWebviewer.visible(true);
             } else {
                 iframes.pDFTronWebviewer.loadNone();
@@ -129,7 +129,7 @@ class FileShow {
             }
 
             if (groupType === GroupType.md) {
-                setShowTools(GroupType.txt);
+                setShowToolbar(GroupType.txt);
                 iframes.cherryMarkdown.visible(true);
             } else {
                 iframes.cherryMarkdown.visible(false);
@@ -144,8 +144,8 @@ class FileShow {
          * @param type 
          * @returns 
          */
-        function getToolsDom(type: string): HTMLElement | null {
-            return M.dom_tools.querySelector(`.main-tools-group[data-name="${type}"]`);
+        function getToolbarDom(type: string): HTMLElement | null {
+            return M.dom_toolbar.querySelector(`.main-toolbar-group[data-name="${type}"]`);
         }
 
 
@@ -153,14 +153,14 @@ class FileShow {
          * 更換工具列
          * @param type 
          */
-        function setShowTools(type: string) {
-            let arToolsGroup = document.querySelectorAll(".main-tools-group");
-            for (let i = 0; i < arToolsGroup.length; i++) {
-                const item = arToolsGroup[i];
+        function setShowToolbar(type: string) {
+            let arToolbarGroup = document.querySelectorAll(".main-toolbar-group");
+            for (let i = 0; i < arToolbarGroup.length; i++) {
+                const item = arToolbarGroup[i];
                 item.setAttribute("active", "");
             }
 
-            getToolsDom(type)?.setAttribute("active", "true"); //更換工具列
+            getToolbarDom(type)?.setAttribute("active", "true"); //更換工具列
         }
 
         function getIsLoaded() {
@@ -333,7 +333,7 @@ class FileShow {
             tiefseeview.setEventChangeZoom(((ratio: number) => {
                 let txt = (ratio * 100).toFixed(0) + "%"
 
-                let dom_btnScale = M.dom_tools.querySelector(`[data-name="btnScale"]`);//工具列
+                let dom_btnScale = M.dom_toolbar.querySelector(`[data-name="btnScale"]`);//工具列
                 if (dom_btnScale !== null) { dom_btnScale.innerHTML = txt; }
 
                 M.initMenu.updateRightMenuImageZoomRatioTxt(txt);//更新 右鍵選單的圖片縮放比例
@@ -349,13 +349,13 @@ class FileShow {
             tiefseeview.setAlign(_alignType);
 
             //圖片長寬
-            let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
+            let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);
             if (dom_size != null) {
                 dom_size.innerHTML = `${tiefseeview.getOriginalWidth()}<br>${tiefseeview.getOriginalHeight()}`;
             }
 
             //檔案類型
-            let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
+            let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2);
                 let fileLength = Lib.getFileLength(fileInfo2.Lenght);
@@ -363,7 +363,7 @@ class FileShow {
             }
 
             //檔案修改時間
-            let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
+            let dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
                 let timeUtc = fileInfo2.LastWriteTimeUtc;
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
@@ -400,7 +400,7 @@ class FileShow {
 
 
             //檔案類型
-            let dom_type = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
+            let dom_type = getToolbarDom(GroupType.pdf)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
                 let fileLength = Lib.getFileLength(fileInfo2.Lenght);
@@ -408,7 +408,7 @@ class FileShow {
             }
 
             //檔案修改時間
-            let dom_writeTime = getToolsDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
+            let dom_writeTime = getToolbarDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
                 let timeUtc = fileInfo2.LastWriteTimeUtc;
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
@@ -466,7 +466,7 @@ class FileShow {
             }
 
             //檔案類型
-            let dom_type = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
+            let dom_type = getToolbarDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
                 let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
                 let fileLength = Lib.getFileLength(fileInfo2.Lenght);
@@ -474,7 +474,7 @@ class FileShow {
             }
 
             //檔案修改時間
-            let dom_writeTime = getToolsDom(GroupType.txt)?.querySelector(`[data-name="infoWriteTime"]`);
+            let dom_writeTime = getToolbarDom(GroupType.txt)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
                 let timeUtc = fileInfo2.LastWriteTimeUtc;
                 let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
@@ -503,9 +503,9 @@ class FileShow {
             setShowType(GroupType.none);//改變顯示類型
 
             tiefseeview.zoomFull(TiefseeviewZoomType["100%"]);
-            let dom_size = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);  //圖片長寬
-            let dom_type = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);  //檔案類型
-            let dom_writeTime = getToolsDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   //檔案修改時間
+            let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);  //圖片長寬
+            let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);  //檔案類型
+            let dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   //檔案修改時間
             if (dom_size) { dom_size.innerHTML = ""; }
             if (dom_type) { dom_type.innerHTML = ""; }
             if (dom_writeTime) { dom_writeTime.innerHTML = ""; }

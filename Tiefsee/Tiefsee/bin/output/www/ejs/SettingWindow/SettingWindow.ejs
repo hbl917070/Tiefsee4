@@ -40,7 +40,7 @@
     <script src="./js/Config.js"></script>
     <script src="./js/SvgList.js"></script>
     <!-- <script src="./js/MainWindow/Menu.js"></script> -->
-    <script src="./js/MainWindow/MainTools.js"></script>
+    <script src="./js/MainWindow/MainToolbar.js"></script>
     <script src="./js/Msgbox.js"></script>
     <script src="./js/SettingWindow/SettingWindow.js"></script>
 
@@ -59,7 +59,7 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-general" i18n="sw.tabs.general" active="true"> 一般 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-appearance" i18n="sw.tabs.appearance"> 外觀 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n="sw.tabs.layout"> 版面 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-tools" i18n="sw.tabs.toolbar"> 工具列</div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵</div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association"> 設為預設程式 </div>
@@ -82,23 +82,23 @@
 
                 <div class="titlebar-txt"></div>
 
-                <div class="titlebar-tools">
-                    <!-- <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+                <div class="titlebar-toolbar">
+                    <!-- <div class="titlebar-toolbar-btn titlebar-toolbar-menu" style="display:none;">
                         <%- await readFile("./img/default/window-menu.svg"); %>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-topmost">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-topmost">
                         <%- await readFile("./img/default/window-topmost.svg"); %>
                     </div> -->
-                    <div class="titlebar-tools-btn titlebar-tools-minimized">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
                         <%- await readFile("./img/default/window-minimized.svg"); %>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-normal" style="display:none;">
                         <%- await readFile("./img/default/window-normal.svg"); %>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-maximized">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-maximized">
                         <%- await readFile("./img/default/window-maximized.svg"); %>
                     </div>
-                    <div class="titlebar-tools-btn titlebar-tools-close">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-close">
                         <%- await readFile("./img/default/window-close.svg"); %>
                     </div>
 
@@ -541,14 +541,14 @@
                 </div>
 
                 <!-- 工具列 -->
-                <div class="page-tabsPage" id="tabsPage-tools">
+                <div class="page-tabsPage" id="tabsPage-toolbar">
                     <div class="page-title" i18n="sw.tabs.toolbar"> 工具列 </div>
                     <div class="box">
                         <div class="box-title" i18n="sw.customToolbar.title"> 顯示與排序 </div>
 
                         <div class="text-title"> </div>
                         <div class="text-content">
-                            <select class="text-input" id="select-toolsListType">
+                            <select class="text-input" id="select-toolbarListType">
                                 <!-- <option value="welcome"></option> -->
                                 <option value="img" i18n="sw.customToolbar.imageToolbar">圖片 工具列</option>
                                 <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office文件 工具列</option>
@@ -557,9 +557,9 @@
                         </div>
 
                         <div class="text-title" i18n="sw.customToolbar.adjustOrderByDragging">(可拖曳調整順序) </div>
-                        <div class="toolsList" id="toolsList-img"> </div>
-                        <div class="toolsList" id="toolsList-pdf"> </div>
-                        <div class="toolsList" id="toolsList-txt"> </div>
+                        <div class="toolbarList" id="toolbarList-img"> </div>
+                        <div class="toolbarList" id="toolbarList-pdf"> </div>
+                        <div class="toolbarList" id="toolbarList-txt"> </div>
                     </div>
                 </div>
 
@@ -726,7 +726,7 @@
                     <div class="box">
                         <div class="box-title">
                             <span i18n="sw.about.version">版本:</span>
-                            <span> Tiefsee 4.0.0-beta.23</span>
+                            <span> Tiefsee 4.0.0-beta.24</span>
                         </div>
                         <div class="box-title">
                             <span i18n="sw.about.developer">開發者:</span>

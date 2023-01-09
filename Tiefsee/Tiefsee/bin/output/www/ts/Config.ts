@@ -158,7 +158,7 @@ class Config {
             dirListShowWidth: 200,//寬度
             dirListImgNumber: 3,//圖片數量
 
-            mainToolsEnabled: true,//啟用 工具列
+            mainToolbarEnabled: true,//啟用 工具列
 
             mainExifEnabled: false,//啟用 詳細資料視窗
             mainExifShowWidth: 150,//寬度
@@ -177,10 +177,46 @@ class Config {
         },
 
         /** 工具列按鈕，n=按鈕的key、v=是否顯示 */
-        mainTools: { img: [], pdf: [], txt: [] } as {
-            img: { n: string; v: boolean; }[];
-            pdf: { n: string; v: boolean; }[];
-            txt: { n: string; v: boolean; }[];
+        mainToolbar: {
+            img: [
+                { "n": "prevFile", "v": false },
+                { "n": "nextFile", "v": false },
+                { "n": "showMenuFile", "v": true },
+                { "n": "prevDir", "v": false },
+                { "n": "nextDir", "v": false },
+                { "n": "showMenuSort", "v": true },
+                { "n": "showMenuCopy", "v": true },
+                { "n": "dragDropFile", "v": true },
+                { "n": "showDeleteMsg", "v": true },
+                { "n": "showMenuImageSearch", "v": true },
+                { "n": "showSetting", "v": true },
+                { "n": "showMenuRotation", "v": true },
+                { "n": "zoomToFit", "v": true }
+            ],
+            pdf: [
+                { "n": "prevFile", "v": false },
+                { "n": "nextFile", "v": false },
+                { "n": "showMenuFile", "v": true },
+                { "n": "prevDir", "v": false },
+                { "n": "nextDir", "v": false },
+                { "n": "showMenuSort", "v": true },
+                { "n": "showMenuCopy", "v": true },
+                { "n": "dragDropFile", "v": true },
+                { "n": "showDeleteMsg", "v": true },
+                { "n": "showSetting", "v": true }
+            ],
+            txt: [
+                { "n": "prevFile", "v": false },
+                { "n": "nextFile", "v": false },
+                { "n": "showMenuFile", "v": true },
+                { "n": "prevDir", "v": false },
+                { "n": "nextDir", "v": false },
+                { "n": "showMenuSort", "v": true },
+                { "n": "showMenuCopy", "v": true },
+                { "n": "dragDropFile", "v": true },
+                { "n": "showDeleteMsg", "v": true },
+                { "n": "showSetting", "v": true }
+            ]
         },
 
         /** 進階設定 */

@@ -37,7 +37,7 @@
 
     <script src="./js/WebAPI.js"></script>
     <script src="./js/Config.js"></script>
-    <script src="./js/MainWindow/MainTools.js"></script>
+    <script src="./js/MainWindow/MainToolbar.js"></script>
     <script src="./js/MainWindow/FileLoad.js"></script>
     <script src="./js/MainWindow/MainFileList.js"></script>
     <script src="./js/MainWindow/MainDirList.js"></script>
@@ -73,26 +73,26 @@
                 <span>tiefsee 4</span>
             </div>
 
-            <div class="titlebar-tools">
-                <div class="titlebar-tools-btn titlebar-tools-menu" style="display:none;">
+            <div class="titlebar-toolbar">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-menu" style="display:none;">
                     <%- await readFile("./img/default/window-menu.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-topmost" style="display:none;">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-topmost" style="display:none;">
                     <%- await readFile("./img/default/window-topmost.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-layout" title="版面" i18n="menu.layout">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="版面" i18n="menu.layout">
                     <%- await readFile("./img/default/window-layout.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-minimized">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
                     <%- await readFile("./img/default/window-minimized.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-normal" style="display:none;">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-normal" style="display:none;">
                     <%- await readFile("./img/default/window-normal.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-maximized">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-maximized">
                     <%- await readFile("./img/default/window-maximized.svg"); %>
                 </div>
-                <div class="titlebar-tools-btn titlebar-tools-close">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-close">
                     <%- await readFile("./img/default/window-close.svg"); %>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                 <div class="main-T">
 
                     <!-- 工具列 -->
-                    <div id="main-tools" class="main-tools"> </div>
+                    <div id="main-toolbar" class="main-toolbar"> </div>
 
                 </div>
 
@@ -135,7 +135,7 @@
                         <div id="mView-welcome" class="mView-welcome">
                             <div>
                                 <img class="mView-welcome-logo" src="./img/logo.svg">
-                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.23</div>
+                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.24</div>
                             </div>
                         </div>
                         <textarea id="mView-txt" class="mView-text base-scrollbar" readonly2=""></textarea>

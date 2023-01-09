@@ -9,13 +9,13 @@ class MainWindow {
 
     public quickLookUp;
 
-    public dom_tools: HTMLElement;
+    public dom_toolbar: HTMLElement;
     public dom_mainL: HTMLElement;
     public dom_mainR: HTMLElement;
 
     public i18n;
     public config;
-    public mainTools;
+    public mainToolbar;
     public fileLoad;
     public fileShow;
     public fileSort;
@@ -40,10 +40,10 @@ class MainWindow {
 
         this.quickLookUp = quickLookUp;
 
-        var dom_tools = <HTMLElement>document.getElementById("main-tools");//工具列
+        var dom_toolbar = <HTMLElement>document.getElementById("main-toolbar");//工具列
         var dom_mainL = <HTMLElement>document.getElementById("main-L");//左邊區域
         var dom_mainR = <HTMLElement>document.getElementById("main-R");//左邊區域
-        var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-tools-layout");//開啟layout選單
+        var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-toolbar-layout");//開啟layout選單
 
         let firstRun = true;//用於判斷是否為第一次執行
         let startType = 0;//1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
@@ -51,7 +51,7 @@ class MainWindow {
         /** 是否為快速預覽 */
         var isQuickLook = false;
 
-        this.dom_tools = dom_tools;
+        this.dom_toolbar = dom_toolbar;
         this.dom_mainL = dom_mainL;
         this.dom_mainR = dom_mainR;
 
@@ -64,7 +64,7 @@ class MainWindow {
         var mainDirList = this.mainDirList = new MainDirList(this);
         var imgSearch = this.imgSearch = new ImgSearch(this);
         var mainExif = this.mainExif = new MainExif(this);
-        var mainTools = this.mainTools = new MainTools(this);
+        var mainToolbar = this.mainToolbar = new MainToolbar(this);
         var menu = this.menu = new Menu(this);
         var initMenu = this.initMenu = new InitMenu(this);
         var largeBtn = this.largeBtn = new LargeBtn(this);
@@ -165,7 +165,7 @@ class MainWindow {
             });*/
 
             //double click 最大化或視窗化
-            Lib.addEventDblclick(dom_tools, async (e) => {//工具列
+            Lib.addEventDblclick(dom_toolbar, async (e) => {//工具列
                 //如果是按鈕就不雙擊全螢幕
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
@@ -202,7 +202,7 @@ class MainWindow {
             });
 
             //讓工具列允許拖曳視窗
-            dom_tools.addEventListener("mousedown", async (e) => {
+            dom_toolbar.addEventListener("mousedown", async (e) => {
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
@@ -211,29 +211,29 @@ class MainWindow {
                     await WV_Window.WindowDrag("move");
                 }
             });
-            dom_tools.addEventListener("touchstart", async (e) => {
+            dom_toolbar.addEventListener("touchstart", async (e) => {
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
-                let isShowScroll = dom_tools.scrollWidth > dom_tools.clientWidth;//判斷當前是否有捲動軸
+                let isShowScroll = dom_toolbar.scrollWidth > dom_toolbar.clientWidth;//判斷當前是否有捲動軸
                 if (isShowScroll === false) {
-                    baseWindow.touchDrop.start(dom_tools, e, "move");
+                    baseWindow.touchDrop.start(dom_toolbar, e, "move");
                 }
             });
 
             //在工具列滾動時，進行水平移動
-            dom_tools.addEventListener("mousewheel", (e: WheelEventInit) => {
+            dom_toolbar.addEventListener("mousewheel", (e: WheelEventInit) => {
 
-                let scrollLeft = dom_tools.scrollLeft;
+                let scrollLeft = dom_toolbar.scrollLeft;
                 let deltaY: number = 0;//上下滾動的量
                 if (e.deltaY) { deltaY = e.deltaY }
 
                 if (deltaY > 0) {//往右
-                    dom_tools.scroll(scrollLeft + 20, 0)
+                    dom_toolbar.scroll(scrollLeft + 20, 0)
                 }
                 if (deltaY < 0) {//往左
-                    dom_tools.scroll(scrollLeft - 20, 0)
+                    dom_toolbar.scroll(scrollLeft - 20, 0)
                 }
             }, false)
 
@@ -564,7 +564,7 @@ class MainWindow {
 
             //-----------
 
-            mainTools.setEnabled(config.settings.layout.mainToolsEnabled);//工具列
+            mainToolbar.setEnabled(config.settings.layout.mainToolbarEnabled);//工具列
 
             mainFileList.setEnabled(config.settings.layout.fileListEnabled);//檔案預覽視窗
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
@@ -587,10 +587,10 @@ class MainWindow {
             arGroupName.map((gn) => {
                 let groupName = gn as ("img" | "pdf" | "txt");
 
-                let dom_group = dom_tools.querySelector(`.main-tools-group[data-name=${groupName}]`) as HTMLElement;
-                let arMainTools = config.settings.mainTools[groupName];
-                for (let i = 0; i < arMainTools.length; i++) {
-                    const item = arMainTools[i];
+                let dom_group = dom_toolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
+                let arMainToolbar = config.settings.mainToolbar[groupName];
+                for (let i = 0; i < arMainToolbar.length; i++) {
+                    const item = arMainToolbar[i];
                     let dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
                     if (dom_btn == null) { continue; }
                     dom_btn.style.order = i + "";//排序
