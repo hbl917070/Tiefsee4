@@ -54,6 +54,8 @@ class Tiefseeview {
     public getUrl;//取得當前圖片網址
     public getCanvasBase64;
     public getCanvasBlob;
+    public getIsZoomWithWindow; //取得 是否圖片隨視窗縮放
+    public setIsZoomWithWindow;
 
     public getEventMouseWheel;//滑鼠滾輪捲動時
     public setEventMouseWheel;
@@ -150,6 +152,10 @@ class Tiefseeview {
         /** Bigimgscale 用於儲存圖片網址與比例 */
         var arBigimgscale: { scale: number, url: string }[] = []
 
+        var isZoomWithWindow = true; //圖片隨視窗縮放
+        var temp_zoomWithWindow = false; //縮放過圖片大小的話，就停止 圖片隨視窗縮放
+        var temp_TiefseeviewZoomType: TiefseeviewZoomType = TiefseeviewZoomType["100%"];
+        var temp_TiefseeviewZoomTypeVal = 100;
 
         //滑鼠滾輪做的事情
         var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
@@ -232,20 +238,29 @@ class Tiefseeview {
         this.getErrerUrl = getErrerUrl;
         this.setErrerUrl = setErrerUrl;
         this.getUrl = getUrl;
-        this.getCanvasBase64 = getCanvasBase64;//從Canvas取得base64
+        this.getCanvasBase64 = getCanvasBase64; //從Canvas取得base64
         this.getCanvasBlob = getCanvasBlob;
+        this.getIsZoomWithWindow = getIsZoomWithWindow;
+        this.setIsZoomWithWindow = setIsZoomWithWindow;
 
-        setLoadingUrl(loadingUrl);//初始化 loading 圖片
-        setLoading(false);//預設為隱藏
+
+        setLoadingUrl(loadingUrl); //初始化 loading 圖片
+        setLoading(false); //預設為隱藏
         dom_tiefseeview.classList.add("tiefseeview");
         setTransform(undefined, undefined, false);//初始化定位
         setDpizoom(-1);
 
         //顯示圖片的區塊改變大小時
         new ResizeObserver(() => {
-            init_point(false);//重新定位圖片
-            eventChangeZoom(getZoomRatio());
+            requestAnimationFrame(() => {
+                init_point(false); //重新定位圖片
+                eventChangeZoom(getZoomRatio());
 
+                //圖片隨視窗縮放
+                if (isZoomWithWindow && temp_zoomWithWindow) {
+                    zoomFull(temp_TiefseeviewZoomType, temp_TiefseeviewZoomTypeVal);
+                }
+            })
         }).observe(dom_dpizoom)
 
         //捲動軸變化時，同步至圖片位置
@@ -302,6 +317,8 @@ class Tiefseeview {
             temp_pinchZoom = 1;
             temp_pinchCenterX = ev.center.x;
             temp_pinchCenterY = ev.center.y;
+
+            temp_zoomWithWindow = false;
         });
         hammerPlural.on("pinch", (ev) => {//pinchin
             requestAnimationFrame(() => {
@@ -335,6 +352,7 @@ class Tiefseeview {
             //避免在捲動軸上面也觸發
             if (e.target !== dom_dpizoom) { return; }
 
+            temp_zoomWithWindow = false;
             $(dom_con).stop(true, false);
 
             let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;//捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
@@ -606,6 +624,17 @@ class Tiefseeview {
         });
 
 
+        /**
+         * 取得 是否圖片隨視窗縮放
+         * @returns 
+         */
+        function getIsZoomWithWindow() { return isZoomWithWindow; }
+        /**
+         * 設定 是否圖片隨視窗縮放
+         * @param val 
+         */
+        function setIsZoomWithWindow(val: boolean) { isZoomWithWindow = val; }
+
 
         /**
          * 取得 loading圖片
@@ -628,7 +657,6 @@ class Tiefseeview {
         function getErrerUrl(): string { return errerUrl }
         /**
          * 設定 error圖片
-         * @param _url 
          */
         function setErrerUrl(_url: string): void { errerUrl = _url }
 
@@ -1992,6 +2020,18 @@ class Tiefseeview {
          * @param _val 附加參數，例如以px或%進行縮放時，必須另外傳入number
          */
         function zoomFull(_type: TiefseeviewZoomType, _val?: number): void {
+
+            //圖片隨視窗縮放
+            temp_TiefseeviewZoomType = _type;
+            if (_val != undefined) { temp_TiefseeviewZoomTypeVal = _val; }
+            if (_type === TiefseeviewZoomType["%-w"] || _type === TiefseeviewZoomType["%-h"] ||
+                _type === TiefseeviewZoomType["full-w"] || _type === TiefseeviewZoomType["full-h"] ||
+                _type === TiefseeviewZoomType["full-wh"] || _type === TiefseeviewZoomType["full-100%"]) {
+
+                temp_zoomWithWindow = true;
+            } else {
+                temp_zoomWithWindow = false;
+            }
 
             let _w = getZoomFull_width(_type, _val);
             setDataSize(_w);
