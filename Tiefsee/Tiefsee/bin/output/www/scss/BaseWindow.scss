@@ -131,10 +131,10 @@ select option {
   white-space: nowrap;
 }
 
-.titlebar-tools {
+.titlebar-toolbar {
   display: flex;
 }
-.titlebar-tools-btn {
+.titlebar-toolbar-btn {
   height: 100%;
   width: 38px;
   margin-left: 1px;
@@ -145,11 +145,11 @@ select option {
   /* border-radius: 4px; */
 }
 
-.titlebar-tools-btn:hover {
+.titlebar-toolbar-btn:hover {
   background-color: var(--color-white20);
   cursor: pointer;
 }
-.titlebar-tools-btn svg {
+.titlebar-toolbar-btn svg {
   width: 25px;
   height: 25px;
   pointer-events: none;

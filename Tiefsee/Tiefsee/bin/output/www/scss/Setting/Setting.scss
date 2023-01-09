@@ -357,10 +357,10 @@ select {
 //#endregion
 
 //自訂工具列
-.toolsList {
+.toolbarList {
   margin-left: 30px;
 
-  .toolsList-item {
+  .toolbarList-item {
     display: flex;
     align-items: center;
     background-color: var(--color-white10);
@@ -372,18 +372,18 @@ select {
     user-select: none;
     cursor: ns-resize;
   }
-  .toolsList-item input {
+  .toolbarList-item input {
     position: absolute;
     top: 0;
     bottom: 0;
     left: -25px;
     margin: auto;
   }
-  .toolsList-item svg {
+  .toolbarList-item svg {
     height: 25px;
     margin-right: 5px;
   }
-  .toolsList-item span {
+  .toolbarList-item span {
   }
 }
 

@@ -3,7 +3,7 @@
 @import "./MainDirList";
 @import "./MainExif";
 @import "./MainFileList";
-@import "./MainTools";
+@import "./MainToolbar";
 @import "./LoadingSetting";
 
 /*---------------------------*/
@@ -12,8 +12,8 @@
 :root {
   --svgWeight: 0px;
 }
-.titlebar-tools-btn svg,
-.main-tools-btn svg,
+.titlebar-toolbar-btn svg,
+.main-toolbar-btn svg,
 .menu-hor-icon svg,
 .menu-grid-item svg {
   stroke: var(--color-white);
@@ -23,7 +23,7 @@
 /*---------------------------*/
 
 // 標題列按鈕展開下拉選單時
-.titlebar-tools-btn.menuActive {
+.titlebar-toolbar-btn.menuActive {
   background-color: var(--color-white20);
 }
 

@@ -1,6 +1,6 @@
-/* #region main-tools 工具列 */
+/* #region main-toolbar 工具列 */
 
-.main-tools {
+.main-toolbar {
   /* background-color: rgba(165, 42, 42, 0.411); */
   height: 35px;
   color: var(--color-white);
@@ -10,34 +10,34 @@
 }
 
 /*捲動軸樣式*/
-.main-tools:hover {
+.main-toolbar:hover {
   overflow-x: overlay;
 }
-.main-tools::-webkit-scrollbar {
+.main-toolbar::-webkit-scrollbar {
   /* background-color: var(--color-black40); */
   height: 3px;
   /* border-radius: 5px; */
 }
 
-.main-tools::-webkit-scrollbar-track {
+.main-toolbar::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);
 }
 
-.main-tools::-webkit-scrollbar-thumb {
+.main-toolbar::-webkit-scrollbar-thumb {
   background-color: var(--color-white40);
   /* border-radius: 5px; */
 }
 
-.main-tools-group {
+.main-toolbar-group {
   display: none;
   margin-left: 3px;
   margin-bottom: 3px;
 }
-.main-tools-group[active="true"] {
+.main-toolbar-group[active="true"] {
   display: flex;
 }
 /*垂直線*/
-.main-tools-hr {
+.main-toolbar-hr {
   width: 1px;
   min-width: 1px;
   height: 35px;
@@ -49,7 +49,7 @@
 }
 
 /*純文字資訊*/
-.main-tools-txt {
+.main-toolbar-txt {
   height: 35px;
   font-size: 15px;
   line-height: 17px;
@@ -66,7 +66,7 @@
 }
 
 /*按鈕*/
-.main-tools-btn {
+.main-toolbar-btn {
   min-width: 35px;
   height: 35px;
   display: flex;
@@ -78,23 +78,23 @@
   flex-shrink: 0; /*避免壓縮*/
 }
 
-.main-tools-btn:hover {
+.main-toolbar-btn:hover {
   cursor: pointer;
   background-color: var(--color-white20);
 }
-.main-tools-btn:active {
+.main-toolbar-btn:active {
   background-color: var(--color-white30);
 }
 
-.main-tools-btn svg,
-.main-tools-btn img {
+.main-toolbar-btn svg,
+.main-toolbar-btn img {
   width: 25px;
   height: 25px;
   pointer-events: none;
 }
 
 /*開啟選單時*/
-.main-tools-btn.menuActive {
+.main-toolbar-btn.menuActive {
   background-color: var(--color-white20) !important;
 }
 
