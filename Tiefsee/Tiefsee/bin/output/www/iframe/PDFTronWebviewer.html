@@ -84,9 +84,10 @@
          */
         async function initPDFTronWebviewer() {
 
-            let pluginPath = libIframe.getPluginPath();
-            let pathLib = pluginPath + "/WebViewer/lib";
-            let pathJs = pathLib + "/webviewer.min.js";
+            let appInfo = libIframe.getAppInfo();
+            let pathLib = appInfo.plugin.PDFTronWebviewer_lib;
+            let pathJs = appInfo.plugin.PDFTronWebviewer_js;
+
             await libIframe.addScript(pathJs);
 
             //-------------

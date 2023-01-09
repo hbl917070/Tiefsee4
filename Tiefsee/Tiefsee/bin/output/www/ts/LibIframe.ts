@@ -113,17 +113,25 @@ class LibIframe {
     /**
      * 取得 Plugin 的路徑
      */
-    public getPluginPath() {
+    public getPluginPath(appInfo?: any) {
+        if (appInfo === undefined) {
+            appInfo = this.getAppInfo();
+        }
+        let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
+        let pathLib = "file:///" + appDataPath + "/Plugin";
+        return pathLib;
+    }
+
+    /**
+     * 取得 AppInfo
+     */
+    public getAppInfo() {
         let getUrlString = location.href;
         let url = new URL(getUrlString);
         let appInfo = url.searchParams.get("appInfo");
-        if (appInfo == null) {
-            return "";
-        }
+        if (appInfo == null) { return {}; }
         let json = JSON.parse(appInfo);
-        let appDataPath = json.appDataPath.replace(/\\/g, "/");
-        let pathLib = "file:///" + appDataPath + "/Plugin";
-        return pathLib;
+        return json;
     }
 
 

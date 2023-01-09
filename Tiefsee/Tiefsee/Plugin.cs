@@ -31,14 +31,28 @@ namespace Tiefsee {
             }
 
             pathNConvert = Path.Combine(dirPlugin, "NConvert/nconvert.exe");
-            pathQuickLook = Path.Combine(dirPlugin, "QuickLook/Tiefsee.QuickLook.dll");
-            pathPDFTronWebviewer = Path.Combine(dirPlugin, "WebViewer/lib/webviewer.min.js");
-            pathMonacoEditor = Path.Combine(dirPlugin, "monaco-editor/min/vs/loader.js");
-
             dataPlugin.NConvert = File.Exists(pathNConvert);
+
+            pathQuickLook = Path.Combine(dirPlugin, "QuickLook/Tiefsee.QuickLook.dll");
             dataPlugin.QuickLook = File.Exists(pathQuickLook);
-            dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
+
+            pathMonacoEditor = Path.Combine(dirPlugin, "monaco-editor/min/vs/loader.js");
             dataPlugin.MonacoEditor = File.Exists(pathMonacoEditor);
+
+            pathPDFTronWebviewer = Path.Combine(dirPlugin, "WebViewer/lib/webviewer.min.js");//從瀏覽器下載的zip
+            dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
+            if (dataPlugin.PDFTronWebviewer) {
+                dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
+                dataPlugin.PDFTronWebviewer_lib = Path.Combine(dirPlugin, "WebViewer/lib");
+            } else {
+                pathPDFTronWebviewer = Path.Combine(dirPlugin, "webviewer/webviewer.min.js");//從npm下載
+                dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
+                if (dataPlugin.PDFTronWebviewer) {
+                    dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
+                    dataPlugin.PDFTronWebviewer_lib = Path.Combine(dirPlugin, "webviewer/public");
+                }
+            }
+
         }
 
     }
@@ -79,8 +93,10 @@ namespace Tiefsee {
     public class DataPlugin {
         public bool NConvert = false;
         public bool QuickLook = false;
-        public bool PDFTronWebviewer = false;
         public bool MonacoEditor = false;
+        public bool PDFTronWebviewer = false;
+        public string PDFTronWebviewer_js = "";
+        public string PDFTronWebviewer_lib = "";
     }
 
 }
