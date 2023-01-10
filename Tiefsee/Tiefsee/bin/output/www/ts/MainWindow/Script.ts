@@ -33,12 +33,12 @@ class ScriptImg {
 
     /** 全滿 */
     public zoomToFit() {
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['full-wh']);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['fitWindow']);
     }
 
     /** 原始大小 */
     public zoomTo100() {
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['100%']);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['imageOriginal']);
     }
 
     /** 順時針90° */

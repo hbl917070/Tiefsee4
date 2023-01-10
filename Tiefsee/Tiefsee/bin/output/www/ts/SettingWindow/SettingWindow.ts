@@ -417,12 +417,21 @@ class Setting {
             select_tiefseeviewZoomType.value = config.settings.image["tiefseeviewZoomType"];
             text_tiefseeviewZoomValue.value = config.settings.image["tiefseeviewZoomValue"].toString();
             select_tiefseeviewAlignType.value = config.settings.image["tiefseeviewAlignType"];
+
+            //避免出現下拉選單沒有的值
+            if (select_tiefseeviewZoomType.value == "") {
+                select_tiefseeviewZoomType.value = "fitWindowOrImageOriginal";
+            }
+            if (select_tiefseeviewAlignType.value == "") {
+                select_tiefseeviewAlignType.value = "center";
+            }
+
             showValue();
 
             //顯示或隱藏 「圖片預設縮放模式」的附加欄位
             function showValue() {
                 let val = select_tiefseeviewZoomType.value;
-                let ar = ["px-w", "px-h", "%-w", "%-h"];
+                let ar = ["imageWidthPx", "imageHeightPx", "windowWidthRatio", "windowHeightRatio"];
                 if (ar.indexOf(val) !== -1) {
                     text_tiefseeviewZoomValue.style.display = "block";
                 } else {
@@ -596,7 +605,7 @@ class Setting {
                 restartTiefsee();
             });
         })
-      
+
         //檔案預覽視窗
         addLoadEvent(() => {
             var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;

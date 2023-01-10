@@ -154,7 +154,7 @@ class Tiefseeview {
 
         var isZoomWithWindow = true; //圖片隨視窗縮放
         var temp_zoomWithWindow = false; //縮放過圖片大小的話，就停止 圖片隨視窗縮放
-        var temp_TiefseeviewZoomType: TiefseeviewZoomType = TiefseeviewZoomType["100%"];
+        var temp_TiefseeviewZoomType: TiefseeviewZoomType = TiefseeviewZoomType["imageOriginal"];
         var temp_TiefseeviewZoomTypeVal = 100;
 
         //滑鼠滾輪做的事情
@@ -1209,7 +1209,7 @@ class Tiefseeview {
             } else if (_renderin === TiefseeviewImageRendering["pixelated"]) {
                 dom_data.style.imageRendering = "pixelated";
 
-            } else if (_renderin === TiefseeviewImageRendering["auto-pixelated"]) {
+            } else if (_renderin === TiefseeviewImageRendering["autoOrPixelated"]) {
                 if (getZoomRatio() > 1) {
                     dom_data.style.imageRendering = "pixelated";
                 } else {
@@ -1357,39 +1357,39 @@ class Tiefseeview {
             if (_type === TiefseeviewAlignType["none"]) {
                 return;
             }
-            if (_type === TiefseeviewAlignType["T"]) {
+            if (_type === TiefseeviewAlignType["top"]) {
                 type_horizontal = "center";
                 type_vertical = "top";
             }
-            if (_type === TiefseeviewAlignType["R"]) {
+            if (_type === TiefseeviewAlignType["right"]) {
                 type_horizontal = "right";
                 type_vertical = "center";
             }
-            if (_type === TiefseeviewAlignType["L"]) {
+            if (_type === TiefseeviewAlignType["left"]) {
                 type_horizontal = "left";
                 type_vertical = "center";
             }
-            if (_type === TiefseeviewAlignType["B"]) {
+            if (_type === TiefseeviewAlignType["bottom"]) {
                 type_horizontal = "center";
                 type_vertical = "bottom";
             }
-            if (_type === TiefseeviewAlignType["RT"]) {
+            if (_type === TiefseeviewAlignType["topRight"]) {
                 type_horizontal = "right";
                 type_vertical = "top";
             }
-            if (_type === TiefseeviewAlignType["RB"]) {
+            if (_type === TiefseeviewAlignType["bottomRight"]) {
                 type_horizontal = "right";
                 type_vertical = "bottom";
             }
-            if (_type === TiefseeviewAlignType["LT"]) {
+            if (_type === TiefseeviewAlignType["topLeft"]) {
                 type_horizontal = "left";
                 type_vertical = "top";
             }
-            if (_type === TiefseeviewAlignType["LB"]) {
+            if (_type === TiefseeviewAlignType["bottomLeft"]) {
                 type_horizontal = "left";
                 type_vertical = "bottom";
             }
-            if (_type === TiefseeviewAlignType["C"]) {
+            if (_type === TiefseeviewAlignType["center"]) {
                 type_horizontal = "center";
                 type_vertical = "center";
             }
@@ -2024,9 +2024,9 @@ class Tiefseeview {
             //圖片隨視窗縮放
             temp_TiefseeviewZoomType = _type;
             if (_val != undefined) { temp_TiefseeviewZoomTypeVal = _val; }
-            if (_type === TiefseeviewZoomType["%-w"] || _type === TiefseeviewZoomType["%-h"] ||
-                _type === TiefseeviewZoomType["full-w"] || _type === TiefseeviewZoomType["full-h"] ||
-                _type === TiefseeviewZoomType["full-wh"] || _type === TiefseeviewZoomType["full-100%"]) {
+            if (_type === TiefseeviewZoomType["windowWidthRatio"] || _type === TiefseeviewZoomType["windowHeightRatio"] ||
+                _type === TiefseeviewZoomType["fiwWindowWidth"] || _type === TiefseeviewZoomType["fitWindowHeight"] ||
+                _type === TiefseeviewZoomType["fitWindow"] || _type === TiefseeviewZoomType["fitWindowOrImageOriginal"]) {
 
                 temp_zoomWithWindow = true;
             } else {
@@ -2054,7 +2054,7 @@ class Tiefseeview {
         }
         /** 取得縮放圖片都得 寬度 (用於套用設定) */
         function getZoomFull_width(_type: TiefseeviewZoomType, _val?: number) {
-            if (_type === undefined) { _type = TiefseeviewZoomType["full-wh"] }
+            if (_type === undefined) { _type = TiefseeviewZoomType["fitWindow"] }
             if (_val === undefined) { _val = 100 }
 
             let _w = 1;
@@ -2064,43 +2064,43 @@ class Tiefseeview {
             let dom_con_offsetWidth = rect.rectWidth;
             let dom_con_offsetHeight = rect.rectHeight;
 
-            if (_type === TiefseeviewZoomType["full-100%"]) {
+            if (_type === TiefseeviewZoomType["fitWindowOrImageOriginal"]) {
                 if (getOriginalWidth() > (dom_dpizoom.offsetWidth - marginLeft - marginRight) ||
                     getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
-                    _type = TiefseeviewZoomType["full-wh"];//縮放至視窗大小
+                    _type = TiefseeviewZoomType["fitWindow"];//縮放至視窗大小
                 } else {
-                    _type = TiefseeviewZoomType["100%"];//圖片原始大小
+                    _type = TiefseeviewZoomType["imageOriginal"];//圖片原始大小
                 }
             }
 
             //圖片原始大小
-            if (_type === TiefseeviewZoomType["100%"]) {
+            if (_type === TiefseeviewZoomType["imageOriginal"]) {
                 _w = (getOriginalWidth());
             }
-            if (_type === TiefseeviewZoomType["full-wh"]) {//縮放至視窗大小
+            if (_type === TiefseeviewZoomType["fitWindow"]) {//縮放至視窗大小
                 let ratio_w = dom_con_offsetWidth / (dom_dpizoom.offsetWidth - marginLeft - marginRight)
                 let ratio_h = dom_con_offsetHeight / (dom_dpizoom.offsetHeight - marginTop - marginBottom)
                 if (ratio_w > ratio_h) {
-                    _type = TiefseeviewZoomType["full-w"]
+                    _type = TiefseeviewZoomType["fiwWindowWidth"]
                 } else {
-                    _type = TiefseeviewZoomType["full-h"]
+                    _type = TiefseeviewZoomType["fitWindowHeight"]
                 }
             }
-            if (_type === TiefseeviewZoomType["full-w"]) {//寬度全滿
+            if (_type === TiefseeviewZoomType["fiwWindowWidth"]) {//寬度全滿
                 _val = 100;
-                _type = TiefseeviewZoomType["%-w"];
+                _type = TiefseeviewZoomType["windowWidthRatio"];
             }
-            if (_type === TiefseeviewZoomType["full-h"]) {//高度全滿
+            if (_type === TiefseeviewZoomType["fitWindowHeight"]) {//高度全滿
                 _val = 100;
-                _type = TiefseeviewZoomType["%-h"];
+                _type = TiefseeviewZoomType["windowHeightRatio"];
             }
-            if (_type === TiefseeviewZoomType["%-w"]) {//以視窗寬度比例設定
+            if (_type === TiefseeviewZoomType["windowWidthRatio"]) {//以視窗寬度比例設定
                 let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (w * ratio * (_val / 100));
             }
-            if (_type === TiefseeviewZoomType["%-h"]) {//以視窗高度比例設定
+            if (_type === TiefseeviewZoomType["windowHeightRatio"]) {//以視窗高度比例設定
                 let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
@@ -2108,11 +2108,11 @@ class Tiefseeview {
                 _w = (w * ratio * ratio_xy * (_val / 100));
             }
 
-            if (_type === TiefseeviewZoomType["px-w"]) {//以絕對寬度設定
+            if (_type === TiefseeviewZoomType["imageWidthPx"]) {//以絕對寬度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (toNumber(_val) * ratio);
             }
-            if (_type === TiefseeviewZoomType["px-h"]) {//以絕對高度設定
+            if (_type === TiefseeviewZoomType["imageHeightPx"]) {//以絕對高度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
                 let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
                 _w = (toNumber(_val) * ratio * ratio_xy);
@@ -3062,16 +3062,26 @@ class TiefseeviewScroll {
  * 對齊位置
  */
 enum TiefseeviewAlignType {
-    "T", //上
-    "R", //右
-    "B", //下
-    "L", //左
-    "RT", //右上
-    "RB", //右下
-    "LT", //左上
-    "LB", //左下
-    "C", //中間
-    "none", //
+    /** 上 */
+    "top",
+    /** 右 */
+    "right",
+    /** 下 */
+    "bottom",
+    /** 左 */
+    "left",
+    /** 右上 */
+    "topRight",
+    /** 右下 */
+    "bottomRight",
+    /** 左上 */
+    "topLeft",
+    /** 左下 */
+    "bottomLeft",
+    /** 中間 */
+    "center",
+    /**  */
+    "none",
 }
 
 
@@ -3079,27 +3089,29 @@ enum TiefseeviewAlignType {
  * 圖片縮放模式
  */
 enum TiefseeviewZoomType {
-    /**縮放到特定視窗寬度% */
-    "%-w",
-    /**縮放到特定視窗高度% */
-    "%-h",
 
-    /**縮放到特定寬度 */
-    "px-w",
-    /**縮放到特定高度 */
-    "px-h",
+    /** 圖片大於視窗則縮放到視窗內，小於視窗則用圖片原始大小 */
+    "fitWindowOrImageOriginal",
 
-    /**讓圖片填滿視窗寬度 */
-    "full-w",
-    /**讓圖片填滿視窗高度 */
-    "full-h",
-    /**縮放到視窗內 */
-    "full-wh",
-    /**圖片大於視窗則縮放到視窗內，小於視窗則用圖片原始大小 */
-    "full-100%",
+    /** 縮放到視窗內 */
+    "fitWindow",
+    /** 讓圖片填滿視窗寬度 */
+    "fiwWindowWidth",
+    /** 讓圖片填滿視窗高度 */
+    "fitWindowHeight",
 
-    /**原始圖片大小 */
-    "100%",
+    /** 原始圖片大小 */
+    "imageOriginal",
+
+    /** 圖片寬度 (px) */
+    "imageWidthPx",
+    /** 圖片高度 (px) */
+    "imageHeightPx",
+
+    /** 視窗寬度 (%) */
+    "windowWidthRatio",
+    /** 視窗高度 (%) */
+    "windowHeightRatio",
 }
 
 
@@ -3108,13 +3120,13 @@ enum TiefseeviewZoomType {
  */
 enum TiefseeviewImageRendering {
 
-    /**預設值，運算成本較高 */
+    /** 預設值，運算成本較高 */
     "auto" = 0,
 
-    /**運算成本低，放大時呈現方塊 */
+    /** 運算成本低，放大時呈現方塊 */
     "pixelated" = 1,
 
-    /**圖片大於100%時切換成pixelated，否則使用auto */
-    "auto-pixelated" = 2,
+    /** 圖片大於100%時呈現方塊 */
+    "autoOrPixelated" = 2,
 }
 

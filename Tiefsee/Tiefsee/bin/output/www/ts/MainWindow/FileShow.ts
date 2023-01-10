@@ -263,7 +263,7 @@ class FileShow {
                     let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                     let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
                     //let _alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[M.config.settings.image.tiefseeviewAlignType];
-                    if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["full-100%"] }
+                    if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
                     //if (_alignType === undefined) { _alignType = TiefseeviewAlignType["C"] }
 
                     await tiefseeview.loadBigimgscale(
@@ -343,8 +343,8 @@ class FileShow {
             let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
             let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
             let _alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[M.config.settings.image.tiefseeviewAlignType];
-            if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["full-100%"] }
-            if (_alignType === undefined) { _alignType = TiefseeviewAlignType["C"] }
+            if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
+            if (_alignType === undefined) { _alignType = TiefseeviewAlignType["center"] }
             tiefseeview.zoomFull(_zoomType, _zoomVal);
             tiefseeview.setAlign(_alignType);
 
@@ -502,7 +502,7 @@ class FileShow {
             M.fileLoad.setGroupType(GroupType.none);
             setShowType(GroupType.none);//改變顯示類型
 
-            tiefseeview.zoomFull(TiefseeviewZoomType["100%"]);
+            tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
             let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);  //圖片長寬
             let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);  //檔案類型
             let dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   //檔案修改時間

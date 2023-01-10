@@ -83,17 +83,18 @@ var langData = {
                 "en": "Image default zoom mode",
                 "ja": "画像のデフォルトズームモード",
             },
-            whenLessThan100ZoomToFit: {
+            
+            fitWindowOrImageOriginal: {
                 "zh-TW": "縮放至適合視窗 或 圖片原始大小",
                 "en": "Zoom to fit or Image original size",
                 "ja": "ズームトゥフィット または 画像原寸大",
             },
-            zoomToFit: {
+            fitWindow: {
                 "zh-TW": "強制縮放至適合視窗",
                 "en": "Always zoom to fit",
                 "ja": "常にズームトゥフィット",
             },
-            imageOriginalSize: {
+            imageOriginal: {
                 "zh-TW": "圖片原始大小",
                 "en": "Image original size",
                 "ja": "画像原寸大",

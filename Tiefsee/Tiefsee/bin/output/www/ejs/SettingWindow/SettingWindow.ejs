@@ -131,15 +131,15 @@
                         <div class="text-title" i18n="sw.zoomMode.title"> 圖片預設縮放模式 </div>
                         <div class="text-content">
                             <select class="text-input" id="select-tiefseeviewZoomType">
-                                <option value="full-100%" i18n="sw.zoomMode.whenLessThan100ZoomToFit">
-                                    小於100%時，縮放至適合視窗
+                                <option value="fitWindowOrImageOriginal" i18n="sw.zoomMode.fitWindowOrImageOriginal">
+                                    縮放至適合視窗 或 圖片原始大小 
                                 </option>
-                                <option value="full-wh" i18n="sw.zoomMode.zoomToFit">縮放至適合視窗</option>
-                                <option value="100%" i18n="sw.zoomMode.imageOriginalSize">圖片原始大小</option>
-                                <option value="px-w" i18n="sw.zoomMode.imageWidthPx">圖片寬度(px)</option>
-                                <option value="px-h" i18n="sw.zoomMode.imageHeightPx">圖片高度(px)</option>
-                                <option value="%-w" i18n="sw.zoomMode.windowWidthRatio">視窗寬度(%)</option>
-                                <option value="%-h" i18n="sw.zoomMode.windowHeightRatio">視窗高度(%)</option>
+                                <option value="fitWindow" i18n="sw.zoomMode.fitWindow">縮放至適合視窗</option>
+                                <option value="imageOriginal" i18n="sw.zoomMode.imageOriginal">圖片原始大小</option>
+                                <option value="imageWidthPx" i18n="sw.zoomMode.imageWidthPx">圖片寬度(px)</option>
+                                <option value="imageHeightPx" i18n="sw.zoomMode.imageHeightPx">圖片高度(px)</option>
+                                <option value="windowWidthRatio" i18n="sw.zoomMode.windowWidthRatio">視窗寬度(%)</option>
+                                <option value="windowHeightRatio" i18n="sw.zoomMode.windowHeightRatio">視窗高度(%)</option>
                             </select>
                             <input class="text-input" id="text-tiefseeviewZoomValue"
                                 style="width:60px; margin-left:5px; flex:0;" type="number">
@@ -148,15 +148,15 @@
                         <div class="text-title" i18n="sw.imageAlign.title"> 圖片預設對齊位置 </div>
                         <div class="text-content">
                             <select class="text-input" id="select-tiefseeviewAlignType">
-                                <option value="C" i18n="sw.imageAlign.center">中央</option>
-                                <option value="LT" i18n="sw.imageAlign.topLeft">左上</option>
-                                <option value="T" i18n="sw.imageAlign.top">上</option>
-                                <option value="RT" i18n="sw.imageAlign.topRight">右上</option>
-                                <option value="R" i18n="sw.imageAlign.right">右</option>
-                                <option value="RB" i18n="sw.imageAlign.bottomRight">右下</option>
-                                <option value="B" i18n="sw.imageAlign.bottom">下</option>
-                                <option value="LB" i18n="sw.imageAlign.bottomLeft">左下</option>
-                                <option value="L" i18n="sw.imageAlign.left">左</option>
+                                <option value="center" i18n="sw.imageAlign.center">中央</option>
+                                <option value="topLeft" i18n="sw.imageAlign.topLeft">左上</option>
+                                <option value="top" i18n="sw.imageAlign.top">上</option>
+                                <option value="topRight" i18n="sw.imageAlign.topRight">右上</option>
+                                <option value="right" i18n="sw.imageAlign.right">右</option>
+                                <option value="bottomRight" i18n="sw.imageAlign.bottomRight">右下</option>
+                                <option value="bottom" i18n="sw.imageAlign.bottom">下</option>
+                                <option value="bottomLeft" i18n="sw.imageAlign.bottomLeft">左下</option>
+                                <option value="left" i18n="sw.imageAlign.left">左</option>
                             </select>
                         </div>
                     </div>

@@ -555,7 +555,7 @@ class MainWindow {
             if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
             fileShow.tiefseeview.setDpizoom(dpizoom);
 
-            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]);//圖片縮放模式
+            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]);//設定 圖片的渲染模式
             fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
