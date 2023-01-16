@@ -1351,6 +1351,11 @@ var langData = {
             "en": `"Text" copying completed`,
             "ja": "コピー「テキスト」完了",
         },
+        copyExif: {
+            "zh-TW": "已將「{v}」複製至剪貼簿",
+            "en": `"{v}" copying completed`,
+            "ja": "コピー「{v}」完了",
+        },
         //#endregion
 
         //#region 重新命名

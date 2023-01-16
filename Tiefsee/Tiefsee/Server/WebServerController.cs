@@ -52,7 +52,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/img/nconvert", nconvert);
             webServer.RouteAdd("/api/img/vipsInit", vipsInit);
             webServer.RouteAdd("/api/img/vipsResize", vipsResize);
-    
+
             webServer.RouteAdd("/www/{*}", getWww);
             webServer.RouteAdd("/{*}", getWww);
         }
@@ -65,6 +65,7 @@ namespace Tiefsee {
         /// </summary>
         void getExif(RequestData d) {
 
+            int maxLength = int.Parse(d.args["maxLength"]);
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
 
@@ -78,7 +79,7 @@ namespace Tiefsee {
             //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
             //if (is304) { return; }
 
-            string json = Exif.GetExif(path);
+            string json = Exif.GetExif(path, maxLength);
 
             WriteString(d, json);
         }
@@ -388,7 +389,7 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
 
-            WV_File wvf=  new WV_File();
+            WV_File wvf = new WV_File();
             string srtStrJson = wvf.GetFileInfo2(path);
             //string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
             WriteString(d, srtStrJson);//回傳
@@ -434,7 +435,7 @@ namespace Tiefsee {
         /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
         /// </summary>
         private void getSiblingDir(RequestData d) {
-       
+
             var json = JObject.Parse(d.postData);
             string path = json["path"].ToString();
             string[] arExt = json["arExt"].ToObject<string[]>();

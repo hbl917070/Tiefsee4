@@ -186,8 +186,7 @@ class MainExif {
 						let val = vals[i];
 						let x = val.indexOf(": "); //資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
-							html += getItemHtml(name, val);
-
+							dom_mainExifList.appendChild(getItemHtml(name, val));
 						} else {
 
 							name = val.substring(0, x);
@@ -203,13 +202,13 @@ class MainExif {
 										for (let i = 0; i < arCommentkey.length; i++) {
 											let keyComment = arCommentkey[i];
 											let valComment = jsonComment[keyComment];
-											html += getItemHtml(keyComment, valComment);
+											dom_mainExifList.appendChild(getItemHtml(keyComment, valComment));
 										}
 									} else {
-										html += getItemHtml(name, val);
+										dom_mainExifList.appendChild(getItemHtml(name, val));
 									}
 								} catch (e) {
-									html += getItemHtml(name, val);
+									dom_mainExifList.appendChild(getItemHtml(name, val));
 								}
 
 							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
@@ -217,42 +216,40 @@ class MainExif {
 								let promptSplit = val.indexOf("Negative prompt: ");//負面提示
 								let otherSplit = val.indexOf("Steps: ");//其他參數
 								if (promptSplit !== -1 && otherSplit !== -1) {
-									html += getItemHtml("Prompt", val.substring(0, promptSplit));//提示
-									html += getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit));//負面提示
+									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, promptSplit)));//提示
+									dom_mainExifList.appendChild(getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit)));//負面提示
 									//html += getItemHtml("Other", val.substring(otherSplit));
 									let arOther = val.substring(otherSplit).split(", ");//其他參數
 									for (let i = 0; i < arOther.length; i++) {
 										const itemOther = arOther[i];
 										let itemOtherSplit = itemOther.split(": ");
 										if (itemOtherSplit.length > 0) {
-											html += getItemHtml(itemOtherSplit[0], itemOtherSplit[1]);
+											dom_mainExifList.appendChild(getItemHtml(itemOtherSplit[0], itemOtherSplit[1]));
 										} else {
-											html += getItemHtml("", itemOther);
+											dom_mainExifList.appendChild(getItemHtml("", itemOther));
 										}
 									}
 
 								} else if (promptSplit === -1 && otherSplit !== -1) {//沒有輸入負面詞的情況
 
-									html += getItemHtml("Prompt", val.substring(0, otherSplit));//提示
-									//html += getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit));//負面提示
-									//html += getItemHtml("Other", val.substring(otherSplit));
+									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, otherSplit)));//提示
 									let arOther = val.substring(otherSplit).split(", ");//其他參數
 									for (let i = 0; i < arOther.length; i++) {
 										const itemOther = arOther[i];
 										let itemOtherSplit = itemOther.split(": ");
 										if (itemOtherSplit.length > 0) {
-											html += getItemHtml(itemOtherSplit[0], itemOtherSplit[1]);
+											dom_mainExifList.appendChild(getItemHtml(itemOtherSplit[0], itemOtherSplit[1]));
 										} else {
-											html += getItemHtml("", itemOther);
+											dom_mainExifList.appendChild(getItemHtml("", itemOther));
 										}
 									}
 
 								} else {
-									html += getItemHtml(name, val);
+									dom_mainExifList.appendChild(getItemHtml(name, val));
 								}
 
 							} else {
-								html += getItemHtml(name, val);
+								dom_mainExifList.appendChild(getItemHtml(name, val));
 							}
 
 						}
@@ -277,11 +274,10 @@ class MainExif {
 						value = Lib.getFileLength(Number(value));
 					}
 					name = M.i18n.t(`exif.name.${name}`);
-					html += getItemHtml(name, value, nameI18n, valueI18n);
+					dom_mainExifList.appendChild(getItemHtml(name, value, nameI18n, valueI18n));
 				}
 			}
 
-			dom_mainExifList.innerHTML = html;
 		}
 
 		/** 
@@ -289,19 +285,31 @@ class MainExif {
 		 */
 		function getItemHtml(name: string, value: string, nameI18n = "", valueI18n = "") {
 
+
+			let oVal = value; //原始資料
+
 			name = name.toString();
 			value = value.toString();
-			name = Lib.escape(name);//移除可能破壞html的跳脫符號
+			name = Lib.escape(name); //移除可能破壞html的跳脫符號
 			value = Lib.escape(value);
 
-			value = value.replace(/\n/g, "<br>");//處理換行
+			value = value.replace(/\n/g, "<br>"); //處理換行
 
 			let html = `
 				<div class="mainExifItem">
+					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
 				</div>`
-			return html;
+
+			let div = newDiv(html);
+			let btn = div.querySelector(".mainExifCopyBtn") as HTMLElement;
+			btn.addEventListener("click", async () => {
+				await WV_System.SetClipboard_Txt(oVal);
+				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); //已將「exifName」複製至剪貼簿
+			})
+
+			return div;
 		}
 
 		/** 

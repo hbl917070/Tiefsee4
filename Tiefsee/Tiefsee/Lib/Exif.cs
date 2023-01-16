@@ -78,7 +78,7 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        public static string GetExif(string path) {
+        public static string GetExif(string path, int maxLength) {
 
             ImgExif exif = new ImgExif();
 
@@ -120,7 +120,7 @@ namespace Tiefsee {
                             continue;
                         }
 
-                        if (value != null && value.Length > 5000) {//某些圖片可能把二進制資訊封裝進去
+                        if (value != null && value.Length > maxLength) {//某些圖片可能把二進制資訊封裝進去
                             continue;
                         }
 

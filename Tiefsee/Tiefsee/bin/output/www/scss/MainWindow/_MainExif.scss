@@ -31,6 +31,7 @@
     word-wrap: break-word;
     //word-break: break-all;
     font-size: 14px;
+    position: relative;
   }
   .mainExifItem:last-child {
     border-bottom: none;
@@ -46,7 +47,14 @@
     flex: 1;
     min-width: 100px;
     color: var(--color-white);
+
+    // 限制顯示的最大行數
+    overflow: hidden;
+    -webkit-line-clamp: 20;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
   }
+
   //google map
   .mainExifMap {
     position: relative;
@@ -76,6 +84,30 @@
     height: 100%;
     border: none;
     overflow: hidden;
+  }
+
+  //右上角的 複製按鈕
+  .mainExifCopyBtn {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-black80);
+    border: 1px solid var(--color-blue40);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+  }
+  .mainExifCopyBtn:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+  .mainExifCopyBtn svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
