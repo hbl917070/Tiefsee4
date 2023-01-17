@@ -158,7 +158,6 @@ class MainExif {
 			}*/
 
 			let ar = json.data;
-			let html = "";
 			let whitelist = M.config.exif.whitelist;
 
 			for (let i = 0; i < whitelist.length; i++) {
@@ -172,12 +171,13 @@ class MainExif {
 
 					value = encodeURIComponent(value);//移除可能破壞html的跳脫符號
 
-					html += `
-					<div class="mainExifItem">
-						<div class="mainExifMap">
-							<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
-						</div>
-					</div>`
+					let mapHtml = `
+						<div class="mainExifItem">
+							<div class="mainExifMap">
+								<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
+							</div>
+						</div>`;
+					dom_mainExifList.appendChild(newDiv(mapHtml));
 
 				} else if (name === "Textual Data") {//PNG iTXt / zTXt / tEXt
 
@@ -187,6 +187,7 @@ class MainExif {
 						let x = val.indexOf(": "); //資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
 							dom_mainExifList.appendChild(getItemHtml(name, val));
+
 						} else {
 
 							name = val.substring(0, x);
@@ -284,7 +285,6 @@ class MainExif {
 		 * exif項目的html
 		 */
 		function getItemHtml(name: string, value: string, nameI18n = "", valueI18n = "") {
-
 
 			let oVal = value; //原始資料
 
