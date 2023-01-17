@@ -81,9 +81,9 @@ class LibIframe {
             };
             this.postMsg(json);
 
-            //  e.stopPropagation();
-            //  e.preventDefault();
-        }, false);
+            e.stopPropagation();
+            //e.preventDefault();
+        }, true);
     }
 
 
@@ -109,6 +109,17 @@ class LibIframe {
         parent.postMessage(json, "*");
     }
 
+    /**
+     * 取得 AppInfo
+     */
+    public getAppInfo() {
+        let getUrlString = location.href;
+        let url = new URL(getUrlString);
+        let appInfo = url.searchParams.get("appInfo");
+        if (appInfo == null) { return {}; }
+        let json = JSON.parse(appInfo);
+        return json;
+    }
 
     /**
      * 取得 Plugin 的路徑
@@ -123,15 +134,13 @@ class LibIframe {
     }
 
     /**
-     * 取得 AppInfo
+     * 取得使用者選擇的語言
      */
-    public getAppInfo() {
+    public getLang() {
         let getUrlString = location.href;
         let url = new URL(getUrlString);
-        let appInfo = url.searchParams.get("appInfo");
-        if (appInfo == null) { return {}; }
-        let json = JSON.parse(appInfo);
-        return json;
+        let lang = url.searchParams.get("lang");
+        return lang;
     }
 
 

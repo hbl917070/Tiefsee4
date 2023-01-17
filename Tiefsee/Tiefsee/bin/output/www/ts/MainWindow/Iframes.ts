@@ -171,7 +171,7 @@ class PDFTronWebviewer {
 
             if (dom_pdftronWebviewer.src == "") {
                 let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_pdftronWebviewer.src = "./iframe/PDFTronWebviewer.html?appInfo=" + appInfoJson;
+                dom_pdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
             for (let i = 0; i < 2000; i++) {//等待套件初始化
@@ -277,7 +277,7 @@ class MonacoEditor {
         async function awaitInit() {
             if (dom_monacoEditor.src == "") {
                 let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_monacoEditor.src = "./iframe/MonacoEditor.html?appInfo=" + appInfoJson;
+                dom_monacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
             for (let i = 0; i < 2000; i++) {//等待套件初始化
@@ -439,7 +439,7 @@ class CherryMarkdown {
         async function awaitInit() {
             if (dom_iframe.src == "") {
                 let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_iframe.src = "./iframe/CherryMarkdown.html?appInfo=" + appInfoJson;
+                dom_iframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
             for (let i = 0; i < 2000; i++) {//等待套件初始化
