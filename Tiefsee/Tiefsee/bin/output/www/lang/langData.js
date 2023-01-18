@@ -83,7 +83,7 @@ var langData = {
                 "en": "Image default zoom mode",
                 "ja": "画像のデフォルトズームモード",
             },
-            
+
             fitWindowOrImageOriginal: {
                 "zh-TW": "縮放至適合視窗 或 圖片原始大小",
                 "en": "Zoom to fit or Image original size",
@@ -573,6 +573,11 @@ var langData = {
                 "zh-TW": "顯示 詳細資料面板",
                 "en": "Display information panel",
                 "ja": "情報パネルを表示する",
+            },
+            maxLine: {
+                "zh-TW": "顯示的最大行數 (1~100)",
+                "en": "Maximum number of lines displayed (1~100)",
+                "ja": "最大表示行数 (1~100)",
             },
         },
 
@@ -1086,32 +1091,32 @@ var langData = {
 
         //#region 下拉選單 複製
         copyFile: {
-            "zh-TW": "複製 檔案",
+            "zh-TW": "複製檔案",
             "en": "Copy File",
             "ja": "コピーファイル",
         },
         copyFileName: {
-            "zh-TW": "複製 檔名",
+            "zh-TW": "複製檔名",
             "en": "Copy File Name",
             "ja": "コピーファイル名",
         },
         copyFilePath: {
-            "zh-TW": "複製 完整路徑",
+            "zh-TW": "複製完整路徑",
             "en": "Copy File Path",
             "ja": "コピーファイルパス",
         },
         copyImage: {
-            "zh-TW": "複製 影像",
+            "zh-TW": "複製影像",
             "en": "Copy Image",
             "ja": "コピー画像",
         },
         copyImageBase64: {
-            "zh-TW": "複製 影像 Base64",
+            "zh-TW": "複製影像 Base64",
             "en": "Copy Image Base64",
             "ja": "コピー画像 Base64",
         },
         copyText: {
-            "zh-TW": "複製 文字",
+            "zh-TW": "複製文字",
             "en": "Copy Text",
             "ja": "コピーテキスト",
         },

@@ -471,7 +471,7 @@ class MainWindow {
                     fileLoad.loadFiles(dirPath, arFile);//載入多張圖片
                 }
             }
-            
+
         }
 
 
@@ -551,34 +551,35 @@ class MainWindow {
             i18n.setLang(lang);
 
             //-----------
-            let dpizoom = Number(config.settings["image"]["dpizoom"]);//圖片DPI縮放
+            let dpizoom = Number(config.settings["image"]["dpizoom"]); //圖片DPI縮放
             if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
             fileShow.tiefseeview.setDpizoom(dpizoom);
 
-            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]);//設定 圖片的渲染模式
+            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]); //設定 圖片的渲染模式
             fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
-            baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]);//視窗縮放
-            document.body.style.fontWeight = config.settings["theme"]["fontWeight"];//文字粗細
-            cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]);//圖示粗細
+            baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); //視窗縮放
+            document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; //文字粗細
+            cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); //圖示粗細
 
             //-----------
 
-            mainToolbar.setEnabled(config.settings.layout.mainToolbarEnabled);//工具列
+            mainToolbar.setEnabled(config.settings.layout.mainToolbarEnabled); //工具列
 
-            mainFileList.setEnabled(config.settings.layout.fileListEnabled);//檔案預覽視窗
+            mainFileList.setEnabled(config.settings.layout.fileListEnabled); //檔案預覽視窗
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
             mainFileList.setShowName(config.settings.layout.fileListShowName);
             if (isStart) { mainFileList.setItemWidth(config.settings.layout.fileListShowWidth); }
 
-            mainDirList.setEnabled(config.settings.layout.dirListEnabled);//資料夾預覽視窗
+            mainDirList.setEnabled(config.settings.layout.dirListEnabled); //資料夾預覽視窗
             mainDirList.setShowNo(config.settings.layout.dirListShowNo);
             mainDirList.setShowName(config.settings.layout.dirListShowName);
             mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
             if (isStart) { mainDirList.setItemWidth(config.settings.layout.dirListShowWidth); }
 
-            mainExif.setEnabled(config.settings.layout.mainExifEnabled);//詳細資料視窗
+            mainExif.setEnabled(config.settings.layout.mainExifEnabled); //詳細資料視窗
             if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
+            cssRoot.style.setProperty("--number-mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~100)
 
             //-----------
 
@@ -593,8 +594,8 @@ class MainWindow {
                     const item = arMainToolbar[i];
                     let dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
                     if (dom_btn == null) { continue; }
-                    dom_btn.style.order = i + "";//排序
-                    dom_btn.style.display = (item.v) ? "" : "none";//顯示或隱藏
+                    dom_btn.style.order = i + ""; //排序
+                    dom_btn.style.display = (item.v) ? "" : "none"; //顯示或隱藏
                 }
 
             })

@@ -147,21 +147,23 @@ class Config {
         },
 
         layout: {
-            fileListEnabled: true,//啟用 檔案預覽視窗
-            fileListShowNo: true,//顯示編號
-            fileListShowName: true,//顯示檔名
-            fileListShowWidth: 100,//寬度
+            fileListEnabled: true, //啟用 檔案預覽視窗
+            fileListShowNo: true, //顯示編號
+            fileListShowName: true, //顯示檔名
+            fileListShowWidth: 100, //寬度
 
-            dirListEnabled: false,//啟用 資料夾預覽視窗
-            dirListShowNo: true,//顯示編號
-            dirListShowName: true,//顯示檔名
-            dirListShowWidth: 200,//寬度
-            dirListImgNumber: 3,//圖片數量
+            dirListEnabled: false, //啟用 資料夾預覽視窗
+            dirListShowNo: true, //顯示編號
+            dirListShowName: true, //顯示檔名
+            dirListShowWidth: 200, //寬度
+            dirListImgNumber: 3, //圖片數量
 
-            mainToolbarEnabled: true,//啟用 工具列
+            mainToolbarEnabled: true, //啟用 工具列
 
-            mainExifEnabled: false,//啟用 詳細資料視窗
-            mainExifShowWidth: 150,//寬度
+            mainExifEnabled: false, //啟用 詳細資料視窗
+            mainExifShowWidth: 150, //寬度
+            mainExifMaxLine: 20, //顯示的最大行數
+
 
             /** 大型切換按鈕 leftRight / bottom / none  */
             largeBtn: "bottom",

@@ -297,9 +297,9 @@ class MainExif {
 
 			let html = `
 				<div class="mainExifItem">
-					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
+					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 				</div>`
 
 			let div = newDiv(html);

@@ -531,7 +531,7 @@ class Setting {
             var jq_windowBorderRadius = $("#text-windowBorderRadius");
             jq_windowBorderRadius.val(config.settings.theme["--window-border-radius"]);
 
-            jq_windowBorderRadius.change(() => {
+            jq_windowBorderRadius.on("change", () => {
                 let val = Number(jq_windowBorderRadius.val());
                 if (val < 0) { val = 0; }
                 if (val > 15) { val = 15; }
@@ -545,8 +545,7 @@ class Setting {
         addLoadEvent(() => {
             var jq_zoomFactor = $("#text-zoomFactor");
             jq_zoomFactor.val(config.settings.theme["zoomFactor"]);
-
-            jq_zoomFactor.change(() => {
+            jq_zoomFactor.on("change", () => {
                 let val = Number(jq_zoomFactor.val());
                 if (isNaN(val)) { val = 1; }
                 if (val === 0) { val = 1; }
@@ -555,7 +554,8 @@ class Setting {
 
                 config.settings["theme"]["zoomFactor"] = val;
                 appleSettingOfMain();
-            });
+            })
+
         })
 
         //文字粗細
@@ -563,7 +563,7 @@ class Setting {
             var jqselect_fontWeight = $("#select-fontWeight");
             jqselect_fontWeight.val(config.settings.theme["fontWeight"]);
 
-            jqselect_fontWeight.change(() => {
+            jqselect_fontWeight.on("change", () => {
                 let val = jqselect_fontWeight.val() as string;
                 config.settings["theme"]["fontWeight"] = val;
                 appleSettingOfMain();
@@ -575,7 +575,7 @@ class Setting {
             var jqselect_svgWeight = $("#select-svgWeight");
             jqselect_svgWeight.val(config.settings.theme["svgWeight"]);
 
-            jqselect_svgWeight.change(() => {
+            jqselect_svgWeight.on("change", () => {
                 let val = jqselect_svgWeight.val() as string;
                 config.settings["theme"]["svgWeight"] = val;
                 appleSettingOfMain();
@@ -665,16 +665,29 @@ class Setting {
             });
         })
 
-        //詳細資料視窗
+        //詳細資料面板
         addLoadEvent(() => {
+            //顯示 詳細資料面板
             var switch_mainExifEnabled = document.querySelector("#switch-mainExifEnabled") as HTMLInputElement;
-            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"];//啟用 詳細資料視窗
-
-            switch_mainExifEnabled.addEventListener("change", () => {//啟用 詳細資料視窗
+            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"];//
+            switch_mainExifEnabled.addEventListener("change", () => {
                 let val = switch_mainExifEnabled.checked;
                 config.settings["layout"]["mainExifEnabled"] = val;
                 appleSettingOfMain();
             });
+
+            //顯示的最大行數(1~100)
+            var text_mainExifMaxLine = document.querySelector("#text-mainExifMaxLine") as HTMLInputElement;
+            text_mainExifMaxLine.value = config.settings["layout"]["mainExifMaxLine"] + "";
+            text_mainExifMaxLine.addEventListener("change", () => {
+                let val = Math.floor(Number(text_mainExifMaxLine.value));
+                if (val > 100) { val = 100; }
+                if (val <= 0) { val = 1; }
+                text_mainExifMaxLine.value = val + "";
+                config.settings["layout"]["mainExifMaxLine"] = val;
+                appleSettingOfMain();
+            });
+
         })
 
         //大型切換按鈕

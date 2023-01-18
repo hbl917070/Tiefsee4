@@ -1,6 +1,7 @@
 /* #region exif 視窗 */
 :root {
   --mainExif-width: 240px;
+  --number-mainExifMaxLine: 2; //顯示的最大行數
 }
 
 .mainExif {
@@ -50,7 +51,7 @@
 
     // 限制顯示的最大行數
     overflow: hidden;
-    -webkit-line-clamp: 20;
+    -webkit-line-clamp: var(--number-mainExifMaxLine);
     -webkit-box-orient: vertical;
     display: -webkit-box;
   }
