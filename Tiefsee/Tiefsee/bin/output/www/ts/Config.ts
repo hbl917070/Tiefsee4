@@ -164,7 +164,6 @@ class Config {
             mainExifShowWidth: 150, //寬度
             mainExifMaxLine: 20, //顯示的最大行數
 
-
             /** 大型切換按鈕 leftRight / bottom / none  */
             largeBtn: "bottom",
         },
@@ -227,6 +226,9 @@ class Config {
             dirListMaxCount: 5000,
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
             highQualityLimit: 4000,
+
+            /** exif 最大讀取長度 */
+            exifReadMaxLength: 200000,
         },
 
         /** 快速預覽 */

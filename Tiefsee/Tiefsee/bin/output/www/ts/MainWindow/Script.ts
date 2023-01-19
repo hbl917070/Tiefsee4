@@ -31,53 +31,80 @@ class ScriptImg {
         this.M = _M;
     }
 
+    /** 檢查當前顯示的類型是否為圖片 */
+    public isImg() {
+        if (this.M.fileLoad.getGroupType() === GroupType.img) {
+            return true;
+        }
+        if (this.M.fileLoad.getGroupType() === GroupType.imgs) {
+            return true;
+        }
+        if (this.M.fileLoad.getGroupType() === GroupType.video) {
+            return true;
+        }
+        if (this.M.fileLoad.getGroupType() === GroupType.unknown) {
+            return true;
+        }
+        return false;
+    }
+
     /** 全滿 */
     public zoomToFit() {
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['fitWindow']);
+        if (this.isImg() === false) { return; }
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindow"]);
     }
 
     /** 原始大小 */
     public zoomTo100() {
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType['imageOriginal']);
+        if (this.isImg() === false) { return; }
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
     }
 
     /** 順時針90° */
     public degForward() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.setDegForward(undefined, undefined);
     }
 
     /** 逆時針90° */
     public degReverse() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.setDegReverse(undefined, undefined);
     }
 
     /** 水平鏡像 */
     public mirrorHorizontal() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.setMirrorHorizontal(!this.M.fileShow.tiefseeview.getMirrorHorizontal());
     }
 
     /** 垂直鏡像 */
     public mirrorVertica() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.setMirrorVertica(!this.M.fileShow.tiefseeview.getMirrorVertica())
     }
 
     /** 初始化旋轉 */
     public transformRefresh() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.transformRefresh(true);
     }
 
     /** 放大 */
     public zoomIn() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomIn();
     }
 
     /** 縮小 */
     public zoomOut() {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomOut();
     }
 
     /** 向特定方向移動圖片 */
     public move(type: "up" | "right" | "down" | "left", distance?: number) {
+        if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.move(type, distance);
     }
 

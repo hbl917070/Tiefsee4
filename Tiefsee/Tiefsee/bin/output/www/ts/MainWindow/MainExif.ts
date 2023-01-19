@@ -129,7 +129,8 @@ class MainExif {
 			}
 
 			let path = fileInfo2.Path;
-			let json = await WebAPI.getExif(fileInfo2);
+			let maxLength = M.config.settings.advanced.exifReadMaxLength;
+			let json = await WebAPI.getExif(fileInfo2, maxLength);
 
 			if (json.code != "1") {
 				return;

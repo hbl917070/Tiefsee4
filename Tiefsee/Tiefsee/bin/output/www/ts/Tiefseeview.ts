@@ -3,75 +3,75 @@
  */
 class Tiefseeview {
 
-    public dom_tiefseeview: HTMLDivElement;//整體的div
-    public dom_con: HTMLDivElement;//表示整體佔位的容器，用於設定left、topo
-    public dom_data: HTMLDivElement;//放圖片的容器，用於旋轉與鏡像
-    public dom_img: HTMLImageElement;//圖片
-    public scrollX;//水平滾動條
-    public scrollY;//垂直滾動條
+    public dom_tiefseeview: HTMLDivElement; //整體的div
+    public dom_con: HTMLDivElement; //表示整體佔位的容器，用於設定left、topo
+    public dom_data: HTMLDivElement; //放圖片的容器，用於旋轉與鏡像
+    public dom_img: HTMLImageElement; //圖片
+    public scrollX; //水平滾動條
+    public scrollY; //垂直滾動條
 
-    public preloadImg;//預載入 圖片
-    public preloadVideo;//預載入 影片
-    public loadImg;//載入圖片
+    public preloadImg; //預載入 圖片
+    public preloadVideo; //預載入 影片
+    public loadImg; //載入圖片
     public loadBigimg;
     public loadBigimgscale;
     public loadVideo;
-    public loadNone;//載入空白圖片
-    public setLoading;//顯示或隱藏 loading
-    public getMargin;//取得 外距
+    public loadNone; //載入空白圖片
+    public setLoading; //顯示或隱藏 loading
+    public getMargin; //取得 外距
     public setMargin;
-    public getDpizoom;// 圖片dpi縮放，原始 1
+    public getDpizoom; // 圖片dpi縮放，原始 1
     public setDpizoom;
-    public getOverflowDistance;//取得 圖片拖曳允許的溢位距離
+    public getOverflowDistance; //取得 圖片拖曳允許的溢位距離
     public setOverflowDistance;
-    public getLoadingUrl;//取得 loading圖片
+    public getLoadingUrl; //取得 loading圖片
     public setLoadingUrl;
-    public getErrerUrl;//取得 error圖片
+    public getErrerUrl; //取得 error圖片
     public setErrerUrl;
-    public getIsOverflowX;//取得 圖片是否大於視窗(水平)
-    public getIsOverflowY;//取得 圖片是否大於視窗(垂直)
-    public getOriginalWidth;//取得圖片原始寬度
-    public getOriginalHeight;//取得圖片原始高度
-    public zoomFull;//圖片全滿
-    public zoomIn;//圖片放大
-    public zoomOut;//圖片縮小
-    public getDeg;//取得角度
+    public getIsOverflowX; //取得 圖片是否大於視窗(水平)
+    public getIsOverflowY; //取得 圖片是否大於視窗(垂直)
+    public getOriginalWidth; //取得圖片原始寬度
+    public getOriginalHeight; //取得圖片原始高度
+    public zoomFull; //圖片全滿
+    public zoomIn; //圖片放大
+    public zoomOut; //圖片縮小
+    public getDeg; //取得角度
     public setDeg;
-    public setDegForward;//順時針旋轉
-    public setDegReverse;//逆時針旋轉
-    public getMirrorHorizontal;//取得 水平鏡像
+    public setDegForward; //順時針旋轉
+    public setDegReverse; //逆時針旋轉
+    public getMirrorHorizontal; //取得 水平鏡像
     public setMirrorHorizontal;
-    public getMirrorVertica;//取得 垂直鏡像
+    public getMirrorVertica; //取得 垂直鏡像
     public setMirrorVertica;
-    public getXY;//取得 圖片坐標
+    public getXY; //取得 圖片坐標
     public setXY;
-    public move;//向特定方向移動
-    public init_point;//初始化坐標(避免超出範圍)
-    public transformRefresh;//旋轉跟鏡像初始化
-    public setAlign;//圖片對齊
-    public getRendering;//取得渲染模式
+    public move; //向特定方向移動
+    public init_point; //初始化坐標(避免超出範圍)
+    public transformRefresh; //旋轉跟鏡像初始化
+    public setAlign; //圖片對齊
+    public getRendering; //取得渲染模式
     public setRendering;
-    public getUrl;//取得當前圖片網址
+    public getUrl; //取得當前圖片網址
     public getCanvasBase64;
     public getCanvasBlob;
     public getIsZoomWithWindow; //取得 是否圖片隨視窗縮放
     public setIsZoomWithWindow;
 
-    public getEventMouseWheel;//滑鼠滾輪捲動時
+    public getEventMouseWheel; //滑鼠滾輪捲動時
     public setEventMouseWheel;
-    public getEventChangeZoom;//圖片發生縮放，或顯示圖片的區域改變大小時
+    public getEventChangeZoom; //圖片發生縮放，或顯示圖片的區域改變大小時
     public setEventChangeZoom;
-    public getEventChangeDeg;//圖片發生旋轉時
+    public getEventChangeDeg; //圖片發生旋轉時
     public setEventChangeDeg;
-    public getEventChangeMirror;//圖片發生鏡像時
+    public getEventChangeMirror; //圖片發生鏡像時
     public setEventChangeMirror;
-    public getEventChangeXY;//圖片發生移動時
+    public getEventChangeXY; //圖片發生移動時
     public setEventChangeXY;
-    public getEventLimitMax;//圖片放大上限
+    public getEventLimitMax; //圖片放大上限
     public setEventLimitMax;
-    public getEventLimitMin;//圖片縮小下限
+    public getEventLimitMin; //圖片縮小下限
     public setEventLimitMin;
-    public setEventHighQualityLimit;//覆寫 圖片面積大於這個數值，就停止使用高品質縮放
+    public setEventHighQualityLimit; //覆寫 圖片面積大於這個數值，就停止使用高品質縮放
 
     constructor(_dom: HTMLDivElement) {
 
@@ -109,46 +109,46 @@ class Tiefseeview {
         var scrollX = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
         var scrollY = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
 
-        var url: string;//目前的圖片網址
+        var url: string; //目前的圖片網址
         var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img";//資料類型
         var dpizoom: number = 1;
         var isDpizoomAUto: boolean = true;
-        var degNow: number = 0;//目前的角度 0~359
-        var zoomRatio: number = 1.1;//縮放比率(必須大於1)
-        var transformDuration: number = 200;//transform 動畫時間(毫秒)
-        var mirrorHorizontal: boolean = false;//水平鏡像
-        var mirrorVertical: boolean = false;//垂直鏡像
+        var degNow: number = 0; //目前的角度 0~359
+        var zoomRatio: number = 1.1; //縮放比率(必須大於1)
+        var transformDuration: number = 200; //transform 動畫時間(毫秒)
+        var mirrorHorizontal: boolean = false; //水平鏡像
+        var mirrorVertical: boolean = false; //垂直鏡像
         var rendering: TiefseeviewImageRendering = TiefseeviewImageRendering["auto"];//圖片渲染模式
-        var overflowDistance: number = 0;//溢位距離
-        var marginTop: number = 10;//外距
+        var overflowDistance: number = 0; //溢位距離
+        var marginTop: number = 10; //外距
         var marginLeft: number = 10;
         var marginBottom: number = 10;
         var marginRight: number = 10;
         var loadingUrl: string = "img/loading.svg";
         var errerUrl: string = "img/error.svg";
-        var rotateCriticalValue = 15;//觸控旋轉的最低旋轉角度
+        var rotateCriticalValue = 15; //觸控旋轉的最低旋轉角度
 
-        var hammerPan = new Hammer(dom_dpizoom);//單指拖曳
-        var panStartX: number = 0;//開始拖曳的坐標
+        var hammerPan = new Hammer(dom_dpizoom); //單指拖曳
+        var panStartX: number = 0; //開始拖曳的坐標
         var panStartY: number = 0;
-        var isMoving = false;//目前是否正在拖曳圖片
-        var isPaning = false;//目前是否正在拖曳圖片
+        var isMoving = false; //目前是否正在拖曳圖片
+        var isPaning = false; //目前是否正在拖曳圖片
 
-        var hammerPlural = new Hammer.Manager(dom_dpizoom);//用於雙指旋轉與縮放
-        var temp_rotateStareDegValue = 0;//雙指旋轉，初始角度
-        var temp_touchRotateStarting = false;//觸控旋轉 開始
-        var temp_rotateStareDegNow = 0;//觸控旋轉的起始角度
-        var temp_pinchZoom = 1;//雙指捏合縮放的上一個值
+        var hammerPlural = new Hammer.Manager(dom_dpizoom); //用於雙指旋轉與縮放
+        var temp_rotateStareDegValue = 0; //雙指旋轉，初始角度
+        var temp_touchRotateStarting = false; //觸控旋轉 開始
+        var temp_rotateStareDegNow = 0; //觸控旋轉的起始角度
+        var temp_pinchZoom = 1; //雙指捏合縮放的上一個值
         var temp_pinchCenterX = 0;
         var temp_pinchCenterY = 0;
 
-        var temp_dateShowLoading: number = 0;//控制laoding顯示的延遲
+        var temp_dateShowLoading: number = 0; //控制laoding顯示的延遲
         var temp_originalWidth: number = 1;//用於記錄圖片size 的暫存
         var temp_originalHeight: number = 1;
-        var temp_img: HTMLImageElement;//圖片暫存
-        var temp_can: HTMLCanvasElement;//canvas暫存
-        var temp_canvasSN = 0;//用於判斷canvas是否重複繪製
-        var temp_touchPadTime = 0;//用於判斷是否為觸控板
+        var temp_img: HTMLImageElement; //圖片暫存
+        var temp_can: HTMLCanvasElement; //canvas暫存
+        var temp_canvasSN = 0; //用於判斷canvas是否重複繪製
+        var temp_touchPadTime = 0; //用於判斷是否為觸控板
         /** Bigimgscale 用於儲存圖片網址與比例 */
         var arBigimgscale: { scale: number, url: string }[] = []
 
@@ -247,7 +247,7 @@ class Tiefseeview {
         setLoadingUrl(loadingUrl); //初始化 loading 圖片
         setLoading(false); //預設為隱藏
         dom_tiefseeview.classList.add("tiefseeview");
-        setTransform(undefined, undefined, false);//初始化定位
+        setTransform(undefined, undefined, false); //初始化定位
         setDpizoom(-1);
 
         //顯示圖片的區塊改變大小時
@@ -284,28 +284,28 @@ class Tiefseeview {
         });
         hammerPlural.on("rotate", async (ev) => {
 
-            let _deg = (ev.rotation - temp_rotateStareDegValue);//取得旋轉角度
+            let _deg = (ev.rotation - temp_rotateStareDegValue); //取得旋轉角度
 
             if (temp_touchRotateStarting === false) {
-                if (Math.abs(temp_rotateStareDegNow - Math.abs(_deg)) > rotateCriticalValue) {//旋轉超過特定角度，才會開始執行旋轉
+                if (Math.abs(temp_rotateStareDegNow - Math.abs(_deg)) > rotateCriticalValue) { //旋轉超過特定角度，才會開始執行旋轉
                     temp_rotateStareDegValue -= (temp_rotateStareDegNow - _deg);
                     _deg += (temp_rotateStareDegNow - _deg);
                     temp_touchRotateStarting = true;
                 }
             }
             if (temp_touchRotateStarting) {
-                setDeg(_deg, ev.center.x, ev.center.y, false);//無動畫旋轉
+                setDeg(_deg, ev.center.x, ev.center.y, false); //無動畫旋轉
             }
 
         });
         hammerPlural.on("rotateend", (ev) => {
             temp_touchRotateStarting = false;
-            let r = degNow % 90;//如果不足90度
+            let r = degNow % 90; //如果不足90度
             if (r === 0) { return }
             if (r > 45 || (r < 0 && r > -45)) {
-                setDegForward(ev.center.x, ev.center.y, true);//順時針旋轉
+                setDegForward(ev.center.x, ev.center.y, true); //順時針旋轉
             } else {
-                setDegReverse(ev.center.x, ev.center.y, true);//逆時針旋轉
+                setDegReverse(ev.center.x, ev.center.y, true); //逆時針旋轉
             }
         });
 
@@ -340,14 +340,14 @@ class Tiefseeview {
         });
         hammerPlural.on("pinchend", (ev) => {
             isPinching = false;
-            setRendering(rendering);//縮放結束後，把渲染模式改回原本的縮放模式
+            setRendering(rendering); //縮放結束後，把渲染模式改回原本的縮放模式
         });
 
 
         //滑鼠滾輪上下滾動時
         dom_dpizoom.addEventListener("wheel", (e: WheelEvent) => {
 
-            e.preventDefault();//禁止頁面滾動
+            e.preventDefault(); //禁止頁面滾動
 
             //避免在捲動軸上面也觸發
             if (e.target !== dom_dpizoom) { return; }
@@ -360,12 +360,12 @@ class Tiefseeview {
             //觸控板雙指移動
             if (isTouchPad || temp_touchPadTime + 200 > new Date().getTime()) {
 
-                temp_touchPadTime = new Date().getTime();//記錄當前時間，在200毫秒內的捲動都當做觸控板
+                temp_touchPadTime = new Date().getTime(); //記錄當前時間，在200毫秒內的捲動都當做觸控板
 
                 window.requestAnimationFrame(() => {
 
                     if (e.ctrlKey === true) {
-                        let scale = 1 - e.deltaY * 0.01;//無法使用
+                        let scale = 1 - e.deltaY * 0.01; //無法使用
                         zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, (scale), TiefseeviewImageRendering["pixelated"]);
 
                     } else {
@@ -382,9 +382,9 @@ class Tiefseeview {
 
                 })
 
-            } else {//一般的滑鼠滾輪
+            } else { //一般的滑鼠滾輪
                 //縮放計算
-                if (e.deltaX < 0 || e.deltaY < 0) {//往上
+                if (e.deltaX < 0 || e.deltaY < 0) { //往上
                     eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
                 } else { //往下
                     eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
@@ -473,16 +473,16 @@ class Tiefseeview {
                 let left = panStartX + deltaX * dpizoom;
                 let top = panStartY + deltaY * dpizoom;
 
-                if (getIsOverflowY()) {//高度大於視窗
-                    if (top > marginTop + overflowDistance) {//上
+                if (getIsOverflowY()) { //高度大於視窗
+                    if (top > marginTop + overflowDistance) { //上
                         top = marginTop + overflowDistance;
                     }
-                    let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
+                    let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom; //下
                     if (top < t - overflowDistance) {
                         top = t - overflowDistance;
                     }
                 } else {
-                    let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
+                    let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2; //置中的坐標
                     if (top > t + overflowDistance) {
                         top = t + overflowDistance;
                     }
@@ -491,16 +491,16 @@ class Tiefseeview {
                     }
                 }
 
-                if (getIsOverflowX()) {//寬度大於視窗
-                    if (left > marginLeft + overflowDistance) {//左
+                if (getIsOverflowX()) { //寬度大於視窗
+                    if (left > marginLeft + overflowDistance) { //左
                         left = marginLeft + overflowDistance;
                     }
-                    let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
+                    let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight; //右
                     if (left < l - overflowDistance) {
                         left = l - overflowDistance;
                     }
                 } else {
-                    let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
+                    let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2; //置中的坐標
                     if (left > l + overflowDistance) {
                         left = l + overflowDistance;
                     }
@@ -525,25 +525,23 @@ class Tiefseeview {
             if (isMoving === false) { return; }
             isMoving = false;
             isPaning = true;
-            let velocity = ev["velocity"];//加速度
+            let velocity = ev["velocity"]; //加速度
             let velocityX = ev["velocityX"];
             let velocityY = ev["velocityY"];
-            let duration = 10;//動畫時間
+            let duration = 10; //動畫時間
 
             let dpi = getDpizoom();
             velocity *= dpi;
             velocityX *= dpi;
             velocityY *= dpi;
 
-            //console.log(velocity, velocityX, velocityY, dpi)
-
-            if (ev.pointerType == "touch") {//如果是觸控
+            if (ev.pointerType == "touch") { //如果是觸控
                 velocity *= 2;
                 velocityX *= 2;
                 velocityY *= 2;
             }
 
-            duration = 150 + 100 * Math.abs(velocity);//動畫時間
+            duration = 150 + 100 * Math.abs(velocity); //動畫時間
             if (duration > 1200) duration = 1200;
 
             $(dom_con).stop(true, false);
@@ -559,25 +557,25 @@ class Tiefseeview {
                 return;
             }
 
-            let speed = 150;//速度
+            let speed = 150; //速度
             let top = toNumber(dom_con.style.top) + (velocityY * speed);
             let left = toNumber(dom_con.style.left) + (velocityX * speed);
 
             let bool_overflowX = false;
             let bool_overflowY = false;
 
-            if (getIsOverflowY()) {//高度大於視窗
-                if (top > marginTop + overflowDistance) {//上
+            if (getIsOverflowY()) { //高度大於視窗
+                if (top > marginTop + overflowDistance) { //上
                     top = marginTop + overflowDistance;
                     bool_overflowX = true;
                 }
-                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom;//下
+                let t = dom_dpizoom.offsetHeight - dom_con.offsetHeight - marginBottom; //下
                 if (top < t - overflowDistance) {
                     top = t - overflowDistance;
                     bool_overflowX = true;
                 }
             } else {
-                let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2;//置中的坐標
+                let t = (dom_dpizoom.offsetHeight - dom_con.offsetHeight) / 2; //置中的坐標
                 if (top > t + overflowDistance) {
                     top = t + overflowDistance;
                     bool_overflowX = true;
@@ -588,18 +586,18 @@ class Tiefseeview {
                 }
             }
 
-            if (getIsOverflowX()) {//寬度大於視窗
-                if (left > marginLeft + overflowDistance) {//左
+            if (getIsOverflowX()) { //寬度大於視窗
+                if (left > marginLeft + overflowDistance) { //左
                     left = marginLeft + overflowDistance;
                     bool_overflowY = true;
                 }
-                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight;//右
+                let l = dom_dpizoom.offsetWidth - dom_con.offsetWidth - marginRight; //右
                 if (left < l - overflowDistance) {
                     left = l - overflowDistance;
                     bool_overflowY = true;
                 }
             } else {
-                let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2;//置中的坐標
+                let l = (dom_dpizoom.offsetWidth - dom_con.offsetWidth) / 2; //置中的坐標
                 if (left > l + overflowDistance) {
                     left = l + overflowDistance;
                     bool_overflowY = true;
@@ -712,17 +710,17 @@ class Tiefseeview {
             let p = await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     if (isInitSize) {
-                        temp_originalWidth = img.naturalWidth;//初始化圖片size
+                        temp_originalWidth = img.naturalWidth; //初始化圖片size
                         temp_originalHeight = img.naturalHeight;
                     }
-                    resolve(true);//繼續往下執行
+                    resolve(true); //繼續往下執行
                 });
                 img.addEventListener("error", (e) => {
                     if (isInitSize) {
                         temp_originalWidth = 1;
                         temp_originalHeight = 1;
                     }
-                    resolve(false);//繼續往下執行
+                    resolve(false); //繼續往下執行
                 });
                 img.src = _url;
             })
@@ -771,7 +769,6 @@ class Tiefseeview {
          * 載入空白圖片
          */
         async function loadNone() {
-
             await loadBigimg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
             //await loadImg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
         }
@@ -787,7 +784,6 @@ class Tiefseeview {
             //setLoading(true);
             url = _url;
             let p = await preloadVideo(_url);
-
             //setLoading(false);
             setDataType("video");
 
@@ -799,7 +795,7 @@ class Tiefseeview {
             }
 
             dom_video.src = _url;
-            dom_video.onloadedmetadata = () => {//載入完成時自動播放
+            dom_video.onloadedmetadata = () => { //載入完成時自動播放
                 dom_video.play();
             }
             return true;
@@ -815,7 +811,6 @@ class Tiefseeview {
             //setLoading(true);
             url = _url;
             let p = await preloadImg(_url);
-
             //setLoading(false);
             setDataType("img");
 
@@ -843,7 +838,6 @@ class Tiefseeview {
             //setLoading(true);
             url = _url;
             let p = await preloadImg(_url);
-
             //setLoading(false);
             setDataType("bigimg");
 
@@ -853,11 +847,8 @@ class Tiefseeview {
                 dom_img.src = errerUrl;
                 return false;
             }
-            //temp_bigimg_50 = null;
-            //temp_bigimg_25 = null;
 
             temp_bigimg = [];
-
             temp_drawImage = {
                 scale: -1,
                 sx: 0, sy: 0,
@@ -867,9 +858,7 @@ class Tiefseeview {
             }
 
             dom_img.src = _url;
-
             temp_can = urlToCanvas(_url)
-
             //setDataSize(getOriginalWidth());
 
             return true;
@@ -921,7 +910,6 @@ class Tiefseeview {
             }
 
             //dom_img.src = url;
-
             //temp_bigimg = [];
             //temp_can = urlToCanvas(bigimgscaleItem.url);
             //setDataSize(getOriginalWidth());
@@ -1019,7 +1007,7 @@ class Tiefseeview {
                     cc.width = can.width;
                     cc.height = can.height;
                     let context = cc.getContext("2d") as CanvasRenderingContext2D;
-                    context.fillStyle = "#FFFFFF";  //填滿顏色
+                    context.fillStyle = "#FFFFFF"; //填滿顏色
                     context.fillRect(0, 0, can.width, can.height);
                     context.drawImage(can, 0, 0, can.width, can.height);
                     can = cc;
@@ -1029,8 +1017,6 @@ class Tiefseeview {
                     blob = b;
                     resolve(true);
                 }, outputType, q);
-
-
 
             })
 
@@ -1074,7 +1060,7 @@ class Tiefseeview {
                         let tempUrl = getUrl();
                         let domImg = document.createElement("img");
                         domImg.addEventListener("load", (e) => {
-                            if (tempUrl != getUrl()) {//避免已經切換圖片了
+                            if (tempUrl != getUrl()) { //避免已經切換圖片了
                                 //console.log("old:" + tempUrl + "   new:" + getUrl())
                                 resolve(false);
                                 return;
@@ -1099,7 +1085,6 @@ class Tiefseeview {
                     }
                 }
             }
-
 
             return null;
         }
@@ -1349,8 +1334,8 @@ class Tiefseeview {
          */
         function setAlign(_type: TiefseeviewAlignType) {
 
-            let type_horizontal: ("left" | "center" | "right") = "center";//水平對齊方式
-            let type_vertical: ("top" | "center" | "bottom") = "center";//垂直對齊方式
+            let type_horizontal: ("left" | "center" | "right") = "center"; //水平對齊方式
+            let type_vertical: ("top" | "center" | "bottom") = "center"; //垂直對齊方式
             let x: number = 0;
             let y: number = 0;
 
@@ -1485,10 +1470,10 @@ class Tiefseeview {
         /** */
         function getBigimgTemp_bigimg() {
 
-            let x = 0.8;//每次縮小的比例
-            let len = 6;//最多縮小幾次
+            let x = 0.8; //每次縮小的比例
+            let len = 6; //最多縮小幾次
 
-            let _scale = getScale();//目前的 圖片縮放比例
+            let _scale = getScale(); //目前的 圖片縮放比例
 
             //如果不需要縮小，就直接回傳
             if (_scale > 0.5) {
@@ -1639,7 +1624,7 @@ class Tiefseeview {
 
                 let domImg = e.data.img;
 
-                if (tempUrl != getUrl()) {//避免已經切換圖片了
+                if (tempUrl != getUrl()) { //避免已經切換圖片了
                     //console.log("old:" + tempUrl + "   new:" + getUrl())
                     return;
                 }
@@ -1690,7 +1675,7 @@ class Tiefseeview {
                 }
             }
 
-            let bigimgTemp = getBigimgTemp();//判斷要使用原圖或是縮小後的圖片
+            let bigimgTemp = getBigimgTemp(); //判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return }
 
             let can = bigimgTemp.img;
@@ -1698,12 +1683,12 @@ class Tiefseeview {
             let temp_can_width = can.width;
             let temp_can_height = can.height;
 
-            let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
+            let _w = toNumber(dom_data.style.width); //原始圖片大小(旋轉前的大小)
             let _h = toNumber(dom_data.style.height);
-            let _margin = 35;//多繪製的區域
-            let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
+            let _margin = 35; //多繪製的區域
+            let _scale = _w / getOriginalWidth(); //目前的 圖片縮放比例
             let radio_can = 1;
-            if (_w > getOriginalWidth()) {//如果圖片大於1倍，則用用原始大小
+            if (_w > getOriginalWidth()) { //如果圖片大於1倍，則用用原始大小
                 radio_can = _w / getOriginalWidth()
             }
 
@@ -1711,8 +1696,8 @@ class Tiefseeview {
             dom_bigimg.style.height = _h + "px";
 
             //取得顯示範圍左上角的坐標
-            let img_left = -toNumber(dom_con.style.left) //* bigimgTemp.scale;
-            let img_top = -toNumber(dom_con.style.top) //* bigimgTemp.scale;
+            let img_left = -toNumber(dom_con.style.left);
+            let img_top = -toNumber(dom_con.style.top);
 
             //計算顯示範圍的四個角落在圖片旋轉前的位置
             let origPoint1 = getOrigPoint(img_left, img_top, _w, _h, degNow);
@@ -1812,34 +1797,21 @@ class Tiefseeview {
                 let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
                 //context.imageSmoothingEnabled = false;
 
-                /*context.drawImage(temp_can,
-                    sx, sy, sWidth, sHeight,
-                    0, 0, dWidth, dHeight
-                );
-                return;*/
 
-
-                temp_canvasSN += 1;
-
+                temp_canvasSN += 1; //用於判斷是否已經切換圖片
                 let tc = temp_canvasSN;
 
-                //context.clearRect(-100, -100, 2000, 2000);
-                //var time = new Date();
+                let resizeQuality: ResizeQuality = "high"; //medium
 
-                //
-                let resizeQuality: ResizeQuality = "high";//medium
-
-                if (can.width * can.height > eventHighQualityLimit() || isPinching) {//如果圖片面積過大，或 雙指縮放中 
+                if (can.width * can.height > eventHighQualityLimit() || isPinching) { //如果圖片面積過大，或 雙指縮放中 
 
                     //console.log("drawImage直接渲染(不使用高品質縮放)");
-
                     sx = sx * bigimgTemp.scale
                     sy = sy * bigimgTemp.scale
                     sWidth = sWidth * bigimgTemp.scale
                     sHeight = sHeight * bigimgTemp.scale
                     dWidth = dWidth
                     dHeight = dHeight
-
                     toFloor();
                     //context.imageSmoothingQuality = "high";
                     context.drawImage(can,
@@ -1862,17 +1834,14 @@ class Tiefseeview {
                     );
 
                 }
-
                 else if (_scale >= 1) {
 
                     //console.log("drawImage直接渲染");
-
                     sx = sx * bigimgTemp.scale
                     sy = sy * bigimgTemp.scale
                     dWidth = dWidth / bigimgTemp.scale
                     dHeight = dHeight / bigimgTemp.scale
                     toFloor();
-
                     const oc = new OffscreenCanvas(sWidth, sHeight); //創建一個canvas畫布
                     const oc2d = oc.getContext("2d"); // canvas 畫筆
                     if (oc2d == null) { return }
@@ -1880,9 +1849,7 @@ class Tiefseeview {
                         sx, sy, sWidth, sHeight,
                         0, 0, sWidth, sHeight
                     );
-
                     resizeQuality = "medium";
-
                     await createImageBitmap(oc, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -1890,6 +1857,7 @@ class Tiefseeview {
                                 context.drawImage(sprites, 0, 0,);
                             }
                         });
+
                 }
                 else if (sWidth > temp_can_width && sHeight > temp_can_height) {
 
@@ -1909,7 +1877,8 @@ class Tiefseeview {
                             }
                         });
 
-                } else if (sWidth > temp_can_width == false && sHeight > temp_can_height) {
+                }
+                else if (sWidth > temp_can_width == false && sHeight > temp_can_height) {
 
                     //console.log("高度全部渲染");
                     //sWidth = getOriginalWidth();
@@ -1924,17 +1893,11 @@ class Tiefseeview {
                         .then(function (sprites) {
                             if (tc === temp_canvasSN) {
                                 context.drawImage(sprites, 0, sy);
-
-                                //把多餘的部分清除
-                                /*if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
-                                let right = ((temp_can_width - sx - sWidth) * _scale);
-                                if (right * -1 < _margin + marginRight + 1) {
-                                    context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
-                                }*/
                             }
                         });
 
-                } else if (sWidth > temp_can_width && sHeight > temp_can_height == false) {
+                }
+                else if (sWidth > temp_can_width && sHeight > temp_can_height == false) {
 
                     //console.log("寬度全部渲染");
                     sWidth = temp_can_width;
@@ -1949,18 +1912,11 @@ class Tiefseeview {
                         .then(function (sprites) {
                             if (tc === temp_canvasSN) {
                                 context.drawImage(sprites, sx, 0);
-
-                                //把多餘的部分清除
-                                /*if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
-                                let bottom = ((temp_can_height - sy - sHeight) * _scale);
-                                if (bottom * -1 < _margin + marginBottom + 1) {
-                                    context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
-                                }*/
                             }
                         });
 
-
-                } else if (sWidth > temp_can_width == false && sHeight > temp_can_height == false) {
+                } 
+                else if (sWidth > temp_can_width == false && sHeight > temp_can_height == false) {
 
                     //console.log("局部渲染");
                     sx = sx * bigimgTemp.scale
@@ -1973,31 +1929,12 @@ class Tiefseeview {
                         .then(function (sprites) {
                             if (tc === temp_canvasSN) {
                                 context.drawImage(sprites, 0, 0,);
-
-                                //把多餘的部分清除
-                                /*if (sx < 1) { context.clearRect(0, 0, sx * -1 * _scale, dom_bigimg_canvas.height); }
-                                let right = ((temp_can_width - sx - sWidth) * _scale);
-                                if (right * -1 < _margin + marginRight + 1) {
-                                    context.clearRect(dom_bigimg_canvas.width + right, 0, _margin + marginRight, dom_bigimg_canvas.height);
-                                }
-                                //把多餘的部分清除
-                                if (sy < 1) { context.clearRect(0, 0, dom_bigimg_canvas.width, sy * -1 * _scale); }
-                                let bottom = ((temp_can_height - sy - sHeight) * _scale);
-                                if (bottom * -1 < _margin + marginBottom + 1) {
-                                    context.clearRect(0, dom_bigimg_canvas.height + bottom, dom_bigimg_canvas.width, _margin + marginBottom);
-                                }*/
                             }
                         });
+
                 }
 
-                //console.log([sx, sy, sWidth, sHeight, dWidth, dHeight])
 
-                /*
-                var int_毫秒 = (new Date()).getTime() - time.getTime();
-                console.log(int_毫秒 );*/
-
-
-                //#######/
             }
 
 
@@ -2008,8 +1945,8 @@ class Tiefseeview {
          * 目前的 圖片縮放比例
          */
         function getScale() {
-            let _w = toNumber(dom_data.style.width);//原始圖片大小(旋轉前的大小)
-            let _scale = _w / getOriginalWidth();//目前的 圖片縮放比例
+            let _w = toNumber(dom_data.style.width); //原始圖片大小(旋轉前的大小)
+            let _scale = _w / getOriginalWidth(); //目前的 圖片縮放比例
             return _scale;
         }
 
@@ -2067,9 +2004,9 @@ class Tiefseeview {
             if (_type === TiefseeviewZoomType["fitWindowOrImageOriginal"]) {
                 if (getOriginalWidth() > (dom_dpizoom.offsetWidth - marginLeft - marginRight) ||
                     getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
-                    _type = TiefseeviewZoomType["fitWindow"];//縮放至視窗大小
+                    _type = TiefseeviewZoomType["fitWindow"]; //縮放至視窗大小
                 } else {
-                    _type = TiefseeviewZoomType["imageOriginal"];//圖片原始大小
+                    _type = TiefseeviewZoomType["imageOriginal"]; //圖片原始大小
                 }
             }
 
@@ -2077,7 +2014,7 @@ class Tiefseeview {
             if (_type === TiefseeviewZoomType["imageOriginal"]) {
                 _w = (getOriginalWidth());
             }
-            if (_type === TiefseeviewZoomType["fitWindow"]) {//縮放至視窗大小
+            if (_type === TiefseeviewZoomType["fitWindow"]) { //縮放至視窗大小
                 let ratio_w = dom_con_offsetWidth / (dom_dpizoom.offsetWidth - marginLeft - marginRight)
                 let ratio_h = dom_con_offsetHeight / (dom_dpizoom.offsetHeight - marginTop - marginBottom)
                 if (ratio_w > ratio_h) {
@@ -2086,35 +2023,35 @@ class Tiefseeview {
                     _type = TiefseeviewZoomType["fitWindowHeight"]
                 }
             }
-            if (_type === TiefseeviewZoomType["fiwWindowWidth"]) {//寬度全滿
+            if (_type === TiefseeviewZoomType["fiwWindowWidth"]) { //寬度全滿
                 _val = 100;
                 _type = TiefseeviewZoomType["windowWidthRatio"];
             }
-            if (_type === TiefseeviewZoomType["fitWindowHeight"]) {//高度全滿
+            if (_type === TiefseeviewZoomType["fitWindowHeight"]) { //高度全滿
                 _val = 100;
                 _type = TiefseeviewZoomType["windowHeightRatio"];
             }
-            if (_type === TiefseeviewZoomType["windowWidthRatio"]) {//以視窗寬度比例設定
+            if (_type === TiefseeviewZoomType["windowWidthRatio"]) { //以視窗寬度比例設定
                 let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (w * ratio * (_val / 100));
             }
-            if (_type === TiefseeviewZoomType["windowHeightRatio"]) {//以視窗高度比例設定
-                let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5;//顯示範圍 - 邊距
+            if (_type === TiefseeviewZoomType["windowHeightRatio"]) { //以視窗高度比例設定
+                let w = dom_dpizoom.offsetHeight - marginTop - marginBottom - 5; //顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
-                let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
-                let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
+                let ratio = getOriginalWidth() / dom_con_offsetWidth; //旋轉後的比例
+                let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight; //旋轉後圖片長寬的比例
                 _w = (w * ratio * ratio_xy * (_val / 100));
             }
 
-            if (_type === TiefseeviewZoomType["imageWidthPx"]) {//以絕對寬度設定
+            if (_type === TiefseeviewZoomType["imageWidthPx"]) { //以絕對寬度設定
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (toNumber(_val) * ratio);
             }
-            if (_type === TiefseeviewZoomType["imageHeightPx"]) {//以絕對高度設定
-                let ratio = getOriginalWidth() / dom_con_offsetWidth;//旋轉後的比例
-                let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight;//旋轉後圖片長寬的比例
+            if (_type === TiefseeviewZoomType["imageHeightPx"]) { //以絕對高度設定
+                let ratio = getOriginalWidth() / dom_con_offsetWidth; //旋轉後的比例
+                let ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight; //旋轉後圖片長寬的比例
                 _w = (toNumber(_val) * ratio * ratio_xy);
             }
 
@@ -2141,7 +2078,7 @@ class Tiefseeview {
             if (_rendering === undefined) {
                 _rendering = rendering
             }
-            setRendering(_rendering, true);//單純套用css，而不覆寫設定
+            setRendering(_rendering, true); //單純套用css，而不覆寫設定
 
             //圖片縮放上限
             if (_zoomRatio === 1) { return; }
@@ -2254,7 +2191,7 @@ class Tiefseeview {
             let top = toNumber(dom_con.style.top);
             let left = toNumber(dom_con.style.left);
 
-            if (bool_w && bool_h) {//圖片寬度高度都大於視窗
+            if (bool_w && bool_h) { //圖片寬度高度都大於視窗
                 if (toNumber(dom_con.style.top) > marginTop) {
                     top = marginTop;
                 }
@@ -2338,7 +2275,7 @@ class Tiefseeview {
         async function setMirrorHorizontal(bool: boolean, boolAnimation: boolean = true) {
 
             if (degNow != 0) {
-                setDeg(360 - degNow, undefined, undefined, true);//先旋轉成鏡像後的角度
+                setDeg(360 - degNow, undefined, undefined, true); //先旋轉成鏡像後的角度
             }
 
             mirrorHorizontal = bool;
@@ -2385,7 +2322,7 @@ class Tiefseeview {
         async function setMirrorVertica(bool: boolean, boolAnimation: boolean = true) {
 
             if (degNow != 0) {
-                setDeg(360 - degNow, undefined, undefined, true);//先旋轉成鏡像後的角度
+                setDeg(360 - degNow, undefined, undefined, true); //先旋轉成鏡像後的角度
             }
 
             mirrorVertical = bool;
@@ -2462,7 +2399,7 @@ class Tiefseeview {
 
                 dom_con.style.top = _top + "px";
                 dom_con.style.left = _left + "px";
-                init_scroll();//初始化捲動軸的位置(跟隨圖片位置同步)
+                init_scroll(); //初始化捲動軸的位置(跟隨圖片位置同步)
 
             } else {
 
@@ -2470,7 +2407,7 @@ class Tiefseeview {
 
                     $(dom_con).animate(
                         {
-                            "top": _top,//自訂用於動畫的變數
+                            "top": _top, //自訂用於動畫的變數
                             "left": _left,
                         },
                         {
@@ -2480,14 +2417,14 @@ class Tiefseeview {
                                 dom_con.style.top = data.top + "px";
                                 dom_con.style.left = data.left + "px";
                                 bigimgDraw();
-                                init_scroll();//初始化捲動軸的位置(跟隨圖片位置同步)
+                                init_scroll(); //初始化捲動軸的位置(跟隨圖片位置同步)
                             },
-                            duration: _sp,//動畫時間
+                            duration: _sp, //動畫時間
                             start: () => { },
-                            complete: () => {//動畫結束時
+                            complete: () => { //動畫結束時
                                 dom_con.style.top = _top + "px";
                                 dom_con.style.left = _left + "px";
-                                resolve(0);//繼續往下執行
+                                resolve(0); //繼續往下執行
                             },
                             easing: "easeOutExpo"
                         });
@@ -2503,9 +2440,7 @@ class Tiefseeview {
          * @param distance 移動距離
          */
         function move(type: ("up" | "right" | "down" | "left"), distance: number = 100) {
-
             const point = getXY();
-
             if (type === "up") {
                 setXY(point.x, point.y + distance, 0);
             }
@@ -2527,7 +2462,6 @@ class Tiefseeview {
          * @param boolAnimation 是否使用動畫
          */
         async function transformRefresh(boolAnimation: boolean = true): Promise<void> {
-
             if (mirrorVertical === true) {
                 await setMirrorVertica(false);
             }
@@ -2548,7 +2482,7 @@ class Tiefseeview {
             //動畫時間
             let duration: number = transformDuration;
             if (isAnimation == false) {
-                duration = 0;//無動畫
+                duration = 0; //無動畫
             }
 
             //鏡像
@@ -2571,7 +2505,7 @@ class Tiefseeview {
             await new Promise((resolve, reject) => {
 
                 $(dom_data).animate({
-                    "transform_rotate": degNow,//自訂用於動畫的變數
+                    "transform_rotate": degNow, //自訂用於動畫的變數
                     "transform_scaleX": scaleX,
                     "transform_scaleY": scaleY,
                 }, {
@@ -2608,9 +2542,9 @@ class Tiefseeview {
                         init_point(false);
 
                     },
-                    duration: duration,//動畫時間
+                    duration: duration, //動畫時間
 
-                    complete: () => {//動畫結束時
+                    complete: () => { //動畫結束時
 
                         //如果角度超過360，就初始化
                         if (degNow <= 0 || degNow >= 360) { degNow = degNow - Math.floor(degNow / 360) * 360; } //避免超過360               
@@ -2619,7 +2553,7 @@ class Tiefseeview {
 
                         dom_data.setAttribute("transform_rotate", degNow.toString());
                         init_point(false);
-                        resolve(0);//繼續往下執行
+                        resolve(0); //繼續往下執行
                     },
                     easing: "linear"
                 });
@@ -2632,7 +2566,6 @@ class Tiefseeview {
 
 
         EventChangePixelRatio(() => {
-
             if (isDpizoomAUto === true) {
                 setDpizoom(window.devicePixelRatio, true);
             }
@@ -2728,9 +2661,9 @@ class Tiefseeview {
             let divsubRect = divsub.getBoundingClientRect();
 
             return {
-                rectWidth: divRect.width,//矩形旋轉後的實際大小
+                rectWidth: divRect.width, //矩形旋轉後的實際大小
                 rectHeight: divRect.height,
-                x: divsubRect.x - divRect.x,//矩形裡面某一個點旋轉後的位置
+                x: divsubRect.x - divRect.x, //矩形裡面某一個點旋轉後的位置
                 y: divsubRect.y - divRect.y
             }
         }
@@ -2826,8 +2759,8 @@ class TiefseeviewScroll {
         var dom_bg: HTMLDivElement = <HTMLDivElement>dom_scroll.querySelector(".scroll-bg");
         var dom_box: HTMLDivElement = <HTMLDivElement>dom_scroll.querySelector(".scroll-box");
         var type: ("x" | "y") = _type;
-        var contentHeight: number = 0;//內容高度(全部的值)
-        var panelHeight: number = 0;//容器的高度
+        var contentHeight: number = 0; //內容高度(全部的值)
+        var panelHeight: number = 0; //容器的高度
         var _eventChange = (v: number, mode: string) => { };
         var hammer_scroll = new Hammer(dom_scroll, {});
         var startLeft: number = 0;
@@ -2845,12 +2778,12 @@ class TiefseeviewScroll {
         dom_scroll.addEventListener("wheel", (ev) => { MouseWheel(ev); }, true);
         const MouseWheel = (e: WheelEvent) => {
 
-            e.preventDefault();//禁止頁面滾動
+            e.preventDefault(); //禁止頁面滾動
             e = e || window.event;
 
             let v = getTop();
 
-            if (e.deltaX > 0 || e.deltaY > 0) {//下
+            if (e.deltaX > 0 || e.deltaY > 0) { //下
                 setTop(v + 10, "wheel");
             } else {//上
                 setTop(v - 10, "wheel");
@@ -2886,7 +2819,7 @@ class TiefseeviewScroll {
         });
 
         hammer_scroll.on("panend", (ev) => {
-            dom_scroll.setAttribute("action", "");//表示「結束拖曳」，用於CSS樣式
+            dom_scroll.setAttribute("action", ""); //表示「結束拖曳」，用於CSS樣式
         });
 
 
@@ -2940,7 +2873,7 @@ class TiefseeviewScroll {
          */
         function setValue(v: number): void {
 
-            v = v / (contentHeight - panelHeight);//換算成百分比
+            v = v / (contentHeight - panelHeight); //換算成百分比
 
             if (type === "y") {
                 v = v * (dom_scroll.offsetHeight - dom_box.offsetHeight);
@@ -3027,14 +2960,14 @@ class TiefseeviewScroll {
         function eventChange(mode: ("set" | "pan" | "wheel")): void {
             let x = 0;
             if (type === "y") {
-                x = dom_scroll.offsetHeight - dom_box.offsetHeight;//計算剩餘空間
-                x = toNumber(dom_box.style.top) / x;//計算比例
+                x = dom_scroll.offsetHeight - dom_box.offsetHeight; //計算剩餘空間
+                x = toNumber(dom_box.style.top) / x; //計算比例
                 x = x * (contentHeight - panelHeight)
             }
 
             if (type === "x") {
-                x = dom_scroll.offsetWidth - dom_box.offsetWidth;//計算剩餘空間
-                x = toNumber(dom_box.style.left) / x;//計算比例
+                x = dom_scroll.offsetWidth - dom_box.offsetWidth; //計算剩餘空間
+                x = toNumber(dom_box.style.left) / x; //計算比例
                 x = x * (contentHeight - panelHeight)
             }
 
@@ -3129,4 +3062,3 @@ enum TiefseeviewImageRendering {
     /** 圖片大於100%時呈現方塊 */
     "autoOrPixelated" = 2,
 }
-

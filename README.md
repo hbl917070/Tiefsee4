@@ -1,23 +1,42 @@
 ﻿# Tiefsee4
 
 ## 簡述
-Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特殊格式 (例如psd、heic、avif、qoi
+
+Tiefsee 是一款開源的圖片檢視器。
+- 免安裝，解壓縮後即可運行
+- 支援多種特殊圖片格式：webp、webm、psd、clip、heic、avif、qoi ...
+
+特點功能
+- 快速啟動：只要Tiefsee尚未完全關閉，就能快速開啟Tiefsee
+- 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
+- 線上搜圖：sauceNAO、Yandex、Ascii2d、Google、Google Lens、Bing
+- 檔案預覽面板：預覽同資料夾內的圖片
+- 資料夾預覽面板：預覽旁邊資料夾內的圖片
+- 詳細資料面板：exif資訊、圖片拍攝地點、AI繪圖使用的參數
+- QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
+- 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx與pptx閱讀器
+
+界面語言：
+- English
+- 中文
+- 日本語
 
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.23](https://github.com/hbl917070/Tiefsee4/releases)
+[Tiefsee 4.0.0-beta.24](https://github.com/hbl917070/Tiefsee4/releases)
 (注意：此為測試版
 
     開發中功能：  
-    瀏覽多幀圖片、大量瀏覽模式、多國語言、自定快速鍵
+    瀏覽多幀圖片、大量瀏覽模式、自定快速鍵
 
 <br>
 
 ## 運行需求
-- 作業系統：64位元的Windows 10、Windows 11
+- 64位元
+- Windows 10 或 Windows 11
 - [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48) (含、以上
-- [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)
+- [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/WebView2/)
 
 <br>
 
@@ -33,32 +52,31 @@ Tiefsee是一個以簡約理念設計而成的圖片檢視器，支援各種特�
 
 <br>
 
+# 常見問題
+
+### 1、啟動程式時顯示「WebView2 must be installed to run this application」
+> 可能原因為
+> - 電腦尚未安裝 WebView2：「<a href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">點此</a>」進行下載。
+> - WebView2安裝失敗：移除舊的WebView2後，對「WebView2的安裝檔」右鍵→系統管理員身份執行。
+> - WebView2初始化錯誤：避免在Tiefsee的路徑裡面包含中文日文韓文之類的特殊字元。
+
+### 2、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
+> 毛玻璃視窗效果並非Windows正式公開的API，在某些裝置上可能存在BUG，或是無法使用。常見的問題為：
+> - 模糊區域溢出到視窗外
+> - Tiefsee的視窗在移動時嚴重延遲
+
+### 3、無法開啟長路經的檔案
+> 理論上改用 .net 6 來編譯可以解決此問題，但 .net 6 的運行環境並非Windows內建的環境，因此暫時不考慮調整專案類型。
+
+### 4、在觸控螢幕上以觸控來移動Tiefsee視窗時，流暢度不佳
+> WebView2 會將「觸控指令」攔截，導致無法使用 winAPI 來移動視窗。目前尚無解決方案。
+
+<br>
+
 # 專案說明
 ### 專案類型：C# WinForm (net 4.8)
 ### 開發語言：C#、TypeScript
 ### [專案建立步驟](/Building.md)
-
-<br>
-
-# 目前已知問題
-### 1、無法使用觸控拖曳移動程式
-> 此問題在同樣基於webview2開發的win11 Microsoft Teams也存在。<br>
-於4.0.0-beta.18修復此問題，但僅是透過js計算視窗坐標，而非使用系統原生的winAPI，因此流暢度不佳。
-
-### 2、無法於 Windows 7 運行
-> 讓視窗透明化的程式碼會導致Tiefsee無法運行於 Windows 7，暫時無解決方案。
-
-### 3、使用毛玻璃視窗後，模糊區域會溢出視窗外
-> 將專案移植到UWP或winUI 3，或許可以解決此問題，但改動幅度極大，因此目前無此計劃。
-
-### 4、視窗使用毛玻璃效果後，可能導致Tiefsee的視窗在移動時嚴重延遲
-> 此BUG並非所有電腦都會發生。Tiefsee提供win7跟win10兩種毛玻璃效果，但不論是哪一種都並非Windows正式公開的API。
-
-### 5、無法開啟長路經的檔案
-> 理論上改用 .net 6 來編譯可以解決此問題，但 .net 6 的運行環境並非Windows內建的環境，因此暫時不考慮調整專案類型。
-
-### 6、Tiefsee.exe的路徑不能含有中文日文之類的特殊字元
-> 此BUG並非所有電腦都會發生。如果確定已經安裝Webview2了但依然顯示「必須安裝Webview2才能運行Tiefsee」，嘗試把Tiefsee放在沒有中文的路徑裡面執行。依然不行的話，嘗試以系統管理員身份執行Webview2的安裝程式。
 
 <br>
 

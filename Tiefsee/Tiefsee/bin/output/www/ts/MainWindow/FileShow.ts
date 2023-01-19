@@ -272,22 +272,22 @@ class FileShow {
                         _zoomType, _zoomVal
                     );
 
-                } else {//載入失敗就顯示圖示
+                } else { //載入失敗就顯示圖示
 
                     imgurl = await WebAPI.Img.getUrl("icon", fileInfo2);//取得圖片網址
-                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                    await tiefseeview.loadImg(imgurl);
 
                 }
 
-            } else {//使用<canvas>直接開啟網址
+            } else { //使用<canvas>直接開啟網址
 
-                imgurl = await WebAPI.Img.getUrl(configType, fileInfo2);//取得圖片網址
-                let loadOk = await tiefseeview.preloadImg(imgurl);//預載入
+                imgurl = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
+                let loadOk = await tiefseeview.preloadImg(imgurl); //預載入
                 if (loadOk) {
-                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
-                } else {//載入失敗就顯示圖示
-                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2);//取得圖片網址
-                    await tiefseeview.loadBigimg(imgurl);//使用<canvas>渲染
+                    await tiefseeview.loadBigimg(imgurl); //使用<canvas>渲染
+                } else { //載入失敗就顯示圖示
+                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
+                    await tiefseeview.loadImg(imgurl); 
                 }
 
             }

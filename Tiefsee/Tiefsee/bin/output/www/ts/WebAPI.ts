@@ -232,11 +232,11 @@ class WebAPI {
     /**
      * 取得檔案exif
      */
-    static async getExif(fileInfo2: FileInfo2) {
+    static async getExif(fileInfo2: FileInfo2, maxLength: number) {
         let path = fileInfo2.Path;
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         let encodePath = encodeURIComponent(path);
-        let url = APIURL + `/api/getExif?maxLength=50000&path=${encodePath}&${fileTime}`;
+        let url = APIURL + `/api/getExif?maxLength=${maxLength}&path=${encodePath}&${fileTime}`;
         let json = await fetchGet_json(url);
         return json as {
             code: string,
