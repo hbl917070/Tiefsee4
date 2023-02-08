@@ -6,7 +6,7 @@ Tiefsee 是一款開源的圖片檢視器。
 - 免安裝，解壓縮後即可運行
 - 支援多種特殊圖片格式：webp、webm、psd、clip、heic、avif、qoi ...
 
-特點功能
+特點功能：
 - 快速啟動：只要Tiefsee尚未完全關閉，就能快速開啟Tiefsee
 - 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
 - 線上搜圖：sauceNAO、Yandex、Ascii2d、Google、Google Lens、Bing

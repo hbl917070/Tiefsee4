@@ -119,43 +119,26 @@ namespace Tiefsee {
                         if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
                             continue;
                         }
-
                         if (value != null && value.Length > maxLength) {//某些圖片可能把二進制資訊封裝進去
                             continue;
                         }
 
-                        //判斷是否為 iso-8859-1 ，是的話就轉成utf8
-                        try {
-                            if (name == "Textual Data" && value != null) {
-
-                                if (CheckEncoding(value, Encoding.GetEncoding(28591))) {
+                        if (name == "Textual Data" && value != null) {
+                            try {
+                                if (group == "PNG-iTXt") { // utf8 格式
                                     byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
-                                    for (int i = 0; i < unknow.Length; i++) {//把 ASCII「A0」轉成一般的「空白符號」，否則會顯示亂碼
-                                        if (unknow[i] == 160) {
-                                            unknow[i] = 32;
-                                        }
-                                    }
                                     string utf8 = Encoding.UTF8.GetString(unknow);
                                     value = utf8;
+                                } else if (group == "PNG-tEXt") { // ISO-8859-1 格式
+                                    /*byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
+                                    string utf8 = Encoding.GetEncoding(28591).GetString(unknow);
+                                    value = utf8;*/
+                                } else {
+                                    continue;
                                 }
-
-                                //using (Stream stream = new MemoryStream(new UTF8Encoding(true).GetBytes(utf8))) {
-                                /*using (Stream stream = new MemoryStream(unknow)) {
-                                    stream.Position = 0;
-                                    StringBuilder sb = new StringBuilder();
-                                    using (System.IO.BinaryReader br = new System.IO.BinaryReader(stream)) {
-                                        for (int i = 0; i < 900; i++) {
-                                            string hexValue = br.ReadByte().ToString("X2");
-                                            int v = Convert.ToInt32(hexValue, 16);
-                                            char charValue = (char)v;
-                                            sb.Append(hexValue + "(" + charValue + ")" + " ");
-                                        }
-                                    }//using
-                                    //Console.WriteLine(sb);
-                                }*/
+                            } catch (Exception ee) {
+                                Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
                             }
-                        } catch (Exception ee) {
-                            Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
                         }
 
                         //sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
@@ -230,38 +213,6 @@ namespace Tiefsee {
         }
 
 
-        /// <summary>
-        /// 檢查編碼類型
-        /// </summary>
-        private static bool CheckEncoding(string str, string type) {
-            if (type == "utf-8") {
-                byte[] unknow = Encoding.UTF8.GetBytes(str);
-                return Encoding.UTF8.GetString(unknow) == str;
-            }
-            if (type == "iso-8859-1") {
-                byte[] unknow = Encoding.GetEncoding(28591).GetBytes(str);
-                return Encoding.GetEncoding(28591).GetString(unknow) == str;
-            }
-            if (type == "ascii") {
-                byte[] unknow = Encoding.ASCII.GetBytes(str);
-                return Encoding.ASCII.GetString(unknow) == str;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 檢查編碼類型
-        /// </summary>
-        private static bool CheckEncoding(string value, Encoding encoding) {
-            bool retCode;
-            var charArray = value.ToCharArray();
-            byte[] bytes = new byte[charArray.Length];
-            for (int i = 0; i < charArray.Length; i++) {
-                bytes[i] = (byte)charArray[i];
-            }
-            retCode = string.Equals(encoding.GetString(bytes, 0, bytes.Length), value, StringComparison.InvariantCulture);
-            return retCode;
-        }
 
 
     }
