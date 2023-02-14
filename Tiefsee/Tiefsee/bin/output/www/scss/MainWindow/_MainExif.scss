@@ -101,10 +101,18 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
+    transition: 0s opacity;
   }
+  //移入整個項目時，顯示半透明的按鈕
+  .mainExifItem:hover .mainExifCopyBtn {
+    opacity: 0.3;
+    transition: 0.3s opacity;
+  }
+  //移入按鈕時，顯示按鈕
   .mainExifCopyBtn:hover {
-    opacity: 1;
     cursor: pointer;
+    transition: 0s opacity !important;
+    opacity: 1 !important;
   }
   .mainExifCopyBtn svg {
     width: 18px;
