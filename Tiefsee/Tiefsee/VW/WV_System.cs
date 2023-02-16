@@ -82,26 +82,25 @@ namespace Tiefsee {
         /// <summary>
         /// 刪除圖片暫存
         /// </summary>
-        /// <param name="maxImg100"> img100資料夾最多保留的檔案數量 </param>
-        /// <param name="maxImgScale"> imgScale資料夾最多保留的檔案數量 </param>
-        public void DeleteTemp(int maxImg100, int maxImgScale) {
+        /// <param name="maxImgProcessed"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
+        /// <param name="maxImgZoom"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
+        public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
             new Thread(() => {
                 if (Program.startType == 3 || Program.startType == 5) {//常駐背景
                     if (QuickRun.runNumber <= 2) {
-                        DeleteTemp(ImgLib.dir_img100, maxImg100);
-                        DeleteTemp(ImgLib.dir_imgScale, maxImgScale);
+                        DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
+                        DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
                         Console.WriteLine("########## 刪除圖片暫存(常駐背景)");
                     }
                     return;
                 }
-
-                string portDir = Path.Combine(Program.appDataPath, "port");
-                if (Directory.Exists(portDir) == false) { return; }
-                int postCount = Directory.GetFiles(portDir).Length;
+                             
+                if (Directory.Exists(AppPath.appDataPort) == false) { return; }
+                int postCount = Directory.GetFiles(AppPath.appDataPort).Length;
                 if (postCount == 1) {
                     if (QuickRun.runNumber <= 1) {
-                        DeleteTemp(ImgLib.dir_img100, maxImg100);
-                        DeleteTemp(ImgLib.dir_imgScale, maxImgScale);
+                        DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
+                        DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
                         Console.WriteLine("########## 刪除圖片暫存" + QuickRun.runNumber);
                     }
                 }
@@ -397,7 +396,7 @@ namespace Tiefsee {
                 try {
                     SystemParametersInfo(20, 1, path, 0x1 | 0x2);  //存在成立，修改桌布　　(uActuin 20 參數為修改wallpaper
                 } catch (Exception e2) {
-                    MessageBox.Show("設定桌布失敗：\n" + e2.ToString(), "失敗");
+                    MessageBox.Show("\"Set as Desktop Background\" failed：\n" + e2.ToString(), "Error");
                 }
             }
         }

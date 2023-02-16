@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapter.cs" />
+    <Compile Include="AppPath.cs" />
     <Compile Include="Lib\Exif.cs" />
     <Compile Include="Lib\FileSort.cs" />
     <Compile Include="Lib\ImgLib.cs" />

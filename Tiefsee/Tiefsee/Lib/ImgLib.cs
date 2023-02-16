@@ -17,19 +17,7 @@ namespace Tiefsee {
 
     public class ImgLib {
 
-        /// <summary> 暫存資料夾 - 未縮放的圖片 </summary>
-        public static string dir_img100 {
-            get {
-                return Path.Combine(Path.GetTempPath(), "Tiefsee\\img100");
-            }
-        }
-
-        /// <summary> 暫存資料夾 - 縮放後的圖片 </summary>
-        public static string dir_imgScale {
-            get {
-                return Path.Combine(Path.GetTempPath(), "Tiefsee\\imgScale");//暫存資料夾
-            }
-        }
+     
 
         /// <summary>
         /// 
@@ -319,14 +307,14 @@ namespace Tiefsee {
             type = type.ToLower();
             //string hashName = FileToHash(path) + (isPng ? ".png" : ".bmp");//暫存檔案名稱
             string hashName = FileToHash(path) + ".jpg";//暫存檔案名稱
-            string filePath = Path.Combine(dir_img100, hashName);//暫存檔案的路徑
+            string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName);//暫存檔案的路徑
 
             if (File.Exists(filePath)) {//如果檔案已經存在，就直接回傳
                 return filePath;
             }
 
-            if (Directory.Exists(dir_img100) == false) {//如果暫存資料夾不存在就建立
-                Directory.CreateDirectory(dir_img100);
+            if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {//如果暫存資料夾不存在就建立
+                Directory.CreateDirectory(AppPath.tempDirImgProcessed);
             }
 
             string argOut = "";
@@ -613,15 +601,15 @@ namespace Tiefsee {
         public static string VipsResize(string path, double scale) {
 
             string hashName = $"{FileToHash(path)}_{scale}.jpg";//暫存檔案名稱
-            string filePath = Path.Combine(dir_imgScale, hashName);//暫存檔案的路徑
+            string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName);//暫存檔案的路徑
 
             if (File.Exists(filePath)) {//如果檔案已經存在，就直接回傳
                 File.SetLastWriteTime(filePath, DateTime.Now);//調整最後修改時間，延後暫存被清理
                 return filePath;
             }
 
-            if (Directory.Exists(dir_imgScale) == false) {//如果暫存資料夾不存在就建立
-                Directory.CreateDirectory(dir_imgScale);
+            if (Directory.Exists(AppPath.tempDirImgZoom) == false) {//如果暫存資料夾不存在就建立
+                Directory.CreateDirectory(AppPath.tempDirImgZoom);
             }
 
             string img100 = PathToImg100(path);
@@ -692,9 +680,9 @@ namespace Tiefsee {
         /// <summary> 取得「img100」暫存資料夾裡面的檔案名稱  </summary>
         public static string PathToImg100(string path) {
             string hashName = $"{FileToHash(path)}.jpg";//暫存檔案名稱
-            string filePath = Path.Combine(dir_img100, hashName);//暫存檔案的路徑
-            if (Directory.Exists(dir_img100) == false) {
-                Directory.CreateDirectory(dir_img100);
+            string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName);//暫存檔案的路徑
+            if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
+                Directory.CreateDirectory(AppPath.tempDirImgProcessed);
             }
             return filePath;
         }

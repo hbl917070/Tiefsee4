@@ -193,6 +193,9 @@ interface WV_Directory {
 
 interface WV_File {
 
+    /** 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑 */
+    Base64ToTempFile(base64: string, extension: string): string;
+
     /** 檔案移到資源回收桶 */
     MoveToRecycle(path: string): bool;
 
@@ -366,10 +369,10 @@ interface WV_System {
 
     /**
      * 刪除圖片暫存
-     * @param maxImg100 img100資料夾最多保留的檔案數量
-     * @param maxImgScale imgScale資料夾最多保留的檔案數量
+     * @param maxImgProcessed tempDirImgZoom 資料夾最多保留的檔案數量
+     * @param maxImgZoom tempDirImgZoom 資料夾最多保留的檔案數量
      */
-    DeleteTemp(maxImg100: number, maxImgScale: number): void;
+    DeleteTemp(maxImgProcessed: number, maxImgZoom: number): void;
 
     /**
      * 模擬鍵盤

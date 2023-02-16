@@ -39,7 +39,7 @@ namespace Tiefsee {
         /// <param name="startType">1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐</param>
         /// <param name="serverCache"> 伺服器對靜態資源使用快取 0=不使用 1=使用 </param>
         public void SetStartIni(int startPort, int startType, int serverCache) {
-            IniManager iniManager = new IniManager(Program.startIniPath);
+            IniManager iniManager = new IniManager(AppPath.appDataStartIni);
             iniManager.WriteIniFile("setting", "startPort", startPort);
             iniManager.WriteIniFile("setting", "startType", startType);
             iniManager.WriteIniFile("setting", "serverCache", serverCache);
@@ -224,7 +224,7 @@ namespace Tiefsee {
         /// </summary>
         /// <returns></returns>
         public string GetAppDataPath() {
-            string path = Program.appDataPath;
+            string path = AppPath.appData;
             if (Directory.Exists(path) == false) {
                 Directory.CreateDirectory(path);
             }

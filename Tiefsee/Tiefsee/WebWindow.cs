@@ -217,9 +217,9 @@ namespace Tiefsee {
             appInfo.startPort = Program.startPort;
             appInfo.serverCache = Program.serverCache;
             appInfo.appDirPath = System.AppDomain.CurrentDomain.BaseDirectory;
-            appInfo.appDataPath = Program.appDataPath;
+            appInfo.appDataPath = AppPath.appData;
             appInfo.mainPort = Program.webServer.port;
-            appInfo.settingPath = Path.Combine(Program.appDataPath, "Setting.json");
+            appInfo.settingPath = AppPath.appDataSetting;
             appInfo.quickLookRunType = quickLookRunType;
 
             if (File.Exists(appInfo.settingPath)) {
@@ -289,7 +289,7 @@ namespace Tiefsee {
             wv2.Dock = DockStyle.Fill;
 
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
-            CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
+            CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);//等待初始化完成
             /*wv2.CoreWebView2.SetVirtualHostNameToFolderMapping(
                 "appassets.example",

@@ -15,7 +15,6 @@ namespace Tiefsee {
         /// <summary> 改成true後，定時執行GC </summary>
         public static bool isRunGC = false;
 
-
         /// <summary> 擴充 </summary>
         //public static Plugin plugin = new Plugin();
 
@@ -128,12 +127,12 @@ namespace Tiefsee {
         /// <param name="post"></param>
         public void LockPort() {
             int port = Program.webServer.port;
-            string portDir = Path.Combine(Program.appDataPath, "Port");
-            if (Directory.Exists(portDir) == false) {//如果資料夾不存在，就新建
-                Directory.CreateDirectory(portDir);
+
+            if (Directory.Exists(AppPath.appDataPort) == false) {//如果資料夾不存在，就新建
+                Directory.CreateDirectory(AppPath.appDataPort);
             }
 
-            string portFile = Path.Combine(portDir, port.ToString());
+            string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
             if (File.Exists(portFile) == false) {
                 using (FileStream fs = new FileStream(portFile, FileMode.Create)) { }
             }
@@ -148,8 +147,7 @@ namespace Tiefsee {
             QuickRun.WindowCreate();
 
             System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
-            string iconPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "www/img/logo.ico");
-            nIcon.Icon = new System.Drawing.Icon(iconPath);
+            nIcon.Icon = new System.Drawing.Icon(AppPath.logoIcon);
             nIcon.Text = "TiefSee";
             nIcon.Visible = true;
 
@@ -179,10 +177,9 @@ namespace Tiefsee {
         /// 初始化webview2
         /// </summary>
         private async void InitWebview() {
-
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             Microsoft.Web.WebView2.WinForms.WebView2 wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
-            var webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.appDataPath, opts);
+            var webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment);
         }
 

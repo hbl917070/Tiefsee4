@@ -271,22 +271,157 @@ class MainWindow {
             }
             async function drop(e: DragEvent) {
 
+                //e.stopPropagation();
+
                 if (e.dataTransfer === null) { return; }
 
                 let files = e.dataTransfer.files;
+                let text = e.dataTransfer.getData("text/plain"); //取得拖曳進來的文字，或圖片的網址
+                /*console.log(e.dataTransfer.types)
+                console.log(e.dataTransfer.getData("text/uri-list"))
+                console.log(e.dataTransfer.getData("text/html"))
+                console.log(files)*/
 
-                let arFile = [];
-                for (let i = 0; i < files.length; i++) {
-                    const item = files[i];
-                    arFile.push(item.name);
+                if (text === "" && files.length > 0) { //本機的檔案
+
+                    let arFile = [];
+                    for (let i = 0; i < files.length; i++) {
+                        const item = files[i];
+                        arFile.push(item.name);
+                    }
+                    await fileLoad.loadDropFile(arFile);
+
+                    e.preventDefault();
+
+                } else if (text.search(/^http[s]?:[/][/]/) === 0 && files.length > 0) { //網頁的圖片
+
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+
+                    let base64 = await readFileAsDataURL(files[0]);
+                    let extension = getExtensionFromBase64(base64); //取得副檔名
+                    if (extension !== "") {
+                        let path = await WV_File.Base64ToTempFile(base64, extension);
+                        await fileLoad.loadFile(path);
+                    } else {
+                        Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
+                    }
+
+                } else if (text.indexOf("data:image/") === 0) { //base64
+
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+
+                    let base64 = text;
+                    let extension = getExtensionFromBase64(base64); //取得副檔名
+                    if (extension !== "") {
+                        let path = await WV_File.Base64ToTempFile(base64, extension);
+                        await fileLoad.loadFile(path);
+                    }
+
+                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=.*\.png$/) === 0) { //如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                    
+                    //ex: http://127.0.0.1:7860/file=D:/ai/a.png
+
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+
+                    var path = text.match(/file=(.+)/)?.[1] || "";
+                    path = Lib.URLToPath(path);
+                    await fileLoad.loadFile(path);
+
+                } else if (text.search(/^http[s]?:[/][/]/) === 0) { //如果是 discord 的圖片超連結
+
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+
+                    let file = await downloadFileFromUrl(text);
+                    if (file != null) {
+                        let base64 = await readFileAsDataURL(file);
+                        let extension = getExtensionFromBase64(base64); //取得副檔名
+                        if (extension !== "") {
+                            let path = await WV_File.Base64ToTempFile(base64, extension);
+                            await fileLoad.loadFile(path);
+                        }
+                    }
                 }
 
-                await fileLoad.loadDropFile(arFile);
-
-                e.stopPropagation();
-                e.preventDefault();
             }
 
+            // file 轉 base64
+            function readFileAsDataURL(file: File): Promise<string> {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        resolve(event.target?.result as string);
+                    };
+                    reader.onerror = (event) => {
+                        reject(event.target?.error);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            // 從base64判斷副檔名
+            function getExtensionFromBase64(base64: string) {
+                if (base64.length < 40) { return ""; }
+                const base64Header = base64.slice(0, 40);
+                const mimeMatch = base64Header.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+                if (!mimeMatch) { return ""; }
+                const mimeType = mimeMatch[1];
+                switch (mimeType) {
+                    case "image/png":
+                        return "png";
+                    case "image/gif":
+                        return "gif";
+                    case "image/jpeg":
+                    case "image/pjpeg":
+                        return "jpg";
+                    case "image/bmp":
+                        return "bmp";
+                    case "image/tiff":
+                        return "tiff";
+                    case "image/svg+xml":
+                        return "svg";
+                    case "image/webp":
+                        return "webp";
+                    case "image/avif":
+                        return "avif";
+                    case "image/vnd.microsoft.icon":
+                        return "ico";
+                    default:
+                        return "";
+                }
+            }
+            // 下載檔案
+            async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
+                const timeout = 20 * 1000; // 逾時
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                try {
+                    const response = await fetch(imageUrl, { signal: controller.signal });
+
+                    const contentLength = response.headers.get("content-length"); //判斷檔案大小
+                    if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { //50m
+                        Toast.show(i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); //檔案大小超過限制
+                        return null;
+                    }
+
+                    // 判斷檔案類型是否為圖片
+                    const contentType = response.headers.get("content-type");
+                    console.log(contentType)
+                    if (!contentType || !contentType.startsWith("image/")) {
+                        Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
+                        return null;
+                    }
+
+                    const blob = await response.blob();
+                    const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+                    return new File([blob], fileName, { type: response.headers.get("content-type") ?? "application/octet-stream" });
+                } catch (error) {
+                    Toast.show(i18n.t("msg.fileDownloadFailed"), 1000 * 3); //檔案下載失敗
+                    console.error(error);
+                    return null;
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            }
 
             //----------------
 

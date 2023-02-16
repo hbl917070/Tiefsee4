@@ -11,6 +11,7 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Markup;
 
 namespace Tiefsee {
 
@@ -40,6 +41,53 @@ namespace Tiefsee {
             this.M = m;
         }
         public WV_File() { }
+
+
+        /// <summary>
+        /// 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑
+        /// </summary>
+        /// <param name="base64"></param>
+        /// <param name="extension"> 副檔名 </param>
+        /// <returns></returns>
+        public string Base64ToTempFile(string base64, string extension) {
+
+            try {
+                //去掉開頭的 data:image/png;base64,
+                int x = base64.IndexOf("base64,");
+                if (x != -1) { base64 = base64.Substring(x + 7); }
+
+                byte[] Buffer = Convert.FromBase64String(base64);
+
+                //取得亂數檔名
+                string path = "";
+                while (true) {
+                    string name = DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + GenerateRandomString(10) + "." + extension;
+                    path = Path.Combine(AppPath.tempDirWebFile, name);
+                    if (File.Exists(path) == false) { break; }
+                }
+                if (Directory.Exists(AppPath.tempDirWebFile) == false) {
+                    Directory.CreateDirectory(AppPath.tempDirWebFile);
+                }
+                File.WriteAllBytes(path, Buffer); // 將資料寫入檔案中
+
+                return path;
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                return "false";
+            }
+
+        }
+        private static string GenerateRandomString(int length) {
+            string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < length; i++) {
+                int index = random.Next(chars.Length);
+                sb.Append(chars[index]);
+            }
+            return sb.ToString();
+        }
+
 
         /// <summary>
         /// 檔案移到資源回收桶
@@ -154,9 +202,9 @@ namespace Tiefsee {
                 openFileDialog.Multiselect = Multiselect; //是否允許多選，false表示單選
                 openFileDialog.Filter = Filter;//檔案類型 All files (*.*)|*.*
                 openFileDialog.Title = Title;//標題
-                //openFileDialog.InitialDirectory = InitialDirectory;//初始目錄
+                                             //openFileDialog.InitialDirectory = InitialDirectory;//初始目錄
                 openFileDialog.RestoreDirectory = true;//恢復到之前選擇的目錄
-                //openFileDialog.FilterIndex = 2;
+                                                       //openFileDialog.FilterIndex = 2;
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
                     var files = openFileDialog.FileNames;
                     return files;

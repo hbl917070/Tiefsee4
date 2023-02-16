@@ -1309,7 +1309,24 @@ var langData = {
             "en": "Not found",
             "ja": "検出されない",
         },
-
+        
+        //#region download
+        fileDownloadFailed: {
+            "zh-TW": "檔案下載失敗",
+            "en": "File download failed",
+            "ja": "ファイルのダウンロードに失敗",
+        },
+        unsupportedFileTypes: {
+            "zh-TW": "不支援的檔案類型",
+            "en": "Unsupported file types",
+            "ja": "対応していないファイル形式です",
+        },
+        fileSizeExceededLimit: {
+            "zh-TW": "檔案大小超過限制",
+            "en": "File size exceeded limit",
+            "ja": "ファイルサイズが制限を超えた",
+        },
+        //#endregion
 
         //#region save
         saveFailed: {

@@ -40,8 +40,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="post"></param>
         public static void PortFreed() {
-            string portDir = Path.Combine(Program.appDataPath, "Port");
-            string portFile = Path.Combine(portDir, Program.webServer.port.ToString());
+            string portFile = Path.Combine(AppPath.appDataPort, Program.webServer.port.ToString());
             if (File.Exists(portFile) == true) {
                 File.Delete(portFile);
             }
@@ -60,14 +59,12 @@ namespace Tiefsee {
             if (Program.startType == 1) {//直接啟動
                 return false;
             }
-
-            String portDir = Path.Combine(Program.appDataPath, "Port");
-
-            if (Directory.Exists(portDir) == false) {
+        
+            if (Directory.Exists(AppPath.appDataPort) == false) {
                 return false;
             }
 
-            foreach (String filePort in Directory.GetFiles(portDir, "*")) {//判斷目前已經開啟的視窗
+            foreach (String filePort in Directory.GetFiles(AppPath.appDataPort, "*")) {//判斷目前已經開啟的視窗
                 try {
 
                     string port = Path.GetFileName(filePort);

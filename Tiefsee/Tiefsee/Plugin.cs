@@ -9,47 +9,41 @@ using System.Threading.Tasks;
 namespace Tiefsee {
 
     public static class Plugin {
-        public static string dirPlugin;
+
         public static string pathNConvert;
         public static string pathQuickLook;
         public static string pathPDFTronWebviewer;
         public static string pathMonacoEditor;
         public static DataPlugin dataPlugin = new DataPlugin();
 
-        /*public static Plugin() {
-            Init();
-        }*/
 
         /// <summary>
         /// 初始化
         /// </summary>
         public static void Init() {
-            dirPlugin = Path.Combine(Program.appDataPath, "Plugin");
 
-            if (Directory.Exists(dirPlugin) == false) {
-                Directory.CreateDirectory(dirPlugin);
-            }
+ 
 
-            pathNConvert = Path.Combine(dirPlugin, "NConvert/nconvert.exe");
+            pathNConvert = Path.Combine(AppPath.appDataPlugin, "NConvert/nconvert.exe");
             dataPlugin.NConvert = File.Exists(pathNConvert);
 
-            pathQuickLook = Path.Combine(dirPlugin, "QuickLook/Tiefsee.QuickLook.dll");
+            pathQuickLook = Path.Combine(AppPath.appDataPlugin, "QuickLook/Tiefsee.QuickLook.dll");
             dataPlugin.QuickLook = File.Exists(pathQuickLook);
 
-            pathMonacoEditor = Path.Combine(dirPlugin, "monaco-editor/min/vs/loader.js");
+            pathMonacoEditor = Path.Combine(AppPath.appDataPlugin, "monaco-editor/min/vs/loader.js");
             dataPlugin.MonacoEditor = File.Exists(pathMonacoEditor);
 
-            pathPDFTronWebviewer = Path.Combine(dirPlugin, "WebViewer/lib/webviewer.min.js");//從瀏覽器下載的zip
+            pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib/webviewer.min.js");//從瀏覽器下載的zip
             dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
             if (dataPlugin.PDFTronWebviewer) {
                 dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
-                dataPlugin.PDFTronWebviewer_lib = Path.Combine(dirPlugin, "WebViewer/lib");
+                dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib");
             } else {
-                pathPDFTronWebviewer = Path.Combine(dirPlugin, "webviewer/webviewer.min.js");//從npm下載
+                pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "webviewer/webviewer.min.js");//從npm下載
                 dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
                 if (dataPlugin.PDFTronWebviewer) {
                     dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
-                    dataPlugin.PDFTronWebviewer_lib = Path.Combine(dirPlugin, "webviewer/public");
+                    dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "webviewer/public");
                 }
             }
 

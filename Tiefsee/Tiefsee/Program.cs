@@ -8,14 +8,13 @@ using System.Windows.Forms;
 namespace Tiefsee {
     static class Program {
 
-        public static string appDataPath;// AppData(使用者資料)
-        public static string startIniPath;// start.ini
+  
         public static int startPort;//程式開始的port
         public static int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
         public static int serverCache;//伺服器對靜態資源快取的時間(秒)
         public static WebServer webServer;//本地伺服器
         public static StartWindow startWindow;//起始視窗，關閉此視窗就會結束程式
-        private static string lockPath;
+  
 
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
@@ -32,23 +31,10 @@ namespace Tiefsee {
             //修改 工作目錄 為程式資料夾 (如果有傳入args的話，工作目錄會被修改，所以需要改回來
             Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
+            AppPath.Init();
 
-            //把Tiefsee4資料夾轉移成Tiefsee
-            string appDataPath_old = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
-            if (Directory.Exists(appDataPath) == false && Directory.Exists(appDataPath_old) == true) {
-                try {
-                    Directory.Move(appDataPath_old, appDataPath);
-                } catch (Exception) { }
-            }
-
-            if (Directory.Exists(appDataPath) == false) {//如果資料夾不存在，就新建
-                Directory.CreateDirectory(appDataPath);
-            }
-
-            lockPath = Path.Combine(appDataPath, "lock");
-            startIniPath = Path.Combine(appDataPath, "Start.ini");
-            IniManager iniManager = new IniManager(startIniPath);
+           
+            IniManager iniManager = new IniManager(AppPath.appDataStartIni);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
@@ -116,10 +102,10 @@ namespace Tiefsee {
         private static bool AppLock(bool val) {
             if (val) {
 
-                if (File.Exists(lockPath)) {
+                if (File.Exists(AppPath.appDataLock)) {
                     try {
                         long ticks = 0;
-                        using (StreamReader sr = new StreamReader(lockPath, System.Text.Encoding.UTF8)) {
+                        using (StreamReader sr = new StreamReader(AppPath.appDataLock, System.Text.Encoding.UTF8)) {
                             ticks = long.Parse(sr.ReadToEnd());
                         }
 
@@ -133,7 +119,7 @@ namespace Tiefsee {
                     }
                 } else {
                     //using (File.Create(lockPath)) { }
-                    using (FileStream fs = new FileStream(lockPath, FileMode.Create)) {
+                    using (FileStream fs = new FileStream(AppPath.appDataLock, FileMode.Create)) {
                         using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) {
                             sw.Write(DateTime.Now.Ticks.ToString());
                         }
@@ -142,8 +128,8 @@ namespace Tiefsee {
                 }
 
             } else {
-                if (File.Exists(lockPath)) {
-                    File.Delete(lockPath);
+                if (File.Exists(AppPath.appDataLock)) {
+                    File.Delete(AppPath.appDataLock);
                 }
             }
             return false;
