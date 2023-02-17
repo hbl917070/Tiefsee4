@@ -14,12 +14,12 @@ class MainExif {
 
 		var dom_mainExif = document.getElementById("mainExif") as HTMLElement;
 		var dom_mainExifList = document.getElementById("mainExifList") as HTMLElement;
-		var dom_dragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement;//拖曳條
+		var dom_dragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement; //拖曳條
 
 		var fileInfo2: FileInfo2;
 
-		var isHide = false;//暫時隱藏
-		var isEnabled = true;//啟用 檔案預覽視窗
+		var isHide = false; //暫時隱藏
+		var isEnabled = true; //啟用 檔案預覽視窗
 
 
 		//拖曳改變size
@@ -29,7 +29,7 @@ class MainExif {
 		dragbar.setEventStart(() => { })
 		//拖曳
 		dragbar.setEventMove((val: number) => {
-			if (val < 10) {//小於10的話就暫時隱藏
+			if (val < 10) { //小於10的話就暫時隱藏
 				dom_mainExif.style.opacity = "0";
 				dragbar.setPosition(0);
 			} else {
@@ -39,7 +39,7 @@ class MainExif {
 		})
 		//拖曳 結束
 		dragbar.setEventEnd((val: number) => {
-			if (val < 10) {//小於10的話，關閉檔案預覽視窗
+			if (val < 10) { //小於10的話，關閉檔案預覽視窗
 				setEnabled(false);
 			}
 		})
@@ -124,7 +124,7 @@ class MainExif {
 
 			dom_mainExifList.innerHTML = "";
 
-			if (fileInfo2.Type === "none") {//如果檔案不存在
+			if (fileInfo2.Type === "none") { //如果檔案不存在
 				return;
 			}
 
@@ -136,19 +136,19 @@ class MainExif {
 				return;
 			}
 			if (noCheckPath === false) {
-				if (M.fileLoad.getFilePath() !== path) {//如果已經在載入期間已經切換到其他檔案
+				if (M.fileLoad.getFilePath() !== path) { //如果已經在載入期間已經切換到其他檔案
 					return;
 				}
 			}
 			//取得經緯度
-			let GPS_lat = getItem(json.data, "GPS Latitude");//緯度
-			let GPS_lng = getItem(json.data, "GPS Longitude");//經度
-			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) {//避免空白資料
+			let GPS_lat = getItem(json.data, "GPS Latitude"); //緯度
+			let GPS_lng = getItem(json.data, "GPS Longitude"); //經度
+			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) { //避免空白資料
 				GPS_lat = undefined;
 				GPS_lng = undefined;
 			}
 			let hasGPS = GPS_lat !== undefined && GPS_lng !== undefined;
-			if (hasGPS) {//如果經緯度不是空，就新增「Map」欄位
+			if (hasGPS) { //如果經緯度不是空，就新增「Map」欄位
 				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
 			}
 
@@ -170,7 +170,7 @@ class MainExif {
 
 				} else if (name === "Map") {
 
-					value = encodeURIComponent(value);//移除可能破壞html的跳脫符號
+					value = encodeURIComponent(value); //移除可能破壞html的跳脫符號
 
 					let mapHtml = `
 						<div class="mainExifItem">
@@ -180,7 +180,15 @@ class MainExif {
 						</div>`;
 					dom_mainExifList.appendChild(newDiv(mapHtml));
 
-				} else if (name === "Textual Data") {//PNG iTXt / zTXt / tEXt
+				} else if (name === "User Comment" && value.indexOf("Steps: ") !== -1 && value.indexOf("Seed: ") !== -1) { // Stable Diffusion webui 輸出的jpg或webp
+
+					ar.push({
+						group: "PNG-tEXt",
+						name: "Textual Data",
+						value: "parameters: " + value
+					})
+
+				} else if (name === "Textual Data") { //PNG iTXt / zTXt / tEXt
 
 					let vals = getItems(ar, name);
 					for (let i = 0; i < vals.length; i++) {
@@ -215,13 +223,13 @@ class MainExif {
 
 							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 
-								let promptSplit = val.indexOf("Negative prompt: ");//負面提示
-								let otherSplit = val.indexOf("Steps: ");//其他參數
+								let promptSplit = val.indexOf("Negative prompt: "); //負面提示
+								let otherSplit = val.indexOf("Steps: "); //其他參數
 								if (promptSplit !== -1 && otherSplit !== -1) {
-									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, promptSplit)));//提示
-									dom_mainExifList.appendChild(getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit)));//負面提示
+									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, promptSplit))); //提示
+									dom_mainExifList.appendChild(getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit))); //負面提示
 									//html += getItemHtml("Other", val.substring(otherSplit));
-									let arOther = val.substring(otherSplit).split(", ");//其他參數
+									let arOther = val.substring(otherSplit).split(", "); //其他參數
 									for (let i = 0; i < arOther.length; i++) {
 										const itemOther = arOther[i];
 										let itemOtherSplit = itemOther.split(": ");
@@ -232,10 +240,10 @@ class MainExif {
 										}
 									}
 
-								} else if (promptSplit === -1 && otherSplit !== -1) {//沒有輸入負面詞的情況
+								} else if (promptSplit === -1 && otherSplit !== -1) { //沒有輸入負面詞的情況
 
-									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, otherSplit)));//提示
-									let arOther = val.substring(otherSplit).split(", ");//其他參數
+									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, otherSplit))); //提示
+									let arOther = val.substring(otherSplit).split(", "); //其他參數
 									for (let i = 0; i < arOther.length; i++) {
 										const itemOther = arOther[i];
 										let itemOtherSplit = itemOther.split(": ");

@@ -293,6 +293,16 @@ class MainWindow {
 
                     e.preventDefault();
 
+                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) { //如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+
+                    //ex: http://127.0.0.1:7860/file=D:/ai/a.png
+
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+
+                    var path = text.match(/file=(.+)/)?.[1] || "";
+                    path = Lib.URLToPath(path);
+                    await fileLoad.loadFile(path);
+
                 } else if (text.search(/^http[s]?:[/][/]/) === 0 && files.length > 0) { //網頁的圖片
 
                     e.preventDefault(); //避免影響 baseWindow.getDropPath()
@@ -316,16 +326,6 @@ class MainWindow {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
                         await fileLoad.loadFile(path);
                     }
-
-                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=.*\.png$/) === 0) { //如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
-                    
-                    //ex: http://127.0.0.1:7860/file=D:/ai/a.png
-
-                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
-
-                    var path = text.match(/file=(.+)/)?.[1] || "";
-                    path = Lib.URLToPath(path);
-                    await fileLoad.loadFile(path);
 
                 } else if (text.search(/^http[s]?:[/][/]/) === 0) { //如果是 discord 的圖片超連結
 
@@ -405,7 +405,7 @@ class MainWindow {
 
                     // 判斷檔案類型是否為圖片
                     const contentType = response.headers.get("content-type");
-                    console.log(contentType)
+                    //console.log(contentType)
                     if (!contentType || !contentType.startsWith("image/")) {
                         Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
                         return null;
