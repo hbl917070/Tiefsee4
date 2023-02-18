@@ -305,15 +305,15 @@ class FileLoad {
             M.msgbox.closeAll();//關閉所有訊息視窗
             M.menu.close();
 
-            let dirPath = Lib.GetDirectoryName(_dropPath);
-            if (dirPath === null) { return; }
             if (files.length > 1) {
+                let dirPath = Lib.GetDirectoryName(_dropPath);
+                if (dirPath === null) { return; }
                 if (dirPath !== null) {
                     await loadFiles(dirPath, files);
                 }
             } else {
-                let filePath = Lib.Combine([dirPath, files[0]]);
-                await loadFile(filePath);
+                //let filePath = Lib.Combine([dirPath, files[0]]);
+                await loadFile(_dropPath);
             }
         }
 

@@ -282,7 +282,7 @@ class MainWindow {
                 console.log(e.dataTransfer.getData("text/html"))
                 console.log(files)*/
 
-                if (text === "" && files.length > 0) { //本機的檔案
+                if ((text === "" && files.length > 0) || text.indexOf("file://") === 0) { //本機的檔案
 
                     let arFile = [];
                     for (let i = 0; i < files.length; i++) {
@@ -303,7 +303,7 @@ class MainWindow {
                     path = Lib.URLToPath(path);
                     await fileLoad.loadFile(path);
 
-                } else if (text.search(/^http[s]?:[/][/]/) === 0 && files.length > 0) { //網頁的圖片
+                } else if (text.search(/^((blob:)?http[s]?|file):[/][/]/) === 0 && files.length > 0) { //網頁的圖片
 
                     e.preventDefault(); //避免影響 baseWindow.getDropPath()
 
@@ -327,7 +327,7 @@ class MainWindow {
                         await fileLoad.loadFile(path);
                     }
 
-                } else if (text.search(/^http[s]?:[/][/]/) === 0) { //如果是 discord 的圖片超連結
+                } else if (text.search(/^http[s]:[/][/]/) === 0) { //如果是超連結
 
                     e.preventDefault(); //避免影響 baseWindow.getDropPath()
 
@@ -397,13 +397,20 @@ class MainWindow {
                 try {
                     const response = await fetch(imageUrl, { signal: controller.signal });
 
-                    const contentLength = response.headers.get("content-length"); //判斷檔案大小
+                    //判斷請求是否成功
+                    if (response.status !== 200) {
+                        Toast.show(i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); //檔案下載失敗
+                        return null;
+                    }
+
+                    //判斷檔案大小
+                    const contentLength = response.headers.get("content-length");
                     if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { //50m
                         Toast.show(i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); //檔案大小超過限制
                         return null;
                     }
 
-                    // 判斷檔案類型是否為圖片
+                    //判斷檔案類型是否為圖片
                     const contentType = response.headers.get("content-type");
                     //console.log(contentType)
                     if (!contentType || !contentType.startsWith("image/")) {
