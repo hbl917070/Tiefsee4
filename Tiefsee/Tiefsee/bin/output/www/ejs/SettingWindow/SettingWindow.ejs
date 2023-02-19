@@ -132,7 +132,7 @@
                         <div class="text-content">
                             <select class="text-input" id="select-tiefseeviewZoomType">
                                 <option value="fitWindowOrImageOriginal" i18n="sw.zoomMode.fitWindowOrImageOriginal">
-                                    縮放至適合視窗 或 圖片原始大小 
+                                    縮放至適合視窗 或 圖片原始大小
                                 </option>
                                 <option value="fitWindow" i18n="sw.zoomMode.fitWindow">縮放至適合視窗</option>
                                 <option value="imageOriginal" i18n="sw.zoomMode.imageOriginal">圖片原始大小</option>
@@ -505,7 +505,15 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.informationPanel.maxLine">顯示的最大行數 (1~100)</div>
+                        <div class="text-title" i18n="sw.informationPanel.horizontal">寬度足夠時，橫向排列</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mainExifHorizontal">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.informationPanel.maxLine">顯示的最大行數 (1~1000)</div>
                         <div class="text-content">
                             <input class="text-input" type="number" id="text-mainExifMaxLine">
                         </div>

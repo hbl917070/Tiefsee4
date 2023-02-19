@@ -22,7 +22,6 @@
     flex: 1;
   }
   .mainExifItem {
-    display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     align-items: center;
@@ -37,6 +36,7 @@
   .mainExifItem:last-child {
     border-bottom: none;
   }
+
   .mainExifName {
     flex: 1;
     min-width: 100px; //寬度不足100時，會自動換行
@@ -118,6 +118,11 @@
     width: 18px;
     height: 18px;
   }
+}
+
+//寬度足夠時，橫向排列
+.mainExif--horizontal .mainExifItem {
+  display: flex;
 }
 
 //啟用

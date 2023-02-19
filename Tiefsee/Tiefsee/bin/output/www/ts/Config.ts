@@ -163,6 +163,7 @@ class Config {
             mainExifEnabled: false, //啟用 詳細資料視窗
             mainExifShowWidth: 150, //寬度
             mainExifMaxLine: 20, //顯示的最大行數
+            mainExifHorizontal: true, //寬度足夠時，橫向排列
 
             /** 大型切換按鈕 leftRight / bottom / none  */
             largeBtn: "bottom",

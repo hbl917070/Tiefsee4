@@ -575,9 +575,14 @@ var langData = {
                 "ja": "情報パネルを表示する",
             },
             maxLine: {
-                "zh-TW": "顯示的最大行數 (1~100)",
-                "en": "Maximum number of lines displayed (1~100)",
-                "ja": "最大表示行数 (1~100)",
+                "zh-TW": "顯示的最大行數 (1~1000)",
+                "en": "Maximum number of lines displayed (1~1000)",
+                "ja": "最大表示行数 (1~1000)",
+            },
+            horizontal: {
+                "zh-TW": "寬度足夠時，橫向排列",
+                "en": "Horizontal arrangement when width enough",
+                "ja": "横幅配置、幅の十分なとき",
             },
         },
 
@@ -1309,7 +1314,7 @@ var langData = {
             "en": "Not found",
             "ja": "検出されない",
         },
-        
+
         //#region download
         fileDownloadFailed: {
             "zh-TW": "檔案下載失敗",

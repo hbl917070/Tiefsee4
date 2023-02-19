@@ -4,6 +4,7 @@ class MainExif {
 	public setEnabled;
 	public setHide;
 	public setItemWidth;
+	public setHorizontal;
 
 	constructor(M: MainWindow) {
 
@@ -11,6 +12,7 @@ class MainExif {
 		this.setEnabled = setEnabled;
 		this.setHide = setHide;
 		this.setItemWidth = setItemWidth;
+		this.setHorizontal = setHorizontal;
 
 		var dom_mainExif = document.getElementById("mainExif") as HTMLElement;
 		var dom_mainExifList = document.getElementById("mainExifList") as HTMLElement;
@@ -91,7 +93,7 @@ class MainExif {
 		function setItemWidth(val: number) {
 
 			let valMin = 150;
-			let valMax = 300;
+			let valMax = 400;
 			if (val <= valMin) { val = valMin; }
 			if (val >= valMax) { val = valMax; }
 
@@ -348,7 +350,16 @@ class MainExif {
 			return undefined;
 		}
 
-
+		/**
+		 * 設定 「寬度足夠時，橫向排列」
+		 */
+		function setHorizontal(val: boolean) {
+			if (val) {
+				dom_mainExif.classList.add("mainExif--horizontal");
+			} else {
+				dom_mainExif.classList.remove("mainExif--horizontal");
+			}
+		}
 
 	}
 

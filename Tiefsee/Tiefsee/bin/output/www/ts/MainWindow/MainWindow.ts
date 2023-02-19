@@ -721,7 +721,8 @@ class MainWindow {
 
             mainExif.setEnabled(config.settings.layout.mainExifEnabled); //詳細資料視窗
             if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
-            cssRoot.style.setProperty("--number-mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~100)
+            cssRoot.style.setProperty("--number-mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~1000)
+            mainExif.setHorizontal(config.settings.layout.mainExifHorizontal); //寬度足夠時，橫向排列
 
             //-----------
 

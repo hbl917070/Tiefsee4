@@ -676,12 +676,21 @@ class Setting {
                 appleSettingOfMain();
             });
 
+            //寬度足夠時，橫向排列
+            var switch_mainExifHorizontal = document.querySelector("#switch-mainExifHorizontal") as HTMLInputElement;
+            switch_mainExifHorizontal.checked = config.settings["layout"]["mainExifHorizontal"];//
+            switch_mainExifHorizontal.addEventListener("change", () => {
+                let val = switch_mainExifHorizontal.checked;
+                config.settings["layout"]["mainExifHorizontal"] = val;
+                appleSettingOfMain();
+            });
+
             //顯示的最大行數(1~100)
             var text_mainExifMaxLine = document.querySelector("#text-mainExifMaxLine") as HTMLInputElement;
             text_mainExifMaxLine.value = config.settings["layout"]["mainExifMaxLine"] + "";
             text_mainExifMaxLine.addEventListener("change", () => {
                 let val = Math.floor(Number(text_mainExifMaxLine.value));
-                if (val > 100) { val = 100; }
+                if (val > 1000) { val = 1000; }
                 if (val <= 0) { val = 1; }
                 text_mainExifMaxLine.value = val + "";
                 config.settings["layout"]["mainExifMaxLine"] = val;
