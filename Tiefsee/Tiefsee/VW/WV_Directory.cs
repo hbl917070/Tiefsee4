@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ImageMagick;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Tiefsee {
 
@@ -95,6 +97,21 @@ namespace Tiefsee {
                     }
                 }
 
+            }
+
+            //如果取得的名單內不包含自己，就補上
+            if (output.ContainsKey(siblingPath) == false) {
+                output.Add(siblingPath, new List<string>());
+                try {
+                    string[] arFile = Directory.GetFiles(siblingPath);
+                    int n = 0;
+                    foreach (string item in arFile) { //子資料夾內的所有檔案
+                        string fileExt = Path.GetExtension(item).ToLower();
+                        output[siblingPath].Add(Path.Combine(item, item));
+                        n += 1;
+                        if (n >= 5) { break; }
+                    }
+                } catch { }
             }
 
             return JsonConvert.SerializeObject(output);
