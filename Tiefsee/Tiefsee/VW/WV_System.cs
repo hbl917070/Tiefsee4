@@ -473,13 +473,16 @@ namespace Tiefsee {
         }
 
 
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+
         /// <summary>
         /// 關聯副檔名
         /// </summary>
         /// <param name="ar_Extension"></param>
         /// <param name="OpenWith"></param>
         /// <param name="ExecutableName"></param>
-        public void SetAssociationExtension(object[] arExtension, string appPath) {
+        public void AssociationExtension(object[] arExtension, string appPath) {
 
             //如果檔案不存在
             if (File.Exists(appPath) == false) { return; }
@@ -488,10 +491,10 @@ namespace Tiefsee {
 
             for (int i = 0; i < arExtension.Length; i++) {
                 string Extension = arExtension[i].ToString();//副檔名
-                _SetAssociationExtension(Extension, appPath, appName);
+                _AssociationExtension(Extension, appPath, appName);
             }
         }
-        private void _SetAssociationExtension(string Extension, string OpenWith, string ExecutableName) {
+        private void _AssociationExtension(string Extension, string OpenWith, string ExecutableName) {
             try {
                 using (RegistryKey User_Classes = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Classes\\", true))
                 using (RegistryKey User_Ext = User_Classes.CreateSubKey("." + Extension))
@@ -521,8 +524,41 @@ namespace Tiefsee {
             }
         }
 
-        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+        /// <summary>
+        /// 解除關聯副檔名
+        /// </summary>
+        /// <param name="ar_Extension"></param>
+        /// <param name="OpenWith"></param>
+        /// <param name="ExecutableName"></param>
+        public void RemoveAssociationExtension(object[] arExtension, string appPath) {
+
+            //如果檔案不存在
+            if (File.Exists(appPath) == false) { return; }
+
+            string appName = Path.GetFileName(appPath);//程式檔名，例如 Tiefsee.exe
+
+            for (int i = 0; i < arExtension.Length; i++) {
+                string Extension = arExtension[i].ToString();//副檔名
+
+                using (RegistryKey User_Classes = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey("SOFTWARE\\Classes\\", true)) {
+                    User_Classes.DeleteSubKeyTree("." + Extension, false);
+                    User_Classes.DeleteSubKeyTree(Extension + "_auto_file", false);
+                    User_Classes.DeleteSubKeyTree("Applications\\" + appName, false);
+                }
+
+                using (RegistryKey User_Explorer = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\." + Extension, true)) {
+                    if (User_Explorer != null) {
+                        User_Explorer.DeleteSubKey("OpenWithList", false);
+                        User_Explorer.DeleteSubKey("OpenWithProgids", false);
+                        User_Explorer.DeleteSubKey("UserChoice", false);
+                        User_Explorer.Close();
+                        Registry.CurrentUser.DeleteSubKey("." + Extension, false);
+                    }
+                }
+            }
+            SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
+        }
+
 
 
         /// <summary>

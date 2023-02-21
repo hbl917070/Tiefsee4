@@ -485,12 +485,15 @@ class Setting {
         addLoadEvent(() => {
             var text_extension = document.querySelector("#text-extension") as HTMLTextAreaElement;
             var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
+            var text_disassociate = document.querySelector("#text-disassociate") as HTMLTextAreaElement;
+            var btn_disassociate = document.querySelector("#btn-disassociate") as HTMLElement;
 
             let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
-            text_extension.value = s_extension.join("\n");//預設顯示的文字
+            text_extension.value = s_extension.join("\n"); //預設顯示的文字
+            text_disassociate.value = s_extension.join("\n"); //預設顯示的文字
 
+            //關聯副檔名
             btn_extension.addEventListener("click", async (e) => {
-
                 let ar_extension = text_extension.value.split("\n");
                 let ar: string[] = [];
                 for (let i = 0; i < ar_extension.length; i++) {
@@ -501,19 +504,39 @@ class Setting {
                 }
 
                 msgbox.show({
-                    txt: i18n.t("msg.associatedFiles") + "<br>" //確定用Tiefsee來開啟這些檔案嗎？
+                    txt: i18n.t("msg.associationExtension") + "<br>" //確定用Tiefsee來開啟這些檔案嗎？
                         + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         msgbox.close(dom);
-                        //let msgboxLoading = Msgbox.show({ txt: "處理中...", isAllowClose: false, isShowBtn: false });
-
                         let appPath = await WV_Window.GetAppPath();
-                        await WV_System.SetAssociationExtension(ar, appPath);
+                        await WV_System.AssociationExtension(ar, appPath);
                         msgbox.show({ txt: i18n.t("msg.done"), }); //處理完成
                     }
                 });
+            });
 
-            })
+            //解除關聯副檔名
+            btn_disassociate.addEventListener("click", async (e) => {
+                let ar_extension = text_disassociate.value.split("\n");
+                let ar: string[] = [];
+                for (let i = 0; i < ar_extension.length; i++) {
+                    const item = ar_extension[i].toLocaleLowerCase().trim();
+                    if (item !== "" && ar.indexOf(item) === -1) {
+                        ar.push(item);
+                    }
+                }
+
+                msgbox.show({
+                    txt: i18n.t("msg.removeAssociationExtension") + "<br>" //確定要解除這些檔案與Tiefsee的關聯嗎？
+                        + ar.join(", "),
+                    funcYes: async (dom: HTMLElement, inputTxt: string) => {
+                        msgbox.close(dom);
+                        let appPath = await WV_Window.GetAppPath();
+                        await WV_System.RemoveAssociationExtension(ar, appPath);
+                        msgbox.show({ txt: i18n.t("msg.done"), }); //處理完成
+                    }
+                });
+            });
         })
 
         //開啟 系統設定

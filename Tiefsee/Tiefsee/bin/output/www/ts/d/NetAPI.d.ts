@@ -437,7 +437,11 @@ interface WV_System {
     Collect(): void;
 
     /** 關聯副檔名 */
-    SetAssociationExtension(arExtension: string[], appPath: string): void;
+    AssociationExtension(arExtension: string[], appPath: string): void;
+
+    /** 解除關聯副檔名 */
+    RemoveAssociationExtension(arExtension: string[], appPath: string): void;
+
 
     /** 對檔案進行排序 */
     Sort(ar: string[], type: string)

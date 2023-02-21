@@ -682,8 +682,16 @@ var langData = {
                 "en": `Open "Windows Settings"`,
                 "ja": "「Windowsの設定」を開く",
             },
-
-
+            removeAssociation: {
+                "zh-TW": "解除預設程式",
+                "en": `Remove Association`,
+                "ja": "関連付けを解除する",
+            },
+            removeFileTypeAssociation: {
+                "zh-TW": "解除副檔名關聯",
+                "en": `Remove file type association`,
+                "ja": "拡張子の関連付けを解除する",
+            },
         },
         //#endregion
 
@@ -1458,10 +1466,15 @@ var langData = {
 
 
         //#region setting
-        associatedFiles: {
+        associationExtension: {
             "zh-TW": "確定用Tiefsee來開啟這些檔案嗎？",
             "en": "Are you sure you want to open these files with Tiefsee?",
             "ja": "これらのファイルを開くのに Tiefsee を使用するのは確かですか？",
+        },
+        removeAssociationExtension: {
+            "zh-TW": "確定要解除這些檔案與Tiefsee的關聯嗎？",
+            "en": "Are you sure you want to remove the association of these files with Tiefsee?",
+            "ja": "これらのファイルを Tiefsee との関連付けから解除してよろしいですか？",
         },
         done: {
             "zh-TW": "完成！",
