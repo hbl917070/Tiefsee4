@@ -59,7 +59,7 @@ namespace Tiefsee {
             if (Program.startType == 1) {//直接啟動
                 return false;
             }
-        
+
             if (Directory.Exists(AppPath.appDataPort) == false) {
                 return false;
             }

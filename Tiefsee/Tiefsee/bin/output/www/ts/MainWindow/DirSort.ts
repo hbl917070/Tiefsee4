@@ -206,7 +206,7 @@ class DirSort {
                 }
                 sortType = defaultSort;
             }
-            
+
             //console.log(`Dir get ` + sortType + " " + dirPath)
             if (sortType.indexOf("Desc") !== -1) {
                 orderbyType = DirOrderbyType.desc;

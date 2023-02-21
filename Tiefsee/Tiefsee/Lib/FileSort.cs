@@ -54,9 +54,9 @@ namespace Tiefsee {
             }
 
             if (type == "random") {//隨機排序  
-                 ar = ar.OrderBy(a => Guid.NewGuid()).ToArray();
+                ar = ar.OrderBy(a => Guid.NewGuid()).ToArray();
             }
- 
+
             return ar;
         }
 

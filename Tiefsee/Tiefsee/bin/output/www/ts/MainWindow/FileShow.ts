@@ -235,7 +235,7 @@ class FileShow {
                 await tiefseeview.loadImg(imgurl);//使用<img>渲染
 
             } else if (configType === "vips") {//
-                
+
                 let vipsType = configItem.vipsType as string;
                 let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
 
@@ -255,7 +255,7 @@ class FileShow {
                         if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) {//如果圖片太小就不處理
                             break;
                         }
-                        let imgU =  WebAPI.Img.vipsResize(scale, fileInfo2);
+                        let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
                         arUrl.push({ scale: scale, url: imgU })
                     }
 
@@ -287,7 +287,7 @@ class FileShow {
                     await tiefseeview.loadBigimg(imgurl); //使用<canvas>渲染
                 } else { //載入失敗就顯示圖示
                     imgurl = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
-                    await tiefseeview.loadImg(imgurl); 
+                    await tiefseeview.loadImg(imgurl);
                 }
 
             }

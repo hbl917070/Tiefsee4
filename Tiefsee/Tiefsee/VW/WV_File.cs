@@ -52,11 +52,6 @@ namespace Tiefsee {
         public string Base64ToTempFile(string base64, string extension) {
 
             try {
-                //去掉開頭的 data:image/png;base64,
-                int x = base64.IndexOf("base64,");
-                if (x != -1) { base64 = base64.Substring(x + 7); }
-
-                byte[] Buffer = Convert.FromBase64String(base64);
 
                 //取得亂數檔名
                 string path = "";
@@ -68,15 +63,22 @@ namespace Tiefsee {
                 if (Directory.Exists(AppPath.tempDirWebFile) == false) {
                     Directory.CreateDirectory(AppPath.tempDirWebFile);
                 }
-                File.WriteAllBytes(path, Buffer); // 將資料寫入檔案中
+
+                //把base646儲存成檔案
+                int x = base64.IndexOf("base64,"); //去掉開頭的 data:image/png;base64,
+                if (x != -1) { base64 = base64.Substring(x + 7); }
+                byte[] buffer = Convert.FromBase64String(base64);
+                File.WriteAllBytes(path, buffer);
 
                 return path;
+
             } catch (Exception e) {
                 Console.WriteLine(e.Message);
                 return "false";
             }
 
         }
+        //取得亂數字串
         private static string GenerateRandomString(int length) {
             string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
             StringBuilder sb = new StringBuilder();

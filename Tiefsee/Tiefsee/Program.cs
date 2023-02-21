@@ -8,13 +8,13 @@ using System.Windows.Forms;
 namespace Tiefsee {
     static class Program {
 
-  
+
         public static int startPort;//程式開始的port
         public static int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
         public static int serverCache;//伺服器對靜態資源快取的時間(秒)
         public static WebServer webServer;//本地伺服器
         public static StartWindow startWindow;//起始視窗，關閉此視窗就會結束程式
-  
+
 
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
@@ -33,14 +33,14 @@ namespace Tiefsee {
 
             AppPath.Init();
 
-           
+
             IniManager iniManager = new IniManager(AppPath.appDataStartIni);
             startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
             bool argsIsNone = (args.Length == 1 && args[0] == "none");//啟動參數是 none
-       
+
             if (args.Length >= 1 && args[0] == "restart") {//啟動參數是 restart
 
                 args = args.Skip(1).ToArray();//刪除陣列的第一筆
