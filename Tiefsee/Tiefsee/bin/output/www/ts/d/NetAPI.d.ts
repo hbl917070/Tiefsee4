@@ -368,11 +368,17 @@ interface WV_System {
     GetScreenFromPoint(x: number, y: number): number[4];
 
     /**
-     * 刪除圖片暫存
-     * @param maxImgProcessed tempDirImgZoom 資料夾最多保留的檔案數量
-     * @param maxImgZoom tempDirImgZoom 資料夾最多保留的檔案數量
+     * 立即刪除所有圖片暫存
      */
-    DeleteTemp(maxImgProcessed: number, maxImgZoom: number): void;
+    DeleteAllTemp();
+
+    /**
+     * 刪除圖片暫存
+     * @param maxImgProcessed 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量
+     * @param maxImgZoom 暫存資料夾 tempDirImgZoom 最多保留的檔案數量
+     * @param maxWebFile 暫存資料夾 tempDirWebFile 最多保留的檔案數量
+     */
+    DeleteTemp(maxImgProcessed: number, maxImgZoom: number, maxWebFile: number): void;
 
     /**
      * 模擬鍵盤

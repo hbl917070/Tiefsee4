@@ -79,28 +79,43 @@ namespace Tiefsee {
             return mouse;
         }
 
+
         /// <summary>
-        /// 刪除圖片暫存
+        /// 立即刪除所有圖片暫存
         /// </summary>
-        /// <param name="maxImgProcessed"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
+        public void DeleteAllTemp() {
+            DeleteTemp(AppPath.tempDirImgProcessed, 0);
+            DeleteTemp(AppPath.tempDirImgZoom, 0);
+            DeleteTemp(AppPath.tempDirWebFile, 0);
+        }
+
+
+        /// <summary>
+        /// 刪除圖片暫存 (保留一定數量
+        /// </summary>
+        /// <param name="maxImgProcessed"> 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量 </param>
         /// <param name="maxImgZoom"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
-        public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
+        /// <param name="maxWebFile"> 暫存資料夾 tempDirWebFile 最多保留的檔案數量 </param>
+        public void DeleteTemp(int maxImgProcessed, int maxImgZoom, int maxWebFile) {
             new Thread(() => {
-                if (Program.startType == 3 || Program.startType == 5) {//常駐背景
+                if (Program.startType == 3 || Program.startType == 5) {//常駐背景，關閉所有視窗才執行清除
                     if (QuickRun.runNumber <= 2) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
+                        DeleteTemp(AppPath.tempDirWebFile, maxWebFile);
                         Console.WriteLine("########## 刪除圖片暫存(常駐背景)");
                     }
                     return;
                 }
 
+                //非「常駐背景」的模式，則從Port資料夾判斷當前還有幾個執行個體
                 if (Directory.Exists(AppPath.appDataPort) == false) { return; }
                 int postCount = Directory.GetFiles(AppPath.appDataPort).Length;
                 if (postCount == 1) {
                     if (QuickRun.runNumber <= 1) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
+                        DeleteTemp(AppPath.tempDirWebFile, maxWebFile);
                         Console.WriteLine("########## 刪除圖片暫存" + QuickRun.runNumber);
                     }
                 }

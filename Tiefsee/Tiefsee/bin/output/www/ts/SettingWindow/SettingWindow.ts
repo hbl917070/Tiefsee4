@@ -821,7 +821,8 @@ class Setting {
             var btn_clearBrowserCache = document.querySelector("#btn-clearBrowserCache") as HTMLElement;
 
             btn_clearBrowserCache.addEventListener("click", async () => {
-                WV_Window.ClearBrowserCache();
+                await WV_System.DeleteAllTemp(); //立即刪除所有圖片暫存
+                await WV_Window.ClearBrowserCache(); //清理webview2的暫存
                 msgbox.show({ txt: i18n.t("msg.tempDeleteCompleted") }); //暫存資料清理完成
             });
         })
