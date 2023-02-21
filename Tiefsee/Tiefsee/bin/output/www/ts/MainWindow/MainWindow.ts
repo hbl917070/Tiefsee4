@@ -277,8 +277,10 @@ class MainWindow {
 
                 let files = e.dataTransfer.files;
                 let text = e.dataTransfer.getData("text/plain"); //取得拖曳進來的文字，或圖片的網址
+                let textUrl = e.dataTransfer.getData("text/uri-list");
                 /*console.log(e.dataTransfer.types)
-                console.log(e.dataTransfer.getData("text/uri-list"))
+                console.log(text)
+                console.log(textUrl)
                 console.log(e.dataTransfer.getData("text/html"))
                 console.log(files)*/
 
@@ -291,13 +293,13 @@ class MainWindow {
                     }
                     await fileLoad.loadDropFile(arFile);
 
-                    e.preventDefault();
+                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
 
                 } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) { //如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
 
                     //ex: http://127.0.0.1:7860/file=D:/ai/a.png
 
-                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+                    e.preventDefault();
 
                     var path = text.match(/file=(.+)/)?.[1] || "";
                     path = Lib.URLToPath(path);
@@ -305,7 +307,7 @@ class MainWindow {
 
                 } else if (text.search(/^((blob:)?http[s]?|file):[/][/]/) === 0 && files.length > 0) { //網頁的圖片
 
-                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+                    e.preventDefault();
 
                     let base64 = await readFileAsDataURL(files[0]);
                     let extension = getExtensionFromBase64(base64); //取得副檔名
@@ -318,7 +320,7 @@ class MainWindow {
 
                 } else if (text.indexOf("data:image/") === 0) { //base64
 
-                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+                    e.preventDefault();
 
                     let base64 = text;
                     let extension = getExtensionFromBase64(base64); //取得副檔名
@@ -329,7 +331,7 @@ class MainWindow {
 
                 } else if (text.search(/^http[s]:[/][/]/) === 0) { //如果是超連結
 
-                    e.preventDefault(); //避免影響 baseWindow.getDropPath()
+                    e.preventDefault();
 
                     let file = await downloadFileFromUrl(text);
                     if (file != null) {
@@ -340,13 +342,23 @@ class MainWindow {
                             await fileLoad.loadFile(path);
                         }
                     }
+                } else if (textUrl.search(/^file:[/][/]/) === 0) { //某些應用程式的檔案連結，例如vscode
+
+                    e.preventDefault();
+                    let path = Lib.URLToPath(textUrl);
+                    await fileLoad.loadFile(path);
+
+                } else {
+
+                    e.preventDefault();
+
                 }
 
             }
 
-            // file 轉 base64
-            function readFileAsDataURL(file: File): Promise<string> {
-                return new Promise((resolve, reject) => {
+            /** file 轉 base64 */
+            async function readFileAsDataURL(file: File): Promise<string> {
+                return await new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         resolve(event.target?.result as string);
@@ -357,7 +369,7 @@ class MainWindow {
                     reader.readAsDataURL(file);
                 });
             }
-            // 從base64判斷副檔名
+            /** 從base64判斷副檔名 */
             function getExtensionFromBase64(base64: string) {
                 if (base64.length < 40) { return ""; }
                 const base64Header = base64.slice(0, 40);
@@ -388,11 +400,13 @@ class MainWindow {
                         return "";
                 }
             }
-            // 下載檔案
+            /** 下載檔案 */
             async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
                 const timeout = 20 * 1000; // 逾時
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                script.window.loadingShow(true);
 
                 try {
                     const response = await fetch(imageUrl, { signal: controller.signal });
@@ -427,6 +441,7 @@ class MainWindow {
                     return null;
                 } finally {
                     clearTimeout(timeoutId);
+                    script.window.loadingShow(false);
                 }
             }
 

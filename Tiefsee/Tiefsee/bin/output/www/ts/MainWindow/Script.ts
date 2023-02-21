@@ -10,6 +10,7 @@ class Script {
     public open: ScriptOpen;
     public copy: ScriptCopy;
     public setting: ScriptSetting;
+    public window: ScriptWindow;
 
     constructor(M: MainWindow) {
         this.img = new ScriptImg(M);
@@ -20,6 +21,7 @@ class Script {
         this.open = new ScriptOpen(M);
         this.copy = new ScriptCopy(M);
         this.setting = new ScriptSetting(M);
+        this.window = new ScriptWindow(M);
     }
 
 }
@@ -519,4 +521,24 @@ class ScriptSetting {
         this.temp_setting = await baseWindow.newWindow("SettingWindow.html");
     }
 
+}
+
+
+class ScriptWindow {
+
+    domLoading = document.querySelector("#loadingWindow") as HTMLElement;
+
+    M: MainWindow;
+    constructor(_M: MainWindow) {
+        this.M = _M;
+    }
+
+    /** 顯示或隱藏 loading */
+    public loadingShow(val: boolean) {
+        if (val) {
+            this.domLoading.style.display = "flex";
+        } else {
+            this.domLoading.style.display = "none";
+        }
+    }
 }
