@@ -65,16 +65,22 @@ class LibIframe {
 
         dom.addEventListener("drop", (e: DragEvent) => {
 
-            if (e.dataTransfer === null) { return; }
+            // 直接把 drop 傳遞給父頁面
+            const dropEvent = new CustomEvent("drop", {
+                bubbles: true,
+                detail: {
+                    event: e
+                }
+            });
+            window.parent.dispatchEvent(dropEvent);
 
+            /*if (e.dataTransfer === null) { return; }
             let files = e.dataTransfer.files;
-
             let arFile = [];
             for (let i = 0; i < files.length; i++) {
                 const item = files[i];
                 arFile.push(item.name);
             }
-
             let json = {
                 type: "loadDropFile",
                 data: arFile,
@@ -82,7 +88,7 @@ class LibIframe {
             this.postMsg(json);
 
             e.stopPropagation();
-            //e.preventDefault();
+            //e.preventDefault();*/
         }, true);
     }
 
