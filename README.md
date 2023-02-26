@@ -7,14 +7,15 @@ Tiefsee 是一款開源的圖片檢視器。
 - 支援多種特殊圖片格式：webp、webm、psd、clip、heic、avif、qoi ...
 
 特點功能：
-- 快速啟動：只要Tiefsee尚未完全關閉，就能快速開啟Tiefsee
+- 快速啟動：只要 Tiefsee 尚未完全關閉，就能快速開啟 Tiefsee
 - 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
-- 線上搜圖：sauceNAO、Yandex、Ascii2d、Google、Google Lens、Bing
+- 開啟網頁圖片：可將瀏覽器上的圖片直接拖曳進 Tiefsee 來進行開啟
+- 線上搜圖：sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing
 - 檔案預覽面板：預覽同資料夾內的圖片
 - 資料夾預覽面板：預覽旁邊資料夾內的圖片
-- 詳細資料面板：exif資訊、圖片拍攝地點、AI繪圖使用的參數
+- 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數
 - QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
-- 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx與pptx閱讀器
+- 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器
 
 界面語言：
 - English
@@ -24,18 +25,16 @@ Tiefsee 是一款開源的圖片檢視器。
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.24](https://github.com/hbl917070/Tiefsee4/releases)
-(注意：此為測試版
+[Tiefsee 4.0.0-beta.25](https://github.com/hbl917070/Tiefsee4/releases)
 
     開發中功能：  
     瀏覽多幀圖片、大量瀏覽模式、自定快速鍵
-
 <br>
 
 ## 運行需求
 - 64位元
 - Windows 10 或 Windows 11
-- [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48) (含、以上
+- [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48) (含、以上)
 - [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/WebView2/)
 
 <br>
@@ -57,11 +56,11 @@ Tiefsee 是一款開源的圖片檢視器。
 ### 1、啟動程式時顯示「WebView2 must be installed to run this application」
 > 可能原因為
 > - 電腦尚未安裝 WebView2：「<a href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">點此</a>」進行下載。
-> - WebView2安裝失敗：移除舊的WebView2後，對「WebView2的安裝檔」右鍵→系統管理員身份執行。
-> - WebView2初始化錯誤：避免在Tiefsee的路徑裡面包含中文日文韓文之類的特殊字元。
+> - WebView2 安裝失敗：移除舊的 WebView2 後，對「WebView2 的安裝檔」右鍵→系統管理員身份執行。
+> - WebView2 初始化錯誤：避免在 Tiefsee 的路徑裡面包含中文日文韓文之類的特殊字元。
 
 ### 2、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
-> 毛玻璃視窗效果並非Windows正式公開的API，在某些裝置上可能存在BUG，或是無法使用。常見的問題為：
+> 毛玻璃視窗效果並非 Windows 正式公開的 API，這項功能在某些裝置上可能存在BUG，或是無法使用。常見的問題為：
 > - 模糊區域溢出到視窗外
 > - Tiefsee的視窗在移動時嚴重延遲
 
@@ -74,9 +73,9 @@ Tiefsee 是一款開源的圖片檢視器。
 <br>
 
 # 專案說明
-### 專案類型：C# WinForm (net 4.8)
-### 開發語言：C#、TypeScript
-### [專案建立步驟](/Building.md)
+- 專案類型：C# WinForm (net 4.8)
+- 開發語言：C#、TypeScript
+- [專案建立步驟](/Building.md)
 
 <br>
 
