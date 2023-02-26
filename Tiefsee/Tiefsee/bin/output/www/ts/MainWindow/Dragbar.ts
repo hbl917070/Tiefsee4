@@ -63,19 +63,23 @@ class Dragbar {
             dom_observe = _dom_observe;
             hammer_dragbar = new Hammer(dom_dragbar);
 
-            //區塊改變大小時
-            new ResizeObserver(() => {
-                if (type === "left") {
-                    dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
-                    dom_dragbar.style.left = dom_box.getBoundingClientRect().left + "px"
-                    dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
-                }
-                if (type === "right") {
-                    dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
-                    dom_dragbar.style.left = dom_box.getBoundingClientRect().left + dom_box.getBoundingClientRect().width + "px"
-                    dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
-                }
-            }).observe(dom_observe)
+            //區塊或body改變大小時，更新拖曳條的坐標
+            function updatePosition() {
+                requestAnimationFrame(() => {
+                    if (type === "left") {
+                        dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
+                        dom_dragbar.style.left = dom_box.getBoundingClientRect().left + "px"
+                        dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
+                    }
+                    if (type === "right") {
+                        dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
+                        dom_dragbar.style.left = dom_box.getBoundingClientRect().left + dom_box.getBoundingClientRect().width + "px"
+                        dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
+                    }
+                })
+            }
+            new ResizeObserver(updatePosition).observe(dom_observe);
+            new ResizeObserver(updatePosition).observe(document.body);
 
 
             //拖曳開始
