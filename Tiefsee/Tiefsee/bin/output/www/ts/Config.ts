@@ -96,12 +96,12 @@ class Config {
             { name: "Bing", icon: "./img/imgSearch/bing.png", url: "https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIIDP&sbisrc=UrlPaste&idpbck=1&q=imgurl:{url}" },
             //{ name: "IQDB", icon: "./img/imgSearch/iqdb.png", url: "https://iqdb.org/?url={url}" },
         ],
-        /** 上傳圖片的server */
-        imgServer: "https://hbl917070.com/imgSearch/upload",
-        /** api key，使用thumbsnap時才需要用到 */
-        imgServerKey: "",
-        //imgServer: "https://thumbsnap.com/api/upload",
-        //key: "00001bfd3de40a19b62672faeb3fa564",
+
+        /** 圖片暫存伺服器 */
+        imgServer: [
+            { url: "https://hbl917070.com/imgSearch/upload", timeout: 8 * 1000 },
+            { url: "https://tiefseesearchimageserver.onrender.com/imgSearch/upload", timeout: 10 * 1000 },
+        ]
     };
 
 
