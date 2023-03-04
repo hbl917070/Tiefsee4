@@ -120,7 +120,7 @@ class BaseWindow {
         windowBorder(<HTMLDivElement>document.querySelector(".window-RT"), "RT");//右上
         windowBorder(<HTMLDivElement>document.querySelector(".window-LB"), "LB");//左下
         windowBorder(<HTMLDivElement>document.querySelector(".window-RB"), "RB");//右下
-        windowBorder(<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-txt"), "move");
+        //windowBorder(<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-txt"), "move");
 
         function windowBorder(_dom: HTMLDivElement, _type: ("CT" | "RC" | "CB" | "LC" | "LT" | "RT" | "LB" | "RB" | "move")) {
             _dom.addEventListener("mousedown", async (e) => {
