@@ -145,6 +145,7 @@
     <Compile Include="Lib\FileSort.cs" />
     <Compile Include="Lib\ImgLib.cs" />
     <Compile Include="Lib\ShellLink.cs" />
+    <Compile Include="Lib\SQLite.cs" />
     <Compile Include="Lib\WindowsThumbnailProvider.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="StartWindow.cs">
