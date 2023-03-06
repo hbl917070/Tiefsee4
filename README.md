@@ -10,9 +10,9 @@ Tiefsee 是一款開源的圖片檢視器。
 - 快速啟動：只要 Tiefsee 尚未完全關閉，就能快速開啟 Tiefsee
 - 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
 - 開啟網頁圖片：可將瀏覽器上的圖片直接拖曳進 Tiefsee 來進行開啟
-- 線上搜圖：sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing
+- 線上搜圖：支援 sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing
 - 檔案預覽面板：預覽同資料夾內的圖片
-- 資料夾預覽面板：預覽旁邊資料夾內的圖片
+- 資料夾預覽面板：顯示資料夾列表，並預覽資料夾內的圖片
 - 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數
 - QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
 - 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器

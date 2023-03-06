@@ -322,10 +322,14 @@ class Config {
                 { ext: "sr2", type: "vips", vipsType: "dcraw" },
                 { ext: "srw", type: "vips", vipsType: "dcraw" },
                 { ext: "dng", type: "vips", vipsType: "dcraw" },
+
+                { ext: "afphoto", type: "vips", vipsType: "extractPng" },
+                { ext: "afdesign", type: "vips", vipsType: "extractPng" },
+                { ext: "clip", type: "vips", vipsType: "clip" },
             ]
 
             //有安裝NConvert才使用
-            if (plugin.NConvert === true) {
+            /*if (plugin.NConvert === true) {
                 this._allowFile_img.push(
                     { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
                     { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
@@ -333,7 +337,8 @@ class Config {
                     //{ ext: "iff",    type:"vips", vipsType: "nconvertJpg" }, //必須使用 heif.zip 裡面的dll
                     { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
                 );
-            }
+            }*/
+
         })();
 
 

@@ -946,12 +946,12 @@ class Setting {
 
                 //初始化 擴充套件清單
                 var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
-                var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
+                //var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
                 var dom_PDFTronWebviewer = document.querySelector("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
                 var dom_MonacoEditor = document.querySelector("#pluginLiet-MonacoEditor") as HTMLInputElement;
 
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
-                dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
+                //dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
                 dom_PDFTronWebviewer.innerHTML = getHtml(baseWindow.appInfo.plugin.PDFTronWebviewer);
                 dom_MonacoEditor.innerHTML = getHtml(baseWindow.appInfo.plugin.MonacoEditor);
 

@@ -35,6 +35,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getText", getText);
             webServer.RouteAdd("/api/getFileIcon", getFileIcon);
             webServer.RouteAdd("/api/getFileInfo2", getFileInfo2);
+            webServer.RouteAdd("/api/getFileInfo2List", getFileInfo2List);
 
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
@@ -52,6 +53,9 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/img/nconvert", nconvert);
             webServer.RouteAdd("/api/img/vipsInit", vipsInit);
             webServer.RouteAdd("/api/img/vipsResize", vipsResize);
+            webServer.RouteAdd("/api/img/clip", clip);
+            webServer.RouteAdd("/api/img/extractPng", extractPng);
+
 
             webServer.RouteAdd("/www/{*}", getWww);
             webServer.RouteAdd("/{*}", getWww);
@@ -251,6 +255,42 @@ namespace Tiefsee {
 
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        void clip(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            using (Stream stream = ImgLib.ClipToStream(path)) {
+                WriteStream(d, stream); //回傳檔案
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        void extractPng(RequestData d) {
+
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            if (File.Exists(path) == false) { return; }
+            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            if (is304 == true) { return; }
+
+            using (Stream stream = ImgLib.ExtractPngToStream(path)) {
+                WriteStream(d, stream); //回傳檔案
+            }
+        }
+
+
+        /// <summary>
         /// 檢查這個port是否為tiefsee所使用，用於快速啟動
         /// </summary>
         private void ckeck(RequestData d) {
@@ -392,6 +432,29 @@ namespace Tiefsee {
             WV_File wvf = new WV_File();
             string srtStrJson = wvf.GetFileInfo2(path);
             //string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
+            WriteString(d, srtStrJson);//回傳
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void getFileInfo2List(RequestData d) {
+
+            //string path = d.args["path"];
+            //path = Uri.UnescapeDataString(path);
+
+            string postData = d.postData;
+            var json = JObject.Parse(postData);
+
+            string[] ar = json["ar"].ToObject<string[]>();
+            WV_File wvf = new WV_File();
+            FileInfo2[] arFileInfo2 = new FileInfo2[ar.Length];
+            for (int i = 0; i < ar.Length; i++) {
+                string path = ar[i];
+                arFileInfo2[i] = wvf._GetFileInfo2(path);
+            }
+
+            string srtStrJson = JsonConvert.SerializeObject(arFileInfo2);
             WriteString(d, srtStrJson);//回傳
         }
 

@@ -2,6 +2,7 @@
 using ImageMagick.Formats;
 using NetVips;
 using NetVips.Extensions;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +18,7 @@ namespace Tiefsee {
 
     public class ImgLib {
 
-     
+
 
         /// <summary>
         /// 
@@ -42,9 +43,7 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <param name="func"></param>
         public static void PathToBitmapSource(String path, Action<BitmapSource> func) {
-
             using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-
                 BitmapDecoder bd = BitmapDecoder.Create(sr, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
                 func(bd.Frames[0]);
             }
@@ -160,7 +159,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         /// <param name="thumbnail"></param>
-        /// <param name="minSize"></param>
+        /// <param name="minSize"> 預覽圖的寬或高小於這個數值，就讀取原始檔案 </param>
         /// <returns></returns>
         public static Stream Dcraw_PathToStream(string path, bool thumbnail = true, int minSize = 800) {
 
@@ -290,6 +289,109 @@ namespace Tiefsee {
               data.Stride);
             bmp.UnlockBits(data);
             return bmp;
+        }
+
+
+        /// <summary>
+        /// 從 stream 內查詢字串第一次出現的位置
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static int FindStrIndexOf(FileStream stream, byte[] str) {
+
+            stream.Position = 0;
+            byte[] buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, (int)stream.Length);
+
+            int index = Array.IndexOf(buffer, str[0]);
+
+            while (index >= 0 && index <= buffer.Length - str.Length) {
+                bool found = true;
+                for (int i = 1; i < str.Length; i++) {
+                    if (buffer[index + i] != str[i]) {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    return index;
+                }
+
+                index = Array.IndexOf(buffer, str[0], index + 1);
+            }
+
+            return -1;
+
+        }
+
+
+        /// <summary>
+        /// Clip Studio Paint 產生的 clip檔
+        /// </summary>
+        public static Stream ClipToStream(string clipPath) {
+            try {
+                string tempFilePath = Path.GetTempFileName();
+                using (FileStream fs = new FileStream(clipPath, FileMode.Open, FileAccess.Read)) {
+
+                    //取得 sqlite標頭 的位置。"SQLite format 3"
+                    byte[] header = new byte[] { 0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, 0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33 };
+                    long startIndex = FindStrIndexOf(fs, header);
+
+                    if (startIndex == -1) { return null; }
+
+                    //把 sqlite 寫入到暫存當
+                    using (FileStream temp = new FileStream(tempFilePath, FileMode.Create)) {
+                        long size = new FileInfo(clipPath).Length;
+                        byte[] data = new byte[size];
+                        fs.Seek(startIndex, SeekOrigin.Begin);
+                        fs.Read(data, 0, data.Length);
+                        temp.Write(data, 0, data.Length);
+                    }
+                }
+
+                //從 sqlite 裡面提取圖片
+                Stream stream = new MemoryStream();
+                using (var db = new SQLiteConnection(tempFilePath)) {
+                    var data = db.ExecuteScalar<byte[]>("SELECT ImageData FROM CanvasPreview");
+                    stream.Write(data, 0, data.Length);
+                }
+
+                File.Delete(tempFilePath);
+                return stream;
+
+            } catch {
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// 以 hex 的方式掃描檔案內的 png，並將其提取出來。可用於 afphoto
+        /// </summary>
+        public static Stream ExtractPngToStream(string filePath) {
+            try {
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
+                    byte[] startHex = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; //png檔的開頭       
+                    int startIndex = FindStrIndexOf(fs, startHex);
+                    if (startIndex == -1) { return null; }
+                    byte[] endHex = new byte[] { 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 }; //png檔的結尾
+                    int endIndex = FindStrIndexOf(fs, endHex);
+                    if (startIndex >= endIndex) { return null; }
+
+                    int size = endIndex - startIndex;
+                    byte[] fileData = File.ReadAllBytes(filePath);
+                    byte[] outputData = new byte[size];
+                    Array.Copy(fileData, startIndex, outputData, 0, size);
+
+                    Stream stream = new MemoryStream();
+                    stream.Write(outputData, 0, outputData.Length);
+                    return stream;
+                }
+            } catch (Exception) {
+                return null;
+            }
         }
 
 
@@ -574,6 +676,26 @@ namespace Tiefsee {
             if (type == "dcraw") {
                 using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
                     using (FileStream fileStream = File.Create(path100)) {//儲存檔案
+                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.CopyTo(fileStream);
+                    }
+                }
+                return GetImgInitInfo(path100, "vips");
+            }
+
+            if (type == "clip") {
+                using (Stream stream = ImgLib.ClipToStream(path)) {
+                    using (FileStream fileStream = File.Create(path100)) { //儲存檔案
+                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.CopyTo(fileStream);
+                    }
+                }
+                return GetImgInitInfo(path100, "vips");
+            }
+
+            if (type == "extractPng") {
+                using (Stream stream = ImgLib.ExtractPngToStream(path)) {
+                    using (FileStream fileStream = File.Create(path100)) { //儲存檔案
                         stream.Seek(0, SeekOrigin.Begin);
                         stream.CopyTo(fileStream);
                     }
