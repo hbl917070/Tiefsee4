@@ -111,19 +111,19 @@ namespace Tiefsee {
                 foreach (var directory in directories) {
                     foreach (var tag in directory.Tags) {
 
-                        string group = directory.Name;
-                        string name = tag.Name;
-                        string value = tag.Description;
+                        string group = directory.Name ?? "";
+                        string name = tag.Name ?? "";
+                        string value = tag.Description ?? "";
                         int tagType = tag.Type;
 
                         if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
                             continue;
                         }
-                        if (value != null && value.Length > maxLength) {//某些圖片可能把二進制資訊封裝進去
+                        if (value.Length > maxLength) {//某些圖片可能把二進制資訊封裝進去
                             continue;
                         }
 
-                        if (name == "Textual Data" && value != null) {
+                        if (name == "Textual Data") {
                             try {
                                 if (group == "PNG-iTXt") { // utf8 格式
                                     byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
@@ -181,9 +181,9 @@ namespace Tiefsee {
                                 name = "Flash(text)",
                                 value = value
                             });
-                        } else if (name == "Image Width") {
+                        } else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { //Thumbnail是縮圖，所以不抓
                             w = directory.GetString(tag.Type);
-                        } else if (name == "Image Height") {
+                        } else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
                             h = directory.GetString(tag.Type);
                         } else {
                             exif.data.Add(new ImgExifItem {
