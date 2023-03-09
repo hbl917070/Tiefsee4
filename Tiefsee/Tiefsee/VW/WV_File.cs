@@ -118,6 +118,11 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public String GetFileInfo2(string path) {
+            FileInfo2 info = _GetFileInfo2(path);
+            String json = JsonConvert.SerializeObject(info);
+            return json;
+        }
+        public FileInfo2 _GetFileInfo2(string path) {
 
             FileInfo2 info = new FileInfo2();
             info.Path = path;
@@ -161,10 +166,8 @@ namespace Tiefsee {
                 info.Type = "none";
             }
 
-            String json = JsonConvert.SerializeObject(info);
-            return json;
+            return info;
         }
-
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」

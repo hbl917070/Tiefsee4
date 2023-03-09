@@ -147,8 +147,11 @@ class DirSort {
 
             let path = M.fileLoad.getDirPath();
             let arDir = M.fileLoad.getWaitingDir();
+            let arKey = M.fileLoad.getWaitingDirKey();
 
-            let arKey = await WebAPI.sort2(M.fileLoad.getWaitingDirKey(), sortType)
+            if (arKey.length <= 1) { return; } //只有1筆資料就不需要排序
+
+            arKey = await WebAPI.sort2(arKey, sortType);
 
             //排序後把資料放回 WaitingDir
             let ar: { [key: string]: string[] } = {}

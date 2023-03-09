@@ -27,7 +27,7 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
+        /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前4筆)
         /// </summary>
         /// <param name="siblingPath"></param>
         /// <param name="_arExt"> 副檔名 </param>
@@ -46,70 +46,74 @@ namespace Tiefsee {
                 arExt[i] = "." + ((String)_arExt[i]).ToLower();
             }
 
-            string parentPath = Path.GetDirectoryName(siblingPath);//取得父親資料夾
+            string parentPath = Path.GetDirectoryName(siblingPath); //取得父親資料夾
             Dictionary<string, List<string>> output = new Dictionary<string, List<string>>();
 
             string[] arDir = new string[0];
             try { //如果取得所有資料夾失敗，就只處理自己目前的資料夾
-                if (parentPath == null) {//如果沒有上一層資料夾
+                if (parentPath == null) { //如果沒有上一層資料夾
                     arDir = new string[] { siblingPath };//只處理自己
                 } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {//如果開啟的是 user資料夾 裡面的資料(例如桌面
-                    arDir = new string[] { siblingPath };//只處理自己
+                    arDir = new string[] { siblingPath }; //只處理自己
                 } else if (maxCount == 0) {
-                    arDir = new string[] { siblingPath };//只處理自己
+                    arDir = new string[] { siblingPath }; //只處理自己
                 } else {
-                    arDir = Directory.GetDirectories(parentPath);//取得所有子資料夾
-                    if (arDir.Length > maxCount) {//如果資料夾太多
-                        arDir = new string[] { siblingPath };//只處理自己
+                    arDir = Directory.GetDirectories(parentPath); //取得所有子資料夾
+                    if (arDir.Length > maxCount) { //如果資料夾太多
+                        arDir = new string[] { siblingPath }; //只處理自己
                     }
                 }
             } catch {
-                arDir = new string[] { siblingPath };//只處理自己
+                arDir = new string[] { siblingPath }; //只處理自己
             }
 
-            foreach (var dirPath in arDir) {//所有子資料夾
-
+            foreach (var dirPath in arDir) { //所有子資料夾
+                string dirName = Path.GetFileName(dirPath);
                 string[] arFile;
                 try {
-                    arFile = Directory.GetFiles(dirPath);
+                    //arFile = Directory.GetFiles(dirPath);
+                    if (arExt.Length == 0) {
+                        //取得資料夾內前4個檔案的檔名
+                        arFile = Directory.EnumerateFiles(dirPath, "*.*") 
+                              .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
+                    } else {
+                        //以副檔名來篩選，取得資料夾內前4個檔案的檔名
+                        var query = from file in Directory.EnumerateFiles(dirPath, "*.*", SearchOption.TopDirectoryOnly)
+                                    where arExt.Contains(Path.GetExtension(file).ToLower(), StringComparer.Ordinal)
+                                    select file;
+                        arFile = query.Take(4).Select(f => Path.GetFileName(f)).ToArray();
+                    }
                 } catch {
                     continue;
                 }
-
-                for (int i = 0; i < arFile.Length; i++) {
-                    arFile[i] = Path.GetFileName(arFile[i]); //把路徑處理成只有檔名，排序比較快
+                if (arFile.Length == 0) {
+                    continue;
                 }
-                //檔名自然排序
-                int len = arFile.Length;
-                if (len > 51) { len = 51; }
-                Array.Sort(arFile, 0, len, new NaturalSort());
 
-                int n = 0;
-                foreach (string item in arFile) {//子資料夾內的所有檔案
-                    string fileExt = Path.GetExtension(item).ToLower();
-                    if (arExt.Contains(fileExt)) { //判斷是否為名單內的副檔名
-                        if (output.ContainsKey(dirPath) == false) {//以資料夾名稱當做key
-                            output.Add(dirPath, new List<string>());
-                        }
-                        output[dirPath].Add(Path.Combine(dirPath, item));
-                        n += 1;
-                        if (n >= 5) { break; }
+                //檔名自然排序
+                /*int len = arFile.Length;
+                if (len > 51) { len = 51; }
+                Array.Sort(arFile,  new NaturalSort());*/
+             
+                foreach (string item in arFile) {
+                    if (output.ContainsKey(dirName) == false) { //以資料夾名稱當做key
+                        output.Add(dirName, new List<string>());
                     }
+                    output[dirName].Add(item);
                 }
 
             }
 
             //如果取得的名單內不包含自己，就補上
-            if (output.ContainsKey(siblingPath) == false) {
-                output.Add(siblingPath, new List<string>());
+            string siblingPathName = Path.GetFileName(siblingPath);
+            if (output.ContainsKey(siblingPathName) == false) {
+                output.Add(siblingPathName, new List<string>());
                 try {
-                    string[] arFile = Directory.GetFiles(siblingPath);
-                    int n = 0;
-                    foreach (string item in arFile) { //子資料夾內的所有檔案
-                        string fileExt = Path.GetExtension(item).ToLower();
-                        output[siblingPath].Add(Path.Combine(item, item));
-                        n += 1;
-                        if (n >= 5) { break; }
+                    //取得資料夾內前4個檔案的檔名
+                    string[] arFile = Directory.EnumerateFiles(siblingPath, "*.*")
+                              .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
+                    foreach (string item in arFile) {
+                        output[siblingPathName].Add(item);
                     }
                 } catch { }
             }

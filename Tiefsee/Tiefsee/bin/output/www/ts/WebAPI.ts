@@ -23,7 +23,7 @@ class WebAPI {
     static Directory = class {
 
         /**
-         * 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
+         * 取得跟自己同層的資料夾內的檔案資料(自然排序的前4筆)
          * @param path 
          * @param arExt 副檔名
          * @param maxCount 資料夾允許處理的最大數量
@@ -31,7 +31,22 @@ class WebAPI {
         static async getSiblingDir(path: string, arExt: string[], maxCount: number) {
             let url = APIURL + "/api/directory/getSiblingDir";
             let postData = { path: path, arExt: arExt, maxCount: maxCount };
-            return WebAPI.sendPost(url, postData);
+            let retJson = await WebAPI.sendPost(url, postData);
+
+            let parentPath = Lib.GetDirectoryName(path) ?? path;
+
+            // 為了減少資料傳輸量，所以返回的資料只有資料夾名跟檔名，要把他們處理回絕對路徑
+            let json: any = {};
+            for (const key in retJson) {
+                if (retJson.hasOwnProperty(key) == false) { continue; }
+                var newKey = Lib.Combine([parentPath, key]);
+                //var newKey = parentPath + "\\" + key;
+                json[newKey] = retJson[key].map((value: string) => {
+                    return newKey + "\\" + value;
+                })
+            }
+
+            return json;
         }
 
         /**
@@ -259,5 +274,18 @@ class WebAPI {
         let url = APIURL + `/api/getFileInfo2?path=${encodePath}&r=${Math.random()}`;
         let json: FileInfo2 = await fetchGet_json(url);
         return json;*/
+    }
+
+
+    /**
+    * 取得多筆檔案基本資料
+    */
+    static async getFileInfo2List(arPath: string[]) {
+
+        let url = APIURL + "/api/getFileInfo2List";
+        let postData = { ar: arPath };
+        let retAr = await WebAPI.sendPost(url, postData);
+
+        return retAr;
     }
 }

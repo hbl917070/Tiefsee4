@@ -67,30 +67,29 @@ class Lib {
         return "." + name.substring(index + 1).toLocaleLowerCase();
     }
 
-
     /**
      * 串接路徑
      * @param arPath 
      * @returns 
      */
     public static Combine = (arPath: string[]): string => {
-        if (arPath.length === 0) { return "" }
-        if (arPath.length === 1) { return arPath[0] }
+        if (arPath.length === 0) { return ""; }
+        if (arPath.length === 1) { return arPath[0]; }
 
         let sum = arPath[0];
-        sum = sum.replace(/[\\]+$/, '');//移除結尾斜線
-        sum += "\\"
+        sum = sum.replace(/[\\]+$/, ""); //移除結尾斜線
+        sum += "\\";
 
         for (let i = 1; i < arPath.length; i++) {
             let item = arPath[i];
-            item = item.replace(/^([\\])+/, '');//移除開頭斜線
-            item = item.replace(/[\\]+$/, '');//移除結尾斜線
-            sum += item
+            item = item.replace(/^([\\])+/, ""); //移除開頭斜線
+            item = item.replace(/[\\]+$/, ""); //移除結尾斜線
+            sum += item;
             if (i != arPath.length - 1) {
-                sum += "\\"
+                sum += "\\";
             }
         }
-        return sum
+        return sum;
     }
 
 
