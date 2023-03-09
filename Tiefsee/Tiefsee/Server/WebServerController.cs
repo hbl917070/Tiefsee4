@@ -542,11 +542,14 @@ namespace Tiefsee {
             string path = json["path"].ToString();
             string searchPattern = json["searchPattern"].ToString();
 
-            string[] retAr = Directory.GetFiles(path, searchPattern);
+            /*string[] retAr = Directory.GetFiles(path, searchPattern);
             int pathLen = path.Length;//只回傳檔名，減少傳輸成本
             for (int i = 0; i < retAr.Length; i++) {
                 retAr[i] = retAr[i].Substring(pathLen);
-            }
+            }*/
+            int pathLen = path.Length; //只回傳檔名，減少傳輸成本
+            string[] retAr = Directory.EnumerateFiles(path, searchPattern)
+                          .Select(filePath => filePath.Substring(pathLen)).ToArray();
 
             string srtStrJson = JsonConvert.SerializeObject(retAr);
             WriteString(d, srtStrJson);//回傳
