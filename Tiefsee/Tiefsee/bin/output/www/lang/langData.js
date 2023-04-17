@@ -1060,8 +1060,18 @@ var langData = {
             "en": "Save",
             "ja": "アーカイブ",
         },
-
+        closeBulkView: {
+            "zh-TW": "返回",
+            "en": "Back",
+            "ja": "戻る",
+        },
+        showBulkViewSetting: {
+            "zh-TW": "大量瀏覽模式設定",
+            "en": "Bulk View Settings",
+            "ja": "バルクビュー設定",
+        },
         //#endregion
+
 
         //#region 下拉選單 檔案
         openNewWindow: {
@@ -1178,7 +1188,7 @@ var langData = {
         },
         name: {
             "zh-TW": "檔名",
-            "en": "Name",
+            "en": "File Name",
             "ja": "ファイル名",
         },
         lastWriteTime: {
@@ -1198,7 +1208,7 @@ var langData = {
         },
         length: {
             "zh-TW": "檔案大小",
-            "en": "Size",
+            "en": "File Size",
             "ja": "ファイルサイズ",
         },
         random: {
@@ -1296,6 +1306,93 @@ var langData = {
         //#endregion
 
     },
+
+
+    //大量瀏覽模式
+    bulkView: {
+        columns: {
+            "zh-TW": "每行圖片數",
+            "en": "Images per Row",
+            "ja": "行ごとの画像数",
+        },
+        gaplessMode: {
+            "zh-TW": "無間距模式",
+            "en": "Gapless Mode",
+            "ja": "ギャップレスモード",
+        },
+        fixedWidth: {
+            "zh-TW": "鎖定寬度",
+            "en": "Fixed Width",
+            "ja": "固定幅",
+        },
+        alignmentDirection: {
+            "zh-TW": "排列方向",
+            "en": "Alignment Direction",
+            "ja": "配置方向",
+        },
+        firstImageIndentation: {
+            "zh-TW": "第一張圖縮排",
+            "en": "First Image Indentation",
+            "ja": "最初の画像のインデント",
+        },
+        enable: {
+            "zh-TW": "啟用",
+            "en": "Enable",
+            "ja": "有効にする",
+        },
+        disable: {
+            "zh-TW": "關閉",
+            "en": "Disable",
+            "ja": "無効にする",
+        },
+        leftToRight: {
+            "zh-TW": "左至右",
+            "en": "Left to Right",
+            "ja": "左から右",
+        },
+        rightToLeft: {
+            "zh-TW": "右至左",
+            "en": "Right to Left",
+            "ja": "右から左",
+        },
+        displayedInformation: {
+            "zh-TW": "顯示的資訊",
+            "en": "Displayed Information",
+            "ja": "表示される情報",
+        },
+        number: {
+            "zh-TW": "編號",
+            "en": "Number",
+            "ja": "番号",
+        },
+        fileName: {
+            "zh-TW": "檔名",
+            "en": "File Name",
+            "ja": "ファイル名",
+        },
+        imageSize: {
+            "zh-TW": "圖片尺寸",
+            "en": "Image Size",
+            "ja": "画像サイズ",
+        },
+        fileSize: {
+            "zh-TW": "檔案大小",
+            "en": "File Size",
+            "ja": "ファイルサイズ",
+        },
+        lastWriteDate: {
+            "zh-TW": "修改日期",
+            "en": "Last Write Date",
+            "ja": "更新日",
+        },
+        lastWriteTime: {
+            "zh-TW": "修改時間",
+            "en": "Last Write Time",
+            "ja": "更新時間",
+        },
+
+    },
+
 
 
     msg: {
@@ -1509,12 +1606,12 @@ var langData = {
                 "ja": "評価",
             },
             "Image Width/Height": {
-                "zh-TW": "尺寸",
-                "en": "Size",
-                "ja": "大きさ",
+                "zh-TW": "圖片尺寸",
+                "en": "Image Size",
+                "ja": "画像サイズ",
             },
             "Length": {
-                "zh-TW": "大小",
+                "zh-TW": "檔案大小",
                 "en": "File Size",
                 "ja": "ファイルサイズ",
             },

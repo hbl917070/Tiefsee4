@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<rect x="2" y="12" width="21" height="1"/>
+		<rect x="2" y="19" width="21" height="1"/>
+		<rect x="2" y="5" width="21" height="1"/>
+		<rect x="9.5" y="11.5" transform="matrix(5.196456e-13 -1 1 5.196456e-13 0.5 25.5)" width="7" height="2"/>
+		<rect x="2.5" y="4.5" transform="matrix(5.196456e-13 -1 1 5.196456e-13 0.5 11.5)" width="7" height="2"/>
+		<rect x="15.5" y="18.5" transform="matrix(5.196456e-13 -1 1 5.196456e-13 -0.5051 38.4949)" width="7" height="2"/>
+	</g>
+</svg>

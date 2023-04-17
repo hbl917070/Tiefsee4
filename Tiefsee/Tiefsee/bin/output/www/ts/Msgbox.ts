@@ -74,7 +74,7 @@ class Msgbox {
             let checked = (item.value == radioValue) ? "checked" : "";//是否選取
             htmlRadio += `
             <label class="msgbox-radio">
-                <input type="radio" name="msgbox-radio" value="${item.value}" ${checked}>
+                <input class="base-radio" type="radio" name="msgbox-radio" value="${item.value}" ${checked}>
                 <span>${item.name}</span>
             </label>`;
         }

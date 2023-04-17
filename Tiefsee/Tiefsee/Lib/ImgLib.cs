@@ -497,34 +497,37 @@ namespace Tiefsee {
         /// </summary>
         public static NetVips.Image GetNetVips(string path) {
 
-            string key = FileToHash(path);
-            for (int i = 0; i < tempArNewVips.Count; i++) {
-                if (tempArNewVips[i].key == key) {
-                    return tempArNewVips[i].vips;
+            lock (tempArNewVips) {
+
+                string key = FileToHash(path);
+                for (int i = 0; i < tempArNewVips.Count; i++) {
+                    if (tempArNewVips[i].key == key) {
+                        return tempArNewVips[i].vips;
+                    }
                 }
-            }
 
-            NetVips.Cache.MaxFiles = 0;//避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
-            NetVips.Image im;
+                NetVips.Cache.MaxFiles = 0; //避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
+                NetVips.Image im;
 
-            if (Path.GetExtension(path).ToLower() == ".webp") {//如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
-                using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                    im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
+                if (Path.GetExtension(path).ToLower() == ".webp") { //如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
+                    using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                        im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
+                    }
+                } else {
+                    im = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
                 }
-            } else {
-                im = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
-            }
 
-            tempArNewVips.Add(new DataVips {
-                key = key, vips = im
-            });
+                tempArNewVips.Add(new DataVips {
+                    key = key, vips = im
+                });
 
-            if (tempArNewVips.Count > 5) {//最多保留5個檔案
-                using (tempArNewVips[0].vips) { }
-                tempArNewVips[0].vips = null;
-                tempArNewVips.RemoveAt(0);
+                if (tempArNewVips.Count > 5) { //最多保留5個檔案
+                    using (tempArNewVips[0].vips) { }
+                    tempArNewVips[0].vips = null;
+                    tempArNewVips.RemoveAt(0);
+                }
+                return im;
             }
-            return im;
         }
 
 

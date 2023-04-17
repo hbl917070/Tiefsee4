@@ -50,6 +50,7 @@
     <script src="./js/MainWindow/InitMenu.js"></script>
     <script src="./js/MainWindow/Menu.js"></script>
     <script src="./js/MainWindow/LargeBtn.js"></script>
+    <script src="./js/MainWindow/BulkView.js"></script>
     <script src="./js/Msgbox.js"></script>
     <script src="./js/Toast.js"></script>
     <script src="./js/MainWindow/Script.js"></script>
@@ -147,6 +148,35 @@
                         <iframe id="mView-pdftronWebviewer" class="mView-iframe"></iframe>
                         <iframe id="mView-monacoEditor" class="mView-iframe"></iframe>
                         <iframe id="mView-cherryMarkdown" class="mView-iframe"></iframe>
+
+                        <!-- 大量瀏覽模式 -->
+                        <div id="mView-bulkView" class="bulkView base-scrollbar">
+                            <div class="bulkView-pagination">
+                                <div class="bulkView-pagination-box">
+                                    <div class="bulkView-pagination-prev" freeze="true">
+                                        <%- await readFile("./img/default/tool-prev.svg"); %>
+                                    </div>
+                                    <select class="bulkView-pagination-select">
+                                    </select>
+                                    <div class="bulkView-pagination-next">
+                                        <%- await readFile("./img/default/tool-next.svg"); %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bulkView-content" show=""></div>
+                            <div class="bulkView-pagination">
+                                <div class="bulkView-pagination-box">
+                                    <div class="bulkView-pagination-prev">
+                                        <%- await readFile("./img/default/tool-prev.svg"); %>
+                                    </div>
+                                    <select class="bulkView-pagination-select">
+                                    </select>
+                                    <div class="bulkView-pagination-next">
+                                        <%- await readFile("./img/default/tool-next.svg"); %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- 大型切換按鈕 -->
                         <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">

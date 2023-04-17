@@ -11,6 +11,7 @@ class Script {
     public copy: ScriptCopy;
     public setting: ScriptSetting;
     public window: ScriptWindow;
+    public bulkView: ScriptBulkView;
 
     constructor(M: MainWindow) {
         this.img = new ScriptImg(M);
@@ -22,6 +23,7 @@ class Script {
         this.copy = new ScriptCopy(M);
         this.setting = new ScriptSetting(M);
         this.window = new ScriptWindow(M);
+        this.bulkView = new ScriptBulkView(M);
     }
 
 }
@@ -158,6 +160,8 @@ class ScriptFileLoad {
         this.M.fileLoad.renameMsg()
     }
 
+
+
 }
 
 class ScriptFileShow {
@@ -258,6 +262,15 @@ class ScriptMenu {
         }
     }
 
+    /** 顯示選單 大量瀏覽模式設定 */
+    showMenuBulkView(btn?: HTMLElement) {
+        if (btn === undefined) {
+            this.M.menu.open_Origin(document.getElementById("menu-bulkView"), 0, 0);
+        } else {
+            this.M.menu.open_Button(document.getElementById("menu-bulkView"), btn, "menuActive");
+        }
+    }
+
     /** 顯示右鍵選單 圖片 */
     showRightMenuImage() {
         var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
@@ -289,6 +302,8 @@ class ScriptMenu {
         var dom = document.getElementById("menu-txt");
         this.M.menu.open_RightClick(dom, 0, 0);
     }
+
+
 }
 
 
@@ -540,5 +555,48 @@ class ScriptWindow {
         } else {
             this.domLoading.style.display = "none";
         }
+    }
+}
+
+
+class ScriptBulkView {
+
+    M: MainWindow;
+    constructor(_M: MainWindow) {
+        this.M = _M;
+    }
+
+    /** 進入 大量瀏覽模式 */
+    public show() {
+        if (this.M.fileLoad.getIsBulkView() == true) { return; }
+        if (this.M.fileLoad.getGroupType() === GroupType.welcome) { return; }
+        if (this.M.fileLoad.getGroupType() === GroupType.none) { return; }
+        this.M.fileLoad.enableBulkView(true);
+        this.M.fileLoad.showFile();
+    }
+
+    /** 結束 大量瀏覽模式 */
+    public close() {
+        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        this.M.fileLoad.enableBulkView(false);
+        this.M.fileLoad.showFile();
+    }
+
+    /** 下一頁 */
+    public pageNext() {
+        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        this.M.fileShow.bulkView.pageNext();
+    }
+
+    /** 上一頁 */
+    public pagePrev() {
+        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        this.M.fileShow.bulkView.pagePrev();
+    }
+
+    /** 設定 欄數 */
+    public setColumns(val: number) {
+        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        this.M.fileShow.bulkView.setColumns(val);
     }
 }

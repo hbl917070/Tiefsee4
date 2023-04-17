@@ -6,6 +6,7 @@ class FileShow {
     public openTxt;
     public openWelcome;
     public openNone;
+    public openBulkView;
     public getIsLoaded;
     public getGroupType;
 
@@ -13,6 +14,7 @@ class FileShow {
     public dom_imgview;
 
     public iframes;
+    public bulkView;
 
     constructor(M: MainWindow) {
 
@@ -20,8 +22,11 @@ class FileShow {
         var tiefseeview: Tiefseeview = new Tiefseeview(dom_imgview);
 
         var iframes = new Iframes(M);
+        var bulkView = new BulkView(M);
         var isLoaded = true;
-        var _groupType = GroupType.none;//目前顯示的類型
+        /** 目前顯示的類型 */
+        var _groupType = GroupType.none;
+
 
         this.openImage = openImage;
         this.openVideo = openVideo;
@@ -29,16 +34,23 @@ class FileShow {
         this.openTxt = openTxt;
         this.openWelcome = openWelcome;
         this.openNone = openNone;
+        this.openBulkView = openBulkView;
         this.getIsLoaded = getIsLoaded;
         this.getGroupType = getGroupType;
+
         this.dom_imgview = dom_imgview;
         this.tiefseeview = tiefseeview;
 
         this.iframes = iframes;
+        this.bulkView = bulkView;
+
+
         /** 
          * 取得 目前顯示的類型
          */
         function getGroupType() { return _groupType }
+
+
 
 
         /**
@@ -67,6 +79,11 @@ class FileShow {
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
                 M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
                 M.largeBtn.setHide(false);//解除隱藏 大型切換按鈕
+            } else if (groupType === GroupType.bulkView) {
+                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
+                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
+                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
             } else {
                 M.mainFileList.setHide(false);//解除隱藏 檔案預覽視窗
                 M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
@@ -92,6 +109,13 @@ class FileShow {
             } else {
                 dom_imgview.style.display = "none";
                 tiefseeview.loadNone();
+            }
+
+            if (groupType === GroupType.bulkView) {
+                setShowToolbar(GroupType.bulkView);
+                bulkView.visible(true);
+            } else {
+                bulkView.visible(false);
             }
 
             if (groupType === GroupType.imgs) {
@@ -510,6 +534,17 @@ class FileShow {
             if (dom_type) { dom_type.innerHTML = ""; }
             if (dom_writeTime) { dom_writeTime.innerHTML = ""; }
         }
+
+
+        /**
+         * 大量瀏覽模式
+         */
+        async function openBulkView() {
+            setShowType(GroupType.bulkView); //改變顯示類型
+
+            await bulkView.load();
+        }
+
 
 
     }

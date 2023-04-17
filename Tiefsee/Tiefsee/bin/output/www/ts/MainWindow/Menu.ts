@@ -92,6 +92,13 @@ class Menu {
                 }
             }
 
+            //在非選單的區域捲動，就關閉選單
+            domMenuBg.onwheel = (sender) => {
+                if (sender.target == domMenuBg) {
+                    func_close(); //關閉menu
+                }
+            }
+
         }
 
 
@@ -124,7 +131,8 @@ class Menu {
             if (left < 0) { left = 0 }
 
             if (menuHeight + top + offsetY > bodyHeight) {
-                top = top - menuHeight + 5
+                //top = top - menuHeight + 5; //在滑鼠上方顯示
+                top = bodyHeight - menuHeight - 5; //靠齊視窗下面
             } else {
                 top = top + offsetY
             }
@@ -152,7 +160,12 @@ class Menu {
                 }
             }
 
-
+            //在非選單的區域捲動，就關閉選單
+            domMenuBg.onwheel = (sender) => {
+                if (sender.target == domMenuBg) {
+                    func_close(); //關閉menu
+                }
+            }
 
         }
 

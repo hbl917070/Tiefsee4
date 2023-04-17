@@ -127,7 +127,9 @@ namespace Tiefsee {
             }
 
             //context.Response.KeepAlive = true; // set the KeepAlive bool to false
-            context.Response.Close(); // close the connection
+            try {
+                context.Response.Close(); // close the connection
+            } catch (Exception) { }
         }
 
 

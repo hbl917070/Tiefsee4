@@ -170,6 +170,50 @@ class WebAPI {
             let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&${fileTime}`;
             return imgU;
         }
+
+        /**
+         * 載入圖片，並取得圖片的size
+         */
+        static async webInit(data: FileInfo2 | string) {
+
+            let url = "";
+            if (typeof data === "string") {
+                url = data;
+            } else {
+                let fileInfo2 = data;
+                let path = fileInfo2.Path;
+                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                url = Lib.pathToURL(path) + `?${fileTime}`;
+            }
+
+            let code: string = "-1"; // 1=成功 -1=失敗
+            let width: number = 1;
+            let height: number = 1;
+
+            let img = document.createElement("img");
+            await new Promise((resolve, reject) => {
+                img.addEventListener("load", (e) => {
+                    code = "1";
+                    width = img.naturalWidth; //初始化圖片size
+                    height = img.naturalHeight;
+                    resolve(true); //繼續往下執行
+                });
+                img.addEventListener("error", (e) => {
+                    code = "-1";
+                    width = 1;
+                    height = 1;
+                    resolve(false); //繼續往下執行
+                });
+                img.src = url;
+            })
+
+            return {
+                code: code,
+                path: url,
+                width: width,
+                height: height,
+            };
+        }
     }
 
 

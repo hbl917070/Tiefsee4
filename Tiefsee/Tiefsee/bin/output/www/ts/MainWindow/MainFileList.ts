@@ -79,6 +79,11 @@ class MainFileList {
          * 暫時隱藏(不影響設定值，強制隱藏
          */
         function setHide(val: boolean) {
+
+            if (M.fileLoad.getIsBulkView()) { //如果當前是大量瀏覽模式
+                val = true;
+            }
+
             isHide = val;
             if (val) {
                 dom_fileList.setAttribute("hide", "true");

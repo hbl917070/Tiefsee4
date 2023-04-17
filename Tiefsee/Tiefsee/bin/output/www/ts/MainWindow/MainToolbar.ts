@@ -33,6 +33,7 @@ class MainToolbar {
             initToolbarPdf();
             initToolbarTxt();
             initToolbarWelcome();
+            initBulkView();
 
             //產生UI
             if (M === null) { return }
@@ -244,19 +245,19 @@ class MainToolbar {
                 },
             })
 
-            //大量瀏覽模式
-            /*ar.push({
+            //進入 大量瀏覽模式
+            ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.img,
                 name: "bulkView",
                 icon: "tool-bulkView.svg",
                 func: (btn) => {
-                    btn.addEventListener("click", () => {
-
+                    btn.addEventListener("click", async () => {
+                        M?.script.bulkView.show();
                     });
                 },
-            })*/
+            })
 
             //設定
             ar.push({
@@ -799,6 +800,96 @@ class MainToolbar {
 
         }
 
+
+        /**
+         * 初始化 工具列 BulkView
+         */
+        function initBulkView() {
+
+            //結束 大量瀏覽模式
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.closeBulkView",
+                group: GroupType.bulkView,
+                name: "closeBulkView",
+                icon: "tool-prev.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.bulkView.close();
+                    });
+                },
+            })
+
+            /*ar.push({
+                type: "hr",
+                group: GroupType.bulkView,
+                i18n: "",
+                name: "hr",
+                icon: "",
+                html: "",
+                func: (domBtn: HTMLElement) => { }
+            })*/
+
+            //上一個資料夾
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.prevDir",
+                group: GroupType.bulkView,
+                name: "prevDir",
+                icon: "tool-prevDir.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.fileLoad.prevDir();
+                    });
+                },
+            })
+
+            //下一個資料夾
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.nextDir",
+                group: GroupType.bulkView,
+                name: "nextDir",
+                icon: "tool-nextDir.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.fileLoad.nextDir();
+                    });
+                },
+            })
+
+            //排序
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showMenuSort",
+                group: GroupType.bulkView,
+                name: "showMenuSort",
+                icon: "tool-sort.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.menu.showMenuSort(btn);
+                    });
+                },
+            })
+
+            //大量瀏覽模式設定
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showSetting",
+                group: GroupType.bulkView,
+                name: "showBulkViewSetting",
+                icon: "tool-setting2.svg",
+                func: (btn) => {
+                    btn.style.marginLeft = "auto"; //靠右對齊
+
+                    btn.addEventListener("click", () => {
+                        M?.script.menu.showMenuBulkView();
+                    });
+                },
+            })
+        }
+
+
         //---------------------
 
         /**
@@ -829,7 +920,7 @@ class MainToolbar {
          */
         function addToolbarHr(item: { group: string, }) {
             let div = newDiv(`<div class="main-toolbar-hr"> </div>`);
-            div.style.order = "999";
+            div.style.order = "888";
             addToolbarDom({
                 group: item.group,
                 dom: div,

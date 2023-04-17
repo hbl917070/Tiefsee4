@@ -64,7 +64,6 @@
   margin-right: 40px;
   margin-bottom: 20px;
   flex: 1;
-  font-size: 15px;
 }
 
 .msgbox-bottom {
@@ -137,10 +136,10 @@
 }
 
 .msgbox-radio {
-  display: block;
   min-height: 30px;
   display: flex;
   align-items: center;
+  padding-left: 3px;
 }
 .msgbox-radio:hover {
   cursor: pointer;

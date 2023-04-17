@@ -773,8 +773,14 @@ class MainWindow {
             fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); //視窗縮放
-            document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; //文字粗細
             cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); //圖示粗細
+            
+            //document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; //文字粗細
+            let fontWeight = Number.parseInt(config.settings["theme"]["fontWeight"]);
+            let fontWeightBole = Number.parseInt(config.settings["theme"]["fontWeight"]) + 200;
+            cssRoot.style.setProperty("--fontWeight", fontWeight.toString()); //文字粗細(一般)
+            cssRoot.style.setProperty("--fontWeightBold", fontWeightBole.toString()); //文字粗細(粗體)
+
 
             //-----------
 
@@ -793,7 +799,7 @@ class MainWindow {
 
             mainExif.setEnabled(config.settings.layout.mainExifEnabled); //詳細資料視窗
             if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
-            cssRoot.style.setProperty("--number-mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~1000)
+            cssRoot.style.setProperty("--mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~1000)
             mainExif.setHorizontal(config.settings.layout.mainExifHorizontal); //寬度足夠時，橫向排列
 
             //-----------

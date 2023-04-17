@@ -36,14 +36,6 @@ input::-webkit-inner-spin-button {
 .window {
   display: flex;
   flex-direction: row;
-  font-size: 15px;
-}
-input,
-button,
-textarea,
-option,
-select {
-  font-size: 15px;
 }
 
 .window-left {
@@ -433,7 +425,7 @@ select {
   label {
     display: block;
     position: relative;
-    padding: 5px 0;
+    min-height: 30px;
   }
   label:hover {
     cursor: pointer;
@@ -442,12 +434,13 @@ select {
   label span {
   }
   label input[type="radio"] {
-    left: 5px;
-    top: 10px;
+    left: 2px;
+    top: 8px;
     position: absolute;
   }
   .radioList-content {
     margin-left: 24px;
+    padding-top: 3px;
     flex-direction: column;
     color: #fff;
     align-items: flex-start;
@@ -459,26 +452,3 @@ select {
   }
 }
 
-// radio 預設樣式
-input[type="radio"] {
-  appearance: none;
-  margin: 0;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--color-white);
-  border-radius: 50%;
-  position: relative;
-}
-input[type="radio"]:checked::before {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  width: 6px;
-  height: 6px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  background-color: var(--color-white);
-}

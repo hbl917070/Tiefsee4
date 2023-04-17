@@ -34,6 +34,9 @@ class FileLoad {
     public renameMsg;
     public updateTitle;
 
+    public enableBulkView;
+    public getIsBulkView;
+
     constructor(M: MainWindow) {
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  video=影片  imgs=多幀圖片  txt=文字 */
@@ -46,6 +49,8 @@ class FileLoad {
         var flagFile: number;
         /** loadFile是否正在處理中 */
         var isLoadFileFinish = true;
+        /** 當前是否為 大量瀏覽模式 */
+        var isBulkView = false;
 
         /** 目前的資料夾路徑 */
         var dirPath: string = "";
@@ -93,7 +98,8 @@ class FileLoad {
         this.deleteMsg = deleteMsg;
         this.renameMsg = renameMsg;
         this.updateTitle = updateTitle;
-
+        this.enableBulkView = enableBulkView;
+        this.getIsBulkView = function () { return isBulkView; };
 
         //#region Dir
 
@@ -466,9 +472,10 @@ class FileLoad {
                 arFile = [path];
                 flagFile = 0;
                 //M.mainFileList.init();//檔案預覽視窗 初始化 
-                await showFileUpdataImg(fileInfo2);
-                M.mainExif.init(fileInfo2, true);//初始化exif
-
+                if (isBulkView === false) {
+                    await showFileUpdataImg(fileInfo2);
+                    M.mainExif.init(fileInfo2, true);//初始化exif
+                }
                 arFile = await WebAPI.Directory.getFiles(dirPath, "*.*");
                 arFile = await filter(Lib.GetExtension(path));
                 if (arFile.indexOf(path) === -1) {
@@ -493,10 +500,13 @@ class FileLoad {
             M.mainFileList.init();//檔案預覽視窗 初始化
             M.mainFileList.setStartLocation();//檔案預覽視窗 捲動到選中項目的中間
             //await showFile();//載入圖片
-            if (isFile) {
+
+            if (isBulkView) {
+                await showFile(); //載入圖片
+            } else if (isFile) {
                 await showFileUpdataUI();//載入圖片(僅更新檔案列表)
             } else {
-                await showFile();//載入圖片
+                await showFile(); //載入圖片
             }
 
             loadDir(dirPath);//處理資料夾預覽視窗
@@ -586,24 +596,35 @@ class FileLoad {
 
             _showFile = async () => {
 
-                if (groupType === GroupType.img || groupType === GroupType.unknown) {
-                    await M.fileShow.openImage(fileInfo2);
+                if (isBulkView) {
+                    await M.fileShow.openBulkView();
+                } else {
+                    if (groupType === GroupType.img || groupType === GroupType.unknown) {
+                        await M.fileShow.openImage(fileInfo2);
+                    }
+                    if (groupType === GroupType.video) {
+                        await M.fileShow.openVideo(fileInfo2);
+                    }
+                    if (groupType === GroupType.pdf) {
+                        await M.fileShow.openPdf(fileInfo2);
+                    }
+                    if (groupType === GroupType.txt) {
+                        await M.fileShow.openTxt(fileInfo2);
+                    }
+                    /*if (path !== getFilePath()) {
+                        console.error(`${path}  ${getFilePath()}`);
+                    }*/
                 }
-                if (groupType === GroupType.video) {
-                    await M.fileShow.openVideo(fileInfo2);
-                }
-                if (groupType === GroupType.pdf) {
-                    await M.fileShow.openPdf(fileInfo2);
-                }
-                if (groupType === GroupType.txt) {
-                    await M.fileShow.openTxt(fileInfo2);
-                }
-                /*if (path !== getFilePath()) {
-                    console.error(`${path}  ${getFilePath()}`);
-                }*/
+
             }
         }
 
+        /**
+         * 
+         */
+        function enableBulkView(val: boolean) {
+            isBulkView = val;
+        }
 
         /**
          * 載入下一個檔案
@@ -643,10 +664,18 @@ class FileLoad {
           * 更新視窗標題
           */
         function updateTitle() {
-            let filePath = getFilePath();
-            if (filePath === undefined) { return; }
-            let title = `「${flagFile + 1}/${arFile.length}」 ${Lib.GetFileName(filePath)}`;
-            baseWindow.setTitle(title);
+            if (isBulkView) {
+                let filePath = getFilePath();
+                if (filePath === undefined) { return; }
+                let title = Lib.GetDirectoryName(filePath) ?? "";
+                title = Lib.GetFileName(title);
+                baseWindow.setTitle(title);
+            } else {
+                let filePath = getFilePath();
+                if (filePath === undefined) { return; }
+                let title = `「${flagFile + 1}/${arFile.length}」 ${Lib.GetFileName(filePath)}`;
+                baseWindow.setTitle(title);
+            }
         }
 
 

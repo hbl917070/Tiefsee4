@@ -386,6 +386,7 @@
     </div>
 </div>
 
+
 <!-- 右鍵選單 輸入框 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-text">
@@ -411,6 +412,7 @@
     </div>
 </div>
 
+
 <!-- 右鍵選單 一般文字 -->
 <div class="menu" active="">
     <div class="menu-content" id="menu-txt">
@@ -420,6 +422,104 @@
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.copy">複製</div>
             </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 大量瀏覽模式 下拉選單 -->
+<div class="menu" active="">
+    <div class="menu-content" id="menu-bulkView">
+        <div class="menu-box">
+
+            <div class="menu-bulkView-box">
+                <div class="menu-bulkView-title" i18n="bulkView.columns">每行圖片數</div>
+                <select class="menu-bulkView-select js-columns">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box js-box-gaplessMode">
+                <div class="menu-bulkView-title" i18n="bulkView.gaplessMode">無間距模式</div>
+                <select class="menu-bulkView-select js-gaplessMode">
+                    <option value="off" i18n="bulkView.disable">關閉</option>
+                    <option value="0">0</option>
+                    <option value="20">20</option>
+                    <option value="40">40</option>
+                    <option value="60">60</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box js-box-firstImageIndentation">
+                <div class="menu-bulkView-title" i18n="bulkView.firstImageIndentation">第一張圖縮排</div>
+                <select class="menu-bulkView-select js-firstImageIndentation">
+                    <option value="off" i18n="bulkView.disable">關閉</option>
+                    <option value="on" i18n="bulkView.enable">啟用</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box js-box-fixedWidth">
+                <div class="menu-bulkView-title" i18n="bulkView.fixedWidth">鎖定寬度</div>
+                <select class="menu-bulkView-select js-fixedWidth">
+                    <option value="off" i18n="bulkView.disable">關閉</option>
+                    <option value="40">40%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box js-box-alignmentDirection">
+                <div class="menu-bulkView-title" i18n="bulkView.alignmentDirection">排列方向</div>
+                <select class="menu-bulkView-select js-alignmentDirection">
+                    <option value="left" i18n="bulkView.leftToRight">左至右</option>
+                    <option value="right" i18n="bulkView.rightToLeft">右至左</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box">
+                <div class="menu-bulkView-title" i18n="bulkView.displayedInformation">顯示資訊</div>
+                <div class="menu-bulkView-content">
+
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-number">
+                        <span i18n="bulkView.number">編號</span>
+                    </label>
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-fileName">
+                        <span i18n="bulkView.fileName">檔案名稱</span>
+                    </label>
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-imageSize">
+                        <span i18n="bulkView.imageSize">圖片尺寸</span>
+                    </label>
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-fileSize">
+                        <span i18n="bulkView.fileSize">檔案大小</span>
+                    </label>
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-lastWriteDate">
+                        <span i18n="bulkView.lastWriteDate">修改日期</span>
+                    </label>
+                    <label class="menu-bulkView-checkbox">
+                        <input type="checkbox" class="base-checkbox js-lastWriteTime">
+                        <span i18n="bulkView.lastWriteTime">修改時間</span>
+                    </label>
+
+                </div>
+            </div>
+
 
         </div>
     </div>

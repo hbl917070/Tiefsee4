@@ -191,7 +191,7 @@ class Setting {
                     if (item.type !== "button") { continue; }
                     let h = `
                         <div class="toolbarList-item" data-name="${item.name}">
-                            <input class="toolbarList-checkbox" type="checkbox" data-name="${item.name}" checked>
+                            <input class="toolbarList-checkbox base-checkbox" type="checkbox" data-name="${item.name}" checked>
                             ${SvgList[item.icon]}
                             ${i18n.tSpan(item.i18n)}
                         </div>`

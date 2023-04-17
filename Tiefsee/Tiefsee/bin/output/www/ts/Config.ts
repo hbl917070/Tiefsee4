@@ -239,6 +239,43 @@ class Config {
             /** 長按滑鼠中鍵觸發 */
             mouseMiddleRun: true,
         },
+        bulkView: {
+            /** 每行圖片數 */
+            columns: 3,
+
+            /** 無間距模式 */
+            gaplessMode: "off",
+
+            /** 鎖定寬度 */
+            fixedWidth: "off",
+
+            /** 排列方向 */
+            alignmentDirection: "left",
+
+            /** 第一張圖縮排 */
+            firstImageIndentation: "off",
+
+            /** 顯示資訊 */
+            show: {
+                /** 顯示資訊-編號 */
+                number: true,
+
+                /** 顯示資訊-檔案名稱 */
+                fileName: true,
+
+                /** 顯示資訊-圖片尺寸 */
+                imageSize: true,
+
+                /** 顯示資訊-檔案大小 */
+                fileSize: true,
+
+                /** 顯示資訊-修改日期 */
+                lastWriteDate: true,
+
+                /** 顯示資訊-修改時間 */
+                lastWriteTime: true,
+            },
+        },
 
         other: {
             /** 刪除前顯示詢問視窗 */
@@ -382,6 +419,7 @@ class Config {
                 { ext: "log", type: "auto" },
                 { ext: "url", type: "auto" },
                 { ext: "md", type: "md" },
+                { ext: "markdown", type: "md" },
                 { ext: "gitignore", type: "auto" },
                 { ext: "csv", type: "auto" },
                 { ext: "vue", type: "vue" },
@@ -501,4 +539,7 @@ var GroupType = {
 
     /** 影片 */
     video: "video",
+
+    /** 大量瀏覽模式 */
+    bulkView: "bulkView"
 }

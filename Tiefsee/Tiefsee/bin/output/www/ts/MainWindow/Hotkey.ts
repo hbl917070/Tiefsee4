@@ -13,6 +13,32 @@ class Hotkey {
             if (e.code == "F5") { return; }
             if (e.code == "F12") { return; }
 
+            //如果有開啟大量瀏覽模式
+            if (M.fileLoad.getIsBulkView()) {
+                if (e.code === "ArrowRight") {
+                    M.script.bulkView.pageNext();
+                }
+                if (e.code === "ArrowLeft") {
+                    M.script.bulkView.pagePrev();
+                }
+                if (e.code === "Comma") {
+                    M.script.fileLoad.prevDir();
+                }
+                if (e.code === "Period") {
+                    M.script.fileLoad.nextDir();
+                }
+                if (e.code == "Escape") {
+                    M.script.bulkView.close();
+                }
+              
+                for (let i = 1; i <= 8; i++) {
+                    if (e.key == i.toString()) {
+                        M.script.bulkView.setColumns(i);
+                    }
+                }
+                return;
+            }
+
             //如果有開啟選單
             if (M.menu.isShow()) {
                 if (e.code == "Escape") {
@@ -100,7 +126,6 @@ class Hotkey {
             if (e.code === "KeyO") {
                 M.script.open.revealInFileExplorer();
             }
-
             if (e.code === "KeyM") {
                 M.script.open.systemContextMenu();
             }
@@ -115,6 +140,9 @@ class Hotkey {
             }
             if (e.code === "End") {
                 M.script.fileLoad.lastFile();
+            }
+            if (e.code === "KeyB") {
+                M.script.bulkView.show();
             }
         });
 

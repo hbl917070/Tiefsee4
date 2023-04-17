@@ -1,7 +1,7 @@
 /* #region exif 視窗 */
 :root {
   --mainExif-width: 240px;
-  --number-mainExifMaxLine: 2; //顯示的最大行數
+  --mainExifMaxLine: 2; //顯示的最大行數
 }
 
 .mainExif {
@@ -42,7 +42,7 @@
     min-width: 100px; //寬度不足100時，會自動換行
     color: var(--color-blue);
     margin-right: 3px;
-    font-weight: 500;
+    font-weight: var(--fontWeightBold);
   }
   .mainExifValue {
     flex: 1;
@@ -51,7 +51,7 @@
 
     // 限制顯示的最大行數
     overflow: hidden;
-    -webkit-line-clamp: var(--number-mainExifMaxLine);
+    -webkit-line-clamp: var(--mainExifMaxLine);
     -webkit-box-orient: vertical;
     display: -webkit-box;
   }

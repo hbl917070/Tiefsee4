@@ -1,0 +1,148 @@
+body,
+input,
+textarea,
+button,
+option {
+  // font-family: "Noto Sans TC","Noto Sans CJK TC Light";
+  font-family: "Segoe UI", "Microsoft JhengHei UI";
+  font-size: 15px;
+  font-weight: var(--fontWeight);
+}
+
+select option {
+  background: var(--color-black);
+}
+
+//----------------------------------------------------------------
+
+//捲動軸樣式 (一般，寬度10px
+
+/*整體背景*/
+.base-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+//滾動條軌道(移入時
+.base-scrollbar::-webkit-scrollbar-track:hover {
+  background-color: var(--color-black60);
+}
+
+//拖曳區塊
+.base-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-white40);
+
+  //產生透明框線並且剪裁掉
+  border: 3px solid rgba(0, 0, 0, 0);
+  background-clip: content-box;
+}
+
+//右下角交匯處
+.base-scrollbar::-webkit-scrollbar-corner {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+//----------------------------------------------------------------
+
+//捲動軸樣式 (大型、寬度16px
+
+//整體背景
+.base-scrollbar-big::-webkit-scrollbar {
+  width: 16px;
+  height: 10px;
+}
+
+//滾動條軌道(移入時
+.base-scrollbar-big::-webkit-scrollbar-track:hover {
+  background-color: var(--color-black60);
+  //產生透明框線並且剪裁掉
+  border-left: 6px solid rgba(0, 0, 0, 0);
+  border-right: 0px solid rgba(0, 0, 0, 0);
+  background-clip: content-box;
+}
+
+/*拖曳區塊*/
+.base-scrollbar-big::-webkit-scrollbar-thumb {
+  background-color: var(--color-white40);
+  //產生透明框線並且剪裁掉
+  border-left: 9px solid rgba(0, 0, 0, 0);
+  border-right: 3px solid rgba(0, 0, 0, 0);
+  border-top: 3px solid rgba(0, 0, 0, 0);
+  border-bottom: 3px solid rgba(0, 0, 0, 0);
+  background-clip: content-box;
+}
+
+//右下角交匯處
+.base-scrollbar-big::-webkit-scrollbar-corner {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+//----------------------------------------------------------------
+
+// checkbox 樣式
+
+.base-checkbox {
+  appearance: none;
+  margin: 0 3px;
+  font: inherit;
+  color: currentColor;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--color-white40);
+  border-radius: 4px;
+  display: grid;
+  place-content: center;
+}
+
+.base-checkbox::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transform-origin: bottom left;
+  transition: 0.1s transform ease-in-out;
+  box-shadow: inset 10px 10px var(--color-blue);
+}
+
+.base-checkbox:checked::before {
+  transform: scale(1);
+}
+
+//----------------------------------------------------------------
+
+// radio 樣式
+.base-radio {
+  appearance: none;
+  //margin: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-white);
+  border-radius: 50%;
+  position: relative;
+
+  margin: 0 4px;
+  //margin-top: 1px;
+  //transform: translateY(1px);
+}
+.base-radio:before {
+  content: "";
+  position: absolute;
+  border-radius: 4px;
+  width: 6px;
+  height: 6px;
+  // top: 3px;
+  // left: 3px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: var(--color-blue);
+  transform: scale(0);
+  //transform-origin: bottom left;
+  transition: 0.1s transform ease-in-out;
+}
+.base-radio:checked::before {
+  transform: scale(1);
+}
