@@ -124,7 +124,7 @@ class InitMenu {
             if (dom_renameFile !== null) {
                 dom_renameFile.onclick = async () => {
                     M.menu.close();//關閉menu
-                    M.script.fileLoad.renameMsg();
+                    M.script.fileLoad.showRenameMsg();
                 }
             }
 
@@ -211,7 +211,7 @@ class InitMenu {
 
                     if (imgBase64 === "") { continue; } //如果沒有圖示，表示檔案不存在
 
-                    let dom = newDiv(`
+                    let dom = newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
                                 <img src="${imgBase64}">
@@ -404,7 +404,7 @@ class InitMenu {
             });
             dom.querySelector(".js-delete")?.addEventListener("click", () => {//刪除圖片
                 M.script.menu.close();
-                M.script.fileLoad.showDeleteMsg();
+                M.script.fileLoad.showDeleteFileMsg();
             });
             dom.querySelector(".js-setting")?.addEventListener("click", () => {//設定
                 M.script.menu.close();

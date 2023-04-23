@@ -29,6 +29,8 @@ class MainWindow {
     public largeBtn;
     public script;
     public msgbox;
+    public bulkView;
+    public updateDomVisibility;
 
     public applySetting;
     public saveSetting;
@@ -72,10 +74,12 @@ class MainWindow {
         var i18n = this.i18n = new I18n();
         i18n.pushData(langData);
         var msgbox = this.msgbox = new Msgbox(i18n);
+        var bulkView = this.bulkView = new BulkView(this);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
         this.getIsQuickLook = getIsQuickLook;
+        this.updateDomVisibility = updateDomVisibility;
 
         new Hotkey(this);
         init();
@@ -745,6 +749,38 @@ class MainWindow {
 
 
         /**
+         * 更新元素顯示或隱藏
+         * <div show-not="img,txt,"> 表示在img或txt的狀態下，不顯示此元素
+         * <div show-only="img,txt,"> 表示僅在img或txt的狀態下，顯示此元素
+         * 結尾一定要「,」
+         */
+        function updateDomVisibility() {
+            let showType = document.body.getAttribute("showType");
+            if (showType === null) { return; }
+
+            let arDom = document.querySelectorAll(`[show-not]`);
+            for (let i = 0; i < arDom.length; i++) {
+                const dom = arDom[i];
+                if (dom.getAttribute("show-not")?.indexOf(showType + ",") !== -1) {
+                    dom.classList.add("js-showType-none");
+                } else {
+                    dom.classList.remove("js-showType-none");
+                }
+            }
+
+            arDom = document.querySelectorAll(`[show-only]`);
+            for (let i = 0; i < arDom.length; i++) {
+                const dom = arDom[i];
+                if (dom.getAttribute("show-only")?.indexOf(showType + ",") !== -1) {
+                    dom.classList.remove("js-showType-none");
+                } else {
+                    dom.classList.add("js-showType-none");
+                }
+            }
+        }
+
+
+        /**
          * 套用設定
          * @param _settings 
          * @param isStart 是否為第一次呼叫
@@ -774,7 +810,7 @@ class MainWindow {
 
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); //視窗縮放
             cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); //圖示粗細
-            
+
             //document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; //文字粗細
             let fontWeight = Number.parseInt(config.settings["theme"]["fontWeight"]);
             let fontWeightBole = Number.parseInt(config.settings["theme"]["fontWeight"]) + 200;

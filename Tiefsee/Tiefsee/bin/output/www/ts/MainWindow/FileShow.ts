@@ -14,7 +14,7 @@ class FileShow {
     public dom_imgview;
 
     public iframes;
-    public bulkView;
+
 
     constructor(M: MainWindow) {
 
@@ -22,7 +22,7 @@ class FileShow {
         var tiefseeview: Tiefseeview = new Tiefseeview(dom_imgview);
 
         var iframes = new Iframes(M);
-        var bulkView = new BulkView(M);
+
         var isLoaded = true;
         /** 目前顯示的類型 */
         var _groupType = GroupType.none;
@@ -42,7 +42,7 @@ class FileShow {
         this.tiefseeview = tiefseeview;
 
         this.iframes = iframes;
-        this.bulkView = bulkView;
+
 
 
         /** 
@@ -62,12 +62,13 @@ class FileShow {
 
             _groupType = groupType;
 
+            document.body.setAttribute("showType", groupType); //搭配CSS，用於顯示或隱藏某些選項
+
             let arToolbarGroup = document.querySelectorAll(".main-toolbar-group");
             for (let i = 0; i < arToolbarGroup.length; i++) {
                 const item = arToolbarGroup[i];
                 item.setAttribute("active", "");
             }
-
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 M.mainFileList.setHide(true);//暫時隱藏 檔案預覽視窗
@@ -113,9 +114,9 @@ class FileShow {
 
             if (groupType === GroupType.bulkView) {
                 setShowToolbar(GroupType.bulkView);
-                bulkView.visible(true);
+                M.bulkView.visible(true);
             } else {
-                bulkView.visible(false);
+                M.bulkView.visible(false);
             }
 
             if (groupType === GroupType.imgs) {
@@ -542,7 +543,16 @@ class FileShow {
         async function openBulkView() {
             setShowType(GroupType.bulkView); //改變顯示類型
 
-            await bulkView.load();
+            //資料夾修改時間
+            let fileInfo2 = await WebAPI.getFileInfo2(M.fileLoad.getDirPath());
+            let dom_writeTime = getToolbarDom(GroupType.bulkView)?.querySelector(`[data-name="infoWriteTime"]`);
+            if (dom_writeTime != null) {
+                let timeUtc = fileInfo2.LastWriteTimeUtc;
+                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                dom_writeTime.innerHTML = time;
+            }
+
+            await M.bulkView.load();
         }
 
 

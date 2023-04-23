@@ -180,7 +180,7 @@ class MainExif {
 								<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
 							</div>
 						</div>`;
-					dom_mainExifList.appendChild(newDiv(mapHtml));
+					dom_mainExifList.appendChild(newDom(mapHtml));
 
 				} else if (name === "User Comment" && value.indexOf("Steps: ") !== -1 && value.indexOf("Seed: ") !== -1) { // Stable Diffusion webui 輸出的jpg或webp
 
@@ -313,7 +313,7 @@ class MainExif {
 					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 				</div>`
 
-			let div = newDiv(html);
+			let div = newDom(html);
 			let btn = div.querySelector(".mainExifCopyBtn") as HTMLElement;
 			btn.addEventListener("click", async () => {
 				await WV_System.SetClipboard_Txt(oVal);

@@ -85,7 +85,7 @@ class Msgbox {
             </div>`
         }
 
-        let dom = newDiv(
+        let dom = newDom(
             `<div class="msgbox">
                 <div class="msgbox-box" active="false">
                     <div class="msgbox-close"></div>

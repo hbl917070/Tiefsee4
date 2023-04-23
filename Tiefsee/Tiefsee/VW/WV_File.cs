@@ -91,26 +91,6 @@ namespace Tiefsee {
         }
 
 
-        /// <summary>
-        /// 檔案移到資源回收桶
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public bool MoveToRecycle(string path) {
-            if (File.Exists(path) == false) { return false; }
-
-            try {
-                FileSystem.DeleteFile(
-                    path,
-                    UIOption.OnlyErrorDialogs,
-                    RecycleOption.SendToRecycleBin
-                );
-            } catch (Exception) {
-                return false;
-            }
-            return true;
-        }
-
 
         /// <summary>
         /// 取得基本檔案資訊
@@ -224,7 +204,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         public void DragDropFile(string path) {
-            if (File.Exists(path) == false) { return; }
+            if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }
             string[] files = { path };
             try {
                 var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
@@ -241,17 +221,36 @@ namespace Tiefsee {
         public void ShowContextMenu(string path, bool followMouse) {
             try {
                 var ctxMnu = new ShellTestApp.ShellContextMenu();
-                FileInfo[] arrFI = new FileInfo[1];
-                arrFI[0] = new FileInfo(path);
 
-                if (followMouse) {
-                    ctxMnu.ShowContextMenu(arrFI, System.Windows.Forms.Cursor.Position);
-                } else {
-                    ctxMnu.ShowContextMenu(arrFI, new System.Drawing.Point(
-                       (int)M.PointToScreen(new Point(0, 0)).X + 10,
-                       (int)M.PointToScreen(new Point(0, 0)).Y + 10)
-                   );
+                if (File.Exists(path)) {
+                    FileInfo[] arrFI = new FileInfo[1];
+                    arrFI[0] = new FileInfo(path);
+
+                    if (followMouse) {
+                        ctxMnu.ShowContextMenu(arrFI, System.Windows.Forms.Cursor.Position);
+                    } else {
+                        ctxMnu.ShowContextMenu(arrFI, new System.Drawing.Point(
+                           (int)M.PointToScreen(new Point(0, 0)).X + 10,
+                           (int)M.PointToScreen(new Point(0, 0)).Y + 10)
+                       );
+                    }
+
+                } else if (Directory.Exists(path)) {
+
+                    DirectoryInfo[] arrFI = new DirectoryInfo[1];
+                    arrFI[0] = new DirectoryInfo(path);
+
+                    if (followMouse) {
+                        ctxMnu.ShowContextMenu(arrFI, System.Windows.Forms.Cursor.Position);
+                    } else {
+                        ctxMnu.ShowContextMenu(arrFI, new System.Drawing.Point(
+                           (int)M.PointToScreen(new Point(0, 0)).X + 10,
+                           (int)M.PointToScreen(new Point(0, 0)).Y + 10)
+                       );
+                    }
                 }
+
+               
             } catch {
                 MessageBox.Show("ShowContextMenu error");
             }
@@ -328,14 +327,34 @@ namespace Tiefsee {
         /// 刪除檔案
         /// </summary>
         /// <param name="path"></param>
-        public bool Delete(string path) {
-            if (File.Exists(path) == false) { return false; }
+        public string Delete(string path) {
+            //if (File.Exists(path) == false) { return false; }
             try {
                 File.Delete(path);
-            } catch (Exception) {
-                return false;
+            } catch (Exception e) {
+                return e.Message;
             }
-            return true;
+            return "";
+        }
+
+
+        /// <summary>
+        /// 檔案移到資源回收桶
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string MoveToRecycle(string path) {
+            //if (File.Exists(path) == false) { return false; }
+            try {
+                FileSystem.DeleteFile(
+                    path,
+                    UIOption.OnlyErrorDialogs,
+                    RecycleOption.SendToRecycleBin
+                );
+            } catch (Exception e) {
+                return e.Message;
+            }
+            return "";
         }
 
 

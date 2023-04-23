@@ -105,7 +105,7 @@ class FileSort {
             setFileSortMenu();
 
             if (M.fileLoad.getIsBulkView()) { //如果是在大量瀏覽模式，則重新載入名單
-                M.fileShow.bulkView.load();
+                M.bulkView.load();
             }
 
             //M.menu.close();//關閉menu

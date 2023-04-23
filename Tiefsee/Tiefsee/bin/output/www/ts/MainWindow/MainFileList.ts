@@ -263,7 +263,7 @@ class MainFileList {
                 htmlName = `<div class="fileList-name">${name}</div> `
             }
 
-            let div = newDiv(
+            let div = newDom(
                 `<div class="fileList-item" data-id="${i}">
                     <div class="fileList-title">
                         ${htmlNo} ${htmlName}

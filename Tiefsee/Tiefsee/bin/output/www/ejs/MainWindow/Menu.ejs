@@ -27,24 +27,23 @@
             </div>
             <div class="menu-hor-item" id="menuitem-renameFile">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
+                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名</div>
             </div>
 
-            <div class="menu-hor-hr"></div>
+            <div class="menu-hor-hr" show-not="bulkView,"></div>
 
-            <div class="menu-hor-item" id="menuitem-print">
+            <div class="menu-hor-item" id="menuitem-print" show-not="bulkView,">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.print">列印</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-setAsDesktop">
+            <div class="menu-hor-item" id="menuitem-setAsDesktop" show-only="img,">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.setAsDesktop">設成桌布</div>
             </div>
 
-
         </div>
 
-        <div class="menu-box">
+        <div class="menu-box" show-not="bulkView,">
             <div class="menu-hor-item" id="menuitem-openWith">
                 <div class="menu-hor-icon">
                 </div>
@@ -72,7 +71,7 @@
 <div class="menu" active="">
     <div class="menu-content" id="menu-copy">
         <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-img-copyFile">
+            <div class="menu-hor-item" id="menuitem-img-copyFile" show-not="bulkView,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyFile">複製 檔案</div>
             </div>
@@ -84,17 +83,18 @@
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyFilePath">複製 完整路徑</div>
             </div>
-            <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item" id="menuitem-img-copyImg">
+            <div class="menu-hor-hr" show-not="bulkView,pdf,office,"></div>
+
+            <div class="menu-hor-item" id="menuitem-img-copyImg" show-only="img,imgs,video,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyImage">複製 影像</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyBase64">
+            <div class="menu-hor-item" id="menuitem-img-copyBase64" show-only="img,imgs,video,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyImageBase64">複製 影像base64</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyTxt">
+            <div class="menu-hor-item" id="menuitem-img-copyTxt" show-not="bulkView,pdf,office,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyText">複製 文字</div>
             </div>
@@ -435,7 +435,19 @@
 
             <div class="menu-bulkView-box">
                 <div class="menu-bulkView-title" i18n="bulkView.columns">每行圖片數</div>
-                <select class="menu-bulkView-select js-columns">
+
+                <div class="menu-bulkView-columns js-columns">
+                    <div class="menu-bulkView-columns-item" value="1" active="true">1</div>
+                    <div class="menu-bulkView-columns-item" value="2">2</div>
+                    <div class="menu-bulkView-columns-item" value="3">3</div>
+                    <div class="menu-bulkView-columns-item" value="4">4</div>
+                    <div class="menu-bulkView-columns-item" value="5">5</div>
+                    <div class="menu-bulkView-columns-item" value="6">6</div>
+                    <div class="menu-bulkView-columns-item" value="7">7</div>
+                    <div class="menu-bulkView-columns-item" value="8">8</div>
+                </div>
+
+                <!-- <select class="menu-bulkView-select js-columns" style="display: none;">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -444,7 +456,7 @@
                     <option value="6">6</option>
                     <option value="7">7</option>
                     <option value="8">8</option>
-                </select>
+                </select> -->
             </div>
 
             <div class="menu-bulkView-box js-box-gaplessMode">
@@ -455,14 +467,6 @@
                     <option value="20">20</option>
                     <option value="40">40</option>
                     <option value="60">60</option>
-                </select>
-            </div>
-
-            <div class="menu-bulkView-box js-box-firstImageIndentation">
-                <div class="menu-bulkView-title" i18n="bulkView.firstImageIndentation">第一張圖縮排</div>
-                <select class="menu-bulkView-select js-firstImageIndentation">
-                    <option value="off" i18n="bulkView.disable">關閉</option>
-                    <option value="on" i18n="bulkView.enable">啟用</option>
                 </select>
             </div>
 
@@ -485,6 +489,14 @@
                 <select class="menu-bulkView-select js-alignmentDirection">
                     <option value="left" i18n="bulkView.leftToRight">左至右</option>
                     <option value="right" i18n="bulkView.rightToLeft">右至左</option>
+                </select>
+            </div>
+
+            <div class="menu-bulkView-box js-box-firstImageIndentation">
+                <div class="menu-bulkView-title" i18n="bulkView.firstImageIndentation">第一張圖縮排</div>
+                <select class="menu-bulkView-select js-firstImageIndentation">
+                    <option value="off" i18n="bulkView.disable">關閉</option>
+                    <option value="on" i18n="bulkView.enable">啟用</option>
                 </select>
             </div>
 

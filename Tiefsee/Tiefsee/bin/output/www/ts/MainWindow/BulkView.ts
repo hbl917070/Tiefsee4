@@ -9,6 +9,7 @@ class BulkView {
     public pageNext;
     public pagePrev;
     public setColumns;
+    public setFocus;
 
     constructor(M: MainWindow) {
 
@@ -16,7 +17,7 @@ class BulkView {
         var dom_bulkViewContent = dom_bulkView.querySelector(".bulkView-content") as HTMLElement;
 
         var dom_menu = document.querySelector("#menu-bulkView") as HTMLSelectElement;
-        var dom_columns = dom_menu.querySelector(".js-columns") as HTMLSelectElement;
+        var dom_columns = dom_menu.querySelector(".js-columns") as HTMLElement;
         var dom_gaplessMode = dom_menu.querySelector(".js-gaplessMode") as HTMLSelectElement;
         var dom_fixedWidth = dom_menu.querySelector(".js-fixedWidth") as HTMLSelectElement;
         var dom_alignmentDirection = dom_menu.querySelector(".js-alignmentDirection") as HTMLSelectElement;
@@ -33,9 +34,7 @@ class BulkView {
         var dom_box_firstImageIndentation = dom_menu.querySelector(".js-box-firstImageIndentation") as HTMLDivElement;
         var dom_box_fixedWidth = dom_menu.querySelector(".js-box-fixedWidth") as HTMLDivElement;
 
-
         var arFile: string[] = [];
-
 
         /** 項目的邊距 */
         var itemMargin = 0;
@@ -51,24 +50,24 @@ class BulkView {
         this.pagePrev = pagePrev;
         this.load = load;
         this.setColumns = setColumns;
+        /** 取得焦點 */
+        this.setFocus = () => {
+            dom_bulkViewContent.tabIndex = 0;
+            dom_bulkViewContent.focus();
+        }
 
         initEvent();
 
 
         function initEvent() {
 
-
-            //區塊改變大小時
-            new ResizeObserver(() => {
+            new ResizeObserver(() => { //區塊改變大小時
                 requestAnimationFrame(() => {
                     updateColumns();
                 })
             }).observe(dom_bulkView);
 
-            /*dom_columns.addEventListener("input", (e) => {
-                let val = Number.parseInt(dom_columns.value);
-                setColumns(val);
-            });*/
+            initGroupRadio(dom_columns); //初始化群組按鈕
 
             (dom_bulkView.querySelectorAll(".bulkView-pagination-prev") as NodeListOf<HTMLDivElement>).forEach(dom => {
                 dom.addEventListener("click", () => {
@@ -83,7 +82,7 @@ class BulkView {
             (dom_bulkView.querySelectorAll(".bulkView-pagination-select") as NodeListOf<HTMLSelectElement>).forEach(dom => {
                 dom.addEventListener("input", () => {
                     let val = Number.parseInt(dom.value);
-                    showFile(val);
+                    showPage(val);
                 });
             });
 
@@ -103,33 +102,35 @@ class BulkView {
                 dom_lastWriteTime
             ];
 
-            let temp_columns = -1;//記錄上一次的值
+            let temp_columns = -1; //記錄上一次的值
             arDomCheckbox.forEach((dom) => {
                 dom.addEventListener("input", (e) => {
                     apply();
-
-                    if (dom === dom_columns) {
-                        let columns = Number.parseInt(dom_columns.value);
-                        let firstImageIndentation = dom_firstImageIndentation.value;
-
-                        if (firstImageIndentation === "on") { //在開啟首圖進縮的情況下
-                            if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
-                                load(pageNow);
-                            }
-                        }
-                        temp_columns = columns;
-                    }
-
                     if (dom === dom_firstImageIndentation) {
-                        let columns = Number.parseInt(dom_columns.value);
+                        let columns = Number.parseInt(getGroupRadioVal(dom_columns));
                         let firstImageIndentation = dom_firstImageIndentation.value;
                         if (columns === 2) {
                             load(pageNow);
                         }
                     }
-
                 });
-            })
+            });
+
+            //切換 欄 時
+            dom_columns.addEventListener("click", (e) => {
+
+                apply();
+
+                let columns = Number.parseInt(getGroupRadioVal(dom_columns));
+                let firstImageIndentation = dom_firstImageIndentation.value;
+                if (firstImageIndentation === "on") { //在開啟首圖進縮的情況下
+                    if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
+                        load(pageNow);
+                    }
+                }
+                temp_columns = columns;
+
+            });
 
         }
 
@@ -138,7 +139,7 @@ class BulkView {
          * 從config讀取設定值並套用(用於初始化設定值)
          */
         function initSetting() {
-            dom_columns.value = M.config.settings.bulkView.columns.toString();
+            setGroupRadioVal(dom_columns, M.config.settings.bulkView.columns.toString());
             dom_gaplessMode.value = M.config.settings.bulkView.gaplessMode;
             dom_fixedWidth.value = M.config.settings.bulkView.fixedWidth;
             dom_alignmentDirection.value = M.config.settings.bulkView.alignmentDirection;
@@ -159,7 +160,7 @@ class BulkView {
          */
         function apply() {
 
-            let columns = M.config.settings.bulkView.columns = Number.parseInt(dom_columns.value);
+            let columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(dom_columns));
             let gaplessMode = M.config.settings.bulkView.gaplessMode = dom_gaplessMode.value;
             let fixedWidth = M.config.settings.bulkView.fixedWidth = dom_fixedWidth.value;
             let alignmentDirection = M.config.settings.bulkView.alignmentDirection = dom_alignmentDirection.value;
@@ -167,7 +168,12 @@ class BulkView {
 
             dom_bulkViewContent.setAttribute("columns", columns.toString());
             dom_bulkViewContent.setAttribute("alignmentDirection", alignmentDirection);
-            dom_bulkViewContent.setAttribute("fixedWidth", fixedWidth);
+            if (columns === 1 || columns === 2) {
+                dom_bulkViewContent.setAttribute("fixedWidth", fixedWidth);
+            } else {
+                dom_bulkViewContent.setAttribute("fixedWidth", "");
+            }
+
             dom_bulkViewContent.setAttribute("gaplessMode", gaplessMode);
             updateColumns(columns);
 
@@ -187,24 +193,34 @@ class BulkView {
             dom_bulkViewContent.setAttribute("show", arShow.join(","));
 
             //顯示或隱藏區塊
-            if (columns === 1 || columns === 2) {
+            if (columns === 1 || columns === 2) { //無間距模式
                 dom_box_gaplessMode.style.display = "block";
             } else {
                 dom_box_gaplessMode.style.display = "none";
             }
-            if (columns === 2) {
+            if (columns === 1 || columns === 2) { //鎖定寬度
+                dom_box_fixedWidth.style.display = "block";
+            } else {
+                dom_box_fixedWidth.style.display = "none";
+            }
+            if (columns === 1) { //排列方向
+                dom_alignmentDirection.style.display = "none";
+            } else {
+                dom_alignmentDirection.style.display = "block";
+            }
+            if (columns === 2) { //第一張圖縮排
                 dom_box_firstImageIndentation.style.display = "block";
             } else {
                 dom_box_firstImageIndentation.style.display = "none";
             }
-        }
 
+        }
 
 
         function setColumns(n: number) {
             if (n < 1) { n = 1; }
             if (n > 8) { n = 8; }
-            dom_columns.value = n.toString();
+            setGroupRadioVal(dom_columns, n.toString());
             dom_columns.dispatchEvent(new Event("input"));
         }
         function getColumns() {
@@ -213,7 +229,6 @@ class BulkView {
         function getFixedWidth() {
             return M.config.settings.bulkView.fixedWidth;
         }
-
         function getFirstImageIndentation() {
             return M.config.settings.bulkView.firstImageIndentation;
         }
@@ -230,7 +245,7 @@ class BulkView {
             if (n < 1) { n = 1; }
             if (n > 8) { n = 8; }
 
-            dom_columns.value = n.toString();
+            setGroupRadioVal(dom_columns, n.toString());
             dom_bulkView.setAttribute("columns", n.toString());
             updateSize();
         }
@@ -242,10 +257,11 @@ class BulkView {
          */
         function updateSize(donItem?: HTMLElement) {
 
-            let domBulkViewWidth = dom_bulkViewContent.offsetWidth - 18 - (getColumns() + 1) * itemMargin;
             dom_bulkViewContent.style.paddingLeft = itemMargin + "px";
             dom_bulkViewContent.style.paddingTop = itemMargin + "px";
-            let size = Math.floor(domBulkViewWidth / getColumns());
+            //let domBulkViewWidth = dom_bulkViewContent.offsetWidth - 18 - (getColumns() + 1) * itemMargin;
+            //let size = Math.floor(domBulkViewWidth / getColumns());
+            let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
 
             let arItme;
             if (donItem === undefined) {
@@ -264,7 +280,7 @@ class BulkView {
                 if (getColumns() <= 2) {
                     itmecenter.style.maxHeight = "";
                 } else if (getColumns() === 3) {
-                    itmecenter.style.maxHeight = size * 4 + "px";
+                    itmecenter.style.maxHeight = size * 3 + "px";
                 } else {
                     itmecenter.style.maxHeight = size * 2 + "px";
                 }
@@ -284,32 +300,78 @@ class BulkView {
             }
         }
 
-        /**
-         * 下一頁
-         */
-        function pageNext() {
-            let page = pageNow;
-            page += 1;
-            let pageMax = Math.ceil(arFile.length / imgMaxCount);
-            if (page >= pageMax) { page = pageMax; }
-            if (page !== pageNow) { //如果已經到達最後一頁就不做任何事情
-                pageNow = page;
-                showFile();
-            }
-        }
 
         /**
-         * 上一頁
+         * 
+         * @param page 
          */
-        function pagePrev() {
-            let page = pageNow;
-            page -= 1;
-            if (page <= 1) { page = 1; }
-            if (page !== pageNow) { //如果已經是第一頁就不做任何事情
-                pageNow = page;
-                showFile();
+        async function load(page = 0) {
+
+            arFile = Array.from(M.fileLoad.getWaitingFile());
+            if (arFile === undefined) { return; }
+
+            if (getFirstImageIndentation() === "on" && getColumns() === 2) {
+                if (baseWindow.appInfo !== undefined) {
+                    let path = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"])
+                    arFile.unshift(path);
+                }
             }
+
+            showPage(page);
         }
+
+        //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
+        var _showPage = async () => { };
+        async function timerPage() {
+            let func = _showPage;
+            _showPage = async () => { };
+            await func();
+
+            setTimeout(() => { timerPage(); }, 50);  //遞迴
+        }
+        timerPage();
+
+
+        /**
+         * 載入頁面
+         * @param _page 
+         */
+        async function showPage(_page?: number) {
+
+            if (_page === undefined) { _page = pageNow; }
+            if (_page !== undefined) { pageNow = _page; }
+            pageNow = _page;
+            if (pageNow < 1) { pageNow = 1; }
+            let pageMax = Math.ceil(arFile.length / imgMaxCount);
+            if (pageNow >= pageMax) { pageNow = pageMax; }
+
+            updatePagination(); //更新分頁器
+
+            _showPage = async () => {
+
+                let start = ((pageNow - 1) * imgMaxCount);
+
+                dom_bulkViewContent.innerHTML = "";
+                for (let i = 0; i < 10; i++) { //分成10次處理
+                    let start2 = start + (imgMaxCount / 10) * (i);
+                    let end = start + (imgMaxCount / 10) * (i + 1);
+                    let newArr = arFile.slice(start2, end); //取得陣列特定範圍
+                    if (newArr.length === 0) { break; }
+                    let retAr = await WebAPI.getFileInfo2List(newArr);
+
+                    for (let j = 0; j < retAr.length; j++) {
+                        const item = retAr[j];
+                        let path = item.Path;
+                        newItem(path, i * 10 + j);
+                    }
+                }
+
+                updateColumns();
+            }
+
+        }
+
+
 
         /**
          * 更新分頁器
@@ -360,6 +422,12 @@ class BulkView {
         }
 
 
+        /**
+         * 
+         * @param path 
+         * @param n 
+         * @returns 
+         */
         async function newItem(path: string, n: number) {
 
             let temp_pageNow = pageNow;
@@ -367,7 +435,7 @@ class BulkView {
 
             let fileInfo2 = await WebAPI.getFileInfo2(path);
 
-            let div = newDiv(/*html*/`
+            let div = newDom(/*html*/`
                 <div class="bulkView-item">
                     <div class="bulkView-center">
                         <img class="bulkView-img" src="./img/loading.svg" style="max-width:100px;">
@@ -490,11 +558,18 @@ class BulkView {
             //區塊改變大小時
             new ResizeObserver(() => {
                 requestAnimationFrame(() => {
+
                     let ret = arUrl[0];
                     let boxWidth = dom_center.offsetWidth;
-                    if (getFixedWidth() !== "off") { //如果有鎖定寬度
-                        boxWidth = boxWidth * Number.parseInt(getFixedWidth()) / 100;
+
+                    //如果石蘭1欄或2欄且有鎖定寬度
+                    if (getFixedWidth() !== "off") {
+                        let columns = getColumns();
+                        if (columns === 1 || columns === 2) {
+                            boxWidth = boxWidth * Number.parseInt(getFixedWidth()) / 100;
+                        }
                     }
+
                     let nowScale = boxWidth / width;
                     for (let i = arUrl.length - 1; i >= 0; i--) {
                         const item = arUrl[i];
@@ -514,76 +589,70 @@ class BulkView {
         }
 
 
-        //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
-        var _showFile = async () => { };
-        async function timerFile() {
-            let func = _showFile;
-            _showFile = async () => { };
-            await func();
-
-            setTimeout(() => { timerFile(); }, 50);  //遞迴
-        }
-        timerFile();
-
-
-        async function showFile(_page?: number) {
-
-            if (_page === undefined) { _page = pageNow; }
-            if (_page !== undefined) { pageNow = _page; }
-            pageNow = _page;
-            if (pageNow < 1) { pageNow = 1; }
+        /**
+         * 下一頁
+         */
+        function pageNext() {
+            let page = pageNow;
+            page += 1;
             let pageMax = Math.ceil(arFile.length / imgMaxCount);
-            if (pageNow >= pageMax) { pageNow = pageMax; }
-
-            updatePagination(); //更新分頁器
-
-            _showFile = async () => {
-
-                let start = ((pageNow - 1) * imgMaxCount);
-
-                dom_bulkViewContent.innerHTML = "";
-                for (let i = 0; i < 10; i++) { //分成10次處理
-                    console.time();
-
-                    let start2 = start + (imgMaxCount / 10) * (i);
-                    let end = start + (imgMaxCount / 10) * (i + 1);
-                    let newArr = arFile.slice(start2, end); //取得陣列特定範圍
-                    if (newArr.length === 0) { break; }
-                    let retAr = await WebAPI.getFileInfo2List(newArr);
-
-                    for (let j = 0; j < retAr.length; j++) {
-                        const item = retAr[j];
-                        let path = item.Path;
-                        newItem(path, i * 10 + j);
-                    }
-                    console.timeEnd();
-                }
-
-                updateColumns();
+            if (page >= pageMax) { page = pageMax; }
+            if (page !== pageNow) { //如果已經到達最後一頁就不做任何事情
+                pageNow = page;
+                showPage();
             }
-
         }
 
 
-
-        async function load(page = 0) {
-
-            arFile = Array.from(M.fileLoad.getWaitingFile());
-            if (arFile === undefined) { return; }
-
-            if (getFirstImageIndentation() === "on" && getColumns() === 2) {
-                if (baseWindow.appInfo !== undefined) {
-                    let path = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"])
-                    arFile.unshift(path);
-                }
+        /**
+         * 上一頁
+         */
+        function pagePrev() {
+            let page = pageNow;
+            page -= 1;
+            if (page <= 1) { page = 1; }
+            if (page !== pageNow) { //如果已經是第一頁就不做任何事情
+                pageNow = page;
+                showPage();
             }
-
-            showFile(page);
         }
 
+        /** 初始化群組按鈕 */
+        function initGroupRadio(dom: HTMLElement) {
+            dom.addEventListener("click", (e) => {
+                let domActive = e.target as HTMLElement;
+                if (domActive === null) { return; }
+                let value = domActive.getAttribute("value");
+                if (value === null) { value = ""; }
+                setGroupRadioVal(dom, value);
+            })
 
+            let domActive = dom.querySelector("[active=true]");
+            if (domActive === null) { return ""; }
+            let value = domActive.getAttribute("value");
+            if (value === null) { value = ""; }
+            return value;
+        }
+        /** 取得群組按鈕的值 */
+        function getGroupRadioVal(dom: HTMLElement) {
+            let domActive = dom.querySelector("[active=true]");
+            if (domActive === null) { return ""; }
+            let value = domActive.getAttribute("value");
+            if (value === null) { value = ""; }
+            return value;
+        }
+        /** 設定群組按鈕的值 */
+        function setGroupRadioVal(dom: HTMLElement, value: string) {
+            let arDom = dom.querySelectorAll("div");
+            for (let i = 0; i < arDom.length; i++) {
+                arDom[i].setAttribute("active", "");
+            }
+
+            let domActive = dom.querySelector(`[value="${value}"]`);
+            if (domActive === null) { return; }
+            domActive.setAttribute("active", "true");
+        }
 
     }
-
 
 }

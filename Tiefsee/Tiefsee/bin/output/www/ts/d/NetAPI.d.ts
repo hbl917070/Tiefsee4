@@ -148,6 +148,7 @@ interface WV_Window {
 
 interface WV_Directory {
 
+
     /**
      * 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
      * @param path 
@@ -179,10 +180,13 @@ interface WV_Directory {
     GetParent(path: string);
 
     /** 刪除資料夾(包含子目錄與檔案) */
-    Delete(path: string): bool;
+    Delete(path: string): string;
+
+    /** 資料夾移到資源回收桶 */
+    MoveToRecycle(path: string): string;
 
     /** 移動檔案或目錄和其內容到新位置 */
-    Move(sourceDirName: string, destDirName: string);
+    Move(sourceDirName: string, destDirName: string): string;
 
     /** 取得資料夾的建立時間 */
     GetCreationTimeUtc(path: string): number;
@@ -195,9 +199,6 @@ interface WV_File {
 
     /** 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑 */
     Base64ToTempFile(base64: string, extension: string): string;
-
-    /** 檔案移到資源回收桶 */
-    MoveToRecycle(path: string): bool;
 
     /** 在檔案總管顯示檔案 */
     ShowOnExplorer(path: string): void;
@@ -239,7 +240,10 @@ interface WV_File {
     Exists(path: string): bool;
 
     /** 刪除檔案 */
-    Delete(path: string): bool;
+    Delete(path: string): string;
+
+    /** 檔案移到資源回收桶 */
+    MoveToRecycle(path: string): string;
 
     /**
      * 移動檔案到新位置

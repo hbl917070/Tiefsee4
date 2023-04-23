@@ -17,7 +17,7 @@ class ImgSearch {
                 let icon = item.icon; //圖示
                 let url = item.url;
 
-                let dom = newDiv(`
+                let dom = newDom(`
                     <div class="menu-hor-item">
                         <div class="menu-hor-icon">
                             <img src="${icon}">

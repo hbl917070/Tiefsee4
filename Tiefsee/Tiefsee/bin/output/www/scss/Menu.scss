@@ -177,12 +177,43 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    height:24px;
+    height: 24px;
   }
   .menu-bulkView-checkbox:hover {
-background-color: var(--color-white10);
+    background-color: var(--color-white10);
   }
   .menu-bulkView-checkbox span {
     color: var(--color-white);
   }
+}
+
+//---------
+
+// 大量瀏覽模式的 每行圖片數
+.menu-bulkView-columns {
+  display: flex;
+  border-radius: 5px;
+  border: 1px solid var(--color-white40);
+  overflow: hidden;
+  min-width: 200px;
+}
+.menu-bulkView-columns-item {
+  flex: 1;
+  height: 35px;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--color-white40);
+  cursor: pointer;
+}
+.menu-bulkView-columns-item:hover {
+  background-color: var(--color-white10);
+}
+.menu-bulkView-columns-item:last-child {
+  border-right: none;
+}
+.menu-bulkView-columns-item[active="true"] {
+  // outline: 1px solid var(--color-blue);
+  background-color: var(--color-white20);
 }

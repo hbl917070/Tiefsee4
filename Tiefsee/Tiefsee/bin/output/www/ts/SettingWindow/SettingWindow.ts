@@ -395,7 +395,7 @@ class Setting {
                 black: { r: number, g: number, b: number },
                 blue: { r: number, g: number, b: number }) {
 
-                let btn = newDiv(html);
+                let btn = newDom(html);
                 btn.onclick = () => {
                     config.settings.theme["--color-window-background"] = windowBackground;
                     config.settings.theme["--color-window-border"] = windowBorder;

@@ -541,5 +541,8 @@ var GroupType = {
     video: "video",
 
     /** 大量瀏覽模式 */
-    bulkView: "bulkView"
+    bulkView: "bulkView",
+
+    /** 大量瀏覽模式-子視窗 */
+    bulkViewSub: "bulkViewSub"
 }

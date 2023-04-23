@@ -151,16 +151,38 @@ class ScriptFileLoad {
     }
 
     /** 顯示 刪除檔案 的對話方塊 */
+    public showDeleteFileMsg() {
+        this.M.fileLoad.showDeleteFileMsg()
+    }
+    /** 顯示 刪除資料夾 的對話方塊 */
+    public showDeleteDirMsg() {
+        this.M.fileLoad.showDeleteDirMsg()
+    }
+    /** 顯示 刪除當前檔案或資料夾 的對話方塊 */
     public showDeleteMsg() {
-        this.M.fileLoad.deleteMsg()
+        if (this.M.fileLoad.getIsBulkView()) {
+            this.showDeleteDirMsg()
+        } else {
+            this.showDeleteFileMsg()
+        }
     }
 
     /** 顯示 重新命名檔案 的對話方塊 */
-    public renameMsg() {
-        this.M.fileLoad.renameMsg()
+    public showRenameFileMsg() {
+        this.M.fileLoad.showRenameFileMsg()
     }
-
-
+    /** 顯示 重新命名資料夾 的對話方塊 */
+    public showRenameDirMsg() {
+        this.M.fileLoad.showRenameDirMsg()
+    }
+    /** 顯示 重新命名當前檔案或資料夾 的對話方塊 */
+    public showRenameMsg() {
+        if (this.M.fileLoad.getIsBulkView()) {
+            this.showRenameDirMsg()
+        } else {
+            this.showRenameFileMsg()
+        }
+    }
 
 }
 
@@ -180,14 +202,22 @@ class ScriptFile {
     /** 快速拖曳(拖出檔案) */
     public dragDropFile() {
         setTimeout(() => {
-            WV_File.DragDropFile(this.M.fileLoad.getFilePath())
+            if (this.M.fileLoad.getIsBulkView()) {
+                WV_File.DragDropFile(this.M.fileLoad.getDirPath());
+            } else {
+                WV_File.DragDropFile(this.M.fileLoad.getFilePath());
+            }
         }, 50);
     }
 
     /** 顯示檔案原生右鍵選單 */
     public async showContextMenu() {
-        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        if (await WV_File.Exists(filePath) === false) { return; }
+        let filePath = ""; //目前顯示的檔案
+        if (this.M.fileLoad.getIsBulkView()) {
+            filePath = this.M.fileLoad.getDirPath();
+        } else {
+            filePath = this.M.fileLoad.getFilePath();
+        }
         WV_File.ShowContextMenu(filePath, true);
     }
 
@@ -315,13 +345,19 @@ class ScriptOpen {
 
     /** 載入檔案 */
     public async openFile() {
-        let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*", "開啟檔案")
+        let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*", this.M.i18n.get("menu.openFile"));
         if (arFile.length === 0) { return; }
         if (arFile.length === 1) {
             this.M.fileLoad.loadFile(arFile[0]);
         }
         if (arFile.length > 1) {
-            this.M.fileLoad.loadFiles(arFile[0], arFile);
+            let arName = [];
+            for (let i = 0; i < arFile.length; i++) {
+                arName.push(Lib.GetFileName(arFile[i]));
+            }
+            let dirPath = Lib.GetDirectoryName(arFile[0]);
+            if (dirPath == null) { return; }
+            this.M.fileLoad.loadFiles(dirPath, arName);
         }
     }
 
@@ -346,8 +382,14 @@ class ScriptOpen {
 
     /** 顯示檔案右鍵選單 */
     public async systemContextMenu() {
-        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        if (await WV_File.Exists(filePath) === false) { return; }
+        let filePath = "";
+        if (this.M.fileLoad.getIsBulkView()) {
+            filePath = this.M.fileLoad.getDirPath();
+            if (await WV_Directory.Exists(filePath) === false) { return; }
+        } else {
+            filePath = this.M.fileLoad.getFilePath();
+            if (await WV_File.Exists(filePath) === false) { return; }
+        }
         WV_File.ShowContextMenu(filePath, true);
     }
 
@@ -585,18 +627,18 @@ class ScriptBulkView {
     /** 下一頁 */
     public pageNext() {
         if (this.M.fileLoad.getIsBulkView() == false) { return; }
-        this.M.fileShow.bulkView.pageNext();
+        this.M.bulkView.pageNext();
     }
 
     /** 上一頁 */
     public pagePrev() {
         if (this.M.fileLoad.getIsBulkView() == false) { return; }
-        this.M.fileShow.bulkView.pagePrev();
+        this.M.bulkView.pagePrev();
     }
 
     /** 設定 欄數 */
     public setColumns(val: number) {
         if (this.M.fileLoad.getIsBulkView() == false) { return; }
-        this.M.fileShow.bulkView.setColumns(val);
+        this.M.bulkView.setColumns(val);
     }
 }

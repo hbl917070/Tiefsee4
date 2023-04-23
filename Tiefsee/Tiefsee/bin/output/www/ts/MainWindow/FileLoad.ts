@@ -30,8 +30,10 @@ class FileLoad {
     public getGroupType;
     public setGroupType;
     public getFileLoadType;
-    public deleteMsg;
-    public renameMsg;
+    public showDeleteFileMsg;
+    public showDeleteDirMsg;
+    public showRenameFileMsg;
+    public showRenameDirMsg;
     public updateTitle;
 
     public enableBulkView;
@@ -95,8 +97,10 @@ class FileLoad {
         this.getGroupType = getGroupType;
         this.setGroupType = setGroupType;
         this.getFileLoadType = getFileLoadType;
-        this.deleteMsg = deleteMsg;
-        this.renameMsg = renameMsg;
+        this.showDeleteFileMsg = showDeleteFileMsg;
+        this.showDeleteDirMsg = showDeleteDirMsg;
+        this.showRenameFileMsg = showRenameFileMsg;
+        this.showRenameDirMsg = showRenameDirMsg;
         this.updateTitle = updateTitle;
         this.enableBulkView = enableBulkView;
         this.getIsBulkView = function () { return isBulkView; };
@@ -769,7 +773,7 @@ class FileLoad {
         /**
          * 顯示 刪除檔案 的對話方塊
          */
-        async function deleteMsg() {
+        async function showDeleteFileMsg() {
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
@@ -777,16 +781,16 @@ class FileLoad {
 
             //執行刪除
             async function runDelete(value: string) {
-                let state = true;
+                let err = "";
                 if (value == "1") {
-                    state = await WV_File.MoveToRecycle(path);
+                    err = await WV_File.MoveToRecycle(path);
                 }
                 if (value == "2") {
-                    state = await WV_File.Delete(path);
+                    err = await WV_File.Delete(path);
                 }
 
-                if (state === false) {
-                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") }); //檔案刪除失敗
+                if (err !== "") {
+                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); //檔案刪除失敗
                 } else {
                     await showFile();
 
@@ -795,9 +799,9 @@ class FileLoad {
                     } else {
                         Toast.show(M.i18n.t("msg.fileToPermanentlyDeleteCompleted"), 1000 * 3); //已將檔案「永久刪除」
                     }
-                    M.mainFileList.init();//檔案預覽視窗 初始化
-                    M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
-                    M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
+                    //M.mainFileList.init();//檔案預覽視窗 初始化
+                    //M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+                    //M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
                 }
             }
 
@@ -827,11 +831,72 @@ class FileLoad {
 
         }
 
+        /**
+         * 顯示 刪除資料夾 的對話方塊
+         */
+        async function showDeleteDirMsg() {
+
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
+
+            //執行刪除
+            async function runDelete(value: string) {
+                let err = "";
+                if (value == "1") {
+                    err = await WV_Directory.MoveToRecycle(path);
+                }
+                if (value == "2") {
+                    err = await WV_Directory.Delete(path);
+                }
+
+                if (err !== "") {
+                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); //檔案刪除失敗
+                } else {
+                    await showDir();
+
+                    if (value == "1") {
+                        Toast.show(M.i18n.t("msg.fileToRecycleBinCompleted"), 1000 * 3); //已將檔案「移至資源回收桶」
+                    } else {
+                        Toast.show(M.i18n.t("msg.fileToPermanentlyDeleteCompleted"), 1000 * 3); //已將檔案「永久刪除」
+                    }
+                    //M.mainFileList.init();//檔案預覽視窗 初始化
+                    //M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+                    //M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
+                }
+            }
+
+            let path = getDirPath();
+
+            if (M.config.settings.other.fileDeletingShowCheckMsg) {
+                M.msgbox.show({
+                    type: "radio",
+                    txt: M.i18n.t("msg.deleteFile") + "<br>" +
+                        `<span style="word-break:break-all;">${Lib.GetFileName(path)}</span>`, //刪除檔案
+                    arRadio: [
+                        { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, //移至資源回收桶
+                        { value: "2", name: M.i18n.t("msg.fileToPermanentlyDelete") }, //永久刪除檔案
+                    ],
+                    radioValue: "1",
+                    funcYes: async (dom: HTMLElement, value: string) => {
+                        M.msgbox.close(dom);
+                        await runDelete(value);
+                    }
+                });
+
+            } else {
+
+                await runDelete("1");
+
+            }
+
+        }
+
 
         /**
          * 顯示 重新命名檔案 的對話方塊
          */
-        async function renameMsg() {
+        async function showRenameFileMsg() {
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
@@ -845,15 +910,15 @@ class FileLoad {
                 type: "text",
                 inputTxt: fileName,
                 funcYes: async (dom: HTMLElement, inputTxt: string) => {
-                    if (inputTxt.trim() == "") {
+                    if (inputTxt.trim() === "") {
                         M.msgbox.show({ txt: M.i18n.t("msg.nameIsEmpty") }); //必須輸入檔名
                         return;
                     }
-                    if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) != -1) {
+                    if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) !== -1) {
                         M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "<br>" + "\\ / : * ? \" < > |" }); //檔案名稱不可以包含下列任意字元
                         return;
                     }
-                    if (fileName == inputTxt) {
+                    if (fileName === inputTxt) {
                         M.msgbox.close(dom);
                         return;
                     }
@@ -871,10 +936,12 @@ class FileLoad {
                     }
 
                     arFile[flagFile] = newName;
-                    updateTitle();
                     M.mainFileList.init();//檔案預覽視窗 初始化
-                    M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
-                    M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
+                    showFile(); //重新載入檔案
+                    //updateTitle();
+                    //M.mainFileList.init();//檔案預覽視窗 初始化
+                    //M.mainFileList.select();//設定 檔案預覽視窗 目前選中的項目
+                    //M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方  
 
                     M.msgbox.close(dom);
                 }
@@ -882,6 +949,76 @@ class FileLoad {
 
             const len = fileName.length - Lib.GetExtension(path).length;
             msg.domInput.setSelectionRange(0, len);
+        }
+
+        /**
+          * 顯示 重新命名資料夾 的對話方塊
+          */
+        async function showRenameDirMsg() {
+
+            if (groupType === GroupType.none || groupType === GroupType.welcome) {
+                return;
+            }
+
+            let path = getDirPath();
+            let fileName = Lib.GetFileName(path);
+
+            let msg = M.msgbox.show({
+                txt: M.i18n.t("msg.renameFile"), //重新命名檔案
+                type: "text",
+                inputTxt: fileName,
+                funcYes: async (dom: HTMLElement, inputTxt: string) => {
+                    if (inputTxt.trim() === "") {
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameIsEmpty") }); //必須輸入檔名
+                        return;
+                    }
+                    if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) !== -1) {
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "<br>" + "\\ / : * ? \" < > |" }); //檔案名稱不可以包含下列任意字元
+                        return;
+                    }
+                    if (fileName == inputTxt) {
+                        M.msgbox.close(dom);
+                        return;
+                    }
+                    let dirPath = Lib.GetDirectoryName(path);
+                    if (dirPath === null) {
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + M.i18n.t("msg.wrongPath") }); //重新命名失敗：路徑異常
+                        return;
+                    }
+
+                    let newName = Lib.Combine([dirPath, inputTxt]);
+                    let err = await WV_Directory.Move(path, newName);
+                    if (err !== "") {
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "<br>" + err }); //重新命名失敗：
+                        return;
+                    }
+
+                    arDir = changeKey(arDir, path, newName);
+                    arDirKey = Object.keys(arDir);
+
+                    M.mainDirList.init()
+                    showDir();
+
+                    M.msgbox.close(dom);
+                }
+            });
+
+            const len = fileName.length;
+            msg.domInput.setSelectionRange(0, len);
+        }
+
+        function changeKey(arDir: { [key: string]: string[] }, oldKey: string, newKey: string) {
+            const keys = Object.keys(arDir);
+            const index = keys.indexOf(oldKey);
+            const newArDir: { [key: string]: string[] } = {};
+            for (let i = 0; i < keys.length; i++) {
+                if (i === index) {
+                    newArDir[newKey] = arDir[oldKey];
+                } else {
+                    newArDir[keys[i]] = arDir[keys[i]];
+                }
+            }
+            return newArDir;
         }
 
 

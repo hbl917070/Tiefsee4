@@ -9,7 +9,6 @@
 
 /*---------------------------*/
 
-
 :root {
   //圖示粗細
   --svgWeight: 0px;
@@ -149,3 +148,12 @@
     user-select: none;
   }
 }
+
+//-------------------------------
+
+//搭配 js函數「updateDomVisibility()」，用於隱藏元素
+.js-showType-none {
+  display: none !important;
+}
+
+

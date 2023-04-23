@@ -13,6 +13,9 @@
 .bulkView-content {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 10px;
+  margin-left: 5px;
+  outline: none;
   /* padding: 10px; */
   /* padding-top:10px; */
   /* padding-left:10px; */
@@ -130,10 +133,10 @@
 }
 
 .bulkView-number {
-  margin-right: 10px;
+  margin-right: 5px;
   margin-bottom: 5px;
   color: var(--color-blue);
-  font-weight: var(--fontWeight);
+  font-weight: var(--fontWeightBold);
   display: none;
 }
 
@@ -157,9 +160,11 @@
   margin-right: 5px;
   border: 1px solid var(--color-white20);
   padding: 3px 5px;
-  border-radius: 8px;
+  border-radius: 5px;
   margin-bottom: 5px;
-  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+   white-space: nowrap;
   display: none;
 }
 
@@ -181,14 +186,16 @@
 //分頁器
 .bulkView-pagination {
   display: none;
+  flex-direction: column;
   text-align: center;
-  margin: 10px;
+  margin-bottom: 10px;
 
   .bulkView-pagination-box {
-    height: 35px;
-    border: 1px solid var(--color-white40);
-    border-radius: 8px;
+    height: 60px;
+    // border: 1px solid var(--color-white40);
+
     display: inline-flex;
+    align-items: center;
     overflow: hidden;
     user-select: none;
   }
@@ -198,21 +205,35 @@
   .bulkView-pagination-next {
     height: 100%;
     width: 50px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
-    justify-content: center;
+
     color: var(--color-white);
+
+    flex: 1;
+    //opacity: 0;
+  }
+  .bulkView-pagination-prev {
+    justify-content: flex-end;
+  }
+  .bulkView-pagination-next {
+    justify-content: flex-start;
   }
   .bulkView-pagination-prev svg,
   .bulkView-pagination-next svg {
-    width: 20px;
+    width: 25px;
+    margin: 8px;
   }
 
   .bulkView-pagination-prev:hover,
   .bulkView-pagination-next:hover,
   .bulkView-pagination-select:hover {
-    background-color: var(--color-white10);
+    //justify-content: center;
     cursor: pointer;
+    opacity: 1;
+    background-color: var(--color-white10);
+    // border: 1px solid var(--color-white10);
   }
 
   //無法點擊的狀態
@@ -225,15 +246,18 @@
   //下拉選單
   .bulkView-pagination-select {
     color: var(--color-white);
-    height: 100%;
+    height: 35px;
+    border-radius: 5px;
     background-color: rgba(0, 0, 0, 0);
     border: none;
     padding-left: 10px;
     outline: none;
     border-left: 1px solid var(--color-white40);
-    border-right: 1px solid var(--color-white40);
+    border: 1px solid var(--color-white40);
+    padding: 0 5px;
+    text-align: center;
   }
 }
 .bulkView-pagination[active="true"] {
-  display: block;
+  display: flex;
 }

@@ -1090,8 +1090,8 @@ var langData = {
             "ja": "コンテキストメニュー",
         },
         renameFile: {
-            "zh-TW": "重新命名檔案",
-            "en": "Rename File",
+            "zh-TW": "重新命名",
+            "en": "Rename",
             "ja": "リネーム",
         },
         print: {
@@ -1492,9 +1492,9 @@ var langData = {
 
         //#region 重新命名
         renameFile: {
-            "zh-TW": "重新命名檔案",
-            "en": "Rename File",
-            "ja": "名前の変更",
+            "zh-TW": "重新命名",
+            "en": "Rename",
+            "ja": "リネーム",
         },
         nameIsEmpty: {
             "zh-TW": "必須輸入檔名",

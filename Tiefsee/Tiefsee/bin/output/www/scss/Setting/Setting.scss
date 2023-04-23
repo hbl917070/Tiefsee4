@@ -394,6 +394,7 @@ input::-webkit-inner-spin-button {
     flex-shrink: 0;
     //margin-bottom: 10px;
     padding: 5px 0;
+    border-radius: 5px;
   }
 
   .radioList-item:hover {
@@ -426,6 +427,7 @@ input::-webkit-inner-spin-button {
     display: block;
     position: relative;
     min-height: 30px;
+    border-radius: 5px;
   }
   label:hover {
     cursor: pointer;
@@ -451,4 +453,3 @@ input::-webkit-inner-spin-button {
     transform: translateY(3px);
   }
 }
-

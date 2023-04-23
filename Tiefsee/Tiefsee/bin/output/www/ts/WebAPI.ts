@@ -40,9 +40,9 @@ class WebAPI {
             for (const key in retJson) {
                 if (retJson.hasOwnProperty(key) == false) { continue; }
                 var newKey = Lib.Combine([parentPath, key]);
-                //var newKey = parentPath + "\\" + key;
                 json[newKey] = retJson[key].map((value: string) => {
-                    return newKey + "\\" + value;
+                    //return newKey + "\\" + value;
+                    return value;
                 })
             }
 

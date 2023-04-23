@@ -13,32 +13,6 @@ class Hotkey {
             if (e.code == "F5") { return; }
             if (e.code == "F12") { return; }
 
-            //如果有開啟大量瀏覽模式
-            if (M.fileLoad.getIsBulkView()) {
-                if (e.code === "ArrowRight") {
-                    M.script.bulkView.pageNext();
-                }
-                if (e.code === "ArrowLeft") {
-                    M.script.bulkView.pagePrev();
-                }
-                if (e.code === "Comma") {
-                    M.script.fileLoad.prevDir();
-                }
-                if (e.code === "Period") {
-                    M.script.fileLoad.nextDir();
-                }
-                if (e.code == "Escape") {
-                    M.script.bulkView.close();
-                }
-              
-                for (let i = 1; i <= 8; i++) {
-                    if (e.key == i.toString()) {
-                        M.script.bulkView.setColumns(i);
-                    }
-                }
-                return;
-            }
-
             //如果有開啟選單
             if (M.menu.isShow()) {
                 if (e.code == "Escape") {
@@ -57,6 +31,48 @@ class Hotkey {
                     M.msgbox.clickYes();
                     e.preventDefault();
                 }
+                return;
+            }
+
+            //如果有開啟大量瀏覽模式
+            if (M.fileLoad.getIsBulkView()) {
+                
+                M.bulkView.setFocus();
+
+                if (e.code === "ArrowRight") {
+                    M.script.bulkView.pageNext();
+                }
+                if (e.code === "ArrowLeft") {
+                    M.script.bulkView.pagePrev();
+                }
+                if (e.code === "Comma") {
+                    M.script.fileLoad.prevDir();
+                }
+                if (e.code === "Period") {
+                    M.script.fileLoad.nextDir();
+                }
+                if (e.code == "Escape") {
+                    M.script.bulkView.close();
+                }
+                if (e.code === "F2") {
+                    M.script.fileLoad.showRenameMsg();
+                }
+                if (e.code === "KeyO") {
+                    M.script.open.revealInFileExplorer();
+                }
+                if (e.code === "KeyM") {
+                    M.script.open.systemContextMenu();
+                }
+                for (let i = 1; i <= 8; i++) {
+                    if (e.key == i.toString()) {
+                        M.script.bulkView.setColumns(i);
+                    }
+                }
+
+                setTimeout(() => {
+                    
+                    
+                }, 100);
                 return;
             }
 
@@ -118,10 +134,10 @@ class Hotkey {
                 M.script.img.zoomOut();
             }
             if (e.code === "F2") {
-                M.script.fileLoad.renameMsg();
+                M.script.fileLoad.showRenameMsg();
             }
             if (e.code === "Delete") {
-                M.script.fileLoad.showDeleteMsg();
+                M.script.fileLoad.showDeleteFileMsg();
             }
             if (e.code === "KeyO") {
                 M.script.open.revealInFileExplorer();

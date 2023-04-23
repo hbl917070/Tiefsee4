@@ -212,8 +212,8 @@ class MainDirList {
 				return;
 			}
 
-			let arDir = M.fileLoad.getWaitingDir()
-			let arDirKey = M.fileLoad.getWaitingDirKey()
+			let arDir = M.fileLoad.getWaitingDir();
+			let arDirKey = M.fileLoad.getWaitingDirKey();
 
 			if (arDirKey.length === 0) {//如果沒資料
 				dom_dirListData.innerHTML = "";//移除之前的所有物件
@@ -272,7 +272,7 @@ class MainDirList {
 
 			let imgHtml = "";
 			for (let i = 0; i < len; i++) {
-				const path = arPath[i];
+				const path = Lib.Combine([_dirPath, arPath[i]]);
 				let style = "";
 				if (temp_loaded.indexOf(n + "-" + i) !== -1) {  //圖片已經載入過了，直接顯示
 					let imgUrl = getImgUrl(path);
@@ -294,7 +294,7 @@ class MainDirList {
 				htmlName = `<div class="dirList-name">${name}</div> `
 			}
 
-			let div = newDiv(`
+			let div = newDom(`
                 <div class="dirList-item" data-id="${n}">
                     <div class="dirList-title">
                         ${htmlNo} ${htmlName}
@@ -316,7 +316,7 @@ class MainDirList {
 				setTimeout(() => {
 					if (dom_dirListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
 					for (let i = 0; i < len; i++) {
-						const path = arPath[i];
+						const path = Lib.Combine([_dirPath, arPath[i]]);
 						if (temp_loaded.indexOf(n + "-" + i) === -1) {  //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
 							temp_loaded.push(n + "-" + i);//加到全域變數，表示已經載入過
 							let _url = getImgUrl(path)

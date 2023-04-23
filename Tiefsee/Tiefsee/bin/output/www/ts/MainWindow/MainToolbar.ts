@@ -50,7 +50,10 @@ class MainToolbar {
                 }
 
                 if (item.type === "hr") {
-                    addToolbarHr({ group: item.group, })
+                    addToolbarHr({
+                        group: item.group,
+                        func: item.func
+                    })
                 }
 
                 if (item.type === "button") {
@@ -812,23 +815,42 @@ class MainToolbar {
                 i18n: "menu.closeBulkView",
                 group: GroupType.bulkView,
                 name: "closeBulkView",
-                icon: "tool-prev.svg",
+                icon: "tool-back.svg",
                 func: (btn) => {
+                    btn.style.width = "50px";
                     btn.addEventListener("click", () => {
                         M?.script.bulkView.close();
                     });
                 },
             })
 
-            /*ar.push({
+            ar.push({
                 type: "hr",
                 group: GroupType.bulkView,
                 i18n: "",
                 name: "hr",
                 icon: "",
                 html: "",
-                func: (domBtn: HTMLElement) => { }
-            })*/
+                func: (domHr: HTMLElement) => {
+                    //domHr.style.marginLeft = "6px";
+                    //domHr.style.marginRight = "6px";
+                    //domHr.style.height = "20px";
+                }
+            })
+
+            // 開啟檔案
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showMenuFile",
+                group: GroupType.bulkView,
+                name: "showMenuFile",
+                icon: "tool-open.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.menu.showMenuFile(btn);
+                    });
+                },
+            })
 
             //上一個資料夾
             ar.push({
@@ -872,18 +894,99 @@ class MainToolbar {
                 },
             })
 
-            //大量瀏覽模式設定
+
+            //複製
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showMenuCopy",
+                group: GroupType.bulkView,
+                name: "showMenuCopy",
+                icon: "tool-copy.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.menu.showMenuCopy(btn);
+                    });
+                },
+            })
+
+            //快速拖曳
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.dragDropFile",
+                group: GroupType.bulkView,
+                name: "dragDropFile",
+                icon: "tool-dragDropFile.svg",
+                func: (btn) => {
+                    btn.addEventListener("mousedown", (e) => {
+                        if (e.button === 0) {//滑鼠左鍵
+                            M?.script.file.dragDropFile();
+                        }
+                    });
+                    btn.addEventListener("mousedown", (e) => {
+                        if (e.button === 2) {//滑鼠右鍵
+                            M?.script.file.showContextMenu();
+                        }
+                    });
+                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
+                },
+            })
+
+            //刪除
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showDeleteMsg",
+                group: GroupType.bulkView,
+                name: "showDeleteMsg",
+                icon: "tool-delete.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.fileLoad.showDeleteMsg();
+                    });
+                },
+            })
+
+            //設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
+                group: GroupType.bulkView,
+                name: "showSetting",
+                icon: "tool-setting.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => {
+                        M?.script.setting.showSetting();
+                    });
+                },
+            })
+
+            // 檔案修改時間
+            ar.push({
+                type: "html",
+                html: `
+                    <div class="main-toolbar-txt" data-name="infoWriteTime">
+                        <!--2022-05-02<br>01:19:49 -->
+                    </div>
+                `,
+                i18n: "menu.infoWriteTime",
+                group: GroupType.bulkView,
+                name: "infoWriteTime",
+                icon: "",
+                func: (btn) => { },
+            })
+
+            //大量瀏覽模式設定
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.showBulkViewSetting",
                 group: GroupType.bulkView,
                 name: "showBulkViewSetting",
                 icon: "tool-setting2.svg",
                 func: (btn) => {
                     btn.style.marginLeft = "auto"; //靠右對齊
+                    btn.style.order = "1000";
 
                     btn.addEventListener("click", () => {
-                        M?.script.menu.showMenuBulkView();
+                        M?.script.menu.showMenuBulkView(btn);
                     });
                 },
             })
@@ -902,7 +1005,7 @@ class MainToolbar {
             i18n: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = newDiv(item.html);
+            let div = newDom(item.html);
             div.setAttribute("title", item.i18n);
             div.setAttribute("i18n", item.i18n);
             div.style.order = "999";
@@ -918,13 +1021,16 @@ class MainToolbar {
          * 新增 垂直線
          * @param item 
          */
-        function addToolbarHr(item: { group: string, }) {
-            let div = newDiv(`<div class="main-toolbar-hr"> </div>`);
+        function addToolbarHr(item: {
+            group: string,
+            func: (domBtn: HTMLElement) => void,
+        }) {
+            let div = newDom(`<div class="main-toolbar-hr"> </div>`);
             div.style.order = "888";
             addToolbarDom({
                 group: item.group,
                 dom: div,
-                func: () => { },
+                func: item.func,
             });
         }
 
@@ -942,7 +1048,7 @@ class MainToolbar {
         }) {
 
             //產生按鈕
-            let div = newDiv(`
+            let div = newDom(`
                 <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
@@ -969,7 +1075,7 @@ class MainToolbar {
             //如果群組不存在，就先產生群組
             let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (dom_group === null) {
-                let div = newDiv(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
+                let div = newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
                 M.dom_toolbar.appendChild(div);
                 dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }

@@ -55,6 +55,8 @@ class Menu {
             let domMenuBg = _domMenu.parentNode as HTMLElement;
             if (domMenuBg === null) { return }
 
+            M.updateDomVisibility(); //更新元素顯示或隱藏
+
             domMenuBg.setAttribute("active", "true");
             _domMenu.style.bottom = "";
 
@@ -111,6 +113,8 @@ class Menu {
 
             let domMenuBg = _domMenu.parentNode as HTMLElement;
             if (domMenuBg === null) { return }
+
+            M.updateDomVisibility(); //更新元素顯示或隱藏
 
             domMenuBg.setAttribute("active", "true");
             _domMenu.style.bottom = "";//避免高度計算錯誤
@@ -180,6 +184,8 @@ class Menu {
             let domMenuBg = _domMenu.parentNode as HTMLElement;
             if (domMenuBg === null) { return }
 
+            M.updateDomVisibility(); //更新元素顯示或隱藏
+
             domMenuBg.setAttribute("active", "true");
             _domMenu.style.bottom = "";//避免高度計算錯誤
 
@@ -221,6 +227,13 @@ class Menu {
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
                     sender.preventDefault();
                     func_close();//關閉menu
+                }
+            }
+
+            //在非選單的區域捲動，就關閉選單
+            domMenuBg.onwheel = (sender) => {
+                if (sender.target == domMenuBg) {
+                    func_close(); //關閉menu
                 }
             }
 

@@ -477,11 +477,10 @@ async function fetchGet_base64(url: string) {
  * @param html 
  * @returns 
  */
-function newDiv(html: string): HTMLElement {
-    let div = document.createElement("div");
-    div.innerHTML = html
-
-    return <HTMLElement>div.getElementsByTagName("div")[0];
+function newDom(html: string): HTMLElement {
+    var template = document.createElement("template");
+    template.innerHTML = html.trim();
+    return <HTMLElement>template.content.firstChild;
 }
 
 
@@ -503,7 +502,7 @@ async function sleep(ms: number) {
  */
 function toNumber(t: string | number): number {
     if (typeof (t) === "number") { return t } //如果本來就是數字，直接回傳     
-    if (typeof t === 'string') { return Number(t.replace('px', '')); } //如果是string，去掉px後轉型成數字
+    if (typeof t === "string") { return Number(t.replace("px", "")); } //如果是string，去掉px後轉型成數字
     return 0;
 }
 
@@ -544,7 +543,7 @@ interface Date {
  * radio 取得值
  */
 function getRadio(queryName: string): string {
-    return $(`${queryName}:checked`).val() + "";//
+    return $(`${queryName}:checked`).val() + "";
 }
 
 
@@ -554,5 +553,5 @@ function getRadio(queryName: string): string {
  * @param {*} value 
  */
 function setRadio(queryName: string, value: string) {
-    $(`${queryName}[value='${value}']`).prop('checked', true);//radio 賦值
+    $(`${queryName}[value="${value}"]`).prop("checked", true); //radio 賦值
 }

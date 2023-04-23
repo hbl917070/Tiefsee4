@@ -35,12 +35,13 @@
 }
 .main-toolbar-group[active="true"] {
   display: flex;
+  align-items: center;
 }
 /*垂直線*/
 .main-toolbar-hr {
   width: 1px;
   min-width: 1px;
-  height: 35px;
+  height: 29px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +49,7 @@
   margin: 0 3px;
 }
 
-/*純文字資訊*/
+//純文字資訊
 .main-toolbar-txt {
   height: 35px;
   font-size: 15px;
@@ -58,11 +59,21 @@
   user-select: none;
   white-space: nowrap;
 
-  //左邊的垂直線
   padding-right: 5px;
-  padding-left: 8px;
-  border-left: 1px solid var(--color-white20);
-  margin-left: 3px;
+  margin-left: 12px;
+  position: relative;
+}
+//純文字資訊-左邊的垂直線
+.main-toolbar-txt::after {
+  position: absolute;
+  content: "";
+  background-color: var(--color-white20);
+  height: 29px;
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  left: -9px;
+  margin: auto;
 }
 
 /*按鈕*/
@@ -80,7 +91,7 @@
 
 .main-toolbar-btn:hover {
   cursor: pointer;
-  background-color: var(--color-white20);
+  background-color: var(--color-white10);
 }
 .main-toolbar-btn:active {
   background-color: var(--color-white30);

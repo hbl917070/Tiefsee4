@@ -25,7 +25,7 @@ namespace Tiefsee {
         }
         public WV_Directory() { }
 
-
+  
         /// <summary>
         /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前4筆)
         /// </summary>
@@ -74,7 +74,7 @@ namespace Tiefsee {
                     //arFile = Directory.GetFiles(dirPath);
                     if (arExt.Length == 0) {
                         //取得資料夾內前4個檔案的檔名
-                        arFile = Directory.EnumerateFiles(dirPath, "*.*") 
+                        arFile = Directory.EnumerateFiles(dirPath, "*.*")
                               .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
                     } else {
                         //以副檔名來篩選，取得資料夾內前4個檔案的檔名
@@ -94,7 +94,7 @@ namespace Tiefsee {
                 /*int len = arFile.Length;
                 if (len > 51) { len = 51; }
                 Array.Sort(arFile,  new NaturalSort());*/
-             
+
                 foreach (string item in arFile) {
                     if (output.ContainsKey(dirName) == false) { //以資料夾名稱當做key
                         output.Add(dirName, new List<string>());
@@ -182,14 +182,34 @@ namespace Tiefsee {
         /// 刪除資料夾(包含子目錄與檔案)
         /// </summary>
         /// <param name="path"></param>
-        public bool Delete(string path) {
-            if (Directory.Exists(path) == false) { return false; }
+        public string Delete(string path) {
+            //if (Directory.Exists(path) == false) { return false; }
             try {
                 Directory.Delete(path, true);
-            } catch (Exception) {
-                return false;
+            } catch (Exception e) {
+                return e.Message;
             }
-            return true;
+            return "";
+        }
+
+
+        /// <summary>
+        /// 資料夾移到資源回收桶
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string MoveToRecycle(string path) {
+            //if (Directory.Exists(path) == false) { return false; }
+            try {
+                Microsoft.VisualBasic.FileIO.FileSystem.DeleteDirectory(
+                    path,
+                    Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
+                    Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin
+                );
+            } catch (Exception e) {
+                return e.Message;
+            }
+            return "";
         }
 
 
@@ -198,8 +218,13 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="sourceDirName"></param>
         /// <param name="destDirName"></param>
-        public void Move(string sourceDirName, string destDirName) {
-            Directory.Move(sourceDirName, destDirName);
+        public string Move(string sourceDirName, string destDirName) {
+            try {
+                Directory.Move(sourceDirName, destDirName);
+            } catch (Exception e) {
+                return e.Message;
+            }
+            return "";
         }
 
 

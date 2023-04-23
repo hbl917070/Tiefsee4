@@ -18,7 +18,7 @@ class Toast {
         txt = Lib.escape(txt);//移除可能破壞html的跳脫符號
         txt = txt.replace(/[\n]/g, "<br>");
       
-        let domItem: HTMLElement | undefined = newDiv(`
+        let domItem: HTMLElement | undefined = newDom(`
                 <div class="toastItem">
                     <div class="toastTxt">${txt}</div>
                     <div class="toastClose"></div>
