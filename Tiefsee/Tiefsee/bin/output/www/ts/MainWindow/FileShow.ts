@@ -515,7 +515,7 @@ class FileShow {
         async function openWelcome() {
             baseWindow.setTitle("Tiefsee 4");
             M.fileLoad.setGroupType(GroupType.welcome);
-            setShowType(GroupType.welcome);//改變顯示類型
+            setShowType(GroupType.welcome); //改變顯示類型
         }
 
 
@@ -552,7 +552,7 @@ class FileShow {
                 dom_writeTime.innerHTML = time;
             }
 
-            await M.bulkView.load();
+            await M.bulkView.load2();
         }
 
 

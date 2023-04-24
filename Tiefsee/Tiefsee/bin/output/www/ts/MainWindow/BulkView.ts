@@ -6,10 +6,12 @@ class BulkView {
 
     public visible;
     public load;
+    public load2;
     public pageNext;
     public pagePrev;
     public setColumns;
     public setFocus;
+    public saveCurrentState;
 
     constructor(M: MainWindow) {
 
@@ -20,8 +22,8 @@ class BulkView {
         var dom_columns = dom_menu.querySelector(".js-columns") as HTMLElement;
         var dom_gaplessMode = dom_menu.querySelector(".js-gaplessMode") as HTMLSelectElement;
         var dom_fixedWidth = dom_menu.querySelector(".js-fixedWidth") as HTMLSelectElement;
-        var dom_alignmentDirection = dom_menu.querySelector(".js-alignmentDirection") as HTMLSelectElement;
-        var dom_firstImageIndentation = dom_menu.querySelector(".js-firstImageIndentation") as HTMLSelectElement;
+        var dom_align = dom_menu.querySelector(".js-align") as HTMLSelectElement;
+        var dom_indentation = dom_menu.querySelector(".js-indentation") as HTMLSelectElement;
 
         var dom_number = dom_menu.querySelector(".js-number") as HTMLInputElement;
         var dom_fileName = dom_menu.querySelector(".js-fileName") as HTMLInputElement;
@@ -31,25 +33,42 @@ class BulkView {
         var dom_lastWriteTime = dom_menu.querySelector(".js-lastWriteTime") as HTMLInputElement;
 
         var dom_box_gaplessMode = dom_menu.querySelector(".js-box-gaplessMode") as HTMLDivElement;
-        var dom_box_firstImageIndentation = dom_menu.querySelector(".js-box-firstImageIndentation") as HTMLDivElement;
+        var dom_box_indentation = dom_menu.querySelector(".js-box-indentation") as HTMLDivElement;
         var dom_box_fixedWidth = dom_menu.querySelector(".js-box-fixedWidth") as HTMLDivElement;
 
+        /** 名單列表 */
         var arFile: string[] = [];
-
         /** 項目的邊距 */
         var itemMargin = 0;
-
         /** 一頁顯示幾張圖片*/
         var imgMaxCount = 100;
-
         /** 當前頁數 */
         var pageNow = 1;
+
+        /** 記錄離開時捲動到哪個位置 */
+        var temp_scrollTop = -1;
+        /** 用於判斷列表是否有異動 */
+        var temp_arFile: string[] = [];
+        /** 用於判斷是否有切換資料夾 */
+        var temp_dirPath = "";
+        /** 離開前記錄當時的頁碼 */
+        var temp_pageNow = -1;
+        /** 判斷是否有修改排序方式， SortType + OrderbyType */
+        var temp_fileSortType = "";
+        /** 判斷是否有捲動 */
+        var temp_hasScrolled = false;
+        /** 離開前記錄bulkViewContent的寬度 */
+        var temp_scrollWidth = 0;
+        /** 離開前記錄bulkViewContent的高度 */
+        var temp_scrollHeight = 0;
 
         this.visible = visible;
         this.pageNext = pageNext;
         this.pagePrev = pagePrev;
         this.load = load;
+        this.load2 = load2;
         this.setColumns = setColumns;
+        this.saveCurrentState = saveCurrentState;
         /** 取得焦點 */
         this.setFocus = () => {
             dom_bulkViewContent.tabIndex = 0;
@@ -61,13 +80,21 @@ class BulkView {
 
         function initEvent() {
 
+            initGroupRadio(dom_columns); //初始化群組按鈕
+
             new ResizeObserver(() => { //區塊改變大小時
                 requestAnimationFrame(() => {
                     updateColumns();
                 })
             }).observe(dom_bulkView);
 
-            initGroupRadio(dom_columns); //初始化群組按鈕
+            //判斷是否有捲動
+            dom_bulkView.addEventListener("wheel", () => {
+                temp_hasScrolled = true;
+            });
+            dom_bulkView.addEventListener("touchmove", () => {
+                temp_hasScrolled = true;
+            });
 
             (dom_bulkView.querySelectorAll(".bulkView-pagination-prev") as NodeListOf<HTMLDivElement>).forEach(dom => {
                 dom.addEventListener("click", () => {
@@ -92,8 +119,8 @@ class BulkView {
                 dom_columns,
                 dom_gaplessMode,
                 dom_fixedWidth,
-                dom_alignmentDirection,
-                dom_firstImageIndentation,
+                dom_align,
+                dom_indentation,
                 dom_number,
                 dom_fileName,
                 dom_imageSize,
@@ -106,9 +133,9 @@ class BulkView {
             arDomCheckbox.forEach((dom) => {
                 dom.addEventListener("input", (e) => {
                     apply();
-                    if (dom === dom_firstImageIndentation) {
+                    if (dom === dom_indentation) {
                         let columns = Number.parseInt(getGroupRadioVal(dom_columns));
-                        let firstImageIndentation = dom_firstImageIndentation.value;
+                        let indentation = dom_indentation.value;
                         if (columns === 2) {
                             load(pageNow);
                         }
@@ -122,8 +149,8 @@ class BulkView {
                 apply();
 
                 let columns = Number.parseInt(getGroupRadioVal(dom_columns));
-                let firstImageIndentation = dom_firstImageIndentation.value;
-                if (firstImageIndentation === "on") { //在開啟首圖進縮的情況下
+                let indentation = dom_indentation.value;
+                if (indentation === "on") { //在開啟首圖進縮的情況下
                     if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
                         load(pageNow);
                     }
@@ -142,8 +169,8 @@ class BulkView {
             setGroupRadioVal(dom_columns, M.config.settings.bulkView.columns.toString());
             dom_gaplessMode.value = M.config.settings.bulkView.gaplessMode;
             dom_fixedWidth.value = M.config.settings.bulkView.fixedWidth;
-            dom_alignmentDirection.value = M.config.settings.bulkView.alignmentDirection;
-            dom_firstImageIndentation.value = M.config.settings.bulkView.firstImageIndentation;
+            dom_align.value = M.config.settings.bulkView.align;
+            dom_indentation.value = M.config.settings.bulkView.indentation;
 
             dom_number.checked = M.config.settings.bulkView.show.number;
             dom_fileName.checked = M.config.settings.bulkView.show.fileName
@@ -163,11 +190,11 @@ class BulkView {
             let columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(dom_columns));
             let gaplessMode = M.config.settings.bulkView.gaplessMode = dom_gaplessMode.value;
             let fixedWidth = M.config.settings.bulkView.fixedWidth = dom_fixedWidth.value;
-            let alignmentDirection = M.config.settings.bulkView.alignmentDirection = dom_alignmentDirection.value;
-            let firstImageIndentation = M.config.settings.bulkView.firstImageIndentation = dom_firstImageIndentation.value;
+            let align = M.config.settings.bulkView.align = dom_align.value;
+            let indentation = M.config.settings.bulkView.indentation = dom_indentation.value;
 
             dom_bulkViewContent.setAttribute("columns", columns.toString());
-            dom_bulkViewContent.setAttribute("alignmentDirection", alignmentDirection);
+            dom_bulkViewContent.setAttribute("align", align);
             if (columns === 1 || columns === 2) {
                 dom_bulkViewContent.setAttribute("fixedWidth", fixedWidth);
             } else {
@@ -204,14 +231,14 @@ class BulkView {
                 dom_box_fixedWidth.style.display = "none";
             }
             if (columns === 1) { //排列方向
-                dom_alignmentDirection.style.display = "none";
+                dom_align.style.display = "none";
             } else {
-                dom_alignmentDirection.style.display = "block";
+                dom_align.style.display = "block";
             }
             if (columns === 2) { //第一張圖縮排
-                dom_box_firstImageIndentation.style.display = "block";
+                dom_box_indentation.style.display = "block";
             } else {
-                dom_box_firstImageIndentation.style.display = "none";
+                dom_box_indentation.style.display = "none";
             }
 
         }
@@ -229,8 +256,8 @@ class BulkView {
         function getFixedWidth() {
             return M.config.settings.bulkView.fixedWidth;
         }
-        function getFirstImageIndentation() {
-            return M.config.settings.bulkView.firstImageIndentation;
+        function getIndentation() {
+            return M.config.settings.bulkView.indentation;
         }
 
 
@@ -277,6 +304,7 @@ class BulkView {
                 item.style.marginBottom = itemMargin + "px";
 
                 let itmecenter = item.querySelector(".bulkView-img") as HTMLElement;
+                item.style.minHeight = size / 2 + "px";
                 if (getColumns() <= 2) {
                     itmecenter.style.maxHeight = "";
                 } else if (getColumns() === 3) {
@@ -300,9 +328,104 @@ class BulkView {
             }
         }
 
+        /**
+         * 記錄當前狀態(結束大量瀏覽模式前呼叫)
+         */
+        function saveCurrentState() {
+            temp_scrollTop = dom_bulkView.scrollTop; //記錄離開時捲動到哪個位置
+            temp_scrollWidth = dom_bulkViewContent.scrollWidth;
+            temp_scrollHeight = dom_bulkViewContent.scrollHeight;
+        }
+
 
         /**
-         * 
+         * 載入列表，並恢復到上次捲動的位置
+         */
+        async function load2() {
+
+            //設定返回按鈕
+            M.toolbarBack.visible(true);
+            M.toolbarBack.setEvent(() => {
+                M?.script.bulkView.close();
+            });
+
+            temp_hasScrolled = false;
+
+            //比較兩個 string[] 是否一樣
+            function arraysEqual(a: string[], b: string[]) {
+                if (a === b) return true;
+                if (a == null || b == null) return false;
+                if (a.length !== b.length) return false;
+
+                for (var i = 0; i < a.length; ++i) {
+                    if (a[i] !== b[i]) return false;
+                }
+                return true;
+            }
+
+            //套用上次的高度
+            function setLastHeight() {
+                //如果寬度變化小於100，則暫時使用上次的高度，避免圖片載入完成前導致移位
+                if (Math.abs(dom_bulkViewContent.scrollWidth - temp_scrollWidth) < 100) {
+                    dom_bulkViewContent.style.minHeight = temp_scrollHeight + "px";
+                    setTimeout(() => {
+                        dom_bulkViewContent.style.minHeight = "";
+                    }, 800);
+                }
+            }
+
+            //返回上次捲動的位置
+            function scrollToLastPosition() {
+                dom_bulkView.scrollTop = temp_scrollTop;
+
+                for (let i = 1; i <= 8; i++) {
+                    setTimeout(() => {
+                        if (temp_hasScrolled === false && temp_pageNow === pageNow) {
+                            dom_bulkView.scrollTop = temp_scrollTop;
+                        }
+                    }, 100 * i);
+                }
+            }
+
+            arFile = Array.from(M.fileLoad.getWaitingFile());
+
+            if (temp_dirPath === M.fileLoad.getDirPath() && arraysEqual(arFile, temp_arFile)) { //完全一樣
+
+                setLastHeight(); //套用上次的高度
+                scrollToLastPosition(); //返回上次捲動的位置
+
+            } else if (temp_dirPath === M.fileLoad.getDirPath()) {
+
+                let fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
+                if (temp_fileSortType === fileSortType) { //資料夾一樣，排序一樣 (名單不一樣)
+
+                    setLastHeight(); //套用上次的高度
+                    scrollToLastPosition(); //返回上次捲動的位置
+                    await load(pageNow);
+
+                } else { //資料夾一樣，排序不一樣
+
+                    dom_bulkView.scrollTop = 0; //捲動到最上面
+                    await load();
+
+                }
+
+            } else { //完全不一樣
+
+                dom_bulkView.scrollTop = 0; //捲動到最上面
+                await load();
+
+            }
+
+            temp_arFile = arFile;
+            temp_dirPath = M.fileLoad.getDirPath();
+            temp_fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
+            temp_pageNow = pageNow;
+        }
+
+
+        /**
+         * 載入列表
          * @param page 
          */
         async function load(page = 0) {
@@ -310,7 +433,7 @@ class BulkView {
             arFile = Array.from(M.fileLoad.getWaitingFile());
             if (arFile === undefined) { return; }
 
-            if (getFirstImageIndentation() === "on" && getColumns() === 2) {
+            if (getIndentation() === "on" && getColumns() === 2) {
                 if (baseWindow.appInfo !== undefined) {
                     let path = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"])
                     arFile.unshift(path);
@@ -319,6 +442,7 @@ class BulkView {
 
             showPage(page);
         }
+
 
         //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
         var _showPage = async () => { };
@@ -372,7 +496,6 @@ class BulkView {
         }
 
 
-
         /**
          * 更新分頁器
          */
@@ -388,6 +511,10 @@ class BulkView {
                     let start = i * imgMaxCount + 1;
                     let end = (i + 1) * imgMaxCount;
                     if (end >= arFile.length) { end = arFile.length; }
+                    if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                        start -= 1;
+                        end -= 1;
+                    }
                     html += `<option value="${n}">${n}　(${start}~${end})</option>`;
                 }
                 dom.innerHTML = html;
@@ -437,13 +564,13 @@ class BulkView {
 
             let div = newDom(/*html*/`
                 <div class="bulkView-item">
-                    <div class="bulkView-center">
-                        <img class="bulkView-img" src="./img/loading.svg" style="max-width:100px;">
+                    <div class="bulkView-center bulkView-loading">
+                        <img class="bulkView-img">
                     </div>
                 </div>
             `)
-            dom_bulkViewContent.appendChild(div);
             updateSize(div);
+            dom_bulkViewContent.appendChild(div);
 
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
@@ -522,6 +649,9 @@ class BulkView {
             //---------
 
             n = n + 1 + (pageNow - 1) * imgMaxCount;
+            if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                n -= 1;
+            }
 
             let fileName = Lib.GetFileName(fileInfo2.Path);
             let LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
@@ -544,6 +674,21 @@ class BulkView {
                     <img class="bulkView-img">
                 </div>
             `
+            updateSize(div);
+
+            //點擊圖片後，退出大量瀏覽模式
+            div.addEventListener("click", async () => {
+                if (n !== 0) {
+                    M.script.bulkView.close();
+                    await M.fileLoad.showFile(n - 1);
+
+                    //設定返回按鈕
+                    M.toolbarBack.visible(true);
+                    M.toolbarBack.setEvent(() => {
+                        M.script.bulkView.show();
+                    });
+                }
+            });
 
             let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
             let dom_center = div.querySelector(".bulkView-center") as HTMLDivElement;
@@ -561,8 +706,11 @@ class BulkView {
 
                     let ret = arUrl[0];
                     let boxWidth = dom_center.offsetWidth;
+                    if (boxWidth <= 0) {
+                        return;
+                    }
 
-                    //如果石蘭1欄或2欄且有鎖定寬度
+                    //如果是1欄或2欄且有鎖定寬度
                     if (getFixedWidth() !== "off") {
                         let columns = getColumns();
                         if (columns === 1 || columns === 2) {
@@ -585,7 +733,7 @@ class BulkView {
                 })
             }).observe(div);
 
-            updateSize(div);
+
         }
 
 
@@ -616,6 +764,7 @@ class BulkView {
                 showPage();
             }
         }
+
 
         /** 初始化群組按鈕 */
         function initGroupRadio(dom: HTMLElement) {

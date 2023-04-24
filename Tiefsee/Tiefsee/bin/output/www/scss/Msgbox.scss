@@ -82,7 +82,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-white);
-  background-color: var(--color-white10);
+  background-color: var(--color-white20);
   border: none;
   height: 35px;
   border-radius: 5px;
@@ -106,7 +106,7 @@
 }
 
 .msgbox-close:hover {
-  background-color: var(--color-white30);
+  background-color: var(--color-white10);
   cursor: pointer;
 }
 

@@ -310,8 +310,8 @@ class FileLoad {
                 if (dirParentPath === null) {
                     dirParentPath = _dirPath;
                 }
-                M.dirSort.getDirSortType(dirParentPath);//取得該資料夾設定的檔案排序方式
-                M.dirSort.setDirSortMenu();//更新menu選單
+                M.dirSort.readSortType(dirParentPath);//取得該資料夾設定的檔案排序方式
+                M.dirSort.updateMenu();//更新menu選單
                 await M.dirSort.sort();
 
                 await updateFlagDir(_dirPath);//重新計算 flagDir
@@ -393,8 +393,8 @@ class FileLoad {
             atLoadingGroupType = fileToGroupType(fileInfo2);
             atLoadingExt = Lib.GetExtension(path);
 
-            M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
-            M.fileSort.setFileSortMenu();//更新menu選單
+            M.fileSort.readSortType(dirPath);//取得該資料夾設定的檔案排序方式
+            M.fileSort.updateMenu();//更新menu選單
             arFile = await M.fileSort.sort(arFile);
 
             //目前檔案位置
@@ -442,8 +442,8 @@ class FileLoad {
                 dirPath = path;
                 arFile = await WebAPI.Directory.getFiles(path, "*.*");//取得資料夾內所有檔案
 
-                M.fileSort.getFileSortType(path);//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu();//更新menu選單
+                M.fileSort.readSortType(path);//取得該資料夾設定的檔案排序方式
+                M.fileSort.updateMenu();//更新menu選單
                 arFile = await M.fileSort.sort(arFile);
 
                 if (_dirGroupType === undefined) {
@@ -486,8 +486,8 @@ class FileLoad {
                     arFile.splice(0, 0, path);
                 }
 
-                M.fileSort.getFileSortType(dirPath);//取得該資料夾設定的檔案排序方式
-                M.fileSort.setFileSortMenu();//更新menu選單
+                M.fileSort.readSortType(dirPath);//取得該資料夾設定的檔案排序方式
+                M.fileSort.updateMenu();//更新menu選單
                 arFile = await M.fileSort.sort(arFile);
             }
 
@@ -553,6 +553,9 @@ class FileLoad {
          * @param _flag 
          */
         async function showFile(_flag?: number) {
+            
+            M.toolbarBack.visible(false); //隱藏返回按鈕
+
             if (isLoadFileFinish === false) {
                 console.log("loadFile處理中");
                 return;

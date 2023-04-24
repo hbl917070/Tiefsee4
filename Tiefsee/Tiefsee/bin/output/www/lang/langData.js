@@ -517,7 +517,7 @@ var langData = {
                 "ja": "ファイルパネル",
             },
             displayPanel: {
-                "zh-TW": "顯示 檔案預覽面板",
+                "zh-TW": "顯示檔案預覽面板",
                 "en": "Display file panel",
                 "ja": "ファイルパネルを表示する",
             },
@@ -541,7 +541,7 @@ var langData = {
                 "ja": "ディレクトリパネル",
             },
             displayPanel: {
-                "zh-TW": "顯示 資料夾預覽面板",
+                "zh-TW": "顯示資料夾預覽面板",
                 "en": "Display directory panel",
                 "ja": "ディレクトリパネルを表示する",
             },
@@ -570,7 +570,7 @@ var langData = {
                 "ja": "情報パネル",
             },
             displayPanel: {
-                "zh-TW": "顯示 詳細資料面板",
+                "zh-TW": "顯示詳細資料面板",
                 "en": "Display information panel",
                 "ja": "情報パネルを表示する",
             },
@@ -583,6 +583,35 @@ var langData = {
                 "zh-TW": "寬度足夠時，橫向排列",
                 "en": "Horizontal arrangement when width enough",
                 "ja": "横幅配置、幅の十分なとき",
+            },
+        },
+
+        // 工具列
+        mainToolbar: {
+            title: {
+                "zh-TW": "工具列",
+                "en": "Toolbar",
+                "ja": "ツールバー",
+            },
+            displayPanel: {
+                "zh-TW": "顯示工具列",
+                "en": "Display toolbar",
+                "ja": "ツールバーを表示する",
+            },
+            toolbarAlignment: {
+                "zh-TW": "工具列對齊",
+                "en": "Toolbar alignment",
+                "ja": "ツールバーの配置",
+            },
+            left: {
+                "zh-TW": "靠左",
+                "en": "Left",
+                "ja": "左",
+            },
+            center: {
+                "zh-TW": "置中",
+                "en": "Center",
+                "ja": "中央",
             },
         },
 
@@ -627,19 +656,24 @@ var langData = {
                 "ja": "表示とソート",
             },
             imageToolbar: {
-                "zh-TW": "圖片 工具列",
+                "zh-TW": "圖片工具列",
                 "en": "Image Toolbar",
                 "ja": "画像ツールバー",
             },
             officeToolbar: {
-                "zh-TW": "Office文件 工具列",
+                "zh-TW": "Office文件工具列",
                 "en": "Office Document Toolbar",
                 "ja": "Office文書ツールバー",
             },
             textToolbar: {
-                "zh-TW": "文字 工具列",
+                "zh-TW": "文字工具列",
                 "en": "Text Toolbar",
                 "ja": "テキストツールバー",
+            },
+            bulkViewToolbar: {
+                "zh-TW": "大量瀏覽模式工具列",
+                "en": " Bulk View Toolbar",
+                "ja": "バルクビューツールバー",
             },
             adjustOrderByDragging: {
                 "zh-TW": "(可拖曳調整順序)",
@@ -947,7 +981,11 @@ var langData = {
             "en": "Layout",
             "ja": "レイアウト",
         },
-
+        back: {
+            "zh-TW": "返回",
+            "en": "Back",
+            "ja": "戻る",
+        },
 
         prevFile: {
             "zh-TW": "上一個檔案",
@@ -1059,11 +1097,6 @@ var langData = {
             "zh-TW": "儲存檔案",
             "en": "Save",
             "ja": "アーカイブ",
-        },
-        closeBulkView: {
-            "zh-TW": "返回",
-            "en": "Back",
-            "ja": "戻る",
         },
         showBulkViewSetting: {
             "zh-TW": "大量瀏覽模式設定",
@@ -1325,12 +1358,12 @@ var langData = {
             "en": "Fixed Width",
             "ja": "固定幅",
         },
-        alignmentDirection: {
+        align: {
             "zh-TW": "排列方向",
             "en": "Alignment Direction",
             "ja": "配置方向",
         },
-        firstImageIndentation: {
+        indentation: {
             "zh-TW": "第一張圖縮排",
             "en": "First Image Indentation",
             "ja": "最初の画像のインデント",

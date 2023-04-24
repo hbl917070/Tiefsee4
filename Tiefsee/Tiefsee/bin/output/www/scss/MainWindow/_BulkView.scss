@@ -41,7 +41,7 @@
   display: block;
 }
 //排列方向
-.bulkView-content[alignmentDirection="right"] {
+.bulkView-content[align="right"] {
   flex-direction: row-reverse;
 }
 
@@ -76,30 +76,22 @@
   }
 }
 //雙欄時，讓左右的圖片合併
-.bulkView-content[columns="2"][alignmentDirection="left"]:not(
-    [gaplessMode="off"]
-  )
+.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"])
   .bulkView-item:nth-child(odd)
   .bulkView-center {
   justify-content: end;
 }
-.bulkView-content[columns="2"][alignmentDirection="left"]:not(
-    [gaplessMode="off"]
-  )
+.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"])
   .bulkView-item:nth-child(even)
   .bulkView-center {
   justify-content: start;
 }
-.bulkView-content[columns="2"][alignmentDirection="right"]:not(
-    [gaplessMode="off"]
-  )
+.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"])
   .bulkView-item:nth-child(odd)
   .bulkView-center {
   justify-content: start;
 }
-.bulkView-content[columns="2"][alignmentDirection="right"]:not(
-    [gaplessMode="off"]
-  )
+.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"])
   .bulkView-item:nth-child(even)
   .bulkView-center {
   justify-content: end;
@@ -118,10 +110,8 @@
   padding-bottom: 5px;
   overflow: hidden;
   //border: 1px solid var(--color-white40);
-
   user-select: none;
 }
-
 .bulkView-item:hover {
   border: 1px solid var(--color-white10);
 }
@@ -164,7 +154,7 @@
   margin-bottom: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
-   white-space: nowrap;
+  white-space: nowrap;
   display: none;
 }
 
@@ -172,7 +162,14 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  /* border-top: 1px solid #FFF; */
+}
+
+.bulkView-loading {
+  background-image: url("./../../img/loading.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 100px;
+  min-height: 100px;
 }
 
 .bulkView-img {

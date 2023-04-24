@@ -72,20 +72,9 @@ class Menu {
             _domMenu.style.left = left + "px";
             _domMenu.style.top = top + "px";
             _domMenu.style.bottom = "0";
-
             _domBtn.classList.add(_css);
 
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
-                _domBtn.classList.remove(_css);
-
-                temp_closeList = temp_closeList.filter((item) => {
-                    return item !== func_close
-                });
-            }
-            temp_closeList.push(func_close);
-
-            domMenuBg.onmousedown = (sender) => {
+            let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
                 let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
@@ -93,6 +82,19 @@ class Menu {
                     func_close();//關閉menu
                 }
             }
+            domMenuBg.addEventListener("touchstart", onmousedown);
+            domMenuBg.addEventListener("mousedown", onmousedown);
+
+            let func_close = () => {//關閉menu
+                domMenuBg.setAttribute("active", "");//關閉menu
+                _domBtn.classList.remove(_css);
+                temp_closeList = temp_closeList.filter((item) => {
+                    return item !== func_close
+                });
+                domMenuBg.removeEventListener("touchstart", onmousedown);
+                domMenuBg.removeEventListener("mousedown", onmousedown);
+            }
+            temp_closeList.push(func_close);        
 
             //在非選單的區域捲動，就關閉選單
             domMenuBg.onwheel = (sender) => {
@@ -146,16 +148,7 @@ class Menu {
             _domMenu.style.top = top + "px";
             _domMenu.style.bottom = "0";
 
-
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
-                temp_closeList = temp_closeList.filter((item) => {
-                    return item !== func_close
-                });
-            }
-            temp_closeList.push(func_close);
-
-            domMenuBg.onmousedown = (sender) => {
+            let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
                 let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
@@ -163,6 +156,18 @@ class Menu {
                     func_close();//關閉menu
                 }
             }
+            domMenuBg.addEventListener("touchstart", onmousedown);
+            domMenuBg.addEventListener("mousedown", onmousedown);
+
+            let func_close = () => {//關閉menu
+                domMenuBg.setAttribute("active", "");//關閉menu
+                temp_closeList = temp_closeList.filter((item) => {
+                    return item !== func_close
+                });
+                domMenuBg.removeEventListener("touchstart", onmousedown);
+                domMenuBg.removeEventListener("mousedown", onmousedown);
+            }
+            temp_closeList.push(func_close);
 
             //在非選單的區域捲動，就關閉選單
             domMenuBg.onwheel = (sender) => {
@@ -213,15 +218,7 @@ class Menu {
             _domMenu.style.top = top + "px";
             _domMenu.style.bottom = "0";
 
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
-                temp_closeList = temp_closeList.filter((item) => {
-                    return item !== func_close
-                });
-            }
-            temp_closeList.push(func_close);
-
-            domMenuBg.onmousedown = (sender) => {
+            let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
                 let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
                 if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
@@ -229,7 +226,19 @@ class Menu {
                     func_close();//關閉menu
                 }
             }
+            domMenuBg.addEventListener("touchstart", onmousedown);
+            domMenuBg.addEventListener("mousedown", onmousedown);
 
+            let func_close = () => {//關閉menu
+                domMenuBg.setAttribute("active", "");//關閉menu
+                temp_closeList = temp_closeList.filter((item) => {
+                    return item !== func_close
+                });
+                domMenuBg.removeEventListener("touchstart", onmousedown);
+                domMenuBg.removeEventListener("mousedown", onmousedown);
+            }
+            temp_closeList.push(func_close);
+    
             //在非選單的區域捲動，就關閉選單
             domMenuBg.onwheel = (sender) => {
                 if (sender.target == domMenuBg) {

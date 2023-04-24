@@ -111,7 +111,13 @@
 
                 <div class="main-T">
                     <!-- 工具列 -->
-                    <div id="main-toolbar" class="main-toolbar"> </div>
+                    <div id="main-toolbar" class="main-toolbar" toolbarAlign="center"> 
+
+                       <!-- 共通的 返回按鈕 -->
+                        <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back" title="" i18n="menu.back">
+                            <%- await readFile("./img/default/tool-back.svg"); %>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="main-C">

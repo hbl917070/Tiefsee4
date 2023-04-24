@@ -423,10 +423,32 @@
                     <div class="page-title" i18n="sw.tabs.layout"> 版面 </div>
 
                     <div class="box">
+                        <div class="box-title" i18n="sw.mainToolbar.title"> 工具列 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title" i18n="sw.mainToolbar.displayPanel"> 顯示工具列 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mainToolbarEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.mainToolbar.toolbarAlignment"> 工具列對齊 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-mainToolbarAlign">
+                                <option value="left" i18n="sw.mainToolbar.left">靠左</option>
+                                <option value="center" i18n="sw.mainToolbar.center">置中</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
                         <div class="box-title" i18n="sw.filePanel.title"> 檔案預覽面板 </div>
                         <div class="text-title"> </div>
 
-                        <div class="text-title" i18n="sw.filePanel.displayPanel"> 啟用 檔案預覽面板</div>
+                        <div class="text-title" i18n="sw.filePanel.displayPanel"> 顯示檔案預覽面板</div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-fileListEnabled">
@@ -456,7 +478,7 @@
                         <div class="box-title" i18n="sw.directoryPanel.title"> 資料夾預覽視窗 </div>
                         <div class="text-title"> </div>
 
-                        <div class="text-title" i18n="sw.directoryPanel.displayPanel"> 啟用 資料夾預覽視窗</div>
+                        <div class="text-title" i18n="sw.directoryPanel.displayPanel"> 顯示資料夾預覽視窗</div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-dirListEnabled">
@@ -497,7 +519,7 @@
                         <div class="box-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
                         <div class="text-title"> </div>
 
-                        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 啟用 詳細資料面板</div>
+                        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板</div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-mainExifEnabled">
@@ -563,9 +585,10 @@
                         <div class="text-content">
                             <select class="text-input" id="select-toolbarListType">
                                 <!-- <option value="welcome"></option> -->
-                                <option value="img" i18n="sw.customToolbar.imageToolbar">圖片 工具列</option>
-                                <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office文件 工具列</option>
-                                <option value="txt" i18n="sw.customToolbar.textToolbar">文字 工具列</option>
+                                <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
+                                <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office文件工具列</option>
+                                <option value="txt" i18n="sw.customToolbar.textToolbar">文字工具列</option>
+                                <option value="bulkView" i18n="sw.customToolbar.bulkViewToolbar">大量瀏覽模式工具列</option>
                             </select>
                         </div>
 
@@ -573,6 +596,7 @@
                         <div class="toolbarList" id="toolbarList-img"> </div>
                         <div class="toolbarList" id="toolbarList-pdf"> </div>
                         <div class="toolbarList" id="toolbarList-txt"> </div>
+                        <div class="toolbarList" id="toolbarList-bulkView"> </div>
                     </div>
                 </div>
 

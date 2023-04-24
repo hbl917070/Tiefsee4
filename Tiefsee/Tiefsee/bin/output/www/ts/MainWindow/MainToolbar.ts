@@ -810,7 +810,7 @@ class MainToolbar {
         function initBulkView() {
 
             //結束 大量瀏覽模式
-            ar.push({
+            /*ar.push({
                 type: "button", html: "",
                 i18n: "menu.closeBulkView",
                 group: GroupType.bulkView,
@@ -836,7 +836,7 @@ class MainToolbar {
                     //domHr.style.marginRight = "6px";
                     //domHr.style.height = "20px";
                 }
-            })
+            })*/
 
             // 開啟檔案
             ar.push({
@@ -982,8 +982,7 @@ class MainToolbar {
                 name: "showBulkViewSetting",
                 icon: "tool-setting2.svg",
                 func: (btn) => {
-                    btn.style.marginLeft = "auto"; //靠右對齊
-                    btn.style.order = "1000";
+                    btn.style.order = "2001"; //靠右對齊
 
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuBulkView(btn);

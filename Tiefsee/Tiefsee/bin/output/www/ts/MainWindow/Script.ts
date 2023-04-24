@@ -620,6 +620,7 @@ class ScriptBulkView {
     /** 結束 大量瀏覽模式 */
     public close() {
         if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        this.M.bulkView.saveCurrentState();
         this.M.fileLoad.enableBulkView(false);
         this.M.fileLoad.showFile();
     }

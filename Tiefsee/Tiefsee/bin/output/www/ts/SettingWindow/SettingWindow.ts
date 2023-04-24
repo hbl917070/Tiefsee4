@@ -177,10 +177,10 @@ class Setting {
 
             var mainToolbarArray = mainToolbar.getArrray();
 
-            const arGroupName = ["img", "pdf", "txt"];
+            const arGroupName = ["img", "pdf", "txt", "bulkView"];
             arGroupName.map((gn) => {
 
-                let groupName = gn as ("img" | "pdf" | "txt");
+                let groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
                 var dom_toolbarList = document.querySelector(`#toolbarList-${groupName}`) as HTMLElement;
 
                 //產生html
@@ -266,6 +266,7 @@ class Setting {
                     img: getItem("img"),
                     pdf: getItem("pdf"),
                     txt: getItem("txt"),
+                    bulkView: getItem("bulkView"),
                 };
                 return data
             }
@@ -277,22 +278,32 @@ class Setting {
             var dom_toolbarList_img = document.querySelector("#toolbarList-img") as HTMLElement;
             var dom_toolbarList_pdf = document.querySelector("#toolbarList-pdf") as HTMLElement;
             var dom_toolbarList_txt = document.querySelector("#toolbarList-txt") as HTMLElement;
+            var dom_toolbarList_bulkView = document.querySelector("#toolbarList-bulkView") as HTMLElement;
             let eventChange = () => {
                 let val = select_toolbarListType.value;
                 if (val == "img") {
                     dom_toolbarList_img.style.display = "block";
                     dom_toolbarList_pdf.style.display = "none";
                     dom_toolbarList_txt.style.display = "none";
+                    dom_toolbarList_bulkView.style.display = "none";
                 }
                 if (val == "pdf") {
                     dom_toolbarList_img.style.display = "none";
                     dom_toolbarList_pdf.style.display = "block";
                     dom_toolbarList_txt.style.display = "none";
+                    dom_toolbarList_bulkView.style.display = "none";
                 }
                 if (val == "txt") {
                     dom_toolbarList_img.style.display = "none";
                     dom_toolbarList_pdf.style.display = "none";
                     dom_toolbarList_txt.style.display = "block";
+                    dom_toolbarList_bulkView.style.display = "none";
+                }
+                if (val == "bulkView") {
+                    dom_toolbarList_img.style.display = "none";
+                    dom_toolbarList_pdf.style.display = "none";
+                    dom_toolbarList_txt.style.display = "none";
+                    dom_toolbarList_bulkView.style.display = "block";
                 }
             }
             select_toolbarListType.onchange = eventChange;
@@ -608,10 +619,8 @@ class Setting {
         // 視窗效果 (aero毛玻璃)
         addLoadEvent(() => {
 
-
             var switch_areo = document.querySelector("#select-aeroType") as HTMLSelectElement;
             switch_areo.value = config.settings["theme"]["aeroType"];
-
 
             switch_areo.addEventListener("change", () => {
                 let val = switch_areo.value;
@@ -626,6 +635,27 @@ class Setting {
             });
             btn_restart.addEventListener("click", () => {
                 restartTiefsee();
+            });
+        })
+
+        //工具列
+        addLoadEvent(() => {
+            var switch_mainToolbarEnabled = document.querySelector("#switch-mainToolbarEnabled") as HTMLInputElement;
+            var select_mainToolbarAlign = document.querySelector("#select-mainToolbarAlign") as HTMLInputElement;
+
+            switch_mainToolbarEnabled.checked = config.settings["layout"]["mainToolbarEnabled"]; //顯示工具列
+            select_mainToolbarAlign.value = config.settings["layout"]["mainToolbarAlign"]; //工具列對齊
+
+            switch_mainToolbarEnabled.addEventListener("change", () => { //顯示工具列
+                let val = switch_mainToolbarEnabled.checked;
+                config.settings["layout"]["mainToolbarEnabled"] = val;
+                appleSettingOfMain();
+            });
+
+            select_mainToolbarAlign.addEventListener("change", () => { //工具列對齊
+                let val = select_mainToolbarAlign.value;
+                config.settings["layout"]["mainToolbarAlign"] = val;
+                appleSettingOfMain();
             });
         })
 

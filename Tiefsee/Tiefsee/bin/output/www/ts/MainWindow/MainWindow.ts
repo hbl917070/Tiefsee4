@@ -30,6 +30,7 @@ class MainWindow {
     public script;
     public msgbox;
     public bulkView;
+    public toolbarBack;
     public updateDomVisibility;
 
     public applySetting;
@@ -75,6 +76,7 @@ class MainWindow {
         i18n.pushData(langData);
         var msgbox = this.msgbox = new Msgbox(i18n);
         var bulkView = this.bulkView = new BulkView(this);
+        var toolbarBack = this.toolbarBack = new ToolbarBack();
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
@@ -351,7 +353,7 @@ class MainWindow {
                     }
 
                 } else if (text.indexOf("data:image/") === 0) { //base64
-                    console.log(4)
+
                     e.preventDefault();
 
                     let base64 = text;
@@ -821,6 +823,7 @@ class MainWindow {
             //-----------
 
             mainToolbar.setEnabled(config.settings.layout.mainToolbarEnabled); //工具列
+            dom_toolbar.setAttribute("toolbarAlign", config.settings.layout.mainToolbarAlign); //工具列對齊
 
             mainFileList.setEnabled(config.settings.layout.fileListEnabled); //檔案預覽視窗
             mainFileList.setShowNo(config.settings.layout.fileListShowNo);
@@ -841,20 +844,21 @@ class MainWindow {
             //-----------
 
             //工具列順序與是否顯示
-            const arGroupName = ["img", "pdf", "txt"];
+            const arGroupName = ["img", "pdf", "txt", "bulkView"];
             arGroupName.map((gn) => {
-                let groupName = gn as ("img" | "pdf" | "txt");
+                let groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
 
                 let dom_group = dom_toolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
                 let arMainToolbar = config.settings.mainToolbar[groupName];
                 for (let i = 0; i < arMainToolbar.length; i++) {
                     const item = arMainToolbar[i];
                     let dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
-                    if (dom_btn == null) { continue; }
+                    if (dom_btn === null) { continue; }
+                    if (dom_btn.getAttribute("data-name") == "showBulkViewSetting") { continue; } //大量瀏覽模式設定
+
                     dom_btn.style.order = i + ""; //排序
                     dom_btn.style.display = (item.v) ? "" : "none"; //顯示或隱藏
                 }
-
             })
 
             //-----------
@@ -917,6 +921,67 @@ class MainWindow {
             await WV_File.SetText(path, s);
         }
 
+
+    }
+}
+
+
+/**
+ * 頁面的返回按鈕
+ */
+class ToolbarBack {
+
+    public visible;
+    public getVisible;
+    public setEvent;
+    public runEvent;
+
+    constructor() {
+
+        var btn = document.querySelector("#toolbar-back") as HTMLElement;
+        var clickEvent: () => void = () => { }
+        var active = false;
+
+        this.visible = visible;
+        this.getVisible = getVisible;
+        this.setEvent = setEvent;
+        this.runEvent = runEvent;
+        
+        btn.addEventListener("click", () => {
+            clickEvent();
+        })
+
+        /** 
+         * 設定顯示或隱藏dom
+         */
+        function visible(val: boolean) {
+            if (val === true) {
+                btn.setAttribute("active", "true");
+                active = true;
+            } else {
+                btn.setAttribute("active", "");
+                active = false;
+            }
+        }
+
+        function getVisible() {
+            return active;
+        }
+
+        /**
+         * 設定新的click事件
+         * @param func 
+         */
+        function setEvent(func: () => void) {
+            clickEvent = func;
+        }
+
+        /**
+         * 執行click事件
+         */
+        function runEvent() {
+            clickEvent();
+        }
 
     }
 }

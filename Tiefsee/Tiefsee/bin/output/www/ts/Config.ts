@@ -158,15 +158,21 @@ class Config {
             dirListShowWidth: 200, //寬度
             dirListImgNumber: 3, //圖片數量
 
-            mainToolbarEnabled: true, //啟用 工具列
+
 
             mainExifEnabled: false, //啟用 詳細資料視窗
             mainExifShowWidth: 150, //寬度
             mainExifMaxLine: 20, //顯示的最大行數
             mainExifHorizontal: true, //寬度足夠時，橫向排列
 
-            /** 大型切換按鈕 leftRight / bottom / none  */
+            /** 啟用 工具列 */
+            mainToolbarEnabled: true,
+            /** 工具列對齊。 left / center */
+            mainToolbarAlign: "left",
+
+            /** 大型切換按鈕。 leftRight / bottom / none  */
             largeBtn: "bottom",
+
         },
 
         /** 記錄程式上次關閉時的位置 */
@@ -218,6 +224,17 @@ class Config {
                 { "n": "dragDropFile", "v": true },
                 { "n": "showDeleteMsg", "v": true },
                 { "n": "showSetting", "v": true }
+            ], 
+            bulkView: [
+                { "n": "showMenuFile", "v": true },
+                { "n": "prevDir", "v": true },
+                { "n": "nextDir", "v": true },
+                { "n": "showMenuSort", "v": true },
+                { "n": "showMenuCopy", "v": true },
+                { "n": "dragDropFile", "v": true },
+                { "n": "showDeleteMsg", "v": true },
+                { "n": "showSetting", "v": true },
+                { "n": "showBulkViewSetting", "v": true },
             ]
         },
 
@@ -250,10 +267,10 @@ class Config {
             fixedWidth: "off",
 
             /** 排列方向 */
-            alignmentDirection: "left",
+            align: "left",
 
             /** 第一張圖縮排 */
-            firstImageIndentation: "off",
+            indentation: "off",
 
             /** 顯示資訊 */
             show: {

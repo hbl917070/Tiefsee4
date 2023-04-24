@@ -1,15 +1,17 @@
 /* #region main-toolbar 工具列 */
 
 .main-toolbar {
-  /* background-color: rgba(165, 42, 42, 0.411); */
   height: 35px;
   color: var(--color-white);
   overflow-x: hidden;
   overflow-y: hidden;
   margin-bottom: 3px;
+  display: flex;
 }
 
-/*捲動軸樣式*/
+//----------
+
+//捲動軸樣式
 .main-toolbar:hover {
   overflow-x: overlay;
 }
@@ -18,26 +20,30 @@
   height: 3px;
   /* border-radius: 5px; */
 }
-
 .main-toolbar::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0);
 }
-
 .main-toolbar::-webkit-scrollbar-thumb {
   background-color: var(--color-white40);
   /* border-radius: 5px; */
 }
 
+//----------
+
 .main-toolbar-group {
   display: none;
   margin-left: 3px;
   margin-bottom: 3px;
+  flex: 1;
 }
 .main-toolbar-group[active="true"] {
   display: flex;
   align-items: center;
 }
-/*垂直線*/
+
+//----------
+
+//垂直線
 .main-toolbar-hr {
   width: 1px;
   min-width: 1px;
@@ -49,6 +55,8 @@
   margin: 0 3px;
 }
 
+//----------
+
 //純文字資訊
 .main-toolbar-txt {
   height: 35px;
@@ -58,7 +66,6 @@
   align-items: center;
   user-select: none;
   white-space: nowrap;
-
   padding-right: 5px;
   margin-left: 12px;
   position: relative;
@@ -76,7 +83,9 @@
   margin: auto;
 }
 
-/*按鈕*/
+//----------
+
+//按鈕
 .main-toolbar-btn {
   min-width: 35px;
   height: 35px;
@@ -88,7 +97,6 @@
   user-select: none;
   flex-shrink: 0; /*避免壓縮*/
 }
-
 .main-toolbar-btn:hover {
   cursor: pointer;
   background-color: var(--color-white10);
@@ -96,7 +104,6 @@
 .main-toolbar-btn:active {
   background-color: var(--color-white30);
 }
-
 .main-toolbar-btn svg,
 .main-toolbar-btn img {
   width: 25px;
@@ -104,9 +111,51 @@
   pointer-events: none;
 }
 
-/*開啟選單時*/
+//開啟選單時
 .main-toolbar-btn.menuActive {
   background-color: var(--color-white20) !important;
+}
+
+//----------
+
+//置中
+#main-toolbar[toolbarAlign="center"] .main-toolbar-group::before {
+  content: "";
+  margin-left: auto;
+  display: block;
+  order: -1;
+}
+.main-toolbar-group::after {
+  content: "";
+  margin-left: auto;
+  display: block;
+  order: 2000;
+}
+
+//----------
+
+// 返回按鈕
+.main-toolbar-back {
+  // min-width: 50px;
+  position: relative;
+  margin-right: 4px;
+  display: none;
+}
+.main-toolbar-back[active="true"] {
+  display: flex;
+}
+
+//返回按鈕-右邊的垂直線
+.main-toolbar-back::after {
+  position: absolute;
+  content: "";
+  background-color: var(--color-white20);
+  height: 29px;
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  right: -4px;
+  margin: auto;
 }
 
 /* #endregion */

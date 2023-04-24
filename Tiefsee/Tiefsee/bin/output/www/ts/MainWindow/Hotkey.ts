@@ -34,6 +34,15 @@ class Hotkey {
                 return;
             }
 
+            //如果可以返回上一頁
+            if (M.toolbarBack.getVisible()) {
+                if (e.code == "Escape") {
+                    M.toolbarBack.runEvent();
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             //如果有開啟大量瀏覽模式
             if (M.fileLoad.getIsBulkView()) {
                 

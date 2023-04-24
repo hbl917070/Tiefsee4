@@ -1,8 +1,8 @@
 class DirSort {
 
     //public getSortType;
-    public getDirSortType;
-    public setDirSortMenu;
+    public readSortType;
+    public updateMenu;
     public sort;
 
     constructor(M: MainWindow) {
@@ -22,9 +22,9 @@ class DirSort {
 
         //this.getSortType = () => { return sortType }
         //this.setSortType = (val: string) => { sortType = val; }
-        this.getDirSortType = getDirSortType;
+        this.readSortType = readSortType;
         //this.setDirSortType = setDirSortType;
-        this.setDirSortMenu = setDirSortMenu;
+        this.updateMenu = updateMenu;
         this.sort = sort;
 
         dom_dirSort_name.addEventListener("click", () => {
@@ -92,7 +92,7 @@ class DirSort {
             M.mainDirList.init();//設定 檔案預覽視窗 目前選中的項目
             M.mainDirList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 
-            setDirSortMenu();
+            updateMenu();
             //M.menu.close();//關閉menu
         }
 
@@ -101,7 +101,7 @@ class DirSort {
          * 更新menu選單
          * @param _sortType 
          */
-        function setDirSortMenu() {
+        function updateMenu() {
 
             dom_dirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
             dom_dirSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
@@ -193,7 +193,7 @@ class DirSort {
          * @param dirPath 
          * @returns 
          */
-        function getDirSortType(dirPath: string) {
+        function readSortType(dirPath: string) {
 
             let t = window.localStorage.getItem("sortDir");
 

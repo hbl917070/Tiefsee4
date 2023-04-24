@@ -1,8 +1,10 @@
 class FileSort {
 
-    public getFileSortType;
-    public setFileSortMenu;
+    public readSortType;
+    public updateMenu;
     public sort;
+    public getSortType;
+    public getOrderbyType;
 
     constructor(M: MainWindow) {
         var dom_fileSort_name = document.getElementById("menuitem-fileSort-name") as HTMLInputElement;
@@ -19,10 +21,11 @@ class FileSort {
         var sortType = FileSortType.name;//排序方式
         var orderbyType = FileOrderbyType.asc;
 
-        this.getFileSortType = getFileSortType;
-        this.setFileSortMenu = setFileSortMenu;
+        this.readSortType = readSortType;
+        this.updateMenu = updateMenu;
         this.sort = sort;
-
+        this.getSortType = () => { return sortType; }
+        this.getOrderbyType = () => { return orderbyType; }
 
         dom_fileSort_name.addEventListener("click", () => {
             sortType = FileSortType.name;
@@ -102,7 +105,7 @@ class FileSort {
             M.mainFileList.init();//檔案預覽視窗 初始化
             M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
 
-            setFileSortMenu();
+            updateMenu();
 
             if (M.fileLoad.getIsBulkView()) { //如果是在大量瀏覽模式，則重新載入名單
                 M.bulkView.load();
@@ -116,7 +119,7 @@ class FileSort {
          * 更新menu選單
          * @param _sortType 
          */
-        function setFileSortMenu() {
+        function updateMenu() {
 
             dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
             dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
@@ -194,7 +197,7 @@ class FileSort {
          * @param dirPath 
          * @returns 
          */
-        function getFileSortType(dirPath: string) {
+        function readSortType(dirPath: string) {
 
             let t = window.localStorage.getItem("sortFile");
 
