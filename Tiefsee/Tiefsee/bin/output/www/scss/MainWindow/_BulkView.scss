@@ -1,7 +1,7 @@
 .bulkView {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
   position: absolute;
   top: 0;
@@ -19,6 +19,8 @@
   /* padding: 10px; */
   /* padding-top:10px; */
   /* padding-left:10px; */
+  position: relative;
+  flex-shrink: 0;
 }
 
 /* #region 附加選項 */
@@ -43,6 +45,16 @@
 //排列方向
 .bulkView-content[align="right"] {
   flex-direction: row-reverse;
+}
+
+//瀑布流-垂直
+.bulkView-content[waterfall="vertical"]:not([columns="1"], [columns="2"]) .bulkView-item {
+  position: absolute;
+  left: -9999px;
+}
+// 瀑布流-水平，tag不允許換行
+.bulkView-content[waterfall="horizontal"] .bulkView-header2 {
+  flex-wrap: nowrap;
 }
 
 //鎖定寬度
@@ -100,7 +112,6 @@
 
 .bulkView-item {
   border: 1px solid rgba(0, 0, 0, 0);
-
   min-width: 10px;
   min-height: 10px;
   box-sizing: border-box;

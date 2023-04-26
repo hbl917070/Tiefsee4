@@ -158,8 +158,6 @@ class Config {
             dirListShowWidth: 200, //寬度
             dirListImgNumber: 3, //圖片數量
 
-
-
             mainExifEnabled: false, //啟用 詳細資料視窗
             mainExifShowWidth: 150, //寬度
             mainExifMaxLine: 20, //顯示的最大行數
@@ -224,7 +222,7 @@ class Config {
                 { "n": "dragDropFile", "v": true },
                 { "n": "showDeleteMsg", "v": true },
                 { "n": "showSetting", "v": true }
-            ], 
+            ],
             bulkView: [
                 { "n": "showMenuFile", "v": true },
                 { "n": "prevDir", "v": true },
@@ -256,41 +254,35 @@ class Config {
             /** 長按滑鼠中鍵觸發 */
             mouseMiddleRun: true,
         },
+        /** 大量瀏覽模式 */
         bulkView: {
-            /** 每行圖片數 */
-            columns: 3,
 
+            /** 每行圖片數 */
+            columns: 5,
+            /**  */
+            waterfall: "horizontal",
             /** 無間距模式 */
             gaplessMode: "off",
-
             /** 鎖定寬度 */
             fixedWidth: "off",
-
             /** 排列方向 */
             align: "left",
-
             /** 第一張圖縮排 */
             indentation: "off",
-
             /** 顯示資訊 */
             show: {
                 /** 顯示資訊-編號 */
                 number: true,
-
                 /** 顯示資訊-檔案名稱 */
                 fileName: true,
-
                 /** 顯示資訊-圖片尺寸 */
                 imageSize: true,
-
                 /** 顯示資訊-檔案大小 */
-                fileSize: true,
-
+                fileSize: false,
                 /** 顯示資訊-修改日期 */
                 lastWriteDate: true,
-
                 /** 顯示資訊-修改時間 */
-                lastWriteTime: true,
+                lastWriteTime: false,
             },
         },
 

@@ -1348,6 +1348,11 @@ var langData = {
             "en": "Images per Row",
             "ja": "行ごとの画像数",
         },
+        waterfall: {
+            "zh-TW": "瀑布流",
+            "en": "Waterfall layout",
+            "ja": "ウォーターフォールレイアウト",
+        },
         gaplessMode: {
             "zh-TW": "無間距模式",
             "en": "Gapless Mode",
@@ -1372,6 +1377,16 @@ var langData = {
             "zh-TW": "啟用",
             "en": "Enable",
             "ja": "有効にする",
+        },
+        vertical: {
+            "zh-TW": "垂直",
+            "en": "Vertical",
+            "ja": "垂直",
+        },
+        horizontal: {
+            "zh-TW": "水平",
+            "en": "Horizontal",
+            "ja": "水平",
         },
         disable: {
             "zh-TW": "關閉",

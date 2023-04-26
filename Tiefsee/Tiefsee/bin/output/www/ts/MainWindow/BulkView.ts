@@ -24,6 +24,7 @@ class BulkView {
         var dom_fixedWidth = dom_menu.querySelector(".js-fixedWidth") as HTMLSelectElement;
         var dom_align = dom_menu.querySelector(".js-align") as HTMLSelectElement;
         var dom_indentation = dom_menu.querySelector(".js-indentation") as HTMLSelectElement;
+        var dom_waterfall = dom_menu.querySelector(".js-waterfall") as HTMLSelectElement;
 
         var dom_number = dom_menu.querySelector(".js-number") as HTMLInputElement;
         var dom_fileName = dom_menu.querySelector(".js-fileName") as HTMLInputElement;
@@ -35,6 +36,7 @@ class BulkView {
         var dom_box_gaplessMode = dom_menu.querySelector(".js-box-gaplessMode") as HTMLDivElement;
         var dom_box_indentation = dom_menu.querySelector(".js-box-indentation") as HTMLDivElement;
         var dom_box_fixedWidth = dom_menu.querySelector(".js-box-fixedWidth") as HTMLDivElement;
+        var dom_box_waterfall = dom_menu.querySelector(".js-box-waterfall") as HTMLDivElement;
 
         /** 名單列表 */
         var arFile: string[] = [];
@@ -82,10 +84,8 @@ class BulkView {
 
             initGroupRadio(dom_columns); //初始化群組按鈕
 
-            new ResizeObserver(() => { //區塊改變大小時
-                requestAnimationFrame(() => {
-                    updateColumns();
-                })
+            new ResizeObserver(() => { //區塊改變大小時    
+                updateColumns();
             }).observe(dom_bulkView);
 
             //判斷是否有捲動
@@ -121,6 +121,8 @@ class BulkView {
                 dom_fixedWidth,
                 dom_align,
                 dom_indentation,
+                dom_waterfall,
+
                 dom_number,
                 dom_fileName,
                 dom_imageSize,
@@ -135,7 +137,6 @@ class BulkView {
                     apply();
                     if (dom === dom_indentation) {
                         let columns = Number.parseInt(getGroupRadioVal(dom_columns));
-                        let indentation = dom_indentation.value;
                         if (columns === 2) {
                             load(pageNow);
                         }
@@ -171,6 +172,7 @@ class BulkView {
             dom_fixedWidth.value = M.config.settings.bulkView.fixedWidth;
             dom_align.value = M.config.settings.bulkView.align;
             dom_indentation.value = M.config.settings.bulkView.indentation;
+            dom_waterfall.value = M.config.settings.bulkView.waterfall;
 
             dom_number.checked = M.config.settings.bulkView.show.number;
             dom_fileName.checked = M.config.settings.bulkView.show.fileName
@@ -192,7 +194,9 @@ class BulkView {
             let fixedWidth = M.config.settings.bulkView.fixedWidth = dom_fixedWidth.value;
             let align = M.config.settings.bulkView.align = dom_align.value;
             let indentation = M.config.settings.bulkView.indentation = dom_indentation.value;
+            let waterfall = M.config.settings.bulkView.waterfall = dom_waterfall.value;
 
+            dom_bulkViewContent.setAttribute("waterfall", waterfall);
             dom_bulkViewContent.setAttribute("columns", columns.toString());
             dom_bulkViewContent.setAttribute("align", align);
             if (columns === 1 || columns === 2) {
@@ -225,15 +229,20 @@ class BulkView {
             } else {
                 dom_box_gaplessMode.style.display = "none";
             }
+            if (columns === 1 || columns === 2) { //瀑布流
+                dom_box_waterfall.style.display = "none";
+            } else {
+                dom_box_waterfall.style.display = "block";
+            }
             if (columns === 1 || columns === 2) { //鎖定寬度
                 dom_box_fixedWidth.style.display = "block";
             } else {
                 dom_box_fixedWidth.style.display = "none";
             }
-            if (columns === 1) { //排列方向
-                dom_align.style.display = "none";
-            } else {
+            if (columns === 2) { //排列方向
                 dom_align.style.display = "block";
+            } else {
+                dom_align.style.display = "none";
             }
             if (columns === 2) { //第一張圖縮排
                 dom_box_indentation.style.display = "block";
@@ -244,22 +253,29 @@ class BulkView {
         }
 
 
+        /** 取得 鎖定寬度 */
+        function getFixedWidth() {
+            return M.config.settings.bulkView.fixedWidth;
+        }
+        /** 取得 首圖進縮 */
+        function getIndentation() {
+            return M.config.settings.bulkView.indentation;
+        }
+        /** 取得 瀑布流 */
+        function getWaterfall() {
+            return M.config.settings.bulkView.waterfall;
+        }
+        /** 取得 欄 */
+        function getColumns() {
+            return M.config.settings.bulkView.columns;
+        }
+        /** 設定 欄 */
         function setColumns(n: number) {
             if (n < 1) { n = 1; }
             if (n > 8) { n = 8; }
             setGroupRadioVal(dom_columns, n.toString());
             dom_columns.dispatchEvent(new Event("input"));
         }
-        function getColumns() {
-            return M.config.settings.bulkView.columns;
-        }
-        function getFixedWidth() {
-            return M.config.settings.bulkView.fixedWidth;
-        }
-        function getIndentation() {
-            return M.config.settings.bulkView.indentation;
-        }
-
 
         /**
          * 
@@ -277,6 +293,16 @@ class BulkView {
             updateSize();
         }
 
+        //以定時的方式執行 updateSize() ，如果接受到多次指令，則只會執行最後一個指令
+        var _updateSize = async () => { };
+        async function timerUpdateSize() {
+            let func = _updateSize;
+            _updateSize = async () => { };
+            await func();
+
+            setTimeout(() => { timerUpdateSize(); }, 50);  //遞迴
+        }
+        timerUpdateSize();
 
         /**
          * 重新計算項目大小
@@ -284,34 +310,169 @@ class BulkView {
          */
         function updateSize(donItem?: HTMLElement) {
 
-            dom_bulkViewContent.style.paddingLeft = itemMargin + "px";
-            dom_bulkViewContent.style.paddingTop = itemMargin + "px";
-            //let domBulkViewWidth = dom_bulkViewContent.offsetWidth - 18 - (getColumns() + 1) * itemMargin;
-            //let size = Math.floor(domBulkViewWidth / getColumns());
-            let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
+            _updateSize = async () => {
+                dom_bulkViewContent.style.paddingLeft = itemMargin + "px";
+                dom_bulkViewContent.style.paddingTop = itemMargin + "px";
+                //let domBulkViewWidth = dom_bulkViewContent.offsetWidth - 18 - (getColumns() + 1) * itemMargin;
+                let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
+                let columns = getColumns();
 
-            let arItme;
-            if (donItem === undefined) {
-                arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
-            } else {
-                arItme = [donItem];
-            }
-
-            for (let i = 0; i < arItme.length; i++) {
-                const item = arItme[i] as HTMLElement;
-                item.style.width = `calc( ${100 / getColumns()}% - ${itemMargin}px )`;
-                item.style.marginRight = itemMargin + "px";
-                item.style.marginBottom = itemMargin + "px";
-
-                let itmecenter = item.querySelector(".bulkView-img") as HTMLElement;
-                item.style.minHeight = size / 2 + "px";
-                if (getColumns() <= 2) {
-                    itmecenter.style.maxHeight = "";
-                } else if (getColumns() === 3) {
-                    itmecenter.style.maxHeight = size * 3 + "px";
+                let arItme;
+                if (donItem === undefined) {
+                    arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
                 } else {
-                    itmecenter.style.maxHeight = size * 2 + "px";
+                    arItme = [donItem];
                 }
+
+                if (getWaterfall() === "off" || getWaterfall() === "vertical" || columns <= 2) {
+                    for (let i = 0; i < arItme.length; i++) {
+                        const dom = arItme[i] as HTMLElement;
+                        dom.style.width = `calc( ${100 / getColumns()}% - ${itemMargin}px )`;
+                        dom.style.marginRight = itemMargin + "px";
+                        dom.style.marginBottom = itemMargin + "px";
+
+                        //復原
+                        const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
+                        domImg.style.width = "";
+                        domImg.style.height = "";
+
+                        if (getColumns() > 2) {
+                            dom.style.minHeight = size / 2 + "px";
+                        }
+                        let domCenter = dom.querySelector(".bulkView-img") as HTMLElement;
+                        if (getColumns() <= 2) {
+                            domCenter.style.maxHeight = "";
+                        } else if (getColumns() === 3) {
+                            domCenter.style.maxHeight = size * 3 + "px";
+                        } else {
+                            domCenter.style.maxHeight = size * 2 + "px";
+                        }
+                    }
+
+                    dom_bulkViewContent.style.height = ""; //復原總高度
+                }
+
+                //瀑布流 垂直
+                if (getWaterfall() === "vertical" && columns >= 3) {
+                    if (arItme.length === 1) {
+                        arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
+                    }
+
+                    let w = dom_bulkViewContent.offsetWidth / columns;
+                    let arTop = new Array(columns).fill(0); //判斷要插入到哪一個垂直列
+
+                    for (let i = 0; i < arItme.length; i++) {
+                        const dom = arItme[i] as HTMLElement;
+
+                        //清除 瀑布流水平 的資料
+                        const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
+                        domImg.style.width = "";
+                        domImg.style.height = "";
+
+                        //找出最小
+                        let minTop = arTop[0];
+                        let minTopFlag = 0;
+                        for (let i = 0; i < arTop.length; i++) {
+                            if (minTop > arTop[i]) {
+                                minTopFlag = i;
+                                minTop = arTop[i];
+                            }
+                        }
+
+                        let h = dom.offsetHeight;
+                        let left = (minTopFlag) * w;
+                        let top = arTop[minTopFlag];
+                        dom.style.left = left + "px";
+                        dom.style.top = top + "px";
+
+                        arTop[minTopFlag] += h;
+                    }
+
+                    //修改總高度
+                    let sumHeight = Math.max.apply(null, arTop);
+                    dom_bulkViewContent.style.height = sumHeight + "px";
+                }
+
+                //瀑布流 水平
+                if (getWaterfall() === "horizontal" && columns >= 3) {
+                    if (arItme.length === 1) {
+                        arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
+                    }
+                    let columns = getColumns();
+                    let isEnd = false;
+                    let len = Math.floor(arItme.length / columns) + 1;
+                    for (let i = 0; i < len; i++) {
+
+                        let images: number[][] = []; // 圖片大小 [寬度, 高度]
+
+                        let isRun = true;
+                        for (let j = i * columns; j < i * columns + columns; j++) {
+                            if (j >= arItme.length) {
+                                isEnd = true;
+                                break;
+                            }
+                            const item = arItme[j] as HTMLElement;
+                            //if (item === undefined) { break }
+                            if (item.getAttribute("data-width") === null) {
+                                isRun = false;
+                                break;
+                            } else {
+                                images.push([
+                                    Number.parseInt(item.getAttribute("data-width") ?? "1"),
+                                    Number.parseInt(item.getAttribute("data-height") ?? "1"),
+                                ])
+                            }
+                        }
+                        if (isRun === false) {
+                            break;
+                        }
+
+                        // 計算總高度
+                        var totalHeight = images.reduce((acc, curr) => acc + curr[1], 0);
+
+                        // 計算每個圖片應該有的高度
+                        var heightPerImage = totalHeight / images.length;
+
+                        // 計算每個圖片應該有的寬度
+                        var widths = images.map(image => image[0] * heightPerImage / image[1]);
+
+                        // 計算總寬度
+                        var totalWidth = widths.reduce((acc, curr) => acc + curr, 0);
+
+                        // 計算每個圖片應該有的調整比例
+                        var ratio = (dom_bulkViewContent.offsetWidth - columns * 10) / totalWidth;
+                        if (isEnd) {
+                            ratio = (dom_bulkViewContent.offsetWidth - columns * 10) / columns * (arItme.length % columns) / totalWidth;
+                        }
+
+                        // 調整每個圖片的寬度和高度
+                        var newImages = images.map((image, index) => {
+                            const newWidth = widths[index] * ratio;
+                            const newHeight = heightPerImage * ratio;
+                            return [newWidth, newHeight];
+                        });
+
+                        for (let j = 0; j < newImages.length; j++) {
+                            const dom = arItme[i * columns + j] as HTMLElement;
+                            const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
+                            const size = newImages[j];
+
+                            //清除 啟用瀑布流 的資料
+                            let domCenter = dom.querySelector(".bulkView-img") as HTMLElement;
+                            dom.style.minHeight = "";
+                            domCenter.style.maxHeight = "";
+
+                            dom.style.width = Math.floor(size[0]) + 10 + "px";
+                            domImg.style.width = Math.floor(size[0]) + "px";
+                            domImg.style.height = Math.floor(size[1]) + "px";
+                            //donImg.style.maxHeight = "calc( 100% - 10px)";
+                        }
+
+                    }
+
+                    dom_bulkViewContent.style.height = ""; //復原總高度
+                }
+
             }
         }
 
@@ -327,6 +488,7 @@ class BulkView {
                 dom_bulkView.style.display = "none";
             }
         }
+
 
         /**
          * 記錄當前狀態(結束大量瀏覽模式前呼叫)
@@ -363,23 +525,23 @@ class BulkView {
                 return true;
             }
 
-            //套用上次的高度
-            function setLastHeight() {
+            //返回上次捲動的位置
+            function scrollToLastPosition() {
+
                 //如果寬度變化小於100，則暫時使用上次的高度，避免圖片載入完成前導致移位
                 if (Math.abs(dom_bulkViewContent.scrollWidth - temp_scrollWidth) < 100) {
                     dom_bulkViewContent.style.minHeight = temp_scrollHeight + "px";
                     setTimeout(() => {
                         dom_bulkViewContent.style.minHeight = "";
+                        temp_scrollTop = -1;
                     }, 800);
                 }
-            }
 
-            //返回上次捲動的位置
-            function scrollToLastPosition() {
+                if (temp_scrollTop === -1) { return; }
                 dom_bulkView.scrollTop = temp_scrollTop;
-
                 for (let i = 1; i <= 8; i++) {
                     setTimeout(() => {
+                        if (temp_scrollTop === -1) { return; }
                         if (temp_hasScrolled === false && temp_pageNow === pageNow) {
                             dom_bulkView.scrollTop = temp_scrollTop;
                         }
@@ -391,7 +553,6 @@ class BulkView {
 
             if (temp_dirPath === M.fileLoad.getDirPath() && arraysEqual(arFile, temp_arFile)) { //完全一樣
 
-                setLastHeight(); //套用上次的高度
                 scrollToLastPosition(); //返回上次捲動的位置
 
             } else if (temp_dirPath === M.fileLoad.getDirPath()) {
@@ -399,7 +560,6 @@ class BulkView {
                 let fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
                 if (temp_fileSortType === fileSortType) { //資料夾一樣，排序一樣 (名單不一樣)
 
-                    setLastHeight(); //套用上次的高度
                     scrollToLastPosition(); //返回上次捲動的位置
                     await load(pageNow);
 
@@ -444,16 +604,16 @@ class BulkView {
         }
 
 
-        //以定時的方式執行 show() ，如果在圖片載入完成前接受到多次指令，則只會執行最後一個指令
+        //以定時的方式執行，如果接受到多次指令，則只會執行最後一個指令
         var _showPage = async () => { };
-        async function timerPage() {
+        async function timerShowPage() {
             let func = _showPage;
             _showPage = async () => { };
             await func();
 
-            setTimeout(() => { timerPage(); }, 50);  //遞迴
+            setTimeout(() => { timerShowPage(); }, 50);  //遞迴
         }
-        timerPage();
+        timerShowPage();
 
 
         /**
@@ -558,7 +718,6 @@ class BulkView {
         async function newItem(path: string, n: number) {
 
             let temp_pageNow = pageNow;
-            let temp_dir = M.fileLoad.getFilePath();
 
             let fileInfo2 = await WebAPI.getFileInfo2(path);
 
@@ -674,6 +833,8 @@ class BulkView {
                     <img class="bulkView-img">
                 </div>
             `
+            div.setAttribute("data-width", width.toString());
+            div.setAttribute("data-height", height.toString());
             updateSize(div);
 
             //點擊圖片後，退出大量瀏覽模式
@@ -703,7 +864,6 @@ class BulkView {
             //區塊改變大小時
             new ResizeObserver(() => {
                 requestAnimationFrame(() => {
-
                     let ret = arUrl[0];
                     let boxWidth = dom_center.offsetWidth;
                     if (boxWidth <= 0) {
@@ -730,9 +890,10 @@ class BulkView {
                     if (dom_img.getAttribute("src") !== ret.url) {
                         dom_img.setAttribute("src", ret.url);
                     }
+                    updateSize();
                 })
-            }).observe(div);
 
+            }).observe(div);
 
         }
 
@@ -792,13 +953,14 @@ class BulkView {
         }
         /** 設定群組按鈕的值 */
         function setGroupRadioVal(dom: HTMLElement, value: string) {
+            let domActive = dom.querySelector(`[value="${value}"]`);
+            if (domActive === null) { return; }
+
             let arDom = dom.querySelectorAll("div");
             for (let i = 0; i < arDom.length; i++) {
                 arDom[i].setAttribute("active", "");
             }
 
-            let domActive = dom.querySelector(`[value="${value}"]`);
-            if (domActive === null) { return; }
             domActive.setAttribute("active", "true");
         }
 

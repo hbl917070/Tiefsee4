@@ -1,5 +1,5 @@
 <!-- 下拉選單 檔案 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-file">
 
         <div class="menu-box">
@@ -68,7 +68,7 @@
 
 
 <!-- 下拉選單 複製  -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-copy">
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-img-copyFile" show-not="bulkView,">
@@ -105,7 +105,7 @@
 
 
 <!-- 下拉選單 旋轉  -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-rotate">
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-img-rotateCw">
@@ -151,7 +151,7 @@
 
 
 <!-- 下拉選單 排序  -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-sort">
         <div class="menu-box">
 
@@ -240,7 +240,7 @@
 
 
 <!-- 右鍵選單 圖片 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-rightMenuImage">
 
         <div class="menu-box" style="width:200px">
@@ -339,8 +339,8 @@
 
 
 <!-- 下拉選單 layout  -->
-<div class="menu" active="">
-    <div class="menu-content" data-menu="none" id="menu-layout">
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-layout">
         <div class="menu-box">
 
             <div class="menu-hor-item js-topmost">
@@ -378,7 +378,7 @@
 
 
 <!-- 下拉選單 搜圖 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-imgSearch">
         <div class="menu-box" id="menu-imgSearch-list">
             <!-- js產生 -->
@@ -388,7 +388,7 @@
 
 
 <!-- 右鍵選單 輸入框 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-text">
         <div class="menu-box">
             <div class="menu-hor-item" id="menuitem-text-cut">
@@ -414,7 +414,7 @@
 
 
 <!-- 右鍵選單 一般文字 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-txt">
         <div class="menu-box">
 
@@ -429,7 +429,7 @@
 
 
 <!-- 大量瀏覽模式 下拉選單 -->
-<div class="menu" active="">
+<div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-bulkView">
         <div class="menu-box">
 
@@ -457,6 +457,15 @@
                     <option value="7">7</option>
                     <option value="8">8</option>
                 </select> -->
+            </div>
+
+            <div class="menu-bulkView-box js-box-waterfall">
+                <div class="menu-bulkView-title" i18n="bulkView.waterfall">瀑布流</div>
+                <select class="menu-bulkView-select js-waterfall">
+                    <option value="off" i18n="bulkView.disable">關閉</option>
+                    <option value="vertical" i18n="bulkView.vertical">垂直</option>
+                    <option value="horizontal" i18n="bulkView.horizontal">水平</option>
+                </select>
             </div>
 
             <div class="menu-bulkView-box js-box-gaplessMode">

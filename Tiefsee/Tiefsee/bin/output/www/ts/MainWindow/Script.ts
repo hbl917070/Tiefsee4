@@ -440,8 +440,14 @@ class ScriptCopy {
 
     /** 複製 檔名 */
     public async copyName() {
-        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        if (await WV_File.Exists(filePath) === false) { return; }
+        let filePath = "";
+        if (this.M.fileLoad.getIsBulkView()) {
+            filePath = this.M.fileLoad.getDirPath();
+            if (await WV_Directory.Exists(filePath) === false) { return; }
+        } else {
+            filePath = this.M.fileLoad.getFilePath();
+            if (await WV_File.Exists(filePath) === false) { return; }
+        }
         let name = Lib.GetFileName(filePath)
         await WV_System.SetClipboard_Txt(name);
         Toast.show(this.M.i18n.t("msg.copyName"), 1000 * 3); //已將「檔名」複製至剪貼簿
@@ -449,8 +455,14 @@ class ScriptCopy {
 
     /** 複製 完整路徑 */
     public async copyPath() {
-        let filePath = this.M.fileLoad.getFilePath();//目前顯示的檔案
-        if (await WV_File.Exists(filePath) === false) { return; }
+        let filePath = "";
+        if (this.M.fileLoad.getIsBulkView()) {
+            filePath = this.M.fileLoad.getDirPath();
+            if (await WV_Directory.Exists(filePath) === false) { return; }
+        } else {
+            filePath = this.M.fileLoad.getFilePath();
+            if (await WV_File.Exists(filePath) === false) { return; }
+        }
         await WV_System.SetClipboard_Txt(filePath);
         Toast.show(this.M.i18n.t("msg.copyPath"), 1000 * 3); //已將「路徑」複製至剪貼簿
     }
