@@ -79,11 +79,11 @@ class Iframes {
                 return "";
             }
 
-            for (let i = 0; i < 2000; i++) {//等待套件初始化
+            for (let i = 0; i < 2000; i++) { //等待套件初始化
                 if (_txt !== null) {
                     break;
                 }
-                await sleep(10);
+                await Lib.sleep(10);
             }
             let txt = _txt
             _txt = null;
@@ -174,11 +174,11 @@ class PDFTronWebviewer {
                 dom_pdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
-            for (let i = 0; i < 2000; i++) {//等待套件初始化
+            for (let i = 0; i < 2000; i++) { //等待套件初始化
                 if (isInitPDFTronWebviewer === true) {
                     break;
                 }
-                await sleep(10);
+                await Lib.sleep(10);
             }
 
             let json = {
@@ -280,11 +280,11 @@ class MonacoEditor {
                 dom_monacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
-            for (let i = 0; i < 2000; i++) {//等待套件初始化
+            for (let i = 0; i < 2000; i++) { //等待套件初始化
                 if (isInitMonacoEditor === true) {
                     break;
                 }
-                await sleep(10);
+                await Lib.sleep(10);
             }
         }
 
@@ -442,11 +442,11 @@ class CherryMarkdown {
                 dom_iframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.config.settings.other.lang}`;
             }
 
-            for (let i = 0; i < 2000; i++) {//等待套件初始化
+            for (let i = 0; i < 2000; i++) { //等待套件初始化
                 if (isInitCherryMarkdown === true) {
                     break;
                 }
-                await sleep(10);
+                await Lib.sleep(10);
             }
         }
 
@@ -590,11 +590,11 @@ class Textview {
          * 載入文字
          */
         async function loadText(text: string) {
-            dom_text.scrollTo(0, 0);//捲到最上面
+            dom_text.scrollTo(0, 0); //捲到最上面
             dom_text.value = text;
         }
 
-        var isReadonly = false;//是否為唯讀
+        var isReadonly = false; //是否為唯讀
         /**
           * 設定是否唯讀
           */

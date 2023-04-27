@@ -17,7 +17,7 @@ class ImgSearch {
                 let icon = item.icon; //圖示
                 let url = item.url;
 
-                let dom = newDom(`
+                let dom = Lib.newDom(`
                     <div class="menu-hor-item">
                         <div class="menu-hor-icon">
                             <img src="${icon}">
@@ -27,7 +27,7 @@ class ImgSearch {
                 `);
 
                 dom.onclick = async () => {
-                    //let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
+                    //let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
                     //if (await WV_File.Exists(filePath) === false) { return; }
                     M.menu.close(); //關閉menu
 

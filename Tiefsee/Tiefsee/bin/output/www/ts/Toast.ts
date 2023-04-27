@@ -1,6 +1,6 @@
 class Toast {
 
-    static domToastList: undefined | HTMLElement = undefined;//放所有 toastItem 的容器
+    static domToastList: undefined | HTMLElement = undefined; //放所有 toastItem 的容器
 
     /**
      * 顯示一個 Toast 文字訊息
@@ -15,10 +15,10 @@ class Toast {
             document.body.appendChild(Toast.domToastList);
         }
 
-        txt = Lib.escape(txt);//移除可能破壞html的跳脫符號
+        txt = Lib.escape(txt); //移除可能破壞html的跳脫符號
         txt = txt.replace(/[\n]/g, "<br>");
       
-        let domItem: HTMLElement | undefined = newDom(`
+        let domItem: HTMLElement | undefined = Lib.newDom(`
                 <div class="toastItem">
                     <div class="toastTxt">${txt}</div>
                     <div class="toastClose"></div>

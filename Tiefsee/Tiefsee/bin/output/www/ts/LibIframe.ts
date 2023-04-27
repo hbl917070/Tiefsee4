@@ -23,7 +23,7 @@ class LibIframe {
      */
     public async closeIME() {
 
-        var domFocus = document.activeElement as HTMLElement | null;//當前擁有焦點的dom
+        var domFocus = document.activeElement as HTMLElement | null; //當前擁有焦點的dom
 
         var text = document.createElement("input");
         text.setAttribute("type", "url");
@@ -39,9 +39,9 @@ class LibIframe {
                 text.blur();
                 document.body.removeChild(text);
                 if (domFocus !== null) {
-                    domFocus.focus();//把焦點設定回去
+                    domFocus.focus(); //把焦點設定回去
                 }
-                resolve(0);//繼續往下執行
+                resolve(0); //繼續往下執行
             }, 10);
         })
 
@@ -207,7 +207,7 @@ class LibIframe {
     }
 
 
-    private isReadonly = false;//是否為唯讀
+    private isReadonly = false; //是否為唯讀
     /**
      * 設定是否為唯讀
      * @param val 

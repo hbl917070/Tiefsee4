@@ -13,13 +13,13 @@ class Setting {
 
     constructor() {
 
-        baseWindow = new BaseWindow();//初始化視窗
+        baseWindow = new BaseWindow(); //初始化視窗
 
         this.saveData = saveSetting;
 
         var appInfo: AppInfo;
         var config = new Config(baseWindow);
-        var mainToolbar = new MainToolbar(null);//取得工具列
+        var mainToolbar = new MainToolbar(null); //取得工具列
         var i18n = new I18n();
         i18n.initNone(); //有翻譯的地方都顯示空白(用於翻譯前)
         i18n.pushData(langData);
@@ -34,7 +34,7 @@ class Setting {
             loadEvent.push(func);
         }
 
-        //initDomImport();//初始化圖示
+        //initDomImport(); //初始化圖示
 
         /**
           * 覆寫 onCreate
@@ -44,8 +44,8 @@ class Setting {
 
             baseWindow.appInfo = json;
 
-            await WV_Window.ShowWindow_Center(600 * window.devicePixelRatio, 450 * window.devicePixelRatio);//顯示視窗 
-            WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio);//設定視窗最小size
+            await WV_Window.ShowWindow_Center(600 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
+            WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio); //設定視窗最小size
             WV_Window.Text = "Setting";
             let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
             WV_Window.SetIcon(iconPath);
@@ -66,7 +66,7 @@ class Setting {
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
-                if (e.button === 0) {//滑鼠左鍵
+                if (e.button === 0) { //滑鼠左鍵
                     await WV_Window.WindowDrag("move");
                 }
             })
@@ -120,7 +120,7 @@ class Setting {
             });
 
             //document.querySelector("input")?.focus();
-            document.querySelector("input")?.blur();//失去焦點
+            document.querySelector("input")?.blur(); //失去焦點
         }
 
         //初始化多國語言
@@ -157,19 +157,19 @@ class Setting {
             }
 
             var tabs = new Tabs();
-            tabs.add(getDom("tabsBtn-general"), getDom("tabsPage-general"), () => { goTop() });//一般
-            tabs.add(getDom("tabsBtn-appearance"), getDom("tabsPage-appearance"), () => { goTop() });//外觀
-            tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() });//版面
-            tabs.add(getDom("tabsBtn-toolbar"), getDom("tabsPage-toolbar"), () => { goTop() });//工具列
+            tabs.add(getDom("tabsBtn-general"), getDom("tabsPage-general"), () => { goTop() }); //一般
+            tabs.add(getDom("tabsBtn-appearance"), getDom("tabsPage-appearance"), () => { goTop() }); //外觀
+            tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() }); //版面
+            tabs.add(getDom("tabsBtn-toolbar"), getDom("tabsPage-toolbar"), () => { goTop() }); //工具列
             //tabs.add(getDom("tabsBtn-image"), getDom("tabsPage-image"), () => { goTop() });
             //tabs.add(getDom("tabsBtn-shortcutKeys"),getDom("tabsPage-hotkey"), () => { goTop() });/快速鍵
-            tabs.add(getDom("tabsBtn-extension"), getDom("tabsPage-extension"), () => { goTop() });//設為預設程式
-            tabs.add(getDom("tabsBtn-advanced"), getDom("tabsPage-advanced"), () => { goTop() });//進階設定
-            tabs.add(getDom("tabsBtn-about"), getDom("tabsPage-about"), () => { goTop() });//關於
-            tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() });//擴充套件
-            tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() });//快速預覽
+            tabs.add(getDom("tabsBtn-extension"), getDom("tabsPage-extension"), () => { goTop() }); //設為預設程式
+            tabs.add(getDom("tabsBtn-advanced"), getDom("tabsPage-advanced"), () => { goTop() }); //進階設定
+            tabs.add(getDom("tabsBtn-about"), getDom("tabsPage-about"), () => { goTop() }); //關於
+            tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() }); //擴充套件
+            tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() }); //快速預覽
 
-            tabs.set(getDom("tabsBtn-general"));//預設選擇的頁面
+            tabs.set(getDom("tabsBtn-general")); //預設選擇的頁面
         })
 
         //自訂工具列
@@ -315,11 +315,11 @@ class Setting {
         addLoadEvent(() => {
 
             //var cssRoot = document.documentElement;
-            var jq_colorWindowBackground = $("#text-colorWindowBackground");//視窗顏色
-            var jq_colorWindowBorder = $("#text-colorWindowBorder");//邊框顏色
-            var jq_colorWhite = $("#text-colorWhite");//文字顏色
-            var jq_colorBlack = $("#text-colorBlack");//區塊底色
-            var jq_colorBlue = $("#text-colorBlue");//主顏色
+            var jq_colorWindowBackground = $("#text-colorWindowBackground"); //視窗顏色
+            var jq_colorWindowBorder = $("#text-colorWindowBorder"); //邊框顏色
+            var jq_colorWhite = $("#text-colorWhite"); //文字顏色
+            var jq_colorBlack = $("#text-colorBlack"); //區塊底色
+            var jq_colorBlue = $("#text-colorBlue"); //主顏色
             var dom_applyThemeBtns = document.querySelector("#applyTheme-btns") as HTMLElement;
 
             //初始化顏色選擇器物件
@@ -339,11 +339,11 @@ class Setting {
                 jQdim.minicolors({
                     format: "rgb",
                     opacity: opacity,
-                    changeDelay: 10,//change時間的更新延遲
+                    changeDelay: 10, //change時間的更新延遲
                     change: function (value: string, opacity: number) {
 
                         //@ts-ignore
-                        let c = jQdim.minicolors("rgbObject");//取得顏色 
+                        let c = jQdim.minicolors("rgbObject"); //取得顏色 
 
                         //設定本身視窗的主題
                         /*for (let i = 1; i < 9; i++) {
@@ -406,7 +406,7 @@ class Setting {
                 black: { r: number, g: number, b: number },
                 blue: { r: number, g: number, b: number }) {
 
-                let btn = newDom(html);
+                let btn = Lib.newDom(html);
                 btn.onclick = () => {
                     config.settings.theme["--color-window-background"] = windowBackground;
                     config.settings.theme["--color-window-border"] = windowBorder;
@@ -664,21 +664,21 @@ class Setting {
             var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
             var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo") as HTMLInputElement;
             var switch_fileListShowName = document.querySelector("#switch-fileListShowName") as HTMLInputElement;
-            switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"];//啟用 檔案預覽視窗
-            switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"];//顯示編號
-            switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"];//顯示檔名
+            switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"]; //啟用 檔案預覽視窗
+            switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"]; //顯示編號
+            switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"]; //顯示檔名
 
-            switch_fileListEnabled.addEventListener("change", () => {//啟用 檔案預覽視窗
+            switch_fileListEnabled.addEventListener("change", () => { //啟用 檔案預覽視窗
                 let val = switch_fileListEnabled.checked;
                 config.settings["layout"]["fileListEnabled"] = val;
                 appleSettingOfMain();
             });
-            switch_fileListShowNo.addEventListener("change", () => {//顯示編號
+            switch_fileListShowNo.addEventListener("change", () => { //顯示編號
                 let val = switch_fileListShowNo.checked;
                 config.settings["layout"]["fileListShowNo"] = val;
                 appleSettingOfMain();
             });
-            switch_fileListShowName.addEventListener("change", () => {//顯示檔名
+            switch_fileListShowName.addEventListener("change", () => { //顯示檔名
                 let val = switch_fileListShowName.checked;
                 config.settings["layout"]["fileListShowName"] = val;
                 appleSettingOfMain();
@@ -691,27 +691,27 @@ class Setting {
             var switch_dirListShowNo = document.querySelector("#switch-dirListShowNo") as HTMLInputElement;
             var switch_dirListShowName = document.querySelector("#switch-dirListShowName") as HTMLInputElement;
             var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber") as HTMLInputElement;
-            switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"];//啟用 資料夾預覽視窗
-            switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"];//顯示編號
-            switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"];//顯示檔名
-            select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + "";//圖片數量
+            switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"]; //啟用 資料夾預覽視窗
+            switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"]; //顯示編號
+            switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"]; //顯示檔名
+            select_dirListImgNumber.value = config.settings["layout"]["dirListImgNumber"] + ""; //圖片數量
 
-            switch_dirListEnabled.addEventListener("change", () => {//啟用 資料夾預覽視窗
+            switch_dirListEnabled.addEventListener("change", () => { //啟用 資料夾預覽視窗
                 let val = switch_dirListEnabled.checked;
                 config.settings["layout"]["dirListEnabled"] = val;
                 appleSettingOfMain();
             });
-            switch_dirListShowNo.addEventListener("change", () => {//顯示編號
+            switch_dirListShowNo.addEventListener("change", () => { //顯示編號
                 let val = switch_dirListShowNo.checked;
                 config.settings["layout"]["dirListShowNo"] = val;
                 appleSettingOfMain();
             });
-            switch_dirListShowName.addEventListener("change", () => {//顯示檔名
+            switch_dirListShowName.addEventListener("change", () => { //顯示檔名
                 let val = switch_dirListShowName.checked;
                 config.settings["layout"]["dirListShowName"] = val;
                 appleSettingOfMain();
             });
-            select_dirListImgNumber.addEventListener("change", () => {//圖片數量
+            select_dirListImgNumber.addEventListener("change", () => { //圖片數量
                 let val = Number(select_dirListImgNumber.value);
                 config.settings["layout"]["dirListImgNumber"] = val;
                 appleSettingOfMain();
@@ -722,7 +722,7 @@ class Setting {
         addLoadEvent(() => {
             //顯示 詳細資料面板
             var switch_mainExifEnabled = document.querySelector("#switch-mainExifEnabled") as HTMLInputElement;
-            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"];//
+            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"]; //
             switch_mainExifEnabled.addEventListener("change", () => {
                 let val = switch_mainExifEnabled.checked;
                 config.settings["layout"]["mainExifEnabled"] = val;
@@ -731,7 +731,7 @@ class Setting {
 
             //寬度足夠時，橫向排列
             var switch_mainExifHorizontal = document.querySelector("#switch-mainExifHorizontal") as HTMLInputElement;
-            switch_mainExifHorizontal.checked = config.settings["layout"]["mainExifHorizontal"];//
+            switch_mainExifHorizontal.checked = config.settings["layout"]["mainExifHorizontal"]; //
             switch_mainExifHorizontal.addEventListener("change", () => {
                 let val = switch_mainExifHorizontal.checked;
                 config.settings["layout"]["mainExifHorizontal"] = val;
@@ -755,12 +755,12 @@ class Setting {
         //大型切換按鈕
         addLoadEvent(() => {
             //初始化設定
-            setRadio("[name='largeBtn']", config.settings.layout.largeBtn);
+            Lib.setRadio("[name='largeBtn']", config.settings.layout.largeBtn);
 
             //變更時
             let domRadio = document.querySelector("#largeBtn-group") as HTMLElement;
-            domRadio.addEventListener("change", () => {//
-                let val = getRadio("[name='largeBtn']");
+            domRadio.addEventListener("change", () => { //
+                let val = Lib.getRadio("[name='largeBtn']");
                 config.settings.layout.largeBtn = val;
                 appleSettingOfMain();
             });
@@ -839,7 +839,7 @@ class Setting {
             btn_openTemp.addEventListener("click", async () => {
                 let path = await WV_Path.GetTempPath();
                 path = Lib.Combine([path, "Tiefsee"]);
-                if (await WV_Directory.Exists(path) === false) {//如果不存在就新建
+                if (await WV_Directory.Exists(path) === false) { //如果不存在就新建
                     await WV_Directory.CreateDirectory(path);
                 }
                 WV_RunApp.OpenUrl(path);
@@ -888,7 +888,7 @@ class Setting {
             var text_serverCache = document.querySelector("#text-serverCache") as HTMLInputElement;
             var btn_restart = document.querySelector("#btn-startupMode-restart") as HTMLButtonElement;
 
-            setRadio("[name='radio-startType']", appInfo.startType.toString())
+            Lib.setRadio("[name='radio-startType']", appInfo.startType.toString())
             text_startPort.value = appInfo.startPort.toString();
             text_serverCache.value = appInfo.serverCache.toString();
 
@@ -902,7 +902,7 @@ class Setting {
             baseWindow.closingEvents.push(async () => {
                 //儲存 start.ini
                 let startPort = parseInt(text_startPort.value);
-                let startType: any = getRadio("[name='radio-startType']");
+                let startType: any = Lib.getRadio("[name='radio-startType']");
                 let serverCache = parseInt(text_serverCache.value);
 
                 if (isNaN(startPort)) { startPort = 4876; }
@@ -1008,7 +1008,7 @@ class Setting {
             document.querySelector("#btn-openPluginDir")?.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDataPath();
                 path = Lib.Combine([path, "Plugin"]);
-                if (await WV_Directory.Exists(path) === false) {//如果不存在就新建
+                if (await WV_Directory.Exists(path) === false) { //如果不存在就新建
                     await WV_Directory.CreateDirectory(path);
                 }
                 WV_RunApp.OpenUrl(path);
@@ -1085,11 +1085,11 @@ class Setting {
          */
         async function saveSetting() {
 
-            appleSettingOfMain();//將設定套用至 mainwiwndow
+            appleSettingOfMain(); //將設定套用至 mainwiwndow
 
             //儲存 setting.json
             let s = JSON.stringify(config.settings, null, '\t');
-            var path = await WV_Window.GetAppDataPath();//程式的暫存資料夾
+            var path = await WV_Window.GetAppDataPath(); //程式的暫存資料夾
             path = Lib.Combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
         }
@@ -1106,7 +1106,7 @@ class Setting {
                 await arFunc[i]();
             }
 
-            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`);//取得目前顯示的圖片
+            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`); //取得目前顯示的圖片
             if (imgPath === "null") { imgPath = "" }
             let exePath = await WV_Window.GetAppPath();
             WV_RunApp.ProcessStart(exePath, imgPath, true, false);

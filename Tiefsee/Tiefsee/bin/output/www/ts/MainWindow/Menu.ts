@@ -14,7 +14,7 @@ class Menu {
         this.isShow = isShow;
         this.close = close;
 
-        var temp_closeList: any[] = [];//記錄所有被開過的menu
+        var temp_closeList: any[] = []; //記錄所有被開過的menu
 
         var mouseX = 0;
         var mouseY = 0;
@@ -76,17 +76,17 @@ class Menu {
 
             let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
-                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
+                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) { //點擊透明背景時
                     sender.preventDefault();
-                    func_close();//關閉menu
+                    func_close(); //關閉menu
                 }
             }
             domMenuBg.addEventListener("touchstart", onmousedown);
             domMenuBg.addEventListener("mousedown", onmousedown);
 
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
+            let func_close = () => { //關閉menu
+                domMenuBg.setAttribute("active", ""); //關閉menu
                 _domBtn.classList.remove(_css);
                 temp_closeList = temp_closeList.filter((item) => {
                     return item !== func_close
@@ -119,7 +119,7 @@ class Menu {
             M.updateDomVisibility(); //更新元素顯示或隱藏
 
             domMenuBg.setAttribute("active", "true");
-            _domMenu.style.bottom = "";//避免高度計算錯誤
+            _domMenu.style.bottom = ""; //避免高度計算錯誤
 
             let menuHeight = _domMenu.getBoundingClientRect().height;
             let menuWidth = _domMenu.getBoundingClientRect().width;
@@ -150,17 +150,17 @@ class Menu {
 
             let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
-                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
+                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) { //點擊透明背景時
                     sender.preventDefault();
-                    func_close();//關閉menu
+                    func_close(); //關閉menu
                 }
             }
             domMenuBg.addEventListener("touchstart", onmousedown);
             domMenuBg.addEventListener("mousedown", onmousedown);
 
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
+            let func_close = () => { //關閉menu
+                domMenuBg.setAttribute("active", ""); //關閉menu
                 temp_closeList = temp_closeList.filter((item) => {
                     return item !== func_close
                 });
@@ -192,11 +192,11 @@ class Menu {
             M.updateDomVisibility(); //更新元素顯示或隱藏
 
             domMenuBg.setAttribute("active", "true");
-            _domMenu.style.bottom = "";//避免高度計算錯誤
+            _domMenu.style.bottom = ""; //避免高度計算錯誤
 
-            let menuWidth = _domMenu.getBoundingClientRect().width;//menu 寬度
+            let menuWidth = _domMenu.getBoundingClientRect().width; //menu 寬度
             let menuHeight = _domMenu.getBoundingClientRect().height;
-            let bodyWidth = document.body.getBoundingClientRect().width;//視窗 寬度
+            let bodyWidth = document.body.getBoundingClientRect().width; //視窗 寬度
             let bodyHeight = document.body.getBoundingClientRect().height;
 
             let left = mouseX
@@ -220,17 +220,17 @@ class Menu {
 
             let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let domClick = sender.target as HTMLElement;
-                let isScroll = Lib.isScrollbarVisible(_domMenu);//判斷是否有捲軸
-                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) {//點擊透明背景時
+                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) { //點擊透明背景時
                     sender.preventDefault();
-                    func_close();//關閉menu
+                    func_close(); //關閉menu
                 }
             }
             domMenuBg.addEventListener("touchstart", onmousedown);
             domMenuBg.addEventListener("mousedown", onmousedown);
 
-            let func_close = () => {//關閉menu
-                domMenuBg.setAttribute("active", "");//關閉menu
+            let func_close = () => { //關閉menu
+                domMenuBg.setAttribute("active", ""); //關閉menu
                 temp_closeList = temp_closeList.filter((item) => {
                     return item !== func_close
                 });

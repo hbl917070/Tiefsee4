@@ -56,7 +56,7 @@
                 setRoot("");
                 setText(data.txt);
             }
-            if (type === "loadFile") {//載入檔案並且設定目錄
+            if (type === "loadFile") { //載入檔案並且設定目錄
                 setRoot(data.dir);
                 setText(data.txt);
             }
@@ -96,14 +96,14 @@
     <script>
 
         var libIframe = new LibIframe();
-        libIframe.initEventDrop(window);//註冊 drop 事件，拖曳檔案進來時 開啟檔案
-        libIframe.initTextHotkey();//按 ctrl + S 時，儲存文字檔
+        libIframe.initEventDrop(window); //註冊 drop 事件，拖曳檔案進來時 開啟檔案
+        libIframe.initTextHotkey(); //按 ctrl + S 時，儲存文字檔
 
         var cherryObj;
 
         document.addEventListener("DOMContentLoaded", async () => {
             cherryObj = initCherry();
-            await libIframe.closeIME();//嘗試關閉輸入法
+            await libIframe.closeIME(); //嘗試關閉輸入法
             initFinish();
         });
 
@@ -133,7 +133,7 @@
                 }
             }
 
-            libIframe.openUrl(href);//開啟網址或檔案
+            libIframe.openUrl(href); //開啟網址或檔案
 
             e.preventDefault();
         });
@@ -157,7 +157,7 @@
                 }
             });
 
-            let lang = libIframe.getLang();//取得使用者選擇的語言
+            let lang = libIframe.getLang(); //取得使用者選擇的語言
             if (lang == "zh-TW") {
                 lang = "zh_TW";
             } else {
@@ -172,7 +172,7 @@
                     //echarts: window.echarts,
                     MathJax: window.MathJax,
                 },
-                fileUpload: (e) => {//貼上剪貼簿裡面的圖片時
+                fileUpload: (e) => { //貼上剪貼簿裡面的圖片時
                     //不做任何事情
                 },
                 // 解析引擎組態
@@ -263,7 +263,7 @@
          */
         function setText(s) {
             cherryObj.setMarkdown(s);
-            cherryObj.editor.editor.clearHistory();//清空歷史資料
+            cherryObj.editor.editor.clearHistory(); //清空歷史資料
         }
 
         /**
@@ -300,8 +300,8 @@
             } else {
                 val = false;
             }
-            libIframe.setReadonly(val);//攔截鍵盤
-            cherryObj.editor.editor.options.readOnly = val;//文字編輯器設定成唯讀
+            libIframe.setReadonly(val); //攔截鍵盤
+            cherryObj.editor.editor.options.readOnly = val; //文字編輯器設定成唯讀
         }
     </script>
 

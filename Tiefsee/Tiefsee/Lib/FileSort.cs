@@ -18,42 +18,42 @@ namespace Tiefsee {
         /// <returns></returns>
         public string[] Sort(string[] ar, string type) {
 
-            if (type == "name") {//檔名自然排序
+            if (type == "name") { //檔名自然排序
                 Array.Sort(ar, new NaturalSort());
             }
-            if (type == "nameDesc") {//檔名自然排序(逆) 
+            if (type == "nameDesc") { //檔名自然排序(逆) 
                 Array.Sort(ar, new NaturalSortDesc());
             }
 
-            if (type == "lastWriteTime") {//修改時間排序 
+            if (type == "lastWriteTime") { //修改時間排序 
                 ar = SortLastWriteTime(ar, true);
             }
-            if (type == "lastWriteTimeDesc") {//修改時間排序(逆)  
+            if (type == "lastWriteTimeDesc") { //修改時間排序(逆)  
                 ar = SortLastWriteTime(ar, false);
             }
 
-            if (type == "length") {//檔案大小排序  
+            if (type == "length") { //檔案大小排序  
                 ar = SortLength(ar, true);
             }
-            if (type == "lengthDesc") {//檔案大小排序(逆)  
+            if (type == "lengthDesc") { //檔案大小排序(逆)  
                 ar = SortLength(ar, false);
             }
 
-            if (type == "lastAccessTime") {//檔案存取時間排序  
+            if (type == "lastAccessTime") { //檔案存取時間排序  
                 ar = SortLastAccessTime(ar, true);
             }
-            if (type == "lastAccessTimeDesc") {//檔案存取時間排序(逆)  
+            if (type == "lastAccessTimeDesc") { //檔案存取時間排序(逆)  
                 ar = SortLastAccessTime(ar, false);
             }
 
-            if (type == "creationTime") {//檔案建立時間排序  
+            if (type == "creationTime") { //檔案建立時間排序  
                 ar = SortCreationTime(ar, true);
             }
-            if (type == "creationTimeDesc") {//檔案建立時間排序(逆)  
+            if (type == "creationTimeDesc") { //檔案建立時間排序(逆)  
                 ar = SortCreationTime(ar, false);
             }
 
-            if (type == "random") {//隨機排序  
+            if (type == "random") { //隨機排序  
                 ar = ar.OrderBy(a => Guid.NewGuid()).ToArray();
             }
 
@@ -97,7 +97,7 @@ namespace Tiefsee {
             for (int i = 0; i < ar.Length; i++) {
                 string path = ar[i];
                 FileSystemInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                if (fileInfo.Exists || Directory.Exists(path)) { //檔案或資料夾
                     arF.Add(fileInfo);
                 }
             }
@@ -130,7 +130,7 @@ namespace Tiefsee {
             for (int i = 0; i < ar.Length; i++) {
                 string path = ar[i];
                 FileSystemInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                if (fileInfo.Exists || Directory.Exists(path)) { //檔案或資料夾
                     arF.Add(fileInfo);
                 }
             }
@@ -163,7 +163,7 @@ namespace Tiefsee {
             for (int i = 0; i < ar.Length; i++) {
                 string path = ar[i];
                 FileSystemInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                if (fileInfo.Exists || Directory.Exists(path)) { //檔案或資料夾
                     arF.Add(fileInfo);
                 }
             }
@@ -196,7 +196,7 @@ namespace Tiefsee {
             for (int i = 0; i < ar.Length; i++) {
                 string path = ar[i];
                 FileInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Exists || Directory.Exists(path)) {//檔案或資料夾
+                if (fileInfo.Exists || Directory.Exists(path)) { //檔案或資料夾
                     arF.Add(fileInfo);
                 }
             }

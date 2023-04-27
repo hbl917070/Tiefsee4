@@ -18,7 +18,7 @@ class FileSort {
         var dom_fileSort_desc = document.getElementById("menuitem-fileSort-desc") as HTMLInputElement;
 
         var yesSvgTxt = SvgList["yes.svg"];
-        var sortType = FileSortType.name;//排序方式
+        var sortType = FileSortType.name; //排序方式
         var orderbyType = FileOrderbyType.asc;
 
         this.readSortType = readSortType;
@@ -100,10 +100,10 @@ class FileSort {
             }
 
             M.fileLoad.setWaitingFile(ar);
-            M.fileLoad.updateTitle();//更新視窗標題
+            M.fileLoad.updateTitle(); //更新視窗標題
 
-            M.mainFileList.init();//檔案預覽視窗 初始化
-            M.mainFileList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
+            M.mainFileList.init(); //檔案預覽視窗 初始化
+            M.mainFileList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
 
             updateMenu();
 
@@ -111,7 +111,7 @@ class FileSort {
                 M.bulkView.load();
             }
 
-            //M.menu.close();//關閉menu
+            //M.menu.close(); //關閉menu
         }
 
 
@@ -209,7 +209,7 @@ class FileSort {
                 sortType = _sortType;
             } else {
                 let defaultSort = M.config.settings.sort["fileSort"];
-                if (Object.keys(FileSortType).indexOf(defaultSort) === -1) {//如果找不到
+                if (Object.keys(FileSortType).indexOf(defaultSort) === -1) { //如果找不到
                     defaultSort = FileSortType.name;
                 }
                 sortType = defaultSort;

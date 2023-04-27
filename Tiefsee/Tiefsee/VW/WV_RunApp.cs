@@ -46,12 +46,12 @@ namespace Tiefsee {
         public string[] GetStartMenuList() {
 
             string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
-            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs");//開始選單的路徑
+            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs"); //開始選單的路徑
 
-            List<String> arFile = new List<string>();//
+            List<String> arFile = new List<string>();
 
             if (Directory.Exists(path)) {
-                GetDirForeachFiles(path, arFile);//windows的開始
+                GetDirForeachFiles(path, arFile); //windows的開始
             }
 
             return arFile.ToArray();
@@ -124,13 +124,13 @@ namespace Tiefsee {
         /// <param name="Arguments"></param>
         /// <param name="CreateNoWindow"></param>
         /// <param name="UseShellExecute"></param>
-        public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {                
+        public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
             var psi = new System.Diagnostics.ProcessStartInfo();
-            psi.FileName = FileName;//執行檔路徑
-            psi.WorkingDirectory = Path.GetDirectoryName(FileName);//設定執行檔所在的目錄
-            psi.Arguments = Arguments;//命令參數
-            psi.CreateNoWindow = CreateNoWindow;//是否使用新視窗
-            psi.UseShellExecute = UseShellExecute;//false=新視窗個體 
+            psi.FileName = FileName; //執行檔路徑
+            psi.WorkingDirectory = Path.GetDirectoryName(FileName); //設定執行檔所在的目錄
+            psi.Arguments = Arguments; //命令參數
+            psi.CreateNoWindow = CreateNoWindow; //是否使用新視窗
+            psi.UseShellExecute = UseShellExecute; //false=新視窗個體 
             System.Diagnostics.Process.Start(psi);
         }
 

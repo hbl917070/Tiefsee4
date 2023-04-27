@@ -9,7 +9,7 @@ class LargeBtn {
     public setHide;
 
     constructor(M: MainWindow) {
-        var dom_largeBtnLeft = document.getElementById("largeBtnLeft") as HTMLElement;//上一頁大按鈕
+        var dom_largeBtnLeft = document.getElementById("largeBtnLeft") as HTMLElement; //上一頁大按鈕
         var dom_largeBtnRight = document.getElementById("largeBtnRight") as HTMLElement;
 
         this.dom_largeBtnLeft = dom_largeBtnLeft;

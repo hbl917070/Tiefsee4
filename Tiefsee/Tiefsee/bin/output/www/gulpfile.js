@@ -7,8 +7,8 @@ const rename = require("gulp-rename");
 const gulpEsbuild = require("gulp-esbuild");
 const sass = require("gulp-sass")(require("sass"));
 
-const fc2json = require("gulp-file-contents-to-json");//處理svg
-const jsonTransform = require("gulp-json-transform");//處理svg
+const fc2json = require("gulp-file-contents-to-json"); //處理svg
+const jsonTransform = require("gulp-json-transform"); //處理svg
 
 
 
@@ -52,7 +52,7 @@ gulp.task("scss", function () {
 gulp.task("ejs-main", () => {
     return gulp.src("./ejs/MainWindow/MainWindow.ejs")
         .pipe(ejs({ readFile: readFile }, { async: true }))
-        .pipe(rename({ extname: ".html" }))//修改輸出的副檔名
+        .pipe(rename({ extname: ".html" })) //修改輸出的副檔名
         .pipe(gulp.dest("./"))
 });
 gulp.task("ejs-setting", () => {
@@ -66,7 +66,7 @@ gulp.task("ejs-setting", () => {
 gulp.task("ts", () => {
     return gulp.src("./ts/**/*.ts")
         .pipe(gulpEsbuild({
-            //minify: true,//壓縮
+            //minify: true, //壓縮
             //outfile: "bundle.js",
             //bundle: true,
             //loader: { ".tsx": "tsx", },
@@ -82,7 +82,7 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
     gulp.watch("./ejs/MainWindow/*.ejs", gulp.series("ejs-main"));
     gulp.watch("./ejs/SettingWindow/*.ejs", gulp.series("ejs-setting"));
 
-    gulp.watch("./img/default/*.svg", gulp.series("ejs-main"));//svg圖示
+    gulp.watch("./img/default/*.svg", gulp.series("ejs-main")); //svg圖示
     gulp.watch("./img/default/*.svg", gulp.series("svg"));
 }));
 
@@ -98,7 +98,7 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
 async function readFile(path) {
     let t = await new Promise((resolve, reject) => {
         fs.readFile(path, "utf8", function (err, data) {
-            resolve(data);//繼續往下執行
+            resolve(data); //繼續往下執行
         });
     })
     return t;

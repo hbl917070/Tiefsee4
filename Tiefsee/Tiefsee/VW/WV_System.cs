@@ -27,8 +27,8 @@ namespace Tiefsee {
         }
 
         public string GetDownKey() {
-            bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
-            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+            bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); //按著空白鍵
+            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
 
             var obj = new {
                 isKeyboardSpace = isKeyboardSpace,
@@ -51,7 +51,7 @@ namespace Tiefsee {
 
             //產生捷徑
             using (ShellLink slLinkObject = new ShellLink()) {
-                slLinkObject.WorkPath = Directory.GetParent(exePath).ToString();//工作資料夾
+                slLinkObject.WorkPath = Directory.GetParent(exePath).ToString(); //工作資料夾
                 slLinkObject.IconLocation = exePath + ",0";   //圖示檔案。 0圖示檔的 Index
                 slLinkObject.ExecuteFile = exePath;
                 slLinkObject.ExecuteArguments = args;
@@ -98,7 +98,7 @@ namespace Tiefsee {
         /// <param name="maxWebFile"> 暫存資料夾 tempDirWebFile 最多保留的檔案數量 </param>
         public void DeleteTemp(int maxImgProcessed, int maxImgZoom, int maxWebFile) {
             new Thread(() => {
-                if (Program.startType == 3 || Program.startType == 5) {//常駐背景，關閉所有視窗才執行清除
+                if (Program.startType == 3 || Program.startType == 5) { //常駐背景，關閉所有視窗才執行清除
                     if (QuickRun.runNumber <= 2) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
@@ -124,8 +124,8 @@ namespace Tiefsee {
         }
         public void DeleteTemp(string path, int max) {
             if (Directory.Exists(path) == false) { return; }
-            FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos();//取得資料夾內的所有檔案與資料夾
-            if (ar.Length <= max) { return; }//如果檔案數量未達上限，就不做任何事情
+            FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos(); //取得資料夾內的所有檔案與資料夾
+            if (ar.Length <= max) { return; } //如果檔案數量未達上限，就不做任何事情
             List<FileSystemInfo> sortedFiles = ar.OrderBy(f => f.LastWriteTime).ToList();
             for (int i = 0; i < sortedFiles.Count - max; i++) {
                 try {
@@ -211,11 +211,11 @@ namespace Tiefsee {
             try {
                 using (MemoryStream ms = Base64ToMemoryStream(base64)) {
                     using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
-                        System.Windows.Forms.Clipboard.Clear();//清理剪貼簿
+                        System.Windows.Forms.Clipboard.Clear(); //清理剪貼簿
                         System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
-                        data_object.SetData(DataFormats.Bitmap, true, bm);//無透明色的圖片，所有軟體都支援
+                        data_object.SetData(DataFormats.Bitmap, true, bm); //無透明色的圖片，所有軟體都支援
                         if (isTransparent) {
-                            data_object.SetData("PNG", true, ms);//含有透明色，但並非所有軟體都支援
+                            data_object.SetData("PNG", true, ms); //含有透明色，但並非所有軟體都支援
                         }
                         System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
                         return true;
@@ -242,11 +242,11 @@ namespace Tiefsee {
                 using (Stream ms = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
                     using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
 
-                        System.Windows.Forms.Clipboard.Clear();//先清理剪貼簿
+                        System.Windows.Forms.Clipboard.Clear(); //先清理剪貼簿
                         System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
                         data_object.SetData(DataFormats.Bitmap, true, bm);
                         if (isTransparent) {
-                            data_object.SetData("PNG", true, ms);//含有透明色，但並非所有軟體都支援
+                            data_object.SetData("PNG", true, ms); //含有透明色，但並非所有軟體都支援
                         }
                         System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
                         return true;
@@ -312,7 +312,7 @@ namespace Tiefsee {
                     base64String = "data:image/jpeg;base64," + Convert.ToBase64String(temp);
                 }
 
-                System.Windows.Forms.Clipboard.SetDataObject(base64String, false, 5, 200);//存入剪貼簿
+                System.Windows.Forms.Clipboard.SetDataObject(base64String, false, 5, 200); //存入剪貼簿
                 return true;
 
             } catch (Exception e) {
@@ -347,7 +347,7 @@ namespace Tiefsee {
         /// <returns></returns>
         public bool SetClipboard_Txt(string txt) {
             try {
-                System.Windows.Forms.Clipboard.SetDataObject(txt, false, 5, 200);//存入剪貼簿
+                System.Windows.Forms.Clipboard.SetDataObject(txt, false, 5, 200); //存入剪貼簿
                 return true;
             } catch (Exception) {
                 return false;
@@ -409,7 +409,7 @@ namespace Tiefsee {
         public void SetWallpaper(string path) {
             if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
                 try {
-                    SystemParametersInfo(20, 1, path, 0x1 | 0x2);  //存在成立，修改桌布　　(uActuin 20 參數為修改wallpaper
+                    SystemParametersInfo(20, 1, path, 0x1 | 0x2); //存在成立，修改桌布　　(uActuin 20 參數為修改wallpaper
                 } catch (Exception e2) {
                     MessageBox.Show("\"Set as Desktop Background\" failed：\n" + e2.ToString(), "Error");
                 }
@@ -438,8 +438,8 @@ namespace Tiefsee {
         /// </summary>
         public bool IsWindows7() {
             try {
-                String os = System.Environment.OSVersion.Version.ToString();//取得作業系統地版本
-                return os.Length > 3 && os.Substring(0, 3) == "6.1";//win7
+                String os = System.Environment.OSVersion.Version.ToString(); //取得作業系統地版本
+                return os.Length > 3 && os.Substring(0, 3) == "6.1"; //win7
             } catch {
                 return false;
             }
@@ -502,10 +502,10 @@ namespace Tiefsee {
             //如果檔案不存在
             if (File.Exists(appPath) == false) { return; }
 
-            string appName = Path.GetFileName(appPath);//程式檔名，例如 Tiefsee.exe
+            string appName = Path.GetFileName(appPath); //程式檔名，例如 Tiefsee.exe
 
             for (int i = 0; i < arExtension.Length; i++) {
-                string Extension = arExtension[i].ToString();//副檔名
+                string Extension = arExtension[i].ToString(); //副檔名
                 _AssociationExtension(Extension, appPath, appName);
             }
         }
@@ -550,10 +550,10 @@ namespace Tiefsee {
             //如果檔案不存在
             if (File.Exists(appPath) == false) { return; }
 
-            string appName = Path.GetFileName(appPath);//程式檔名，例如 Tiefsee.exe
+            string appName = Path.GetFileName(appPath); //程式檔名，例如 Tiefsee.exe
 
             for (int i = 0; i < arExtension.Length; i++) {
-                string Extension = arExtension[i].ToString();//副檔名
+                string Extension = arExtension[i].ToString(); //副檔名
 
                 using (RegistryKey User_Classes = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey("SOFTWARE\\Classes\\", true)) {
                     User_Classes.DeleteSubKeyTree("." + Extension, false);

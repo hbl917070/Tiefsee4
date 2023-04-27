@@ -71,25 +71,25 @@ class FileShow {
             }
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
-                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽視窗
-                M.mainDirList.setHide(true);//暫時隱藏 資料夾預覽視窗
-                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
+                M.mainFileList.setHide(true); //暫時隱藏 檔案預覽視窗
+                M.mainDirList.setHide(true); //暫時隱藏 資料夾預覽視窗
+                M.mainExif.setHide(true); //暫時隱藏 詳細資料視窗
+                M.largeBtn.setHide(true); //暫時隱藏 大型切換按鈕
             } else if (groupType === GroupType.img || groupType === GroupType.imgs || groupType === GroupType.video) {
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽視窗
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(false);//解除隱藏 大型切換按鈕
+                M.mainFileList.setHide(false); //解除隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false); //解除隱藏 資料夾預覽視窗
+                M.mainExif.setHide(false); //解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(false); //解除隱藏 大型切換按鈕
             } else if (groupType === GroupType.bulkView) {
-                M.mainFileList.setHide(true);//暫時隱藏 檔案預覽視窗
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
-                M.mainExif.setHide(true);//暫時隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
+                M.mainFileList.setHide(true); //暫時隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false); //解除隱藏 資料夾預覽視窗
+                M.mainExif.setHide(true); //暫時隱藏 詳細資料視窗
+                M.largeBtn.setHide(true); //暫時隱藏 大型切換按鈕
             } else {
-                M.mainFileList.setHide(false);//解除隱藏 檔案預覽視窗
-                M.mainDirList.setHide(false);//解除隱藏 資料夾預覽視窗
-                M.mainExif.setHide(false);//解除隱藏 詳細資料視窗
-                M.largeBtn.setHide(true);//暫時隱藏 大型切換按鈕
+                M.mainFileList.setHide(false); //解除隱藏 檔案預覽視窗
+                M.mainDirList.setHide(false); //解除隱藏 資料夾預覽視窗
+                M.mainExif.setHide(false); //解除隱藏 詳細資料視窗
+                M.largeBtn.setHide(true); //暫時隱藏 大型切換按鈕
             }
 
 
@@ -200,31 +200,31 @@ class FileShow {
             let _path = fileInfo2.Path;
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let imgurl = _path;//圖片網址
+            let imgurl = _path; //圖片網址
 
-            let imgType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType);// ex. { ext: "avif", type: ["wpf", "magick"] }
+            let imgType = Lib.GetFileType(fileInfo2); //取得檔案類型
+            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType); // ex. { ext: "avif", type: ["wpf", "magick"] }
             let loadOk = false;
             if (fileItem !== null) {
-                let arType = fileItem.type;//ex. ["wpf", "magick"]
+                let arType = fileItem.type; //ex. ["wpf", "magick"]
                 for (let i = 0; i < arType.length; i++) {
                     const type = arType[i];
                     imgurl = await getUrl(type);
 
-                    loadOk = await tiefseeview.preloadImg(imgurl);//預載入
-                    if (loadOk) {//如果載入失敗就使用下一種模式來解析
+                    loadOk = await tiefseeview.preloadImg(imgurl); //預載入
+                    if (loadOk) { //如果載入失敗就使用下一種模式來解析
                         break;
                     }
                 }
             } else {
                 imgurl = await getUrl("magick");
-                loadOk = await tiefseeview.preloadImg(imgurl);//預載入
+                loadOk = await tiefseeview.preloadImg(imgurl); //預載入
             }
 
             //如果都載入失敗，就顯示檔案的圖示
             if (loadOk == false) {
                 imgurl = await getUrl("icon")
-                await tiefseeview.preloadImg(imgurl);//預載入
+                await tiefseeview.preloadImg(imgurl); //預載入
             }
 
             return imgurl;
@@ -240,26 +240,26 @@ class FileShow {
 
             isLoaded = false;
             let _path = fileInfo2.Path;
-            setShowType(GroupType.img);//改變顯示類型
-            let imgurl = _path;//圖片網址
+            setShowType(GroupType.img); //改變顯示類型
+            let imgurl = _path; //圖片網址
 
             tiefseeview.setLoading(true, 200);
 
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
-            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType);// ex. { ext:"psd", type:"magick" }
+            let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
             if (configItem === null) {
                 configItem = { ext: "", type: "vips", vipsType: "magick" }
             }
             let configType = configItem.type;
 
-            if (Lib.IsAnimation(fileInfo2) === true) {//判斷是否為動圖
+            if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
 
-                imgurl = await WebAPI.Img.getUrl("web", fileInfo2);//取得圖片網址並且預載入
-                await tiefseeview.loadImg(imgurl);//使用<img>渲染
+                imgurl = await WebAPI.Img.getUrl("web", fileInfo2); //取得圖片網址並且預載入
+                await tiefseeview.loadImg(imgurl); //使用<img>渲染
 
-            } else if (configType === "vips") {//
+            } else if (configType === "vips") { //
 
                 let vipsType = configItem.vipsType as string;
                 let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
@@ -277,7 +277,7 @@ class FileShow {
 
                     for (let i = 1; i <= 30; i++) {
                         let scale = Number(Math.pow(ratio, i).toFixed(3));
-                        if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) {//如果圖片太小就不處理
+                        if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) { //如果圖片太小就不處理
                             break;
                         }
                         let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
@@ -299,7 +299,7 @@ class FileShow {
 
                 } else { //載入失敗就顯示圖示
 
-                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2);//取得圖片網址
+                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
                     await tiefseeview.loadImg(imgurl);
 
                 }
@@ -330,18 +330,18 @@ class FileShow {
 
             isLoaded = false;
             let _path = fileInfo2.Path;
-            setShowType(GroupType.video);//改變顯示類型
-            let imgurl = _path;//圖片網址
+            setShowType(GroupType.video); //改變顯示類型
+            let imgurl = _path; //圖片網址
 
-            if (M.fileLoad.getGroupType() === GroupType.unknown) {//如果是未知的類型
-                imgurl = await WV_Image.GetFileIcon(_path, 256);//取得檔案總管的圖示
+            if (M.fileLoad.getGroupType() === GroupType.unknown) { //如果是未知的類型
+                imgurl = await WV_Image.GetFileIcon(_path, 256); //取得檔案總管的圖示
             } else {
                 imgurl = await WebAPI.Img.getUrl("web", fileInfo2);
             }
 
             tiefseeview.setLoading(true, 200);
-            await tiefseeview.preloadImg(imgurl);//預載入
-            await tiefseeview.loadVideo(imgurl);//使用video渲染
+            await tiefseeview.preloadImg(imgurl); //預載入
+            await tiefseeview.loadVideo(imgurl); //使用video渲染
 
             initTiefseeview(fileInfo2);
             isLoaded = true;
@@ -354,14 +354,14 @@ class FileShow {
          */
         async function initTiefseeview(fileInfo2: FileInfo2) {
             tiefseeview.setLoading(false);
-            await tiefseeview.transformRefresh(false);//初始化 旋轉、鏡像
+            await tiefseeview.transformRefresh(false); //初始化 旋轉、鏡像
             tiefseeview.setEventChangeZoom(((ratio: number) => {
                 let txt = (ratio * 100).toFixed(0) + "%"
 
-                let dom_btnScale = M.dom_toolbar.querySelector(`[data-name="btnScale"]`);//工具列
+                let dom_btnScale = M.dom_toolbar.querySelector(`[data-name="btnScale"]`); //工具列
                 if (dom_btnScale !== null) { dom_btnScale.innerHTML = txt; }
 
-                M.initMenu.updateRightMenuImageZoomRatioTxt(txt);//更新 右鍵選單的圖片縮放比例
+                M.initMenu.updateRightMenuImageZoomRatioTxt(txt); //更新 右鍵選單的圖片縮放比例
             }))
 
             //縮放方式與對齊方式
@@ -405,20 +405,20 @@ class FileShow {
 
             let _path = fileInfo2.Path;
 
-            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let configItem = M.config.getAllowFileTypeItem(GroupType.pdf, fileType);// ex. { ext:"psd", type:"magick" }
+            let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.pdf, fileType); // ex. { ext:"psd", type:"magick" }
             if (configItem == undefined) {
                 configItem = { ext: "", type: "pdf" }
             }
             let configType = configItem.type;
 
             if (configType == "pdf") {
-                setShowType(GroupType.pdf);//改變顯示類型
+                setShowType(GroupType.pdf); //改變顯示類型
                 iframes.pdfview.loadFile(fileInfo2);
             }
 
             if (configType == "PDFTronWebviewer") {
-                setShowType(GroupType.office);//改變顯示類型
+                setShowType(GroupType.office); //改變顯示類型
                 iframes.setTheme();
                 await iframes.pDFTronWebviewer.loadFile(_path);
             }
@@ -450,8 +450,8 @@ class FileShow {
 
             let _path = fileInfo2.Path;
 
-            let fileType = Lib.GetFileType(fileInfo2);//取得檔案類型
-            let configItem = M.config.getAllowFileTypeItem(GroupType.txt, fileType);// ex. { ext:"psd", type:"magick" }
+            let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
+            let configItem = M.config.getAllowFileTypeItem(GroupType.txt, fileType); // ex. { ext:"psd", type:"magick" }
             if (configItem == undefined) {
                 configItem = { ext: "", type: "auto" }
             }
@@ -461,10 +461,9 @@ class FileShow {
 
             let txt = await WebAPI.getText(_path);
 
-
             if (configType === "md") {
 
-                setShowType(GroupType.md);//改變顯示類型
+                setShowType(GroupType.md); //改變顯示類型
                 iframes.setTheme();
                 let dir = Lib.GetDirectoryName(_path) as string;
                 dir = Lib.pathToURL(dir) + "/";
@@ -473,7 +472,7 @@ class FileShow {
 
             } else if (baseWindow.appInfo.plugin.MonacoEditor) {
 
-                setShowType(GroupType.monacoEditor);//改變顯示類型
+                setShowType(GroupType.monacoEditor); //改變顯示類型
                 iframes.setTheme();
                 if (configType == "auto") {
                     await iframes.monacoEditor.loadFile(txt, _path);
@@ -484,7 +483,7 @@ class FileShow {
 
             } else {
 
-                setShowType(GroupType.txt);//改變顯示類型
+                setShowType(GroupType.txt); //改變顯示類型
                 iframes.setTheme();
                 iframes.textView.setReadonly(M.getIsQuickLook());
                 iframes.textView.loadTxt(txt);
@@ -525,11 +524,11 @@ class FileShow {
         function openNone() {
             baseWindow.setTitle("Tiefsee 4");
             M.fileLoad.setGroupType(GroupType.none);
-            setShowType(GroupType.none);//改變顯示類型
+            setShowType(GroupType.none); //改變顯示類型
 
             tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
-            let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);  //圖片長寬
-            let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`);  //檔案類型
+            let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`); //圖片長寬
+            let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`); //檔案類型
             let dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   //檔案修改時間
             if (dom_size) { dom_size.innerHTML = ""; }
             if (dom_type) { dom_type.innerHTML = ""; }

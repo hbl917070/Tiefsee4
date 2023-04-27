@@ -50,7 +50,7 @@ namespace Tiefsee {
                 if (i != 0) {
                     if (name.Length > 0)
                         if (name.Substring(0, 1) == "\\" || name.Substring(0, 1) == "/") {
-                            name = name.Substring(1);//拿掉的斜線
+                            name = name.Substring(1); //拿掉的斜線
                         }
                 }
                 ar[i] = name;

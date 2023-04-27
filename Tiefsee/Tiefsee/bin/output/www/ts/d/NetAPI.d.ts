@@ -539,6 +539,3 @@ interface AppInfoPlugin {
     PDFTronWebviewer_js: string,
     PDFTronWebviewer_lib: string,
 }
-
-
-//declare let cef_window: cef_window;

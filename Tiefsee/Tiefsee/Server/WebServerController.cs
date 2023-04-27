@@ -15,7 +15,7 @@ namespace Tiefsee {
     public class WebServerController {
 
         WebServer webServer;
-        private int CacheTime = 0;//靜態資源快取的時間
+        private int CacheTime = 0; //靜態資源快取的時間
 
 
         public WebServerController(WebServer _webServer) {
@@ -80,7 +80,7 @@ namespace Tiefsee {
                 return;
             }
 
-            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //if (is304) { return; }
 
             string json = Exif.GetExif(path, maxLength);
@@ -98,18 +98,18 @@ namespace Tiefsee {
             ImgInitInfo imgInfo = new ImgInitInfo();
 
             string path = d.args["path"];
-            string[] arType = d.args["type"].Split(',');//使用什麼方式處理圖片
-            //string outputOriginalFile = d.args["outputOriginalFile"];//是否直接回傳原檔
+            string[] arType = d.args["type"].Split(','); //使用什麼方式處理圖片
+            //string outputOriginalFile = d.args["outputOriginalFile"]; //是否直接回傳原檔
 
             path = Uri.UnescapeDataString(path);
 
-            if (File.Exists(path) == false) {//檔案不存在
+            if (File.Exists(path) == false) { //檔案不存在
                 json = JsonConvert.SerializeObject(new ImgInitInfo());
-                WriteString(d, json);//回傳
+                WriteString(d, json); //回傳
                 return;
             }
 
-            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //if (is304 == true) { return; }
 
             for (int i = 0; i < arType.Length; i++) {
@@ -130,7 +130,7 @@ namespace Tiefsee {
             }
 
             json = JsonConvert.SerializeObject(imgInfo);
-            WriteString(d, json);//回傳輸出的檔案路徑
+            WriteString(d, json); //回傳輸出的檔案路徑
         }
 
 
@@ -143,11 +143,11 @@ namespace Tiefsee {
 
             path = Uri.UnescapeDataString(path);
 
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304) { return; }
 
             string imgPath = ImgLib.VipsResize(path, scale);
-            WriteFile(d, imgPath);//回傳檔案
+            WriteFile(d, imgPath); //回傳檔案
         }
 
 
@@ -161,7 +161,7 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
             //string contentType = "";
-            //bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //if (is304 == true) { return; }
 
             string imgPath;
@@ -170,7 +170,7 @@ namespace Tiefsee {
             } else {
                 imgPath = ImgLib.Nconvert_PathToPath(path, false, "bmp");
             }
-            WriteString(d, imgPath);//回傳輸出的檔案路徑
+            WriteString(d, imgPath); //回傳輸出的檔案路徑
         }
 
 
@@ -184,7 +184,7 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
 
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
             //d.context.Response.ContentType = "image/bmp";
@@ -203,7 +203,7 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
 
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
             d.context.Response.ContentType = "image/bmp";
@@ -222,16 +222,16 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
 
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
-            if (ImgLib.IsCMYK(path)) {//檢查檔案是否為 CMYK
+            if (ImgLib.IsCMYK(path)) { //檢查檔案是否為 CMYK
                 d.context.Response.ContentType = "image/bmp";
                 using (Stream stream = ImgLib.Wpf_PathToStream(path)) {
                     WriteStream(d, stream); //回傳檔案
                 }
             } else {
-                WriteFile(d, path);//回傳檔案
+                WriteFile(d, path); //回傳檔案
             }
 
         }
@@ -245,7 +245,7 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = "image/bmp";
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
             using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
@@ -263,7 +263,7 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
             using (Stream stream = ImgLib.ClipToStream(path)) {
@@ -281,7 +281,7 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == true) { return; }
 
             using (Stream stream = ImgLib.ExtractPngToStream(path)) {
@@ -303,7 +303,7 @@ namespace Tiefsee {
         /// </summary>
         private void newWindow(RequestData d) {
 
-            string arg = Uri.UnescapeDataString(d.args["path"]);//將字串剖析回命令列參數
+            string arg = Uri.UnescapeDataString(d.args["path"]); //將字串剖析回命令列參數
             string[] args = arg.Split('\n');
 
             Adapter.UIThread(() => {
@@ -321,9 +321,9 @@ namespace Tiefsee {
             string path = d.value;
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == false) {
-                WriteFile(d, path);//回傳檔案
+                WriteFile(d, path); //回傳檔案
             }
         }
 
@@ -336,9 +336,9 @@ namespace Tiefsee {
             path = Uri.UnescapeDataString(path);
             if (File.Exists(path) == false) { return; }
             d.context.Response.ContentType = "application/pdf";
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == false) {
-                WriteFile(d, path);//回傳檔案
+                WriteFile(d, path); //回傳檔案
             }
         }
 
@@ -358,7 +358,7 @@ namespace Tiefsee {
                 return;
             }
 
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304) { return; }
 
             string ret = "";
@@ -387,7 +387,7 @@ namespace Tiefsee {
             }
 
             d.context.Response.ContentType = "image/png";
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304 == false) {
 
                 try {
@@ -412,7 +412,7 @@ namespace Tiefsee {
                         }
                     }
                     icon.Dispose();
-                    //WriteFile(d, path);//回傳檔案
+                    //WriteFile(d, path); //回傳檔案
                 } catch {
                     d.context.Response.StatusCode = 500;
                     WriteString(d, "500");
@@ -432,7 +432,7 @@ namespace Tiefsee {
             WV_File wvf = new WV_File();
             string srtStrJson = wvf.GetFileInfo2(path);
             //string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
         /// <summary>
@@ -455,7 +455,7 @@ namespace Tiefsee {
             }
 
             string srtStrJson = JsonConvert.SerializeObject(arFileInfo2);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -471,7 +471,7 @@ namespace Tiefsee {
             var filesort = new FileSort();
             string[] retAr = filesort.Sort(ar, type);
             string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -488,7 +488,7 @@ namespace Tiefsee {
             var filesort = new FileSort();
             string[] retAr = filesort.Sort2(dir, ar, type);
             string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -508,7 +508,7 @@ namespace Tiefsee {
             string srtStrJson = wvdir.GetSiblingDir(path, arExt, maxCount);
 
             //string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -523,13 +523,13 @@ namespace Tiefsee {
 
             var wvdir = new WV_Directory();
             string[] retAr = wvdir.GetFiles2(dirPath, arName);
-            int pathLen = dirPath.Length;//只回傳檔名，減少傳輸成本
+            int pathLen = dirPath.Length; //只回傳檔名，減少傳輸成本
             for (int i = 0; i < retAr.Length; i++) {
                 retAr[i] = retAr[i].Substring(pathLen);
             }
 
             string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -543,7 +543,7 @@ namespace Tiefsee {
             string searchPattern = json["searchPattern"].ToString();
 
             /*string[] retAr = Directory.GetFiles(path, searchPattern);
-            int pathLen = path.Length;//只回傳檔名，減少傳輸成本
+            int pathLen = path.Length; //只回傳檔名，減少傳輸成本
             for (int i = 0; i < retAr.Length; i++) {
                 retAr[i] = retAr[i].Substring(pathLen);
             }*/
@@ -552,7 +552,7 @@ namespace Tiefsee {
                           .Select(filePath => filePath.Substring(pathLen)).ToArray();
 
             string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -566,13 +566,13 @@ namespace Tiefsee {
             string searchPattern = json["searchPattern"].ToString();
 
             string[] retAr = Directory.GetDirectories(path, searchPattern);
-            int pathLen = path.Length;//只回傳檔名，減少傳輸成本
+            int pathLen = path.Length; //只回傳檔名，減少傳輸成本
             for (int i = 0; i < retAr.Length; i++) {
                 retAr[i] = retAr[i].Substring(pathLen);
             }
 
             string srtStrJson = JsonConvert.SerializeObject(retAr);
-            WriteString(d, srtStrJson);//回傳
+            WriteString(d, srtStrJson); //回傳
         }
 
 
@@ -584,7 +584,7 @@ namespace Tiefsee {
         /// </summary>
         private void getWww(RequestData d) {
 
-            String exeDir = System.AppDomain.CurrentDomain.BaseDirectory;//程式的目錄
+            String exeDir = System.AppDomain.CurrentDomain.BaseDirectory; //程式的目錄
 
             String path;
             if (d.value.IndexOf("www/") == 0) {
@@ -601,10 +601,10 @@ namespace Tiefsee {
             }
 
             d.context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ? mime : "application/octet-stream";
-            bool is304 = HeadersAdd304(d, path);//回傳檔案時加入快取的Headers
+            bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //d.context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             if (is304 == false) {
-                WriteFile(d, path);//回傳檔案
+                WriteFile(d, path); //回傳檔案
             }
         }
 
@@ -624,11 +624,11 @@ namespace Tiefsee {
             string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
             string etag = dt.ToFileTimeUtc().ToString();
 
-            d.context.Response.Headers.Add("Last-Modified", lastModified);//檔案建立的時間
-            d.context.Response.Headers.Add("ETag", etag);//瀏覽器用來判斷資源是否有更新的key
+            d.context.Response.Headers.Add("Last-Modified", lastModified); //檔案建立的時間
+            d.context.Response.Headers.Add("ETag", etag); //瀏覽器用來判斷資源是否有更新的key
             d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + CacheTime); //讓瀏覽器快取檔案
 
-            if (d.context.Request.Headers["If-None-Match"] == etag) {//表示瀏覽器還留有暫存，狀態304後，不用回傳任何資料
+            if (d.context.Request.Headers["If-None-Match"] == etag) { //表示瀏覽器還留有暫存，狀態304後，不用回傳任何資料
                 d.context.Response.StatusCode = 304;
                 return true;
             }
@@ -643,7 +643,7 @@ namespace Tiefsee {
         /// <param name="time"> 秒數</param>
         public void SetCacheTime(int time) {
             if (time <= 0) { time = 0; }
-            if (time >= 31536000) { time = 31536000; }//一年
+            if (time >= 31536000) { time = 31536000; } //一年
             CacheTime = time;
         }
 
@@ -654,7 +654,7 @@ namespace Tiefsee {
         /// <param name="context"></param>
         /// <param name="str"></param>
         private void WriteString(RequestData d, string str) {
-            d.context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");//設定編碼
+            d.context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
             byte[] _responseArray = Encoding.UTF8.GetBytes(str);
             d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
         }

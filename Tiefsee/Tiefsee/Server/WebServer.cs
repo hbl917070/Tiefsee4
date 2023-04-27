@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace Tiefsee {
     public class WebServer {
 
-        public int port;//當前掛載的port
+        public int port; //當前掛載的port
         public string origin;
         public WebServerController controller;
         private HttpListener _httpListener;
-        private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>();//路由
+        private List<Func<RequestData, bool>> ArRoute = new List<Func<RequestData, bool>>(); //路由
 
         public WebServer() { }
 
@@ -27,7 +27,7 @@ namespace Tiefsee {
         /// <returns> 初始化成功或失敗 </returns>
         public bool Init() {
 
-            port = GetAllowPost();//取得能使用的port
+            port = GetAllowPost(); //取得能使用的port
 
             for (int i = 0; i < 100; i++) {
                 try {
@@ -72,8 +72,8 @@ namespace Tiefsee {
 
             //禁止webview2以外的請求
             if (request.UserAgent != Program.webvviewUserAgent) {
-                context.Response.StatusCode = 403;//狀態
-                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");//設定編碼
+                context.Response.StatusCode = 403; //狀態
+                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
                 byte[] _responseArray = Encoding.UTF8.GetBytes("403");
                 context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
 
@@ -83,7 +83,7 @@ namespace Tiefsee {
 
             Dictionary<string, string> dirArgs = new Dictionary<string, string>();
             int argStart = _url.IndexOf("?");
-            if (argStart != -1) {//如果有「?」，就解析傳入參數 
+            if (argStart != -1) { //如果有「?」，就解析傳入參數 
                 string[] arArgs = _url.Substring(argStart + 1).Split('&');
                 for (int i = 0; i < arArgs.Length; i++) {
                     string item = arArgs[i];
@@ -102,7 +102,7 @@ namespace Tiefsee {
                     }
                 }
 
-                _url = _url.Substring(0, argStart);//取得「?」前面的文字
+                _url = _url.Substring(0, argStart); //取得「?」前面的文字
             }
 
             var requestData = new RequestData();
@@ -111,15 +111,15 @@ namespace Tiefsee {
             requestData.args = dirArgs;
 
             try {
-                for (int i = 0; i < ArRoute.Count; i++) {//嘗試匹配每一個有註冊的路由 
-                    if (ArRoute[i](requestData) == true) {//如果匹配網址成功，就離開
+                for (int i = 0; i < ArRoute.Count; i++) { //嘗試匹配每一個有註冊的路由 
+                    if (ArRoute[i](requestData) == true) { //如果匹配網址成功，就離開
                         break;
                     }
                 }
             } catch (Exception e) {
                 //狀態500、回傳錯誤訊息的文字
                 context.Response.StatusCode = 500;
-                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");//設定編碼
+                context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
                 byte[] _responseArray = Encoding.UTF8.GetBytes(e.ToString());
                 context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
 
@@ -219,8 +219,8 @@ namespace Tiefsee {
     /// </summary>
     public class RequestData {
         public string url = "";
-        public string value = "";//取得網址結尾「{*}」實際的字串
-        public Dictionary<string, string> args = new Dictionary<string, string>();//「?」後面的參數
+        public string value = ""; //取得網址結尾「{*}」實際的字串
+        public Dictionary<string, string> args = new Dictionary<string, string>(); //「?」後面的參數
         public HttpListenerContext context;
         public string postData {
             get {

@@ -52,8 +52,8 @@ namespace Tiefsee {
             string[] arDir = new string[0];
             try { //如果取得所有資料夾失敗，就只處理自己目前的資料夾
                 if (parentPath == null) { //如果沒有上一層資料夾
-                    arDir = new string[] { siblingPath };//只處理自己
-                } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) {//如果開啟的是 user資料夾 裡面的資料(例如桌面
+                    arDir = new string[] { siblingPath }; //只處理自己
+                } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) { //如果開啟的是 user資料夾 裡面的資料(例如桌面
                     arDir = new string[] { siblingPath }; //只處理自己
                 } else if (maxCount == 0) {
                     arDir = new string[] { siblingPath }; //只處理自己
@@ -135,11 +135,11 @@ namespace Tiefsee {
             for (int i = 0; i < arName.Length; i++) {
                 string item = arName[i].ToString();
                 string filePath = Path.Combine(dirPath, item);
-                if (File.Exists(filePath)) {//如果是檔案
+                if (File.Exists(filePath)) { //如果是檔案
                     arWaitingList.Add(filePath);
 
-                } else if (Directory.Exists(filePath)) {//如果是資料夾
-                    string[] arFile = Directory.GetFiles(filePath, "*.*");//取得資料夾內所有檔案
+                } else if (Directory.Exists(filePath)) { //如果是資料夾
+                    string[] arFile = Directory.GetFiles(filePath, "*.*"); //取得資料夾內所有檔案
                     for (int j = 0; j < arFile.Length; j++) {
                         arWaitingList.Add(arFile[j]);
                     }

@@ -28,7 +28,7 @@ namespace Tiefsee {
         /// 清理webview2的暫存
         /// </summary>
         public void ClearBrowserCache() {
-            //M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync();//會清除使用者資料
+            //M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync(); //會清除使用者資料
             M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
         }
 
@@ -176,7 +176,7 @@ namespace Tiefsee {
                 WebWindow webwindow = (WebWindow)_window;
 
                 if (TopMost == true) {
-                    TopMost = false;//設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
+                    TopMost = false; //設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
                     TopMost = true;
                 } else {
@@ -380,7 +380,7 @@ namespace Tiefsee {
             if (_type == "LB") { _run = ResizeDirection.LB; }
             if (_type == "RB") { _run = ResizeDirection.RB; }
 
-            /*if (_run== ResizeDirection.Move) {//拖曳視窗
+            /*if (_run== ResizeDirection.Move) { //拖曳視窗
                 int WM_NCLBUTTONDOWN = 161; //  0xA1
                 int HTCAPTION = 2;
                 ReleaseCapture();
@@ -400,14 +400,14 @@ namespace Tiefsee {
 
         #region 視窗拖曳
         public enum ResizeDirection {
-            LC = 0xF001,//左
-            RC = 0xF002,//右
-            CT = 0xF003,//上
-            LT = 0xF004,//左上
-            RT = 0xF005,//右上
-            CB = 0xF006,//下
-            LB = 0xF007,//左下
-            RB = 0xF008,//右下
+            LC = 0xF001, //左
+            RC = 0xF002, //右
+            CT = 0xF003, //上
+            LT = 0xF004, //左上
+            RT = 0xF005, //右上
+            CB = 0xF006, //下
+            LB = 0xF007, //左下
+            RB = 0xF008, //右下
             Move = 0xF009 //移動
         }
 

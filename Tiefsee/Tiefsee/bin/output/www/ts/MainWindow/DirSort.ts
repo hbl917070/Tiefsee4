@@ -17,7 +17,7 @@ class DirSort {
         var dom_dirSort_desc = document.getElementById("menuitem-dirSort-desc") as HTMLInputElement;
 
         var yesSvgTxt = SvgList["yes.svg"];
-        var sortType = DirSortType.name;//排序方式
+        var sortType = DirSortType.name; //排序方式
         var orderbyType = DirOrderbyType.asc;
 
         //this.getSortType = () => { return sortType }
@@ -88,12 +88,12 @@ class DirSort {
             }
             setDirSortType(dirParentPath, sortType);
 
-            M.fileLoad.updateTitle();//更新視窗標題
-            M.mainDirList.init();//設定 檔案預覽視窗 目前選中的項目
-            M.mainDirList.updateLocation();//檔案預覽視窗 自動捲動到選中項目的地方
+            M.fileLoad.updateTitle(); //更新視窗標題
+            M.mainDirList.init(); //設定 檔案預覽視窗 目前選中的項目
+            M.mainDirList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
 
             updateMenu();
-            //M.menu.close();//關閉menu
+            //M.menu.close(); //關閉menu
         }
 
 
@@ -134,7 +134,7 @@ class DirSort {
             if (orderbyType === DirOrderbyType.desc) {
                 dom_dirSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
             }
-            //M.menu.close();//關閉menu
+            //M.menu.close(); //關閉menu
         }
 
 
@@ -204,7 +204,7 @@ class DirSort {
                 sortType = _sortType;
             } else {
                 let defaultSort = M.config.settings.sort["dirSort"];
-                if (Object.keys(DirSortType).indexOf(defaultSort) === -1) {//如果找不到
+                if (Object.keys(DirSortType).indexOf(defaultSort) === -1) { //如果找不到
                     defaultSort = DirSortType.name;
                 }
                 sortType = defaultSort;

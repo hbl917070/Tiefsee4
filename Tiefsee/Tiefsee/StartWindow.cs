@@ -24,8 +24,8 @@ namespace Tiefsee {
             Adapter.Initialize();
             Plugin.Init();
 
-            LockPort();//寫入檔案，表示此port已經被佔用
-            CheckWebView2();//檢查是否有webview2執行環境
+            LockPort(); //寫入檔案，表示此port已經被佔用
+            CheckWebView2(); //檢查是否有webview2執行環境
 
             //--------------
 
@@ -34,23 +34,23 @@ namespace Tiefsee {
 
             this.Shown += (sender, e) => {
                 this.Hide();
-                if (Program.startType == 3) {//快速啟動且常駐
+                if (Program.startType == 3) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
 
-                if (Program.startType == 5) {//快速啟動且常駐
+                if (Program.startType == 5) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
-                InitWebview();//初始化webview2(常駐在背景
+                InitWebview(); //初始化webview2(常駐在背景
             };
 
             //如果有進行圖片運算的話，定時執行GC
             Adapter.LoopRun(30 * 1000, () => {
                 if (isRunGC) {
-                    DateTime time_start = DateTime.Now;//計時開始 取得目前時間
+                    DateTime time_start = DateTime.Now; //計時開始 取得目前時間
                     WV_System._Collect();
-                    DateTime time_end = DateTime.Now;//計時結束 取得目前時間            
-                    string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString();//後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
+                    DateTime time_end = DateTime.Now; //計時結束 取得目前時間            
+                    string result2 = ((TimeSpan)(time_end - time_start)).TotalMilliseconds.ToString(); //後面的時間減前面的時間後 轉型成TimeSpan即可印出時間差
 
                     isRunGC = false;
                     Console.WriteLine("=============== GC == " + result2);
@@ -58,7 +58,7 @@ namespace Tiefsee {
             }, true);
 
 
-            InitQuickLook();//快速預覽
+            InitQuickLook(); //快速預覽
         }
 
 
@@ -74,8 +74,8 @@ namespace Tiefsee {
 
             Adapter.LoopRun(50, () => {
 
-                bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
-                bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+                bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); //按著空白鍵
+                bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
 
                 int quickLookRunType = 0;
                 if (isKeyboardSpace) { quickLookRunType = 1; }
@@ -86,24 +86,24 @@ namespace Tiefsee {
                     if (isDown == false) {
                         isDown = true;
 
-                        String selectedItem = PluginQuickLook.GetCurrentSelection();//取得檔案總管目前選取的檔案
+                        String selectedItem = PluginQuickLook.GetCurrentSelection(); //取得檔案總管目前選取的檔案
                         if (selectedItem == "") { return; }
 
                         //再次檢查是否按著空白鍵或滑鼠中鍵
-                        isKeyboardSpace = Keyboard.IsKeyDown(Key.Space);//按著空白鍵
-                        isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle;//按著滑鼠滾輪
+                        isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); //按著空白鍵
+                        isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
                         if (isMouseMiddle == false && isKeyboardSpace == false) { return; }
 
                         if (Program.startType == 2 || Program.startType == 3) {
                             if (WebWindow.tempWindow == null) { return; }
                             WebWindow.SendOnCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
 
-                        } else if (Program.startType == 4 || Program.startType == 5) {//單一執行個體，用原來的視窗開啟
+                        } else if (Program.startType == 4 || Program.startType == 5) { //單一執行個體，用原來的視窗開啟
                             WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
                         }
                     }
 
-                } else {//放開空白鍵
+                } else { //放開空白鍵
 
                     if (isDown) {
                         if (WebWindow.tempWindow != null) {
@@ -128,7 +128,7 @@ namespace Tiefsee {
         public void LockPort() {
             int port = Program.webServer.port;
 
-            if (Directory.Exists(AppPath.appDataPort) == false) {//如果資料夾不存在，就新建
+            if (Directory.Exists(AppPath.appDataPort) == false) { //如果資料夾不存在，就新建
                 Directory.CreateDirectory(AppPath.appDataPort);
             }
 
@@ -151,7 +151,7 @@ namespace Tiefsee {
             nIcon.Text = "TiefSee";
             nIcon.Visible = true;
 
-            var cm = new System.Windows.Forms.ContextMenu();//右鍵選單
+            var cm = new System.Windows.Forms.ContextMenu(); //右鍵選單
 
             cm.MenuItems.Add("New", new EventHandler((sender2, e2) => {
                 WebWindow.Create("MainWindow.html", new string[0], null);
@@ -160,7 +160,7 @@ namespace Tiefsee {
             cm.MenuItems.Add("Exit Tiefsee", new EventHandler((sender2, e2) => {
                 nIcon.Visible = false;
 
-                //QuickRun.runNumber = 0;//不論存在幾個視窗都直接關閉
+                //QuickRun.runNumber = 0; //不論存在幾個視窗都直接關閉
                 QuickRun.WindowFreed();
             }));
 
@@ -194,7 +194,7 @@ namespace Tiefsee {
                 if (IsWebView2Runtime() == true) { //檢查安裝webview2執行環境
                     return;
                 }
-                Adapter.UIThread(() => {//如果沒有執行環境，就用瀏覽器開啟下載頁面
+                Adapter.UIThread(() => { //如果沒有執行環境，就用瀏覽器開啟下載頁面
                     MessageBox.Show("WebView2 must be installed to run this application");
                     System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
                     this.Close();

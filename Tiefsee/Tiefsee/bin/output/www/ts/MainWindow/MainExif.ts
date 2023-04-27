@@ -180,7 +180,7 @@ class MainExif {
 								<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
 							</div>
 						</div>`;
-					dom_mainExifList.appendChild(newDom(mapHtml));
+					dom_mainExifList.appendChild(Lib.newDom(mapHtml));
 
 				} else if (name === "User Comment" && value.indexOf("Steps: ") !== -1 && value.indexOf("Seed: ") !== -1) { // Stable Diffusion webui 輸出的jpg或webp
 
@@ -206,7 +206,7 @@ class MainExif {
 
 							if (name === "Comment") { // NovelAI 才有的欄位
 								try {
-									//val = JSON.stringify(JSON.parse(val), null, 2);//格式化json再顯示
+									//val = JSON.stringify(JSON.parse(val), null, 2); //格式化json再顯示
 									//html += getItemHtml(name, val);
 									if (val.indexOf(`"steps": `) !== -1) {
 										let jsonComment = JSON.parse(val); //把json裡面的每一筆資料進行剖析
@@ -313,7 +313,7 @@ class MainExif {
 					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 				</div>`
 
-			let div = newDom(html);
+			let div = Lib.newDom(html);
 			let btn = div.querySelector(".mainExifCopyBtn") as HTMLElement;
 			btn.addEventListener("click", async () => {
 				await WV_System.SetClipboard_Txt(oVal);

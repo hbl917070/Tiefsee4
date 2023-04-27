@@ -18,12 +18,12 @@ namespace Tiefsee {
 
     [ComVisible(true)]
     public class FileInfo2 {
-        public string Type = "none";// file / dir / none
-        public string Path = "";//檔案路徑
-        public long Lenght = 0;//檔案大小
-        public long CreationTimeUtc = 0;//建立時間
-        public long LastWriteTimeUtc = 0;//修改時間
-        public string HexValue = "";//用於辨識檔案類型
+        public string Type = "none"; // file / dir / none
+        public string Path = ""; //檔案路徑
+        public long Lenght = 0; //檔案大小
+        public long CreationTimeUtc = 0; //建立時間
+        public long LastWriteTimeUtc = 0; //修改時間
+        public string HexValue = ""; //用於辨識檔案類型
     }
 
 
@@ -126,8 +126,8 @@ namespace Tiefsee {
                                 fs.Close();
                                 br.Close();
                             }
-                        }//using
-                    }//using
+                        }
+                    }
                 } catch { }
 
                 info.HexValue = sb.ToString();
@@ -185,10 +185,10 @@ namespace Tiefsee {
         public string[] OpenFileDialog(bool Multiselect, string Filter, string Title) {
             using (OpenFileDialog openFileDialog = new OpenFileDialog()) {
                 openFileDialog.Multiselect = Multiselect; //是否允許多選，false表示單選
-                openFileDialog.Filter = Filter;//檔案類型 All files (*.*)|*.*
-                openFileDialog.Title = Title;//標題
-                                             //openFileDialog.InitialDirectory = InitialDirectory;//初始目錄
-                openFileDialog.RestoreDirectory = true;//恢復到之前選擇的目錄
+                openFileDialog.Filter = Filter; //檔案類型 All files (*.*)|*.*
+                openFileDialog.Title = Title; //標題
+                                             //openFileDialog.InitialDirectory = InitialDirectory; //初始目錄
+                openFileDialog.RestoreDirectory = true; //恢復到之前選擇的目錄
                                                        //openFileDialog.FilterIndex = 2;
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
                     var files = openFileDialog.FileNames;
@@ -264,7 +264,7 @@ namespace Tiefsee {
         public void PrintFile(string path) {
             try {
                 var pr = new System.Diagnostics.Process();
-                pr.StartInfo.FileName = path;//文件全稱-包括文件後綴
+                pr.StartInfo.FileName = path; //文件全稱-包括文件後綴
                 pr.StartInfo.CreateNoWindow = true;
                 pr.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 pr.StartInfo.Verb = "Print";

@@ -207,16 +207,16 @@ class MainToolbar {
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) {//滑鼠左鍵
+                        if (e.button === 0) { //滑鼠左鍵
                             M?.script.file.dragDropFile();
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) {//滑鼠右鍵
+                        if (e.button === 2) { //滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
                 },
             })
 
@@ -486,16 +486,16 @@ class MainToolbar {
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) {//滑鼠左鍵
+                        if (e.button === 0) { //滑鼠左鍵
                             M?.script.file.dragDropFile();
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) {//滑鼠右鍵
+                        if (e.button === 2) { //滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
                 },
             })
 
@@ -691,16 +691,16 @@ class MainToolbar {
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) {//滑鼠左鍵
+                        if (e.button === 0) { //滑鼠左鍵
                             M?.script.file.dragDropFile();
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) {//滑鼠右鍵
+                        if (e.button === 2) { //滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
                 },
             })
 
@@ -918,16 +918,16 @@ class MainToolbar {
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) {//滑鼠左鍵
+                        if (e.button === 0) { //滑鼠左鍵
                             M?.script.file.dragDropFile();
                         }
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) {//滑鼠右鍵
+                        if (e.button === 2) { //滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none");//避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
                 },
             })
 
@@ -1004,7 +1004,7 @@ class MainToolbar {
             i18n: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = newDom(item.html);
+            let div = Lib.newDom(item.html);
             div.setAttribute("title", item.i18n);
             div.setAttribute("i18n", item.i18n);
             div.style.order = "999";
@@ -1024,7 +1024,7 @@ class MainToolbar {
             group: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = newDom(`<div class="main-toolbar-hr"> </div>`);
+            let div = Lib.newDom(`<div class="main-toolbar-hr"> </div>`);
             div.style.order = "888";
             addToolbarDom({
                 group: item.group,
@@ -1047,11 +1047,11 @@ class MainToolbar {
         }) {
 
             //產生按鈕
-            let div = newDom(`
+            let div = Lib.newDom(`
                 <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
-            div.style.order = "888";//未定義順序的按鈕就放在最後面
+            div.style.order = "888"; //未定義順序的按鈕就放在最後面
             addToolbarDom({
                 group: item.group,
                 dom: div,
@@ -1074,22 +1074,17 @@ class MainToolbar {
             //如果群組不存在，就先產生群組
             let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (dom_group === null) {
-                let div = newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
+                let div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
                 M.dom_toolbar.appendChild(div);
                 dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }
 
             item.func(item.dom)
-
             if (dom_group !== null) {
                 dom_group.appendChild(item.dom);
             }
         }
 
 
-
     }
-
 }
-
-

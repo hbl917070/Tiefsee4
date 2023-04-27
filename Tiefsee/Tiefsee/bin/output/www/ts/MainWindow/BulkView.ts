@@ -277,6 +277,7 @@ class BulkView {
             dom_columns.dispatchEvent(new Event("input"));
         }
 
+        
         /**
          * 
          * @param n 
@@ -293,24 +294,15 @@ class BulkView {
             updateSize();
         }
 
-        //以定時的方式執行 updateSize() ，如果接受到多次指令，則只會執行最後一個指令
-        var _updateSize = async () => { };
-        async function timerUpdateSize() {
-            let func = _updateSize;
-            _updateSize = async () => { };
-            await func();
-
-            setTimeout(() => { timerUpdateSize(); }, 50);  //遞迴
-        }
-        timerUpdateSize();
-
+       
+        var updateSizeThrottle = new Throttle(50); //節流
         /**
          * 重新計算項目大小
          * @param donItem 項目，未傳入則全部重新計算
          */
         function updateSize(donItem?: HTMLElement) {
 
-            _updateSize = async () => {
+            updateSizeThrottle.run = async () => {
                 dom_bulkViewContent.style.paddingLeft = itemMargin + "px";
                 dom_bulkViewContent.style.paddingTop = itemMargin + "px";
                 //let domBulkViewWidth = dom_bulkViewContent.offsetWidth - 18 - (getColumns() + 1) * itemMargin;
@@ -508,7 +500,7 @@ class BulkView {
             //設定返回按鈕
             M.toolbarBack.visible(true);
             M.toolbarBack.setEvent(() => {
-                M?.script.bulkView.close();
+                M.script.bulkView.close();
             });
 
             temp_hasScrolled = false;
@@ -604,18 +596,7 @@ class BulkView {
         }
 
 
-        //以定時的方式執行，如果接受到多次指令，則只會執行最後一個指令
-        var _showPage = async () => { };
-        async function timerShowPage() {
-            let func = _showPage;
-            _showPage = async () => { };
-            await func();
-
-            setTimeout(() => { timerShowPage(); }, 50);  //遞迴
-        }
-        timerShowPage();
-
-
+        var showPageThrottle = new Throttle(50); //節流
         /**
          * 載入頁面
          * @param _page 
@@ -631,7 +612,7 @@ class BulkView {
 
             updatePagination(); //更新分頁器
 
-            _showPage = async () => {
+            showPageThrottle.run = async () => {
 
                 let start = ((pageNow - 1) * imgMaxCount);
 
@@ -721,7 +702,7 @@ class BulkView {
 
             let fileInfo2 = await WebAPI.getFileInfo2(path);
 
-            let div = newDom(/*html*/`
+            let div = Lib.newDom(/*html*/`
                 <div class="bulkView-item">
                     <div class="bulkView-center bulkView-loading">
                         <img class="bulkView-img">

@@ -8,7 +8,7 @@ class InitMenu {
 
     constructor(M: MainWindow) {
 
-        var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement;//右鍵選單的圖片縮放比例
+        var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement; //右鍵選單的圖片縮放比例
 
         this.initOpen = initOpen;
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
@@ -38,9 +38,9 @@ class InitMenu {
 
                 if (dataMenu !== "none") {
                     e.preventDefault();
-                    if (Lib.isTextFocused()) {//焦點在輸入框上
+                    if (Lib.isTextFocused()) { //焦點在輸入框上
                         M.script.menu.showRightMenuText();
-                    } else if (Lib.isTxtSelect()) {//有選取文字的話
+                    } else if (Lib.isTxtSelect()) { //有選取文字的話
                         M.script.menu.showRightMenuTxt();
                     } else {
                         M.script.menu.showRightMenuImage();
@@ -58,7 +58,7 @@ class InitMenu {
 
             if (dom_rightMenuImage_zoomRatioTxt === null) { return }
 
-            if (txt !== undefined) {//如果有傳入文字，就更新文字內容
+            if (txt !== undefined) { //如果有傳入文字，就更新文字內容
                 dom_rightMenuImage_zoomRatioTxt.innerHTML = txt;
             }
 
@@ -79,14 +79,14 @@ class InitMenu {
          */
         async function initOpen() {
 
-            if (isInit) { return; }//避免重複執行
+            if (isInit) { return; } //避免重複執行
             isInit = true;
 
             //載入檔案
             var dom_OpenFile = document.getElementById("menuitem-openFile");
             if (dom_OpenFile !== null) {
                 dom_OpenFile.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.openFile();
                 }
             }
@@ -96,7 +96,7 @@ class InitMenu {
             var dom_newWindow = document.getElementById("menuitem-openNewWindow");
             if (dom_newWindow !== null) {
                 dom_newWindow.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.openNewWindow();
                 }
             }
@@ -105,7 +105,7 @@ class InitMenu {
             var dom_RevealInFileExplorer = document.getElementById("menuitem-RevealInFileExplorer");
             if (dom_RevealInFileExplorer !== null) {
                 dom_RevealInFileExplorer.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.revealInFileExplorer();
                 }
             }
@@ -114,7 +114,7 @@ class InitMenu {
             var dom_systemContextMenu = document.getElementById("menuitem-systemContextMenu");
             if (dom_systemContextMenu !== null) {
                 dom_systemContextMenu.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.systemContextMenu();
                 }
             }
@@ -123,7 +123,7 @@ class InitMenu {
             var dom_renameFile = document.getElementById("menuitem-renameFile");
             if (dom_renameFile !== null) {
                 dom_renameFile.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.fileLoad.showRenameMsg();
                 }
             }
@@ -132,7 +132,7 @@ class InitMenu {
             var dom_print = document.getElementById("menuitem-print");
             if (dom_print !== null) {
                 dom_print.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.print();
                 }
             }
@@ -141,7 +141,7 @@ class InitMenu {
             var dom_setAsDesktop = document.getElementById("menuitem-setAsDesktop");
             if (dom_setAsDesktop !== null) {
                 dom_setAsDesktop.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.setAsDesktop();
                 }
             }
@@ -150,7 +150,7 @@ class InitMenu {
             var dom_openWith = document.getElementById("menuitem-openWith");
             if (dom_openWith !== null) {
                 dom_openWith.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.openWith();
                 }
             }
@@ -159,10 +159,10 @@ class InitMenu {
             var dom_Open3DMSPaint = document.getElementById("menuitem-open3DMSPaint");
             if (dom_Open3DMSPaint !== null) {
                 dom_Open3DMSPaint.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.open.Open3DMSPaint();
                 }
-                if (await WV_System.IsWindows10() === false) {//不是win10就隱藏
+                if (await WV_System.IsWindows10() === false) { //不是win10就隱藏
                     dom_Open3DMSPaint.style.display = "none";
                 }
             }
@@ -186,10 +186,10 @@ class InitMenu {
                 }
 
                 //加入lnk
-                let arLnk = await WV_RunApp.GetStartMenuList();//取得開始選單裡面的所有lnk
+                let arLnk = await WV_RunApp.GetStartMenuList(); //取得開始選單裡面的所有lnk
                 for (let i = 0; i < arLnk.length; i++) {
                     const lnk = arLnk[i];
-                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1);//取得檔名
+                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
                     name = name.substr(0, name.length - 4);
 
                     for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
@@ -206,12 +206,12 @@ class InitMenu {
                 for (let i = 0; i < arExe.length; i++) {
 
                     const exe = arExe[i];
-                    let name = exe.name;//顯示的名稱
-                    let imgBase64 = await WV_Image.GetFileIcon(exe.path, 32);//圖示
+                    let name = exe.name; //顯示的名稱
+                    let imgBase64 = await WV_Image.GetFileIcon(exe.path, 32); //圖示
 
                     if (imgBase64 === "") { continue; } //如果沒有圖示，表示檔案不存在
 
-                    let dom = newDom(`
+                    let dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
                                 <img src="${imgBase64}">
@@ -221,10 +221,10 @@ class InitMenu {
                     `);
 
                     dom.onclick = async () => {
-                        let filePath = M.fileLoad.getFilePath();//目前顯示的檔案
+                        let filePath = M.fileLoad.getFilePath(); //目前顯示的檔案
                         if (await WV_File.Exists(filePath) === false) { return; }
-                        M.menu.close();//關閉menu
-                        WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false);//開啟檔案
+                        M.menu.close(); //關閉menu
+                        WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); //開啟檔案
                     };
                     dom_menuOtherAppOpen?.append(dom);
                 }
@@ -243,7 +243,7 @@ class InitMenu {
             var dom_copyFile = document.getElementById("menuitem-img-copyFile");
             if (dom_copyFile !== null) {
                 dom_copyFile.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.copy.copyFile();
                 }
             }
@@ -252,7 +252,7 @@ class InitMenu {
             var dom_copyName = document.getElementById("menuitem-img-copyName");
             if (dom_copyName !== null) {
                 dom_copyName.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.copy.copyName();
                 }
             }
@@ -261,7 +261,7 @@ class InitMenu {
             var dom_copyPath = document.getElementById("menuitem-img-copyPath");
             if (dom_copyPath !== null) {
                 dom_copyPath.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.copy.copyPath();
                 }
             }
@@ -270,7 +270,7 @@ class InitMenu {
             var dom_copyImg = document.getElementById("menuitem-img-copyImg");
             if (dom_copyImg !== null) {
                 dom_copyImg.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.copy.copyImg();
                 }
             }
@@ -279,7 +279,7 @@ class InitMenu {
             var dom_copyBase64 = document.getElementById("menuitem-img-copyBase64");
             if (dom_copyBase64 !== null) {
                 dom_copyBase64.onclick = async () => {
-                    M.menu.close();//關閉menu      
+                    M.menu.close(); //關閉menu      
                     M.script.copy.copyImageBase64();
                 }
             }
@@ -288,7 +288,7 @@ class InitMenu {
             var dom_copyTxt = document.getElementById("menuitem-img-copyTxt");
             if (dom_copyTxt !== null) {
                 dom_copyTxt.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.copy.copyTxt();
                 }
             }
@@ -305,7 +305,7 @@ class InitMenu {
             var dom_rotateCw = document.getElementById("menuitem-img-rotateCw");
             if (dom_rotateCw !== null) {
                 dom_rotateCw.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.img.degForward();
                 }
             }
@@ -314,7 +314,7 @@ class InitMenu {
             var dom_rotateCcw = document.getElementById("menuitem-img-rotateCcw");
             if (dom_rotateCcw !== null) {
                 dom_rotateCcw.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.img.degReverse();
                 }
             }
@@ -323,7 +323,7 @@ class InitMenu {
             var dom_mirroringH = document.getElementById("menuitem-img-mirroringH");
             if (dom_mirroringH !== null) {
                 dom_mirroringH.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.img.mirrorHorizontal();
                 }
             }
@@ -332,7 +332,7 @@ class InitMenu {
             var dom_mirroringV = document.getElementById("menuitem-img-mirroringV");
             if (dom_mirroringV !== null) {
                 dom_mirroringV.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.img.mirrorVertica();
                 }
             }
@@ -341,7 +341,7 @@ class InitMenu {
             var dom_initRotate = document.getElementById("menuitem-img-initRotate");
             if (dom_initRotate !== null) {
                 dom_initRotate.onclick = async () => {
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     M.script.img.transformRefresh();
                 }
             }
@@ -390,31 +390,31 @@ class InitMenu {
                 M.script.img.zoomTo100();
             });
 
-            dom.querySelector(".js-open")?.addEventListener("click", () => {//在檔案總管中顯示
+            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
             });
-            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => {//檔案右鍵選單
+            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
                 M.script.menu.close();
                 M.script.file.showContextMenu();
             });
-            dom.querySelector(".js-copy")?.addEventListener("click", () => {//複製影像
+            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製影像
                 M.script.menu.close();
                 M.script.copy.copyImg();
             });
-            dom.querySelector(".js-delete")?.addEventListener("click", () => {//刪除圖片
+            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
                 M.script.menu.close();
                 M.script.fileLoad.showDeleteFileMsg();
             });
-            dom.querySelector(".js-setting")?.addEventListener("click", () => {//設定
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
                 M.script.menu.close();
                 M.script.setting.showSetting();
             });
-            dom.querySelector(".js-help")?.addEventListener("click", () => {//說明
+            dom.querySelector(".js-help")?.addEventListener("click", () => { //說明
                 M.script.menu.close();
                 WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')
             });
-            dom.querySelector(".js-close")?.addEventListener("click", () => {//關閉程式
+            dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
                 M.script.menu.close();
                 baseWindow.close();
             });
@@ -429,16 +429,16 @@ class InitMenu {
             var dom_menu = document.getElementById("menu-text");
             if (dom_menu !== null) {
                 dom_menu.addEventListener("mousedown", (e) => {
-                    e.preventDefault();//避免搶走輸入框的焦點
+                    e.preventDefault(); //避免搶走輸入框的焦點
                 });
             }
 
-            var dom_cut = document.getElementById("menuitem-text-cut");//剪下
+            var dom_cut = document.getElementById("menuitem-text-cut"); //剪下
             if (dom_cut !== null) {
                 dom_cut.onclick = async () => {
 
                     await WV_System.SendKeys_CtrlAnd("x");
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                     /*let dom_input = document.activeElement as HTMLInputElement;
                     if (dom_input === null) { return; }
                     let start = dom_input.selectionStart;
@@ -448,14 +448,14 @@ class InitMenu {
 
                     let txt = dom_input.value;
                     let select = txt.substring(start, end);
-                    WV_System.SetClipboard_Txt(select);//存入剪貼簿
+                    WV_System.SetClipboard_Txt(select); //存入剪貼簿
 
-                    dom_input.value = txt.substring(0, start) + txt.substring(end);//去除中間的文字
-                    dom_input.setSelectionRange(start, start);//把焦點放回開頭*/
+                    dom_input.value = txt.substring(0, start) + txt.substring(end); //去除中間的文字
+                    dom_input.setSelectionRange(start, start); //把焦點放回開頭*/
                 }
             }
 
-            var dom_copy = document.getElementById("menuitem-text-copy");//複製
+            var dom_copy = document.getElementById("menuitem-text-copy"); //複製
             if (dom_copy !== null) {
                 dom_copy.onclick = async () => {
 
@@ -463,26 +463,26 @@ class InitMenu {
 
                     let selection = document.getSelection();
                     if (selection === null) { return; }
-                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿
+                    WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿
 
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                 }
             }
 
-            var dom_paste = document.getElementById("menuitem-text-paste");//貼上
+            var dom_paste = document.getElementById("menuitem-text-paste"); //貼上
             if (dom_paste !== null) {
                 dom_paste.onclick = async () => {
                     await WV_System.SendKeys_CtrlAnd("v");
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
                 }
             }
 
-            var dom_selectAll = document.getElementById("menuitem-text-selectAll");//全選
+            var dom_selectAll = document.getElementById("menuitem-text-selectAll"); //全選
             if (dom_selectAll !== null) {
                 dom_selectAll.onclick = async () => {
 
                     //await WV_System.SendKeys_CtrlAnd("a");
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
 
                     let dom_input = document.activeElement as HTMLInputElement;
                     if (dom_input === null) { return; }
@@ -500,19 +500,19 @@ class InitMenu {
             var dom_menu = document.getElementById("menu-txt");
             if (dom_menu !== null) {
                 dom_menu.addEventListener("mousedown", (e) => {
-                    e.preventDefault();//避免搶走輸入框的焦點
+                    e.preventDefault(); //避免搶走輸入框的焦點
                 });
             }
 
-            var dom_copy = document.getElementById("menuitem-txt-copy");//複製
+            var dom_copy = document.getElementById("menuitem-txt-copy"); //複製
             if (dom_copy !== null) {
                 dom_copy.onclick = async () => {
 
-                    M.menu.close();//關閉menu
+                    M.menu.close(); //關閉menu
 
                     let selection = document.getSelection();
                     if (selection === null) { return; }
-                    WV_System.SetClipboard_Txt(selection.toString());//存入剪貼簿
+                    WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿
                 }
             }
         }

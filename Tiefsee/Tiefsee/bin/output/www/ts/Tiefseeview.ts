@@ -106,11 +106,11 @@ class Tiefseeview {
         var dom_video = <HTMLVideoElement>dom_tiefseeview.querySelector(".view-video");
         var dom_bigimg_canvas = <HTMLCanvasElement>dom_tiefseeview.querySelector(".view-bigimg-canvas");
         var dom_loading = <HTMLImageElement>dom_tiefseeview.querySelector(".tiefseeview-loading");
-        var scrollX = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x");//水平捲動軸
-        var scrollY = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y");//垂直捲動軸
+        var scrollX = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x"); //水平捲動軸
+        var scrollY = new TiefseeviewScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y"); //垂直捲動軸
 
         var url: string; //目前的圖片網址
-        var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img";//資料類型
+        var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img"; //資料類型
         var dpizoom: number = 1;
         var isDpizoomAUto: boolean = true;
         var degNow: number = 0; //目前的角度 0~359
@@ -118,7 +118,7 @@ class Tiefseeview {
         var transformDuration: number = 200; //transform 動畫時間(毫秒)
         var mirrorHorizontal: boolean = false; //水平鏡像
         var mirrorVertical: boolean = false; //垂直鏡像
-        var rendering: TiefseeviewImageRendering = TiefseeviewImageRendering["auto"];//圖片渲染模式
+        var rendering: TiefseeviewImageRendering = TiefseeviewImageRendering["auto"]; //圖片渲染模式
         var overflowDistance: number = 0; //溢位距離
         var marginTop: number = 10; //外距
         var marginLeft: number = 10;
@@ -143,7 +143,7 @@ class Tiefseeview {
         var temp_pinchCenterY = 0;
 
         var temp_dateShowLoading: number = 0; //控制laoding顯示的延遲
-        var temp_originalWidth: number = 1;//用於記錄圖片size 的暫存
+        var temp_originalWidth: number = 1; //用於記錄圖片size 的暫存
         var temp_originalHeight: number = 1;
         var temp_img: HTMLImageElement; //圖片暫存
         var temp_can: HTMLCanvasElement; //canvas暫存
@@ -172,8 +172,8 @@ class Tiefseeview {
 
         var pinch = new Hammer.Pinch();
         var rotate = new Hammer.Rotate();
-        rotate.recognizeWith(pinch);// we want to detect both the same time
-        hammerPlural.add([pinch, rotate]);// add to the Manager
+        rotate.recognizeWith(pinch); // we want to detect both the same time
+        hammerPlural.add([pinch, rotate]); // add to the Manager
 
         this.dom_tiefseeview = dom_tiefseeview;
         this.dom_con = dom_con;
@@ -320,7 +320,7 @@ class Tiefseeview {
 
             temp_zoomWithWindow = false;
         });
-        hammerPlural.on("pinch", (ev) => {//pinchin
+        hammerPlural.on("pinch", (ev) => { //pinchin
             requestAnimationFrame(() => {
 
                 //從兩指的中心進行縮放
@@ -355,7 +355,7 @@ class Tiefseeview {
             temp_zoomWithWindow = false;
             $(dom_con).stop(true, false);
 
-            let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;//捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
+            let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100; //捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
 
             //觸控板雙指移動
             if (isTouchPad || temp_touchPadTime + 200 > new Date().getTime()) {
@@ -376,7 +376,7 @@ class Tiefseeview {
                             toNumber(dom_con.style.left) - posX,
                             toNumber(dom_con.style.top) - posY,
                             0
-                        );//平移
+                        ); //平移
                         init_point(false);
                     }
 
@@ -611,7 +611,7 @@ class Tiefseeview {
             //計算滑行距離
             /*let dep = Math.sqrt(Math.pow((toNumber(dom_con.style.top) - top), 2) + Math.pow((toNumber(dom_con.style.left) - left), 2));
             //console.log(dep, duration)
-            if ((bool_overflowX || bool_overflowY) && dep < 300 * dpi) {//距離太短就直接限制動畫時間
+            if ((bool_overflowX || bool_overflowY) && dep < 300 * dpi) { //距離太短就直接限制動畫時間
                 duration = 300;
                 return
             }*/
@@ -744,14 +744,14 @@ class Tiefseeview {
             let video = document.createElement("video");
             let p = await new Promise((resolve, reject) => {
                 video.addEventListener("loadedmetadata", (e) => {
-                    temp_originalWidth = video.videoWidth;//初始化圖片size
+                    temp_originalWidth = video.videoWidth; //初始化圖片size
                     temp_originalHeight = video.videoHeight;
-                    resolve(true);//繼續往下執行
+                    resolve(true); //繼續往下執行
                 });
                 video.addEventListener("error", (e) => {
                     temp_originalWidth = 1;
                     temp_originalHeight = 1;
-                    resolve(false);//繼續往下執行
+                    resolve(false); //繼續往下執行
                 });
                 video.src = _url;
             })
@@ -875,7 +875,7 @@ class Tiefseeview {
             _zoomType: TiefseeviewZoomType, _zoomVal: number): Promise<boolean> {
 
 
-            temp_originalWidth = _w;//初始化圖片size
+            temp_originalWidth = _w; //初始化圖片size
             temp_originalHeight = _h;
             arBigimgscale = _arUrl;
 
@@ -1049,7 +1049,7 @@ class Tiefseeview {
                 return temp_can;
             }
 
-            if (dataType === "bigimgscale") {//未測試
+            if (dataType === "bigimgscale") { //未測試
 
                 if (temp_bigimgscale[1] != undefined) {
                     return temp_bigimgscale[1];
@@ -1116,7 +1116,7 @@ class Tiefseeview {
                 }, delay);
                 temp_dateShowLoading = (new Date()).getTime() + delay - 1;
             } else {
-                temp_dateShowLoading = 99999999999999;//避免延遲時間到了之後還顯示
+                temp_dateShowLoading = 99999999999999; //避免延遲時間到了之後還顯示
                 dom_loading.style.display = "none";
             }
         }
@@ -1492,7 +1492,7 @@ class Tiefseeview {
 
                 //產生縮小後的圖片
                 if (temp_bigimg[i] === undefined) {
-                    let last = temp_bigimg[i - 1] as HTMLCanvasElement | HTMLImageElement | ImageBitmap;//上一次的圖
+                    let last = temp_bigimg[i - 1] as HTMLCanvasElement | HTMLImageElement | ImageBitmap; //上一次的圖
                     temp_bigimg[i] = getCanvasZoom(last, x, "medium");
                     //console.log(Math.pow(x, i + 1));
                 }
@@ -2003,7 +2003,7 @@ class Tiefseeview {
 
             if (_type === TiefseeviewZoomType["fitWindowOrImageOriginal"]) {
                 if (getOriginalWidth() > (dom_dpizoom.offsetWidth - marginLeft - marginRight) ||
-                    getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) {//圖片比視窗大時
+                    getOriginalHeight() > (dom_dpizoom.offsetHeight - marginTop - marginBottom)) { //圖片比視窗大時
                     _type = TiefseeviewZoomType["fitWindow"]; //縮放至視窗大小
                 } else {
                     _type = TiefseeviewZoomType["imageOriginal"]; //圖片原始大小
@@ -2032,7 +2032,7 @@ class Tiefseeview {
                 _type = TiefseeviewZoomType["windowHeightRatio"];
             }
             if (_type === TiefseeviewZoomType["windowWidthRatio"]) { //以視窗寬度比例設定
-                let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5;//顯示範圍 - 邊距
+                let w = dom_dpizoom.offsetWidth - marginLeft - marginRight - 5; //顯示範圍 - 邊距
                 if (w < 10) { w = 10 }
                 let ratio = getOriginalWidth() / dom_con_offsetWidth;
                 _w = (w * ratio * (_val / 100));
@@ -2413,7 +2413,7 @@ class Tiefseeview {
                         {
                             step: function (now: any, fx: any) {
                                 // @ts-ignore
-                                let data: { left: number, top: number } = $(dom_data).animate()[0];//取得記錄所有動畫變數的物件
+                                let data: { left: number, top: number } = $(dom_data).animate()[0]; //取得記錄所有動畫變數的物件
                                 dom_con.style.top = data.top + "px";
                                 dom_con.style.left = data.left + "px";
                                 bigimgDraw();
@@ -2515,7 +2515,7 @@ class Tiefseeview {
                         //if (fx.prop == "transform_rotate") { }
 
                         // @ts-ignore
-                        let andata: { transform_rotate, transform_scaleX, transform_scaleY } = $(dom_data).animate()[0];//取得記錄所有動畫變數的物件
+                        let andata: { transform_rotate, transform_scaleX, transform_scaleY } = $(dom_data).animate()[0]; //取得記錄所有動畫變數的物件
 
                         //沒有指定從哪裡開始旋轉，就從中間
                         if (_x === undefined) { _x = (dom_dpizoom.offsetWidth / 2); }
@@ -2536,7 +2536,7 @@ class Tiefseeview {
                         let rect2 = getRotateRect(dom_data.offsetWidth, dom_data.offsetHeight, x4, y4, andata.transform_rotate);
 
                         dom_data.style.transform = `rotate(${andata.transform_rotate}deg) scaleX(${andata.transform_scaleX}) scaleY(${andata.transform_scaleY})`;
-                        dom_data.setAttribute("transform_rotate", andata.transform_rotate);//儲存目前動畫旋轉的角度
+                        dom_data.setAttribute("transform_rotate", andata.transform_rotate); //儲存目前動畫旋轉的角度
                         setXY(_x - rect2.x, _y - rect2.y, 0);
 
                         init_point(false);
@@ -2638,7 +2638,7 @@ class Tiefseeview {
 
             let div = <HTMLDivElement>document.querySelector(".js--tiefseeview-temporary");
             let divsub = <HTMLDivElement>document.querySelector(".js--tiefseeview-temporary .js--tiefseeview-temporary_sub");
-            if (div === null) {//
+            if (div === null) { //
                 div = document.createElement("div");
                 div.style.position = "fixed";
                 div.style.pointerEvents = "none";
@@ -2785,7 +2785,7 @@ class TiefseeviewScroll {
 
             if (e.deltaX > 0 || e.deltaY > 0) { //下
                 setTop(v + 10, "wheel");
-            } else {//上
+            } else { //上
                 setTop(v - 10, "wheel");
             }
         }

@@ -58,7 +58,7 @@ class WebAPI {
             let url = APIURL + "/api/directory/getFiles2";
             let postData = { dirPath: dirPath, arName: arName };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) {//把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
                 retAr[i] = dirPath + retAr[i];
             }
             return retAr;
@@ -71,7 +71,7 @@ class WebAPI {
             let url = APIURL + "/api/directory/getFiles";
             let postData = { path: path, searchPattern: searchPattern };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) {//把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
             return retAr;
@@ -84,7 +84,7 @@ class WebAPI {
             let url = APIURL + "/api/directory/getDirectories";
             let postData = { path: path, searchPattern: searchPattern };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) {//把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
             return retAr;
@@ -132,12 +132,12 @@ class WebAPI {
             }
             if (type === "nconvert" || type === "nconvertBmp") {
                 let url = APIURL + `/api/img/nconvert?type=bmp&path=${encodePath}&${fileTime}`;
-                url = Lib.pathToURL(await fetchGet_text(url));
+                url = Lib.pathToURL(await Lib.sendGet("text", url));
                 return url;
             }
             if (type === "nconvertPng") {
                 let url = APIURL + `/api/img/nconvert?type=png&path=${encodePath}&${fileTime}`;
-                url = Lib.pathToURL(await fetchGet_text(url));
+                url = Lib.pathToURL(await Lib.sendGet("text", url));
                 return url;
             }
             return APIURL + `/api/img/magick?path=${encodePath}&${fileTime}`;
@@ -151,7 +151,7 @@ class WebAPI {
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             let u = APIURL + `/api/img/vipsInit?path=${encodePath}&type=${vipsType}&${fileTime}`;
-            let imgInitInfo = await fetchGet_json(u);
+            let imgInitInfo = await Lib.sendGet("json", u);
             return imgInitInfo as {
                 code: string, // 1=成功 -1=失敗
                 path: string,
@@ -273,7 +273,7 @@ class WebAPI {
     static async getText(path: string) {
         let encodePath = encodeURIComponent(path);
         let url = APIURL + `/api/getText?path=${encodePath}&r=${Math.random()}`;
-        let ret = await fetchGet_text(url);
+        let ret = await Lib.sendGet("text", url);
         return ret;
     }
 
@@ -296,7 +296,7 @@ class WebAPI {
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         let encodePath = encodeURIComponent(path);
         let url = APIURL + `/api/getExif?maxLength=${maxLength}&path=${encodePath}&${fileTime}`;
-        let json = await fetchGet_json(url);
+        let json = await Lib.sendGet("json", url);
         return json as {
             code: string,
             data: {

@@ -108,7 +108,7 @@ class Config {
     public settings = {
         theme: {
             /** 是否啟用毛玻璃 */
-            "aeroType": "none",//none / win7 / win10
+            "aeroType": "none", //none / win7 / win10
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
             /** 文字粗細 */
@@ -311,7 +311,7 @@ class Config {
         //img
         (() => {
             this._allowFile_img = [
-                { ext: "jpg", type: "vips", vipsType: "jpg" },//如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
+                { ext: "jpg", type: "vips", vipsType: "jpg" }, //如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
                 { ext: "png", type: "vips", vipsType: "vips" },
@@ -330,10 +330,10 @@ class Config {
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },
                 { ext: "heic", type: "vips", vipsType: "magick" },
-                { ext: "avif", type: "vips", vipsType: "wpf,magick" },//如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
+                { ext: "avif", type: "vips", vipsType: "wpf,magick" }, //如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: "vips", vipsType: "magick" },
-                //{ ext: "dcm",type:"vips", vipsType:"magick" },//多幀
-                { ext: "hdr", type: "vips", vipsType: "magick" },//必須輸出成png顏色才不會跑掉
+                //{ ext: "dcm",type:"vips", vipsType:"magick" }, //多幀
+                { ext: "hdr", type: "vips", vipsType: "magick" }, //必須輸出成png顏色才不會跑掉
                 { ext: "miff", type: "vips", vipsType: "magick" },
                 { ext: "mng", type: "vips", vipsType: "magick" },
                 { ext: "otb", type: "vips", vipsType: "magick" },
@@ -347,11 +347,11 @@ class Config {
                 { ext: "pbm", type: "vips", vipsType: "magick" },
                 { ext: "exr", type: "vips", vipsType: "magick" },
                 { ext: "jpf", type: "vips", vipsType: "magick" },
-                { ext: "jp2", type: "vips", vipsType: "magick" },//開啟速度很慢
+                { ext: "jp2", type: "vips", vipsType: "magick" }, //開啟速度很慢
                 { ext: "sct", type: "vips", vipsType: "magick" },
-                { ext: "mef", type: "vips", vipsType: "magick" },//向量
+                { ext: "mef", type: "vips", vipsType: "magick" }, //向量
                 { ext: "wmf", type: "vips", vipsType: "magick" },
-                { ext: "mpo", type: "vips", vipsType: "magick" },//相機
+                { ext: "mpo", type: "vips", vipsType: "magick" }, //相機
                 { ext: "jxl", type: "vips", vipsType: "magick" }, //JPEG XL，開啟速度很慢
 
                 { ext: "crw", type: "vips", vipsType: "dcraw" },

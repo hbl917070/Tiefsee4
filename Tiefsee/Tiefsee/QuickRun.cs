@@ -11,7 +11,7 @@ using Microsoft.Web.WebView2.Core;
 namespace Tiefsee {
     public class QuickRun {
 
-        public static int runNumber = 0;//目前的視窗數量
+        public static int runNumber = 0; //目前的視窗數量
 
         /// <summary>
         /// 新建視窗時呼叫
@@ -30,7 +30,7 @@ namespace Tiefsee {
             if (runNumber <= 0) {
                 Adapter.Shutdown();
                 PortFreed();
-                Program.startWindow.Close();//關閉此視窗，程式就會完全結束
+                Program.startWindow.Close(); //關閉此視窗，程式就會完全結束
             }
         }
 
@@ -54,9 +54,9 @@ namespace Tiefsee {
         /// <returns></returns>
         public static bool Check(string[] args) {
 
-            //DateTime time_start = DateTime.Now;//計時開始 取得目前時間
+            //DateTime time_start = DateTime.Now; //計時開始 取得目前時間
 
-            if (Program.startType == 1) {//直接啟動
+            if (Program.startType == 1) { //直接啟動
                 return false;
             }
 
@@ -64,7 +64,7 @@ namespace Tiefsee {
                 return false;
             }
 
-            foreach (String filePort in Directory.GetFiles(AppPath.appDataPort, "*")) {//判斷目前已經開啟的視窗
+            foreach (String filePort in Directory.GetFiles(AppPath.appDataPort, "*")) { //判斷目前已經開啟的視窗
                 try {
 
                     string port = Path.GetFileName(filePort);
@@ -72,7 +72,7 @@ namespace Tiefsee {
                     //偵測是否可用
                     String uri = $"http://127.0.0.1:{port}/api/check";
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-                    request.Timeout = 1000;//逾時
+                    request.Timeout = 1000; //逾時
                     request.UserAgent = Program.webvviewUserAgent;
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                         using (Stream stream = response.GetResponseStream()) {
@@ -82,22 +82,22 @@ namespace Tiefsee {
                         }
                     }
 
-                    if (Program.startType == 2) {//快速啟動
+                    if (Program.startType == 2) { //快速啟動
                         NewWindow(args, port);
                         return true;
                     }
 
-                    if (Program.startType == 3) {//快速啟動且常駐
+                    if (Program.startType == 3) { //快速啟動且常駐
                         NewWindow(args, port);
                         return true;
                     }
 
-                    if (Program.startType == 4) {//
+                    if (Program.startType == 4) { //
                         NewWindow(args, port);
                         return true;
                     }
 
-                    if (Program.startType == 5) {//
+                    if (Program.startType == 5) { //
                         NewWindow(args, port);
                         return true;
                     }
@@ -105,9 +105,9 @@ namespace Tiefsee {
                     //MessageBox.Show(e.ToString());
                 }
 
-                File.Delete(filePort);//如果這個port超過時間沒有回應，就當做無法使用，將檔案刪除
+                File.Delete(filePort); //如果這個port超過時間沒有回應，就當做無法使用，將檔案刪除
 
-            }//foreach
+            }
 
             return false;
         }

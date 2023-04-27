@@ -28,23 +28,23 @@ class MainDirList {
 		this.setItemWidth = setItemWidth;
 		this.setImgNumber = setImgNumber;
 
-		let dom_dirList = document.getElementById("main-dirList") as HTMLElement;//螢幕看得到的區域
-		let dom_dirListBody = document.getElementById("main-dirListBody") as HTMLElement;//整體的高
-		let dom_dirListData = document.getElementById("main-dirListData") as HTMLElement;//資料
+		let dom_dirList = document.getElementById("main-dirList") as HTMLElement; //螢幕看得到的區域
+		let dom_dirListBody = document.getElementById("main-dirListBody") as HTMLElement; //整體的高
+		let dom_dirListData = document.getElementById("main-dirListData") as HTMLElement; //資料
 		var dom_dragbar_mainDirList = document.getElementById("dragbar-mainDirList") as HTMLElement;
 
-		var isHide = false;//暫時隱藏
-		var isEnabled = true;//啟用 檔案預覽視窗
-		var isShowNo = true;//顯示編號
-		var isShowName = true;//顯示檔名
-		var itemWidth = 1;//單個項目的寬度
-		var itemHeight = 1;//單個項目的高度
-		var imgNumber = 3;//資料夾顯示的圖片數量
+		var isHide = false; //暫時隱藏
+		var isEnabled = true; //啟用 檔案預覽視窗
+		var isShowNo = true; //顯示編號
+		var isShowName = true; //顯示檔名
+		var itemWidth = 1; //單個項目的寬度
+		var itemHeight = 1; //單個項目的高度
+		var imgNumber = 3; //資料夾顯示的圖片數量
 
-		var temp_loaded: string[] = [];//已經載入過的圖片編號
-		var temp_start = 0;//用於判斷是否需要重新渲染UI
+		var temp_loaded: string[] = []; //已經載入過的圖片編號
+		var temp_start = 0; //用於判斷是否需要重新渲染UI
 		var temp_count = 0;
-		var temp_itemHeight = 0;//用於判斷物件高度是否需要更新
+		var temp_itemHeight = 0; //用於判斷物件高度是否需要更新
 
 		//拖曳改變size
 		var dragbar = new Dragbar();
@@ -53,7 +53,7 @@ class MainDirList {
 		dragbar.setEventStart(() => { })
 		//拖曳
 		dragbar.setEventMove((val: number) => {
-			if (val < 10) {//小於10的話就暫時隱藏
+			if (val < 10) { //小於10的話就暫時隱藏
 				dom_dirList.style.opacity = "0";
 				dragbar.setPosition(0);
 			} else {
@@ -63,14 +63,14 @@ class MainDirList {
 		})
 		//拖曳 結束
 		dragbar.setEventEnd((val: number) => {
-			if (val < 10) {//小於10的話，關閉檔案預覽視窗
+			if (val < 10) { //小於10的話，關閉檔案預覽視窗
 				setEnabled(false);
 			}
 		})
 
 
 		//更新畫面
-		dom_dirList.addEventListener("scroll", () => {//捲動時
+		dom_dirList.addEventListener("scroll", () => { //捲動時
 			updateItem()
 		})
 		new ResizeObserver(() => { //區塊改變大小時
@@ -127,10 +127,10 @@ class MainDirList {
 
 			if (isEnabled === val) { return; }
 			isEnabled = val;
-			temp_start = -1;//強制必須重新繪製
-			dom_dirListData.innerHTML = "";//移除之前的所有物件
+			temp_start = -1; //強制必須重新繪製
+			dom_dirListData.innerHTML = ""; //移除之前的所有物件
 			updateItem();
-			setStartLocation();//捲到中間
+			setStartLocation(); //捲到中間
 		}
 
 
@@ -142,10 +142,10 @@ class MainDirList {
 		function setShowNo(val: boolean) {
 			if (isShowNo === val) { return; }
 			isShowNo = val;
-			temp_start = -1;//強制必須重新繪製
-			dom_dirListData.innerHTML = "";//移除之前的所有物件
+			temp_start = -1; //強制必須重新繪製
+			dom_dirListData.innerHTML = ""; //移除之前的所有物件
 			updateItem();
-			setStartLocation();//捲到中間
+			setStartLocation(); //捲到中間
 		}
 
 
@@ -155,10 +155,10 @@ class MainDirList {
 		function setShowName(val: boolean) {
 			if (isShowName === val) { return; }
 			isShowName = val;
-			temp_start = -1;//強制必須重新繪製
-			dom_dirListData.innerHTML = "";//移除之前的所有物件
+			temp_start = -1; //強制必須重新繪製
+			dom_dirListData.innerHTML = ""; //移除之前的所有物件
 			updateItem();
-			setStartLocation();//捲到中間
+			setStartLocation(); //捲到中間
 		}
 
 		/**
@@ -167,10 +167,10 @@ class MainDirList {
 		function setImgNumber(val: number) {
 			if (imgNumber === val) { return; }
 			imgNumber = val;
-			temp_start = -1;//強制必須重新繪製
-			dom_dirListData.innerHTML = "";//移除之前的所有物件
+			temp_start = -1; //強制必須重新繪製
+			dom_dirListData.innerHTML = ""; //移除之前的所有物件
 			updateItem();
-			setStartLocation();//捲到中間
+			setStartLocation(); //捲到中間
 		}
 
 
@@ -194,9 +194,9 @@ class MainDirList {
 			cssRoot.style.setProperty("--dirList-width", val + "px");
 			dragbar.setPosition(val);
 
-			temp_start = -1;//強制必須重新繪製
+			temp_start = -1; //強制必須重新繪製
 			updateItem();
-			setStartLocation();//捲到中間
+			setStartLocation(); //捲到中間
 			//updateLocation()
 		}
 
@@ -208,15 +208,15 @@ class MainDirList {
 		function updateItem() {
 
 			if (isEnabled === false) {
-				dom_dirListData.innerHTML = "";//移除之前的所有物件
+				dom_dirListData.innerHTML = ""; //移除之前的所有物件
 				return;
 			}
 
 			let arDir = M.fileLoad.getWaitingDir();
 			let arDirKey = M.fileLoad.getWaitingDirKey();
 
-			if (arDirKey.length === 0) {//如果沒資料
-				dom_dirListData.innerHTML = "";//移除之前的所有物件
+			if (arDirKey.length === 0) { //如果沒資料
+				dom_dirListData.innerHTML = ""; //移除之前的所有物件
 				return;
 			}
 
@@ -236,17 +236,17 @@ class MainDirList {
 			}
 			temp_itemHeight = itemHeight;
 
-			let start = Math.floor(dom_dirList.scrollTop / itemHeight) - 1;//開始位置
-			let count = Math.floor(dom_dirList.clientHeight / itemHeight) + 5;//抓取數量
+			let start = Math.floor(dom_dirList.scrollTop / itemHeight) - 1; //開始位置
+			let count = Math.floor(dom_dirList.clientHeight / itemHeight) + 5; //抓取數量
 
 			if (start < 0) { start = 0 }
-			if (temp_start === start && temp_count === count) {//沒變化就離開
+			if (temp_start === start && temp_count === count) { //沒變化就離開
 				return
 			}
 			temp_start = start;
 			temp_count = count;
 
-			dom_dirListData.innerHTML = "";//移除之前的所有物件
+			dom_dirListData.innerHTML = ""; //移除之前的所有物件
 			dom_dirListData.style.marginTop = (start * itemHeight) + "px";
 
 			let end = start + count;
@@ -274,7 +274,7 @@ class MainDirList {
 			for (let i = 0; i < len; i++) {
 				const path = Lib.Combine([_dirPath, arPath[i]]);
 				let style = "";
-				if (temp_loaded.indexOf(n + "-" + i) !== -1) {  //圖片已經載入過了，直接顯示
+				if (temp_loaded.indexOf(n + "-" + i) !== -1) { //圖片已經載入過了，直接顯示
 					let imgUrl = getImgUrl(path);
 					style = `background-image:url('${imgUrl}')`;
 				}
@@ -284,7 +284,7 @@ class MainDirList {
 				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`
 			}
 
-			let name = Lib.GetFileName(_dirPath);//檔名
+			let name = Lib.GetFileName(_dirPath); //檔名
 			let htmlNo = ``
 			let htmlName = ``
 			if (isShowNo === true) {
@@ -294,7 +294,7 @@ class MainDirList {
 				htmlName = `<div class="dirList-name">${name}</div> `
 			}
 
-			let div = newDom(`
+			let div = Lib.newDom(`
                 <div class="dirList-item" data-id="${n}">
                     <div class="dirList-title">
                         ${htmlNo} ${htmlName}
@@ -317,8 +317,8 @@ class MainDirList {
 					if (dom_dirListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
 					for (let i = 0; i < len; i++) {
 						const path = Lib.Combine([_dirPath, arPath[i]]);
-						if (temp_loaded.indexOf(n + "-" + i) === -1) {  //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
-							temp_loaded.push(n + "-" + i);//加到全域變數，表示已經載入過
+						if (temp_loaded.indexOf(n + "-" + i) === -1) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+							temp_loaded.push(n + "-" + i); //加到全域變數，表示已經載入過
 							let _url = getImgUrl(path)
 							let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
 							domImg.style.backgroundImage = `url("${_url}")`;
@@ -358,7 +358,7 @@ class MainDirList {
 			//移除上一次選擇的項目
 			document.querySelector(`.dirList-item[active=true]`)?.setAttribute("active", "");
 
-			let id = M.fileLoad.getFlagDir();//取得id
+			let id = M.fileLoad.getFlagDir(); //取得id
 
 			let div = document.querySelector(`.dirList-item[data-id="${id}"]`);
 			if (div == null) { return; }
@@ -373,8 +373,8 @@ class MainDirList {
 
 			if (isEnabled === false) { return; }
 
-			let id = M.fileLoad.getFlagDir();//取得id
-			let f = (dom_dirList.clientHeight - itemHeight) / 2;//計算距離中心的距離
+			let id = M.fileLoad.getFlagDir(); //取得id
+			let f = (dom_dirList.clientHeight - itemHeight) / 2; //計算距離中心的距離
 			dom_dirList.scrollTop = id * itemHeight - f;
 		}
 
@@ -386,17 +386,17 @@ class MainDirList {
 
 			if (isEnabled === false) { return; }
 
-			let id = M.fileLoad.getFlagDir();//取得id
+			let id = M.fileLoad.getFlagDir(); //取得id
 
 			//如果選中的項目在上面
-			let start = Math.floor(dom_dirList.scrollTop / itemHeight);//開始位置
+			let start = Math.floor(dom_dirList.scrollTop / itemHeight); //開始位置
 			if (id <= start) {
 				dom_dirList.scrollTop = id * itemHeight;
 				return
 			}
 
 			//如果選中的項目在下面
-			let count = Math.floor(dom_dirList.clientHeight / itemHeight);//抓取數量
+			let count = Math.floor(dom_dirList.clientHeight / itemHeight); //抓取數量
 			let end = (id - count + 1) * itemHeight - (dom_dirList.clientHeight % itemHeight) + 5;
 			if (dom_dirList.scrollTop < end) {
 				dom_dirList.scrollTop = end;

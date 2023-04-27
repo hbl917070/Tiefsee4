@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Tiefsee {
     public static class Adapter {
         public static SynchronizationContext Dispacher { get; private set; }
-        public static bool isRuning = true;//用於判斷程式是否還在運行
+        public static bool isRuning = true; //用於判斷程式是否還在運行
 
         /// <summary>
         /// 請於UI執行緒呼叫此方法。
@@ -92,7 +92,7 @@ namespace Tiefsee {
 
             int x = interval;
 
-            while (isRuning) {//每100毫秒檢查一次程式是否還在運行
+            while (isRuning) { //每100毫秒檢查一次程式是否還在運行
                 if (x > 100) {
                     Thread.Sleep(100);
                 } else {

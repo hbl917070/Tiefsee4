@@ -9,11 +9,11 @@ namespace Tiefsee {
     static class Program {
 
 
-        public static int startPort;//程式開始的port
-        public static int startType;//1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
-        public static int serverCache;//伺服器對靜態資源快取的時間(秒)
-        public static WebServer webServer;//本地伺服器
-        public static StartWindow startWindow;//起始視窗，關閉此視窗就會結束程式
+        public static int startPort; //程式開始的port
+        public static int startType; //1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
+        public static int serverCache; //伺服器對靜態資源快取的時間(秒)
+        public static WebServer webServer; //本地伺服器
+        public static StartWindow startWindow; //起始視窗，關閉此視窗就會結束程式
 
 
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
@@ -39,11 +39,11 @@ namespace Tiefsee {
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
-            bool argsIsNone = (args.Length == 1 && args[0] == "none");//啟動參數是 none
+            bool argsIsNone = (args.Length == 1 && args[0] == "none"); //啟動參數是 none
 
-            if (args.Length >= 1 && args[0] == "restart") {//啟動參數是 restart
+            if (args.Length >= 1 && args[0] == "restart") { //啟動參數是 restart
 
-                args = args.Skip(1).ToArray();//刪除陣列的第一筆
+                args = args.Skip(1).ToArray(); //刪除陣列的第一筆
 
             } else {
 
@@ -90,12 +90,12 @@ namespace Tiefsee {
 ";
 
             if (argsIsNone == false) {
-                WebWindow.Create("MainWindow.html", args, null);//顯示初始視窗
+                WebWindow.Create("MainWindow.html", args, null); //顯示初始視窗
             } else { //如果args是none
-                WebWindow.NewTempWindow("MainWindow.html");//新增一個看不見的視窗，用於下次顯示
+                WebWindow.NewTempWindow("MainWindow.html"); //新增一個看不見的視窗，用於下次顯示
             }
 
-            if (startType != 1) { AppLock(false); }//解除鎖定
+            if (startType != 1) { AppLock(false); } //解除鎖定
             startWindow = new StartWindow();
             Application.Run(startWindow);
         }
@@ -116,7 +116,7 @@ namespace Tiefsee {
                             ticks = long.Parse(sr.ReadToEnd());
                         }
 
-                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) {//在5秒內連續啟動，就禁止啟動
+                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) { //在5秒內連續啟動，就禁止啟動
                             return true;
                         } else {
                             return false;
