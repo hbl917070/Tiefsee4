@@ -223,7 +223,7 @@ class MainToolbar {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "menu.showDeleteMsg",
+                i18n: "menu.showDeleteFileMsg",
                 group: GroupType.img,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -502,7 +502,7 @@ class MainToolbar {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "menu.showDeleteMsg",
+                i18n: "menu.showDeleteFileMsg",
                 group: GroupType.pdf,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -707,7 +707,7 @@ class MainToolbar {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "menu.showDeleteMsg",
+                i18n: "menu.showDeleteFileMsg",
                 group: GroupType.txt,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",
@@ -934,7 +934,7 @@ class MainToolbar {
             //刪除
             ar.push({
                 type: "button", html: "",
-                i18n: "menu.showDeleteMsg",
+                i18n: "menu.showDeleteDirMsg",
                 group: GroupType.bulkView,
                 name: "showDeleteMsg",
                 icon: "tool-delete.svg",

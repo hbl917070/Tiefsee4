@@ -303,9 +303,25 @@ class ScriptMenu {
 
     /** 顯示右鍵選單 圖片 */
     showRightMenuImage() {
-        var dom_rightClickImage = document.getElementById("menu-rightMenuImage");
-        this.M.menu.open_RightClick(dom_rightClickImage, 0, -85);
+        let dom = document.getElementById("menu-rightMenuImage");
+        this.M.menu.open_RightClick(dom, 0, -85);
         this.M.initMenu.updateRightMenuImageZoomRatioTxt(); //更新 右鍵選單的圖片縮放比例
+    }
+    /** 顯示右鍵選單 起始畫面 */
+    showRightMenuWelcome() {
+        let dom = document.getElementById("menu-rightMenuWelcome");
+        this.M.menu.open_RightClick(dom, 0, 0);
+    }
+    /** 顯示右鍵選單 大量瀏覽模式 */
+    showRightMenuBulkView() {
+        let dom = document.getElementById("menu-rightMenuBulkView");
+        this.M.menu.open_RightClick(dom, 0, -50);
+    }
+
+    /** 顯示右鍵選單 預設 */
+    showRightMenuDefault() {
+        let dom = document.getElementById("menu-rightMenuDefault");
+        this.M.menu.open_RightClick(dom, 0, -55);
     }
 
     /** 顯示右鍵選單 輸入框 */
@@ -365,7 +381,7 @@ class ScriptOpen {
     public async openNewWindow() {
         let filePath = this.M.fileLoad.getFilePath(); //目前顯示的檔案
         let exePath = await WV_Window.GetAppPath();
-
+        await this.M.saveSetting();
         if (await WV_File.Exists(filePath)) {
             WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
         } else {
@@ -450,7 +466,11 @@ class ScriptCopy {
         }
         let name = Lib.GetFileName(filePath)
         await WV_System.SetClipboard_Txt(name);
-        Toast.show(this.M.i18n.t("msg.copyName"), 1000 * 3); //已將「檔名」複製至剪貼簿
+        if (this.M.fileLoad.getIsBulkView()) {
+            Toast.show(this.M.i18n.t("msg.copyDirName"), 1000 * 3); //已將「檔案名稱」複製至剪貼簿
+        } else {
+            Toast.show(this.M.i18n.t("msg.copyFileName"), 1000 * 3); //已將「資料夾名稱」複製至剪貼簿
+        }
     }
 
     /** 複製 完整路徑 */
@@ -464,7 +484,11 @@ class ScriptCopy {
             if (await WV_File.Exists(filePath) === false) { return; }
         }
         await WV_System.SetClipboard_Txt(filePath);
-        Toast.show(this.M.i18n.t("msg.copyPath"), 1000 * 3); //已將「路徑」複製至剪貼簿
+        if (this.M.fileLoad.getIsBulkView()) {
+            Toast.show(this.M.i18n.t("msg.copyDirPath"), 1000 * 3); //已將「檔案路徑」複製至剪貼簿
+        } else {
+            Toast.show(this.M.i18n.t("msg.copyFilePath"), 1000 * 3); //已將「資料夾路徑」複製至剪貼簿
+        }
     }
 
     /** 複製 影像 */

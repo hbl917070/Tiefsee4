@@ -1033,10 +1033,15 @@ var langData = {
             "en": "Quick Drag File",
             "ja": "クイックドラッグ",
         },
-        showDeleteMsg: {
+        showDeleteFileMsg: {
             "zh-TW": "刪除檔案",
             "en": "Delete File",
             "ja": "ファイルの削除",
+        },
+        showDeleteDirMsg: {
+            "zh-TW": "刪除資料夾",
+            "en": "Delete Directory",
+            "ja": "ディレクトリを削除",
         },
         showMenuImageSearch: {
             "zh-TW": "搜圖",
@@ -1089,9 +1094,9 @@ var langData = {
             "ja": "ファイル形式 / ファイルサイズ",
         },
         infoWriteTime: {
-            "zh-TW": "檔案修改日期",
+            "zh-TW": "修改日期",
             "en": "Last Write Time",
-            "ja": "ファイル更新日時",
+            "ja": "更新日時",
         },
         showSave: {
             "zh-TW": "儲存檔案",
@@ -1118,7 +1123,7 @@ var langData = {
             "ja": "エクスプローラーで表示",
         },
         systemContextMenu: {
-            "zh-TW": "檔案右鍵選單",
+            "zh-TW": "系統選單",
             "en": "System Context Menu",
             "ja": "コンテキストメニュー",
         },
@@ -1156,10 +1161,20 @@ var langData = {
             "en": "Copy File Name",
             "ja": "コピーファイル名",
         },
+        copyDirName: {
+            "zh-TW": "複製資料夾名",
+            "en": "Copy Directory Name",
+            "ja": "コピーディレクトリ名",
+        },
         copyFilePath: {
-            "zh-TW": "複製完整路徑",
+            "zh-TW": "複製檔案路徑",
             "en": "Copy File Path",
             "ja": "コピーファイルパス",
+        },
+        copyDirPath: {
+            "zh-TW": "複製資料夾路徑",
+            "en": "Copy Directory Path",
+            "ja": "コピーディレクトリパス",
         },
         copyImage: {
             "zh-TW": "複製影像",
@@ -1263,10 +1278,15 @@ var langData = {
 
 
         //#region 右鍵選單 圖片
-        delete: {
+        deleteFile: {
             "zh-TW": "刪除檔案",
             "en": "Delete File",
-            "ja": "ファイルの削除",
+            "ja": "ファイルを削除",
+        },
+        deleteDir: {
+            "zh-TW": "刪除資料夾",
+            "en": "Delete Directory",
+            "ja": "ディレクトリを削除",
         },
         setting: {
             "zh-TW": "設定",
@@ -1506,20 +1526,30 @@ var langData = {
             "en": ` "File" copying completed`,
             "ja": "コピー「ファイル」完了",
         },
-        copyName: {
-            "zh-TW": "已將「檔名」複製至剪貼簿",
+        copyFileName: {
+            "zh-TW": "已將「檔案名稱」複製至剪貼簿",
             "en": `"File Name" copying completed`,
             "ja": "コピー「ファイル名」完了",
+        },
+        copyDirName: {
+            "zh-TW": "已將「資料夾名稱」複製至剪貼簿",
+            "en": `"Directory Name" copying completed`,
+            "ja": "コピー「ディレクトリ名」完了",
         },
         copyImage: {
             "zh-TW": "已將「影像」複製至剪貼簿",
             "en": `"Image" copying completed`,
             "ja": "コピー「画像」完了",
         },
-        copyPath: {
-            "zh-TW": "已將「路徑」複製至剪貼簿",
+        copyFilePath: {
+            "zh-TW": "已將「檔案路徑」複製至剪貼簿",
             "en": `"File Path" copying completed`,
             "ja": "コピー「ファイルパス」完了",
+        },
+        copyDirPath: {
+            "zh-TW": "已將「資料夾路徑」複製至剪貼簿",
+            "en": `"Directory Path" copying completed`,
+            "ja": "コピー「ディレクトリパス」完了",
         },
         copyIamgeBase64: {
             "zh-TW": "已將「影像 Base64」複製至剪貼簿",
@@ -1571,7 +1601,12 @@ var langData = {
         deleteFile: {
             "zh-TW": "刪除檔案",
             "en": "Delete File",
-            "ja": "ファイルの削除",
+            "ja": "ファイルを削除",
+        },
+        deleteDir: {
+            "zh-TW": "刪除資料夾",
+            "en": "Delete Directory",
+            "ja": "ディレクトリを削除",
         },
         fileToRecycleBin: {
             "zh-TW": "移至資源回收桶",
@@ -1579,24 +1614,24 @@ var langData = {
             "ja": "ごみ箱へ移動",
         },
         fileToPermanentlyDelete: {
-            "zh-TW": "永久刪除檔案",
-            "en": "Permanently delete file",
+            "zh-TW": "永久刪除",
+            "en": "Permanently delete",
             "ja": "完全に削除",
         },
         fileToRecycleBinCompleted: {
-            "zh-TW": "已將檔案「移至資源回收桶」",
+            "zh-TW": "已完成「移至資源回收桶」",
             "en": `"Move to recycle bin" completed`,
             "ja": "「ごみ箱へ移動」完了",
         },
         fileToPermanentlyDeleteCompleted: {
-            "zh-TW": "已將檔案「永久刪除」",
+            "zh-TW": "已完成「永久刪除」",
             "en": `"Permanently delete file" completed`,
             "ja": "「完全に削除」完了",
         },
         fileDeletionFailed: {
-            "zh-TW": "檔案刪除失敗",
-            "en": "File deletion failed",
-            "ja": "ファイル削除の失敗",
+            "zh-TW": "刪除失敗",
+            "en": "deletion failed",
+            "ja": "削除失敗",
         },
         //#endregion
 

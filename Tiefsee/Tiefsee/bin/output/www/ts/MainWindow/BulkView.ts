@@ -277,7 +277,7 @@ class BulkView {
             dom_columns.dispatchEvent(new Event("input"));
         }
 
-        
+
         /**
          * 
          * @param n 
@@ -294,7 +294,7 @@ class BulkView {
             updateSize();
         }
 
-       
+
         var updateSizeThrottle = new Throttle(50); //節流
         /**
          * 重新計算項目大小
@@ -612,6 +612,8 @@ class BulkView {
 
             updatePagination(); //更新分頁器
 
+            let temp = pageNow + M.fileLoad.getDirPath();
+
             showPageThrottle.run = async () => {
 
                 let start = ((pageNow - 1) * imgMaxCount);
@@ -624,6 +626,11 @@ class BulkView {
                     if (newArr.length === 0) { break; }
                     let retAr = await WebAPI.getFileInfo2List(newArr);
 
+                    if (temp !== pageNow + M.fileLoad.getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
+                        //console.log("old：" + temp);
+                        //console.log("new：" + pageNow + M.fileLoad.getDirPath());
+                        return;
+                    }
                     for (let j = 0; j < retAr.length; j++) {
                         const item = retAr[j];
                         let path = item.Path;

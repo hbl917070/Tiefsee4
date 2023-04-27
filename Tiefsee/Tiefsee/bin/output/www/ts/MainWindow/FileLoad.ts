@@ -835,7 +835,7 @@ class FileLoad {
             if (M.config.settings.other.fileDeletingShowCheckMsg) {
                 M.msgbox.show({
                     type: "radio",
-                    txt: M.i18n.t("msg.deleteFile") + "<br>" +
+                    txt: M.i18n.t("msg.deleteDir") + "<br>" +
                         `<span style="word-break:break-all;">${Lib.GetFileName(path)}</span>`, //刪除檔案
                     arRadio: [
                         { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, //移至資源回收桶

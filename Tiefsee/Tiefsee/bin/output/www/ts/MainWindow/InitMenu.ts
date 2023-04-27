@@ -17,6 +17,9 @@ class InitMenu {
         initRotate();
         this.menu_layout = new Menu_layout(M);
         initRightMenuImage();
+        initRightMenuWelcome();
+        initRightMenuDefault();
+        initRightMenuBulkView();
         initText();
         initTxt();
 
@@ -27,25 +30,43 @@ class InitMenu {
                 let dom = target as HTMLElement;
 
                 //取得 data-menu ，如果當前的dom沒有設定，則往往上層找
-                let dataMenu = null;
+                let dataMenu = "auto";
                 while (true) {
-                    dataMenu = dom.getAttribute("data-menu");
+                    let _dataMenu = dom.getAttribute("data-menu");
                     dom = dom.parentNode as HTMLElement;
-                    if (dataMenu !== null || dom === document.body) {
+                    if (dom === document.body) {
+                        break;
+                    }
+                    if (_dataMenu !== null) {
+                        dataMenu = _dataMenu;
                         break;
                     }
                 }
 
-                if (dataMenu !== "none") {
+                if (dataMenu === "none") {
                     e.preventDefault();
-                    if (Lib.isTextFocused()) { //焦點在輸入框上
-                        M.script.menu.showRightMenuText();
-                    } else if (Lib.isTxtSelect()) { //有選取文字的話
-                        M.script.menu.showRightMenuTxt();
-                    } else {
+                    return;
+                }
+
+                if (Lib.isTextFocused()) { //焦點在輸入框上
+                    M.script.menu.showRightMenuText();
+                } else if (Lib.isTxtSelect()) { //有選取文字的話
+                    M.script.menu.showRightMenuTxt();
+                } else {
+
+                    //根據當前的顯示類型來決定右鍵選單
+                    let showType = document.body.getAttribute("showType") ?? "";
+                    if (showType === "img" || showType === "imgs" || showType === "video") {
                         M.script.menu.showRightMenuImage();
+                    } else if (showType === "bulkView") {
+                        M.script.menu.showRightMenuBulkView();
+                    } else if (showType === "welcome") {
+                        M.script.menu.showRightMenuWelcome();
+                    } else {
+                        M.script.menu.showRightMenuDefault();
                     }
                 }
+
             }
         })
 
@@ -420,6 +441,128 @@ class InitMenu {
             });
         }
 
+
+        /**
+         *  初始化 右鍵選單 - 起始畫面
+         */
+        function initRightMenuWelcome() {
+
+            let dom = document.getElementById("menu-rightMenuWelcome")
+            if (dom === null) { return; }
+
+            dom.querySelector(".js-open")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.open.openFile();
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.setting.showSetting();
+            });
+            dom.querySelector(".js-help")?.addEventListener("click", () => { //說明
+                M.script.menu.close();
+                WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')
+            });
+            dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
+                M.script.menu.close();
+                baseWindow.close();
+            });
+        }
+
+
+        /**
+         * 初始化 右鍵選單 - 預設
+         */
+        function initRightMenuDefault() {
+
+            let dom = document.getElementById("menu-rightMenuDefault")
+            if (dom === null) { return; }
+
+            dom.querySelector(".js-prev")?.addEventListener("click", () => {
+                M.script.fileLoad.prevFile();
+            });
+            dom.querySelector(".js-next")?.addEventListener("click", () => {
+                M.script.fileLoad.nextFile();
+            });
+            dom.querySelector(".js-prevDir")?.addEventListener("click", () => {
+                M.script.fileLoad.prevDir();
+            });
+            dom.querySelector(".js-nextDir")?.addEventListener("click", () => {
+                M.script.fileLoad.nextDir();
+            });
+            dom.querySelector(".js-sort")?.addEventListener("click", () => {
+                M.script.menu.close();
+                M.script.menu.showMenuSort();
+            });
+
+            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
+                M.script.menu.close();
+                M.script.open.revealInFileExplorer();
+            });
+            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
+                M.script.menu.close();
+                M.script.file.showContextMenu();
+            });
+            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製影像
+                M.script.menu.close();
+                M.script.copy.copyImg();
+            });
+            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
+                M.script.menu.close();
+                M.script.fileLoad.showDeleteFileMsg();
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.setting.showSetting();
+            });
+            dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
+                M.script.menu.close();
+                baseWindow.close();
+            });
+        }
+
+
+        /**
+         *  初始化 右鍵選單 - 大量瀏覽模式
+         */
+        function initRightMenuBulkView() {
+
+            let dom = document.getElementById("menu-rightMenuBulkView")
+            if (dom === null) { return; }
+
+            dom.querySelector(".js-back")?.addEventListener("click", () => { //返回
+                M.script.menu.close();
+                M.toolbarBack.runEvent();
+            });
+
+            dom.querySelector(".js-showBulkViewSetting")?.addEventListener("click", () => { //大量瀏覽模式設定
+                M.script.menu.close();
+                M.script.menu.showMenuBulkView();
+            });
+            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
+                M.script.menu.close();
+                M.script.open.revealInFileExplorer();
+            });
+            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
+                M.script.menu.close();
+                M.script.file.showContextMenu();
+            });
+            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製路徑
+                M.script.menu.close();
+                M.script.copy.copyPath();
+            });
+            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
+                M.script.menu.close();
+                M.script.fileLoad.showDeleteDirMsg();
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.setting.showSetting();
+            });
+            dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
+                M.script.menu.close();
+                baseWindow.close();
+            });
+        }
 
         /**
          *  初始化 右鍵選單 - 輸入框
