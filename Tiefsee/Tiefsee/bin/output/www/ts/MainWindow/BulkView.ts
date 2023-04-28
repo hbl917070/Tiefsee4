@@ -802,6 +802,7 @@ class BulkView {
 
             let fileName = Lib.GetFileName(fileInfo2.Path);
             let LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
+            let LastWriteTime = new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss");
             let writeDate = new Date(LastWriteTimeUtc).format("yyyy-MM-dd");
             let writeTime = new Date(LastWriteTimeUtc).format("hh:mm:ss");
             let fileSize = Lib.getFileLength(fileInfo2.Lenght);
@@ -841,6 +842,14 @@ class BulkView {
 
             let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
             let dom_center = div.querySelector(".bulkView-center") as HTMLDivElement;
+            let dom_header = div.querySelector(".bulkView-header") as HTMLDivElement;
+            let dom_header2 = div.querySelector(".bulkView-header2") as HTMLDivElement;
+
+            let title = `${M.i18n.t("bulkView.imageSize")}：${width} x ${height}\n` +
+                `${M.i18n.t("bulkView.fileSize")}：${fileSize}\n` +
+                `${M.i18n.t("bulkView.lastWriteDate")}：${LastWriteTime}`;
+            dom_header.setAttribute("title", title);
+            dom_header2.setAttribute("title", title);
 
             //載入失敗時
             if (dom_img.onerror === null) {
