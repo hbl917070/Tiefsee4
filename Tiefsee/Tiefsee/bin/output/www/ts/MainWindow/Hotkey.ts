@@ -36,7 +36,7 @@ class Hotkey {
 
             //如果可以返回上一頁
             if (M.toolbarBack.getVisible()) {
-                if (e.code == "Escape") {
+                if (e.code == "Escape" || e.code == "Backspace") {
                     M.toolbarBack.runEvent();
                     e.preventDefault();
                     return;
@@ -45,7 +45,7 @@ class Hotkey {
 
             //如果有開啟大量瀏覽模式
             if (M.fileLoad.getIsBulkView()) {
-                
+
                 M.bulkView.setFocus();
 
                 if (e.code === "ArrowRight") {
@@ -72,16 +72,16 @@ class Hotkey {
                 if (e.code === "KeyM") {
                     M.script.open.systemContextMenu();
                 }
+                if (e.code === "Space" && M.getIsQuickLook()) { //避免跟快速預覽的空白鍵衝突
+                    e.preventDefault();
+                }
                 for (let i = 1; i <= 8; i++) {
                     if (e.key == i.toString()) {
                         M.script.bulkView.setColumns(i);
                     }
                 }
 
-                setTimeout(() => {
-                    
-                    
-                }, 100);
+
                 return;
             }
 

@@ -284,35 +284,35 @@ var langData = {
             },
 
             tooltip_1: {
-                "zh-TW": "每個Tiefsee視窗都是一個新的執行個體，需要較長的啟動時間",
+                "zh-TW": "每個 Tiefsee 視窗都是一個新的執行個體，需要較長的啟動時間",
                 "en": "Each Tiefsee window is a new instances, the startup speed is slower",
-                "ja": "Tiefseeウィンドウはそれぞれ新しいインスタンスであるため、起動速度が遅くなる",
+                "ja": "Tiefsee ウィンドウはそれぞれ新しいインスタンスであるため、起動速度が遅くなる",
             },
             tooltip_2: {
-                "zh-TW": "所有的Tiefsee共用同一個執行個體。只要Tiefsee的視窗尚未全部關閉，就能快速啟動Tiefsee",
+                "zh-TW": "所有的 Tiefsee 共用同一個執行個體。只要 Tiefsee 的視窗尚未全部關閉，就能快速啟動 Tiefsee",
                 "en": "All Tiefsee window share the same instances. As long as the Tiefsee window is not all closed, you can quickly startup Tiefsee",
                 "ja": `
-                    すべてのTiefseeウィンドウは同じインスタンスを共有しています。Tiefseeウィンドウが閉じていない限り、Tiefseeを高速起動することができます`,
+                    すべての Tiefsee ウィンドウは同じインスタンスを共有しています。Tiefsee ウィンドウが閉じていない限り、Tiefsee を高速起動することができます`,
             },
             tooltip_3: {
-                "zh-TW": "所有視窗共用同一個執行個體。Tiefsee會常駐在背景，隨時都能以極快的速度啟動",
+                "zh-TW": "所有視窗共用同一個執行個體。Tiefsee 會常駐在背景，隨時都能以極快的速度啟動",
                 "en": `All Tiefsee window share the same instances. Tiefsee will Running in the background, you can quickly startup Tiefsee at any time`,
-                "ja": `Tiefseeのウィンドウはすべて同じインスタンスを共有しています。Tiefseeはバックグラウンドで動作し、いつでも高速起動が可能です`,
+                "ja": `Tiefsee のウィンドウはすべて同じインスタンスを共有しています。Tiefsee はバックグラウンドで動作し、いつでも高速起動が可能です`,
             },
             tooltip_4: {
-                "zh-TW": "只允許存在一個Tiefsee視窗",
+                "zh-TW": "只允許存在一個 Tiefsee 視窗",
                 "en": "Not allowed to have multiple Tiefsee window",
-                "ja": "複数のTiefseeウィンドウを持つことはできません",
+                "ja": "複数の Tiefsee ウィンドウを持つことはできません",
             },
             tooltip_5: {
-                "zh-TW": "只允許存在一個Tiefsee視窗。程式會常駐在背景，隨時都能以極快的速度啟動",
+                "zh-TW": "只允許存在一個 Tiefsee 視窗。程式會常駐在背景，隨時都能以極快的速度啟動",
                 "en": `
                     Not allowed to have multiple Tiefsee window.<br>
                     Tiefsee will Running in the background, you can quickly startup Tiefsee at any time
                     `,
                 "ja": `
-                    複数のTiefseeウィンドウを持つことはできません。<br>
-                    Tiefseeはバックグラウンドで動作し、いつでも高速起動が可能です
+                    複数の Tiefsee ウィンドウを持つことはできません。<br>
+                    Tiefsee はバックグラウンドで動作し、いつでも高速起動が可能です
                 `,
             },
         },
@@ -330,9 +330,9 @@ var langData = {
                 "ja": "パソコンの電源を入れた後、バックグラウンドで Tiefsee を起動させます",
             },
             openStartup: {
-                "zh-TW": "開啟Windows的「Startup」",
+                "zh-TW": "開啟 Windows 的「Startup」",
                 "en": `Open Windows "Startup"`,
-                "ja": "Windowsの「Startup」を開く",
+                "ja": "Windows の「Startup」を開く",
             },
         },
 
@@ -489,7 +489,7 @@ var langData = {
             tooltip: {
                 "zh-TW": `  
                     1. 使用「AERO」或「Acrylic」後，還必須調整「視窗背景色」的透明度，才能達到最佳視覺效果。<br>
-                    2. 使用「AERO」或「Acrylic」後，可能導致Tiefsee在移動視窗時卡頓。<br>
+                    2. 使用「AERO」或「Acrylic」後，可能導致 Tiefsee 在移動視窗時卡頓。<br>
                     3. Windows 11 可能無法使用「AERO」。
                 `,
                 "en": `
@@ -499,8 +499,8 @@ var langData = {
                 `,
                 "ja": `
                     1. 「AERO」または「Acrylic」を使用した後、「ウィンドウの背景色」の不透明度も調整すると、最適な見た目になります。<br>
-                    2. 一部のコンピュータでは、「AERO」や「Acrylic」を使用した後に Tiefsee がLAGになります。<br>
-                    3. Windows11では、「AERO」が使用できない場合があります。
+                    2. 一部のコンピュータでは、「AERO」や「Acrylic」を使用した後に Tiefsee が LAG になります。<br>
+                    3. Windows 11 では、「AERO」が使用できない場合があります。
                     `,
             }
         },
@@ -687,9 +687,9 @@ var langData = {
         //#region 設為預設程式
         association: {
             step1: {
-                "zh-TW": "步驟1、把Tiefsee關聯到特定副檔名",
+                "zh-TW": "步驟1、把 Tiefsee 關聯到特定副檔名",
                 "en": "Step 1: Associate Tiefsee to the specified File Extension",
-                "ja": "Step 1：Tiefseeを指定されたファイル名拡張子に関連付けます",
+                "ja": "Step 1：Tiefsee を指定されたファイル名拡張子に関連付けます",
             },
             step1Subtitle: {
                 "zh-TW": "(一行代表一種副檔名)",
@@ -709,12 +709,12 @@ var langData = {
             step2Subtitle: {
                 "zh-TW": "開啟系統設定，將「相片檢視器」修改成「Tiefsee」",
                 "en": `Go to the "Windows Settings" and change the "Photo Viewer" to "Tiefsee"`,
-                "ja": "「Windowsの設定」から「フォトビューアー」を「Tiefsee」に変更する",
+                "ja": "「Windows の設定」から「フォトビューアー」を「Tiefsee」に変更する",
             },
             openSystemSettings: {
                 "zh-TW": "開啟 系統設定",
                 "en": `Open "Windows Settings"`,
-                "ja": "「Windowsの設定」を開く",
+                "ja": "「Windows の設定」を開く",
             },
             removeAssociation: {
                 "zh-TW": "解除預設程式",
@@ -789,7 +789,7 @@ var langData = {
             useCreateImageBitmap: {
                 "zh-TW": "圖片面積過大時，停用 createImageBitmap (停用高品質縮放)",
                 "en": "Disable createImageBitmap when image is too large (disable high-quality scaling)",
-                "ja": "画像が大きすぎる場合、createImageBitmapを無効にする (高品質の拡大を無効にする)",
+                "ja": "画像が大きすぎる場合、createImageBitmap を無効にする (高品質の拡大を無効にする)",
             },
             alwaysDisable: {
                 "zh-TW": "一律停用",
@@ -808,9 +808,9 @@ var langData = {
             },
 
             useLibvips: {
-                "zh-TW": "當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間)",
+                "zh-TW": "當圖片縮小至特定比例以下，就使用 libvips 重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間)",
                 "en": "When image is resized to a specific ratio or smaller, use libvips to re-process the image (usually, a higher value results in better image quality, but resizing will take more time)",
-                "ja": "画像が特定の割合または小さくなった場合、libvipsを使用して画像を再処理する (通常、高い値は画像品質が向上しますが、リサイズにはより多くの時間がかかります)",
+                "ja": "画像が特定の割合または小さくなった場合、libvips を使用して画像を再処理する (通常、高い値は画像品質が向上しますが、リサイズにはより多くの時間がかかります)",
             },
         },
 
@@ -883,19 +883,19 @@ var langData = {
                 "ja": "デスクトップまたはフォルダー内のファイルを選択して、スペースバーを長押しすると、ファイルがプレビューされます",
             },
             monacoEditor: {
-                "zh-TW": "讓Tiefsee使用 monaco-editor 來載入文字檔。常用於閱讀與編輯程式碼",
+                "zh-TW": "讓 Tiefsee 使用 monaco-editor 來載入文字檔。常用於閱讀與編輯程式碼",
                 "en": "Let Tiefsee use monaco-editor to load text files. Commonly used for reading and editing code",
-                "ja": "Tiefseeにmonaco-editorを使って、テキストファイルを読み込ませる。 コードの読み取りと編集によく使われる",
+                "ja": "Tiefsee に monaco-editor を使って、テキストファイルを読み込ませる。 コードの読み取りと編集によく使われる",
             },
             webviewer: {
-                "zh-TW": "讓Tiefsee支援「doc、docx、ppt、pptx」",
+                "zh-TW": "讓 Tiefsee 支援「doc、docx、ppt、pptx」",
                 "en": `Let Tiefsee support "doc, docx, ppt, pptx"`,
-                "ja": "Tiefseeに「doc, docx, ppt, pptx」をサポートさせる",
+                "ja": "Tiefsee に「doc, docx, ppt, pptx」をサポートさせる",
             },
             nConvert: {
-                "zh-TW": "讓Tiefsee支援「Clip Studio Paint」產生的「clip檔」",
+                "zh-TW": "讓 Tiefsee 支援「Clip Studio Paint」產生的「clip 檔」",
                 "en": `Let Tiefsee support "clip file" generated by "Clip Studio Paint"`,
-                "ja": `Tiefseeに「Clip Studio Paint」で生成された「clip ファイル」をサポートさせる`,
+                "ja": `Tiefsee に「Clip Studio Paint」で生成された「clip ファイル」をサポートさせる`,
             },
             installationSteps: {
                 "zh-TW": "安裝步驟",
@@ -925,12 +925,12 @@ var langData = {
             step3: {
                 "zh-TW": "3、重新啟動 Tiefsee",
                 "en": "3. Restart Tiefsee",
-                "ja": "3. Tiefseeを再起動する",
+                "ja": "3. Tiefsee を再起動する",
             },
             restartTiefsee: {
                 "zh-TW": "重新啟動 Tiefsee",
                 "en": "Restart Tiefsee",
-                "ja": "Tiefseeを再起動する",
+                "ja": "Tiefsee を再起動する",
             },
             example: {
                 "zh-TW": "(示意圖)",
@@ -950,7 +950,7 @@ var langData = {
             subtitle: {
                 "zh-TW": "「啟動模式」如果為「直接啟動」則無法使用 QuickLook",
                 "en": `QuickLook is not available if the "Startup Mode" is "Normal Startup"`,
-                "ja": `「起動モード」が 「通常起動」の場合、QuickLookは使用できません`,
+                "ja": `「起動モード」が 「通常起動」の場合、QuickLook は使用できません`,
             },
             notInstalledQuickLook: {
                 "zh-TW": "必須安裝擴充套件「QuickLook」才能使用此功能",
@@ -1370,7 +1370,7 @@ var langData = {
         },
         waterfall: {
             "zh-TW": "瀑布流",
-            "en": "Waterfall layout",
+            "en": "Waterfall Layout",
             "ja": "ウォーターフォールレイアウト",
         },
         gaplessMode: {
@@ -1647,12 +1647,12 @@ var langData = {
 
         //#region setting
         associationExtension: {
-            "zh-TW": "確定用Tiefsee來開啟這些檔案嗎？",
+            "zh-TW": "確定用 Tiefsee 來開啟這些檔案嗎？",
             "en": "Are you sure you want to open these files with Tiefsee?",
             "ja": "これらのファイルを開くのに Tiefsee を使用するのは確かですか？",
         },
         removeAssociationExtension: {
-            "zh-TW": "確定要解除這些檔案與Tiefsee的關聯嗎？",
+            "zh-TW": "確定要解除這些檔案與 Tiefsee 的關聯嗎？",
             "en": "Are you sure you want to remove the association of these files with Tiefsee?",
             "ja": "これらのファイルを Tiefsee との関連付けから解除してよろしいですか？",
         },

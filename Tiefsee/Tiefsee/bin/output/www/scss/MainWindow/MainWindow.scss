@@ -90,6 +90,7 @@
   height: 100%;
   width: 100%;
   border: none;
+  user-select: none;
 }
 
 .mView-text {
@@ -155,5 +156,3 @@
 .js-showType-none {
   display: none !important;
 }
-
-

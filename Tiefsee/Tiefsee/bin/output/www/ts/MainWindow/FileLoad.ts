@@ -55,7 +55,7 @@ class FileLoad {
         var isBulkView = false;
 
         /** 目前的資料夾路徑 */
-        var dirPath: string = "";
+        var dirPathNow: string = "";
         var arDir: { [key: string]: string[] } = {};
         var arDirKey: string[] = [];
         /** 目前在資料夾列表的編號 */
@@ -112,7 +112,14 @@ class FileLoad {
          * @returns 
          */
         function getDirPath() {
-            return arDirKey[flagDir];
+            return dirPathNow;
+            /*let path = arDirKey[flagDir];
+            if (path === undefined) {
+                //path = Lib.GetDirectoryName(getFilePath()) ?? "";
+                console.error("辨識失敗：" + flagDir);
+                console.error(arDirKey);
+            }
+            return path;*/
         }
 
 
@@ -136,7 +143,7 @@ class FileLoad {
             if (arDirKey.length === 0) { return; }
 
             //如果找不到資料夾，就重新讀取名單
-            await initDirList(dirPath); //取得資料夾名單
+            await initDirList(dirPathNow); //取得資料夾名單
             await M.dirSort.sort();
             M.mainDirList.init();
 
@@ -194,9 +201,9 @@ class FileLoad {
             }
 
             let maxCount = M.config.settings.advanced.dirListMaxCount;
-            let json = await WebAPI.Directory.getSiblingDir(dirPath, arExt, maxCount);
+            let json = await WebAPI.Directory.getSiblingDir(dirPathNow, arExt, maxCount);
 
-            if (dirPath !== _dirPath) { return; }
+            if (dirPathNow !== _dirPath) { return; }
 
             arDir = json;
             arDirKey = Object.keys(arDir);
@@ -289,7 +296,7 @@ class FileLoad {
          */
         async function loadDir(_dirPath: string) {
 
-            dirPath = _dirPath;
+            dirPathNow = _dirPath;
 
             if (await isUpdateDirList(_dirPath)) { //載入不同資料夾，需要重新讀取
 
@@ -302,7 +309,7 @@ class FileLoad {
                 }
                 M.dirSort.readSortType(dirParentPath); //取得該資料夾設定的檔案排序方式
                 M.dirSort.updateMenu(); //更新menu選單
-                await M.dirSort.sort();
+                await M.dirSort.sort(_dirPath);
 
                 await updateFlagDir(_dirPath); //重新計算 flagDir
                 M.mainDirList.init();
@@ -353,6 +360,7 @@ class FileLoad {
          */
         async function loadFiles(dirPath: string, arName: string[] = []) {
 
+            dirPathNow = dirPath;
             fileLoadType = FileLoadType.userDefined; //名單類型，自訂義
 
             //改用C#處理，增加執行效率
@@ -398,10 +406,11 @@ class FileLoad {
             }
             isLoadFileFinish = false;
 
+
             fileLoadType = FileLoadType.dir; //名單類型，資料夾內的檔案
 
             let fileInfo2 = await WebAPI.getFileInfo2(path);
-            let dirPath = "";
+            //let dirPath = "";
             arFile = [];
 
             let isFile = true;
@@ -410,7 +419,7 @@ class FileLoad {
 
                 isFile = false;
 
-                dirPath = path;
+                dirPathNow = path;
                 arFile = await WebAPI.Directory.getFiles(path, "*.*"); //取得資料夾內所有檔案
 
                 M.fileSort.readSortType(path); //取得該資料夾設定的檔案排序方式
@@ -439,7 +448,7 @@ class FileLoad {
 
                 let _dirPath = Lib.GetDirectoryName(path); //取得檔案所在的資料夾路徑
                 if (_dirPath === null) { return; }
-                dirPath = _dirPath;
+                dirPathNow = _dirPath;
                 groupType = fileToGroupType(fileInfo2);
                 atLoadingGroupType = groupType;
                 atLoadingExt = Lib.GetExtension(path);
@@ -451,13 +460,13 @@ class FileLoad {
                     await showFileUpdataImg(fileInfo2);
                     M.mainExif.init(fileInfo2, true); //初始化exif
                 }
-                arFile = await WebAPI.Directory.getFiles(dirPath, "*.*");
+                arFile = await WebAPI.Directory.getFiles(dirPathNow, "*.*");
                 arFile = await filter(Lib.GetExtension(path));
                 if (arFile.indexOf(path) === -1) {
                     arFile.splice(0, 0, path);
                 }
 
-                M.fileSort.readSortType(dirPath); //取得該資料夾設定的檔案排序方式
+                M.fileSort.readSortType(dirPathNow); //取得該資料夾設定的檔案排序方式
                 M.fileSort.updateMenu(); //更新menu選單
                 arFile = await M.fileSort.sort(arFile);
             }
@@ -484,7 +493,7 @@ class FileLoad {
                 await showFile(); //載入圖片
             }
 
-            loadDir(dirPath); //處理資料夾預覽視窗
+            loadDir(dirPathNow); //處理資料夾預覽視窗
 
         }
 
@@ -563,6 +572,18 @@ class FileLoad {
             }
 
             showFileThrottle.run = async () => {
+
+                /*for (let i = 0; i < 10; i++) {
+                    if (getFilePath() === undefined) {
+                        await Lib.sleep(10);
+                        console.log("等待 " + i)
+                    } else {
+                        break;
+                    }
+                }         
+                console.log(getFilePath())*/
+
+
 
                 if (isBulkView) {
                     await M.fileShow.openBulkView();

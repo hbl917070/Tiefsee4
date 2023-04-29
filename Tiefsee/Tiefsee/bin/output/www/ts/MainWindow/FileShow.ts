@@ -543,7 +543,8 @@ class FileShow {
             setShowType(GroupType.bulkView); //改變顯示類型
 
             //資料夾修改時間
-            let fileInfo2 = await WebAPI.getFileInfo2(M.fileLoad.getDirPath());
+            let dir = M.fileLoad.getDirPath();
+            let fileInfo2 = await WebAPI.getFileInfo2(dir);
             let dom_writeTime = getToolbarDom(GroupType.bulkView)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
                 let timeUtc = fileInfo2.LastWriteTimeUtc;

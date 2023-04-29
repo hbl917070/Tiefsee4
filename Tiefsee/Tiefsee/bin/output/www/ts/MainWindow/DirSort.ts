@@ -143,9 +143,11 @@ class DirSort {
          * @param _type 排序類型
          * @returns 排序後的陣列
          */
-        async function sort() {
+        async function sort(path?: string) {
 
-            let path = M.fileLoad.getDirPath();
+            if (path === undefined) {
+                path = M.fileLoad.getDirPath();
+            }
             let arDir = M.fileLoad.getWaitingDir();
             let arKey = M.fileLoad.getWaitingDirKey();
 

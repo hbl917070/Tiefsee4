@@ -444,6 +444,23 @@ class Lib {
         return 0;
     }
 
+    /**
+     * 防抖 (持續接收到指令時不會執行，停止接收指令後的x毫秒，才會執行)
+     */
+    public static debounce(func: (...args: any[]) => void, delay = 250) {
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        return function (this: any, ...args: any[]) {
+            let context = this;
+
+            if (timer) {
+                clearTimeout(timer);
+            }
+            timer = setTimeout(() => {
+                func.apply(context, args);
+            }, delay);
+        }
+    }
 
     /**
      * 取得 radio 值
@@ -512,23 +529,8 @@ class Throttle {
         let _func = this.run;
         this.run = async () => { };
         await _func();
-        setTimeout(() => { this.timer(); }, this.timeout); //遞迴
+        setTimeout(() => {
+            this.timer(); //遞迴
+        }, this.timeout);
     }
 }
-
-/*
-//防抖
-function debounce(func: (...args: any[]) => void, delay = 250) {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    return function (this: any, ...args: any[]) {
-        let context = this;
-
-        if (timer) {
-            clearTimeout(timer);
-        }
-        timer = setTimeout(() => {
-            func.apply(context, args);
-        }, delay);
-    }
-}*/

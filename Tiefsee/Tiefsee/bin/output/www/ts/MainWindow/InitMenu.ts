@@ -23,9 +23,28 @@ class InitMenu {
         initText();
         initTxt();
 
-        //點擊右鍵時
+        //避免CSS設定過user-select:none的元素，無法透過點擊來讓文字取消選取狀態
         document.body.addEventListener("mousedown", (e) => {
+            //點擊左鍵時
+            if (e.button === 0) {
+                if (Lib.isTextFocused()) { //焦點在輸入框上
+                    return;
+                }
+                if (M.menu.isShow()) {
+                    return;
+                }
+                let targetElement = e.target as Element;
+                let userSelect = window.getComputedStyle(targetElement).getPropertyValue("user-select");
+                if (userSelect === "none") {
+                    window.getSelection()?.removeAllRanges(); //取消文字的選取狀態
+                }
+            }
+        })
+
+        document.body.addEventListener("mouseup", (e) => {
+            //點擊右鍵時
             if (e.button === 2) {
+
                 let target = e.target as HTMLElement;
                 let dom = target as HTMLElement;
 
@@ -43,17 +62,16 @@ class InitMenu {
                     }
                 }
 
-                if (dataMenu === "none") {
-                    e.preventDefault();
-                    return;
-                }
+                e.preventDefault();
+                e.stopPropagation();
 
-                if (Lib.isTextFocused()) { //焦點在輸入框上
+                if (dataMenu === "none") {
+                    return;
+                } else if (Lib.isTextFocused()) { //焦點在輸入框上
                     M.script.menu.showRightMenuText();
                 } else if (Lib.isTxtSelect()) { //有選取文字的話
                     M.script.menu.showRightMenuTxt();
                 } else {
-
                     //根據當前的顯示類型來決定右鍵選單
                     let showType = document.body.getAttribute("showType") ?? "";
                     if (showType === "img" || showType === "imgs" || showType === "video") {
@@ -69,6 +87,7 @@ class InitMenu {
 
             }
         })
+
 
 
         /**
@@ -579,9 +598,9 @@ class InitMenu {
             var dom_cut = document.getElementById("menuitem-text-cut"); //剪下
             if (dom_cut !== null) {
                 dom_cut.onclick = async () => {
-
                     await WV_System.SendKeys_CtrlAnd("x");
                     M.menu.close(); //關閉menu
+
                     /*let dom_input = document.activeElement as HTMLInputElement;
                     if (dom_input === null) { return; }
                     let start = dom_input.selectionStart;
@@ -601,13 +620,9 @@ class InitMenu {
             var dom_copy = document.getElementById("menuitem-text-copy"); //複製
             if (dom_copy !== null) {
                 dom_copy.onclick = async () => {
-
-                    //await WV_System.SendKeys_CtrlAnd("c");
-
                     let selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿
-
                     M.menu.close(); //關閉menu
                 }
             }
@@ -615,6 +630,7 @@ class InitMenu {
             var dom_paste = document.getElementById("menuitem-text-paste"); //貼上
             if (dom_paste !== null) {
                 dom_paste.onclick = async () => {
+                    await Lib.sleep(10);
                     await WV_System.SendKeys_CtrlAnd("v");
                     M.menu.close(); //關閉menu
                 }
@@ -623,10 +639,7 @@ class InitMenu {
             var dom_selectAll = document.getElementById("menuitem-text-selectAll"); //全選
             if (dom_selectAll !== null) {
                 dom_selectAll.onclick = async () => {
-
-                    //await WV_System.SendKeys_CtrlAnd("a");
                     M.menu.close(); //關閉menu
-
                     let dom_input = document.activeElement as HTMLInputElement;
                     if (dom_input === null) { return; }
                     dom_input.setSelectionRange(0, dom_input.value.length)
