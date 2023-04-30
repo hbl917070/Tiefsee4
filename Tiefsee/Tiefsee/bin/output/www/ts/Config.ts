@@ -276,11 +276,11 @@ class Config {
                 /** 顯示資訊-檔案名稱 */
                 fileName: true,
                 /** 顯示資訊-圖片尺寸 */
-                imageSize: true,
+                imageSize: false,
                 /** 顯示資訊-檔案大小 */
                 fileSize: false,
                 /** 顯示資訊-修改日期 */
-                lastWriteDate: true,
+                lastWriteDate: false,
                 /** 顯示資訊-修改時間 */
                 lastWriteTime: false,
             },

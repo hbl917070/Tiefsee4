@@ -309,8 +309,9 @@ class BulkView {
 
                 if (isVisible === false) { return; }
 
-                let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
+                var containerPadding = 5; //內距
                 let columns = getColumns();
+                let itemWidth = Math.floor(dom_bulkViewContent.offsetWidth / columns); //容器寬度
 
                 let arItme;
                 if (donItem === undefined) {
@@ -325,25 +326,48 @@ class BulkView {
                 ) {
 
                     for (let i = 0; i < arItme.length; i++) {
+
                         const dom = arItme[i] as HTMLElement;
-                        dom.style.width = `calc( ${100 / getColumns()}% )`;
-
-                        //復原
                         const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
-                        domImg.style.width = "";
-                        domImg.style.height = "";
+                        dom.style.width = `calc( ${100 / columns}% )`;
 
-                        if (getColumns() > 2) {
-                            dom.style.minHeight = size / 2 + "px";
+                        if (dom.getAttribute("data-width") !== null) {
+
+                            if (columns > 2) {
+                                dom.style.minHeight = itemWidth / 2 + "px";
+                            } else {
+                                dom.style.minHeight = "";
+                            }
+
+                            let imgWidth = Number.parseInt(dom.getAttribute("data-width") ?? "1");
+                            let imgHeight = Number.parseInt(dom.getAttribute("data-height") ?? "1");
+
+                            let ratio = imgHeight / imgWidth;
+                            let newImgWidth = itemWidth - 10;
+                            let newImgHeight = newImgWidth * ratio;
+
+                            let maxH = itemWidth;
+                            if (columns === 1 || columns === 2) {
+                                domImg.style.width = "";
+                                domImg.style.height = "";
+                            } else {
+                                if (columns === 3) {
+                                    maxH = itemWidth * 3;
+                                } else {
+                                    maxH = itemWidth * 2;
+                                }
+
+                                if (newImgHeight > maxH) {
+                                    domImg.style.width = "";
+                                    domImg.style.height = maxH + "px";
+                                } else {
+                                    domImg.style.width = "100%";
+                                    domImg.style.height = "";
+                                }
+                            }
+
                         }
-                        let domCenter = dom.querySelector(".bulkView-img") as HTMLElement;
-                        if (getColumns() <= 2) {
-                            domCenter.style.maxHeight = "";
-                        } else if (getColumns() === 3) {
-                            domCenter.style.maxHeight = size * 3 + "px";
-                        } else {
-                            domCenter.style.maxHeight = size * 2 + "px";
-                        }
+                     
                     }
 
                     dom_bulkViewContent.style.height = ""; //復原總高度
@@ -355,16 +379,10 @@ class BulkView {
                         arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
                     }
 
-                    let w = dom_bulkViewContent.offsetWidth / columns;
                     let arTop = new Array(columns).fill(0); //判斷要插入到哪一個垂直列
 
                     for (let i = 0; i < arItme.length; i++) {
                         const dom = arItme[i] as HTMLElement;
-
-                        //清除 瀑布流水平 的資料
-                        const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
-                        domImg.style.width = "";
-                        domImg.style.height = "";
 
                         //找出最小
                         let minTop = arTop[0];
@@ -377,7 +395,7 @@ class BulkView {
                         }
 
                         let h = dom.offsetHeight;
-                        let left = (minTopFlag) * w;
+                        let left = (minTopFlag) * itemWidth;
                         let top = arTop[minTopFlag];
                         dom.style.left = left + "px";
                         dom.style.top = top + "px";
@@ -395,7 +413,6 @@ class BulkView {
                     if (arItme.length === 1) {
                         arItme = dom_bulkViewContent.querySelectorAll(".bulkView-item");
                     }
-                    let columns = getColumns();
                     let isEnd = false;
                     let len = Math.floor(arItme.length / columns) + 1;
                     for (let i = 0; i < len; i++) {
@@ -409,7 +426,6 @@ class BulkView {
                                 break;
                             }
                             const item = arItme[j] as HTMLElement;
-                            //if (item === undefined) { break }
                             if (item.getAttribute("data-width") === null) {
                                 isRun = false;
                                 break;
@@ -420,49 +436,32 @@ class BulkView {
                                 ])
                             }
                         }
-                        if (isRun === false) {
+                        if (isRun === false || images.length === 0) {
                             break;
                         }
 
-                        // 計算總高度
-                        var totalHeight = images.reduce((acc, curr) => acc + curr[1], 0);
-
-                        // 計算每個圖片應該有的高度
-                        var heightPerImage = totalHeight / images.length;
-
-                        // 計算每個圖片應該有的寬度
-                        var widths = images.map(image => image[0] * heightPerImage / image[1]);
-
-                        // 計算總寬度
-                        var totalWidth = widths.reduce((acc, curr) => acc + curr, 0);
-
-                        // 計算每個圖片應該有的調整比例
-                        var ratio = (dom_bulkViewContent.offsetWidth - 1 - columns * 10) / totalWidth;
+                        let containerWidth = dom_bulkViewContent.offsetWidth - 1;
                         if (isEnd) {
-                            ratio = (dom_bulkViewContent.offsetWidth - columns * 10) / columns * (arItme.length % columns) / totalWidth;
+                            containerWidth = dom_bulkViewContent.offsetWidth / columns * (arItme.length % columns) - 1;
                         }
+                        //let images = [[30, 10], [20, 20], [100, 50]];
+                        let aspectRatios = images.map(size => size[0] / size[1]); //計算每張圖片的寬高比
+                        let totalAspectRatio = aspectRatios.reduce((a, b) => a + b); // 計算所有圖片寬高比之和
+                        let imageHeights = aspectRatios.map(ratio => (containerWidth - containerPadding * images.length * 2) / totalAspectRatio); //計算每張圖片的高度，使得每張圖片的高度一樣
+                        let divWidths = imageHeights.map((height, index) => height * aspectRatios[index] + containerPadding * 2); //計算每個容器的寬度，使每個容器的寬度加起來剛好填滿總寬度，且圖片距離容器有內距
 
-                        // 調整每個圖片的寬度和高度
-                        var newImages = images.map((image, index) => {
-                            const newWidth = widths[index] * ratio;
-                            const newHeight = heightPerImage * ratio;
-                            return [newWidth, newHeight];
-                        });
-
-                        for (let j = 0; j < newImages.length; j++) {
+                        for (let j = 0; j < divWidths.length; j++) {
                             const dom = arItme[i * columns + j] as HTMLElement;
                             const domImg = dom.querySelector(".bulkView-img") as HTMLImageElement;
-                            const size = newImages[j];
+                            const divWidth = divWidths[j];
+                            const imgWidth = divWidths[j] - containerPadding * 2;
+                            const imgHeight = imageHeights[j];
+                            dom.style.width = divWidth + "px";
+                            domImg.style.width = imgWidth + "px";
+                            domImg.style.height = imgHeight + "px";
 
-                            //清除 啟用瀑布流 的資料
-                            let domCenter = dom.querySelector(".bulkView-img") as HTMLElement;
-                            dom.style.minHeight = "";
-                            domCenter.style.maxHeight = "";
-
-                            dom.style.width = Math.floor(size[0]) + 10 + "px";
-                            domImg.style.width = Math.floor(size[0]) + "px";
-                            domImg.style.height = Math.floor(size[1]) + "px";
-                            //donImg.style.maxHeight = "calc( 100% - 10px)";
+                            dom.style.minHeight = ""; //復原
+                            //donImg.style.maxHeight = "calc( 100% - 10px )";
                         }
 
                     }
