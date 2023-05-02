@@ -14,6 +14,7 @@ Tiefsee 是一款開源的圖片檢視器。
 - 檔案預覽面板：預覽同資料夾內的圖片
 - 資料夾預覽面板：顯示資料夾列表，並預覽資料夾內的圖片
 - 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數
+- 大量瀏覽模式：一次載入多張圖片，以垂直捲動的方式查看圖片
 - QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
 - 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器
 
@@ -25,10 +26,10 @@ Tiefsee 是一款開源的圖片檢視器。
 <br>
 
 ## 下載
-[Tiefsee 4.0.0-beta.25](https://github.com/hbl917070/Tiefsee4/releases)
+[Tiefsee 4.0.0-beta.26](https://github.com/hbl917070/Tiefsee4/releases)
 
     開發中功能：  
-    瀏覽多幀圖片、大量瀏覽模式、自定快速鍵
+    瀏覽多幀圖片、自定快速鍵
 <br>
 
 ## 運行需求
@@ -43,7 +44,7 @@ Tiefsee 是一款開源的圖片檢視器。
 ## 程式截圖
 ![](https://cdn.discordapp.com/attachments/896768892003823627/1044270942026727536/2022-11-21_23-19-27.jpg)
 
-![](https://cdn.discordapp.com/attachments/803673073621401633/917208044578951229/2021-12-06_07-56-44.jpg)
+![](https://cdn.discordapp.com/attachments/896768892003823627/1102959644990767144/ezgif-3-9a6f5460a7.webp)
 
 ![](https://cdn.discordapp.com/attachments/896768892003823627/1026908356125933649/2022-10-05_00-37-08.jpg)
 
@@ -87,6 +88,6 @@ They all have their own licenses!
 
 <br>
 
-Tiefsee4的原始碼以[MIT授權](/LICENSE)形式開源，<br>
-但另外安裝那些的擴充套件，並不屬於Tiefsee4專案的一部分，<br>
+Tiefsee4 的原始碼以[MIT授權](/LICENSE)形式開源，<br>
+但另外安裝那些的擴充套件，並不屬於 Tiefsee4 專案的一部分，<br>
 他們都有各自的授權條款！
