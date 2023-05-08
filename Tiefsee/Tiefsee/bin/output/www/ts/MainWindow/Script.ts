@@ -252,76 +252,76 @@ class ScriptMenu {
 
     /** 顯示選單 開啟 */
     showMenuFile(btn: HTMLElement) {
-        this.M.menu.open_Button(document.getElementById("menu-file"), btn, "menuActive");
+        this.M.menu.openAtButton(document.getElementById("menu-file"), btn, "menuActive");
     }
 
     /** 顯示選單 複製 */
     showMenuCopy(btn: HTMLElement) {
-        this.M.menu.open_Button(document.getElementById("menu-copy"), btn, "menuActive");
+        this.M.menu.openAtButton(document.getElementById("menu-copy"), btn, "menuActive");
     }
 
     /** 顯示選單 Layout */
     showLayout(btn?: HTMLElement) {
-        this.M.initMenu.menu_layout.show(btn);
+        this.M.mainMenu.menu_layout.show(btn);
     }
 
     /** 顯示選單 旋轉與鏡像 */
     showMenuRotation(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-rotate"), 0, 0);
+            this.M.menu.openAtOrigin(document.getElementById("menu-rotate"), 0, 0);
         } else {
-            this.M.menu.open_Button(document.getElementById("menu-rotate"), btn, "menuActive");
+            this.M.menu.openAtButton(document.getElementById("menu-rotate"), btn, "menuActive");
         }
     }
 
     /** 顯示選單 搜圖 */
     showMenuImageSearch(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-imgSearch"), 0, 0);
+            this.M.menu.openAtOrigin(document.getElementById("menu-imgSearch"), 0, 0);
         } else {
-            this.M.menu.open_Button(document.getElementById("menu-imgSearch"), btn, "menuActive");
+            this.M.menu.openAtButton(document.getElementById("menu-imgSearch"), btn, "menuActive");
         }
     }
 
     /** 顯示選單 排序 */
     showMenuSort(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-sort"), 0, 0);
+            this.M.menu.openAtOrigin(document.getElementById("menu-sort"), 0, 0);
         } else {
-            this.M.menu.open_Button(document.getElementById("menu-sort"), btn, "menuActive");
+            this.M.menu.openAtButton(document.getElementById("menu-sort"), btn, "menuActive");
         }
     }
 
     /** 顯示選單 大量瀏覽模式設定 */
     showMenuBulkView(btn?: HTMLElement) {
         if (btn === undefined) {
-            this.M.menu.open_Origin(document.getElementById("menu-bulkView"), 0, 0);
+            this.M.menu.openAtOrigin(document.getElementById("menu-bulkView"), 0, 0);
         } else {
-            this.M.menu.open_Button(document.getElementById("menu-bulkView"), btn, "menuActive");
+            this.M.menu.openAtButton(document.getElementById("menu-bulkView"), btn, "menuActive");
         }
     }
 
     /** 顯示右鍵選單 圖片 */
     showRightMenuImage() {
         let dom = document.getElementById("menu-rightMenuImage");
-        this.M.menu.open_RightClick(dom, 0, -85);
-        this.M.initMenu.updateRightMenuImageZoomRatioTxt(); //更新 右鍵選單的圖片縮放比例
+        this.M.menu.openAtPosition(dom, 0, -85);
+        this.M.mainMenu.updateRightMenuImageZoomRatioTxt(); //更新 右鍵選單的圖片縮放比例
     }
     /** 顯示右鍵選單 起始畫面 */
     showRightMenuWelcome() {
         let dom = document.getElementById("menu-rightMenuWelcome");
-        this.M.menu.open_RightClick(dom, 0, 0);
+        this.M.menu.openAtPosition(dom, 0, 0);
     }
     /** 顯示右鍵選單 大量瀏覽模式 */
     showRightMenuBulkView() {
         let dom = document.getElementById("menu-rightMenuBulkView");
-        this.M.menu.open_RightClick(dom, 0, -50);
+        this.M.menu.openAtPosition(dom, 0, -50);
     }
 
     /** 顯示右鍵選單 預設 */
     showRightMenuDefault() {
         let dom = document.getElementById("menu-rightMenuDefault");
-        this.M.menu.open_RightClick(dom, 0, -55);
+        this.M.menu.openAtPosition(dom, 0, -55);
     }
 
     /** 顯示右鍵選單 輸入框 */
@@ -340,13 +340,13 @@ class ScriptMenu {
         }
 
         var dom = document.getElementById("menu-text");
-        this.M.menu.open_RightClick(dom, 0, 0);
+        this.M.menu.openAtPosition(dom, 0, 0);
     }
 
     /** 顯示右鍵選單 一般文字 */
     showRightMenuTxt() {
         var dom = document.getElementById("menu-txt");
-        this.M.menu.open_RightClick(dom, 0, 0);
+        this.M.menu.openAtPosition(dom, 0, 0);
     }
 
 

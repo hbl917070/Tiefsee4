@@ -25,7 +25,7 @@ class MainWindow {
     public imgSearch;
     public mainExif;
     public menu;
-    public initMenu;
+    public mainMenu;
     public largeBtn;
     public script;
     public msgbox;
@@ -69,7 +69,7 @@ class MainWindow {
         var mainExif = this.mainExif = new MainExif(this);
         var mainToolbar = this.mainToolbar = new MainToolbar(this);
         var menu = this.menu = new Menu(this);
-        var initMenu = this.initMenu = new InitMenu(this);
+        var mainMenu = this.mainMenu = new MainMenu(this);
         var largeBtn = this.largeBtn = new LargeBtn(this);
         var script = this.script = new Script(this);
         var i18n = this.i18n = new I18n();
@@ -539,7 +539,7 @@ class MainWindow {
 
                     initSetting(json.settingTxt); //初始讀取設定
                     await initLastPosition(); //初始 套用上次的視窗狀態與坐標
-                    initMenu.initOpen(); //初始化「開啟檔案」的menu
+                    mainMenu.initOpen(); //初始化「開啟檔案」的menu
                     initLoad(json.args); //初始 載入檔案
                     initAERO(); //初始 套用aero毛玻璃效果
 
@@ -568,7 +568,7 @@ class MainWindow {
                         isQuickLook = true;
                         fileShow.openNone(); //避免卡在上一張圖片
                         await initQuickLookPosition(); //初始 快速啟動的坐標
-                        initMenu.initOpen(); //初始化「開啟檔案」的menu    
+                        mainMenu.initOpen(); //初始化「開啟檔案」的menu    
                         initLoad(json.args); //初始 載入檔案
                         initAERO(); //初始 套用aero毛玻璃效果
                     }

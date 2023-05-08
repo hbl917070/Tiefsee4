@@ -14,7 +14,7 @@ class Hotkey {
             if (e.code == "F12") { return; }
 
             //如果有開啟選單
-            if (M.menu.isShow()) {
+            if (M.menu.getIsShow()) {
                 if (e.code == "Escape") {
                     M.menu.close();
                     return;

@@ -361,7 +361,7 @@ class FileShow {
                 let dom_btnScale = M.dom_toolbar.querySelector(`[data-name="btnScale"]`); //工具列
                 if (dom_btnScale !== null) { dom_btnScale.innerHTML = txt; }
 
-                M.initMenu.updateRightMenuImageZoomRatioTxt(txt); //更新 右鍵選單的圖片縮放比例
+                M.mainMenu.updateRightMenuImageZoomRatioTxt(txt); //更新 右鍵選單的圖片縮放比例
             }))
 
             //縮放方式與對齊方式
@@ -492,7 +492,7 @@ class FileShow {
             //檔案類型
             let dom_type = getToolbarDom(GroupType.txt)?.querySelector(`[data-name="infoType"]`);
             if (dom_type != null) {
-                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();;
+                let fileType = Lib.GetFileType(fileInfo2).toLocaleUpperCase();
                 let fileLength = Lib.getFileLength(fileInfo2.Lenght);
                 dom_type.innerHTML = `${fileType}<br>${fileLength}`;
             }

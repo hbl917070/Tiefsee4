@@ -4,7 +4,7 @@ class ImgSearch {
 
         let arData = M.config.imgSearch.list;
 
-        initMenu()
+        initMenu();
 
         function initMenu() {
 

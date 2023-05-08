@@ -1,5 +1,5 @@
 
-class InitMenu {
+class MainMenu {
 
     public initOpen;
     public updateRightMenuImageZoomRatioTxt;
@@ -23,50 +23,58 @@ class InitMenu {
         initText();
         initTxt();
 
-        //避免CSS設定過user-select:none的元素，無法透過點擊來讓文字取消選取狀態
+        var dataMenu = "";
+
+
         document.body.addEventListener("mousedown", (e) => {
+
             //點擊左鍵時
             if (e.button === 0) {
                 if (Lib.isTextFocused()) { //焦點在輸入框上
                     return;
                 }
-                if (M.menu.isShow()) {
+                if (M.menu.getIsShow()) {
                     return;
                 }
+                //避免CSS設定過user-select:none的元素，無法透過點擊來讓文字取消選取狀態
                 let targetElement = e.target as Element;
                 let userSelect = window.getComputedStyle(targetElement).getPropertyValue("user-select");
                 if (userSelect === "none") {
                     window.getSelection()?.removeAllRanges(); //取消文字的選取狀態
                 }
             }
-        })
 
-        document.body.addEventListener("mouseup", (e) => {
             //點擊右鍵時
             if (e.button === 2) {
-
                 let target = e.target as HTMLElement;
                 let dom = target as HTMLElement;
-
                 //取得 data-menu ，如果當前的dom沒有設定，則往往上層找
-                let dataMenu = "auto";
                 while (true) {
                     let _dataMenu = dom.getAttribute("data-menu");
-                    dom = dom.parentNode as HTMLElement;
                     if (dom === document.body) {
+                        dataMenu = "auto"
                         break;
                     }
-                    if (_dataMenu !== null) {
+                    if (_dataMenu != null) {
                         dataMenu = _dataMenu;
                         break;
                     }
+                    dom = dom.parentNode as HTMLElement;
                 }
+            }
+        });
 
+        document.body.addEventListener("mouseup", (e) => {
+
+            //點擊右鍵時
+            if (e.button === 2) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (dataMenu === "none") {
-                    return;
+                if (dataMenu === "") {
+
+                } if (dataMenu === "none") {
+
                 } else if (Lib.isTextFocused()) { //焦點在輸入框上
                     M.script.menu.showRightMenuText();
                 } else if (Lib.isTxtSelect()) { //有選取文字的話
@@ -84,9 +92,10 @@ class InitMenu {
                         M.script.menu.showRightMenuDefault();
                     }
                 }
-
+                dataMenu = "";
             }
-        })
+
+        });
 
 
 
@@ -96,7 +105,7 @@ class InitMenu {
          */
         function updateRightMenuImageZoomRatioTxt(txt?: string) {
 
-            if (dom_rightMenuImage_zoomRatioTxt === null) { return }
+            if (dom_rightMenuImage_zoomRatioTxt === null) { return; }
 
             if (txt !== undefined) { //如果有傳入文字，就更新文字內容
                 dom_rightMenuImage_zoomRatioTxt.innerHTML = txt;
@@ -104,7 +113,7 @@ class InitMenu {
 
             if (dom_rightMenuImage_zoomRatioTxt.clientWidth !== 0) {
                 let r = 35 / dom_rightMenuImage_zoomRatioTxt.clientWidth;
-                if (r > 1) { r = 1 }
+                if (r > 1) { r = 1; }
                 dom_rightMenuImage_zoomRatioTxt.style.transform = `scaleX(${r})`
             }
         }
@@ -722,9 +731,9 @@ class Menu_layout {
         function show(btn?: HTMLElement) {
             updateData();
             if (btn === undefined) {
-                M.menu.open_Origin(dom, 0, 0);
+                M.menu.openAtOrigin(dom, 0, 0);
             } else {
-                M.menu.open_Button(dom, btn, "menuActive");
+                M.menu.openAtButton(dom, btn, "menuActive");
             }
         }
 
