@@ -1915,7 +1915,7 @@ class Tiefseeview {
                             }
                         });
 
-                } 
+                }
                 else if (sWidth > temp_can_width == false && sHeight > temp_can_height == false) {
 
                     //console.log("局部渲染");
@@ -2840,17 +2840,13 @@ class TiefseeviewScroll {
 
             if (type === "y") {
                 let h = _panelHeight / _contentHeight * dom_scroll.offsetHeight;
-                if (h < 30) {
-                    h = 30;
-                }
+                if (h < 50) { h = 50; }
                 dom_box.style.height = h + "px";
             }
 
             if (type === "x") {
                 let l = _panelHeight / _contentHeight * dom_scroll.offsetWidth;
-                if (l < 30) {
-                    l = 30;
-                }
+                if (l < 50) { l = 50; }
                 dom_box.style.width = l + "px";
             }
 

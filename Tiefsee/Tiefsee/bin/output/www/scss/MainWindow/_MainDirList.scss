@@ -13,14 +13,14 @@
 
   .main-dirListBody {
     overflow: hidden;
-    padding-top: 4px;
+    padding-top: 3px;
   }
 
   .dirList-item {
     padding-left: 6px;
-    margin-right: 8px;
+    margin-right: 6px;
     user-select: none;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     white-space: nowrap;
     position: relative;
     cursor: pointer;
@@ -30,14 +30,15 @@
     //outline: 2px solid var(--color-white40);
     //outline-offset: 2px;
     position: absolute;
-    top: -4px;
-    left: 2px;
-    right: -4px;
-    bottom: -4px;
+    top: -3px;
+    left: 3px;
+    right: -3px;
+    bottom: -3px;
     border: 2px solid var(--color-white40);
     pointer-events: none;
     z-index: 1;
     content: "";
+    border-radius: 7px;
   }
 
   //選中
@@ -45,14 +46,15 @@
     //outline: 2px solid var(--color-blue);
     //outline-offset: 2px;
     position: absolute;
-    top: -4px;
-    left: 2px;
-    right: -4px;
-    bottom: -4px;
+    top: -3px;
+    left: 3px;
+    right: -3px;
+    bottom: -3px;
     border: 2px solid var(--color-blue);
     pointer-events: none;
     z-index: 1;
     content: "";
+    border-radius: 7px;
   }
 
   //
@@ -98,6 +100,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+    border-radius: 4px;
   }
   .dirList-img__1 {
     width: calc((var(--dirList-width) - 1 * 3px) / 1);

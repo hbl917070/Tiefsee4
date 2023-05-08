@@ -49,18 +49,22 @@
   position: relative;
 }
 
+//容器 - 上
 .main-T {
 }
 
+//容器 - 下
+.main-B {
+}
+
+//容器 - 中 (用於放 左中右容器)
 .main-C {
   display: flex;
   flex: 1 1 auto;
   overflow: hidden;
 }
 
-.main-B {
-}
-
+//容器 - 左
 .main-L {
   height: 100%;
   position: relative;
@@ -68,14 +72,21 @@
   flex-direction: row;
 }
 
+//容器 - 右
+.main-R {
+  height: 100%;
+  position: relative;
+}
+
+//容器 - 中 (用於顯示主內容)
 .main-V {
   flex: 1;
   position: relative;
 }
 
-.main-R {
-  height: 100%;
-  position: relative;
+//同時顯示檔案面板跟資料夾面板時，減少兩個項目之間的距離
+.main-item:nth-child(n + 2 of .main-item[active="true"]:not([hide="true"])) {
+  margin-left: -3px;
 }
 
 /*---------------------------*/

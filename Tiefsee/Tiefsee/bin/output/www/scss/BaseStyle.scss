@@ -35,7 +35,7 @@ select option {
   //產生透明框線並且剪裁掉
   border: 3px solid rgba(0, 0, 0, 0);
   background-clip: content-box;
-  min-height: 30px;
+  min-height: 50px;
 }
 
 //右下角交匯處
@@ -71,7 +71,7 @@ select option {
   border-top: 3px solid rgba(0, 0, 0, 0);
   border-bottom: 3px solid rgba(0, 0, 0, 0);
   background-clip: content-box;
-  min-height: 30px;
+  min-height: 50px;
 }
 
 //右下角交匯處

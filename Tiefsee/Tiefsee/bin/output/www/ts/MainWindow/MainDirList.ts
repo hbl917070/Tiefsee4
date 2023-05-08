@@ -227,7 +227,7 @@ class MainDirList {
 				dirListItem = dom_dirListData.querySelector(".dirList-item");
 			}
 			if (dirListItem !== null) {
-				itemHeight = dirListItem.getBoundingClientRect().height + 5;
+				itemHeight = dirListItem.getBoundingClientRect().height + 6;
 			}
 
 			//重新計算整體的高度
@@ -397,7 +397,7 @@ class MainDirList {
 
 			//如果選中的項目在下面
 			let count = Math.floor(dom_dirList.clientHeight / itemHeight); //抓取數量
-			let end = (id - count + 1) * itemHeight - (dom_dirList.clientHeight % itemHeight) + 5;
+			let end = (id - count + 1) * itemHeight - (dom_dirList.clientHeight % itemHeight) + 3;
 			if (dom_dirList.scrollTop < end) {
 				dom_dirList.scrollTop = end;
 			}

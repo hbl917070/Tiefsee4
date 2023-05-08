@@ -189,7 +189,7 @@ class MainFileList {
             }
 
             if (fileListItem !== null) {
-                itemHeight = fileListItem.getBoundingClientRect().height + 5;
+                itemHeight = fileListItem.getBoundingClientRect().height + 6;
             }
 
             //重新計算整體的高度
@@ -351,7 +351,7 @@ class MainFileList {
 
             //如果選中的項目在下面
             let count = Math.floor(dom_fileList.clientHeight / itemHeight); //抓取數量
-            let end = (id - count + 1) * itemHeight - (dom_fileList.clientHeight % itemHeight) + 5;
+            let end = (id - count + 1) * itemHeight - (dom_fileList.clientHeight % itemHeight) + 3;
             if (dom_fileList.scrollTop < end) {
                 dom_fileList.scrollTop = end;
             }
