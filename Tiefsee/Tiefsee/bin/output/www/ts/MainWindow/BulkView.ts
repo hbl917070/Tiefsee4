@@ -842,7 +842,11 @@ class BulkView {
             div.addEventListener("click", async () => {
                 if (n !== 0) {
                     M.script.bulkView.close();
+                    
                     await M.fileLoad.showFile(n - 1);
+                    await Lib.sleep(10);
+                    M.mainFileList.select(); //設定檔案預覽視窗 目前選中的項目
+                    M.mainFileList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
 
                     //設定返回按鈕
                     M.toolbarBack.visible(true);
