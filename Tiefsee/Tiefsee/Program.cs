@@ -91,12 +91,15 @@ namespace Tiefsee {
 
             if (argsIsNone == false) {
                 WebWindow.Create("MainWindow.html", args, null); //顯示初始視窗
-            } else { //如果args是none
-                WebWindow.NewTempWindow("MainWindow.html"); //新增一個看不見的視窗，用於下次顯示
-            }
+            } 
 
             if (startType != 1) { AppLock(false); } //解除鎖定
             startWindow = new StartWindow();
+
+            if (argsIsNone == true) { //如果args是none
+                WebWindow.NewTempWindow("MainWindow.html"); //新增一個看不見的視窗，用於下次顯示
+            }
+
             Application.Run(startWindow);
         }
 
