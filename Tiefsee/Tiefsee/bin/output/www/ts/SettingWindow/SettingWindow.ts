@@ -1105,9 +1105,8 @@ class Setting {
             for (let i = 0; i < arFunc.length; i++) {
                 await arFunc[i]();
             }
-
-            let imgPath = await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`); //取得目前顯示的圖片
-            if (imgPath === "null") { imgPath = "" }
+            let imgPath = JSON.parse(await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`)); //取得目前顯示的圖片
+            if (imgPath === null) { imgPath = "" }
             let exePath = await WV_Window.GetAppPath();
             WV_RunApp.ProcessStart(exePath, imgPath, true, false);
             WV_Window.CloseAllWindow();
