@@ -65,6 +65,9 @@ class BulkView {
         /** 離開前記錄bulkViewContent的高度 */
         var temp_scrollHeight = 0;
 
+        /** 請求限制器 */
+        const limiter = new RequestLimiter(3);
+
         this.visible = visible;
         this.pageNext = pageNext;
         this.pagePrev = pagePrev;
@@ -367,7 +370,7 @@ class BulkView {
                             }
 
                         }
-                     
+
                     }
 
                     dom_bulkViewContent.style.height = ""; //復原總高度
@@ -841,12 +844,11 @@ class BulkView {
             //點擊圖片後，退出大量瀏覽模式
             div.addEventListener("click", async () => {
                 if (n !== 0) {
-                    M.script.bulkView.close();
-                    
-                    await M.fileLoad.showFile(n - 1);
+
+                    M.fileLoad.setIsBulkViewSub(true);
+                    await M.script.bulkView.close(n - 1);
                     await Lib.sleep(10);
-                    M.mainFileList.select(); //設定檔案預覽視窗 目前選中的項目
-                    M.mainFileList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
+                    M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
 
                     //設定返回按鈕
                     M.toolbarBack.visible(true);
@@ -904,7 +906,8 @@ class BulkView {
                 }
 
                 if (dom_img.getAttribute("src") !== ret.url) {
-                    dom_img.setAttribute("src", ret.url);
+                    //dom_img.setAttribute("src", ret.url);
+                    limiter.addRequest(dom_img, ret.url);
                 }
                 updateSize();
 
@@ -985,4 +988,68 @@ class BulkView {
 
     }
 
+}
+
+
+
+/**
+ * 限制最大同時連線數。Chrome最大連線數為6
+ */
+class RequestLimiter {
+    private queue: [HTMLImageElement, string][];
+    private inProgress: number;
+    private maxRequests: number;
+
+    constructor(maxRequests: number) {
+        this.queue = [];
+        this.inProgress = 0;
+        this.maxRequests = maxRequests;
+    }
+
+    addRequest(img: HTMLImageElement, url: string) {
+
+        // 檢查 img 元素是否仍然存在於文檔中
+        if (!document.body.contains(img)) {
+            return;
+        }
+
+        // 檢查佇列中是否已經存在相同的 img 元素和網址
+        const index = this.queue.findIndex(([i, u]) => i === img && u === url);
+        if (index !== -1) { // 如果存在，則忽略這個請求       
+            return;
+        }
+
+        // 檢查佇列中是否存在相同的 img 元素但不同的網址
+        const index2 = this.queue.findIndex(([i, u]) => i === img && u !== url);
+        if (index2 !== -1) { // 如果存在，則將舊的請求從佇列中移除   
+            this.queue.splice(index2, 1);
+        }
+
+        // 添加新的請求
+        this.queue.push([img, url]);
+        this.processQueue();
+    }
+
+    private processQueue() {
+        while (this.inProgress < this.maxRequests && this.queue.length > 0) {
+            this.inProgress++;
+            const [img, url] = this.queue.shift()!;
+            this.loadImage(img, url).then(() => {
+                this.inProgress--;
+                this.processQueue();
+            });
+        }
+    }
+
+    private loadImage(img: HTMLImageElement, url: string) {
+        return new Promise<void>((resolve) => {
+            if (!document.body.contains(img)) { // 檢查 img 元素是否仍然存在於文檔中
+                resolve();
+                return;
+            }
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+            img.src = url;
+        });
+    }
 }

@@ -38,6 +38,7 @@ class FileLoad {
 
     public enableBulkView;
     public getIsBulkView;
+    public setIsBulkViewSub;
 
     constructor(M: MainWindow) {
 
@@ -53,6 +54,8 @@ class FileLoad {
         var isLoadFileFinish = true;
         /** 當前是否為 大量瀏覽模式 */
         var isBulkView = false;
+        /** 當前是否為 大量瀏覽模式子視窗 */
+        var isBulkViewSub = false;
 
         /** 目前的資料夾路徑 */
         var dirPathNow: string = "";
@@ -104,6 +107,8 @@ class FileLoad {
         this.updateTitle = updateTitle;
         this.enableBulkView = enableBulkView;
         this.getIsBulkView = function () { return isBulkView; };
+        /** 設定當前是否為大量瀏覽模式子視窗 */
+        this.setIsBulkViewSub = function (val: boolean) { isBulkViewSub = val; };
 
         //#region Dir
 
@@ -524,7 +529,10 @@ class FileLoad {
          */
         async function showFile(_flag?: number) {
 
-            M.toolbarBack.visible(false); //隱藏返回按鈕
+            if (isBulkView === false && isBulkViewSub === false) {
+                M.toolbarBack.visible(false); //隱藏返回按鈕
+            }
+            isBulkViewSub = false;
 
             if (isLoadFileFinish === false) {
                 console.log("loadFile處理中");
@@ -572,18 +580,6 @@ class FileLoad {
             }
 
             showFileThrottle.run = async () => {
-
-                /*for (let i = 0; i < 10; i++) {
-                    if (getFilePath() === undefined) {
-                        await Lib.sleep(10);
-                        console.log("等待 " + i)
-                    } else {
-                        break;
-                    }
-                }         
-                console.log(getFilePath())*/
-
-
 
                 if (isBulkView) {
                     await M.fileShow.openBulkView();

@@ -654,11 +654,11 @@ class ScriptBulkView {
     }
 
     /** 結束 大量瀏覽模式 */
-    public close() {
+    public async close(_flag?: number | undefined) {
         if (this.M.fileLoad.getIsBulkView() == false) { return; }
         this.M.bulkView.saveCurrentState();
         this.M.fileLoad.enableBulkView(false);
-        this.M.fileLoad.showFile();
+        await this.M.fileLoad.showFile(_flag);
     }
 
     /** 下一頁 */
