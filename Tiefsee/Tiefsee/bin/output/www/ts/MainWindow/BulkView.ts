@@ -88,9 +88,9 @@ class BulkView {
 
             initGroupRadio(dom_columns); //初始化群組按鈕
 
-            new ResizeObserver(() => { //區塊改變大小時    
-                updateColumns();
-            }).observe(dom_bulkView);
+            new ResizeObserver(Lib.debounce(() => { //區塊改變大小時    
+                updateSize();
+            }, 30)).observe(dom_bulkView);
 
             //判斷是否有捲動
             dom_bulkView.addEventListener("wheel", () => {
@@ -314,7 +314,12 @@ class BulkView {
 
                 var containerPadding = 5; //內距
                 let columns = getColumns();
-                let itemWidth = Math.floor(dom_bulkViewContent.offsetWidth / columns); //容器寬度
+                let bulkViewWidth = dom_bulkViewContent.offsetWidth;
+                let itemWidth = Math.floor(bulkViewWidth / columns); //容器寬度
+
+                if (bulkViewWidth < 50) { //避免最小化視窗也觸發
+                    return;
+                }
 
                 let arItme;
                 if (donItem === undefined) {
@@ -443,9 +448,9 @@ class BulkView {
                             break;
                         }
 
-                        let containerWidth = dom_bulkViewContent.offsetWidth - 1;
+                        let containerWidth = bulkViewWidth - 1;
                         if (isEnd) {
-                            containerWidth = dom_bulkViewContent.offsetWidth / columns * (arItme.length % columns) - 1;
+                            containerWidth = bulkViewWidth / columns * (arItme.length % columns) - 1;
                         }
                         //let images = [[30, 10], [20, 20], [100, 50]];
                         let aspectRatios = images.map(size => size[0] / size[1]); //計算每張圖片的寬高比
@@ -636,8 +641,6 @@ class BulkView {
                     let retAr = await WebAPI.getFileInfo2List(newArr);
 
                     if (temp !== pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
-                        //console.log("old：" + temp);
-                        //console.log("new：" + pageNow + getDirPath());
                         return;
                     }
                     for (let j = 0; j < retAr.length; j++) {
@@ -647,7 +650,7 @@ class BulkView {
                     }
                 }
 
-                updateColumns();
+                updateSize();
             }
 
         }
@@ -801,8 +804,6 @@ class BulkView {
             //--------
 
             if (temp !== pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
-                //console.log("old:" + temp)
-                //console.log("new:" + pageNow + getDirPath())
                 return;
             }
 
