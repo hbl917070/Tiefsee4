@@ -3,25 +3,37 @@ class MainMenu {
 
     public initOpen;
     public updateRightMenuImageZoomRatioTxt;
-
-    public menu_layout;
+    public updateMenuLayoutCheckState;
+    public setMenuLayoutCheckState;
+    //public menu_layout;
 
     constructor(M: MainWindow) {
 
         var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement; //右鍵選單的圖片縮放比例
 
+        var btnTopmost = document.querySelector("#menu-layout .js-topmost") as HTMLElement;
+        var btnMainToolbar = document.querySelector("#menu-layout .js-mainToolbar") as HTMLElement;
+        var btnMainDirList = document.querySelector("#menu-layout .js-mainDirList") as HTMLElement;
+        var btnMainFileList = document.querySelector("#menu-layout .js-mainFileList") as HTMLElement;
+        var btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
+        var btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
+
+
         this.initOpen = initOpen;
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
+        this.updateMenuLayoutCheckState = updateMenuLayoutCheckState;
+        this.setMenuLayoutCheckState = setMenuLayoutCheckState;
+
 
         initCopy();
         initRotate();
-        this.menu_layout = new Menu_layout(M);
         initRightMenuImage();
         initRightMenuWelcome();
         initRightMenuDefault();
         initRightMenuBulkView();
         initText();
         initTxt();
+        initLayout();
 
         var dataMenu = "";
 
@@ -682,131 +694,43 @@ class MainMenu {
             }
         }
 
-    }
-}
-
-/** 版面的下拉選單 */
-class Menu_layout {
-
-    public show;
-
-    constructor(M: MainWindow) {
-
-        var dom = document.getElementById("menu-layout") as HTMLElement;
-        var dom_topmost = dom.querySelector(".js-topmost") as HTMLElement;
-        var dom_mainToolbar = dom.querySelector(".js-mainToolbar") as HTMLElement;
-        var dom_mainDirList = dom.querySelector(".js-mainDirList") as HTMLElement;
-        var dom_mainFileList = dom.querySelector(".js-mainFileList") as HTMLElement;
-        var dom_mainExif = dom.querySelector(".js-mainExif") as HTMLElement;
-
-        var isTopmost: boolean = false;
-        var isMainToolbar: boolean = false;
-        var isMainDirList: boolean = false;
-        var isMainFileList: boolean = false;
-        var isMainExif: boolean = false;
-
-        this.show = show;
-
-        dom_topmost.addEventListener("click", async () => {
-            setTopmost();
-        });
-        dom_mainToolbar.addEventListener("click", () => {
-            setMainToolbar();
-        });
-        dom_mainDirList.addEventListener("click", () => {
-            setMainDirList();
-        });
-        dom_mainFileList.addEventListener("click", () => {
-            setMainFileList();
-        });
-        dom_mainExif.addEventListener("click", () => {
-            setMainExif();
-        });
-        //------------------------
+        //-----------------------------
 
         /**
-         * 開啟選單
-         * @param btn 
+         * 初始化 menu-版面
          */
-        function show(btn?: HTMLElement) {
-            updateData();
-            if (btn === undefined) {
-                M.menu.openAtOrigin(dom, 0, 0);
-            } else {
-                M.menu.openAtButton(dom, btn, "menuActive");
-            }
-        }
+        async function initLayout() {
 
+            btnTopmost.addEventListener("click", async () => {
+                M.script.window.enabledTopmost();
+            });
+            btnFullScreen.addEventListener("click", () => {
+                M.script.window.enabledFullScreen();
+            });
+            btnMainToolbar.addEventListener("click", () => {
+                M.script.window.enabledMainToolbar();
+            });
+            btnMainDirList.addEventListener("click", () => {
+                M.script.window.enabledMainDirList();
+            });
+            btnMainFileList.addEventListener("click", () => {
+                M.script.window.enabledMainFileList();
+            });
+            btnMainExif.addEventListener("click", () => {
+                M.script.window.enabledMainExif();
+            });
+
+        }
 
         /**
          * 判斷哪些選項要被勾選，於開啟選單時呼叫
          */
-        function updateData() {
-            isMainToolbar = M.config.settings.layout.mainToolbarEnabled;
-            isMainDirList = M.config.settings.layout.dirListEnabled;
-            isMainFileList = M.config.settings.layout.fileListEnabled;
-            isMainExif = M.config.settings.layout.mainExifEnabled;
-            setCheckState(dom_mainToolbar, isMainToolbar);
-            setCheckState(dom_mainDirList, isMainDirList);
-            setCheckState(dom_mainFileList, isMainFileList);
-            setCheckState(dom_mainExif, isMainExif);
-        }
-
-
-        /**
-         * 顯示或隱藏 視窗固定最上層
-         * @param val 
-         */
-        function setTopmost(val?: boolean) {
-            if (val === undefined) { val = !isTopmost }
-            isTopmost = val;
-            baseWindow.topMost = val;
-            setCheckState(dom_topmost, val);
-            WV_Window.TopMost = val;
-        }
-
-
-        /**
-         * 顯示或隱藏 工具列
-         * @param val 
-         */
-        function setMainToolbar(val?: boolean) {
-            if (val === undefined) { val = !isMainToolbar }
-            isMainToolbar = val;
-            setCheckState(dom_mainToolbar, val);
-            M.mainToolbar.setEnabled(val);
-        }
-
-
-        /**
-         * 顯示或隱藏 資料夾預覽視窗
-         */
-        function setMainDirList(val?: boolean) {
-            if (val === undefined) { val = !isMainDirList }
-            isMainDirList = val;
-            setCheckState(dom_mainDirList, val);
-            M.mainDirList.setEnabled(val);
-        }
-
-
-        /**
-         * 顯示或隱藏 檔案預覽視窗
-         */
-        function setMainFileList(val?: boolean) {
-            if (val === undefined) { val = !isMainFileList }
-            isMainFileList = val;
-            setCheckState(dom_mainFileList, val);
-            M.mainFileList.setEnabled(val);
-        }
-
-        /**
-         * 顯示或隱藏 詳細資料視窗
-         */
-        function setMainExif(val?: boolean) {
-            if (val === undefined) { val = !isMainExif }
-            isMainExif = val;
-            setCheckState(dom_mainExif, val);
-            M.mainExif.setEnabled(val);
+        function updateMenuLayoutCheckState() {
+            setMenuLayoutCheckState(btnMainToolbar, M.config.settings.layout.mainToolbarEnabled);
+            setMenuLayoutCheckState(btnMainDirList, M.config.settings.layout.dirListEnabled);
+            setMenuLayoutCheckState(btnMainFileList, M.config.settings.layout.fileListEnabled);
+            setMenuLayoutCheckState(btnMainExif, M.config.settings.layout.mainExifEnabled);
+            setMenuLayoutCheckState(btnFullScreen, M.fullScreen.getEnabled());
         }
 
         /**
@@ -814,7 +738,7 @@ class Menu_layout {
          * @param dom 
          * @param bool 
          */
-        function setCheckState(dom: HTMLElement, bool: boolean) {
+        function setMenuLayoutCheckState(dom: HTMLElement, bool: boolean) {
             if (bool) {
                 dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["yes.svg"];
             } else {
@@ -824,3 +748,4 @@ class Menu_layout {
 
     }
 }
+

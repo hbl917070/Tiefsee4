@@ -98,8 +98,8 @@ namespace Tiefsee {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="windowState"></param>
-        public void ShowWindow_SetSize(int x, int y, int width, int height, string windowState) {
-            M.ShowWindow_SetSize(x, y, width, height, windowState);
+        public void ShowWindowAtPosition(int x, int y, int width, int height, string windowState) {
+            M.ShowWindowAtPosition(x, y, width, height, windowState);
         }
 
 
@@ -108,8 +108,8 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public void ShowWindow_Center(int width, int height) {
-            M.ShowWindow_Center(width, height);
+        public void ShowWindowAtCenter(int width, int height) {
+            M.ShowWindowAtCenter(width, height);
         }
 
 
@@ -159,7 +159,7 @@ namespace Tiefsee {
         }
 
         /// <summary>
-        /// 取得碩放倍率
+        /// 取得縮放倍率
         /// </summary>
         /// <returns></returns>
         public double GetZoomFactor() {
@@ -174,7 +174,6 @@ namespace Tiefsee {
         public void SetOwner(object _window) {
             if (_window != null) {
                 WebWindow webwindow = (WebWindow)_window;
-
                 if (TopMost == true) {
                     TopMost = false; //設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
@@ -182,8 +181,6 @@ namespace Tiefsee {
                 } else {
                     webwindow.Owner = M;
                 }
-
-                //webwindow.Owner = M;
             }
         }
 
@@ -222,7 +219,6 @@ namespace Tiefsee {
         /// <summary>
         /// 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee
         /// </summary>
-        /// <returns></returns>
         public string GetAppDataPath() {
             string path = AppPath.appData;
             if (Directory.Exists(path) == false) {
@@ -233,9 +229,8 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 取得執行檔目錄
+        /// 取得執行檔所在的資料夾
         /// </summary>
-        /// <returns></returns>
         public string GetAppDirPath() {
             return System.AppDomain.CurrentDomain.BaseDirectory;
         }
@@ -328,6 +323,21 @@ namespace Tiefsee {
         }
 
         /// <summary>
+        /// 啟用或關閉 全螢幕
+        /// </summary>
+        public void SetFullScreen(bool val) {
+            M.SetFullScreen(val);
+        }
+
+        /// <summary>
+        /// 取得當前是否為 全螢幕
+        /// </summary>
+        public bool GetFullScreen() {
+            return M.GetFullScreen();
+        }
+
+
+        /// <summary>
         /// 關閉視窗
         /// </summary>
         public void Close() {
@@ -335,12 +345,14 @@ namespace Tiefsee {
             M.CloseWindow();
         }
 
+
         /// <summary>
         /// 隱藏視窗
         /// </summary>
         public void Hide() {
             M.HideWindow();
         }
+
 
         /// <summary>
         /// 視窗固定在最上層
@@ -426,7 +438,6 @@ namespace Tiefsee {
         public const int WM_LBUTTONUP = 0x202;
 
         #endregion
-
 
 
         #region 毛玻璃

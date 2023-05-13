@@ -54,10 +54,10 @@ interface WV_Window {
     ShowWindow(): void;
 
     /** 網頁載入完成後，呼叫此函數才會顯示視窗，指定起始坐標 */
-    ShowWindow_SetSize(x: number, y: number, width: number, height: number, windowState: string): void;
+    ShowWindowAtPosition(x: number, y: number, width: number, height: number, windowState: string): void;
 
     /** 網頁載入完成後，呼叫此函數才會顯示視窗，子視窗從父視窗中間開啟 */
-    ShowWindow_Center(width: number, height: number): void;
+    ShowWindowAtCenter(width: number, height: number): void;
 
     /**
      * 新開視窗
@@ -136,6 +136,11 @@ interface WV_Window {
 
     /**視窗狀態 */
     WindowState: ("Maximized" | "Minimized" | "Normal");
+
+    /** 啟用或關閉 全螢幕 */
+    SetFullScreen(val: bool);
+    /** 取得當前是否為 全螢幕 */
+    GetFullScreen(): boolean;
 
     /**視窗置頂 */
     TopMost: boolean;

@@ -31,6 +31,7 @@ class MainWindow {
     public msgbox;
     public bulkView;
     public toolbarBack;
+    public fullScreen;
     public updateDomVisibility;
 
     public applySetting;
@@ -77,6 +78,7 @@ class MainWindow {
         var msgbox = this.msgbox = new Msgbox(i18n);
         var bulkView = this.bulkView = new BulkView(this);
         var toolbarBack = this.toolbarBack = new ToolbarBack();
+        var fullScreen = this.fullScreen = new FullScreen(this);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
@@ -177,7 +179,7 @@ class MainWindow {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
                 let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized") {
+                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
                     setTimeout(() => {
@@ -187,7 +189,7 @@ class MainWindow {
             });
             Lib.addEventDblclick(fileShow.dom_imgview, async () => { //圖片物件
                 let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized") {
+                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
                     setTimeout(() => {
@@ -197,7 +199,7 @@ class MainWindow {
             });
             Lib.addEventDblclick(fileShow.iframes.welcomeview.dom, async () => { //歡迎頁面
                 let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized") {
+                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
                     setTimeout(() => {
@@ -208,6 +210,7 @@ class MainWindow {
 
             //讓工具列允許拖曳視窗
             dom_toolbar.addEventListener("mousedown", async (e) => {
+                if (fullScreen.getEnabled() === true) { return; }
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
@@ -217,6 +220,7 @@ class MainWindow {
                 }
             });
             dom_toolbar.addEventListener("touchstart", async (e) => {
+                if (fullScreen.getEnabled() === true) { return; }
                 let _dom = e.target as HTMLDivElement;
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
@@ -468,7 +472,7 @@ class MainWindow {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-                script.window.loadingShow(true);
+                script.window.enabledLoading(true);
 
                 try {
                     const response = await fetch(imageUrl, { signal: controller.signal });
@@ -503,7 +507,7 @@ class MainWindow {
                     return null;
                 } finally {
                     clearTimeout(timeoutId);
-                    script.window.loadingShow(false);
+                    script.window.enabledLoading(false);
                 }
             }
 
@@ -622,7 +626,7 @@ class MainWindow {
             let left = screenX + ((screenW - width) / 2);
             let top = screenY + ((screenH - height) / 2);
 
-            await WV_Window.ShowWindow_SetSize(left, top, width, height, "Normal"); //顯示視窗 
+            await WV_Window.ShowWindowAtPosition(left, top, width, height, "Normal"); //顯示視窗 
         }
 
 
@@ -633,14 +637,14 @@ class MainWindow {
             let txtPosition = config.settings.position;
             if (txtPosition.left !== -9999) {
                 if (txtPosition.windowState == "Maximized") {
-                    await WV_Window.ShowWindow_SetSize(
+                    await WV_Window.ShowWindowAtPosition(
                         txtPosition.left, txtPosition.top,
                         //800 * window.devicePixelRatio, 600 * window.devicePixelRatio,
                         txtPosition.width, txtPosition.height,
                         "Maximized"
                     ); //顯示視窗 
                 } else if (txtPosition.windowState == "Normal") {
-                    await WV_Window.ShowWindow_SetSize(
+                    await WV_Window.ShowWindowAtPosition(
                         txtPosition.left, txtPosition.top,
                         txtPosition.width, txtPosition.height,
                         "Normal"
@@ -723,6 +727,8 @@ class MainWindow {
                 isInitAERO = true;
             }
         }
+
+
 
 
         /**
@@ -945,7 +951,7 @@ class ToolbarBack {
         this.getVisible = getVisible;
         this.setEvent = setEvent;
         this.runEvent = runEvent;
-        
+
         btn.addEventListener("click", () => {
             clickEvent();
         })
@@ -983,4 +989,93 @@ class ToolbarBack {
         }
 
     }
+}
+
+
+class FullScreen {
+
+    M: MainWindow;
+
+    /** 是否啟用全螢幕 */
+    private enabled = false;
+    /** 當前是否顯示標題列 */
+    private showTitlebar = false;
+    /** 標題列 */
+    private domTitleBar = document.querySelector("#window-titlebar") as HTMLDivElement;
+    /** 工具列 */
+    private domMainT = document.querySelector("#main-T") as HTMLDivElement;
+    /** 標題列 - 離開全螢幕 */
+    private btnExitFullScreen = document.querySelector(".titlebar-toolbar-exitFullScreen") as HTMLDivElement;
+
+    /** 滑鼠移到視窗頂端時，顯示標題列與工具列 */
+    private mousemoveEvent = (e: MouseEvent) => {
+        //if (this.M.menu.getIsShow()) { return; }
+        if (this.showTitlebar === false && e.clientY <= 5) {
+            this.showTitlebar = true;
+            document.body.setAttribute("showTitlebar", "true");
+        } else if (this.showTitlebar === true && e.clientY < this.domTitleBar.offsetHeight + this.domMainT.offsetHeight + 10) {
+            this.showTitlebar = true;
+            document.body.setAttribute("showTitlebar", "true");
+        } else {
+            this.showTitlebar = false;
+            document.body.setAttribute("showTitlebar", "false");
+        }
+    };
+
+    /** 視窗化後就結束全螢幕 */
+    private exitEvent = async () => {
+        if (this.getEnabled() === true && baseWindow.windowState !== "Maximized") {
+            this.setEnabled(false);
+        }
+    }
+
+
+    /**
+     * 
+     */
+    constructor(M: MainWindow) {
+        this.M = M;
+
+        //結束全螢幕
+        this.btnExitFullScreen.addEventListener("click", () => {
+            this.setEnabled(false);
+        });
+    }
+
+    /**
+     * 取得 是否啟用全螢幕
+     */
+    public getEnabled() {
+        return this.enabled;
+    }
+
+    /**
+     * 啟用或關閉全螢幕
+     * @param val 
+     */
+    public async setEnabled(val?: boolean) {
+        if (val === undefined) {
+            val = !this.enabled;
+        }
+        this.enabled = val;
+        this.M.menu.close();
+
+        await WV_Window.SetFullScreen(val);
+
+        if (val) {
+            document.body.setAttribute("fullScreen", "true");
+            document.addEventListener("mousemove", this.mousemoveEvent);
+            baseWindow.sizeChangeEvents.push(this.exitEvent);
+        } else {
+            document.body.setAttribute("fullScreen", "false");
+            document.removeEventListener("mousemove", this.mousemoveEvent);
+            //移除事件
+            const index = baseWindow.sizeChangeEvents.indexOf(this.exitEvent);
+            if (index > -1) {
+                baseWindow.sizeChangeEvents.splice(index, 1);
+            }
+        }
+
+    }
+
 }

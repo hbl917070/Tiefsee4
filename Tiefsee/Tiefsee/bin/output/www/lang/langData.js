@@ -986,6 +986,11 @@ var langData = {
             "en": "Back",
             "ja": "戻る",
         },
+        exitFullScreen: {
+            "zh-TW": "結束全螢幕",
+            "en": "Exit Full Screen",
+            "ja": "全画面表示を終了する",
+        },
 
         prevFile: {
             "zh-TW": "上一個檔案",
@@ -1307,6 +1312,11 @@ var langData = {
 
 
         //#region 下拉選單 layout
+        fullScreen: {
+            "zh-TW": "全螢幕",
+            "en": "Full Screen",
+            "ja": "全画面表示",
+        },
         topmost: {
             "zh-TW": "視窗固定最上層",
             "en": "Keep window always in top",

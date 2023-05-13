@@ -75,9 +75,12 @@ class Menu {
             temp_closeList.push(funcClose);
 
             let onmousedown = (sender: TouchEvent | MouseEvent) => {
-                let domClick = sender.target as HTMLElement;
+                let dom = sender.target as HTMLElement;
                 let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
-                if (domClick.classList.contains("menu") || (isScroll == false && domClick.classList.contains("menu-content"))) { //點擊透明背景時
+                if (
+                    dom.classList.contains("menu") //透明背景
+                    || (isScroll === false && dom.classList.contains("menu-content")) //避免出現捲動條後，無法點擊捲動條
+                ) {
                     sender.preventDefault();
                     funcClose(); //關閉menu
                 }
@@ -87,7 +90,12 @@ class Menu {
 
             //在非選單的區域捲動，就關閉選單
             domMenuBg.onwheel = (sender) => {
-                if (sender.target == domMenuBg) {
+                let dom = sender.target as HTMLElement;
+                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                if (
+                    dom.classList.contains("menu") //透明背景
+                    || (isScroll === false && dom.classList.contains("menu-content")) //避免出現捲動條後，無法點擊捲動條
+                ) {
                     funcClose(); //關閉menu
                 }
             }

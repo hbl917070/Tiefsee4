@@ -43,6 +43,20 @@ class Hotkey {
                 }
             }
 
+            //如果在全螢幕狀態下
+            if (M.fullScreen.getEnabled()) {
+                if (e.code == "Escape") {
+                    M.fullScreen.setEnabled(false);
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+            if (e.code === "F11") {
+                M.fullScreen.setEnabled();
+                return;
+            }
+
             //如果有開啟大量瀏覽模式
             if (M.fileLoad.getIsBulkView()) {
 
@@ -80,7 +94,6 @@ class Hotkey {
                         M.script.bulkView.setColumns(i);
                     }
                 }
-
 
                 return;
             }

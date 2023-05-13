@@ -262,7 +262,13 @@ class ScriptMenu {
 
     /** 顯示選單 Layout */
     showLayout(btn?: HTMLElement) {
-        this.M.mainMenu.menu_layout.show(btn);
+        this.M.mainMenu.updateMenuLayoutCheckState();
+        let dom = document.getElementById("menu-layout");
+        if (btn === undefined) {
+            this.M.menu.openAtOrigin(dom, 0, 0);
+        } else {
+            this.M.menu.openAtButton(dom, btn, "menuActive");
+        }
     }
 
     /** 顯示選單 旋轉與鏡像 */
@@ -620,6 +626,14 @@ class ScriptSetting {
 class ScriptWindow {
 
     domLoading = document.querySelector("#loadingWindow") as HTMLElement;
+    btnTopmost = document.querySelector("#menu-layout .js-topmost") as HTMLElement;
+    btnMainToolbar = document.querySelector("#menu-layout .js-mainToolbar") as HTMLElement;
+    btnMainDirList = document.querySelector("#menu-layout .js-mainDirList") as HTMLElement;
+    btnMainFileList = document.querySelector("#menu-layout .js-mainFileList") as HTMLElement;
+    btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
+    btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
+
+    isTopmost: boolean = false;
 
     M: MainWindow;
     constructor(_M: MainWindow) {
@@ -627,12 +641,54 @@ class ScriptWindow {
     }
 
     /** 顯示或隱藏 loading */
-    public loadingShow(val: boolean) {
+    public enabledLoading(val: boolean) {
         if (val) {
             this.domLoading.style.display = "flex";
         } else {
             this.domLoading.style.display = "none";
         }
+    }
+
+    /** 啟用或關閉 全螢幕 */
+    public enabledFullScreen(val?: boolean) {
+        this.M.fullScreen.setEnabled(val);
+    }
+
+    /** 啟用或關閉 視窗固定最上層 */
+    public enabledTopmost(val?: boolean) {
+        if (val === undefined) { val = !this.isTopmost }
+        this.isTopmost = val;
+        baseWindow.topMost = val;
+        this.M.mainMenu.setMenuLayoutCheckState(this.btnTopmost, val);
+        WV_Window.TopMost = val;
+    }
+
+    /** 啟用或關閉 工具列 */
+    public enabledMainToolbar(val?: boolean) {
+        if (val === undefined) { val = !this.M.config.settings.layout.mainToolbarEnabled }
+        this.M.mainMenu.setMenuLayoutCheckState(this.btnMainToolbar, val);
+        this.M.mainToolbar.setEnabled(val);
+    }
+
+    /** 啟用或關閉 資料夾預覽視窗 */
+    public enabledMainDirList(val?: boolean) {
+        if (val === undefined) { val = !this.M.config.settings.layout.dirListEnabled }
+        this.M.mainMenu.setMenuLayoutCheckState(this.btnMainDirList, val);
+        this.M.mainDirList.setEnabled(val);
+    }
+
+    /** 啟用或關閉 檔案預覽視窗 */
+    public enabledMainFileList(val?: boolean) {
+        if (val === undefined) { val = !this.M.config.settings.layout.fileListEnabled }
+        this.M.mainMenu.setMenuLayoutCheckState(this.btnMainFileList, val);
+        this.M.mainFileList.setEnabled(val);
+    }
+
+    /** 啟用或關閉 詳細資料視窗 */
+    public enabledMainExif(val?: boolean) {
+        if (val === undefined) { val = !this.M.config.settings.layout.mainExifEnabled }
+        this.M.mainMenu.setMenuLayoutCheckState(this.btnMainExif, val);
+        this.M.mainExif.setEnabled(val);
     }
 }
 
@@ -646,7 +702,7 @@ class ScriptBulkView {
 
     /** 進入 大量瀏覽模式 */
     public show() {
-        if (this.M.fileLoad.getIsBulkView() == true) { return; }
+        if (this.M.fileLoad.getIsBulkView() === true) { return; }
         if (this.M.fileLoad.getGroupType() === GroupType.welcome) { return; }
         if (this.M.fileLoad.getGroupType() === GroupType.none) { return; }
         this.M.fileLoad.enableBulkView(true);
@@ -655,7 +711,7 @@ class ScriptBulkView {
 
     /** 結束 大量瀏覽模式 */
     public async close(_flag?: number | undefined) {
-        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.saveCurrentState();
         this.M.fileLoad.enableBulkView(false);
         await this.M.fileLoad.showFile(_flag);
@@ -663,19 +719,19 @@ class ScriptBulkView {
 
     /** 下一頁 */
     public pageNext() {
-        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.pageNext();
     }
 
     /** 上一頁 */
     public pagePrev() {
-        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.pagePrev();
     }
 
     /** 設定 欄數 */
     public setColumns(val: number) {
-        if (this.M.fileLoad.getIsBulkView() == false) { return; }
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.setColumns(val);
     }
 }

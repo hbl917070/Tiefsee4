@@ -14,17 +14,19 @@ using System.Windows.Forms;
 
 namespace Tiefsee {
 
-
     [ComVisible(true)]
     public class WebWindow : FormNone {
 
-        //public WebView2 wv2;
         public WebView2 wv2;
         public WebWindow parentWindow; //父視窗
         public string[] args; //命令列參數 
         public static WebWindow tempWindow; //用於快速啟動的暫存視窗
         private bool isShow = false; //是否已經顯式過視窗(用於單一啟動
         public bool isDelayInit = false; //是否延遲初始化(暫存視窗必須設定成true
+
+        //用於記錄全螢幕前的狀態
+        private FormWindowState tempFormWindowState = FormWindowState.Normal;
+        private bool tempFullScreen = false;
 
         public WV_Window WV_Window;
         public WV_Directory WV_Directory;
@@ -60,7 +62,7 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => { //網頁載入完成時
-                    SendOnCreate(ww, _args);
+                    TriggerCreate(ww, _args);
                 };
 
                 return ww;
@@ -75,7 +77,7 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => { //網頁載入完成時
-                    SendOnCreate(ww, _args);
+                    TriggerCreate(ww, _args);
                 };
                 return ww;
             }
@@ -92,7 +94,7 @@ namespace Tiefsee {
                     tempWindow.args = _args;
                     tempWindow.wv2.Source = new Uri(GetHtmlFilePath(_url));
                     tempWindow.wv2.NavigationCompleted += (sender, e) => { //網頁載入完成時
-                        SendOnCreate(tempWindow, _args);
+                        TriggerCreate(tempWindow, _args);
                     };
 
                     //如果是 單一執行+快速啟動，則在視窗關閉的時候建立下一個視窗
@@ -115,7 +117,7 @@ namespace Tiefsee {
                     //呼叫先前已經建立的window來執行onCreate
                     tempWindow.parentWindow = _parentWindow;
                     tempWindow.args = _args;
-                    SendOnCreate(tempWindow, _args);
+                    TriggerCreate(tempWindow, _args);
                 }
 
                 return tempWindow;
@@ -131,7 +133,7 @@ namespace Tiefsee {
                 ww.args = _args;
                 ww.wv2.Source = new Uri(GetHtmlFilePath(_url));
                 ww.wv2.NavigationCompleted += (sender, e) => { //網頁載入完成時
-                    SendOnCreate(ww, _args);
+                    TriggerCreate(ww, _args);
                 };
 
                 NewTempWindow(_url); //新建window，用於下次顯示
@@ -145,14 +147,15 @@ namespace Tiefsee {
             temp2.parentWindow = _parentWindow;
             temp2.args = _args;
             temp2.wv2.NavigationCompleted += (sender, e) => { //網頁載入完成時
-                SendOnCreate(temp2, _args);
+                TriggerCreate(temp2, _args);
             };
-            SendOnCreate(temp2, _args);
+            TriggerCreate(temp2, _args);
 
             NewTempWindow(_url); //新建window，用於下次顯示
 
             return temp2; //回傳剛剛新建的window
         }
+
 
         /// <summary>
         /// 新建window，用於下次顯示
@@ -190,19 +193,24 @@ namespace Tiefsee {
         }
 
 
-
-        private static string GetHtmlFilePath(string path) {
+        /// <summary>
+        /// 傳入www資料夾內的檔名，回傳實體路徑
+        /// </summary>
+        private static string GetHtmlFilePath(string fileName) {
             string p = "file:///" + Path.Combine(
-                          System.AppDomain.CurrentDomain.BaseDirectory, "www", path
-                       ) + "#" + Program.webServer.port;
-            //string p = $"{Program.webServer.origin}/www/{path}";
+                          System.AppDomain.CurrentDomain.BaseDirectory, "www", fileName
+                       ) + "#" + Program.webServer.port; // post 用於讓 js 識別 webAPI 的網址
             return p;
         }
 
 
-        public static void SendOnCreate(WebWindow w, string[] args, int quickLookRunType = 0) {
+        /// <summary>
+        /// 觸發 js 的 baseWindow.onCreate
+        /// </summary>
+        public static void TriggerCreate(WebWindow w, string[] args, int quickLookRunType = 0) {
             w.RunJs($"baseWindow.onCreate({GetAppInfo(args, quickLookRunType)});");
         }
+
 
         /// <summary>
         /// 
@@ -248,13 +256,12 @@ namespace Tiefsee {
             public DataPlugin plugin = Plugin.dataPlugin; //哪些擴充是有啟用的
         }
 
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="_url"></param>
         public async void Init() {
 
-            //this.SetSize(400, 300);
             this.Opacity = 0;
             wv2 = new WebView2();
             this.Controls.Add(wv2);
@@ -291,13 +298,8 @@ namespace Tiefsee {
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment); //等待初始化完成
-            /*wv2.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                "appassets.example",
-                @"D:\GitHub\tiefsee4\tiefsee\Tiefsee\bin\output\www", 
-                CoreWebView2HostResourceAccessKind.DenyCors
-            );*/
 
-            //wv2.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44 QQQQQQQQQ";
+            //wv2.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44";
             wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false; //是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
             //wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false; //觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
             wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; //自動填充啟用
@@ -341,7 +343,7 @@ namespace Tiefsee {
                 string s = this.WindowState.ToString();
                 RunJs($"baseWindow.onSizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{s}')");
 
-                //最大化時，程式網內縮
+                //最大化時，視窗內縮
                 if (this.WindowState == FormWindowState.Maximized) {
                     int x = System.Windows.Forms.Screen.FromHandle(this.Handle).WorkingArea.X
                             - this.RectangleToScreen(new Rectangle()).X; //程式所在的螢幕工作區域-程式目前坐標
@@ -368,12 +370,10 @@ namespace Tiefsee {
         }
 
 
-
-
         /// <summary>
         /// 以js呼叫此函數後才會顯示視窗(從父視窗的中間開啟
         /// </summary>
-        public void ShowWindow_Center(int width, int height) {
+        public void ShowWindowAtCenter(int width, int height) {
 
             //如果視窗已經顯示了，則只取得焦點，不做其他事情
             if (isShow) {
@@ -424,7 +424,7 @@ namespace Tiefsee {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="windowState"></param>
-        public void ShowWindow_SetSize(int x, int y, int width, int height, string windowState) {
+        public void ShowWindowAtPosition(int x, int y, int width, int height, string windowState) {
 
             //如果視窗已經顯示了，則只取得焦點，不做其他事情
             if (isShow) {
@@ -507,7 +507,6 @@ namespace Tiefsee {
         /// 關閉視窗
         /// </summary>
         public void CloseWindow() {
-
             Adapter.DelayRun(1, () => {
                 if (tempWindow == this) { tempWindow = null; }
                 Close();
@@ -540,13 +539,46 @@ namespace Tiefsee {
         }
 
 
+
+        /// <summary>
+        /// 啟用或關閉 全螢幕
+        /// </summary>
+        public void SetFullScreen(bool val) {
+            if (tempFullScreen == val) {
+                return;
+            }
+            tempFullScreen = val;
+            if (val) {
+                tempFormWindowState = WindowState;
+
+                SuspendLayout();
+                FormBorderStyle = FormBorderStyle.None;
+                if (WindowState == FormWindowState.Maximized) {
+                    WindowState = FormWindowState.Normal;
+                }
+                WindowState = FormWindowState.Maximized;
+
+                ResumeLayout();
+            } else {
+                FormBorderStyle = FormBorderStyle.Sizable;
+                WindowState = tempFormWindowState;
+            }
+        }
+        /// <summary>
+        /// 取得當前是否為 全螢幕
+        /// </summary>
+        public bool GetFullScreen() {
+            return tempFullScreen;
+        }
+
+
         /// <summary>
         /// 讓視窗在最上面並且取得焦點
         /// </summary>
         public void SetFocus() {
 
-            //this.TopMost = true;
-            //this.TopMost = false;
+            this.TopMost = true;
+            this.TopMost = false;
 
             GlobalActivate(this.Handle);
             this.Activate();
@@ -699,11 +731,6 @@ namespace Tiefsee {
         /// <summary>
         /// 避免最大化跟視窗化時，視窗大小錯誤
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="specified"></param>
         protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) {
             //base.SetBoundsCore(x, y, width- 16, height - 39, specified);
             if (allowSetSize == true) {

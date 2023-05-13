@@ -68,21 +68,20 @@
         <div class="dragbar-v" id="dragbar-mainExif"> </div>
 
         <!-- 標題列 -->
-        <div class="window-titlebar">
+        <div id="window-titlebar" class="window-titlebar">
 
             <div class="titlebar-txt">
                 <span>tiefsee 4</span>
             </div>
 
             <div class="titlebar-toolbar">
-                <div class="titlebar-toolbar-btn titlebar-toolbar-menu" style="display:none;">
-                    <%- await readFile("./img/default/window-menu.svg"); %>
-                </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-topmost" style="display:none;">
-                    <%- await readFile("./img/default/window-topmost.svg"); %>
-                </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="版面" i18n="menu.layout">
+
+                <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="佈局" i18n="menu.layout">
                     <%- await readFile("./img/default/window-layout.svg"); %>
+                </div>
+                <div class="titlebar-toolbar-btn titlebar-toolbar-exitFullScreen" title="結束全螢幕"
+                    i18n="menu.exitFullScreen" style="display:none;">
+                    <%- await readFile("./img/default/window-exitFullScreen.svg"); %>
                 </div>
                 <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
                     <%- await readFile("./img/default/window-minimized.svg"); %>
@@ -109,7 +108,7 @@
                     <img src="./img/loading.svg">
                 </div>
 
-                <div class="main-T">
+                <div id="main-T" class="main-T">
                     <!-- 工具列 -->
                     <div id="main-toolbar" class="main-toolbar" toolbarAlign="center">
 
@@ -123,7 +122,7 @@
 
                 <div class="main-C">
 
-                    <div class="main-L" id="main-L">
+                    <div id="main-L" class="main-L">
 
                         <!-- 資料夾預覽視窗 -->
                         <div class="main-item main-dirList base-scrollbar-mini" id="main-dirList" active="true">
@@ -146,7 +145,7 @@
                         <div id="mView-welcome" class="mView-welcome">
                             <div>
                                 <img class="mView-welcome-logo" src="./img/logo.svg">
-                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.26</div>
+                                <div class="mView-welcome-txt">Tiefsee 4.0.0-beta.26.1</div>
                             </div>
                         </div>
                         <textarea id="mView-txt" class="mView-text base-scrollbar" readonly2=""></textarea>

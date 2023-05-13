@@ -7,7 +7,7 @@
 @import "./LoadingSetting";
 @import "./BulkView";
 
-/*---------------------------*/
+//-------------------------------
 
 :root {
   //圖示粗細
@@ -22,14 +22,14 @@
   stroke-width: var(--svgWeight);
 }
 
-/*---------------------------*/
+//-------------------------------
 
 // 標題列按鈕展開下拉選單時
 .titlebar-toolbar-btn.menuActive {
   background-color: var(--color-white20);
 }
 
-/*---------------------------*/
+//-------------------------------
 
 //內容區塊
 .window-body {
@@ -38,7 +38,7 @@
   height: 0;
 }
 
-/*---------------------------*/
+//-------------------------------
 
 .main-content {
   display: flex;
@@ -89,7 +89,7 @@
   margin-left: -3px;
 }
 
-/*---------------------------*/
+//-------------------------------
 
 .mView-tiefseeview {
   z-index: 1;
@@ -114,7 +114,8 @@
   outline: none;
 }
 
-/*---------------------------*/
+//-------------------------------
+
 //歡迎畫面
 .mView-welcome {
   height: 100%;
@@ -139,7 +140,8 @@
     pointer-events: none;
   }
 }
-/*---------------------------*/
+
+//-------------------------------
 
 #loadingWindow {
   position: absolute;
@@ -166,4 +168,54 @@
 //搭配 js函數「updateDomVisibility()」，用於隱藏元素
 .js-showType-none {
   display: none !important;
+}
+
+//-------------------------------
+
+//全螢幕
+body[fullScreen="true"] {
+  .window-titlebar {
+    position: fixed;
+    top: -70px;
+    left: 0;
+    right: 0;
+    transition: top 0.3s;
+    z-index: 100;
+    background-color: var(--color-black80);
+    //backdrop-filter: saturate(180%) blur(20px);
+  }
+  .main-T {
+    position: fixed;
+    top: -40px;
+    left: 0;
+    right: 0;
+    transition: top 0.3s;
+    z-index: 100;
+    background-color: var(--color-black80);
+    //backdrop-filter: saturate(180%) blur(20px);
+  }
+  .titlebar-txt {
+    app-region: no-drag; //讓視窗不允許拖曳
+  }
+
+  //顯示「結束全螢幕」的按鈕
+  .titlebar-toolbar-exitFullScreen {
+    display: flex !important;
+  }
+  //隱藏「最大化、視窗化、最小化、關閉」
+  .titlebar-toolbar-minimized,
+  .titlebar-toolbar-normal,
+  .titlebar-toolbar-maximized,
+  .titlebar-toolbar-close {
+    display: none !important;
+  }
+}
+//滑鼠移動到最上面時，顯示標題列與工具列
+body[fullScreen="true"][showTitlebar="true"] {
+  .window-titlebar {
+    top: 0px;
+  }
+  .main-T {
+    top: 30px;
+  }
 }

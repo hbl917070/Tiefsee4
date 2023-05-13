@@ -44,7 +44,7 @@ class Setting {
 
             baseWindow.appInfo = json;
 
-            await WV_Window.ShowWindow_Center(600 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
+            await WV_Window.ShowWindowAtCenter(600 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
             WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio); //設定視窗最小size
             WV_Window.Text = "Setting";
             let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
@@ -1107,6 +1107,7 @@ class Setting {
             }
             let imgPath = JSON.parse(await WV_Window.RunJsOfParent(`mainWindow.fileLoad.getFilePath()`)); //取得目前顯示的圖片
             if (imgPath === null) { imgPath = "" }
+            imgPath = `"${imgPath}"`;
             let exePath = await WV_Window.GetAppPath();
             WV_RunApp.ProcessStart(exePath, imgPath, true, false);
             WV_Window.CloseAllWindow();

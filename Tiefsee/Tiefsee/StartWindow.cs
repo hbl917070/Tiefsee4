@@ -96,7 +96,7 @@ namespace Tiefsee {
 
                         if (Program.startType == 2 || Program.startType == 3) {
                             if (WebWindow.tempWindow == null) { return; }
-                            WebWindow.SendOnCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
+                            WebWindow.TriggerCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
 
                         } else if (Program.startType == 4 || Program.startType == 5) { //單一執行個體，用原來的視窗開啟
                             WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
