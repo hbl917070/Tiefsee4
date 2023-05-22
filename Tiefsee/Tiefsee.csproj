@@ -1,0 +1,96 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows10.0.17763.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+    <UseWPF>True</UseWPF>
+    <StartupObject>Tiefsee.Program</StartupObject>
+    <Copyright>Copyright © 2021-2023 hbl917070</Copyright>
+    <PackageProjectUrl>https://github.com/hbl917070/Tiefsee4</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/hbl917070/Tiefsee4</RepositoryUrl>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  	
+  <ItemGroup>
+    <Content Include="logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.1.2" />
+    <PackageReference Include="MetadataExtractor" Version="2.8.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1774.30" />
+    <PackageReference Include="NetVips.Extensions" Version="2.3.0" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="ReadMe.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<!-- 編譯時複製這些資料夾 -->
+	<ItemGroup>
+		<Content Include="data\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="www\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Remove="www\node_modules\**" />
+		<Content Remove="www\ejs\**" />
+		<Content Remove="www\ts\**" />
+		<Content Remove="www\scss\**" />
+	</ItemGroup>
+	
+	<!--  避免重複複製 Magick -->
+	<PropertyGroup>
+		<MagickCopyNativeWindows>false</MagickCopyNativeWindows>
+		<MagickCopyNativeLinux>false</MagickCopyNativeLinux>
+		<MagickCopyNativeLinuxMusl>false</MagickCopyNativeLinuxMusl>
+		<MagickCopyNativeMacOS>false</MagickCopyNativeMacOS>
+	</PropertyGroup>
+	
+</Project>

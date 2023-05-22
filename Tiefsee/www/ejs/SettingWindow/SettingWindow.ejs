@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tiefsee 4</title>
+
+    <!--google字體-->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC" rel="stylesheet"> -->
+
+    <script src="./vender/jquery-3.6.0.min.js"></script>
+
+    <!-- MiniColors(選擇顏色套件 -->
+    <script src="./vender/jquery-minicolors-master/jquery.minicolors.min.js"></script>
+    <link href="./vender/jquery-minicolors-master/jquery.minicolors.css" rel="stylesheet">
+
+    <!-- tippy(工具提示套件 -->
+    <script src="./vender/tippyjs/popper.min.js"></script>
+    <script src="./vender/tippyjs/tippy-bundle.umd.min.js"></script>
+
+    <!-- 拖曳排序物件 -->
+    <script src="./vender/Sortable.min.js"></script>
+
+    <link rel="stylesheet" href="./css/BaseWindow.css">
+    <script src="./js/BaseWindow.js"></script>
+    <script src="./js/Lib.js"></script>
+
+    <link rel="stylesheet" href="./css/SettingWindow/SettingWindow.css">
+    <!-- <link rel="stylesheet" href="./css/Menu.css"> -->
+    <link rel="stylesheet" href="./css/Msgbox.css">
+
+    <!-- 多國語言 -->
+    <script src="./lang/langData.js"></script>
+    <script src="./js/I18n.js"></script>
+
+    <script src="./js/Config.js"></script>
+    <script src="./js/SvgList.js"></script>
+    <!-- <script src="./js/MainWindow/Menu.js"></script> -->
+    <script src="./js/MainWindow/MainToolbar.js"></script>
+    <script src="./js/Msgbox.js"></script>
+    <script src="./js/SettingWindow/SettingWindow.js"></script>
+
+</head>
+
+<body>
+
+    <div class="window">
+
+        <div class="window-left" id="window-left">
+
+
+            <div class="pagetab base-scrollbar">
+
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-general" i18n="sw.tabs.general" active="true"> 一般 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-appearance" i18n="sw.tabs.appearance"> 外觀 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n="sw.tabs.layout"> 版面 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵</div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association"
+                    show-not="storeApp"> 設為預設程式 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
+
+                <div class="page-tabsHr"> </div>
+
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-plugin" i18n="sw.tabs.plugin"> 擴充套件 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-quickLook" i18n="sw.tabs.quickLook"> 快速預覽 </div>
+
+                <div class="page-tabsHr"> </div>
+
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n="sw.tabs.about"> 關於 </div>
+
+            </div>
+
+        </div>
+
+        <div class="window-right">
+
+            <!-- 標題列 -->
+            <div class="window-titlebar">
+
+                <div class="titlebar-txt"></div>
+
+                <div class="titlebar-toolbar">
+                    <!-- <div class="titlebar-toolbar-btn titlebar-toolbar-menu" style="display:none;">
+                        <%- await readFile("./img/default/window-menu.svg"); %>
+                    </div>
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-topmost">
+                        <%- await readFile("./img/default/window-topmost.svg"); %>
+                    </div> -->
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
+                        <%- await readFile("./img/default/window-minimized.svg"); %>
+                    </div>
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-normal" style="display:none;">
+                        <%- await readFile("./img/default/window-normal.svg"); %>
+                    </div>
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-maximized">
+                        <%- await readFile("./img/default/window-maximized.svg"); %>
+                    </div>
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-close">
+                        <%- await readFile("./img/default/window-close.svg"); %>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="window-body base-scrollbar-big" id="window-body">
+
+                <!-- 一般 -->
+                <div class="page-tabsPage" id="tabsPage-general">
+                    <div class="page-title" i18n="sw.tabs.general"> 一般 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.imageSettings.title"> 圖片設定 </div>
+
+                        <div class="text-title" i18n="sw.imageSettings.imageShowPixels"> 如果圖片縮放比例大於100%，則呈現像素 </div>
+                        <div class="text-content">
+                            <!-- <select class="text-input" id="select-tiefseeviewImageRendering">
+                                <option value="0" i18n="sw.imageSettings.appearsSmooth">呈現平滑</option>
+                                <option value="1">銳利</option>
+                                <option value="2" i18n="sw.imageSettings.appearsPixelated">呈現像素</option>
+                            </select> -->
+                            <label class="switch">
+                                <input type="checkbox" id="switch-imageShowPixels">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.zoomMode.title"> 圖片預設縮放模式 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tiefseeviewZoomType">
+                                <option value="fitWindowOrImageOriginal" i18n="sw.zoomMode.fitWindowOrImageOriginal">
+                                    縮放至適合視窗 或 圖片原始大小
+                                </option>
+                                <option value="fitWindow" i18n="sw.zoomMode.fitWindow">縮放至適合視窗</option>
+                                <option value="imageOriginal" i18n="sw.zoomMode.imageOriginal">圖片原始大小</option>
+                                <option value="imageWidthPx" i18n="sw.zoomMode.imageWidthPx">圖片寬度(px)</option>
+                                <option value="imageHeightPx" i18n="sw.zoomMode.imageHeightPx">圖片高度(px)</option>
+                                <option value="windowWidthRatio" i18n="sw.zoomMode.windowWidthRatio">視窗寬度(%)</option>
+                                <option value="windowHeightRatio" i18n="sw.zoomMode.windowHeightRatio">視窗高度(%)</option>
+                            </select>
+                            <input class="text-input" id="text-tiefseeviewZoomValue"
+                                style="width:60px; margin-left:5px; flex:0;" type="number">
+                        </div>
+
+                        <div class="text-title" i18n="sw.imageAlign.title"> 圖片預設對齊位置 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tiefseeviewAlignType">
+                                <option value="center" i18n="sw.imageAlign.center">中央</option>
+                                <option value="topLeft" i18n="sw.imageAlign.topLeft">左上</option>
+                                <option value="top" i18n="sw.imageAlign.top">上</option>
+                                <option value="topRight" i18n="sw.imageAlign.topRight">右上</option>
+                                <option value="right" i18n="sw.imageAlign.right">右</option>
+                                <option value="bottomRight" i18n="sw.imageAlign.bottomRight">右下</option>
+                                <option value="bottom" i18n="sw.imageAlign.bottom">下</option>
+                                <option value="bottomLeft" i18n="sw.imageAlign.bottomLeft">左下</option>
+                                <option value="left" i18n="sw.imageAlign.left">左</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.sortMode.title"> 預設排序 </div>
+
+                        <div class="text-title" i18n="sw.sortMode.fileDefaultSort"> 檔案預設排序 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-fileSort">
+                                <option value="name" i18n="sw.sortMode.name">檔名</option>
+                                <option value="nameDesc" i18n="sw.sortMode.nameDesc">檔名(遞減)</option>
+                                <option value="lastWriteTime" i18n="sw.sortMode.lastWriteTime">修改日期</option>
+                                <option value="lastWriteTimeDesc" i18n="sw.sortMode.lastWriteTimeDesc">修改日期(遞減)
+                                </option>
+                                <option value="lastAccessTime" i18n="sw.sortMode.lastAccessTime">存取日期</option>
+                                <option value="lastAccessTimeDesc" i18n="sw.sortMode.lastAccessTimeDesc">存取日期(遞減)
+                                </option>
+                                <option value="creationTime" i18n="sw.sortMode.creationTime">建立日期</option>
+                                <option value="creationTimeDesc" i18n="sw.sortMode.creationTimeDesc">建立日期(遞減)
+                                </option>
+                                <option value="length" i18n="sw.sortMode.length">檔案大小</option>
+                                <option value="lengthDesc" i18n="sw.sortMode.lengthDesc">檔案大小(遞減)</option>
+                                <option value="random" i18n="sw.sortMode.random">隨機</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.sortMode.directoryDefaultSort"> 資料夾預設排序 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-dirSort">
+                                <option value="name" i18n="sw.sortMode.name">檔名</option>
+                                <option value="nameDesc" i18n="sw.sortMode.nameDesc">檔名(遞減)</option>
+                                <option value="lastWriteTime" i18n="sw.sortMode.lastWriteTime">修改日期</option>
+                                <option value="lastWriteTimeDesc" i18n="sw.sortMode.lastWriteTimeDesc">修改日期(遞減)
+                                </option>
+                                <option value="lastAccessTime" i18n="sw.sortMode.lastAccessTime">存取日期</option>
+                                <option value="lastAccessTimeDesc" i18n="sw.sortMode.lastAccessTimeDesc">存取日期(遞減)
+                                </option>
+                                <option value="creationTime" i18n="sw.sortMode.creationTime">建立日期</option>
+                                <option value="creationTimeDesc" i18n="sw.sortMode.creationTimeDesc">建立日期(遞減)
+                                </option>
+                                <option value="random" i18n="sw.sortMode.random">隨機</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.startupMode.title"> 啟動模式 </div>
+
+                        <!-- <div class="text-title">(修改後需重啟程式) </div> -->
+
+                        <div class="radioList-v">
+                            <label>
+                                <input class="base-radio" type="radio" name="radio-startType" value="1">
+                                <div class="radioList-content">
+                                    <span i18n="sw.startupMode.mode_1">直接啟動</span>
+                                    <div class="img-help" data-i18n="sw.startupMode.tooltip_1">
+                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>
+                                <input class="base-radio" type="radio" name="radio-startType" value="2">
+                                <div class="radioList-content">
+                                    <span i18n="sw.startupMode.mode_2">快速啟動</span>
+                                    <div class="img-help" data-i18n="sw.startupMode.tooltip_2">
+                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>
+                                <input class="base-radio" type="radio" name="radio-startType" value="3">
+                                <div class="radioList-content">
+                                    <span i18n="sw.startupMode.mode_3">快速啟動 + 常駐背景</span>
+                                    <div class="img-help" data-i18n="sw.startupMode.tooltip_3">
+                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>
+                                <input class="base-radio" type="radio" name="radio-startType" value="4">
+                                <div class="radioList-content">
+                                    <span i18n="sw.startupMode.mode_4">單一視窗</span>
+                                    <div class="img-help" data-i18n="sw.startupMode.tooltip_4">
+                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                    </div>
+                                </div>
+                            </label>
+                            <label>
+                                <input class="base-radio" type="radio" name="radio-startType" value="5">
+                                <div class="radioList-content">
+                                    <span i18n="sw.startupMode.mode_5">單一視窗 + 常駐背景</span>
+                                    <div class="img-help" data-i18n="sw.startupMode.tooltip_5">
+                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="text-content">
+                            <div class="btn" id="btn-startupMode-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.startupRunTiefsee.title"> 開機後自動啟動 </div>
+
+                        <div class="text-title" i18n="sw.startupRunTiefsee.subtitle"> 電腦開機後，讓 Tiefsee 常駐在背景 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-autoStart">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <!-- <div class="text-title"> 相關路徑 </div> -->
+                        <div style="height:10px" show-not="storeApp"></div>
+                        <div class="text-content" show-not="storeApp">
+                            <div class="link" id="btn-openStartup" i18n="sw.startupRunTiefsee.openStartup">
+                                Windows的「啟動資料夾」
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.other.title"> 其他 </div>
+
+                        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog"> 檔案刪除前顯示確認視窗 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-fileDeletingShowCheckMsg">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title"> Language</div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-lang">
+                                <option value="en">English</option>
+                                <option value="zh-TW">中文</option>
+                                <option value="ja">日本語</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 外觀 -->
+                <div class="page-tabsPage" id="tabsPage-appearance">
+
+                    <div class="page-title" i18n="sw.tabs.appearance">外觀</div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.theme.defaultTheme">預設主題</div>
+                        <div id="applyTheme-btns"></div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.theme.customTheme">自訂主題</div>
+
+                        <div class="text-title" i18n="sw.theme.windowBackgroundColor">視窗背景色</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" data-format="rgba" id="text-colorWindowBackground">
+                        </div>
+
+                        <div class="text-title" i18n="sw.theme.windowBorderColor">視窗邊框色</div>
+                        <div class="text-content">
+                            <input class="text-input" type="text" data-format="rgba" id="text-colorWindowBorder">
+                        </div>
+
+                        <div class="text-title" i18n="sw.theme.textColor">文字顏色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-colorWhite">
+                        </div>
+
+                        <div class="text-title" i18n="sw.theme.accentColor">強調顏色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-colorBlue">
+                        </div>
+
+                        <div class="text-title" i18n="sw.theme.blockColor">區塊底色</div>
+                        <div class="text-content">
+                            <input class="text-input" data-format="rgb" type="text" id="text-colorBlack">
+                        </div>
+
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.textAndIcon.title"> 文字與圖示 </div>
+
+                        <div class="text-title" i18n="sw.textAndIcon.textStrokeWidth"> 文字粗細 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-fontWeight">
+                                <option value="100" i18n="sw.textAndIcon.text_1">1(最細)</option>
+                                <option value="200">2</option>
+                                <option value="300">3</option>
+                                <option value="400" i18n="sw.textAndIcon.text_4">4(預設)</option>
+                                <option value="500">5</option>
+                                <option value="600">6</option>
+                                <option value="700">7</option>
+                                <option value="800">8</option>
+                                <option value="900" i18n="sw.textAndIcon.text_9">9(最粗)</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.textAndIcon.iconStrokeWidth"> 圖示粗細 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-svgWeight">
+                                <option value="0px" i18n="sw.textAndIcon.icon_0">0(最細、預設)</option>
+                                <option value="0.1px">1</option>
+                                <option value="0.2px">2</option>
+                                <option value="0.3px">3</option>
+                                <option value="0.4px">4</option>
+                                <option value="0.5px">5</option>
+                                <option value="0.6px">6</option>
+                                <option value="0.7px">7</option>
+                                <option value="0.8px">8</option>
+                                <option value="0.9px">9</option>
+                                <option value="1px" i18n="sw.textAndIcon.icon_10">10(最粗)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.windowSetting.title"> 視窗設定 </div>
+
+                        <div class="text-title" i18n="sw.windowSetting.zoom"> 視窗縮放 (0.5~3.0)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="number" id="text-zoomFactor">
+                        </div>
+
+                        <div class="text-title" i18n="sw.windowSetting.roundedCorners"> 視窗圓角 (0~15)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="number" id="text-windowBorderRadius">
+                        </div>
+
+                        <div class="text-title">
+                            <span i18n="sw.windowSetting.windowAero">視窗效果</span>
+                            <div class="img-help" data-i18n="sw.windowSetting.tooltip">
+                                <%- await readFile("./img/default/tool-help.svg"); %>
+                            </div>
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-aeroType">
+                                <option value="none" i18n="sw.windowSetting.aeroNone">透明 (預設)</option>
+                                <option value="win7" i18n="sw.windowSetting.aeroWin7">win7 樣式</option>
+                                <option value="win10" i18n="sw.windowSetting.aeroWin10">win10 樣式</option>
+                            </select>
+                        </div>
+                        <div class="text-content">
+                            <div class="btn" id="btn-windowAero-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 版面 -->
+                <div class="page-tabsPage" id="tabsPage-layout">
+                    <div class="page-title" i18n="sw.tabs.layout"> 版面 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.mainToolbar.title"> 工具列 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title" i18n="sw.mainToolbar.displayPanel"> 顯示工具列 </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mainToolbarEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.mainToolbar.toolbarAlignment"> 工具列對齊 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-mainToolbarAlign">
+                                <option value="left" i18n="sw.mainToolbar.left">靠左</option>
+                                <option value="center" i18n="sw.mainToolbar.center">置中</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.directoryPanel.title"> 資料夾預覽視窗 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title" i18n="sw.directoryPanel.displayPanel"> 顯示資料夾預覽視窗</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-dirListEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.directoryPanel.displayNumber"> 顯示編號</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-dirListShowNo">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.directoryPanel.displayName"> 顯示資料夾名</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-dirListShowName">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.directoryPanel.numberOfImages"> 圖片數量 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-dirListImgNumber">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.filePanel.title"> 檔案預覽面板 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title" i18n="sw.filePanel.displayPanel"> 顯示檔案預覽面板</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-fileListEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.filePanel.displayNumber"> 顯示編號</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-fileListShowNo">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.filePanel.displayName"> 顯示檔名</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-fileListShowName">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mainExifEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.informationPanel.horizontal">寬度足夠時，橫向排列</div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-mainExifHorizontal">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.informationPanel.maxLine">顯示的最大行數 (1~1000)</div>
+                        <div class="text-content">
+                            <input class="text-input" type="number" id="text-mainExifMaxLine">
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.largeBtn.title"> 大型選擇按鈕 </div>
+                        <div class="text-title"> </div>
+
+                        <div class="text-title"> </div>
+                        <div class="">
+                            <div class="radioList-h" id="largeBtn-group">
+                                <label class="radioList-item">
+                                    <input class="base-radio" type="radio" name="largeBtn" value="none">
+                                    <img src="./img/default/largeBtn-none.svg">
+                                    <span i18n="sw.largeBtn.noDisplay">不顯示</span>
+                                </label>
+                                <label class="radioList-item">
+                                    <input class="base-radio" type="radio" name="largeBtn" value="bottom">
+                                    <img src="./img/default/largeBtn-bottom.svg">
+                                    <span i18n="sw.largeBtn.bottom">底部</span>
+                                </label>
+                                <label class="radioList-item">
+                                    <input class="base-radio" type="radio" name="largeBtn" value="leftRight">
+                                    <img src="./img/default/largeBtn-leftRight.svg">
+                                    <span i18n="sw.largeBtn.bothSides">左右兩側</span>
+                                </label>
+                                <label class="radioList-item">
+                                    <input class="base-radio" type="radio" name="largeBtn" value="leftRight2">
+                                    <img src="./img/default/largeBtn-leftRight2.svg">
+                                    <span i18n="sw.largeBtn.bothSidesContraction">左右兩側(內縮)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 工具列 -->
+                <div class="page-tabsPage" id="tabsPage-toolbar">
+                    <div class="page-title" i18n="sw.tabs.toolbar"> 工具列 </div>
+                    <div class="box">
+                        <div class="box-title" i18n="sw.customToolbar.title"> 顯示與排序 </div>
+
+                        <div class="text-title"> </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-toolbarListType">
+                                <!-- <option value="welcome"></option> -->
+                                <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
+                                <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office 文件工具列</option>
+                                <option value="txt" i18n="sw.customToolbar.textToolbar">文字工具列</option>
+                                <option value="bulkView" i18n="sw.customToolbar.bulkViewToolbar">大量瀏覽模式工具列</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.customToolbar.adjustOrderByDragging">(可拖曳調整順序) </div>
+                        <div class="toolbarList" id="toolbarList-img"> </div>
+                        <div class="toolbarList" id="toolbarList-pdf"> </div>
+                        <div class="toolbarList" id="toolbarList-txt"> </div>
+                        <div class="toolbarList" id="toolbarList-bulkView"> </div>
+                    </div>
+                </div>
+
+                <!-- 圖片 -->
+                <div class="page-tabsPage" id="tabsPage-image">
+                    <div class="page-title" i18n=""> 影像處理 </div>
+                </div>
+
+                <!-- 快速鍵 -->
+                <div class="page-tabsPage" id="tabsPage-hotkey">
+                    <div class="page-title" i18n=""> 快速鍵 </div>
+                    <div class="box">
+                        <div class="box-title">
+                            還在做
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 設為預設程式 -->
+                <div class="page-tabsPage" id="tabsPage-extension">
+                    <div class="page-title" i18n="sw.tabs.association"> 設為預設程式 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.association.step1"> 步驟1、把Tiefsee關聯到特定副檔名 </div>
+                        <div class="text-title" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
+                        <div class="text-content">
+                            <textarea class="text-input base-scrollbar" rows="7" id="text-extension"> </textarea>
+                        </div>
+                        <div class="btn" id="btn-extension" i18n="sw.association.apply">套用</div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.association.step2"> 步驟2、修改系統預設APP </div>
+                        <div class="text-title" i18n="sw.association.step2Subtitle">開啟系統設定後將「相片檢視器」修改成「Tiefsee」 </div>
+                        <div class="btn" id="btn-openSystemSettings" i18n="sw.association.openSystemSettings">開啟系統設定
+                        </div>
+                    </div>
+
+                    <!-- 水平線 -->
+                    <div style="height:40px;"></div>
+                    <div style="background:url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAUAQMAAADFiO34AAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlMAZtJCCVUAAAArSURBVAjXYwACBQYQcEAiG0AEIwOCZAKTLEgkBxIpwIAwRgHZGHTDmOAkAKrqAtL90ZhdAAAAAElFTkSuQmCC&quot;); 
+                        height: 15px;
+                        pointer-events: none; 
+                        border: 1px solid rgba(255, 255, 255, 0.4); 
+                        background-position:15px,0;">
+                    </div>
+                    <div style="height:40px;"></div>
+
+                    <!-- <div class="page-title" i18n="sw.association.removeAssociation"> 解除預設程式 </div> -->
+                    <div class="box">
+                        <div class="box-title" i18n="sw.association.removeFileTypeAssociation"> 解除副檔名關聯 </div>
+                        <div class="text-title" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
+                        <div class="text-content">
+                            <textarea class="text-input base-scrollbar" rows="7" id="text-disassociate"> </textarea>
+                        </div>
+                        <div class="btn" id="btn-disassociate" i18n="sw.association.apply">套用</div>
+                    </div>
+                </div>
+
+                <!-- 進階設定 -->
+                <div class="page-tabsPage" id="tabsPage-advanced">
+                    <div class="page-title" i18n="sw.tabs.advanced"> 進階設定 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.clearTempData.title"> 清理暫存資料 </div>
+
+                        <div class="text-title"> </div>
+                        <div class="text-content">
+                            <div class="btn" id="btn-clearBrowserCache" i18n="sw.clearTempData.clear">清理</div>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.performance.title"> 效能 </div>
+
+                        <div class="text-title" i18n="sw.performance.disabledDirectoryPanel"> 資料夾數量太多時，禁用「資料夾預覽面板」
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-dirListMaxCount">
+                                <option value="0" i18n="sw.performance.alwaysDisable">一律禁用</option>
+                                <option value="5000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":5000}'>
+                                    大於5000時禁用</option>
+                                <option value="10000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":10000}'>
+                                    大於10000時禁用</option>
+                                <option value="30000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":30000}'>
+                                    大於30000時禁用</option>
+                                <option value="-1" i18n="sw.performance.alwaysEnable">一律不禁用</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.experimentalFeatures.title"> 實驗性功能 </div>
+
+                        <div class="text-title" i18n="sw.experimentalFeatures.imageDPI"> 圖片DPI </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-imageDpizoom">
+                                <option value="-1">Auto</option>
+                                <option value="1">100%</option>
+                                <option value="1.25">125%</option>
+                                <option value="1.5">150%</option>
+                                <option value="1.75">175%</option>
+                                <option value="2.0">200%</option>
+                                <option value="2.25">225%</option>
+                                <option value="2.5">250%</option>
+                                <option value="2.75">275%</option>
+                                <option value="3.0">300%</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.experimentalFeatures.useCreateImageBitmap">
+                            圖片面積過大時，停用 createImageBitmap(停用高品質縮放
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-highQualityLimit">
+                                <option value="0" i18n="sw.experimentalFeatures.alwaysDisable">一律停用</option>
+                                <option value="2000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
+                                <option value="3000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":3000}'>大於3000*3000時停用</option>
+                                <option value="4000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":4000}'>大於4000*4000時停用</option>
+                                <option value="5000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":5000}'>大於5000*5000時停用</option>
+                                <option value="6000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":6000}'>大於6000*6000時停用</option>
+                                <option value="7000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
+                                    i18n-v='{"v":7000}'>大於7000*7000時停用</option>
+                                <option value="-1" i18n="sw.experimentalFeatures.alwaysUse">一律使用</option>
+                            </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.experimentalFeatures.useLibvips">
+                            當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-tiefseeviewBigimgscaleRatio">
+                                <option value="0.9">90%^n (90、81、72、65...</option>
+                                <option value="0.85">85%^n (85、72、61、52...</option>
+                                <option value="0.8">80%^n (80、64、51、40...</option>
+                                <option value="0.75">75%^n (75、56、42、31...</option>
+                                <option value="0.7">70%^n (70、49、34、24...</option>
+                                <option value="0.65">65%^n (65、42、27、17...</option>
+                                <option value="0.6">60%^n (60、36、21、12...</option>
+                                <option value="0.55">55%^n (55、30、16、9...</option>
+                                <option value="0.5">50%^n (50、25、12、6...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title"> Tiefsee Localhost Server </div>
+
+                        <div class="text-title" i18n="sw.localhostServer.port"> Port (如果已經被使用，則會使用下一個號碼 </div>
+                        <div class="text-content">
+                            <input class="text-input" type="number" id="text-startPort">
+                        </div>
+
+                        <div class="text-title" style="display:none;"> 快取有效時間 (秒) </div>
+                        <div class="text-content" style="display:none;">
+                            <input class="text-input" type="number" id="text-serverCache">
+                        </div>
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.relatedSettings.title"> 相關路徑 </div>
+                        <div class="">
+                            <div class="text-title"> </div>
+                            <div class="link" id="btn-openAppData" i18n="sw.relatedSettings.appData">AppData(使用者資料)
+                            </div>
+                            <div class="link" id="btn-openWww" i18n="sw.relatedSettings.www">www(原始碼)</div>
+                            <div class="link" id="btn-openTemp" i18n="sw.relatedSettings.temporaryDirectory">暫存資料夾</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 關於 -->
+                <div class="page-tabsPage" id="tabsPage-about">
+                    <div class="page-title" i18n="sw.tabs.about"> 關於 </div>
+
+                    <div class="box">
+                        <!-- <div class="box-title">
+                            <span i18n="sw.about.version">版本:</span>
+                            <span> Tiefsee 4.0.0</span>
+                        </div> -->
+
+                        <div class="logobox">
+                            <img class="logobox-img" src="./img/logo.svg">
+                            <div class="logobox-text">
+                                <div class="logobox-text-title">Tiefsee</div>
+                                <div class="logobox-text-subtitle">4.0.0-beta.26.1</div>
+                            </div>
+                        </div>
+
+                        <div class="box-title">
+                            <span i18n="sw.about.softwareUpdates">軟體更新:</span>
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')"> Microsoft
+                                Store </span>
+                        </div>
+
+                        <div class="page-hr"></div>
+
+                        <div class="box-title">
+                            <span i18n="sw.about.developer">開發者:</span>
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+                        </div>
+                        <div class="box-title">
+                            <span i18n="sw.about.repository">儲存庫:</span>
+                            <span class="link"
+                                onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 擴充套件 -->
+                <div class="page-tabsPage" id="tabsPage-plugin">
+                    <div class="page-title" i18n="sw.tabs.plugin"> 擴充套件 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.plugin.pluginList"> 擴充套件清單 </div>
+
+                        <div class="pluginLiet">
+                            <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">QuickLook</div>
+                                    <div class="pluginLiet-text" i18n="sw.plugin.quickLook">在桌面或資料夾選中任一檔案，然後長按空白鍵，即可預覽檔案
+                                    </div>
+                                </div>
+                                <div class="pluginLiet-R" id="pluginLiet-QuickLook">
+                                    <div class="pluginLiet-status pluginLiet-status__no">Not Installed</div>
+                                </div>
+                            </div>
+                            <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">monaco-editor</div>
+                                    <div class="pluginLiet-text" i18n="sw.plugin.monacoEditor">讓Tiefsee使用 monaco-editor
+                                        來載入文字檔。常用於閱讀與編輯程式碼</div>
+                                </div>
+                                <div class="pluginLiet-R" id="pluginLiet-MonacoEditor">
+                                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                                </div>
+                            </div>
+                            <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">Webviewer</div>
+                                    <div class="pluginLiet-text" i18n="sw.plugin.webviewer">讓Tiefsee支援 doc、docx、ppt、pptx
+                                    </div>
+                                </div>
+                                <div class="pluginLiet-R" id="pluginLiet-PDFTronWebviewer">
+                                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                                </div>
+                            </div>
+                            <!-- <div class="pluginLiet-item">
+                                <div class="pluginLiet-L">
+                                    <div class="pluginLiet-title">NConvert</div>
+                                    <div class="pluginLiet-text" i18n="sw.plugin.nConvert">讓Tiefsee支援「Clip Studio
+                                        Paint」產生的「clip檔」</div>
+                                </div>
+                                <div class="pluginLiet-R" id="pluginLiet-NConvert">
+                                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                                </div>
+                            </div> -->
+
+                        </div>
+
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.plugin.installationSteps"> 安裝步驟 </div>
+
+                        <div class="text-title" i18n="sw.plugin.step1">
+                            1、在「Tiefsee Plugin」的網頁下載擴充套件
+                        </div>
+                        <div class="btn" id="btn-openPluginDownload" i18n="sw.plugin.openPluginWebpage">開啟「Tiefsee
+                            Plugin」網頁</div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title" i18n="sw.plugin.step2">
+                            2、把ZIP解壓縮，然後放到「Plugin」資料夾內
+                        </div>
+                        <div class="btn" id="btn-openPluginDir" i18n="sw.plugin.openPluginDir">開啟「Plugin」資料夾</div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title" i18n="sw.plugin.step3">
+                            3、重新啟動Tiefsee
+                        </div>
+                        <div class="text-content">
+                            <div class="btn" id="btn-plugin-restart" i18n="sw.plugin.restartTiefsee"> 重新啟動 Tiefsee</div>
+                        </div>
+                        <div style="height:20px"></div>
+
+                        <div class="text-title" i18n="sw.plugin.example"> (示意圖) </div>
+                        <img src="./img/SettingWindow/plugin-1.jpg" style="max-width:100%;">
+
+                    </div>
+
+                </div>
+
+                <!-- 快速預覽 -->
+                <div class="page-tabsPage" id="tabsPage-quickLook">
+                    <div class="page-title" i18n="sw.tabs.quickLook"> 快速預覽 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.quickLook.title"> 快速預覽桌面或資料夾的檔案 </div>
+
+                        <div class="text-title" i18n="sw.quickLook.subtitle">「啟動模式」如果為「直接啟動」則無法使用快速預覽 </div>
+
+                        <div style="height:20px"></div>
+
+                        <!-- 未安裝QuickLook才會顯示此訊息 -->
+                        <div id="quickLook-noInstalled" style="display:none">
+                            <div class="text-title">
+                                <span class="color-warning" i18n="sw.quickLook.notInstalledQuickLook">
+                                    必須安裝擴充套件「QuickLook」才能使用此功能
+                                </span>
+                            </div>
+                            <div style="height:20px"></div>
+                        </div>
+
+                        <div id="quickLook-box">
+                            <div class="text-title" i18n="sw.quickLook.longPressSpacebar"> 長按「空白鍵」觸發 </div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-keyboardSpaceRun">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="text-title" i18n="sw.quickLook.longPressMousewheel"> 長按「滑鼠滾輪」觸發 </div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-mouseMiddleRun">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="window-LC window-border"></div>
+            <div class="window-RC window-border"></div>
+            <div class="window-CT window-border"></div>
+            <div class="window-LT window-border"></div>
+            <div class="window-RT window-border"></div>
+            <div class="window-CB window-border"></div>
+            <div class="window-LB window-border"></div>
+            <div class="window-RB window-border"></div>
+
+        </div>
+
+
+</body>
+
+</html>

@@ -2,24 +2,24 @@
 # 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
 ################################################################################
 
-/Tiefsee/.vs
-/Tiefsee/packages
-/Tiefsee/Tiefsee/obj
+/.vs
+/Tiefsee/obj
+/Tiefsee/bin
 
-/Tiefsee/Tiefsee/bin/output/Tiefsee.exe.WebView2
-/Tiefsee/Tiefsee/bin/output/Tiefsee.pdb
-/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Core.xml
-/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.WinForms.xml
-/Tiefsee/Tiefsee/bin/output/Microsoft.Web.WebView2.Wpf.xml
-/Tiefsee/Tiefsee/bin/output/Magick.NET-Q8-OpenMP-x64.xml
-/Tiefsee/Tiefsee/bin/output/Magick.NET.Core.xml
-/Tiefsee/Tiefsee/bin/output/System.Buffers.xml
-/Tiefsee/Tiefsee/bin/output/NetVips.xml
-/Tiefsee/Tiefsee/bin/output/NetVips.Extensions.xml
+/Tiefsee/www/node_modules
+/Tiefsee/www/js
+/Tiefsee/www/css
+/Tiefsee/www/MainWindow.html
+/Tiefsee/www/SettingWindow.html
 
-/Tiefsee/Tiefsee/bin/output/www/node_modules
-/Tiefsee/Tiefsee/bin/output/www/js
-/Tiefsee/Tiefsee/bin/output/www/css
-/Tiefsee/Tiefsee/bin/output/www/MainWindow.html
-/Tiefsee/Tiefsee/bin/output/www/SettingWindow.html
+/TiefseeAppPackager/Package.StoreAssociation.xml
+/TiefseeAppPackager/obj
+/TiefseeAppPackager/bin
+/TiefseeAppPackager/AppPackages
+/TiefseeAppPackager/TiefseeAppPackager.assets.cache
+/TiefseeAppPackager/BundleArtifacts
+
+
+
+
 

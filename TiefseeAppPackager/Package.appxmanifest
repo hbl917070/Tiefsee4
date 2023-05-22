@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="desktop"
+ xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10">
+
+	<Identity
+	  Name="60852WEN-HONGLIAO.Tiefsee"
+	  Publisher="CN=D526D33E-7242-4E85-B8D1-6A0923DB4EDA"
+	  Version="4.0.6.0" />
+
+	<Properties>
+		<DisplayName>Tiefsee</DisplayName>
+		<PublisherDisplayName>hbl917070</PublisherDisplayName>
+		<Logo>Images\StoreLogo.png</Logo>
+	</Properties>
+
+	<Dependencies>
+		<!--<TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />-->
+		<TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
+	</Dependencies>
+
+	<Resources>
+		<Resource Language="x-generate"/>
+	</Resources>
+
+	<Applications>
+		<Application Id="App"
+		  Executable="$targetnametoken$.exe"
+		  EntryPoint="$targetentrypoint$">
+			<uap:VisualElements
+			  DisplayName="Tiefsee"
+			  Description="Tiefsee Image Viewer"
+			  BackgroundColor="transparent"
+			  Square150x150Logo="Images\Square150x150Logo.png"
+			  Square44x44Logo="Images\Square44x44Logo.png">
+				<uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png">
+				</uap:DefaultTile >
+				<uap:SplashScreen Image="Images\SplashScreen.png"/>
+			</uap:VisualElements>
+
+			<Extensions>
+
+				<!-- 開機自動啟動 -->
+				<desktop:Extension
+				  Category="windows.startupTask"
+				  Executable="Tiefsee\Tiefsee.exe"
+				  EntryPoint="Windows.FullTrustApplication">
+					<desktop:StartupTask
+					  TaskId="TiefseeTask"
+					  Enabled="false"
+					  DisplayName="Tiefsee" />
+				</desktop:Extension>
+				
+				<!-- 關聯副檔名 -->
+				<uap:Extension Category="windows.fileTypeAssociation">
+					<uap:FileTypeAssociation Name="tiefseefiletypes">
+						<uap:DisplayName>Tiefsee</uap:DisplayName>
+						<uap:SupportedFileTypes>
+							<uap:FileType>.ai</uap:FileType>
+							<uap:FileType>.pdf</uap:FileType>
+
+							<uap:FileType>.markdown</uap:FileType>
+							<uap:FileType>.md</uap:FileType>
+
+							<uap:FileType>.jpg</uap:FileType>
+							<uap:FileType>.jpeg</uap:FileType>
+							<uap:FileType>.jfif</uap:FileType>
+							<uap:FileType>.png</uap:FileType>
+							<uap:FileType>.webp</uap:FileType>
+							<uap:FileType>.bmp</uap:FileType>
+							<uap:FileType>.apng</uap:FileType>
+							<uap:FileType>.gif</uap:FileType>
+							<uap:FileType>.svg</uap:FileType>
+							<uap:FileType>.ico</uap:FileType>
+							<uap:FileType>.tif</uap:FileType>
+							<uap:FileType>.tiff</uap:FileType>
+							<uap:FileType>.dds</uap:FileType>
+							<uap:FileType>.psd</uap:FileType>
+							<uap:FileType>.psb</uap:FileType>
+							<uap:FileType>.pcx</uap:FileType>
+							<uap:FileType>.heic</uap:FileType>
+							<uap:FileType>.avif</uap:FileType>
+							<uap:FileType>.fits</uap:FileType>
+							<uap:FileType>.hdr</uap:FileType>
+							<uap:FileType>.miff</uap:FileType>
+							<uap:FileType>.mng</uap:FileType>
+							<uap:FileType>.otb</uap:FileType>
+							<uap:FileType>.pfm</uap:FileType>
+							<uap:FileType>.pgm</uap:FileType>
+							<uap:FileType>.ppm</uap:FileType>
+							<uap:FileType>.tga</uap:FileType>
+							<uap:FileType>.xcf</uap:FileType>
+							<uap:FileType>.xpm</uap:FileType>
+							<uap:FileType>.qoi</uap:FileType>
+							<uap:FileType>.pbm</uap:FileType>
+							<uap:FileType>.exr</uap:FileType>
+							<uap:FileType>.jpf</uap:FileType>
+							<uap:FileType>.jp2</uap:FileType>
+							<uap:FileType>.sct</uap:FileType>
+							<uap:FileType>.mef</uap:FileType>
+							<uap:FileType>.wmf</uap:FileType>
+							<uap:FileType>.mpo</uap:FileType>
+							<uap:FileType>.jxl</uap:FileType>
+							<uap:FileType>.crw</uap:FileType>
+							<uap:FileType>.raf</uap:FileType>
+							<uap:FileType>.cr2</uap:FileType>
+							<uap:FileType>.mrw</uap:FileType>
+							<uap:FileType>.nef</uap:FileType>
+							<uap:FileType>.x3f</uap:FileType>
+							<uap:FileType>.pef</uap:FileType>
+							<uap:FileType>.orf</uap:FileType>
+							<uap:FileType>.rw2</uap:FileType>
+							<uap:FileType>.arw</uap:FileType>
+							<uap:FileType>.erf</uap:FileType>
+							<uap:FileType>.sr2</uap:FileType>
+							<uap:FileType>.srw</uap:FileType>
+							<uap:FileType>.dng</uap:FileType>
+							<uap:FileType>.clip</uap:FileType>
+						</uap:SupportedFileTypes>
+					</uap:FileTypeAssociation>
+				</uap:Extension>
+			</Extensions>
+
+		</Application>
+	</Applications>
+
+	<Capabilities>
+		<rescap:Capability Name="runFullTrust" />
+	</Capabilities>
+</Package>
