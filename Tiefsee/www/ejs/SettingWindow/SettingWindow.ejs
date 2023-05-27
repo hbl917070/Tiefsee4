@@ -60,7 +60,8 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n="sw.tabs.layout"> 版面 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
-                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵</div> -->
+                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵 </div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-mouse" i18n="sw.tabs.mouse"> 滑鼠 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association"
                     show-not="storeApp"> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
@@ -120,11 +121,7 @@
 
                         <div class="text-title" i18n="sw.imageSettings.imageShowPixels"> 如果圖片縮放比例大於100%，則呈現像素 </div>
                         <div class="text-content">
-                            <!-- <select class="text-input" id="select-tiefseeviewImageRendering">
-                                <option value="0" i18n="sw.imageSettings.appearsSmooth">呈現平滑</option>
-                                <option value="1">銳利</option>
-                                <option value="2" i18n="sw.imageSettings.appearsPixelated">呈現像素</option>
-                            </select> -->
+
                             <label class="switch">
                                 <input type="checkbox" id="switch-imageShowPixels">
                                 <span class="slider round"></span>
@@ -602,6 +599,77 @@
                         <div class="toolbarList" id="toolbarList-bulkView"> </div>
                     </div>
                 </div>
+
+
+                <!-- 滑鼠 -->
+                <div class="page-tabsPage" id="tabsPage-mouse">
+                    <div class="page-title" i18n="sw.tabs.mouse"> 滑鼠 </div>
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.mouse.mouseButton"> 滑鼠按鍵 </div>
+
+                        <div class="text-title" i18n="sw.mouse.leftDoubleClick"> 左鍵雙擊 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-leftDoubleClick"> </select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.scrollWheelButton"> 滾輪鍵 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollWheelButton"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.mouseButton4"> 滑鼠按鍵 4 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-mouseButton4"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.mouseButton5"> 滑鼠按鍵 5 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-mouseButton5"></select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="box">
+                        <div class="box-title" i18n="sw.mouse.mouseScrollWheel"> 滑鼠滾輪 </div>
+
+                        <div class="text-title" i18n="sw.mouse.scrollUp"> 向上捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollUp"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.scrollDown"> 向下捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollDown"></select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.mouse.scrollUpCtrl"> Ctrl + 向上捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollUpCtrl"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.scrollDownCtrl"> Ctrl + 向下捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollDownCtrl"></select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.mouse.scrollUpShift"> Shift + 向上捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollUpShift"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.scrollDownShift"> Shift + 向下捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollDownShift"></select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.mouse.scrollUpAlt"> Alt + 向上捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollUpAlt"></select>
+                        </div>
+                        <div class="text-title" i18n="sw.mouse.scrollDownAlt"> Alt + 向下捲動 </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-scrollDownAlt"></select>
+                        </div>
+                    </div>
+
+                </div>
+
 
                 <!-- 圖片 -->
                 <div class="page-tabsPage" id="tabsPage-image">

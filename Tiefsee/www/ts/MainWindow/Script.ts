@@ -1,7 +1,7 @@
 
 class Script {
 
-    //private M: MainWindow;
+    private M: MainWindow;
     public img: ScriptImg;
     public fileLoad: ScriptFileLoad;
     public fileShow: ScriptFileShow;
@@ -14,6 +14,7 @@ class Script {
     public bulkView: ScriptBulkView;
 
     constructor(M: MainWindow) {
+        this.M = M;
         this.img = new ScriptImg(M);
         this.fileLoad = new ScriptFileLoad(M);
         this.fileShow = new ScriptFileShow(M);
@@ -26,6 +27,187 @@ class Script {
         this.bulkView = new ScriptBulkView(M);
     }
 
+    public async run(s: string) {
+
+        if (s === "imageFitWindowOrImageOriginal") { //縮放至適合視窗 或 圖片原始大小
+            this.img.fitWindowOrImageOriginal();
+        }
+        if (s === "imageFitWindow") { //強制縮放至適合視窗
+            this.img.zoomToFit();
+        }
+        if (s === "imageOriginal") { //圖片原始大小
+            this.img.zoomTo100();
+        }
+        if (s === "imageZoomIn") { //放大
+            this.img.zoomIn();
+        }
+        if (s === "imageZoomOut") { //縮小
+            this.img.zoomOut();
+        }
+        if (s === "imageRotateCw") { //順時針90°
+            this.img.degForward();
+        }
+        if (s === "imageRotateCcw") { //逆時針90°
+            this.img.degReverse();
+        }
+        if (s === "imageFlipHorizontal") { //水平鏡像
+            this.img.mirrorHorizontal();
+        }
+        if (s === "imageFlipVertical") { //垂直鏡像
+            this.img.mirrorVertica();
+        }
+        if (s === "imageInitialRotation") { //圖初始化旋轉
+            this.img.transformRefresh();
+        }
+
+        if (s === "imageMoveUp") { //圖片向上移動
+            this.img.move("up");
+        }
+        if (s === "imageMoveDown") { //圖片向下移動
+            this.img.move("down");
+        }
+        if (s === "imageMoveLeft") { //圖片向左移動
+            this.img.move("left");
+        }
+        if (s === "imageMoveRight") { //圖片向右移動
+            this.img.move("right");
+        }
+
+        if (s === "imageMoveUpOrPrevFile") { //圖片向上移動 or 上一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
+                this.img.move("up");
+            } else {
+                this.fileLoad.prevFile();
+            }
+        }
+        if (s === "imageMoveDownOrNextFile") { //圖片向下移動 or 下一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
+                this.img.move("down");
+            } else {
+                this.fileLoad.nextFile();
+            }
+        }
+        if (s === "imageMoveLeftOrPrevFile") { //圖片向左移動 or 上一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
+                this.img.move("left");
+            } else {
+                this.fileLoad.prevFile();
+            }
+        }
+        if (s === "imageMoveLeftOrNextFile") { //圖片向左移動 or 下一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
+                this.img.move("left");
+            } else {
+                this.fileLoad.nextFile();
+            }
+        }
+        if (s === "imageMoveRightOrPrevFile") { ///圖片向右移動 or 上一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
+                this.img.move("right");
+            } else {
+                this.fileLoad.prevFile();
+            }
+        }
+        if (s === "imageMoveRightOrNextFile") { //圖片向右移動 or 下一個檔案
+            if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
+                this.img.move("right");
+            } else {
+                this.fileLoad.nextFile();
+            }
+        }
+        //#region 檔案
+        if (s === "newWindow") { //另開視窗
+            await this.open.openNewWindow();
+        }
+        if (s === "prevFile") { //上一個檔案
+            this.fileLoad.prevFile();
+        }
+        if (s === "nextFile") { //下一個檔案
+            this.fileLoad.nextFile();
+        }
+        if (s === "prevDir") { //上一個資料夾
+            this.fileLoad.prevDir();
+        }
+        if (s === "nextDir") { //下一個資料夾
+            this.fileLoad.nextDir();
+        }
+        if (s === "firstFile") { //第一個檔案
+            this.fileLoad.firstFile();
+        }
+        if (s === "lastFile") { //最後一個檔案
+            this.fileLoad.lastFile();
+        }
+        if (s === "firstDir") { //第一個資料夾
+            this.fileLoad.firstDir();
+        }
+        if (s === "lastDir") { //最後一個資料夾
+            this.fileLoad.lastDir();
+        }
+        if (s === "revealInFileExplorer") { //在檔案總管中顯示
+            this.open.revealInFileExplorer();
+        }
+        if (s === "systemContextMenu") { //系統選單
+            this.open.systemContextMenu();
+        }
+        if (s === "renameFile") { //重新命名
+            this.fileLoad.showRenameMsg();
+        }
+        if (s === "openWith") { //用其他程式開啟
+            this.open.openWith();
+        }
+        if (s === "fileToRecycleBin") { //移至資源回收桶
+            this.fileLoad.showDeleteMsg("moveToRecycle");
+        }
+        if (s === "fileToPermanentlyDelete") { //永久刪除
+            this.fileLoad.showDeleteMsg("delete");
+        }
+        //#endregion
+
+        //#region 複製
+        if (s === "copyFile") { //複製檔案
+            this.copy.copyFile();
+        }
+        if (s === "copyFileName") { //複製檔名
+            this.copy.copyName();
+        }
+        if (s === "copyFilePath") { //複製檔案路徑
+            this.copy.copyPath();
+        }
+        if (s === "copyImage") { //複製影像
+            this.copy.copyImg();
+        }
+        if (s === "copyImageBase64") { //複製影像 Base64
+            this.copy.copyImageBase64();
+        }
+        if (s === "copyText") { //複製文字
+            this.copy.copyTxt();
+        }
+        //#endregion
+
+        //#region layout
+        if (s === "maximizeWindow") { //視窗最大化
+            this.window.maximizeWindow();
+        }
+        if (s === "topmost") { //視窗固定最上層
+            this.window.enabledTopmost();
+        }
+        if (s === "fullScreen") { //全螢幕
+            this.window.enabledFullScreen();
+        }
+        if (s === "showToolbar") { //工具列
+            this.window.enabledMainToolbar();
+        }
+        if (s === "showFilePanel") { //檔案預覽面板
+            this.window.enabledMainFileList();
+        }
+        if (s === "showDirectoryPanel") { //資料夾預覽面板
+            this.window.enabledMainDirList();
+        }
+        if (s === "showInformationPanel") { //詳細資料面板
+            this.window.enabledMainExif();
+        }
+        //#endregion
+    }
 }
 
 
@@ -62,6 +244,12 @@ class ScriptImg {
     public zoomTo100() {
         if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
+    }
+
+    /** 縮放至適合視窗 或 圖片原始大小 */
+    public fitWindowOrImageOriginal() {
+        if (this.isImg() === false) { return; }
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindowOrImageOriginal"]);
     }
 
     /** 順時針90° */
@@ -150,20 +338,30 @@ class ScriptFileLoad {
         this.M.fileLoad.nextDir()
     }
 
+    /** 第一個資料夾 */
+    public firstDir() {
+        this.M.fileLoad.showDir(0)
+    }
+
+    /** 最後一個資料夾 */
+    public lastDir() {
+        this.M.fileLoad.showDir(this.M.fileLoad.getWaitingDirKey().length - 1)
+    }
+
     /** 顯示 刪除檔案 的對話方塊 */
-    public showDeleteFileMsg() {
-        this.M.fileLoad.showDeleteFileMsg()
+    public showDeleteFileMsg(type?: undefined | "delete" | "moveToRecycle") {
+        this.M.fileLoad.showDeleteFileMsg(type)
     }
     /** 顯示 刪除資料夾 的對話方塊 */
-    public showDeleteDirMsg() {
-        this.M.fileLoad.showDeleteDirMsg()
+    public showDeleteDirMsg(type?: undefined | "delete" | "moveToRecycle") {
+        this.M.fileLoad.showDeleteDirMsg(type)
     }
     /** 顯示 刪除當前檔案或資料夾 的對話方塊 */
-    public showDeleteMsg() {
+    public showDeleteMsg(type?: undefined | "delete" | "moveToRecycle") {
         if (this.M.fileLoad.getIsBulkView()) {
-            this.showDeleteDirMsg()
+            this.showDeleteDirMsg(type)
         } else {
-            this.showDeleteFileMsg()
+            this.showDeleteFileMsg(type)
         }
     }
 
@@ -714,6 +912,23 @@ class ScriptWindow {
         this.M.mainMenu.setMenuLayoutCheckState(this.btnMainExif, val);
         this.M.mainExif.setEnabled(val);
     }
+
+    /** 啟用或關閉 視窗最大化 */
+    public maximizeWindow(val?: boolean) {
+        if (val === undefined) {
+            let WindowState = baseWindow.windowState;
+            val = WindowState === "Maximized" && this.M.fullScreen.getEnabled() === false;
+            val = !val;
+        }
+        if (val) {
+            setTimeout(() => {
+                baseWindow.maximized();
+            }, 50);
+        } else {
+            baseWindow.normal();
+        }
+    }
+
 }
 
 

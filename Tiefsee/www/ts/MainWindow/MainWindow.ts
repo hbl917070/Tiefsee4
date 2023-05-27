@@ -187,16 +187,6 @@ class MainWindow {
                     }, 50);
                 }
             });
-            Lib.addEventDblclick(fileShow.dom_imgview, async () => { //圖片物件
-                let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
-                    baseWindow.normal();
-                } else {
-                    setTimeout(() => {
-                        baseWindow.maximized();
-                    }, 50);
-                }
-            });
             Lib.addEventDblclick(fileShow.iframes.welcomeview.dom, async () => { //歡迎頁面
                 let WindowState = baseWindow.windowState
                 if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
@@ -264,6 +254,66 @@ class MainWindow {
                     }
                 }
             });
+
+            //#region 自定義滑鼠
+
+            //按下
+            fileShow.dom_imgview.addEventListener("mousedown", (e) => {
+                let sc = "";
+                let type = e.button;
+                if (type === 1) { //滾輪鍵
+                    sc = config.settings.mouse.scrollWheelButton;
+                }
+                if (type === 3) { //按鍵4
+                    sc = config.settings.mouse.mouseButton4;
+                }
+                if (type === 4) { //按鍵5
+                    sc = config.settings.mouse.mouseButton5;
+                }
+                script.run(sc);
+            })
+
+            //雙擊左鍵
+            Lib.addEventDblclick(fileShow.dom_imgview, async () => { //圖片物件
+                script.run(config.settings.mouse.leftDoubleClick);
+            });
+
+            //覆寫滾動事件
+            fileShow.tiefseeview.setEventMouseWheel((type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => {
+
+                let sc = "";
+                if (type === "up") {
+                    if (e.ctrlKey) {
+                        sc = config.settings.mouse.scrollUpCtrl;
+                    } else if (e.shiftKey) {
+                        sc = config.settings.mouse.scrollUpShift;
+                    } else if (e.altKey) {
+                        sc = config.settings.mouse.scrollUpAlt;
+                    } else {
+                        sc = config.settings.mouse.scrollUp;
+                    }
+                } else {
+                    if (e.ctrlKey) {
+                        sc = config.settings.mouse.scrollDownCtrl;
+                    } else if (e.shiftKey) {
+                        sc = config.settings.mouse.scrollDownShift;
+                    } else if (e.altKey) {
+                        sc = config.settings.mouse.scrollDownAlt;
+                    } else {
+                        sc = config.settings.mouse.scrollDown;
+                    }
+                }
+
+                if (sc === "imageZoomIn") { //放大
+                    fileShow.tiefseeview.zoomIn(offsetX, offsetY);
+                } else if (sc === "imageZoomOut") { //縮小
+                    fileShow.tiefseeview.zoomOut(offsetX, offsetY);
+                } else {
+                    script.run(sc);
+                }
+            });
+
+            //#endregion
 
             window.addEventListener("dragenter", dragenter, false);
             window.addEventListener("dragover", dragover, false);

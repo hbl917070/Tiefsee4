@@ -124,6 +124,8 @@ class Config {
             "--color-blue": { r: 0, g: 200, b: 255, },
             "--color-grey": { r: 30, g: 30, b: 30, },
         },
+
+        /** 圖片 */
         image: {
             /** 圖片dpi縮放 */
             "dpizoom": "-1",
@@ -139,6 +141,8 @@ class Config {
             /** 縮小至特定比例以下，就使用libvips重新處理圖片 */
             tiefseeviewBigimgscaleRatio: 0.8
         },
+
+        /** 預設裴谞 */
         sort: {
             /** 預設檔案排序 */
             fileSort: "name",
@@ -146,6 +150,7 @@ class Config {
             dirSort: "name",
         },
 
+        /** 佈局 */
         layout: {
             fileListEnabled: true, //啟用 檔案預覽視窗
             fileListShowNo: true, //顯示編號
@@ -254,6 +259,7 @@ class Config {
             /** 長按滑鼠中鍵觸發 */
             mouseMiddleRun: true,
         },
+
         /** 大量瀏覽模式 */
         bulkView: {
 
@@ -286,12 +292,29 @@ class Config {
             },
         },
 
+        /** 其他 */
         other: {
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
 
             /** 語言 */
             lang: "",
+        },
+
+        /** 滑鼠 */
+        mouse: {
+            leftDoubleClick: "fullScreen",
+            scrollWheelButton: "none",
+            mouseButton4: "prevFile",
+            mouseButton5: "nextFile",
+            scrollUp: "imageZoomIn",
+            scrollDown: "imageZoomOut",
+            scrollUpCtrl: "imageZoomIn",
+            scrollDownCtrl: "imageZoomOut",
+            scrollUpShift: "imageMoveRight",
+            scrollDownShift: "imageMoveLeft",
+            scrollUpAlt: "imageMoveUp",
+            scrollDownAlt: "imageMoveDown"
         },
     }
 

@@ -2,14 +2,16 @@ body,
 input,
 textarea,
 button,
-option {
+option,
+optgroup {
   // font-family: "Noto Sans TC","Noto Sans CJK TC Light";
   font-family: "Segoe UI", "Microsoft JhengHei UI";
   font-size: 15px;
   font-weight: var(--fontWeight);
 }
 
-select option {
+select option,
+select optgroup {
   background: var(--color-black);
 }
 

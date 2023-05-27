@@ -158,7 +158,7 @@ class I18n {
          * @param {object} value 參數json(選填)
          * @param {string} type 語言(選填)
          */
-        function get(key: string | null, value?: any, type?: string) {
+        function get(key: string | null, value?: any, type?: string): string {
 
             if (key === null) { return ""; }
 
@@ -175,11 +175,15 @@ class I18n {
             //未填入語言的話，就是用預設語言
             if (type === undefined) { type = lang }
 
-            if (d.hasOwnProperty(type) && d[type] !== null) { //翻譯存在的話就回傳
+            if (typeof d === "string") { //連結到另一筆資料
+                return get(d.toString(), value, type);
+
+            } else if (d.hasOwnProperty(type) && d[type] !== null) { //翻譯存在的話就回傳
                 return applyValue(d[type], value);
 
             } else if (d.hasOwnProperty(defaultLang)) { //如果不存在該語言的翻譯，則回傳預設語言的翻譯
                 return applyValue(d[defaultLang], value);
+
             }
 
             //什麼都找不到，回傳key
@@ -261,6 +265,10 @@ class I18n {
             } else if (dom.tagName == "TD" && dom.getAttribute("data-th") !== null) { //翻譯響應式table裡面的文字 data-th
 
                 dom.setAttribute("data-th", t);
+
+            }else if (dom.tagName == "OPTGROUP" ) { //翻譯響應式table裡面的文字 data-th
+
+                dom.setAttribute("label", t);
 
             } else if (dom.getAttribute("title") !== null) {
 

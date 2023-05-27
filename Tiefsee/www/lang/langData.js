@@ -31,6 +31,11 @@ var langData = {
                 "en": "Toolbar",
                 "ja": "ツールバー",
             },
+            mouse: {
+                "zh-TW": "滑鼠",
+                "en": "Mouse",
+                "ja": "マウス",
+            },
             association: {
                 "zh-TW": "設為預設程式",
                 "en": "Association",
@@ -80,43 +85,43 @@ var langData = {
         zoomMode: {
             title: {
                 "zh-TW": "圖片預設縮放模式",
-                "en": "Image default zoom mode",
+                "en": "Image Default Zoom Mode",
                 "ja": "画像のデフォルトズームモード",
             },
 
             fitWindowOrImageOriginal: {
-                "zh-TW": "縮放至適合視窗 或 圖片原始大小",
-                "en": "Zoom to fit or Image original size",
-                "ja": "ズームトゥフィット または 画像原寸大",
+                "zh-TW": "縮放至適合視窗 or 圖片原始大小",
+                "en": "Zoom to Fit or Image Original Size",
+                "ja": "ズームトゥフィット or 画像原寸大",
             },
             fitWindow: {
                 "zh-TW": "強制縮放至適合視窗",
-                "en": "Always zoom to fit",
+                "en": "Always Zoom to Fit",
                 "ja": "常にズームトゥフィット",
             },
             imageOriginal: {
                 "zh-TW": "圖片原始大小",
-                "en": "Image original size",
+                "en": "Image Original Size",
                 "ja": "画像原寸大",
             },
             imageWidthPx: {
                 "zh-TW": "圖片寬度 (px)",
-                "en": "Image width (px)",
+                "en": "Image Width (px)",
                 "ja": "画像の幅 (px)",
             },
             imageHeightPx: {
                 "zh-TW": "圖片高度 (px)",
-                "en": "Image height (px)",
+                "en": "Image Height (px)",
                 "ja": "画像の高さ (px)",
             },
             windowWidthRatio: {
                 "zh-TW": "視窗寬度 (%)",
-                "en": "Window width (%)",
+                "en": "Window Width (%)",
                 "ja": "ウィンドウの幅 (%)",
             },
             windowHeightRatio: {
                 "zh-TW": "視窗高度 (%)",
-                "en": "Window height (%)",
+                "en": "Window Height (%)",
                 "ja": "ウィンドウの高さ (%)",
             },
         },
@@ -684,6 +689,84 @@ var langData = {
 
         //#endregion
 
+        //#region 滑鼠
+
+        mouse: {
+            mouseButton: {
+                "zh-TW": "滑鼠按鍵",
+                "en": "Mouse button",
+                "ja": "マウスボタン"
+            },
+            leftDoubleClick: {
+                "zh-TW": "左鍵雙擊",
+                "en": "Left double-click",
+                "ja": "左ダブルクリック"
+            },
+            scrollWheelButton: {
+                "zh-TW": "滾輪鍵",
+                "en": "Scroll wheel button",
+                "ja": "スクロールホイールボタン"
+            },
+            mouseButton4: {
+                "zh-TW": "滑鼠按鍵 4",
+                "en": "Mouse button 4",
+                "ja": "マウスボタン 4"
+            },
+            mouseButton5: {
+                "zh-TW": "滑鼠按鍵 5",
+                "en": "Mouse button 5",
+                "ja": "マウスボタン 5"
+            },
+
+            mouseScrollWheel: {
+                "zh-TW": "滑鼠滾輪",
+                "en": "Mouse scroll wheel",
+                "ja": "マウススクロールホイール"
+            },
+            scrollUp: {
+                "zh-TW": "向上捲動",
+                "en": "Scroll up",
+                "ja": "上にスクロール"
+            },
+            scrollDown: {
+                "zh-TW": "向下捲動",
+                "en": "Scroll down",
+                "ja": "下にスクロール"
+            },
+            scrollUpCtrl: {
+                "zh-TW": "Ctrl + 向上捲動",
+                "en": "Ctrl + Scroll up",
+                "ja": "Ctrl + 上にスクロール"
+            },
+            scrollDownCtrl: {
+                "zh-TW": "Ctrl + 向下捲動",
+                "en": "Ctrl + Scroll down",
+                "ja": "Ctrl + 下にスクロール"
+            },
+            scrollUpShift: {
+                "zh-TW": "Shift + 向上捲動",
+                "en": "Shift + Scroll up",
+                "ja": "Shift + 上にスクロール"
+            },
+            scrollDownShift: {
+                "zh-TW": "Shift + 向下捲動",
+                "en": "Shift + Scroll down",
+                "ja": "Shift + 下にスクロール"
+            },
+            scrollUpAlt: {
+                "zh-TW": "Alt + 向上捲動",
+                "en": "Alt + Scroll up",
+                "ja": "Alt + 上にスクロール"
+            },
+            scrollDownAlt: {
+                "zh-TW": "Alt + 向下捲動",
+                "en": "Alt + Scroll down",
+                "ja": "Alt + 下にスクロール"
+            },
+        },
+
+        //#endregion
+
         //#region 設為預設程式
         association: {
             step1: {
@@ -977,7 +1060,6 @@ var langData = {
 
     },
 
-
     menu: {
 
         //#region 工具列
@@ -1002,7 +1084,6 @@ var langData = {
             "en": "Prev File",
             "ja": "前のファイル",
         },
-
         nextFile: {
             "zh-TW": "下一個檔案",
             "en": "Next File",
@@ -1324,7 +1405,7 @@ var langData = {
         },
         topmost: {
             "zh-TW": "視窗固定最上層",
-            "en": "Keep window always in top",
+            "en": "Window Always on Top",
             "ja": "ウィンドウを常に最前面に表示",
         },
         showToolbar: {
@@ -1374,7 +1455,6 @@ var langData = {
         //#endregion
 
     },
-
 
     //大量瀏覽模式
     bulkView: {
@@ -1475,7 +1555,6 @@ var langData = {
         },
 
     },
-
 
 
     msg: {
@@ -1625,22 +1704,22 @@ var langData = {
         },
         fileToRecycleBin: {
             "zh-TW": "移至資源回收桶",
-            "en": "Move to recycle bin",
+            "en": "Move to Recycle Bin",
             "ja": "ごみ箱へ移動",
         },
         fileToPermanentlyDelete: {
             "zh-TW": "永久刪除",
-            "en": "Permanently delete",
+            "en": "Permanently Delete",
             "ja": "完全に削除",
         },
         fileToRecycleBinCompleted: {
             "zh-TW": "已完成「移至資源回收桶」",
-            "en": `"Move to recycle bin" completed`,
+            "en": `"Move to Tecycle Bin" completed`,
             "ja": "「ごみ箱へ移動」完了",
         },
         fileToPermanentlyDeleteCompleted: {
             "zh-TW": "已完成「永久刪除」",
-            "en": `"Permanently delete file" completed`,
+            "en": `"Permanently Delete" completed`,
             "ja": "「完全に削除」完了",
         },
         fileDeletionFailed: {
@@ -1993,5 +2072,196 @@ var langData = {
 
     },
 
+
+
+    script: {
+
+        none: {
+            "zh-TW": "無",
+            "en": "None",
+            "ja": "なし",
+        },
+
+        //#region 圖片
+        image: {
+            "zh-TW": "圖片",
+            "en": "Image",
+            "ja": "画像",
+        },
+        imageFitWindowOrImageOriginal: {
+            "zh-TW": "縮放至適合視窗 or 圖片原始大小",
+            "en": "Zoom to Fit or Image Original Size",
+            "ja": "ズームトゥフィット or 画像原寸大",
+        },
+        imageFitWindow: {
+            "zh-TW": "強制縮放至適合視窗",
+            "en": "Always Zoom to Fit",
+            "ja": "常にズームトゥフィット",
+        },
+        imageOriginal: {
+            "zh-TW": "圖片原始大小",
+            "en": "Image Original Size",
+            "ja": "画像原寸大",
+        },
+        imageZoomIn: "menu.zoomIn", //放大
+        imageZoomOut: "menu.zoomOut", //縮小
+        imageRotateCw: "menu.rotateCw", //順時針90°
+        imageRotateCcw: "menu.rotateCcw", //逆時針90°
+        imageFlipHorizontal: "menu.flipHorizontal", //水平鏡像
+        imageFlipVertical: "menu.flipVertical", //垂直鏡像
+        imageInitialRotation: "menu.initialRotation", //圖初始化旋轉
+        imageMoveUp: {
+            "zh-TW": "圖片向上移動",
+            "en": "Move Image Up",
+            "ja": "画像を上に移動"
+        },
+        imageMoveDown: {
+            "zh-TW": "圖片向下移動",
+            "en": "Move Image Down",
+            "ja": "画像を下に移動"
+        },
+        imageMoveLeft: {
+            "zh-TW": "圖片向左移動",
+            "en": "Move Image Left",
+            "ja": "画像を左に移動"
+        },
+        imageMoveRight: {
+            "zh-TW": "圖片向右移動",
+            "en": "Move Image Right",
+            "ja": "画像を右に移動"
+        },
+        imageMoveUpOrPrevFile: {
+            "zh-TW": "圖片向上移動 or 上一個檔案",
+            "en": "Move Image Up or Prev File",
+            "ja": "画像を上に移動 or 前のファイル"
+        },
+        imageMoveDownOrNextFile: {
+            "zh-TW": "圖片向下移動 or 下一個檔案",
+            "en": "Move Image Down or Next File",
+            "ja": "画像を下に移動 or 次のファイル"
+        },
+
+        imageMoveLeftOrPrevFile: {
+            "zh-TW": "圖片向左移動 or 上一個檔案",
+            "en": "Move Image Left or Prev File",
+            "ja": "画像を左に移動 or 前のファイル"
+        },
+        imageMoveRightOrNextFile: {
+            "zh-TW": "圖片向右移動 or 下一個檔案",
+            "en": "Move Image Right or Next File",
+            "ja": "画像を右に移動 or 次のファイル"
+        },
+        imageMoveRightOrPrevFile: {
+            "zh-TW": "圖片向右移動 or 上一個檔案",
+            "en": "Move Image Right or Prev File",
+            "ja": "画像を右に移動 or 前のファイル"
+        },
+        imageMoveLeftOrNextFile: {
+            "zh-TW": "圖片向左移動 or 下一個檔案",
+            "en": "Move Image Left or Next File",
+            "ja": "画像を左に移動 or 次のファイル"
+        },
+        
+      
+        //#endregion
+
+        //#region 檔案
+        file: {
+            "zh-TW": "檔案",
+            "en": "File",
+            "ja": "ファイル",
+        },
+        newWindow: "menu.openNewWindow", //另開視窗
+        prevFile: "menu.prevFile", //上一個檔案
+        nextFile: "menu.nextFile", //下一個檔案
+        prevDir: "menu.prevDir", //上一個資料夾
+        nextDir: "menu.nextDir", //下一個資料夾
+        firstFile: {
+            "zh-TW": "第一個檔案",
+            "en": "First File",
+            "ja": "最初のファイル"
+        },
+        lastFile: {
+            "zh-TW": "最後一個檔案",
+            "en": "Last File",
+            "ja": "最後のファイル"
+        },
+        firstDir: {
+            "zh-TW": "第一個資料夾",
+            "en": "First Directory",
+            "ja": "最初のディレクトリ"
+        },
+        lastDir: {
+            "zh-TW": "最後一個資料夾",
+            "en": "Last Directory",
+            "ja": "最後のディレクトリ"
+        },
+        revealInFileExplorer: "menu.revealInFileExplorer", //在檔案總管中顯示
+        systemContextMenu: "menu.systemContextMenu", //系統選單
+        renameFile: "menu.renameFile", //重新命名
+        openWith: "menu.openWith", //用其他程式開啟
+        fileToRecycleBin: "msg.fileToRecycleBin", //移至資源回收桶
+        fileToPermanentlyDelete: "msg.fileToPermanentlyDelete", //永久刪除
+        //#endregion
+
+        //#region 複製
+        copy: {
+            "zh-TW": "複製",
+            "en": "Copy",
+            "ja": "コピー",
+        },
+        copyFile: "menu.copyFile", //複製檔案
+        copyFileName: "menu.copyFileName", //複製檔名
+        copyDirName: "menu.copyDirName", //複製資料夾名
+        copyFilePath: "menu.copyFilePath", //複製檔案路徑
+        copyDirPath: "menu.copyDirPath", //複製資料夾路徑
+        copyImage: "menu.copyImage", //複製影像
+        copyImageBase64: "menu.copyImageBase64", //複製影像 Base64
+        copyText: "menu.copyText", //複製文字
+        //#endregion
+
+        //#region 佈局
+        layout: {
+            "zh-TW": "佈局",
+            "en": "Layout",
+            "ja": "レイアウト",
+        },
+        maximizeWindow: {
+            "zh-TW": "視窗最大化",
+            "en": "Maximize Window",
+            "ja": "ウィンドウを最大化",
+        },
+        topmost: "menu.topmost", //視窗固定最上層
+        fullScreen: "menu.fullScreen", //全螢幕
+        showToolbar: "menu.showToolbar", //工具列
+        showFilePanel: "menu.showFilePanel", //檔案預覽面板
+        showDirectoryPanel: "menu.showDirectoryPanel", //資料夾預覽面板
+        showInformationPanel: "menu.showInformationPanel", //詳細資料面板
+        //#endregion
+
+        //#region 其他
+        "other": {
+            "zh-TW": "其他",
+            "en": "Other",
+            "ja": "その他",
+        },
+        back: "menu.back", //返回
+        showSetting: "menu.showSetting", //設定
+        //#endregion
+
+        //#region 文字編輯器
+        textEditor: {
+            "zh-TW": "文字編輯器",
+            "en": "Text Editor",
+            "ja": "テキストエディタ"
+        },
+        save: {
+            "zh-TW": "儲存檔案",
+            "en": "Save",
+            "ja": "アーカイブ",
+        },
+        //#endregion
+
+    },
 }
 

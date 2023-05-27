@@ -777,10 +777,17 @@ class FileLoad {
         /**
          * 顯示 刪除檔案 的對話方塊
          */
-        async function showDeleteFileMsg() {
+        async function showDeleteFileMsg(type?: undefined | "delete" | "moveToRecycle") {
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
+            }
+
+            let _type;
+            if (type === "delete") {
+                _type = "2";
+            } else {
+                _type = "1";
             }
 
             //執行刪除
@@ -820,7 +827,7 @@ class FileLoad {
                         { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, //移至資源回收桶
                         { value: "2", name: M.i18n.t("msg.fileToPermanentlyDelete") }, //永久刪除檔案
                     ],
-                    radioValue: "1",
+                    radioValue: _type,
                     funcYes: async (dom: HTMLElement, value: string) => {
                         M.msgbox.close(dom);
                         await runDelete(value); //
@@ -829,7 +836,7 @@ class FileLoad {
 
             } else {
 
-                await runDelete("1");
+                await runDelete(_type);
 
             }
 
@@ -838,10 +845,17 @@ class FileLoad {
         /**
          * 顯示 刪除資料夾 的對話方塊
          */
-        async function showDeleteDirMsg() {
+        async function showDeleteDirMsg(type?: undefined | "delete" | "moveToRecycle") {
 
             if (groupType === GroupType.none || groupType === GroupType.welcome) {
                 return;
+            }
+
+            let _type;
+            if (type === "delete") {
+                _type = "2";
+            } else {
+                _type = "1";
             }
 
             //執行刪除
@@ -881,7 +895,7 @@ class FileLoad {
                         { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, //移至資源回收桶
                         { value: "2", name: M.i18n.t("msg.fileToPermanentlyDelete") }, //永久刪除檔案
                     ],
-                    radioValue: "1",
+                    radioValue: _type,
                     funcYes: async (dom: HTMLElement, value: string) => {
                         M.msgbox.close(dom);
                         await runDelete(value);
@@ -890,7 +904,7 @@ class FileLoad {
 
             } else {
 
-                await runDelete("1");
+                await runDelete(_type);
 
             }
 

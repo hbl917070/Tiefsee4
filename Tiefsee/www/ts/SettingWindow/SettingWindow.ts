@@ -2,12 +2,12 @@
 
 var baseWindow: BaseWindow;
 
-var setting;
+var settingWindow;
 document.addEventListener("DOMContentLoaded", async () => {
-    setting = new Setting();
+    settingWindow = new SettingWindow();
 });
 
-class Setting {
+class SettingWindow {
 
     public saveData;
 
@@ -32,6 +32,10 @@ class Setting {
          */
         function addLoadEvent(func: () => void) {
             loadEvent.push(func);
+        }
+
+        function getDom(id: string) {
+            return document.querySelector(id);
         }
 
         //initDomImport(); //初始化圖示
@@ -62,7 +66,7 @@ class Setting {
             });
 
             //拖曳視窗
-            let domLeftBox = document.querySelector("#window-left .pagetab") as HTMLElement;
+            let domLeftBox = getDom("#window-left .pagetab") as HTMLElement;
             domLeftBox.addEventListener("mousedown", async (e) => {
 
                 //如果有捲動軸，就禁止拖曳(避免無法點擊捲動軸)
@@ -123,14 +127,14 @@ class Setting {
                 func()
             });
 
-            //document.querySelector("input")?.focus();
-            document.querySelector("input")?.blur(); //失去焦點
+            //getDom("input")?.focus();
+            getDom("input")?.blur(); //失去焦點
         }
 
         //初始化多國語言
         addLoadEvent(() => {
 
-            let dom_select = document.querySelector("#select-lang") as HTMLSelectElement;
+            let dom_select = getDom("#select-lang") as HTMLSelectElement;
 
             let configLang = config.settings.other.lang;
             if (configLang == "") {
@@ -153,27 +157,24 @@ class Setting {
 
             //捲到最上面
             function goTop() {
-                document.querySelector("#window-body")?.scrollTo(0, 0)
-            }
-
-            function getDom(id: string) {
-                return document.getElementById(id);
+                getDom("#window-body")?.scrollTo(0, 0)
             }
 
             var tabs = new Tabs();
-            tabs.add(getDom("tabsBtn-general"), getDom("tabsPage-general"), () => { goTop() }); //一般
-            tabs.add(getDom("tabsBtn-appearance"), getDom("tabsPage-appearance"), () => { goTop() }); //外觀
-            tabs.add(getDom("tabsBtn-layout"), getDom("tabsPage-layout"), () => { goTop() }); //版面
-            tabs.add(getDom("tabsBtn-toolbar"), getDom("tabsPage-toolbar"), () => { goTop() }); //工具列
-            //tabs.add(getDom("tabsBtn-image"), getDom("tabsPage-image"), () => { goTop() });
-            //tabs.add(getDom("tabsBtn-shortcutKeys"),getDom("tabsPage-hotkey"), () => { goTop() });/快速鍵
-            tabs.add(getDom("tabsBtn-extension"), getDom("tabsPage-extension"), () => { goTop() }); //設為預設程式
-            tabs.add(getDom("tabsBtn-advanced"), getDom("tabsPage-advanced"), () => { goTop() }); //進階設定
-            tabs.add(getDom("tabsBtn-about"), getDom("tabsPage-about"), () => { goTop() }); //關於
-            tabs.add(getDom("tabsBtn-plugin"), getDom("tabsPage-plugin"), () => { goTop() }); //擴充套件
-            tabs.add(getDom("tabsBtn-quickLook"), getDom("tabsPage-quickLook"), () => { goTop() }); //快速預覽
+            tabs.add(getDom("#tabsBtn-general"), getDom("#tabsPage-general"), () => { goTop() }); //一般
+            tabs.add(getDom("#tabsBtn-appearance"), getDom("#tabsPage-appearance"), () => { goTop() }); //外觀
+            tabs.add(getDom("#tabsBtn-layout"), getDom("#tabsPage-layout"), () => { goTop() }); //版面
+            tabs.add(getDom("#tabsBtn-toolbar"), getDom("#tabsPage-toolbar"), () => { goTop() }); //工具列
+            tabs.add(getDom("#tabsBtn-mouse"), getDom("#tabsPage-mouse"), () => { goTop() }); //滑鼠
+            //tabs.add(getDom("#tabsBtn-image"), getDom("#tabsPage-image"), () => { goTop() });
+            //tabs.add(getDom("#tabsBtn-shortcutKeys"),getDom("#tabsPage-hotkey"), () => { goTop() });/快速鍵
+            tabs.add(getDom("#tabsBtn-extension"), getDom("#tabsPage-extension"), () => { goTop() }); //設為預設程式
+            tabs.add(getDom("#tabsBtn-advanced"), getDom("#tabsPage-advanced"), () => { goTop() }); //進階設定
+            tabs.add(getDom("#tabsBtn-about"), getDom("#tabsPage-about"), () => { goTop() }); //關於
+            tabs.add(getDom("#tabsBtn-plugin"), getDom("#tabsPage-plugin"), () => { goTop() }); //擴充套件
+            tabs.add(getDom("#tabsBtn-quickLook"), getDom("#tabsPage-quickLook"), () => { goTop() }); //快速預覽
 
-            tabs.set(getDom("tabsBtn-general")); //預設選擇的頁面
+            tabs.set(getDom("#tabsBtn-general")); //預設選擇的頁面
         })
 
         //自訂工具列
@@ -185,7 +186,7 @@ class Setting {
             arGroupName.map((gn) => {
 
                 let groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
-                var dom_toolbarList = document.querySelector(`#toolbarList-${groupName}`) as HTMLElement;
+                var dom_toolbarList = getDom(`#toolbarList-${groupName}`) as HTMLElement;
 
                 //產生html
                 var html = "";
@@ -251,7 +252,7 @@ class Setting {
             function getToolbarListData() {
                 function getItem(type: string) {
                     let ar = [];
-                    let dom_toolbarList = document.querySelector(`#toolbarList-${type}`) as HTMLElement;
+                    let dom_toolbarList = getDom(`#toolbarList-${type}`) as HTMLElement;
                     let domAr = dom_toolbarList.querySelectorAll(".toolbarList-checkbox");
 
                     for (let i = 0; i < domAr.length; i++) {
@@ -278,11 +279,11 @@ class Setting {
             //------------
 
             //切換下拉選單時，顯示對應的內容
-            var select_toolbarListType = document.querySelector("#select-toolbarListType") as HTMLSelectElement;
-            var dom_toolbarList_img = document.querySelector("#toolbarList-img") as HTMLElement;
-            var dom_toolbarList_pdf = document.querySelector("#toolbarList-pdf") as HTMLElement;
-            var dom_toolbarList_txt = document.querySelector("#toolbarList-txt") as HTMLElement;
-            var dom_toolbarList_bulkView = document.querySelector("#toolbarList-bulkView") as HTMLElement;
+            var select_toolbarListType = getDom("#select-toolbarListType") as HTMLSelectElement;
+            var dom_toolbarList_img = getDom("#toolbarList-img") as HTMLElement;
+            var dom_toolbarList_pdf = getDom("#toolbarList-pdf") as HTMLElement;
+            var dom_toolbarList_txt = getDom("#toolbarList-txt") as HTMLElement;
+            var dom_toolbarList_bulkView = getDom("#toolbarList-bulkView") as HTMLElement;
             let eventChange = () => {
                 let val = select_toolbarListType.value;
                 if (val == "img") {
@@ -324,7 +325,7 @@ class Setting {
             var jq_colorWhite = $("#text-colorWhite"); //文字顏色
             var jq_colorBlack = $("#text-colorBlack"); //區塊底色
             var jq_colorBlue = $("#text-colorBlue"); //主顏色
-            var dom_applyThemeBtns = document.querySelector("#applyTheme-btns") as HTMLElement;
+            var dom_applyThemeBtns = getDom("#applyTheme-btns") as HTMLElement;
 
             //初始化顏色選擇器物件
             addEvent(jq_colorWindowBackground, "--color-window-background", true);
@@ -425,9 +426,9 @@ class Setting {
 
         //圖片預設 縮放模式、對齊位置
         addLoadEvent(() => {
-            var select_tiefseeviewZoomType = document.querySelector("#select-tiefseeviewZoomType") as HTMLSelectElement;
-            var text_tiefseeviewZoomValue = document.querySelector("#text-tiefseeviewZoomValue") as HTMLInputElement;
-            var select_tiefseeviewAlignType = document.querySelector("#select-tiefseeviewAlignType") as HTMLSelectElement;
+            var select_tiefseeviewZoomType = getDom("#select-tiefseeviewZoomType") as HTMLSelectElement;
+            var text_tiefseeviewZoomValue = getDom("#text-tiefseeviewZoomValue") as HTMLInputElement;
+            var select_tiefseeviewAlignType = getDom("#select-tiefseeviewAlignType") as HTMLSelectElement;
 
             select_tiefseeviewZoomType.value = config.settings.image["tiefseeviewZoomType"];
             text_tiefseeviewZoomValue.value = config.settings.image["tiefseeviewZoomValue"].toString();
@@ -478,8 +479,8 @@ class Setting {
 
         //預設排序
         addLoadEvent(() => {
-            var select_fileSort = document.querySelector("#select-fileSort") as HTMLSelectElement;
-            var select_dirSort = document.querySelector("#select-dirSort") as HTMLSelectElement;
+            var select_fileSort = getDom("#select-fileSort") as HTMLSelectElement;
+            var select_dirSort = getDom("#select-dirSort") as HTMLSelectElement;
 
             select_fileSort.value = config.settings.sort["fileSort"];
             select_dirSort.value = config.settings.sort["dirSort"];
@@ -498,10 +499,10 @@ class Setting {
 
         //關聯副檔名 
         addLoadEvent(() => {
-            var text_extension = document.querySelector("#text-extension") as HTMLTextAreaElement;
-            var btn_extension = document.querySelector("#btn-extension") as HTMLElement;
-            var text_disassociate = document.querySelector("#text-disassociate") as HTMLTextAreaElement;
-            var btn_disassociate = document.querySelector("#btn-disassociate") as HTMLElement;
+            var text_extension = getDom("#text-extension") as HTMLTextAreaElement;
+            var btn_extension = getDom("#btn-extension") as HTMLElement;
+            var text_disassociate = getDom("#text-disassociate") as HTMLTextAreaElement;
+            var btn_disassociate = getDom("#btn-disassociate") as HTMLElement;
 
             let s_extension = ["JPG", "JPEG", "PNG", "GIF", "BMP", "SVG", "WEBP",];
             text_extension.value = s_extension.join("\n"); //預設顯示的文字
@@ -556,7 +557,7 @@ class Setting {
 
         //開啟 系統設定
         addLoadEvent(() => {
-            let btn = document.querySelector("#btn-openSystemSettings") as HTMLElement;
+            let btn = getDom("#btn-openSystemSettings") as HTMLElement;
 
             btn.addEventListener("click", async () => {
                 let path = "ms-settings:defaultapps";
@@ -623,7 +624,7 @@ class Setting {
         // 視窗效果 (aero毛玻璃)
         addLoadEvent(() => {
 
-            var switch_areo = document.querySelector("#select-aeroType") as HTMLSelectElement;
+            var switch_areo = getDom("#select-aeroType") as HTMLSelectElement;
             switch_areo.value = config.settings["theme"]["aeroType"];
 
             switch_areo.addEventListener("change", () => {
@@ -632,7 +633,7 @@ class Setting {
             });
 
             //調整選項後，顯示「重新啟動」的按鈕
-            var btn_restart = document.querySelector("#btn-windowAero-restart") as HTMLButtonElement;
+            var btn_restart = getDom("#btn-windowAero-restart") as HTMLButtonElement;
             btn_restart.style.display = "none";
             switch_areo.addEventListener("change", () => {
                 btn_restart.style.display = "";
@@ -644,8 +645,8 @@ class Setting {
 
         //工具列
         addLoadEvent(() => {
-            var switch_mainToolbarEnabled = document.querySelector("#switch-mainToolbarEnabled") as HTMLInputElement;
-            var select_mainToolbarAlign = document.querySelector("#select-mainToolbarAlign") as HTMLInputElement;
+            var switch_mainToolbarEnabled = getDom("#switch-mainToolbarEnabled") as HTMLInputElement;
+            var select_mainToolbarAlign = getDom("#select-mainToolbarAlign") as HTMLInputElement;
 
             switch_mainToolbarEnabled.checked = config.settings["layout"]["mainToolbarEnabled"]; //顯示工具列
             select_mainToolbarAlign.value = config.settings["layout"]["mainToolbarAlign"]; //工具列對齊
@@ -663,11 +664,146 @@ class Setting {
             });
         })
 
+        //滑鼠
+        addLoadEvent(() => {
+
+            var select_leftDoubleClick = getDom("#select-leftDoubleClick") as HTMLSelectElement;
+            var select_scrollWheelButton = getDom("#select-scrollWheelButton") as HTMLSelectElement;
+            var select_mouseButton4 = getDom("#select-mouseButton4") as HTMLSelectElement;
+            var select_mouseButton5 = getDom("#select-mouseButton5") as HTMLSelectElement;
+            var select_scrollUp = getDom("#select-scrollUp") as HTMLSelectElement;
+            var select_scrollDown = getDom("#select-scrollDown") as HTMLSelectElement;
+            var select_scrollUpCtrl = getDom("#select-scrollUpCtrl") as HTMLSelectElement;
+            var select_scrollDownCtrl = getDom("#select-scrollDownCtrl") as HTMLSelectElement;
+            var select_scrollUpShift = getDom("#select-scrollUpShift") as HTMLSelectElement;
+            var select_scrollDownShift = getDom("#select-scrollDownShift") as HTMLSelectElement;
+            var select_scrollUpAlt = getDom("#select-scrollUpAlt") as HTMLSelectElement;
+            var select_scrollDownAlt = getDom("#select-scrollDownAlt") as HTMLSelectElement;
+
+            let arDom = [
+                { dom: select_leftDoubleClick, config: "leftDoubleClick" },
+                { dom: select_scrollWheelButton, config: "scrollWheelButton" },
+                { dom: select_mouseButton4, config: "mouseButton4" },
+                { dom: select_mouseButton5, config: "mouseButton5" },
+                { dom: select_scrollUp, config: "scrollUp" },
+                { dom: select_scrollDown, config: "scrollDown" },
+                { dom: select_scrollUpCtrl, config: "scrollUpCtrl" },
+                { dom: select_scrollDownCtrl, config: "scrollDownCtrl" },
+                { dom: select_scrollUpShift, config: "scrollUpShift" },
+                { dom: select_scrollDownShift, config: "scrollDownShift" },
+                { dom: select_scrollUpAlt, config: "scrollUpAlt" },
+                { dom: select_scrollDownAlt, config: "scrollDownAlt" },
+            ];
+
+            const data: { [key: string]: string[] } = {
+                "image": [
+                    "imageFitWindowOrImageOriginal", //縮放至適合視窗 或 圖片原始大小
+                    "imageFitWindow", //強制縮放至適合視窗
+                    "imageOriginal", //圖片原始大小
+                    "imageZoomIn", //放大
+                    "imageZoomOut", //縮小
+                    "imageRotateCw", //順時針90°
+                    "imageRotateCcw", //逆時針90°
+                    "imageFlipHorizontal", //水平鏡像
+                    "imageFlipVertical", //垂直鏡像
+                    "imageInitialRotation", //圖初始化旋轉
+                    "imageMoveUp", //圖片向上移動
+                    "imageMoveDown", //圖片向下移動
+                    "imageMoveLeft", //圖片向左移動
+                    "imageMoveRight", //圖片向右移動
+                    "imageMoveUpOrPrevFile", //圖片向上移動 or 上一個檔案
+                    "imageMoveDownOrNextFile", //圖片向下移動 or 下一個檔案
+                    "imageMoveLeftOrPrevFile", //圖片向左移動 or 上一個檔案
+                    "imageMoveRightOrNextFile", //圖片向右移動 or 下一個檔案
+                    "imageMoveRightOrPrevFile", //圖片向右移動 or 上一個檔案
+                    "imageMoveLeftOrNextFile", //圖片向左移動 or 下一個檔案
+                ],
+                "file": [
+                    "prevFile", //上一個檔案
+                    "nextFile", //下一個檔案
+                    "firstFile", //第一個檔案
+                    "lastFile", //最後一個檔案
+                    "prevDir", //上一個資料夾
+                    "nextDir", //下一個資料夾
+                    "firstDir", //第一個資料夾
+                    "lastDir", //最後一個資料夾
+                    "newWindow", //另開視窗
+                    "revealInFileExplorer", //在檔案總管中顯示
+                    "systemContextMenu", //系統選單
+                    "openWith", //用其他程式開啟
+                    "renameFile", //重新命名
+                    "fileToRecycleBin", //移至資源回收桶
+                    "fileToPermanentlyDelete", //永久刪除
+                ],
+                "copy": [
+                    "copyFile", //複製檔案
+                    "copyFileName", //複製檔名
+                    //"copyDirName", //複製資料夾名
+                    "copyFilePath", //複製檔案路徑
+                    //"copyDirPath", //複製資料夾路徑
+                    "copyImage", //複製影像
+                    "copyImageBase64", //複製影像 Base64
+                    "copyText", //複製文字
+                ],
+                "layout": [
+                    "maximizeWindow", //視窗最大化
+                    "topmost", //視窗固定最上層
+                    "fullScreen", //全螢幕
+                    "showToolbar", //工具列
+                    "showDirectoryPanel", //資料夾預覽面板
+                    "showFilePanel", //檔案預覽面板
+                    "showInformationPanel", //詳細資料面板        
+                ],
+                //"other":[
+                //    "back", //返回
+                //    "showSetting", //設定       
+                //],
+                //"textEditor":[
+                //    "save", //儲存檔案
+                //],
+            }
+            let htmlString = `
+            <optgroup label="-">
+                <option value="none" i18n="script.none"></option>
+            </optgroup>
+            `;
+            for (const key in data) {
+                htmlString += `<optgroup label="" i18n="script.${key}">`;
+                for (const value of data[key]) {
+                    htmlString += `<option value="${value}" i18n="script.${value}"></option>`;
+                }
+                htmlString += `</optgroup>`;
+            }
+
+
+            arDom.forEach(item => {
+
+                let dom = item.dom;
+                //let config = item.config;
+
+                //初始化設定值
+                dom.innerHTML = htmlString;
+                //@ts-ignore
+                dom.value = config.settings.mouse[item.config];
+
+                dom.addEventListener("change", () => {
+                    //@ts-ignore
+                    config.settings.mouse[item.config] = dom.value;
+                    appleSettingOfMain();
+                });
+
+            })
+
+
+            i18n.setAll()
+        })
+
+
         //檔案預覽視窗
         addLoadEvent(() => {
-            var switch_fileListEnabled = document.querySelector("#switch-fileListEnabled") as HTMLInputElement;
-            var switch_fileListShowNo = document.querySelector("#switch-fileListShowNo") as HTMLInputElement;
-            var switch_fileListShowName = document.querySelector("#switch-fileListShowName") as HTMLInputElement;
+            var switch_fileListEnabled = getDom("#switch-fileListEnabled") as HTMLInputElement;
+            var switch_fileListShowNo = getDom("#switch-fileListShowNo") as HTMLInputElement;
+            var switch_fileListShowName = getDom("#switch-fileListShowName") as HTMLInputElement;
             switch_fileListEnabled.checked = config.settings["layout"]["fileListEnabled"]; //啟用 檔案預覽視窗
             switch_fileListShowNo.checked = config.settings["layout"]["fileListShowNo"]; //顯示編號
             switch_fileListShowName.checked = config.settings["layout"]["fileListShowName"]; //顯示檔名
@@ -691,10 +827,10 @@ class Setting {
 
         //資料夾預覽視窗
         addLoadEvent(() => {
-            var switch_dirListEnabled = document.querySelector("#switch-dirListEnabled") as HTMLInputElement;
-            var switch_dirListShowNo = document.querySelector("#switch-dirListShowNo") as HTMLInputElement;
-            var switch_dirListShowName = document.querySelector("#switch-dirListShowName") as HTMLInputElement;
-            var select_dirListImgNumber = document.querySelector("#select-dirListImgNumber") as HTMLInputElement;
+            var switch_dirListEnabled = getDom("#switch-dirListEnabled") as HTMLInputElement;
+            var switch_dirListShowNo = getDom("#switch-dirListShowNo") as HTMLInputElement;
+            var switch_dirListShowName = getDom("#switch-dirListShowName") as HTMLInputElement;
+            var select_dirListImgNumber = getDom("#select-dirListImgNumber") as HTMLInputElement;
             switch_dirListEnabled.checked = config.settings["layout"]["dirListEnabled"]; //啟用 資料夾預覽視窗
             switch_dirListShowNo.checked = config.settings["layout"]["dirListShowNo"]; //顯示編號
             switch_dirListShowName.checked = config.settings["layout"]["dirListShowName"]; //顯示檔名
@@ -725,7 +861,7 @@ class Setting {
         //詳細資料面板
         addLoadEvent(() => {
             //顯示 詳細資料面板
-            var switch_mainExifEnabled = document.querySelector("#switch-mainExifEnabled") as HTMLInputElement;
+            var switch_mainExifEnabled = getDom("#switch-mainExifEnabled") as HTMLInputElement;
             switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"]; //
             switch_mainExifEnabled.addEventListener("change", () => {
                 let val = switch_mainExifEnabled.checked;
@@ -734,7 +870,7 @@ class Setting {
             });
 
             //寬度足夠時，橫向排列
-            var switch_mainExifHorizontal = document.querySelector("#switch-mainExifHorizontal") as HTMLInputElement;
+            var switch_mainExifHorizontal = getDom("#switch-mainExifHorizontal") as HTMLInputElement;
             switch_mainExifHorizontal.checked = config.settings["layout"]["mainExifHorizontal"]; //
             switch_mainExifHorizontal.addEventListener("change", () => {
                 let val = switch_mainExifHorizontal.checked;
@@ -743,7 +879,7 @@ class Setting {
             });
 
             //顯示的最大行數(1~100)
-            var text_mainExifMaxLine = document.querySelector("#text-mainExifMaxLine") as HTMLInputElement;
+            var text_mainExifMaxLine = getDom("#text-mainExifMaxLine") as HTMLInputElement;
             text_mainExifMaxLine.value = config.settings["layout"]["mainExifMaxLine"] + "";
             text_mainExifMaxLine.addEventListener("change", () => {
                 let val = Math.floor(Number(text_mainExifMaxLine.value));
@@ -762,7 +898,7 @@ class Setting {
             Lib.setRadio("[name='largeBtn']", config.settings.layout.largeBtn);
 
             //變更時
-            let domRadio = document.querySelector("#largeBtn-group") as HTMLElement;
+            let domRadio = getDom("#largeBtn-group") as HTMLElement;
             domRadio.addEventListener("change", () => { //
                 let val = Lib.getRadio("[name='largeBtn']");
                 config.settings.layout.largeBtn = val;
@@ -772,7 +908,7 @@ class Setting {
 
         // 圖片 dpi
         addLoadEvent(() => {
-            var select_imageDpizoom = document.querySelector("#select-imageDpizoom") as HTMLInputElement;
+            var select_imageDpizoom = getDom("#select-imageDpizoom") as HTMLInputElement;
             select_imageDpizoom.value = config.settings["image"]["dpizoom"];
 
             select_imageDpizoom.addEventListener("change", () => {
@@ -784,7 +920,7 @@ class Setting {
 
         // 縮小至特定比例以下，就使用libvips重新處理圖片
         addLoadEvent(() => {
-            var select_tiefseeviewBigimgscaleRatio = document.querySelector("#select-tiefseeviewBigimgscaleRatio") as HTMLInputElement;
+            var select_tiefseeviewBigimgscaleRatio = getDom("#select-tiefseeviewBigimgscaleRatio") as HTMLInputElement;
             select_tiefseeviewBigimgscaleRatio.value = config.settings["image"]["tiefseeviewBigimgscaleRatio"].toString();
 
             select_tiefseeviewBigimgscaleRatio.addEventListener("change", () => {
@@ -797,7 +933,7 @@ class Setting {
         // 圖片 縮放模式
         addLoadEvent(() => {
 
-            /*var select_tiefseeviewImageRendering = document.querySelector("#select-tiefseeviewImageRendering") as HTMLInputElement;
+            /*var select_tiefseeviewImageRendering = getDom("#select-tiefseeviewImageRendering") as HTMLInputElement;
             select_tiefseeviewImageRendering.value = config.settings["image"]["tiefseeviewImageRendering"];
 
             select_tiefseeviewImageRendering.addEventListener("change", () => {
@@ -806,7 +942,7 @@ class Setting {
                 appleSettingOfMain();
             });*/
 
-            var switch_imageShowPixels = document.querySelector("#switch-imageShowPixels") as HTMLInputElement;
+            var switch_imageShowPixels = getDom("#switch-imageShowPixels") as HTMLInputElement;
             switch_imageShowPixels.checked = config.settings["image"]["tiefseeviewImageRendering"] == "2"
 
             switch_imageShowPixels.addEventListener("change", () => {
@@ -822,9 +958,9 @@ class Setting {
 
         //相關路徑
         addLoadEvent(() => {
-            var btn_openAppData = document.querySelector("#btn-openAppData") as HTMLElement;
-            var btn_openWww = document.querySelector("#btn-openWww") as HTMLElement;
-            var btn_openTemp = document.querySelector("#btn-openTemp") as HTMLElement;
+            var btn_openAppData = getDom("#btn-openAppData") as HTMLElement;
+            var btn_openWww = getDom("#btn-openWww") as HTMLElement;
+            var btn_openTemp = getDom("#btn-openTemp") as HTMLElement;
 
             //開啟 AppData(使用者資料)
             btn_openAppData.addEventListener("click", async () => {
@@ -852,7 +988,7 @@ class Setting {
 
         //清理暫存資料
         addLoadEvent(() => {
-            var btn_clearBrowserCache = document.querySelector("#btn-clearBrowserCache") as HTMLElement;
+            var btn_clearBrowserCache = getDom("#btn-clearBrowserCache") as HTMLElement;
 
             btn_clearBrowserCache.addEventListener("click", async () => {
                 await WV_System.DeleteAllTemp(); //立即刪除所有圖片暫存
@@ -863,7 +999,7 @@ class Setting {
 
         //資料夾數量太多時，禁用資料夾預覽視窗
         addLoadEvent(() => {
-            var select_dirListMaxCount = document.querySelector("#select-dirListMaxCount") as HTMLInputElement;
+            var select_dirListMaxCount = getDom("#select-dirListMaxCount") as HTMLInputElement;
             select_dirListMaxCount.value = config.settings["advanced"]["dirListMaxCount"] + "";
 
             select_dirListMaxCount.addEventListener("change", () => {
@@ -875,7 +1011,7 @@ class Setting {
 
         //圖片面積太大時，禁用高品質縮放
         addLoadEvent(() => {
-            var select_highQualityLimit = document.querySelector("#select-highQualityLimit") as HTMLInputElement;
+            var select_highQualityLimit = getDom("#select-highQualityLimit") as HTMLInputElement;
             select_highQualityLimit.value = config.settings["advanced"]["highQualityLimit"] + "";
 
             select_highQualityLimit.addEventListener("change", () => {
@@ -888,9 +1024,9 @@ class Setting {
         // 啟動模式 、 Port
         addLoadEvent(() => {
 
-            var text_startPort = document.querySelector("#text-startPort") as HTMLInputElement;
-            var text_serverCache = document.querySelector("#text-serverCache") as HTMLInputElement;
-            var btn_restart = document.querySelector("#btn-startupMode-restart") as HTMLButtonElement;
+            var text_startPort = getDom("#text-startPort") as HTMLInputElement;
+            var text_serverCache = getDom("#text-serverCache") as HTMLInputElement;
+            var btn_restart = getDom("#btn-startupMode-restart") as HTMLButtonElement;
 
             Lib.setRadio("[name='radio-startType']", appInfo.startType.toString())
             text_startPort.value = appInfo.startPort.toString();
@@ -934,7 +1070,7 @@ class Setting {
         //開機後自動啟動
         addLoadEvent(async () => {
 
-            var switch_autoStart = document.querySelector("#switch-autoStart") as HTMLInputElement;
+            var switch_autoStart = getDom("#switch-autoStart") as HTMLInputElement;
 
             if (appInfo.isStoreApp) { // 商店版APP
 
@@ -988,7 +1124,7 @@ class Setting {
                 });
 
                 // 開啟Windows的「啟動資料夾
-                var btn_openStartup = document.querySelector("#btn-openStartup") as HTMLElement;
+                var btn_openStartup = getDom("#btn-openStartup") as HTMLElement;
                 btn_openStartup.addEventListener("click", async () => {
                     WV_RunApp.OpenUrl(startupPath);
                 });
@@ -1012,10 +1148,10 @@ class Setting {
             if (baseWindow.appInfo !== undefined) {
 
                 //初始化 擴充套件清單
-                var dom_QuickLook = document.querySelector("#pluginLiet-QuickLook") as HTMLInputElement;
-                //var dom_NConvert = document.querySelector("#pluginLiet-NConvert") as HTMLInputElement;
-                var dom_PDFTronWebviewer = document.querySelector("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
-                var dom_MonacoEditor = document.querySelector("#pluginLiet-MonacoEditor") as HTMLInputElement;
+                var dom_QuickLook = getDom("#pluginLiet-QuickLook") as HTMLInputElement;
+                //var dom_NConvert = getDom("#pluginLiet-NConvert") as HTMLInputElement;
+                var dom_PDFTronWebviewer = getDom("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
+                var dom_MonacoEditor = getDom("#pluginLiet-MonacoEditor") as HTMLInputElement;
 
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
                 //dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
@@ -1023,8 +1159,8 @@ class Setting {
                 dom_MonacoEditor.innerHTML = getHtml(baseWindow.appInfo.plugin.MonacoEditor);
 
                 //如果未安裝QuickLook擴充套件，就顯示提示文字，並且禁止編輯
-                let dom_noInstalled = document.querySelector("#quickLook-noInstalled") as HTMLInputElement;
-                let dom_box = document.querySelector("#quickLook-box") as HTMLInputElement;
+                let dom_noInstalled = getDom("#quickLook-noInstalled") as HTMLInputElement;
+                let dom_box = getDom("#quickLook-box") as HTMLInputElement;
                 if (baseWindow.appInfo.plugin.QuickLook) {
                     dom_noInstalled.style.display = "none";
                     dom_box.style.opacity = "1";
@@ -1037,12 +1173,12 @@ class Setting {
             }
 
             //開啟「Tiefsee Plugin」頁面
-            document.querySelector("#btn-openPluginDownload")?.addEventListener("click", () => {
+            getDom("#btn-openPluginDownload")?.addEventListener("click", () => {
                 WV_RunApp.OpenUrl("https://hbl917070.github.io/aeropic/plugin.html");
             });
 
             //開啟「Plugin」資料夾
-            document.querySelector("#btn-openPluginDir")?.addEventListener("click", async () => {
+            getDom("#btn-openPluginDir")?.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDataPath();
                 path = Lib.Combine([path, "Plugin"]);
                 if (await WV_Directory.Exists(path) === false) { //如果不存在就新建
@@ -1052,7 +1188,7 @@ class Setting {
             });
 
             //重新啟動
-            let btn_restart = document.querySelector("#btn-plugin-restart") as HTMLButtonElement;
+            let btn_restart = getDom("#btn-plugin-restart") as HTMLButtonElement;
             btn_restart.addEventListener("click", () => {
                 restartTiefsee();
             });
@@ -1060,8 +1196,8 @@ class Setting {
 
         //快速預覽
         addLoadEvent(() => {
-            var switch_keyboardSpaceRun = document.querySelector("#switch-keyboardSpaceRun") as HTMLInputElement;
-            var switch_mouseMiddleRun = document.querySelector("#switch-mouseMiddleRun") as HTMLInputElement;
+            var switch_keyboardSpaceRun = getDom("#switch-keyboardSpaceRun") as HTMLInputElement;
+            var switch_mouseMiddleRun = getDom("#switch-mouseMiddleRun") as HTMLInputElement;
 
             switch_keyboardSpaceRun.checked = config.settings.quickLook.keyboardSpaceRun;
             switch_mouseMiddleRun.checked = config.settings.quickLook.mouseMiddleRun;
@@ -1082,7 +1218,7 @@ class Setting {
         //其他
         addLoadEvent(() => {
             //檔案刪除前顯示確認視窗
-            var switch_fileDeletingShowCheckMsg = document.querySelector("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
+            var switch_fileDeletingShowCheckMsg = getDom("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
             switch_fileDeletingShowCheckMsg.checked = config.settings["other"]["fileDeletingShowCheckMsg"];
 
             switch_fileDeletingShowCheckMsg.addEventListener("change", () => {
@@ -1163,7 +1299,7 @@ class Tabs {
     /**
      * 所有頁籤
      */
-    public ar: { btn: HTMLElement | null, page: HTMLElement | null, func: () => void }[] = [];
+    public ar: { btn: Element | null, page: Element | null, func: () => void }[] = [];
 
     /**
      * 
@@ -1171,7 +1307,7 @@ class Tabs {
      * @param page 
      * @param func 
      */
-    private activeEvent(btn: HTMLElement | null, page: HTMLElement | null, func: () => void) {
+    private activeEvent(btn: Element | null, page: Element | null, func: () => void) {
         for (let i = 0; i < this.ar.length; i++) {
             const item = this.ar[i];
             item.btn?.setAttribute("active", "");
@@ -1185,7 +1321,7 @@ class Tabs {
     /**
      * 顯示選擇的頁籤
      */
-    public set(btn: HTMLElement | null) {
+    public set(btn: Element | null) {
         for (let i = 0; i < this.ar.length; i++) {
             const item = this.ar[i];
             if (btn === item.btn) {
@@ -1200,7 +1336,7 @@ class Tabs {
      * @param page 
      * @param func 選中時觸發
      */
-    public add(btn: HTMLElement | null, page: HTMLElement | null, func: () => void) {
+    public add(btn: Element | null, page: Element | null, func: () => void) {
         this.ar.push({ btn, page, func })
         btn?.addEventListener("click", () => {
             this.activeEvent(btn, page, func)

@@ -158,7 +158,7 @@ class Tiefseeview {
         var temp_TiefseeviewZoomTypeVal = 100;
 
         //滑鼠滾輪做的事情
-        var eventMouseWheel = (_type: ("up" | "down"), offsetX: number, offsetY: number): void => {
+        var eventMouseWheel = (_type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number): void => {
             if (_type === "up") { zoomIn(offsetX, offsetY); }
             else { zoomOut(offsetX, offsetY); }
         }
@@ -385,9 +385,9 @@ class Tiefseeview {
             } else { //一般的滑鼠滾輪
                 //縮放計算
                 if (e.deltaX < 0 || e.deltaY < 0) { //往上
-                    eventMouseWheel("up", e.offsetX * dpizoom, e.offsetY * dpizoom);
+                    eventMouseWheel("up", e, e.offsetX * dpizoom, e.offsetY * dpizoom);
                 } else { //往下
-                    eventMouseWheel("down", e.offsetX * dpizoom, e.offsetY * dpizoom);
+                    eventMouseWheel("down", e, e.offsetX * dpizoom, e.offsetY * dpizoom);
                 }
             }
 
@@ -2128,7 +2128,7 @@ class Tiefseeview {
          * 覆寫 滑鼠滾輪的事件
          * @param _func 
          */
-        function setEventMouseWheel(_func: (_type: ("up" | "down"), offsetX: number, offsetY: number) => {}) {
+        function setEventMouseWheel(_func: (_type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => void) {
             eventMouseWheel = _func;
         }
 
