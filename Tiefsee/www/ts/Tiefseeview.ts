@@ -328,11 +328,11 @@ class Tiefseeview {
                 zoomIn(ev.center.x, ev.center.y, (ev.scale / temp_pinchZoom), TiefseeviewImageRendering["pixelated"]);
 
                 //根據中心點的位移來拖曳圖片
-                setXY(
+                /*setXY(
                     toNumber(dom_con.style.left) - (temp_pinchCenterX - ev.center.x),
                     toNumber(dom_con.style.top) - (temp_pinchCenterY - ev.center.y),
                     0
-                );
+                );*/
                 temp_pinchZoom = ev.scale;
                 temp_pinchCenterX = ev.center.x;
                 temp_pinchCenterY = ev.center.y;
@@ -366,7 +366,7 @@ class Tiefseeview {
 
                     if (e.ctrlKey === true) {
                         let scale = 1 - e.deltaY * 0.01; //無法使用
-                        zoomIn(e.offsetX * dpizoom, e.offsetY * dpizoom, (scale), TiefseeviewImageRendering["pixelated"]);
+                        zoomIn(e.offsetX, e.offsetY, (scale), TiefseeviewImageRendering["pixelated"]);
 
                     } else {
 
@@ -385,9 +385,9 @@ class Tiefseeview {
             } else { //一般的滑鼠滾輪
                 //縮放計算
                 if (e.deltaX < 0 || e.deltaY < 0) { //往上
-                    eventMouseWheel("up", e, e.offsetX * dpizoom, e.offsetY * dpizoom);
+                    eventMouseWheel("up", e, e.offsetX, e.offsetY);
                 } else { //往下
-                    eventMouseWheel("down", e, e.offsetX * dpizoom, e.offsetY * dpizoom);
+                    eventMouseWheel("down", e, e.offsetX, e.offsetY);
                 }
             }
 
@@ -1956,7 +1956,7 @@ class Tiefseeview {
          * @param _type 縮放類型
          * @param _val 附加參數，例如以px或%進行縮放時，必須另外傳入number
          */
-        function zoomFull(_type: TiefseeviewZoomType, _val?: number): void {
+        function zoomFull(_type: TiefseeviewZoomType, _val?: number, _x?: number, _y?: number): void {
 
             //圖片隨視窗縮放
             temp_TiefseeviewZoomType = _type;
@@ -1970,19 +1970,26 @@ class Tiefseeview {
                 temp_zoomWithWindow = false;
             }
 
-            let _w = getZoomFull_width(_type, _val);
-            setDataSize(_w);
+            if (_type === TiefseeviewZoomType["imageOriginal"]) {
+                let tatio = getOriginalWidth() / dom_con.offsetWidth;
+                if (_x !== undefined && _y !== undefined) {
+                    zoomIn(_x, _y, tatio);
+                } else {
+                    zoomIn(undefined, undefined, tatio);
+                }
+            } else {
+                let _w = getZoomFull_width(_type, _val);
+                setDataSize(_w);
+                setXY(
+                    (toNumber(dom_con.style.left)) * 0,
+                    (toNumber(dom_con.style.top)) * 0,
+                    0
+                );
+                init_point(false);
+                eventChangeZoom(getZoomRatio());
+                setRendering(rendering);
+            }
 
-            setXY(
-                (toNumber(dom_con.style.left)) * 0,
-                (toNumber(dom_con.style.top)) * 0,
-                0
-            );
-
-            init_point(false);
-            eventChangeZoom(getZoomRatio());
-
-            setRendering(rendering);
         }
         /** 取得縮放圖片後的 縮放比例 */
         function getZoomFull_scale(_type: TiefseeviewZoomType, _val?: number) {
@@ -2068,8 +2075,8 @@ class Tiefseeview {
         function zoomIn(_x?: number, _y?: number, _zoomRatio?: number, _rendering?: TiefseeviewImageRendering) {
 
             //未填入參數則從中央進行縮放
-            if (_x === undefined) { _x = dom_dpizoom.offsetWidth / 2; }
-            if (_y === undefined) { _y = dom_dpizoom.offsetHeight / 2; }
+            if (_x === undefined) { _x = dom_dpizoom.offsetWidth / 2; } else { _x *= dpizoom; }
+            if (_y === undefined) { _y = dom_dpizoom.offsetHeight / 2; } else { _y *= dpizoom; }
 
             //未填入縮放比例，就是用預設縮放比例
             if (_zoomRatio === undefined) { _zoomRatio = zoomRatio }
@@ -2272,7 +2279,7 @@ class Tiefseeview {
          * @param bool true=水平鏡像、false=原始狀態 
          * @param boolAnimation 是否使用動畫
          */
-        async function setMirrorHorizontal(bool: boolean, boolAnimation: boolean = true) {
+        async function setMirrorHorizontal(bool: boolean, _x?: number, _y?: number) {
 
             if (degNow != 0) {
                 setDeg(360 - degNow, undefined, undefined, true); //先旋轉成鏡像後的角度
@@ -2281,9 +2288,19 @@ class Tiefseeview {
             mirrorHorizontal = bool;
             eventChangeMirror(mirrorHorizontal, mirrorVertical);
 
+            let x;
+            let y;
+            if (_x !== undefined && _y !== undefined) {
+                x = _x * dpizoom;
+                y = _y * dpizoom;
+            } else {
+                x = (dom_dpizoom.offsetWidth / 2);
+                y = (dom_dpizoom.offsetHeight / 2);
+            }
+
             //取得顯示範圍的中心點
-            let left = -toNumber(dom_con.style.left) + (dom_dpizoom.offsetWidth / 2);
-            let top = -toNumber(dom_con.style.top) + (dom_dpizoom.offsetHeight / 2);
+            let left = -toNumber(dom_con.style.left) + x;
+            let top = -toNumber(dom_con.style.top) + y;
 
             //計算鏡像後的坐標
             left = dom_data.getBoundingClientRect().width - left;
@@ -2300,13 +2317,15 @@ class Tiefseeview {
             top = rotateRect.y;
 
             //轉換成定位用的值，並移動回中心點
-            top = -top + (dom_dpizoom.offsetHeight / 2)
-            left = -left + (dom_dpizoom.offsetWidth / 2)
+            left = -left + x;
+            top = -top + y;
 
             await setTransform(undefined, undefined, false);
 
             setXY(left, top, 0);
-            //init_point(false);
+            if (getIsOverflowX() === false) { //在圖片有捲動軸且指定坐標來鏡像時，允許超出視窗
+                init_point(false);
+            }
         }
 
         /**
@@ -2319,7 +2338,7 @@ class Tiefseeview {
          * @param bool true=垂直鏡像、false=原始狀態 
          * @param boolAnimation 是否使用動畫
          */
-        async function setMirrorVertica(bool: boolean, boolAnimation: boolean = true) {
+        async function setMirrorVertica(bool: boolean, _x?: number, _y?: number) {
 
             if (degNow != 0) {
                 setDeg(360 - degNow, undefined, undefined, true); //先旋轉成鏡像後的角度
@@ -2328,9 +2347,18 @@ class Tiefseeview {
             mirrorVertical = bool;
             eventChangeMirror(mirrorHorizontal, mirrorVertical);
 
+            let x;
+            let y;
+            if (_x !== undefined && _y !== undefined) {
+                x = _x * dpizoom;
+                y = _y * dpizoom;
+            } else {
+                x = (dom_dpizoom.offsetWidth / 2);
+                y = (dom_dpizoom.offsetHeight / 2);
+            }
             //取得顯示範圍的中心點
-            let left = -toNumber(dom_con.style.left) + (dom_dpizoom.offsetWidth / 2);
-            let top = -toNumber(dom_con.style.top) + (dom_dpizoom.offsetHeight / 2);
+            let left = -toNumber(dom_con.style.left) + x;
+            let top = -toNumber(dom_con.style.top) + y;
 
             //計算鏡像後的坐標
             //left = dom_data.getBoundingClientRect().width - left;
@@ -2347,12 +2375,15 @@ class Tiefseeview {
             top = rotateRect.y;
 
             //轉換成定位用的值，並移動回中心點
-            top = -top + (dom_dpizoom.offsetHeight / 2)
-            left = -left + (dom_dpizoom.offsetWidth / 2)
+            left = -left + x;
+            top = -top + y;
 
             await setTransform(undefined, undefined, false);
 
             setXY(left, top, 0);
+            if (getIsOverflowY() === false) { //在圖片有捲動軸且指定坐標來鏡像時，允許超出視窗
+                init_point(false);
+            }
         }
 
         /**

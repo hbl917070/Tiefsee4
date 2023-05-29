@@ -27,7 +27,9 @@ class Script {
         this.bulkView = new ScriptBulkView(M);
     }
 
-    public async run(s: string) {
+    public async run(s: string, option?: { x?: number, y?: number }) {
+
+        if (option === undefined) { option = {} }
 
         if (s === "imageFitWindowOrImageOriginal") { //縮放至適合視窗 或 圖片原始大小
             this.img.fitWindowOrImageOriginal();
@@ -36,25 +38,25 @@ class Script {
             this.img.zoomToFit();
         }
         if (s === "imageOriginal") { //圖片原始大小
-            this.img.zoomTo100();
+            this.img.zoomTo100(option.x, option.y);
         }
         if (s === "imageZoomIn") { //放大
-            this.img.zoomIn();
+            this.img.zoomIn(option.x, option.y);
         }
         if (s === "imageZoomOut") { //縮小
-            this.img.zoomOut();
+            this.img.zoomOut(option.x, option.y);
         }
         if (s === "imageRotateCw") { //順時針90°
-            this.img.degForward();
+            this.img.degForward(option.x, option.y);
         }
         if (s === "imageRotateCcw") { //逆時針90°
-            this.img.degReverse();
+            this.img.degReverse(option.x, option.y);
         }
         if (s === "imageFlipHorizontal") { //水平鏡像
-            this.img.mirrorHorizontal();
+            this.img.mirrorHorizontal(option.x, option.y);
         }
         if (s === "imageFlipVertical") { //垂直鏡像
-            this.img.mirrorVertica();
+            this.img.mirrorVertica(option.x, option.y);
         }
         if (s === "imageInitialRotation") { //圖初始化旋轉
             this.img.transformRefresh();
@@ -241,9 +243,9 @@ class ScriptImg {
     }
 
     /** 原始大小 */
-    public zoomTo100() {
+    public zoomTo100(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"], undefined, x, y);
     }
 
     /** 縮放至適合視窗 或 圖片原始大小 */
@@ -253,27 +255,27 @@ class ScriptImg {
     }
 
     /** 順時針90° */
-    public degForward() {
+    public degForward(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.setDegForward(undefined, undefined);
+        this.M.fileShow.tiefseeview.setDegForward(x, y);
     }
 
     /** 逆時針90° */
-    public degReverse() {
+    public degReverse(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.setDegReverse(undefined, undefined);
+        this.M.fileShow.tiefseeview.setDegReverse(x, y);
     }
 
     /** 水平鏡像 */
-    public mirrorHorizontal() {
+    public mirrorHorizontal(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.setMirrorHorizontal(!this.M.fileShow.tiefseeview.getMirrorHorizontal());
+        this.M.fileShow.tiefseeview.setMirrorHorizontal(!this.M.fileShow.tiefseeview.getMirrorHorizontal(), x, y);
     }
 
     /** 垂直鏡像 */
-    public mirrorVertica() {
+    public mirrorVertica(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.setMirrorVertica(!this.M.fileShow.tiefseeview.getMirrorVertica())
+        this.M.fileShow.tiefseeview.setMirrorVertica(!this.M.fileShow.tiefseeview.getMirrorVertica(), x, y)
     }
 
     /** 初始化旋轉 */
@@ -283,15 +285,15 @@ class ScriptImg {
     }
 
     /** 放大 */
-    public zoomIn() {
+    public zoomIn(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomIn();
+        this.M.fileShow.tiefseeview.zoomIn(x, y);
     }
 
     /** 縮小 */
-    public zoomOut() {
+    public zoomOut(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomOut();
+        this.M.fileShow.tiefseeview.zoomOut(x, y);
     }
 
     /** 向特定方向移動圖片 */

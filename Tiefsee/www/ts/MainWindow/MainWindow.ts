@@ -270,12 +270,20 @@ class MainWindow {
                 if (type === 4) { //按鍵5
                     sc = config.settings.mouse.mouseButton5;
                 }
-                script.run(sc);
+
+                //let offsetX = e.offsetX;
+                //let offsetY = e.offsetY;
+                let offsetX = e.x - fileShow.dom_imgview.getBoundingClientRect().left;
+                let offsetY = e.y - fileShow.dom_imgview.getBoundingClientRect().top;
+                script.run(sc, { x: offsetX, y: offsetY });
             })
 
             //雙擊左鍵
-            Lib.addEventDblclick(fileShow.dom_imgview, async () => { //圖片物件
-                script.run(config.settings.mouse.leftDoubleClick);
+            Lib.addEventDblclick(fileShow.dom_imgview, async (e: MouseEvent) => { //圖片物件
+                let sc = config.settings.mouse.leftDoubleClick;
+                let offsetX = e.x - fileShow.dom_imgview.getBoundingClientRect().left;
+                let offsetY = e.y - fileShow.dom_imgview.getBoundingClientRect().top;
+                script.run(sc, { x: offsetX, y: offsetY });
             });
 
             //覆寫滾動事件
@@ -304,13 +312,7 @@ class MainWindow {
                     }
                 }
 
-                if (sc === "imageZoomIn") { //放大
-                    fileShow.tiefseeview.zoomIn(offsetX, offsetY);
-                } else if (sc === "imageZoomOut") { //縮小
-                    fileShow.tiefseeview.zoomOut(offsetX, offsetY);
-                } else {
-                    script.run(sc);
-                }
+                script.run(sc, { x: offsetX, y: offsetY });
             });
 
             //#endregion

@@ -200,6 +200,7 @@ class Config {
                 { "n": "dragDropFile", "v": true },
                 { "n": "showDeleteMsg", "v": true },
                 { "n": "showMenuImageSearch", "v": true },
+                { "n": "bulkView", "v": true },
                 { "n": "showSetting", "v": true },
                 { "n": "showMenuRotation", "v": true },
                 { "n": "zoomToFit", "v": true }
@@ -303,7 +304,7 @@ class Config {
 
         /** 滑鼠 */
         mouse: {
-            leftDoubleClick: "fullScreen",
+            leftDoubleClick: "maximizeWindow",
             scrollWheelButton: "none",
             mouseButton4: "prevFile",
             mouseButton5: "nextFile",
