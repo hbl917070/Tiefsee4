@@ -897,6 +897,20 @@ var langData = {
             },
         },
 
+        // 重設設定
+        reset: {
+            resetSettings: {
+                "zh-TW": "重設設定",
+                "en": "Reset settings",
+                "ja": "設定をリセット",
+            },
+            restoreDefaultSettings: {
+                "zh-TW": "將設定還原為其預設值",
+                "en": "Restore default settings",
+                "ja": "デフォルト設定に戻す",
+            },
+        },
+
         // Tiefsee 伺服器
         localhostServer: {
             port: {
@@ -1613,7 +1627,6 @@ var langData = {
         },
         //#endregion
 
-
         //#region copy
         copyFile: {
             "zh-TW": "已將「檔案」複製至剪貼簿",
@@ -1690,7 +1703,6 @@ var langData = {
         },
         //#endregion
 
-
         //#region 刪除檔案
         deleteFile: {
             "zh-TW": "刪除檔案",
@@ -1729,7 +1741,6 @@ var langData = {
         },
         //#endregion
 
-
         //#region 搜圖
         imageSearchFailed: {
             "zh-TW": "圖片搜尋失敗",
@@ -1737,7 +1748,6 @@ var langData = {
             "ja": "画像検索に失敗",
         },
         //#endregion
-
 
         //#region setting
         associationExtension: {
@@ -1775,6 +1785,12 @@ var langData = {
             "zh-TW": "變更失敗，此設定被使用者禁用",
             "en": "Change failed, this setting is disabled by the user",
             "ja": "変更に失敗しました。この設定はユーザーによって無効にされています",
+        },
+
+        resetSettings: {
+            "zh-TW": "確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)",
+            "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and file sorting)",
+            "ja": "Tiefseeのすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
         },
         //#endregion
     },
@@ -2161,8 +2177,8 @@ var langData = {
             "en": "Move Image Left or Next File",
             "ja": "画像を左に移動 or 次のファイル"
         },
-        
-      
+
+
         //#endregion
 
         //#region 檔案

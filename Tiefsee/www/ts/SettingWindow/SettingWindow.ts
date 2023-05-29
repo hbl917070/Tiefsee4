@@ -25,6 +25,9 @@ class SettingWindow {
         i18n.pushData(langData);
         var msgbox = new Msgbox(i18n);
 
+        /** 初始設定 */
+        var defaultConfig = new Config(baseWindow).settings;
+
         var loadEvent: (() => void)[] = [];
         /**
          * 讀取設定完成後執行的工作
@@ -34,8 +37,8 @@ class SettingWindow {
             loadEvent.push(func);
         }
 
-        function getDom(id: string) {
-            return document.querySelector(id);
+        function getDom(selectors: string) {
+            return document.querySelector(selectors);
         }
 
         //initDomImport(); //初始化圖示
@@ -128,7 +131,7 @@ class SettingWindow {
             });
 
             //getDom("input")?.focus();
-            getDom("input")?.blur(); //失去焦點
+            //getDom("input")?.blur(); //失去焦點
         }
 
         //初始化多國語言
@@ -775,11 +778,9 @@ class SettingWindow {
                 htmlString += `</optgroup>`;
             }
 
-
             arDom.forEach(item => {
 
                 let dom = item.dom;
-                //let config = item.config;
 
                 //初始化設定值
                 dom.innerHTML = htmlString;
@@ -1067,6 +1068,46 @@ class SettingWindow {
 
         })
 
+
+
+        //重設設定 
+        addLoadEvent(() => {
+
+            var btn_resetSettings = getDom("#btn-resetSettings") as HTMLElement;
+            btn_resetSettings.addEventListener("click", async (e) => {
+
+                msgbox.show({
+                    txt: i18n.t("msg.resetSettings"),  //確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)
+
+                    funcYes: async (dom: HTMLElement, inputTxt: string) => {
+                        msgbox.close(dom);
+                 
+                        config.settings = defaultConfig;
+
+                        //啟動模式
+                        Lib.setRadio("[name='radio-startType']", "3");
+
+                        //Port
+                        let text_startPort = getDom("#text-startPort") as HTMLInputElement;
+                        text_startPort.value = "4876";
+
+                        //開機後自動啟動
+                        var switch_autoStart = getDom("#switch-autoStart") as HTMLInputElement;
+                        switch_autoStart.checked = false;
+                        switch_autoStart.dispatchEvent(new Event("change"));
+                       
+                        await Lib.sleep(300);
+
+                        await WV_System.DeleteAllTemp(); //立即刪除所有圖片暫存
+                        await WV_Window.ClearBrowserCache(); //清理webview2的暫存
+        
+                        restartTiefsee(); //重新啟動 Tiefsee
+                    }
+                });
+            });
+
+        })
+
         //開機後自動啟動
         addLoadEvent(async () => {
 
@@ -1129,10 +1170,6 @@ class SettingWindow {
                     WV_RunApp.OpenUrl(startupPath);
                 });
             }
-
-
-
-
         })
 
         //擴充套件 
@@ -1261,7 +1298,7 @@ class SettingWindow {
             appleSettingOfMain(); //將設定套用至 mainwiwndow
 
             //儲存 setting.json
-            let s = JSON.stringify(config.settings, null, '\t');
+            let s = JSON.stringify(config.settings, null, "\t");
             var path = await WV_Window.GetAppDataPath(); //程式的暫存資料夾
             path = Lib.Combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
