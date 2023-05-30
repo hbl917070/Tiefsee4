@@ -42,13 +42,20 @@ namespace Tiefsee {
 
         public static void Init() {
 
-            try { //如果是商店版
+            try { //商店版
                 appData = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
                 appData = Path.Combine(appData, "Local", "Tiefsee");
                 StartWindow.isStoreApp = true;
 
             } catch { //傳統應用程式版
-                appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
+
+                string portableMode = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "portableMode");
+                if (Directory.Exists(portableMode)) { //便攜模式 (如果存在此資料夾，就把資料儲存在這裡
+                    appData = portableMode;
+                } else {
+                    appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
+                }
+
                 StartWindow.isStoreApp = false;
             }
 
@@ -99,10 +106,6 @@ namespace Tiefsee {
                 Directory.CreateDirectory(appDataPlugin);
             }
         }
-
-
-
-
 
 
     }
