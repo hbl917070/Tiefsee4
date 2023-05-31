@@ -296,8 +296,7 @@ var langData = {
             tooltip_2: {
                 "zh-TW": "所有的 Tiefsee 共用同一個執行個體。只要 Tiefsee 的視窗尚未全部關閉，就能快速啟動 Tiefsee",
                 "en": "All Tiefsee window share the same instances. As long as the Tiefsee window is not all closed, you can quickly startup Tiefsee",
-                "ja": `
-                    すべての Tiefsee ウィンドウは同じインスタンスを共有しています。Tiefsee ウィンドウが閉じていない限り、Tiefsee を高速起動することができます`,
+                "ja": `すべての Tiefsee ウィンドウは同じインスタンスを共有しています。Tiefsee ウィンドウが閉じていない限り、Tiefsee を高速起動することができます`,
             },
             tooltip_3: {
                 "zh-TW": "所有視窗共用同一個執行個體。Tiefsee 會常駐在背景，隨時都能以極快的速度啟動",
@@ -1789,8 +1788,8 @@ var langData = {
 
         resetSettings: {
             "zh-TW": "確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)",
-            "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and file sorting)",
-            "ja": "Tiefseeのすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
+            "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and File Sorting)",
+            "ja": "Tiefsee のすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
         },
         //#endregion
     },

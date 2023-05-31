@@ -84,13 +84,5 @@
 		<Content Remove="www\ts\**" />
 		<Content Remove="www\scss\**" />
 	</ItemGroup>
-	
-	<!--  避免重複複製 Magick -->
-	<PropertyGroup>
-		<MagickCopyNativeWindows>false</MagickCopyNativeWindows>
-		<MagickCopyNativeLinux>false</MagickCopyNativeLinux>
-		<MagickCopyNativeLinuxMusl>false</MagickCopyNativeLinuxMusl>
-		<MagickCopyNativeMacOS>false</MagickCopyNativeMacOS>
-	</PropertyGroup>
-	
+		
 </Project>
