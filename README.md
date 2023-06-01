@@ -44,9 +44,13 @@ Tiefsee 是一款開源的圖片檢視器
 ## 程式截圖
 ![](https://cdn.discordapp.com/attachments/896768892003823627/1113369753160011826/2023-05-29_22-46-03.png)
 
+![](https://cdn.discordapp.com/attachments/896768892003823627/1079441646439104532/GIF_2023-2-26_11-04-49.gif)
+
 ![](https://cdn.discordapp.com/attachments/896768892003823627/1102959644990767144/ezgif-3-9a6f5460a7.webp)
 
 ![](https://cdn.discordapp.com/attachments/896768892003823627/1113369952985022544/2023-05-29_22-07-57.png)
+
+
 
 <br>
 
@@ -74,7 +78,7 @@ Tiefsee 是一款開源的圖片檢視器
 
 
 ### 4、在觸控螢幕上以觸控來移動Tiefsee視窗時，流暢度不佳
-> WebView2 會將「觸控指令」攔截，導致無法使用 winAPI 來移動視窗。目前尚無解決方案。
+ WebView2 會將「觸控指令」攔截，導致無法使用 winAPI 來移動視窗。目前尚無解決方案。
 
 <br>
 
