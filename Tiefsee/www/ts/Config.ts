@@ -45,6 +45,8 @@ class Config {
             { name: "XnConvert", type: ["img"] },
             { name: "FotoSketcher", type: ["img"] },
             { name: "PhoXo", type: ["img"] },
+            { name: "ScreenSketch", type: ["img"] }, //Windows的剪裁工具
+            { name: "imageGlass", type: ["img"] },
         ]
     }
 

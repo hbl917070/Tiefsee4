@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,6 +11,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Animation;
+using Windows.Management.Deployment;
 
 namespace Tiefsee {
 
@@ -19,7 +23,7 @@ namespace Tiefsee {
         public WV_RunApp(WebWindow m) {
             this.M = m;
         }
-
+        public WV_RunApp() { }
 
         /// <summary>
         /// 以其他程式開啟(系統原生選單)
@@ -114,11 +118,96 @@ namespace Tiefsee {
             var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
             if (file != null) {
                 var options = new Windows.System.LauncherOptions();
-                options.TargetApplicationPackageFamilyName = "Microsoft.Windows.Photos_8wekyb3d8bbwe";
+                options.TargetApplicationPackageFamilyName = "60852WEN-HONGLIAO.Tiefsee_zgbpcvardp742";
                 await Windows.System.Launcher.LaunchFileAsync(file, options);
             }
         }
 
+
+        /// <summary>
+        /// 以UWP開啟檔案
+        /// </summary>
+        /// <param name="uwpId"> 例如 Microsoft.ScreenSketch_8wekyb3d8bbwe </param>
+        /// <param name="filePath"></param>
+        async public void RunUwp(string uwpId , string filePath) {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
+            if (file != null) {
+                var options = new Windows.System.LauncherOptions();
+                options.TargetApplicationPackageFamilyName = uwpId;
+                await Windows.System.Launcher.LaunchFileAsync(file, options);
+            }
+        }
+
+
+        class UwpItem {
+            public string Logo;
+            public string Name;
+            public string Id;
+        }
+
+        private static Dictionary<string, UwpItem> temp_UwpItem = null;
+        /// <summary>
+        /// 取得UWP列表
+        /// </summary>
+        public string GetUwpList() {
+
+            bool isFirstRun = false; 
+            if (temp_UwpItem == null) { //判斷是否為首次執行
+                isFirstRun = true;     
+                try {
+                    //如果存在 UwpList.json 的暫存檔，就讀取此檔案
+                    string jsonString = "{}";
+                    if (File.Exists(AppPath.appDataUwpList)) {
+                        using (StreamReader sr = new StreamReader(AppPath.appDataUwpList, Encoding.UTF8)) {
+                            jsonString = sr.ReadToEnd();
+                        }
+                    }
+                    JObject jsonObj = JObject.Parse(jsonString);
+                    temp_UwpItem = jsonObj.ToObject<Dictionary<string, UwpItem>>();
+                } catch (Exception) {
+                    temp_UwpItem = new Dictionary<string, UwpItem>();
+                }
+            }
+
+            Dictionary<string, UwpItem> temp_appDataUwpList = new Dictionary<string, UwpItem>();
+            List<UwpItem> ar = new List<UwpItem>();
+            var packageManager = new PackageManager();
+            var packages = packageManager.FindPackagesForUser("");
+            foreach (var package in packages) {
+
+                string fullName = package.Id.FullName; //名稱+版本
+
+                //如果暫存不存在此筆資料，則重新抓資料
+                if (temp_UwpItem.ContainsKey(fullName) == false) {
+                    string name = package.DisplayName; //APP在地化的名稱 (取得成本高)
+                    string logo = package.Logo.ToString(); //圖示的路徑 (取得成本高)
+                    string id = package.Id.Name + "_" + package.Id.PublisherId;
+                    UwpItem uwpItem = new UwpItem {
+                        Logo = logo,
+                        Name = name,
+                        Id = id
+                    };
+                    temp_UwpItem.Add(fullName, uwpItem);
+                }
+
+                if (isFirstRun) {
+                    temp_appDataUwpList.Add(fullName, temp_UwpItem[fullName]);
+                }
+
+                ar.Add(temp_UwpItem[fullName]);
+            }
+
+            //如果是首次執行，就產生暫存檔，減少下次讀取的時間
+            if (isFirstRun) {
+                using (FileStream fs = new FileStream(AppPath.appDataUwpList, FileMode.Create)) {
+                    using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8)) {
+                        sw.Write(JsonConvert.SerializeObject(temp_appDataUwpList));
+                    }
+                }
+            }
+
+            return JsonConvert.SerializeObject(ar);
+        }
 
         /// <summary>
         /// 以 photos APP開啟(已失效)

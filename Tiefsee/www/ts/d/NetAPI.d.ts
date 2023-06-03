@@ -495,6 +495,9 @@ interface WV_RunApp {
     /** 以3D小畫家開啟 */
     Open3DMSPaint(path: string): void;
 
+    /** 以UWP開啟檔案 */
+    RunUwp(uwpId: string, filePath: string): void;
+
     /**
      * 執行其他程式
      * @param FileName 執行檔路徑

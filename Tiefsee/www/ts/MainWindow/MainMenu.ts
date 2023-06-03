@@ -152,7 +152,6 @@ class MainMenu {
                 }
             }
 
-
             //另開視窗
             var dom_newWindow = document.getElementById("menuitem-openNewWindow");
             if (dom_newWindow !== null) {
@@ -217,7 +216,7 @@ class MainMenu {
             }
 
             //以3D小畫家開啟
-            var dom_Open3DMSPaint = document.getElementById("menuitem-open3DMSPaint");
+            /*var dom_Open3DMSPaint = document.getElementById("menuitem-open3DMSPaint");
             if (dom_Open3DMSPaint !== null) {
                 dom_Open3DMSPaint.onclick = async () => {
                     M.menu.close(); //關閉menu
@@ -226,12 +225,13 @@ class MainMenu {
                 if (await WV_System.IsWindows10() === false) { //不是win10就隱藏
                     dom_Open3DMSPaint.style.display = "none";
                 }
-            }
+            }*/
 
 
             //以第三方程式開啟
             var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
-            (async () => {
+            //讀取開始選單裡面的捷徑
+            async function funcExe() {
 
                 let arExe: { path: string, name: string, type: string }[] = [];
 
@@ -290,8 +290,55 @@ class MainMenu {
                     dom_menuOtherAppOpen?.append(dom);
                 }
 
-            })();
+            }
+            //讀取UWP列表
+            async function funcUwp() {
+                let arUwp: { id: string, path: string, name: string, type: string }[] = [];
 
+                //加入uw[]
+                let arLnk = await WebAPI.getUwpList();
+                for (let i = 0; i < arLnk.length; i++) {
+                    const uwpItem = arLnk[i];
+
+                    for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
+                        const item = M.config.otherAppOpenList.startMenu[j];
+                        if (uwpItem.Name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1 ||
+                            uwpItem.Id.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
+                            if (arUwp.some(e => e.id === uwpItem.Id) === false) {
+                                arUwp.push({ id: uwpItem.Id, path: uwpItem.Logo, name: uwpItem.Name, type: item.type.join(",") });
+                            }
+                        }
+                    }
+                }
+
+                for (let i = 0; i < arUwp.length; i++) {
+
+                    const uwpItem = arUwp[i];
+                    let name = uwpItem.name; //顯示的名稱
+                    let logo = uwpItem.path;
+                    console.log(uwpItem)
+                    let dom = Lib.newDom(`
+                        <div class="menu-hor-item">
+                            <div class="menu-hor-icon">
+                                <img src="${logo}">
+                            </div>
+                            <div class="menu-hor-txt">${name}</div>
+                        </div>
+                    `);
+
+                    dom.onclick = async () => {
+                        let filePath = await M.fileLoad.getFileShortPath(); //目前顯示的檔案
+                        if (await WV_File.Exists(filePath) === false) { return; }
+                        M.menu.close(); //關閉menu
+                        WV_RunApp.RunUwp(uwpItem.id, filePath); //開啟檔案
+                    };
+                    dom_menuOtherAppOpen?.append(dom);
+                }
+            }
+            setTimeout(async () => {
+                await funcUwp();
+                await funcExe();
+            }, 10);
         }
 
 

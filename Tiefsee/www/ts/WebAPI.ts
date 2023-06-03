@@ -326,7 +326,6 @@ class WebAPI {
     * 取得多筆檔案基本資料
     */
     static async getFileInfo2List(arPath: string[]) {
-
         let url = APIURL + "/api/getFileInfo2List";
         let postData = { ar: arPath };
         let retAr = await WebAPI.sendPost(url, postData);
@@ -334,5 +333,16 @@ class WebAPI {
             retAr[i].FullPath = retAr[i].Path;
         }
         return retAr;
+    }
+
+    
+    /**
+     * 取得UWP列表
+     */
+    static async getUwpList() {
+        let url = APIURL + "/api/getUwpList";
+        let postData = {};
+        let ret = await WebAPI.sendPost(url, postData);
+        return ret as { Logo: string, Name: string, Id: string }[];
     }
 }

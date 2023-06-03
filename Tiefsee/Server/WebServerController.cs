@@ -33,6 +33,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getFileIcon", getFileIcon);
             webServer.RouteAdd("/api/getFileInfo2", getFileInfo2);
             webServer.RouteAdd("/api/getFileInfo2List", getFileInfo2List);
+            webServer.RouteAdd("/api/getUwpList", getUwpList);
 
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
@@ -436,13 +437,8 @@ namespace Tiefsee {
         /// 
         /// </summary>
         private void getFileInfo2List(RequestData d) {
-
-            //string path = d.args["path"];
-            //path = Uri.UnescapeDataString(path);
-
             string postData = d.postData;
             var json = JObject.Parse(postData);
-
             string[] ar = json["ar"].ToObject<string[]>();
             WV_File wvf = new WV_File();
             FileInfo2[] arFileInfo2 = new FileInfo2[ar.Length];
@@ -455,6 +451,15 @@ namespace Tiefsee {
             WriteString(d, srtStrJson); //回傳
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void getUwpList(RequestData d) {
+            WV_RunApp wv = new WV_RunApp();
+            string srtStrJson = wv.GetUwpList();
+            WriteString(d, srtStrJson); //回傳
+        }
 
         /// <summary>
         /// 

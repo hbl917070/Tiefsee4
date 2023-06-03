@@ -26,6 +26,8 @@ namespace Tiefsee {
         /// <summary> Strting.json </summary>
         public static string appDataSetting;
 
+        /// <summary> UWP 列表 </summary>
+        public static string appDataUwpList;
 
         /// <summary> 暫存資料夾 - 處理過的圖片(原始大小) </summary>
         public static string tempDirImgProcessed = "";
@@ -64,6 +66,7 @@ namespace Tiefsee {
             appDataPort = Path.Combine(appData, "Port");
             appDataPlugin = Path.Combine(appData, "Plugin");
             appDataSetting = Path.Combine(appData, "Setting.json");
+            appDataUwpList = Path.Combine(appData, "UwpList.json");
 
             tempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed");
             tempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom");
