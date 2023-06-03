@@ -82,7 +82,11 @@
   border-radius: 0;
 }
 //下面的距離
-@for $i from 0 through 10 {
+.bulkView-content[gaplessMode="0"]:is([columns="1"], [columns="2"])
+  .bulkView-item {
+  margin-bottom: -1px !important;
+}
+@for $i from 1 through 10 {
   .bulkView-content[gaplessMode="#{$i*10}"]:is([columns="1"], [columns="2"])
     .bulkView-item {
     margin-bottom: $i * 10px !important;
