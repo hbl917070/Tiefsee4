@@ -1465,7 +1465,9 @@ namespace ShellTestApp {
                 m_hookType,
                 m_filterFunc,
                 IntPtr.Zero,
-                (int)AppDomain.GetCurrentThreadId());
+                //(int)AppDomain.GetCurrentThreadId()
+                System.Threading.Thread.CurrentThread.ManagedThreadId
+            );
         }
         // ************************************************************************
 

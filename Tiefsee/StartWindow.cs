@@ -21,25 +21,27 @@ namespace Tiefsee {
         /// <summary> 是否為商店版APP </summary>
         public static bool isStoreApp = false;
 
-        public StartWindow() {
+        FileStream fsPort;
 
+        public StartWindow() {
+ 
             Adapter.Initialize();
             Plugin.Init();
 
-            LockPort(); //寫入檔案，表示此port已經被佔用
+            PortLock(); //寫入檔案，表示此port已經被佔用
             CheckWebView2(); //檢查是否有webview2執行環境
-     
-            //--------------
 
+            //--------------
+            
             this.Opacity = 0;
             this.ShowInTaskbar = false;
-
+           
             this.Shown += (sender, e) => {
                 this.Hide();
                 if (Program.startType == 3) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
-
+                
                 if (Program.startType == 5) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
@@ -127,19 +129,32 @@ namespace Tiefsee {
         /// 寫入檔案，表示此port已經被佔用
         /// </summary>
         /// <param name="post"></param>
-        public void LockPort() {
-            int port = Program.webServer.port;
-
+        public void PortLock() {
+            
             if (Directory.Exists(AppPath.appDataPort) == false) { //如果資料夾不存在，就新建
                 Directory.CreateDirectory(AppPath.appDataPort);
             }
 
+            int port = Program.webServer.port;
             string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
             if (File.Exists(portFile) == false) {
-                using (FileStream fs = new FileStream(portFile, FileMode.Create)) { }
+                 fsPort = new FileStream(portFile, FileMode.Create);
             }
         }
 
+
+        /// <summary>
+        /// 刪除檔案，表示此post已經釋放
+        /// </summary>
+        /// <param name="post"></param>
+        public void PortFreed() {
+            fsPort.Close();
+            int port = Program.webServer.port;
+            string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
+            if (File.Exists(portFile) == true) {
+                File.Delete(portFile);
+            }
+        }
 
         /// <summary>
         /// 常駐在工作列右下角
@@ -165,7 +180,7 @@ namespace Tiefsee {
                 //QuickRun.runNumber = 0; //不論存在幾個視窗都直接關閉
                 QuickRun.WindowFreed();
             });
-
+            
             nIcon.ContextMenuStrip = cm;
 
             nIcon.DoubleClick += (sender, e) => {

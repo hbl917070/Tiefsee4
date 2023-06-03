@@ -240,14 +240,21 @@ namespace Tiefsee {
         /// <summary>
         /// 以檔案的路徑跟大小來產生雜湊字串(用於暫存檔名)
         /// </summary>
-        public static String FileToHash(String path) {
+        /*public static String FileToHash(String path) {
             var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
             long fileSize = new FileInfo(path).Length; //檔案大小
             long ticks = new FileInfo(path).LastWriteTime.Ticks; //檔案最後修改時間
             String s = Convert.ToBase64String(sha1.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
             return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
+        }*/
+        public static string FileToHash(string path) {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create()) {
+                long fileSize = new FileInfo(path).Length; // File size
+                long ticks = new FileInfo(path).LastWriteTime.Ticks; // File last modified time
+                string s = Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
+                return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
+            }
         }
-
 
         /// <summary>
         /// 檢查圖片的 ICC Profile 是否為 CMYK

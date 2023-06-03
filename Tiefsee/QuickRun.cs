@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Net;
 using Microsoft.Web.WebView2.Core;
+using System.Net.Http;
 
 namespace Tiefsee {
     public class QuickRun {
@@ -29,22 +30,13 @@ namespace Tiefsee {
 
             if (runNumber <= 0) {
                 Adapter.Shutdown();
-                PortFreed();
+                Program.startWindow.PortFreed();
                 Program.startWindow.Close(); //關閉此視窗，程式就會完全結束
             }
         }
 
 
-        /// <summary>
-        /// 刪除檔案，表示此post已經釋放
-        /// </summary>
-        /// <param name="post"></param>
-        public static void PortFreed() {
-            string portFile = Path.Combine(AppPath.appDataPort, Program.webServer.port.ToString());
-            if (File.Exists(portFile) == true) {
-                File.Delete(portFile);
-            }
-        }
+
 
 
         /// <summary>
@@ -65,21 +57,26 @@ namespace Tiefsee {
             }
 
             foreach (String filePort in Directory.GetFiles(AppPath.appDataPort, "*")) { //判斷目前已經開啟的視窗
+
                 try {
+                    using (FileStream flagFile = File.Open(filePort, FileMode.Open)) {
+                    }
+                    File.Delete(filePort); //如果port沒有被鎖定，就刪除檔案
+                    continue;
+                } catch (IOException) {
+                    //檔案被鎖定，表示此port還有在作用
+                }
 
+                try {
                     string port = Path.GetFileName(filePort);
-
                     //偵測是否可用
                     String uri = $"http://127.0.0.1:{port}/api/check";
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-                    request.Timeout = 1000; //逾時
-                    request.UserAgent = Program.webvviewUserAgent;
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
-                        using (Stream stream = response.GetResponseStream()) {
-                            /*using (StreamReader reader = new StreamReader(stream)) {
-                                String s = reader.ReadToEnd();
-                            }*/
-                        }
+                    using (HttpClient client = new HttpClient()) {
+                        client.Timeout = TimeSpan.FromSeconds(5); //逾時
+                        client.DefaultRequestHeaders.Add("User-Agent", Program.webvviewUserAgent);
+
+                        HttpResponseMessage response = client.GetAsync(uri).Result;
+                        //string responseContent = response.Content.ReadAsStringAsync().Result; 
                     }
 
                     if (Program.startType == 2) { //快速啟動
@@ -101,7 +98,7 @@ namespace Tiefsee {
                         NewWindow(args, port);
                         return true;
                     }
-                } catch (Exception e) {
+                } catch (Exception) {
                     //MessageBox.Show(e.ToString());
                 }
 
@@ -142,9 +139,14 @@ namespace Tiefsee {
             //開啟新視窗
             string base64 = Uri.EscapeDataString(sb.ToString());
             string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.UserAgent = Program.webvviewUserAgent;
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) { }
+
+            using (HttpClient client = new HttpClient()) {
+                client.Timeout = TimeSpan.FromSeconds(5); //逾時
+                client.DefaultRequestHeaders.Add("User-Agent", Program.webvviewUserAgent);
+                HttpResponseMessage response = client.GetAsync(uri).Result;
+                //string responseContent = response.Content.ReadAsStringAsync().Result; 
+            }
+
         }
 
 
