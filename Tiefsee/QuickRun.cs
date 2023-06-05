@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
-using System.Net;
-using Microsoft.Web.WebView2.Core;
+﻿using System.IO;
 using System.Net.Http;
+using System.Text;
 
 namespace Tiefsee {
     public class QuickRun {

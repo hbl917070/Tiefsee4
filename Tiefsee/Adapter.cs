@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Tiefsee {
+﻿namespace Tiefsee {
     public static class Adapter {
         public static SynchronizationContext Dispacher { get; private set; }
         public static bool isRuning = true; //用於判斷程式是否還在運行
