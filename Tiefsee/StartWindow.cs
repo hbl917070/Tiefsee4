@@ -1,16 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
-using static NetVips.Introspect;
 
 namespace Tiefsee {
     public class StartWindow : Form {
@@ -21,10 +11,11 @@ namespace Tiefsee {
         /// <summary> 是否為商店版APP </summary>
         public static bool isStoreApp = false;
 
-        FileStream fsPort;
+        /// <summary> 用於鎖定port檔案 </summary>
+        private FileStream fsPort;
 
         public StartWindow() {
- 
+
             Adapter.Initialize();
             Plugin.Init();
 
@@ -32,16 +23,16 @@ namespace Tiefsee {
             CheckWebView2(); //檢查是否有webview2執行環境
 
             //--------------
-            
+
             this.Opacity = 0;
             this.ShowInTaskbar = false;
-           
+
             this.Shown += (sender, e) => {
                 this.Hide();
                 if (Program.startType == 3) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
-                
+
                 if (Program.startType == 5) { //快速啟動且常駐
                     RunNotifyIcon();
                 }
@@ -130,7 +121,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="post"></param>
         public void PortLock() {
-            
+
             if (Directory.Exists(AppPath.appDataPort) == false) { //如果資料夾不存在，就新建
                 Directory.CreateDirectory(AppPath.appDataPort);
             }
@@ -138,7 +129,7 @@ namespace Tiefsee {
             int port = Program.webServer.port;
             string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
             if (File.Exists(portFile) == false) {
-                 fsPort = new FileStream(portFile, FileMode.Create);
+                fsPort = new FileStream(portFile, FileMode.Create);
             }
         }
 
@@ -159,7 +150,7 @@ namespace Tiefsee {
         /// <summary>
         /// 常駐在工作列右下角
         /// </summary>
-        public static void RunNotifyIcon() {
+        public void RunNotifyIcon() {
 
             QuickRun.WindowCreate();
 
@@ -167,25 +158,37 @@ namespace Tiefsee {
             nIcon.Icon = new System.Drawing.Icon(AppPath.logoIcon);
             nIcon.Text = "TiefSee";
             nIcon.Visible = true;
-
-            var cm = new System.Windows.Forms.ContextMenuStrip(); //右鍵選單
-
-            cm.Items.Add("New", null, (sender2, e2) => {
-                WebWindow.Create("MainWindow.html", new string[0], null);
-            });
-
-            cm.Items.Add("Exit Tiefsee", null, (sender2, e2) => {
-                nIcon.Visible = false;
-
-                //QuickRun.runNumber = 0; //不論存在幾個視窗都直接關閉
-                QuickRun.WindowFreed();
-            });
-            
-            nIcon.ContextMenuStrip = cm;
-
             nIcon.DoubleClick += (sender, e) => {
                 WebWindow.Create("MainWindow.html", new string[0], null);
             };
+
+            var cm = new RJDropdownMenu(); //右鍵選單
+            cm.PrimaryColor = Color.FromArgb(65, 65, 65); //滑鼠移入時的背景色
+            cm.MenuItemTextColor = Color.FromArgb(255, 255, 255); //文字顏色
+            cm.IsMainMenu = true;
+            cm.Font = new Font("Segoe UI", 9F);
+
+            ToolStripMenuItem item1 = new ToolStripMenuItem("New");
+            item1.Click += (sender2, e2) => {
+                WebWindow.Create("MainWindow.html", new string[0], null);
+            };
+            cm.Items.Add(item1);
+
+            ToolStripMenuItem item2 = new ToolStripMenuItem("Hide Icon");
+            item2.Click += (sender2, e2) => {
+                nIcon.Visible = false;
+            };
+            cm.Items.Add(item2);
+
+            ToolStripMenuItem item3 = new ToolStripMenuItem("Exit Tiefsee");
+            item3.Click += (sender2, e2) => {
+                nIcon.Visible = false;
+                //QuickRun.runNumber = 0; //不論存在幾個視窗都直接關閉
+                QuickRun.WindowFreed();
+            };
+            cm.Items.Add(item3);
+
+            nIcon.ContextMenuStrip = cm;
 
         }
 
@@ -206,7 +209,6 @@ namespace Tiefsee {
         /// </summary>
         /// <returns></returns>
         private void CheckWebView2() {
-
             new Thread(() => {
                 if (IsWebView2Runtime() == true) { //檢查安裝webview2執行環境
                     return;

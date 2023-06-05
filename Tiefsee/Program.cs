@@ -1,34 +1,33 @@
-using System.IO;
+ï»¿using System.IO;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 
 namespace Tiefsee {
     static class Program {
 
+        public static int startPort; //ç¨‹å¼é–‹å§‹çš„port
+        public static int startType; //1=ç›´æ¥å•Ÿå‹•  2=å¿«é€Ÿå•Ÿå‹•  3=å¿«é€Ÿå•Ÿå‹•ä¸”å¸¸é§  4=å–®ä¸€åŸ·è¡Œå€‹é«”  5=å–®ä¸€åŸ·è¡Œå€‹é«”ä¸”å¸¸é§
+        public static int serverCache; //ä¼ºæœå™¨å°éœæ…‹è³‡æºå¿«å–çš„æ™‚é–“(ç§’)
+        public static WebServer webServer; //æœ¬åœ°ä¼ºæœå™¨
+        public static StartWindow startWindow; //èµ·å§‹è¦–çª—ï¼Œé—œé–‰æ­¤è¦–çª—å°±æœƒçµæŸç¨‹å¼
 
-        public static int startPort; //µ{¦¡¶}©lªºport
-        public static int startType; //1=ª½±µ±Ò°Ê  2=§Ö³t±Ò°Ê  3=§Ö³t±Ò°Ê¥B±`¾n  4=³æ¤@°õ¦æ­ÓÅé  5=³æ¤@°õ¦æ­ÓÅé¥B±`¾n
-        public static int serverCache; //¦øªA¾¹¹ïÀRºA¸ê·½§Ö¨úªº®É¶¡(¬í)
-        public static WebServer webServer; //¥»¦a¦øªA¾¹
-        public static StartWindow startWindow; //°_©lµøµ¡¡AÃö³¬¦¹µøµ¡´N·|µ²§ôµ{¦¡
-
-        /// <summary> ³z¹LUserAgent¨ÓÅçÃÒ¬O§_¦³Åv­­½Ğ¨Dlocalhost server API </summary>
+        /// <summary> é€éUserAgentä¾†é©—è­‰æ˜¯å¦æœ‰æ¬Šé™è«‹æ±‚localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
 
-        /// <summary> webview2ªº±Ò°Ê°Ñ¼Æ </summary>
+        /// <summary> webview2çš„å•Ÿå‹•åƒæ•¸ </summary>
         public static string webvviewArguments;
 
         /// <summary>
-        /// À³¥Îµ{¦¡ªº¥D­n¶i¤JÂI¡C
+        /// æ‡‰ç”¨ç¨‹å¼çš„ä¸»è¦é€²å…¥é»ã€‚
         /// </summary>
         [STAThread]
         static void Main(string[] args) {
 
-            //­×§ï ¤u§@¥Ø¿ı ¬°µ{¦¡¸ê®Æ§¨ (¦pªG¦³¶Ç¤Jargsªº¸Ü¡A¤u§@¥Ø¿ı·|³Q­×§ï¡A©Ò¥H»İ­n§ï¦^¨Ó
+            //ä¿®æ”¹ å·¥ä½œç›®éŒ„ ç‚ºç¨‹å¼è³‡æ–™å¤¾ (å¦‚æœæœ‰å‚³å…¥argsçš„è©±ï¼Œå·¥ä½œç›®éŒ„æœƒè¢«ä¿®æ”¹ï¼Œæ‰€ä»¥éœ€è¦æ”¹å›ä¾†
             Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
             AppPath.Init();
 
-            //¦pªG¬O°Ó©±APPª©¡A¥B¬O¨Ó¦Û¡u¶}¾÷¦Û°Ê±Ò°Ê¡v
+            //å¦‚æœæ˜¯å•†åº—APPç‰ˆï¼Œä¸”æ˜¯ä¾†è‡ªã€Œé–‹æ©Ÿè‡ªå‹•å•Ÿå‹•ã€
             if (StartWindow.isStoreApp) {
                 try {
                     var args2 = AppInstance.GetActivatedEventArgs();
@@ -45,15 +44,15 @@ namespace Tiefsee {
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
-            bool argsIsNone = (args.Length == 1 && args[0] == "none"); //±Ò°Ê°Ñ¼Æ¬O none
+            bool argsIsNone = (args.Length == 1 && args[0] == "none"); //å•Ÿå‹•åƒæ•¸æ˜¯ none
 
-            if (args.Length >= 1 && args[0] == "restart") { //±Ò°Ê°Ñ¼Æ¬O restart
+            if (args.Length >= 1 && args[0] == "restart") { //å•Ÿå‹•åƒæ•¸æ˜¯ restart
 
-                args = args.Skip(1).ToArray(); //§R°£°}¦Cªº²Ä¤@µ§
+                args = args.Skip(1).ToArray(); //åˆªé™¤é™£åˆ—çš„ç¬¬ä¸€ç­†
 
             } else {
 
-                // ±Ò°Ê¼Ò¦¡¤£¬O±`¾n­I´º¡A´Nª½±µÂ÷¶}
+                // å•Ÿå‹•æ¨¡å¼ä¸æ˜¯å¸¸é§èƒŒæ™¯ï¼Œå°±ç›´æ¥é›¢é–‹
                 if (argsIsNone) {
                     if (startType == 3 || startType == 5) {
                     } else {
@@ -61,16 +60,16 @@ namespace Tiefsee {
                     }
                 }
 
-                //¦pªG¤¹³\§Ö³t±Ò°Ê¡A´N¤£¶}±Ò·s­ÓÅé
+                //å¦‚æœå…è¨±å¿«é€Ÿå•Ÿå‹•ï¼Œå°±ä¸é–‹å•Ÿæ–°å€‹é«”
                 if (QuickRun.Check(args)) { return; }
             }
 
-            //¡uª½±µ±Ò°Ê¡v¤§¥~ªº¡A³£­nÁ×§K³sÄò±Ò°Ê
+            //ã€Œç›´æ¥å•Ÿå‹•ã€ä¹‹å¤–çš„ï¼Œéƒ½è¦é¿å…é€£çºŒå•Ÿå‹•
             if (startType != 1) {
                 if (AppLock(true)) { return; }
             }
 
-            //¦b¥»¦aºİ«Ø¥ßserver
+            //åœ¨æœ¬åœ°ç«¯å»ºç«‹server
             webServer = new WebServer();
             bool webServerState = webServer.Init();
             if (webServerState == false) {
@@ -79,14 +78,14 @@ namespace Tiefsee {
             }
             webServer.controller.SetCacheTime(serverCache);
 
-            //Application.EnableVisualStyles();
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //--disable-web-security  ¤¹³\¸ó°ì½Ğ¨D
-            //--disable-features=msWebOOUI,msPdfOOUI  ¸T¤î°g§A¿ï³æ
-            //--disable-backing-store-limit  ¸T¥Î¹ï«á³Æ¦sÀx¼Æ¶qªº­­¨î¡C¥i¥H¨¾¤î¨ã¦³³\¦hµøµ¡/¿ï¶µ¥d©M¤j¶q°O¾ĞÅéªº¥Î¤á°{Ã{
-            //--user-agent  ÂĞ¼guserAgent
-            //--enable-features=msWebView2EnableDraggableRegions Åıwebview2¤ä´©css¡uapp-region:drag¡v
+            //--disable-web-security  å…è¨±è·¨åŸŸè«‹æ±‚
+            //--disable-features=msWebOOUI,msPdfOOUI  ç¦æ­¢è¿·ä½ é¸å–®
+            //--disable-backing-store-limit  ç¦ç”¨å°å¾Œå‚™å­˜å„²æ•¸é‡çš„é™åˆ¶ã€‚å¯ä»¥é˜²æ­¢å…·æœ‰è¨±å¤šè¦–çª—/é¸é …å¡å’Œå¤§é‡è¨˜æ†¶é«”çš„ç”¨æˆ¶é–ƒçˆ
+            //--user-agent  è¦†å¯«userAgent
+            //--enable-features=msWebView2EnableDraggableRegions è®“webview2æ”¯æ´cssã€Œapp-region:dragã€
             webvviewArguments = $@"
 --disable-web-security 
 --disable-features=""msWebOOUI,msPdfOOUI"" 
@@ -95,14 +94,14 @@ namespace Tiefsee {
 --enable-features=""msWebView2EnableDraggableRegions"" 
 ";
 
-            if (startType != 1) { AppLock(false); } //¸Ñ°£Âê©w
+            if (startType != 1) { AppLock(false); } //è§£é™¤é–å®š
             startWindow = new StartWindow();
 
             if (argsIsNone == false) {
-                WebWindow.Create("MainWindow.html", args, null); //Åã¥Üªì©lµøµ¡
+                WebWindow.Create("MainWindow.html", args, null); //é¡¯ç¤ºåˆå§‹è¦–çª—
             }
-            if (argsIsNone == true) { //¦pªGargs¬Onone
-                WebWindow.NewTempWindow("MainWindow.html"); //·s¼W¤@­Ó¬İ¤£¨£ªºµøµ¡¡A¥Î©ó¤U¦¸Åã¥Ü
+            if (argsIsNone == true) { //å¦‚æœargsæ˜¯none
+                WebWindow.NewTempWindow("MainWindow.html"); //æ–°å¢ä¸€å€‹çœ‹ä¸è¦‹çš„è¦–çª—ï¼Œç”¨æ–¼ä¸‹æ¬¡é¡¯ç¤º
             }
 
             Application.Run(startWindow);
@@ -110,10 +109,10 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// ¦bµ{¦¡§¹¥ş±Ò°Ê«e¡A¸T¤î¦A¦¸±Ò°Ê
+        /// åœ¨ç¨‹å¼å®Œå…¨å•Ÿå‹•å‰ï¼Œç¦æ­¢å†æ¬¡å•Ÿå‹•
         /// </summary>
-        /// <param name="val"> true=Âê©w¡Afalse=¸Ñ°£Âê©w </param>
-        /// <returns> ¦^¶Çtrueªí¥Üµ{¦¡¥Ø«eÂê©w¤¤¡A¤£­n±Ò°Êµ{¦¡ </returns>
+        /// <param name="val"> true=é–å®šï¼Œfalse=è§£é™¤é–å®š </param>
+        /// <returns> å›å‚³trueè¡¨ç¤ºç¨‹å¼ç›®å‰é–å®šä¸­ï¼Œä¸è¦å•Ÿå‹•ç¨‹å¼ </returns>
         private static bool AppLock(bool val) {
             if (val) {
 
@@ -124,7 +123,7 @@ namespace Tiefsee {
                             ticks = long.Parse(sr.ReadToEnd());
                         }
 
-                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) { //¦b5¬í¤º³sÄò±Ò°Ê¡A´N¸T¤î±Ò°Ê
+                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) { //åœ¨5ç§’å…§é€£çºŒå•Ÿå‹•ï¼Œå°±ç¦æ­¢å•Ÿå‹•
                             return true;
                         } else {
                             return false;
