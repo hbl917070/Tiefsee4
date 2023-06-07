@@ -3,29 +3,73 @@
 .main-toolbar {
   height: 35px;
   color: var(--color-white);
-  overflow-x: hidden;
+  overflow-x: visible;
   overflow-y: hidden;
   margin-bottom: 3px;
+}
+.toolbar-content {
   display: flex;
+  position: absolute;
+  left: 0;
+  min-width: 100%;
 }
 
 //----------
 
-//捲動軸樣式
-.main-toolbar:hover {
-  overflow-x: overlay;
-}
-.main-toolbar::-webkit-scrollbar {
-  /* background-color: var(--color-black40); */
-  height: 3px;
-  /* border-radius: 5px; */
-}
-.main-toolbar::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0);
-}
-.main-toolbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-white40);
-  /* border-radius: 5px; */
+//滾動條樣式
+.main-toolbar {
+  position: relative;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*水平滾動條*/
+  .scroll-x {
+    height: 3px;
+    position: absolute;
+    bottom: 0px;
+    z-index: 1;
+  }
+
+  /*背景*/
+  .scroll-x .scroll-bg {
+    height: 3px;
+    width: 100%;
+    background-color: var(--color-black60);
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    //top: 0;
+    bottom: 0;
+    opacity: 0;
+  }
+
+  /*拖曳區域*/
+  .scroll-x .scroll-box {
+    height: 3px;
+    background-color: var(--color-white40);
+    position: absolute;
+    bottom: 0px;
+    //border: 3px solid rgba(0, 0, 0, 0);
+    //background-clip: content-box;
+  }
+
+  .scroll-x:hover {
+    cursor: pointer;
+  }
+
+  /*移入與拖曳時-背景*/
+  .scroll-x:hover .scroll-bg,
+  .scroll-x[action="true"] .scroll-bg {
+    opacity: 1;
+  }
+
+  /*移入與拖曳時-拖曳區域*/
+  .scroll-x:hover .scroll-box,
+  .scroll-x[action="true"] .scroll-box {
+  }
 }
 
 //----------

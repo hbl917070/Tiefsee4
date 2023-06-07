@@ -72,7 +72,7 @@ class SettingWindow {
             let domLeftBox = getDom("#window-left .pagetab") as HTMLElement;
             domLeftBox.addEventListener("mousedown", async (e) => {
 
-                //如果有捲動軸，就禁止拖曳(避免無法點擊捲動軸)
+                //如果有滾動條，就禁止拖曳(避免無法點擊滾動條)
                 if (Lib.isScrollbarVisible(domLeftBox)) { return; }
 
                 let _dom = e.target as HTMLElement;
@@ -85,7 +85,7 @@ class SettingWindow {
             })
             domLeftBox.addEventListener("touchstart", async (e) => {
 
-                //如果有捲動軸，就禁止拖曳(避免無法點擊捲動軸)
+                //如果有滾動條，就禁止拖曳(避免無法點擊滾動條)
                 if (Lib.isScrollbarVisible(domLeftBox)) { return; }
 
                 let _dom = e.target as HTMLDivElement;

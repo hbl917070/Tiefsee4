@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滾動條元件</title>
+
+    <script src="./vender/hammer.min.js"></script>
+    <!-- <script src="./vender/jquery-3.6.0.min.js"></script> -->
+    <!-- <script src="./vender/jquery.easing.js"></script> -->
+
+    <!-- <script src="./js/Tiefseeview.js"></script> -->
+    <script src="./js/TiefseeScroll.js"></script>
+    <script src="./js/Lib.js"></script>
+
+
+</head>
+
+<body>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* //區塊顏色 */
+            --color-black: rgba(0, 0, 0, 1);
+            --color-black80: rgba(0, 0, 0, 0.8);
+            --color-black60: rgba(0, 0, 0, 0.6);
+            --color-black40: rgba(0, 0, 0, 0.4);
+            --color-black20: rgba(0, 0, 0, 0.2);
+
+            /* //文字顏色、圖示顏色 */
+            --color-white: rgb(255, 255, 255);
+            --color-white80: rgba(255, 255, 255, 0.8);
+            --color-white60: rgba(255, 255, 255, 0.6);
+            --color-white40: rgba(255, 255, 255, 0.4);
+            --color-white30: rgba(255, 255, 255, 0.3);
+            --color-white20: rgba(255, 255, 255, 0.2);
+            --color-white10: rgba(255, 255, 255, 0.1);
+
+            /* //用於醒目的顏色 */
+            --color-blue: rgb(0, 200, 255);
+            --color-blue80: rgba(0, 200, 255, 0.8);
+            --color-blue60: rgba(0, 200, 255, 0.6);
+            --color-blue40: rgba(0, 200, 255, 0.4);
+            --color-blue20: rgba(0, 200, 255, 0.2);
+        }
+
+        #d {
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 300px;
+            height: 80vh;
+            overflow-y: visible;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #d::-webkit-scrollbar {
+            display: none;
+        }
+
+        .c {
+            background-color: rgba(100, 250, 0, 0.4);
+        }
+
+        .c h1 {
+            margin: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+        }
+    </style>
+
+    <style>
+        /*垂直滾動條*/
+        .scroll-y {
+            width: 20px;
+            position: absolute;
+            right: 0px;
+            z-index: 1;
+        }
+
+        /*背景*/
+        .scroll-y .scroll-bg {
+            height: 100%;
+            width: 10px;
+            background-color: var(--color-black60);
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            opacity: 0;
+        }
+
+        /*拖曳區域*/
+        .scroll-y .scroll-box {
+            width: 10px;
+            background-color: var(--color-white40);
+            position: absolute;
+            right: 0;
+            border: 3px solid rgba(0, 0, 0, 0);
+            background-clip: content-box;
+        }
+
+        .scroll-y:hover {
+            cursor: pointer;
+        }
+
+        /*移入與拖曳時-背景*/
+        .scroll-y:hover .scroll-bg,
+        .scroll-y[action="true"] .scroll-bg {
+            opacity: 1;
+        }
+
+        /*移入與拖曳時-拖曳區域*/
+        .scroll-y:hover .scroll-box,
+        .scroll-y[action="true"] .scroll-box {}
+    </style>
+
+    <div id="d">
+
+        <div class="c">
+            <script>
+                for (let i = 0; i < 50; i++) {
+                    document.write(`<h1>${i}</h1>`)
+                }      
+            </script>
+        </div>
+    </div>
+
+    <script>
+
+        var domPanel = document.querySelector("#d");
+        var sc = new TiefseeScroll();
+        sc.initGeneral(domPanel, "y");
+
+    </script>
+
+</body>
+
+</html>

@@ -5,14 +5,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiefseeView Demo</title>
+    <title>Tiefseeview</title>
 
     <script src="./vender/hammer.min.js"></script>
     <script src="./vender/jquery-3.6.0.min.js"></script>
     <script src="./vender/jquery.easing.js"></script>
 
     <script src="./js/Tiefseeview.js"></script>
-    <link rel="stylesheet" href="./css/tiefseeview.css">
+    <script src="./js/TiefseeScroll.js"></script>
+    <script src="./js/Lib.js"></script>
+
+    <link href="./css/tiefseeview.css" rel="stylesheet">
 
 </head>
 
@@ -22,6 +25,10 @@
         html,
         body {
             touch-action: none;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         #dd {
@@ -34,6 +41,31 @@
             width: 90%;
             height: 800px;
             background-color: rgba(0, 0, 0, 0.753);
+        }
+
+        :root {
+            /* //區塊顏色 */
+            --color-black: rgba(0, 0, 0, 1);
+            --color-black80: rgba(0, 0, 0, 0.8);
+            --color-black60: rgba(0, 0, 0, 0.6);
+            --color-black40: rgba(0, 0, 0, 0.4);
+            --color-black20: rgba(0, 0, 0, 0.2);
+
+            /* //文字顏色、圖示顏色 */
+            --color-white: rgb(255, 255, 255);
+            --color-white80: rgba(255, 255, 255, 0.8);
+            --color-white60: rgba(255, 255, 255, 0.6);
+            --color-white40: rgba(255, 255, 255, 0.4);
+            --color-white30: rgba(255, 255, 255, 0.3);
+            --color-white20: rgba(255, 255, 255, 0.2);
+            --color-white10: rgba(255, 255, 255, 0.1);
+
+            /* //用於醒目的顏色 */
+            --color-blue: rgb(0, 200, 255);
+            --color-blue80: rgba(0, 200, 255, 0.8);
+            --color-blue60: rgba(0, 200, 255, 0.6);
+            --color-blue40: rgba(0, 200, 255, 0.4);
+            --color-blue20: rgba(0, 200, 255, 0.2);
         }
     </style>
 

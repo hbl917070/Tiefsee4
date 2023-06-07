@@ -43,6 +43,9 @@ class MainFileList {
         var temp_count = 0;
         var temp_itemHeight = 0; //用於判斷物件高度是否需要更新
 
+        var sc = new TiefseeScroll(); //滾動條元件
+        sc.initGeneral(dom_fileList, "y");
+
         //拖曳改變size
         var dragbar = new Dragbar();
         dragbar.init("right", dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);

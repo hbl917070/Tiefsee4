@@ -1075,7 +1075,7 @@ class MainToolbar {
             let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (dom_group === null) {
                 let div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
-                M.dom_toolbar.appendChild(div);
+                M.dom_toolbar.querySelector("#toolbar-content")?.appendChild(div);
                 dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }
 

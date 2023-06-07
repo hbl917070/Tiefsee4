@@ -324,7 +324,7 @@ class Lib {
     }
 
     /**
-     * 判斷物件目前是否有捲動軸
+     * 判斷物件目前是否有滾動條
      * @param type X | Y
      */
     public static isScrollbarVisible(element: HTMLElement, type = "Y") {

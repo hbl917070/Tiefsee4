@@ -107,42 +107,59 @@
 
 //----------------------------------------------------------------
 
-//捲動軸樣式  (小型、用於檔案預覽視窗
+//滾動條樣式  (小型、用於檔案預覽視窗
 
-/*整體背景*/
-.base-scrollbar-mini::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.base-scrollbar-mini:hover::-webkit-scrollbar {
-  background-color: var(--color-black60);
-  border-left: 3px solid rgba(0, 0, 0, 0);
-  background-clip: content-box;
-}
+.base-scrollbar-mini {
 
-//滾動條軌道
-.base-scrollbar-mini:hover::-webkit-scrollbar-thumb {
-  border-left: 6px solid rgba(0, 0, 0, 0);
-  border-right: 0px solid rgba(0, 0, 0, 0);
-}
+  position: relative;
 
-//滾動條軌道(移入時
-.base-scrollbar-mini::-webkit-scrollbar-track:hover {
-}
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-//拖曳區塊
-.base-scrollbar-mini::-webkit-scrollbar-thumb {
-  background-color: var(--color-white40);
-  //產生透明框線並且剪裁掉
-  border-top: 3px solid rgba(0, 0, 0, 0);
-  border-bottom: 3px solid rgba(0, 0, 0, 0);
-  border-left: 7px solid rgba(0, 0, 0, 0);
-  border-right: 0px solid rgba(0, 0, 0, 0);
-  background-clip: content-box;
-  min-height: 50px;
-}
+  /*垂直滾動條*/
+  .scroll-y {
+    width: 16px;
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+  }
 
-//右下角交匯處
-.base-scrollbar-mini::-webkit-scrollbar-corner {
-  background-color: rgba(0, 0, 0, 0);
+  /*背景*/
+  .scroll-y .scroll-bg {
+    height: 100%;
+    width: 6px;
+    background-color: var(--color-black60);
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+  }
+
+  /*拖曳區域*/
+  .scroll-y .scroll-box {
+    width: 3px;
+    background-color: var(--color-white40);
+    position: absolute;
+    right: 0;
+    border-top: 3px solid rgba(0, 0, 0, 0);
+    border-bottom: 3px solid rgba(0, 0, 0, 0);
+    background-clip: content-box;
+  }
+
+  .scroll-y:hover {
+    cursor: pointer;
+  }
+
+  /*移入與拖曳時-背景*/
+  .scroll-y:hover .scroll-bg,
+  .scroll-y[action="true"] .scroll-bg {
+    opacity: 1;
+  }
+
+  /*移入與拖曳時-拖曳區域*/
+  .scroll-y:hover .scroll-box,
+  .scroll-y[action="true"] .scroll-box {
+  }
 }

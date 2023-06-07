@@ -29,6 +29,7 @@
     <script src="./vender/jquery.easing.js"></script>
 
     <script src="./js/Tiefseeview.js"></script>
+    <script src="./js/TiefseeScroll.js"></script>
     <link rel="stylesheet" href="./css/Tiefseeview.css">
 
     <!-- 多國語言 -->
@@ -112,11 +113,14 @@
                     <!-- 工具列 -->
                     <div id="main-toolbar" class="main-toolbar" toolbarAlign="center">
 
-                        <!-- 共通的 返回按鈕 -->
-                        <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back"
-                            title="" i18n="menu.back">
-                            <%- await readFile("./img/default/tool-back.svg"); %>
+                        <div id="toolbar-content" class="toolbar-content">
+                            <!-- 共通的 返回按鈕 -->
+                            <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back"
+                                title="" i18n="menu.back">
+                                <%- await readFile("./img/default/tool-back.svg"); %>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 

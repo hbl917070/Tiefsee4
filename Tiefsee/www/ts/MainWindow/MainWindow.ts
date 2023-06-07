@@ -150,7 +150,7 @@ class MainWindow {
 
             //圖片區域也允許拖曳視窗
             fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
-                //圖片沒有出現捲動軸
+                //圖片沒有出現滾動條
                 if (fileShow.tiefseeview.getIsOverflowX() === false && fileShow.tiefseeview.getIsOverflowY() === false) {
                     if (e.button === 0) { //滑鼠左鍵
                         let WindowState = baseWindow.windowState;
@@ -162,7 +162,7 @@ class MainWindow {
                 window.focus();
             });
             /*fileShow.dom_imgview.addEventListener("touchstart", async (e) => { //雙指縮放時可能衝突
-                //圖片沒有出現捲動軸
+                //圖片沒有出現滾動條
                 if (fileShow.tiefseeview.getIsOverflowX() === false && fileShow.tiefseeview.getIsOverflowY() === false) {
                     let WindowState = baseWindow.windowState;
                     if (WindowState === "Normal") {
@@ -215,7 +215,7 @@ class MainWindow {
                 if (_dom) {
                     if (_dom.classList.contains("js-noDrag")) { return; }
                 }
-                let isShowScroll = dom_toolbar.scrollWidth > dom_toolbar.clientWidth; //判斷當前是否有捲動軸
+                let isShowScroll = dom_toolbar.scrollWidth > dom_toolbar.clientWidth; //判斷當前是否有滾動條
                 if (isShowScroll === false) {
                     baseWindow.touchDrop.start(dom_toolbar, e, "move");
                 }
@@ -235,6 +235,8 @@ class MainWindow {
                     dom_toolbar.scroll(scrollLeft - 20, 0)
                 }
             }, false)
+
+            new TiefseeScroll().initGeneral(dom_toolbar, "x"); //滾動條元件
 
 
             //讓歡迎畫面允許拖曳視窗
