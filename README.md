@@ -24,7 +24,7 @@ Tiefsee 是一款開源的圖片檢視器
 
 ## 下載
 
-當前版本：Tiefsee 4.1.0
+當前版本：Tiefsee 4.1.1
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/>

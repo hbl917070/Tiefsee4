@@ -316,7 +316,6 @@ class MainMenu {
                     const uwpItem = arUwp[i];
                     let name = uwpItem.name; //顯示的名稱
                     let logo = uwpItem.path;
-                    console.log(uwpItem)
                     let dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">

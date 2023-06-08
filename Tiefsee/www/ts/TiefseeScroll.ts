@@ -76,14 +76,14 @@ class TiefseeScroll {
 
             if (type === "y") {
                 domScroll = Lib.newDom(`
-                    <div class="scroll-y">
+                    <div class="scroll-y js-noDrag">
                         <div class="scroll-bg js-noDrag"></div>
                         <div class="scroll-box js-noDrag"></div>
                     </div>`
                 );
             } else {
                 domScroll = Lib.newDom(`
-                    <div class="scroll-x">
+                    <div class="scroll-x js-noDrag">
                         <div class="scroll-bg js-noDrag"></div>
                         <div class="scroll-box js-noDrag"></div>
                     </div>`
@@ -121,23 +121,38 @@ class TiefseeScroll {
 
                     if (type === "y") {
                         domScroll.style.height = domPanel.offsetHeight + "px";
+                        
+                        let v = domPanel.scrollTop;
+                        if (v + domPanel.offsetHeight > domContent.offsetHeight) { //避免滾動條影響高度的計算
+                            domScroll.style.top =  "0px";
+                            v = domPanel.scrollTop;
+                        } 
+                        domScroll.style.top = v + "px";          
+
                         update(
                             domContent.offsetHeight,
                             domPanel.offsetHeight,
                             getTop()
                         );
-                        let v = domPanel.scrollTop;
-                        domScroll.style.top = v + "px";
+
                         setValue(v);
+
                     } else {
                         domScroll.style.width = domPanel.offsetWidth + "px";
+                   
+                        let v = domPanel.scrollLeft;
+                        if (v + domPanel.offsetWidth > domContent.offsetWidth) { //避免滾動條影響高度的計算
+                            domScroll.style.left =  "0px";
+                            v = domPanel.scrollLeft;
+                        } 
+                        domScroll.style.left = v + "px";
+
                         update(
                             domContent.offsetWidth,
                             domPanel.offsetWidth,
                             getTop()
                         );
-                        let v = domPanel.scrollLeft;
-                        domScroll.style.left = v + "px";
+                        
                         setValue(v);
                     }
 

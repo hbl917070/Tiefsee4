@@ -4,6 +4,14 @@
     <_LastSelectedProfileId>D:\GitHub\Tiefsee4\Tiefsee\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
-    
+    <Compile Update="Lib\RJDropdownMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="StartWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="WebWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

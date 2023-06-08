@@ -149,7 +149,7 @@
                         <div id="mView-welcome" class="mView-welcome">
                             <div>
                                 <img class="mView-welcome-logo" src="./img/logo.svg">
-                                <div class="mView-welcome-txt">Tiefsee 4.1.0</div>
+                                <div class="mView-welcome-txt">Tiefsee 4.1.1</div>
                             </div>
                         </div>
                         <textarea id="mView-txt" class="mView-text base-scrollbar" readonly2=""></textarea>
@@ -160,29 +160,31 @@
                         <iframe id="mView-cherryMarkdown" class="mView-iframe"></iframe>
 
                         <!-- 大量瀏覽模式 -->
-                        <div id="mView-bulkView" class="bulkView base-scrollbar">
-                            <div class="bulkView-pagination">
-                                <div class="bulkView-pagination-box">
-                                    <div class="bulkView-pagination-prev" freeze="true">
-                                        <%- await readFile("./img/default/tool-prev.svg"); %>
-                                    </div>
-                                    <select class="bulkView-pagination-select">
-                                    </select>
-                                    <div class="bulkView-pagination-next">
-                                        <%- await readFile("./img/default/tool-next.svg"); %>
+                        <div id="mView-bulkView" class="bulkView">
+                            <div class="bulkView-scroll-content">
+                                <div class="bulkView-pagination">
+                                    <div class="bulkView-pagination-box">
+                                        <div class="bulkView-pagination-prev" freeze="true">
+                                            <%- await readFile("./img/default/tool-prev.svg"); %>
+                                        </div>
+                                        <select class="bulkView-pagination-select">
+                                        </select>
+                                        <div class="bulkView-pagination-next">
+                                            <%- await readFile("./img/default/tool-next.svg"); %>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="bulkView-content" show=""></div>
-                            <div class="bulkView-pagination">
-                                <div class="bulkView-pagination-box">
-                                    <div class="bulkView-pagination-prev">
-                                        <%- await readFile("./img/default/tool-prev.svg"); %>
-                                    </div>
-                                    <select class="bulkView-pagination-select">
-                                    </select>
-                                    <div class="bulkView-pagination-next">
-                                        <%- await readFile("./img/default/tool-next.svg"); %>
+                                <div class="bulkView-content" show=""></div>
+                                <div class="bulkView-pagination">
+                                    <div class="bulkView-pagination-box">
+                                        <div class="bulkView-pagination-prev">
+                                            <%- await readFile("./img/default/tool-prev.svg"); %>
+                                        </div>
+                                        <select class="bulkView-pagination-select">
+                                        </select>
+                                        <div class="bulkView-pagination-next">
+                                            <%- await readFile("./img/default/tool-next.svg"); %>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

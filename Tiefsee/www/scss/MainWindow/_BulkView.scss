@@ -10,6 +10,65 @@
   left: 0;
 }
 
+//滾動條的容器
+.bulkView-scroll-content {
+  margin-right: 10px;
+}
+
+//滾動條樣式
+.bulkView {
+  //position: relative;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*垂直滾動條*/
+  .scroll-y {
+    width: 20px;
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+  }
+
+  /*背景*/
+  .scroll-y .scroll-bg {
+    height: 100%;
+    width: 10px;
+    background-color: var(--color-black60);
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+  }
+
+  /*拖曳區域*/
+  .scroll-y .scroll-box {
+    width: 10px;
+    background-color: var(--color-white40);
+    position: absolute;
+    right: 0;
+    border: 3px solid rgba(0, 0, 0, 0);
+    background-clip: content-box;
+  }
+
+  .scroll-y:hover {
+    cursor: pointer;
+  }
+
+  /*移入與拖曳時-背景*/
+  .scroll-y:hover .scroll-bg,
+  .scroll-y[action="true"] .scroll-bg {
+    opacity: 1;
+  }
+
+  /*移入與拖曳時-拖曳區域*/
+  .scroll-y:hover .scroll-box,
+  .scroll-y[action="true"] .scroll-box {
+  }
+}
+
 .bulkView-content {
   display: flex;
   flex-wrap: wrap;

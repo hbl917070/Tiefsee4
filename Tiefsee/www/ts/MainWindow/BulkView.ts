@@ -92,6 +92,8 @@ class BulkView {
                 updateSize();
             }, 30)).observe(dom_bulkView);
 
+            new TiefseeScroll().initGeneral(dom_bulkView, "y"); //滾動條元件
+
             //判斷是否有捲動
             dom_bulkView.addEventListener("wheel", () => {
                 temp_hasScrolled = true;

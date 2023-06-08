@@ -79,7 +79,7 @@ namespace Tiefsee {
         public WebWindow NewSubWindow(string _url, object[] _args) {
             var w = NewWindow(_url, _args);
             SetOwner(w);
-            return w;
+            return null;
         }
 
 

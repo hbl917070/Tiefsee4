@@ -364,7 +364,7 @@ class Tiefseeview {
 
                 temp_touchPadTime = new Date().getTime(); //記錄當前時間，在200毫秒內的捲動都當做觸控板
 
-                window.requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
 
                     if (e.ctrlKey === true) {
                         let scale = 1 - e.deltaY * 0.01; //無法使用
