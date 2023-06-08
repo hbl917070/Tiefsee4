@@ -58,7 +58,7 @@
 				<!-- 關聯副檔名 -->
 				<uap:Extension Category="windows.fileTypeAssociation">
 					<uap:FileTypeAssociation Name="tiefseefiletypes">
-						<uap:DisplayName>Tiefsee</uap:DisplayName>
+						<!-- <uap:DisplayName>Tiefsee</uap:DisplayName> -->
 						<uap:SupportedFileTypes>
 							<uap:FileType>.ai</uap:FileType>
 							<uap:FileType>.pdf</uap:FileType>
@@ -66,18 +66,17 @@
 							<uap:FileType>.markdown</uap:FileType>
 							<uap:FileType>.md</uap:FileType>
 
-							<uap:FileType>.jpg</uap:FileType>
-							<uap:FileType>.jpeg</uap:FileType>
-							<uap:FileType>.jfif</uap:FileType>
-							<uap:FileType>.png</uap:FileType>
-							<uap:FileType>.webp</uap:FileType>
-							<uap:FileType>.bmp</uap:FileType>
-							<uap:FileType>.apng</uap:FileType>
-							<uap:FileType>.gif</uap:FileType>
-							<uap:FileType>.svg</uap:FileType>
-							<uap:FileType>.ico</uap:FileType>
-							<uap:FileType>.tif</uap:FileType>
-							<uap:FileType>.tiff</uap:FileType>
+							<uap:FileType ContentType="image/jpeg">.jpg</uap:FileType>
+							<uap:FileType ContentType="image/jpeg">.jpeg</uap:FileType>
+							<uap:FileType ContentType="image/jpeg">.jfif</uap:FileType>
+							<uap:FileType ContentType="image/png">.png</uap:FileType>
+							<uap:FileType ContentType="image/webp">.webp</uap:FileType>
+							<uap:FileType ContentType="image/bmp">.bmp</uap:FileType>
+							<uap:FileType ContentType="image/gif">.gif</uap:FileType>
+							<uap:FileType ContentType="image/svg+xml">.svg</uap:FileType>
+							<uap:FileType ContentType="image/vnd.microsoft.icon">.ico</uap:FileType>
+							<uap:FileType ContentType="image/tiff">.tif</uap:FileType>
+							<uap:FileType ContentType="image/tiff">.tiff</uap:FileType>
 							<uap:FileType>.dds</uap:FileType>
 							<uap:FileType>.psd</uap:FileType>
 							<uap:FileType>.psb</uap:FileType>
