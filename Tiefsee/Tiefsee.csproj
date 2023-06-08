@@ -16,6 +16,9 @@
     <ApplicationIcon>logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+
+    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+    <!-- <PublishReadyToRun>true</PublishReadyToRun> -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
