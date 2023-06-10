@@ -119,23 +119,23 @@ namespace Tiefsee {
                             continue;
                         }
 
-                        if (name == "Textual Data") {
+                        /*if (name == "Textual Data") {
                             try {
                                 if (group == "PNG-iTXt") { // utf8 格式
                                     byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
                                     string utf8 = Encoding.UTF8.GetString(unknow);
                                     value = utf8;
                                 } else if (group == "PNG-tEXt") { // ISO-8859-1 格式
-                                    /*byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
-                                    string utf8 = Encoding.GetEncoding(28591).GetString(unknow);
-                                    value = utf8;*/
+                                    //byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
+                                    //string utf8 = Encoding.GetEncoding(28591).GetString(unknow);
+                                    //value = utf8;
                                 } else {
                                     continue;
                                 }
                             } catch (Exception ee) {
                                 Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
                             }
-                        }
+                        }*/
 
                         //sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
                         if (tagType == ExifDirectoryBase.TagOrientation) { //旋轉方向
