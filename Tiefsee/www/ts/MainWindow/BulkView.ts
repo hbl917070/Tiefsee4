@@ -630,6 +630,8 @@ class BulkView {
 
             showPageThrottle.run = async () => {
 
+                dom_bulkView.scrollTop = 0; //捲動到最上面
+                
                 let temp = pageNow + getDirPath();
                 let start = ((pageNow - 1) * imgMaxCount);
 
