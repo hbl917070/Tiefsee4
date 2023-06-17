@@ -1,10 +1,13 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Windows.ApplicationModel;
 
 namespace Tiefsee {
@@ -17,6 +20,92 @@ namespace Tiefsee {
         WebWindow M;
         public WV_System(WebWindow m) {
             this.M = m;
+        }
+
+        class FileWatcherData {
+            public string Key;
+            public string FullPath;
+            public string OldFullPath;
+            public string ChangeType;
+            public string FileType;
+        }
+        private Dictionary<string, FileSystemWatcher> dicFileWatcher = new Dictionary<string, FileSystemWatcher>();
+
+        /// <summary>
+        /// 偵測檔案變化
+        /// </summary>
+        /// <param name="key"> 如果需要偵測多個資料夾，用此欄位來進行區分 </param>
+        /// <param name="path"> 要偵測的資料夾 </param>
+        public void NewFileWatcher(string key, string path) {
+
+            if (dicFileWatcher.ContainsKey(key) == false) {
+                dicFileWatcher.Add(key, null);
+            }
+
+            if (dicFileWatcher[key] != null) {
+                dicFileWatcher[key].Dispose();
+                dicFileWatcher[key] = null;
+            }
+
+            if (path == null || path == "") {
+                return;
+            }
+
+            dicFileWatcher[key] = new FileSystemWatcher();
+            var watcher = dicFileWatcher[key];
+            watcher.Path = path; // 設置要監視的資料夾
+            watcher.IncludeSubdirectories = false; //是否偵測資料夾內的子資料夾
+
+            var onChanged = (string changeType, string fullPath, string oldFullPath) => {
+                string fileType;
+                if (changeType == "deleted") {
+                    fileType = "none";
+                } else if (File.Exists(fullPath)) {
+                    fileType = "file";
+                } else if (Directory.Exists(fullPath)) {
+                    fileType = "dir";
+                } else {
+                    fileType = "none";
+                }
+                string data = JsonConvert.SerializeObject(new FileWatcherData {
+                    Key = key,
+                    FullPath = fullPath,
+                    OldFullPath = oldFullPath,
+                    ChangeType = changeType,
+                    FileType = fileType
+                });
+                Adapter.UIThread(() => {
+                    M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
+                });
+            };
+
+            // 註冊事件處理程序
+            watcher.Changed += (source, e) => {
+                onChanged("changed", e.FullPath, "");
+            };
+            watcher.Created += (source, e) => {
+                onChanged("created", e.FullPath, "");
+            };
+            watcher.Deleted += (source, e) => {
+                onChanged("deleted", e.FullPath, "");
+            };
+            watcher.Renamed += (source, e) => {
+                onChanged("renamed", e.FullPath, e.OldFullPath);
+            };
+
+            // 開始監視
+            watcher.EnableRaisingEvents = true;
+        }
+
+        /// <summary>
+        /// 停止偵測檔案變化
+        /// </summary>
+        public void FileWatcherDispose() {
+            foreach (string key in dicFileWatcher.Keys) {
+                dicFileWatcher[key].Dispose();
+                dicFileWatcher[key] = null;
+            }
+            dicFileWatcher = new Dictionary<string, FileSystemWatcher>();
         }
 
         /// <summary>
@@ -45,7 +134,7 @@ namespace Tiefsee {
         /// <returns></returns>
         public async Task<string> SetTiefseTask(bool val) {
             var startupTask = await StartupTask.GetAsync("TiefseeTask");
-            if (val) {  
+            if (val) {
                 var state = await startupTask.RequestEnableAsync();
                 return state.ToString();
             } else {

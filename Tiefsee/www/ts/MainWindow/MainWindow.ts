@@ -60,6 +60,9 @@ class MainWindow {
         this.dom_mainR = dom_mainR;
 
         var config = this.config = new Config(baseWindow);
+        var i18n = this.i18n = new I18n();
+        i18n.pushData(langData);
+        var msgbox = this.msgbox = new Msgbox(i18n);
         var fileLoad = this.fileLoad = new FileLoad(this);
         var fileShow = this.fileShow = new FileShow(this);
         var fileSort = this.fileSort = new FileSort(this);
@@ -73,9 +76,6 @@ class MainWindow {
         var mainMenu = this.mainMenu = new MainMenu(this);
         var largeBtn = this.largeBtn = new LargeBtn(this);
         var script = this.script = new Script(this);
-        var i18n = this.i18n = new I18n();
-        i18n.pushData(langData);
-        var msgbox = this.msgbox = new Msgbox(i18n);
         var bulkView = this.bulkView = new BulkView(this);
         var toolbarBack = this.toolbarBack = new ToolbarBack();
         var fullScreen = this.fullScreen = new FullScreen(this);

@@ -372,6 +372,9 @@ interface WV_Path {
 
 interface WV_System {
 
+    /** 偵測檔案變化 */
+    NewFileWatcher(key: string, path: string);
+
     /** 取得當前是否有使用「開機自動啟動」 */
     GetTiefseTask(): "Enabled" | "DisabledByUser" | "DisabledByPolicy" | "EnabledByPolicy" | "Disabled";
 
@@ -568,4 +571,13 @@ interface AppInfoPlugin {
     PDFTronWebviewer: bool,
     PDFTronWebviewer_js: string,
     PDFTronWebviewer_lib: string,
+}
+
+/** 偵測檔案變化 */
+interface FileWatcherData {
+    Key: string;
+    FullPath: string;
+    OldFullPath: string;
+    ChangeType: "changed" | "created" | "deleted" | "renamed";
+    FileType: "file" | "dir";
 }

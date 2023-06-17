@@ -360,6 +360,7 @@ namespace Tiefsee {
             //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
 
             this.FormClosed += (sender, e) => {
+                WV_System.FileWatcherDispose(); //停止偵測檔案變化
                 QuickRun.WindowFreed();
             };
         }

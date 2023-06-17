@@ -46,6 +46,7 @@ class Msgbox {
         arRadio?: { value: string, name: string }[],
         radioValue?: string,
         funcYes?: (dom: HTMLElement, inputTxt: string) => void,
+        funcClose?: (dom: HTMLElement) => void,
     }) {
 
         this._isShow = true;
@@ -58,6 +59,7 @@ class Msgbox {
         let arRadio: { value: string; name: string; }[] = []; //radio選項
         let radioValue: string = ""; //radio預設值
         let funcYes = (dom: HTMLElement, value: string) => { this.close(dom); }
+        let funcClose = (dom: HTMLElement) => { this.close(dom); }
 
         if (json.txt !== undefined) { txt = json.txt }
         if (json.type !== undefined) { type = json.type }
@@ -67,6 +69,7 @@ class Msgbox {
         if (json.arRadio !== undefined) { arRadio = json.arRadio }
         if (json.radioValue !== undefined) { radioValue = json.radioValue }
         if (json.funcYes !== undefined) { funcYes = json.funcYes; }
+        if (json.funcClose !== undefined) { funcClose = json.funcClose; }
 
         let htmlRadio = "";
         for (let i = 0; i < arRadio.length; i++) {
@@ -123,13 +126,13 @@ class Msgbox {
             donBottom.style.display = "none"; //不顯示按鈕
         }
         if (type !== "text") {
-            donInput.style.display = "none";   //隱藏輸入框
+            donInput.style.display = "none"; //隱藏輸入框
         }
 
         donInput.value = inputTxt;
 
-        donBtnClose.addEventListener("click", () => { this.close(dom) })
-        donBtnNo.addEventListener("click", () => { this.close(dom) })
+        donBtnClose.addEventListener("click", () => { funcClose(dom) })
+        donBtnNo.addEventListener("click", () => { funcClose(dom) })
         donBtnYes.addEventListener("click", () => { //按下確認時
             let value: string = "";
             if (type === "txt") { }
@@ -150,12 +153,10 @@ class Msgbox {
             donInput.select();
         }
 
-        //setRadio(``, radioValue);
-        //return dom;
         return {
             domMsg: dom,
             domInput: donInput,
-            close: () => { this.close(dom) }
+            //close: () => { this.close(dom) }
         };
     }
 
