@@ -340,6 +340,7 @@ class Config {
                 { ext: "jpg", type: "vips", vipsType: "jpg" }, //如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
+                { ext: "jpe", type: "vips", vipsType: "jpg" },
                 { ext: "png", type: "vips", vipsType: "vips" },
                 { ext: "webp", type: "vips", vipsType: "vips" },
                 { ext: "bmp", type: "vips", vipsType: "bitmap" },

@@ -69,6 +69,7 @@
 							<uap:FileType ContentType="image/jpeg">.jpg</uap:FileType>
 							<uap:FileType ContentType="image/jpeg">.jpeg</uap:FileType>
 							<uap:FileType ContentType="image/jpeg">.jfif</uap:FileType>
+							<uap:FileType ContentType="image/jpeg">.jpe</uap:FileType>
 							<uap:FileType ContentType="image/png">.png</uap:FileType>
 							<uap:FileType ContentType="image/webp">.webp</uap:FileType>
 							<uap:FileType ContentType="image/bmp">.bmp</uap:FileType>
