@@ -1595,6 +1595,13 @@ var langData = {
             "ja": "検出されない",
         },
 
+        reloadFile: {
+            "zh-TW": "檔案已被修改，要重新載入此檔案嗎？",
+            "en": "The file has been changed, do you want to reload this file?",
+            "ja": "ファイルが変更されました。このファイルを再読み込みしますか？",
+        },
+
+
         //#region download
         fileDownloadFailed: {
             "zh-TW": "檔案下載失敗",

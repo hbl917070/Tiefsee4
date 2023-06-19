@@ -184,6 +184,8 @@ class MainFileList {
                 return;
             }
 
+            let noDelay = temp_start === -999; // true=首次執行，載入圖片不需要延遲
+
             //取得單個項目的高度
             let fileListItem = dom_fileListData.querySelector(".fileList-item");
             if (fileListItem === null) {
@@ -207,7 +209,7 @@ class MainFileList {
 
             if (start < 0) { start = 0 }
             if (temp_start === start && temp_count === count) { //沒變化就離開
-                return
+                return;
             }
             temp_start = start;
             temp_count = count;
@@ -216,11 +218,12 @@ class MainFileList {
             dom_fileListData.style.marginTop = (start * itemHeight) + "px";
             let arWaitingFile = M.fileLoad.getWaitingFile()
 
+
             let end = start + count;
             if (end > arWaitingFile.length) { end = arWaitingFile.length }
             for (let i = start; i < end; i++) {
                 const path = arWaitingFile[i];
-                newItem(i, path);
+                newItem(i, path, noDelay);
             }
 
             select();
@@ -233,19 +236,19 @@ class MainFileList {
          * @param path 
          * @returns 
          */
-        function newItem(i: number, path: string) {
+        function newItem(i: number, path: string, noDelay = false) {
 
             let name = Lib.GetFileName(path); //檔名
 
             let style = "";
 
-            if (temp_loaded.indexOf(i) === -1) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+            if (temp_loaded.indexOf(i) === -1 && noDelay === false) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (path !== "") {
                     setTimeout(() => {
                         if (dom_fileListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
 
                         temp_loaded.push(i); //加到全域變數，表示已經載入過
-                        let _url = getImgUrl(path)
+                        let _url = getImgUrl(path);
                         let domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
                         domImg.style.backgroundImage = `url("${_url}")`;
                     }, 30);
@@ -260,10 +263,10 @@ class MainFileList {
             let htmlNo = ``
             let htmlName = ``
             if (isShowNo === true) {
-                htmlNo = `<div class="fileList-no">${i + 1}</div>`
+                htmlNo = `<div class="fileList-no">${i + 1}</div>`;
             }
             if (isShowName === true) {
-                htmlName = `<div class="fileList-name">${name}</div> `
+                htmlName = `<div class="fileList-name">${name}</div>`;
             }
 
             let div = Lib.newDom(
@@ -272,7 +275,7 @@ class MainFileList {
                         ${htmlNo} ${htmlName}
                     </div>
                     <div class="fileList-img" style="${style}"> </div>                                                            
-                </div>`)
+                </div>`);
             dom_fileListData.append(div);
 
             //click載入圖片
@@ -280,7 +283,7 @@ class MainFileList {
                 M.fileLoad.showFile(i);
             })
 
-            return div
+            return div;
         }
 
 

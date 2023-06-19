@@ -57,6 +57,8 @@ class FileLoad {
         var isBulkView = false;
         /** 當前是否為 大量瀏覽模式子視窗 */
         var isBulkViewSub = false;
+        /** 如果使用者關閉「重新載入檔案的對話方塊」，則同一個檔案不再次詢問*/
+        var temp_reloadFilePath = "";
 
         /** 目前的資料夾路徑 */
         var dirPathNow: string = "";
@@ -112,94 +114,6 @@ class FileLoad {
         /** 設定當前是否為大量瀏覽模式子視窗 */
         this.setIsBulkViewSub = function (val: boolean) { isBulkViewSub = val; };
 
-
-        var temp_reloadFilePath = "";
-
-        /**
-         * 顯示 重新載入檔案 的對話方塊
-         */
-        function showReloadFileMsg(type: "delete" | "reload") {
-
-            if (M.msgbox.isShow()) { return; }
-
-            let path = getFilePath();
-
-            //如果使用者關閉詢問視窗，則同一個檔案不再次詢問
-            if (path === temp_reloadFilePath) { return; }
-
-            M.msgbox.show({
-                txt: "檔案已被修改，是否重新載入檔案",
-                funcYes: async (dom: HTMLElement, inputTxt: string) => {
-                    M.msgbox.close(dom);
-                    let flag = arFile.indexOf(path);
-                    showFile(flag); //重新載入檔案
-                },
-                funcClose: async (dom: HTMLElement) => {
-                    M.msgbox.close(dom);
-                    temp_reloadFilePath = path;
-                }
-            });
-
-        }
-
-
-        //偵測 檔案列表
-        baseWindow.fileWatcherEvents.push((data: FileWatcherData) => {
-
-            if (data.Key !== "fileList") { return; }
-
-            if (data.ChangeType === "created") { //新增檔案
-
-                if (data.FileType !== "file") { return; }
-                if (arFile.indexOf(data.FullPath) !== -1) { return; }
-
-                let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
-                let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
-                if (groupType === gt) {
-                    arFile.push(data.FullPath);
-                    M.mainFileList.init(); //檔案預覽視窗 初始化
-                }
-
-            } else if (data.ChangeType === "deleted") { //刪除檔案
-
-                if (data.FullPath === getFilePath()) {
-
-                    showReloadFileMsg("delete"); //顯示 重新載入檔案 的對話方塊
-
-                } else {
-
-                    let flag = arFile.indexOf(data.FullPath);
-                    if (flag !== -1) {
-                        arFile.splice(flag, 1); //刪除此筆
-                        M.mainFileList.init(); //檔案預覽視窗 初始化
-                    }
-
-                }
-
-            } else if (data.ChangeType === "renamed") { //檔案重新命名
-
-                if (data.FileType !== "file") { return; }
-
-                let flag = arFile.indexOf(data.OldFullPath);
-                if (flag !== -1) {
-                
-                    if (data.OldFullPath === getFilePath()) {
-                        arFile[flag] = data.FullPath;
-                        updateTitle(); //更新視窗標題
-                        showFile(); //重新載入檔案
-                    } else {
-                        arFile[flag] = data.FullPath;       
-                    }
-                    M.mainFileList.init(); //檔案預覽視窗 初始化
-                }
-
-            } else if (data.ChangeType === "changed") { //檔案被修改
-
-                if (data.FullPath === getFilePath()) {
-                    showReloadFileMsg("reload"); //顯示 重新載入檔案 的對話方塊
-                }
-            }
-        })
 
         //#region Dir
 
@@ -448,7 +362,6 @@ class FileLoad {
             }
         }
 
-
         /**
          * 載入檔案陣列
          * @param dirPath 
@@ -486,7 +399,6 @@ class FileLoad {
 
             loadDir(dirPath); //處理資料夾預覽視窗
         }
-
 
         /**
          * 載入單一檔案
@@ -591,7 +503,6 @@ class FileLoad {
 
         }
 
-
         /**
          * 取得目前檔案的路徑
          */
@@ -614,10 +525,29 @@ class FileLoad {
 
         /**
          * 取得名單類型
-         * @returns 
          */
         function getFileLoadType() {
             return fileLoadType;
+        }
+
+        /**
+         * 
+         */
+        function getGroupType() {
+            return groupType;
+        }
+        /**
+         * 
+         */
+        function setGroupType(type: string) {
+            groupType = type;
+        }
+
+        /**
+         * 設定大量瀏覽模式是否啟用 (重新載入檔案才會生效)
+         */
+        function enableBulkView(val: boolean) {
+            isBulkView = val;
         }
 
 
@@ -712,13 +642,6 @@ class FileLoad {
         }
 
         /**
-         * 
-         */
-        function enableBulkView(val: boolean) {
-            isBulkView = val;
-        }
-
-        /**
          * 載入下一個檔案
          */
         async function nextFile() {
@@ -733,7 +656,6 @@ class FileLoad {
             if (flagFile >= arFile.length) { flagFile = 0; }
             showFile();
         }
-
 
         /**
          * 載入上一個檔案
@@ -750,7 +672,6 @@ class FileLoad {
             if (flagFile < 0) { flagFile = arFile.length - 1; }
             showFile();
         }
-
 
         /**
           * 更新視窗標題
@@ -769,7 +690,6 @@ class FileLoad {
                 baseWindow.setTitle(title);
             }
         }
-
 
         /**
          * 從檔案類型判斷，要使用什麼用什麼類型來顯示
@@ -796,15 +716,6 @@ class FileLoad {
             }
 
             return GroupType.unknown;
-        }
-
-
-
-        function getGroupType() {
-            return groupType;
-        }
-        function setGroupType(type: string) {
-            groupType = type;
         }
 
         /**
@@ -847,7 +758,6 @@ class FileLoad {
             return ar;
         }
 
-
         /**
          * 過濾「office文件臨時檔」
          */
@@ -865,6 +775,34 @@ class FileLoad {
             }
         }
 
+
+        //#region 對話方塊
+
+        /**
+          * 顯示 重新載入檔案 的對話方塊
+          */
+        function showReloadFileMsg(type: "delete" | "reload") {
+
+            if (M.msgbox.isShow()) { return; }
+
+            let path = getFilePath();
+
+            //如果使用者關閉詢問視窗，則同一個檔案不再次詢問
+            if (path === temp_reloadFilePath) { return; }
+
+            M.msgbox.show({
+                txt: M.i18n.t("msg.reloadFile"), //檔案已被修改，你要重新載入此檔案嗎？
+                funcYes: async (dom: HTMLElement, inputTxt: string) => {
+                    M.msgbox.close(dom);
+                    showFile(); //重新載入檔案
+                },
+                funcClose: async (dom: HTMLElement) => {
+                    M.msgbox.close(dom);
+                    temp_reloadFilePath = path;
+                }
+            });
+
+        }
 
         /**
          * 顯示 刪除檔案 的對話方塊
@@ -1008,7 +946,6 @@ class FileLoad {
 
         }
 
-
         /**
          * 顯示 重新命名檔案 的對話方塊
          */
@@ -1136,6 +1073,99 @@ class FileLoad {
             }
             return newArDir;
         }
+
+        //#endregion
+
+
+        //偵測檔案變化 - 檔案列表
+        baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
+
+            let isMainFileListInit = false; //檔案預覽視窗 初始化
+            let isUpdateTitle = false; //更新視窗標題
+            let isShowReloadFileMsgDelete = false; //顯示 重新載入檔案 的對話方塊
+            let isShowReloadFileMsgReload = false; //顯示 重新載入檔案 的對話方塊
+            let isShowFile = false; //重新載入檔案
+
+            arData.forEach(data => {
+
+                if (data.Key !== "fileList") { return; }
+
+                if (data.ChangeType === "deleted") { //刪除檔案
+
+                    if (data.FullPath === getFilePath()) {
+
+                        isShowReloadFileMsgDelete = true; //顯示 重新載入檔案 的對話方塊
+
+                    } else {
+
+                        let flag = arFile.indexOf(data.FullPath);
+                        if (flag !== -1) {
+                            arFile.splice(flag, 1); //刪除此筆
+                            isMainFileListInit = true; //檔案預覽視窗 初始化
+                            isUpdateTitle = true; //更新視窗標題
+                        }
+
+                    }
+
+                } else if (data.ChangeType === "renamed") { //檔案重新命名
+
+                    if (data.FileType === "dir") { return; }
+
+                    let flag = arFile.indexOf(data.OldFullPath);
+                    if (flag !== -1) { //名單中存在
+                        if (data.OldFullPath === getFilePath()) { //當前開啟
+                            arFile[flag] = data.FullPath;
+                            isUpdateTitle = true; //更新視窗標題
+                            isShowFile = true; //重新載入檔案
+                        } else {
+                            arFile[flag] = data.FullPath;
+                        }
+                        isMainFileListInit = true; //檔案預覽視窗 初始化
+                    } else {
+                        data.ChangeType = "created";
+                    }
+
+                } else if (data.ChangeType === "changed") { //檔案被修改
+
+                    if (groupType === GroupType.img) {
+                        if (data.FullPath === getFilePath()) {
+                            isShowReloadFileMsgReload = true; //顯示 重新載入檔案 的對話方塊
+                        }
+                    }
+
+                }
+
+                if (data.ChangeType === "created") { //新增檔案
+
+                    if (data.FileType !== "file") { return; }
+                    if (arFile.indexOf(data.FullPath) !== -1) { return; }
+
+                    let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
+                    let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
+                    if (groupType === gt) {
+                        arFile.push(data.FullPath);
+                        isMainFileListInit = true; //檔案預覽視窗 初始化
+                        isUpdateTitle = true; //更新視窗標題
+                    }
+
+                }
+            });
+
+
+            if (isMainFileListInit) {
+                M.mainFileList.init(); //檔案預覽視窗 初始化
+            }
+            if (isUpdateTitle) {
+                updateTitle(); //更新視窗標題
+            }
+            if (isShowReloadFileMsgDelete) {
+                showReloadFileMsg("delete"); //顯示 重新載入檔案 的對話方塊
+            } else if (isShowReloadFileMsgReload) {
+                showReloadFileMsg("reload"); //顯示 重新載入檔案 的對話方塊
+            } else if (isShowFile) {
+                showFile(); //重新載入檔案
+            }
+        })
 
 
     }

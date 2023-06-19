@@ -34,7 +34,7 @@ class BaseWindow {
 
     public closingEvents: (() => void)[] = []; //關閉視窗時執行的function
     public sizeChangeEvents: (() => void)[] = []; //sizeChange時執行的function
-    public fileWatcherEvents: ((data: FileWatcherData) => void)[] = []; //檔案發生變化時時執行的function
+    public fileWatcherEvents: ((data: FileWatcherData[]) => void)[] = []; //檔案發生變化時時執行的function
     public touchDrop = new TouchDrop(this);
 
     constructor() {
@@ -283,14 +283,15 @@ class BaseWindow {
 
     /**
      * 由C#主動呼叫。檔案發生變化時
-     * @param data 
+     * @param arData 
      */
-    public async onFileWatcher(data: FileWatcherData) {
-
+    public async onFileWatcher(arData: FileWatcherData[]) {
+        console.log(arData)
         for (let i = 0; i < this.fileWatcherEvents.length; i++) {
-            await this.fileWatcherEvents[i](data);
+            let newArDate =  arData.map(a => {return {...a}});; //複製一個新的陣列(避免被修改)
+            await this.fileWatcherEvents[i](newArDate);
         }
-        console.log(data)
+
     }
 
     //由C#主動呼叫
