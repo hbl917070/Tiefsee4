@@ -12,6 +12,7 @@ class BulkView {
     public setColumns;
     public setFocus;
     public saveCurrentState;
+    public updateFileWatcher;
 
     constructor(M: MainWindow) {
 
@@ -64,6 +65,8 @@ class BulkView {
         var temp_scrollWidth = 0;
         /** 離開前記錄bulkViewContent的高度 */
         var temp_scrollHeight = 0;
+        /** 切換欄時，記錄上一次的值。用於辨識是否使用首圖縮排 */
+        let temp_columns = -1;
 
         /** 請求限制器 */
         const limiter = new RequestLimiter(3);
@@ -75,6 +78,7 @@ class BulkView {
         this.load2 = load2;
         this.setColumns = setColumns;
         this.saveCurrentState = saveCurrentState;
+        this.updateFileWatcher = updateFileWatcher;
         /** 取得焦點 */
         this.setFocus = () => {
             dom_bulkViewContent.tabIndex = 0;
@@ -137,7 +141,7 @@ class BulkView {
                 dom_lastWriteTime
             ];
 
-            let temp_columns = -1; //記錄上一次的值
+
             arDomCheckbox.forEach((dom) => {
                 dom.addEventListener("input", (e) => {
                     apply();
@@ -157,6 +161,7 @@ class BulkView {
 
                 let columns = Number.parseInt(getGroupRadioVal(dom_columns));
                 let indentation = dom_indentation.value;
+                console.log(indentation, temp_columns, columns)
                 if (indentation === "on") { //在開啟首圖進縮的情況下
                     if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
                         load(pageNow);
@@ -174,6 +179,7 @@ class BulkView {
          */
         function initSetting() {
             setGroupRadioVal(dom_columns, M.config.settings.bulkView.columns.toString());
+            temp_columns = M.config.settings.bulkView.columns;
             dom_gaplessMode.value = M.config.settings.bulkView.gaplessMode;
             dom_fixedWidth.value = M.config.settings.bulkView.fixedWidth;
             dom_align.value = M.config.settings.bulkView.align;
@@ -255,7 +261,6 @@ class BulkView {
             } else {
                 dom_box_indentation.style.display = "none";
             }
-
         }
 
 
@@ -482,7 +487,6 @@ class BulkView {
         }
 
 
-
         /** 
          * 顯示或隱藏dom
          */
@@ -505,6 +509,11 @@ class BulkView {
             temp_scrollTop = dom_bulkView.scrollTop; //記錄離開時捲動到哪個位置
             temp_scrollWidth = dom_bulkViewContent.scrollWidth;
             temp_scrollHeight = dom_bulkViewContent.scrollHeight;
+
+            temp_arFile = arFile;
+            temp_dirPath = getDirPath();
+            temp_fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
+            temp_pageNow = pageNow;
         }
 
 
@@ -585,10 +594,7 @@ class BulkView {
 
             }
 
-            temp_arFile = arFile;
-            temp_dirPath = getDirPath();
-            temp_fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
-            temp_pageNow = pageNow;
+
         }
 
 
@@ -626,12 +632,12 @@ class BulkView {
             let pageMax = Math.ceil(arFile.length / imgMaxCount);
             if (pageNow >= pageMax) { pageNow = pageMax; }
 
-            updatePagination(); //更新分頁器       
+            updatePagination(); //更新分頁器
 
             showPageThrottle.run = async () => {
 
                 dom_bulkView.scrollTop = 0; //捲動到最上面
-                
+
                 let temp = pageNow + getDirPath();
                 let start = ((pageNow - 1) * imgMaxCount);
 
@@ -648,13 +654,196 @@ class BulkView {
                     }
                     for (let j = 0; j < retAr.length; j++) {
                         const item = retAr[j];
-                        newItem(item, i * 10 + j);
+                        let domItem = newItem(item, i * 10 + j);
+                        dom_bulkViewContent.appendChild(domItem);
                     }
                 }
 
                 updateSize();
             }
 
+        }
+
+
+        /**
+         * 更新左上角的圖片編號
+         */
+        function updateItemNumber() {
+            let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
+
+            for (let i = 0; i < arDom.length; i++) {
+                const domItem = arDom[i];
+                let domItemPath = domItem.getAttribute("data-path");
+                if (domItemPath === null) { continue; }
+
+                let n = (arFile.indexOf(domItemPath) + 1).toString();
+                domItem.setAttribute("data-number", n);
+
+                let domNumber = domItem.querySelector(".bulkView-number");
+                if (domNumber === null) { continue; }
+                domNumber.innerHTML = n;
+            }
+        }
+
+        var queueUpdateFileWatcher = Promise.resolve(); //佇列
+        /**
+         * 檔案被修改時呼叫
+         */
+        function updateFileWatcher(fileWatcherData: FileWatcherData) {
+
+            let dirPath = getDirPath();
+            let deleteIndex = -1;
+            if (fileWatcherData.ChangeType === "deleted") {
+                //跟上次的檔案列表做比較，取得被刪除的檔案的位置    
+                let newAr = Array.from(M.fileLoad.getWaitingFile());
+                for (let i = 0; i < arFile.length; i++) {
+                    if (arFile[i] != newAr[i]) {
+                        deleteIndex = i;
+                        break;
+                    }
+                }
+                arFile = newAr;
+            } else {
+                arFile = Array.from(M.fileLoad.getWaitingFile()); //取得檔案列表
+            }
+
+            //加入佇列裡面
+            queueUpdateFileWatcher = queueUpdateFileWatcher.then(async () => {
+
+                if (isVisible === false) { return; }
+                if (dirPath !== getDirPath()) { return; }
+
+                if (fileWatcherData.ChangeType === "created") {
+
+                    if (pageNow < 1) { pageNow = 1; }
+
+                    let index = arFile.indexOf(fileWatcherData.FullPath);
+                    if (index === -1) { //副檔名匹配失敗，沒有出現在列表裡
+                        return;
+
+                    } else if (((pageNow - 1) * imgMaxCount) < index + 1 && index < (pageNow * imgMaxCount)) {
+
+                        let newItemDom = await pathToItem(fileWatcherData.FullPath);
+                        let items = dom_bulkView.querySelectorAll(".bulkView-item");
+                        if (items.length !== 0) {
+                            let thirdItem = items[items.length - 1];
+                            thirdItem.insertAdjacentElement("afterend", newItemDom);
+                        } else {
+                            dom_bulkViewContent.appendChild(newItemDom);
+                        }
+
+                    }
+
+                    updateItemNumber(); //更新左上角的圖片編號
+                    updatePagination(); //更新分頁器
+
+                } else if (fileWatcherData.ChangeType === "deleted") {
+
+                    if (deleteIndex === -1) { return; }
+
+                    //如果刪除檔案後，當前頁碼超過最大頁數，則重新載入
+                    let pageMax = Math.ceil(arFile.length / imgMaxCount);
+                    if (pageNow > pageMax) {
+                        pageNow = pageMax;
+                        showPage();
+                        return;
+                    }
+
+                    if (deleteIndex > (pageNow) * imgMaxCount) { //刪除後面頁的圖片
+
+                    } else if (deleteIndex < (pageNow - 1) * imgMaxCount) { //刪除前面頁的圖片
+
+                        //刪除當前顯示的第1張圖片
+                        let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
+                        if (arDom.length > 0) {
+                            arDom[0].remove();
+                        }
+
+                        if (pageNow < pageMax) { //如果不是最後一頁
+                            //在最後面插入下一頁的第1張圖片
+                            let newItemDom = await pathToItem(arFile[pageNow * imgMaxCount - 1]);
+                            let items = dom_bulkView.querySelectorAll(".bulkView-item");
+                            let thirdItem = items[items.length - 1];
+                            thirdItem.insertAdjacentElement("afterend", newItemDom);
+                        }
+                        updateItemNumber(); //更新左上角的圖片編號
+                        updatePagination(); //更新分頁器
+
+                    } else { //刪除當前頁的圖片
+
+                        //確認刪除的目標在當前頁面
+                        let isDelete = false;
+                        let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
+                        for (let i = 0; i < arDom.length; i++) {
+                            const domItem = arDom[i];
+                            let domItemPath = domItem.getAttribute("data-path");
+                            if (domItemPath === fileWatcherData.FullPath) {
+                                domItem.remove();
+                                isDelete = true;
+                                break;
+                            }
+                        }
+
+                        if (isDelete) {
+                            if (pageNow < pageMax) { //如果不是最後一頁
+                                //在最後面插入下一頁的第1張圖片
+                                let newItemDom = await pathToItem(arFile[pageNow * imgMaxCount - 1]);
+                                let items = dom_bulkView.querySelectorAll(".bulkView-item");
+                                let thirdItem = items[items.length - 1];
+                                thirdItem.insertAdjacentElement("afterend", newItemDom);
+                            }
+                            updateItemNumber(); //更新左上角的圖片編號
+                            updatePagination(); //更新分頁器
+                        }
+                    }
+
+                } else if (fileWatcherData.ChangeType === "renamed") {
+
+                    let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
+                    for (let i = 0; i < arDom.length; i++) {
+                        const domItem = arDom[i] as HTMLElement;
+                        let domItemPath = domItem.getAttribute("data-path");
+                        if (domItemPath === fileWatcherData.OldFullPath) {
+
+                            let newItemDom = await pathToItem(fileWatcherData.FullPath);
+                            domItem.insertAdjacentElement("afterend", newItemDom);
+                            domItem.remove();
+
+                            updateItemNumber(); //更新左上角的圖片編號
+                            break;
+                        }
+                    }
+
+                } else if (fileWatcherData.ChangeType === "changed") {
+
+                    return;
+
+                    let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
+                    for (let i = 0; i < arDom.length; i++) {
+                        const domItem = arDom[i];
+                        let domItemPath = domItem.getAttribute("data-path");
+                        if (domItemPath === fileWatcherData.FullPath) {
+
+                            let newItemDom = await pathToItem(fileWatcherData.FullPath);
+                            domItem.insertAdjacentElement("afterend", newItemDom);
+                            domItem.remove();
+
+                            updateItemNumber(); //更新左上角的圖片編號
+                            break;
+                        }
+                    }
+
+                }
+
+                updateSize();
+
+            });
+        }
+        //傳入檔案路徑，回傳item
+        async function pathToItem(path: string) {
+            let retAr = await WebAPI.getFileInfo2List([path]);
+            let newItemDom = newItem(retAr[0], 0);
+            return newItemDom;
         }
 
 
@@ -714,7 +903,7 @@ class BulkView {
         /**
          * 
          */
-        async function newItem(fileInfo2: FileInfo2, n: number) {
+        function newItem(fileInfo2: FileInfo2, n: number) {
 
             let temp = pageNow + getDirPath();
             let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
@@ -725,103 +914,111 @@ class BulkView {
                     </div>
                 </div>
             `)
+            div.setAttribute("data-path", fileInfo2.Path);
             div.style.width = size + "px";
             div.style.minHeight = size + "px";
             updateSize(div);
-            dom_bulkViewContent.appendChild(div);
+            //dom_bulkViewContent.appendChild(div);
 
-            //把長路經轉回虛擬路徑，避免瀏覽器無法載入圖片
-            if (fileInfo2.Path.length > 255) {
-                fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
-            }
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
-            let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
-            if (configItem === null) {
-                configItem = { ext: "", type: "vips", vipsType: "magick" }
-            }
-            let configType = configItem.type;
+            setTimeout(async () => {
 
-            let vipsType = configItem.vipsType as string;
-            let arUrl: { scale: number, url: string }[] = [];
-            let width = -1;
-            let height = -1;
-
-            if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
-
-                let imgInitInfo = await WebAPI.Img.webInit(fileInfo2);
-                if (imgInitInfo.code == "1") {
-                    width = imgInitInfo.width;
-                    height = imgInitInfo.height;
-                    arUrl.push({ scale: 1, url: imgInitInfo.path });
+                //把長路經轉回虛擬路徑，避免瀏覽器無法載入圖片
+                if (fileInfo2.Path.length > 255) {
+                    fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
                 }
+                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+                let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
+                let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
+                if (configItem === null) {
+                    configItem = { ext: "", type: "vips", vipsType: "magick" }
+                }
+                let configType = configItem.type;
 
-            } else if (configType === "vips") {
+                let vipsType = configItem.vipsType as string;
+                let arUrl: { scale: number, url: string }[] = [];
+                let width = -1;
+                let height = -1;
 
-                let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
-                if (imgInitInfo.code == "1") {
+                if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
 
-                    width = imgInitInfo.width;
-                    height = imgInitInfo.height;
+                    let imgInitInfo = await WebAPI.Img.webInit(fileInfo2);
+                    if (imgInitInfo.code == "1") {
+                        width = imgInitInfo.width;
+                        height = imgInitInfo.height;
+                        arUrl.push({ scale: 1, url: imgInitInfo.path });
+                    }
 
-                    let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
-                    if (isNaN(ratio)) { ratio = 0.8; }
-                    if (ratio > 0.95) { ratio = 0.95; }
-                    if (ratio < 0.5) { ratio = 0.5; }
+                } else if (configType === "vips") {
 
-                    //設定縮放的比例
-                    arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
-                    for (let i = 1; i <= 30; i++) {
-                        let scale = Number(Math.pow(ratio, i).toFixed(3));
-                        if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { //如果圖片太小就不處理
-                            break;
+                    let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+                    if (imgInitInfo.code == "1") {
+
+                        width = imgInitInfo.width;
+                        height = imgInitInfo.height;
+
+                        let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
+                        if (isNaN(ratio)) { ratio = 0.8; }
+                        if (ratio > 0.95) { ratio = 0.95; }
+                        if (ratio < 0.5) { ratio = 0.5; }
+
+                        //設定縮放的比例
+                        arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
+                        for (let i = 1; i <= 30; i++) {
+                            let scale = Number(Math.pow(ratio, i).toFixed(3));
+                            if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { //如果圖片太小就不處理
+                                break;
+                            }
+                            let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
+                            arUrl.push({ scale: scale, url: imgU })
                         }
-                        let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
-                        arUrl.push({ scale: scale, url: imgU })
+
+                    }
+
+                } else { //直接開啟網址
+
+                    let url = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
+                    let imgInitInfo = await WebAPI.Img.webInit(url);
+                    if (imgInitInfo.code == "1") {
+                        width = imgInitInfo.width;
+                        height = imgInitInfo.height;
+                        arUrl.push({ scale: 1, url: imgInitInfo.path });
                     }
 
                 }
 
-            } else { //直接開啟網址
-
-                let url = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
-                let imgInitInfo = await WebAPI.Img.webInit(url);
-                if (imgInitInfo.code == "1") {
-                    width = imgInitInfo.width;
-                    height = imgInitInfo.height;
-                    arUrl.push({ scale: 1, url: imgInitInfo.path });
+                if (width === -1) {
+                    let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
+                    width = 256;
+                    height = 256;
+                    arUrl.push({ scale: 1, url: url });
                 }
 
-            }
+                //--------
 
-            if (width === -1) {
-                let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
-                width = 256;
-                height = 256;
-                arUrl.push({ scale: 1, url: url });
-            }
+                if (temp !== pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
+                    return;
+                }
 
-            //--------
+                //---------
 
-            if (temp !== pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
-                return;
-            }
+                let dataNumber = div.getAttribute("data-number");
+                if (dataNumber !== null) {
+                    n = Number(dataNumber);
+                } else {
+                    n = n + 1 + (pageNow - 1) * imgMaxCount;
+                }
+                if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                    n -= 1;
+                }
 
-            //---------
+                let fileName = Lib.GetFileName(fileInfo2.FullPath);
+                let LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
+                let LastWriteTime = new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss");
+                let writeDate = new Date(LastWriteTimeUtc).format("yyyy-MM-dd");
+                let writeTime = new Date(LastWriteTimeUtc).format("hh:mm:ss");
+                let fileSize = Lib.getFileLength(fileInfo2.Lenght);
 
-            n = n + 1 + (pageNow - 1) * imgMaxCount;
-            if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
-                n -= 1;
-            }
-
-            let fileName = Lib.GetFileName(fileInfo2.FullPath);
-            let LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
-            let LastWriteTime = new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss");
-            let writeDate = new Date(LastWriteTimeUtc).format("yyyy-MM-dd");
-            let writeTime = new Date(LastWriteTimeUtc).format("hh:mm:ss");
-            let fileSize = Lib.getFileLength(fileInfo2.Lenght);
-
-            div.innerHTML = /*html*/`
+                div.innerHTML = /*html*/`
                 <div class="bulkView-header">
                     <div class="bulkView-number">${n}</div>
                     <div class="bulkView-fileName">${fileName}</div>
@@ -836,84 +1033,87 @@ class BulkView {
                     <img class="bulkView-img">
                 </div>
             `
-            div.setAttribute("data-width", width.toString());
-            div.setAttribute("data-height", height.toString());
-            div.style.width = size + "px";
-            div.style.minHeight = size + "px";
-            updateSize(div);
+                div.setAttribute("data-width", width.toString());
+                div.setAttribute("data-height", height.toString());
+                div.style.width = size + "px";
+                div.style.minHeight = size + "px";
+                updateSize(div);
 
-            //點擊圖片後，退出大量瀏覽模式
-            div.addEventListener("click", async () => {
-                if (n !== 0) {
+                //點擊圖片後，退出大量瀏覽模式
+                div.addEventListener("click", async () => {
+                    if (n !== 0) {
 
-                    M.fileLoad.setIsBulkViewSub(true);
-                    await M.script.bulkView.close(n - 1);
-                    await Lib.sleep(10);
-                    M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
+                        M.fileLoad.setIsBulkViewSub(true);
+                        await M.script.bulkView.close(n - 1);
+                        await Lib.sleep(10);
+                        M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
 
-                    //設定返回按鈕
-                    M.toolbarBack.visible(true);
-                    M.toolbarBack.setEvent(() => {
-                        M.script.bulkView.show();
-                    });
-                }
-            });
+                        //設定返回按鈕
+                        M.toolbarBack.visible(true);
+                        M.toolbarBack.setEvent(() => {
+                            M.script.bulkView.show();
+                        });
+                    }
+                });
 
-            let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
-            let dom_center = div.querySelector(".bulkView-center") as HTMLDivElement;
-            let dom_header = div.querySelector(".bulkView-header") as HTMLDivElement;
-            let dom_header2 = div.querySelector(".bulkView-header2") as HTMLDivElement;
+                let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
+                let dom_center = div.querySelector(".bulkView-center") as HTMLDivElement;
+                let dom_header = div.querySelector(".bulkView-header") as HTMLDivElement;
+                let dom_header2 = div.querySelector(".bulkView-header2") as HTMLDivElement;
 
-            let title = `${M.i18n.t("bulkView.imageSize")}：${width} x ${height}\n` +
-                `${M.i18n.t("bulkView.fileSize")}：${fileSize}\n` +
-                `${M.i18n.t("bulkView.lastWriteDate")}：${LastWriteTime}`;
-            dom_header.setAttribute("title", title);
-            dom_header2.setAttribute("title", title);
+                let title = `${M.i18n.t("bulkView.imageSize")}：${width} x ${height}\n` +
+                    `${M.i18n.t("bulkView.fileSize")}：${fileSize}\n` +
+                    `${M.i18n.t("bulkView.lastWriteDate")}：${LastWriteTime}`;
+                dom_header.setAttribute("title", title);
+                dom_header2.setAttribute("title", title);
 
-            //載入失敗時
-            if (dom_img.onerror === null) {
-                dom_img.onerror = () => {
-                    dom_img.src = "./img/error.svg";
-                }
-            }
-
-            //區塊改變大小時
-            new ResizeObserver(Lib.debounce(() => {
-
-                if (isVisible === false) { return; }
-
-                let ret = arUrl[0];
-                let boxWidth = dom_center.offsetWidth;
-
-                if (boxWidth <= 10) {
-                    return;
-                }
-
-                //如果是1欄或2欄且有鎖定寬度
-                if (getFixedWidth() !== "off") {
-                    let columns = getColumns();
-                    if (columns === 1 || columns === 2) {
-                        boxWidth = boxWidth * Number.parseInt(getFixedWidth()) / 100;
+                //載入失敗時
+                if (dom_img.onerror === null) {
+                    dom_img.onerror = () => {
+                        dom_img.src = "./img/error.svg";
                     }
                 }
 
-                let nowScale = boxWidth / width;
-                for (let i = arUrl.length - 1; i >= 0; i--) {
-                    const item = arUrl[i];
-                    if (item.scale >= nowScale) {
-                        ret = item;
-                        break;
+                //區塊改變大小時
+                new ResizeObserver(Lib.debounce(() => {
+
+                    if (isVisible === false) { return; }
+
+                    let ret = arUrl[0];
+                    let boxWidth = dom_center.offsetWidth;
+
+                    if (boxWidth <= 10) {
+                        return;
                     }
-                }
 
-                if (dom_img.getAttribute("src") !== ret.url) {
-                    //dom_img.setAttribute("src", ret.url);
-                    limiter.addRequest(dom_img, ret.url);
-                }
-                updateSize();
+                    //如果是1欄或2欄且有鎖定寬度
+                    if (getFixedWidth() !== "off") {
+                        let columns = getColumns();
+                        if (columns === 1 || columns === 2) {
+                            boxWidth = boxWidth * Number.parseInt(getFixedWidth()) / 100;
+                        }
+                    }
 
-            }, 300)).observe(div);
+                    let nowScale = boxWidth / width;
+                    for (let i = arUrl.length - 1; i >= 0; i--) {
+                        const item = arUrl[i];
+                        if (item.scale >= nowScale) {
+                            ret = item;
+                            break;
+                        }
+                    }
 
+                    if (dom_img.getAttribute("src") !== ret.url) {
+                        //dom_img.setAttribute("src", ret.url);
+                        limiter.addRequest(dom_img, ret.url);
+                    }
+                    updateSize();
+
+                }, 300)).observe(div);
+
+            }, 0);
+
+            return div;
         }
 
 

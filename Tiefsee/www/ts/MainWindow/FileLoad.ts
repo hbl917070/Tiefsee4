@@ -412,7 +412,6 @@ class FileLoad {
             }
             isLoadFileFinish = false;
 
-
             fileLoadType = FileLoadType.dir; //名單類型，資料夾內的檔案
 
             let fileInfo2 = await WebAPI.getFileInfo2(path);
@@ -1080,13 +1079,15 @@ class FileLoad {
         //偵測檔案變化 - 檔案列表
         baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
 
+            if (isBulkView) { return; }
+
             let isMainFileListInit = false; //檔案預覽視窗 初始化
             let isUpdateTitle = false; //更新視窗標題
             let isShowReloadFileMsgDelete = false; //顯示 重新載入檔案 的對話方塊
             let isShowReloadFileMsgReload = false; //顯示 重新載入檔案 的對話方塊
             let isShowFile = false; //重新載入檔案
 
-            arData.forEach(data => {
+            arData.forEach(async data => {
 
                 if (data.Key !== "fileList") { return; }
 
@@ -1103,6 +1104,8 @@ class FileLoad {
                             arFile.splice(flag, 1); //刪除此筆
                             isMainFileListInit = true; //檔案預覽視窗 初始化
                             isUpdateTitle = true; //更新視窗標題
+                        } else {
+                            return;
                         }
 
                     }
@@ -1127,10 +1130,10 @@ class FileLoad {
 
                 } else if (data.ChangeType === "changed") { //檔案被修改
 
-                    if (groupType === GroupType.img) {
-                        if (data.FullPath === getFilePath()) {
-                            isShowReloadFileMsgReload = true; //顯示 重新載入檔案 的對話方塊
-                        }
+                    if (groupType === GroupType.img && data.FullPath === getFilePath()) {
+                        isShowReloadFileMsgReload = true; //顯示 重新載入檔案 的對話方塊
+                    } else {
+                        return;
                     }
 
                 }
@@ -1138,7 +1141,7 @@ class FileLoad {
                 if (data.ChangeType === "created") { //新增檔案
 
                     if (data.FileType !== "file") { return; }
-                    if (arFile.indexOf(data.FullPath) !== -1) { return; }
+                    if (arFile.indexOf(data.FullPath) !== -1) { return; } //如果檔案已經存在於列表中
 
                     let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
                     let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
@@ -1146,11 +1149,13 @@ class FileLoad {
                         arFile.push(data.FullPath);
                         isMainFileListInit = true; //檔案預覽視窗 初始化
                         isUpdateTitle = true; //更新視窗標題
+                    } else {
+                        return;
                     }
 
                 }
-            });
 
+            });
 
             if (isMainFileListInit) {
                 M.mainFileList.init(); //檔案預覽視窗 初始化
@@ -1167,7 +1172,59 @@ class FileLoad {
             }
         })
 
+        //偵測檔案變化 - 大量瀏覽模式
+        baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
 
+            if (isBulkView === false) { return; }
+
+            arData.forEach(async data => {
+
+                if (data.Key !== "fileList") { return; }
+
+                if (data.ChangeType === "deleted") { //刪除檔案
+
+                    let flag = arFile.indexOf(data.FullPath);
+                    if (flag !== -1) {
+                        arFile.splice(flag, 1); //刪除此筆
+                    } else {
+                        return;
+                    }
+
+                } else if (data.ChangeType === "renamed") { //檔案重新命名
+
+                    if (data.FileType === "dir") { return; }
+
+                    let flag = arFile.indexOf(data.OldFullPath);
+                    if (flag !== -1) { //名單中存在
+                        arFile[flag] = data.FullPath;
+                    } else {
+                        data.ChangeType = "created";
+                    }
+
+                } else if (data.ChangeType === "changed") { //檔案被修改
+
+                }
+
+                if (data.ChangeType === "created") { //新增檔案
+
+                    if (data.FileType !== "file") { return; }
+                    if (arFile.indexOf(data.FullPath) !== -1) { return; } //如果檔案已經存在於列表中
+
+                    let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
+                    let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
+                    if (groupType === gt) {
+                        arFile.push(data.FullPath);
+                    } else {
+                        return;
+                    }
+
+                }
+
+                await M.bulkView.updateFileWatcher(data);
+
+            });
+
+        })
     }
 
 }

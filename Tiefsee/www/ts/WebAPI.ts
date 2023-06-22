@@ -332,7 +332,7 @@ class WebAPI {
         for (let i = 0; i < retAr.length; i++) {
             retAr[i].FullPath = retAr[i].Path;
         }
-        return retAr;
+        return retAr as FileInfo2[];
     }
 
     
