@@ -2621,8 +2621,8 @@ class Tiefseeview {
                 }
                 let mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
                 let media = matchMedia(mqString);
-                media.addListener(updatePixelRatio);
-                remove = function () { media.removeListener(updatePixelRatio) };
+                media.addEventListener("change", updatePixelRatio);
+                remove = function () { media.removeEventListener("change", updatePixelRatio) };
                 func();
             }
             updatePixelRatio();

@@ -39,7 +39,6 @@
     <script src="./../vender/cherry-markdown/cherry-markdown.min.js"></script>
 
     <script>
-
         window.addEventListener("message", (e) => {
 
             //只開放特定網域呼叫
@@ -90,11 +89,9 @@
             };
             libIframe.postMsg(json);
         }
-
     </script>
 
     <script>
-
         var libIframe = new LibIframe();
         libIframe.initEventDrop(window); //註冊 drop 事件，拖曳檔案進來時 開啟檔案
         libIframe.initTextHotkey(); //按 ctrl + S 時，儲存文字檔
@@ -108,21 +105,27 @@
         });
 
         //點擊超連結時
-        document.querySelector("body").addEventListener("click", function (e) {
+        document.querySelector("body").addEventListener("click", function(e) {
 
             let dom = e.target;
             let tagname = dom.tagName;
 
             //點擊的如果不是A標籤，則搜尋父層dom
             while (true) {
-                if (tagname === "A") { break; }
-                if (tagname === "BODY") { return; }
+                if (tagname === "A") {
+                    break;
+                }
+                if (tagname === "BODY") {
+                    return;
+                }
                 dom = dom.parentNode;
                 tagname = dom.tagName;
             }
 
             let href = dom.href;
-            if (href === undefined || href === null || href === "") { return; }
+            if (href === undefined || href === null || href === "") {
+                return;
+            }
 
             //如果是錨點超連結，就允許執行
             let hrefURL = new URL(href);
@@ -147,7 +150,7 @@
             //自訂選單
             let customMenuImg = Cherry.createMenuHook('Image', {
                 iconName: 'image',
-                onClick: function (selection) {
+                onClick: function(selection) {
                     // 獲取用戶選中的文字，調用getSelection方法後，如果用戶沒有選中任何文字，會嘗試獲取光標所在位置的單詞或句子
                     let $selection = this.getSelection(selection) || 'url';
                     this.registerAfterClickCb(() => {
@@ -189,9 +192,9 @@
                             //console.log(url)
                             if (url.indexOf("http:") == 0 || url.indexOf("https:") == 0 || url.indexOf("mailto:") == 0) {
                                 return url;
-                            } else if (url.length > 2 && url.substr(1, 1) === ":") { // C:\123.jppg
+                            } else if (url.length > 2 && url.substring(1, 2) === ":") { // C:\123.jppg
                                 return url;
-                            } else if (url.length > 2 && url.substr(0, 2) === "\\\\") { // \\Desktop-abc\AA
+                            } else if (url.length > 2 && url.substring(0, 2) === "\\\\") { // \\Desktop-abc\AA
                                 return url;
                             } else {
                                 return getRoot() + url;
@@ -215,7 +218,9 @@
                         //"bold",
                         //"italic",
                         //"strikethrough", "underline", "sub", "sup", "ruby",
-                        { bold: ["bold", "italic", "strikethrough", "underline", "sub", "sup", "ruby"], },
+                        {
+                            bold: ["bold", "italic", "strikethrough", "underline", "sub", "sup", "ruby"],
+                        },
                         "|",
                         {
                             insert: [
@@ -280,6 +285,7 @@
         function setRoot(path) {
             _root = path;
         }
+
         function getRoot() {
             return _root;
         }

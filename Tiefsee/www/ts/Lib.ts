@@ -165,7 +165,7 @@ class Lib {
         if (hex.indexOf("FF D8 FF") === 0) {
             return "jpg";
         }
-        if (hex.indexOf("42 4D") === 0 && hex.length > 30 && hex.substr(18, 11) === "00 00 00 00") {
+        if (hex.indexOf("42 4D") === 0 && hex.length > 30 && hex.substring(18, 29) === "00 00 00 00") {
             return "bmp";
         }
         if (hex.indexOf("47 49 46 38") === 0) { //GIF8
@@ -489,8 +489,8 @@ class Lib {
  * (new Date()).format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
  * (new Date()).format("yyyy-M-d h:m:s.S")   ==> 2006-7-2 8:9:4.18
  */
-Date.prototype.format = function (format: string) {
-    var o: any = {
+Date.prototype.format = function (this: Date, format: string): string {
+    const o: { [key: string]: number } = {
         "M+": this.getMonth() + 1, //month
         "d+": this.getDate(), //day
         "h+": this.getHours(), //hour
@@ -500,12 +500,14 @@ Date.prototype.format = function (format: string) {
         "S": this.getMilliseconds() //millisecond
     }
 
-    if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-        (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o) if (new RegExp("(" + k + ")").test(format))
-        format = format.replace(RegExp.$1,
-            RegExp.$1.length == 1 ? o[k] :
-                ("00" + o[k]).substr(("" + o[k]).length));
+    format = format.replace(/(y+)/, (match) => {
+        return (this.getFullYear() + "").substring(4 - match.length);
+    });
+    for (const k in o) {
+        format = format.replace(new RegExp("(" + k + ")"), (match) => {
+            return match.length == 1 ? o[k].toString() : ("00" + o[k]).substring(("" + o[k]).length);
+        });
+    }
     return format;
 }
 interface Date {

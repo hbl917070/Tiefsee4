@@ -250,8 +250,8 @@ class MainMenu {
                 let arLnk = await WV_RunApp.GetStartMenuList(); //取得開始選單裡面的所有lnk
                 for (let i = 0; i < arLnk.length; i++) {
                     const lnk = arLnk[i];
-                    let name = lnk.substr(lnk.lastIndexOf("\\") + 1); //取得檔名
-                    name = name.substr(0, name.length - 4);
+                    let name = lnk.substring(lnk.lastIndexOf("\\") + 1); //取得檔名
+                    name = name.substring(0, name.length - 4);
 
                     for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
                         const item = M.config.otherAppOpenList.startMenu[j];
