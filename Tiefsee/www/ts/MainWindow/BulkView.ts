@@ -48,6 +48,8 @@ class BulkView {
         var pageNow = 1;
         /** 取得當前的狀態為顯示或隱藏 */
         var isVisible = false;
+        /** 首圖縮排 的svg圖示 */
+        var svgIndentation = "";
 
         /** 記錄離開時捲動到哪個位置 */
         var temp_scrollTop = -1;
@@ -161,14 +163,12 @@ class BulkView {
 
                 let columns = Number.parseInt(getGroupRadioVal(dom_columns));
                 let indentation = dom_indentation.value;
-                console.log(indentation, temp_columns, columns)
                 if (indentation === "on") { //在開啟首圖進縮的情況下
                     if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
                         load(pageNow);
                     }
                 }
                 temp_columns = columns;
-
             });
 
         }
@@ -193,6 +193,10 @@ class BulkView {
             dom_lastWriteDate.checked = M.config.settings.bulkView.show.lastWriteDate;
             dom_lastWriteTime.checked = M.config.settings.bulkView.show.lastWriteTime;
             apply();
+
+            if (svgIndentation === "" && baseWindow.appInfo !== undefined) {
+                svgIndentation = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"]);
+            }
         }
 
 
@@ -511,6 +515,9 @@ class BulkView {
             temp_scrollHeight = dom_bulkViewContent.scrollHeight;
 
             temp_arFile = arFile;
+            if (temp_arFile.length > 0 && temp_arFile[0] === svgIndentation) { //如果有使用首圖縮排
+                temp_arFile.shift();
+            }
             temp_dirPath = getDirPath();
             temp_fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
             temp_pageNow = pageNow;
@@ -608,10 +615,7 @@ class BulkView {
             if (arFile === undefined) { return; }
 
             if (getIndentation() === "on" && getColumns() === 2) {
-                if (baseWindow.appInfo !== undefined) {
-                    let path = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"])
-                    arFile.unshift(path);
-                }
+                arFile.unshift(svgIndentation); //插入到最前面
             }
 
             showPage(page);
@@ -637,26 +641,29 @@ class BulkView {
             showPageThrottle.run = async () => {
 
                 dom_bulkView.scrollTop = 0; //捲動到最上面
+                dom_bulkViewContent.innerHTML = "";
 
                 let temp = pageNow + getDirPath();
                 let start = ((pageNow - 1) * imgMaxCount);
-
-                dom_bulkViewContent.innerHTML = "";
-                for (let i = 0; i < 10; i++) { //分成10次處理
-                    let start2 = start + (imgMaxCount / 10) * (i);
-                    let end = start + (imgMaxCount / 10) * (i + 1);
-                    let newArr = arFile.slice(start2, end); //取得陣列特定範圍
-                    if (newArr.length === 0) { break; }
+                while (true) { //每次都撈10筆
+                    if (start >= pageNow * imgMaxCount) { break; }
+                    let n = 10;
+                    if (start + n > pageNow * imgMaxCount) { //超過頁的結尾
+                        n = pageNow * imgMaxCount - start;
+                    }
+                    let end = start + n;
+                    let newArr = arFile.slice(start, end); //取得陣列特定範圍
                     let retAr = await WebAPI.getFileInfo2List(newArr);
-
                     if (temp !== pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
                         return;
                     }
                     for (let j = 0; j < retAr.length; j++) {
                         const item = retAr[j];
-                        let domItem = newItem(item, i * 10 + j);
+                        let domItem = newItem(item);
                         dom_bulkViewContent.appendChild(domItem);
                     }
+
+                    start += n;
                 }
 
                 updateSize();
@@ -676,12 +683,15 @@ class BulkView {
                 let domItemPath = domItem.getAttribute("data-path");
                 if (domItemPath === null) { continue; }
 
-                let n = (arFile.indexOf(domItemPath) + 1).toString();
-                domItem.setAttribute("data-number", n);
+                let n = (arFile.indexOf(domItemPath) + 1);
+                if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                    n = n - 1;
+                }
+                //domItem.setAttribute("data-number", n);
 
                 let domNumber = domItem.querySelector(".bulkView-number");
                 if (domNumber === null) { continue; }
-                domNumber.innerHTML = n;
+                domNumber.innerHTML = n.toString();
             }
         }
 
@@ -696,6 +706,9 @@ class BulkView {
             if (fileWatcherData.ChangeType === "deleted") {
                 //跟上次的檔案列表做比較，取得被刪除的檔案的位置    
                 let newAr = Array.from(M.fileLoad.getWaitingFile());
+                if (arFile.length > 0 && arFile[0] === svgIndentation) { //如果有使用首圖縮排，先刪除首圖才進行比較
+                    arFile.shift();
+                }
                 for (let i = 0; i < arFile.length; i++) {
                     if (arFile[i] != newAr[i]) {
                         deleteIndex = i;
@@ -712,6 +725,11 @@ class BulkView {
 
                 if (isVisible === false) { return; }
                 if (dirPath !== getDirPath()) { return; }
+
+                if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                    arFile.unshift(svgIndentation); //插入到最前面
+                    if (deleteIndex !== -1) { deleteIndex += 1; }
+                }
 
                 if (fileWatcherData.ChangeType === "created") {
 
@@ -783,7 +801,6 @@ class BulkView {
                                 break;
                             }
                         }
-
                         if (isDelete) {
                             if (pageNow < pageMax) { //如果不是最後一頁
                                 //在最後面插入下一頁的第1張圖片
@@ -799,38 +816,48 @@ class BulkView {
 
                 } else if (fileWatcherData.ChangeType === "renamed") {
 
+                    let domItem: HTMLElement | undefined;
                     let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
                     for (let i = 0; i < arDom.length; i++) {
-                        const domItem = arDom[i] as HTMLElement;
-                        let domItemPath = domItem.getAttribute("data-path");
+                        const dom = arDom[i] as HTMLElement;
+                        let domItemPath = dom.getAttribute("data-path");
                         if (domItemPath === fileWatcherData.OldFullPath) {
-
-                            let newItemDom = await pathToItem(fileWatcherData.FullPath);
-                            domItem.insertAdjacentElement("afterend", newItemDom);
-                            domItem.remove();
-
-                            updateItemNumber(); //更新左上角的圖片編號
+                            domItem = dom;
                             break;
                         }
+                    }
+                    if (domItem !== undefined) {
+                        let newItemDom = await pathToItem(fileWatcherData.FullPath);
+                        domItem.insertAdjacentElement("afterend", newItemDom);
+                        domItem.remove();
+                        updateItemNumber(); //更新左上角的圖片編號
+                    } else {
+                        return;
                     }
 
                 } else if (fileWatcherData.ChangeType === "changed") {
 
-                    return;
-
+                    let domItem: HTMLElement | undefined;
                     let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
                     for (let i = 0; i < arDom.length; i++) {
-                        const domItem = arDom[i];
-                        let domItemPath = domItem.getAttribute("data-path");
+                        let dom = arDom[i] as HTMLElement;
+                        let domItemPath = dom.getAttribute("data-path");
                         if (domItemPath === fileWatcherData.FullPath) {
-
-                            let newItemDom = await pathToItem(fileWatcherData.FullPath);
-                            domItem.insertAdjacentElement("afterend", newItemDom);
-                            domItem.remove();
-
-                            updateItemNumber(); //更新左上角的圖片編號
+                            domItem = dom;
                             break;
                         }
+                    }
+                    if (domItem !== undefined) {
+                        let dataReload = domItem.getAttribute("data-reload");
+                        if (dataReload === "true") { return; }
+                        let domCenter = domItem.querySelector(".bulkView-center");
+                        if (domCenter === null) { return; }
+
+                        let div = Lib.newDom(`<div class="bulkView-reload">${SvgList["tool-rotateCw.svg"]}</div>`);
+                        domCenter.appendChild(div);
+                        domItem.setAttribute("data-reload", "true");
+                    } else {
+                        return;
                     }
 
                 }
@@ -842,7 +869,7 @@ class BulkView {
         //傳入檔案路徑，回傳item
         async function pathToItem(path: string) {
             let retAr = await WebAPI.getFileInfo2List([path]);
-            let newItemDom = newItem(retAr[0], 0);
+            let newItemDom = newItem(retAr[0]);
             return newItemDom;
         }
 
@@ -903,7 +930,7 @@ class BulkView {
         /**
          * 
          */
-        function newItem(fileInfo2: FileInfo2, n: number) {
+        function newItem(fileInfo2: FileInfo2) {
 
             let temp = pageNow + getDirPath();
             let size = Math.floor(dom_bulkViewContent.offsetWidth / getColumns());
@@ -913,12 +940,13 @@ class BulkView {
                         <img class="bulkView-img">
                     </div>
                 </div>
-            `)
+            `);
             div.setAttribute("data-path", fileInfo2.Path);
             div.style.width = size + "px";
             div.style.minHeight = size + "px";
             updateSize(div);
-            //dom_bulkViewContent.appendChild(div);
+
+            let n = arFile.indexOf(fileInfo2.Path) + 1;
 
             setTimeout(async () => {
 
@@ -1001,12 +1029,6 @@ class BulkView {
 
                 //---------
 
-                let dataNumber = div.getAttribute("data-number");
-                if (dataNumber !== null) {
-                    n = Number(dataNumber);
-                } else {
-                    n = n + 1 + (pageNow - 1) * imgMaxCount;
-                }
                 if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
                     n -= 1;
                 }
@@ -1031,8 +1053,8 @@ class BulkView {
                 </div>
                 <div class="bulkView-center">
                     <img class="bulkView-img">
-                </div>
-            `
+                </div>`;
+
                 div.setAttribute("data-width", width.toString());
                 div.setAttribute("data-height", height.toString());
                 div.style.width = size + "px";
@@ -1041,12 +1063,15 @@ class BulkView {
 
                 //點擊圖片後，退出大量瀏覽模式
                 div.addEventListener("click", async () => {
-                    if (n !== 0) {
+                    if (div.getAttribute("data-reload") === "true") {
+                        let newItemDom = await pathToItem(fileInfo2.Path);
+                        div.insertAdjacentElement("afterend", newItemDom);
+                        div.remove();
+                        updateItemNumber(); //更新左上角的圖片編號
+                    } else if (n !== 0) {
 
                         M.fileLoad.setIsBulkViewSub(true);
                         await M.script.bulkView.close(n - 1);
-                        await Lib.sleep(10);
-                        M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
 
                         //設定返回按鈕
                         M.toolbarBack.visible(true);

@@ -956,6 +956,10 @@ class ScriptBulkView {
         this.M.bulkView.saveCurrentState();
         this.M.fileLoad.enableBulkView(false);
         await this.M.fileLoad.showFile(_flag);
+
+        //剛關閉大量瀏覽模式時，檔案預覽面板尚未顯示無法進行初始化，所以等待一段時間後才執行捲動
+        await Lib.sleep(10);
+        this.M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
     }
 
     /** 下一頁 */

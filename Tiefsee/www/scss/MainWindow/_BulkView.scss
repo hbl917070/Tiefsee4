@@ -238,6 +238,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  position: relative;
 }
 
 .bulkView-loading {
@@ -259,6 +260,34 @@
 //避免圖片載入前顯示圖片邊框
 .bulkView-img[src] {
   opacity: 1;
+}
+
+//按鈕 - 重新載入
+.bulkView-reload {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background-color: var(--color-black40);
+  box-shadow: 0px 0px 5px var(--color-blue40);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+.bulkView-reload svg { 
+  width: 30px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.bulkView-center:hover .bulkView-reload{
+  border: 1px solid var(--color-blue);
 }
 
 //分頁器
