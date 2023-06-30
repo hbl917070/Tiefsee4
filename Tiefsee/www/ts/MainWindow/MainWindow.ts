@@ -819,12 +819,26 @@ class MainWindow {
          * 結尾一定要「,」
          */
         function updateDomVisibility() {
-            let showType = document.body.getAttribute("showType");
-            if (showType === null) { return; }
+
+            let bodyShowType = document.body.getAttribute("showType");
+            if (bodyShowType === null) { return; }
+
+            function getShowType(dom: Element) {
+                while (true) { //取得 bulkView-item 的 data-path
+                    let showType = dom.getAttribute("showType");
+                    if (showType !== null && showType !== "") {
+                        return showType;
+                    }
+                    if (dom === document.body) { break; }
+                    dom = dom.parentNode as HTMLElement; //往往上層找
+                }
+                return bodyShowType;
+            }
 
             let arDom = document.querySelectorAll(`[show-not]`);
             for (let i = 0; i < arDom.length; i++) {
                 const dom = arDom[i];
+                let showType = getShowType(dom);
                 if (dom.getAttribute("show-not")?.indexOf(showType + ",") !== -1) {
                     dom.classList.add("js-showType-none");
                 } else {
@@ -835,6 +849,7 @@ class MainWindow {
             arDom = document.querySelectorAll(`[show-only]`);
             for (let i = 0; i < arDom.length; i++) {
                 const dom = arDom[i];
+                let showType = getShowType(dom);
                 if (dom.getAttribute("show-only")?.indexOf(showType + ",") !== -1) {
                     dom.classList.remove("js-showType-none");
                 } else {

@@ -18,12 +18,10 @@ class MainMenu {
         var btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
         var btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
 
-
         this.initOpen = initOpen;
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
         this.updateMenuLayoutCheckState = updateMenuLayoutCheckState;
         this.setMenuLayoutCheckState = setMenuLayoutCheckState;
-
 
         initCopy();
         initRotate();
@@ -31,8 +29,9 @@ class MainMenu {
         initRightMenuWelcome();
         initRightMenuDefault();
         initRightMenuBulkView();
+        initRightMenuBulkViewFileBox();
+        initTextbox();
         initText();
-        initTxt();
         initLayout();
 
         var dataMenu = "";
@@ -76,7 +75,7 @@ class MainMenu {
             }
         });
 
-        document.body.addEventListener("mouseup", (e) => {
+        document.body.addEventListener("mouseup", (e: MouseEvent) => {
 
             //點擊右鍵時
             if (e.button === 2) {
@@ -97,11 +96,12 @@ class MainMenu {
                     if (showType === "img" || showType === "imgs" || showType === "video") {
                         M.script.menu.showRightMenuImage();
                     } else if (showType === "bulkView") {
-                        M.script.menu.showRightMenuBulkView();
+                        M.script.menu.showRightMenuBulkView(e);
                     } else if (showType === "welcome") {
                         M.script.menu.showRightMenuWelcome();
                     } else {
-                        M.script.menu.showRightMenuDefault();
+                        //M.script.menu.showRightMenuDefault();
+                        M.script.menu.showRightMenuImage();
                     }
                 }
                 dataMenu = "";
@@ -143,90 +143,70 @@ class MainMenu {
             if (isInit) { return; } //避免重複執行
             isInit = true;
 
-            //載入檔案
-            var dom_OpenFile = document.getElementById("menuitem-openFile");
-            if (dom_OpenFile !== null) {
-                dom_OpenFile.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.openFile();
+            let dom = document.getElementById("menu-file") as HTMLElement;
+
+            function getPath() {
+                let path = dom.getAttribute("data-path");
+                if (path !== null && path !== "") {
+                    return path;
+                } else {
+                    return undefined;
                 }
             }
+
+            //載入檔案
+            dom.querySelector(".js-openFile")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.openFile();
+            })
 
             //另開視窗
-            var dom_newWindow = document.getElementById("menuitem-openNewWindow");
-            if (dom_newWindow !== null) {
-                dom_newWindow.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.openNewWindow();
-                }
-            }
+            dom.querySelector(".js-openNewWindow")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.openNewWindow(getPath());
+            })
 
             //開啟檔案位置
-            var dom_RevealInFileExplorer = document.getElementById("menuitem-RevealInFileExplorer");
-            if (dom_RevealInFileExplorer !== null) {
-                dom_RevealInFileExplorer.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.revealInFileExplorer();
-                }
-            }
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.revealInFileExplorer(getPath());
+            })
 
             //顯示檔案右鍵選單
-            var dom_systemContextMenu = document.getElementById("menuitem-systemContextMenu");
-            if (dom_systemContextMenu !== null) {
-                dom_systemContextMenu.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.systemContextMenu();
-                }
-            }
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.systemContextMenu(getPath());
+            })
 
             //重新命名檔案
-            var dom_renameFile = document.getElementById("menuitem-renameFile");
-            if (dom_renameFile !== null) {
-                dom_renameFile.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.fileLoad.showRenameMsg();
-                }
-            }
+            dom.querySelector(".js-renameFile")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.fileLoad.showRenameFileMsg(getPath());
+            })
+
+            //重新命名資料夾
+            dom.querySelector(".js-renameDir")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.fileLoad.showRenameDirMsg(getPath());
+            })
 
             //列印
-            var dom_print = document.getElementById("menuitem-print");
-            if (dom_print !== null) {
-                dom_print.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.print();
-                }
-            }
+            dom.querySelector(".js-print")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.print(getPath());
+            })
 
             //設成桌布
-            var dom_setAsDesktop = document.getElementById("menuitem-setAsDesktop");
-            if (dom_setAsDesktop !== null) {
-                dom_setAsDesktop.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.setAsDesktop();
-                }
-            }
+            dom.querySelector(".js-setAsDesktop")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.setAsDesktop(getPath());
+            })
 
             //選擇其他應用程式
-            var dom_openWith = document.getElementById("menuitem-openWith");
-            if (dom_openWith !== null) {
-                dom_openWith.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.openWith();
-                }
-            }
-
-            //以3D小畫家開啟
-            /*var dom_Open3DMSPaint = document.getElementById("menuitem-open3DMSPaint");
-            if (dom_Open3DMSPaint !== null) {
-                dom_Open3DMSPaint.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.open.Open3DMSPaint();
-                }
-                if (await WV_System.IsWindows10() === false) { //不是win10就隱藏
-                    dom_Open3DMSPaint.style.display = "none";
-                }
-            }*/
-
+            dom.querySelector(".js-openWith")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.open.openWith(getPath());
+            })
 
             //以第三方程式開啟
             var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
@@ -282,7 +262,7 @@ class MainMenu {
                     `);
 
                     dom.onclick = async () => {
-                        let filePath = await M.fileLoad.getFileShortPath(); //目前顯示的檔案
+                        let filePath = await M.fileLoad.getFileShortPath(getPath()); //目前顯示的檔案
                         if (await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close(); //關閉menu
                         WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); //開啟檔案
@@ -326,7 +306,7 @@ class MainMenu {
                     `);
 
                     dom.onclick = async () => {
-                        let filePath = await M.fileLoad.getFileShortPath(); //目前顯示的檔案
+                        let filePath = await M.fileLoad.getFileShortPath(getPath()); //目前顯示的檔案
                         if (await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close(); //關閉menu
                         WV_RunApp.RunUwp(uwpItem.id, filePath); //開啟檔案
@@ -346,59 +326,68 @@ class MainMenu {
          */
         async function initCopy() {
 
-            //複製 檔案
-            var dom_copyFile = document.getElementById("menuitem-img-copyFile");
-            if (dom_copyFile !== null) {
-                dom_copyFile.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.copy.copyFile();
+            let dom = document.getElementById("menu-copy") as HTMLElement;
+
+            function getPath() {
+                let path = dom.getAttribute("data-path");
+                if (path !== null && path !== "") {
+                    return path;
+                } else {
+                    return undefined;
                 }
             }
+
+            //複製 檔案
+            dom.querySelector(".js-copyFile")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyFile(getPath());
+            })
 
             //複製 檔名
-            var dom_copyName = document.getElementById("menuitem-img-copyName");
-            if (dom_copyName !== null) {
-                dom_copyName.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.copy.copyName();
-                }
-            }
+            dom.querySelector(".js-copyFileName")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyFileName(getPath());
+            })
+            //複製 檔案路徑
+            dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyFilePath(getPath());
+            })
 
-            //複製 完整路徑
-            var dom_copyPath = document.getElementById("menuitem-img-copyPath");
-            if (dom_copyPath !== null) {
-                dom_copyPath.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.copy.copyPath();
-                }
-            }
+            //複製 資料夾名
+            dom.querySelector(".js-copyDirName")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyDirName(getPath());
+            })
+            //複製 資料夾路徑
+            dom.querySelector(".js-copyDirPath")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyDirPath(getPath());
+            })
 
             //複製 影像
-            var dom_copyImg = document.getElementById("menuitem-img-copyImg");
-            if (dom_copyImg !== null) {
-                dom_copyImg.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.copy.copyImg();
-                }
-            }
+            dom.querySelector(".js-copyImage")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyImage(getPath());
+            })
 
-            //複製 base64
-            var dom_copyBase64 = document.getElementById("menuitem-img-copyBase64");
-            if (dom_copyBase64 !== null) {
-                dom_copyBase64.onclick = async () => {
-                    M.menu.close(); //關閉menu      
-                    M.script.copy.copyImageBase64();
-                }
-            }
+            //複製 影像Base64
+            dom.querySelector(".js-copyImageBase64")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyImageBase64(getPath());
+            })
+
+            //複製 檔案Base64
+            dom.querySelector(".js-copyBase64")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyTextBase64(getPath());
+            })
 
             //複製 SVG 文字
-            var dom_copyTxt = document.getElementById("menuitem-img-copyTxt");
-            if (dom_copyTxt !== null) {
-                dom_copyTxt.onclick = async () => {
-                    M.menu.close(); //關閉menu
-                    M.script.copy.copyTxt();
-                }
-            }
+            dom.querySelector(".js-copyText")?.addEventListener("click", () => {
+                M.menu.close(); //關閉menu
+                M.script.copy.copyText(getPath());
+            })
 
         }
 
@@ -463,21 +452,52 @@ class MainMenu {
             let dom = document.getElementById("menu-rightMenuImage")
             if (dom === null) { return; }
 
+            dom.querySelector(".js-bulkView")?.addEventListener("click", () => { //大量瀏覽模式
+                M.script.menu.close();
+                M.script.bulkView.show();
+            });
             dom.querySelector(".js-prev")?.addEventListener("click", () => {
                 M.script.fileLoad.prevFile();
             });
             dom.querySelector(".js-next")?.addEventListener("click", () => {
                 M.script.fileLoad.nextFile();
             });
-            dom.querySelector(".js-prevDir")?.addEventListener("click", () => {
+            dom.querySelector(".js-prevDir")?.addEventListener("click", () => { //上一資料夾
                 M.script.fileLoad.prevDir();
             });
-            dom.querySelector(".js-nextDir")?.addEventListener("click", () => {
+            dom.querySelector(".js-nextDir")?.addEventListener("click", () => { //下一資料夾
                 M.script.fileLoad.nextDir();
             });
-            dom.querySelector(".js-sort")?.addEventListener("click", () => {
+
+            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
+            if (dragDropFile !== null) {
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 0) { //滑鼠左鍵
+                        M?.script.file.dragDropFile();
+                    }
+                });
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 2) { //滑鼠右鍵
+                        M?.script.file.showContextMenu();
+                    }
+                });
+            }
+
+            dom.querySelector(".js-showMenuFile")?.addEventListener("click", () => { //檔案 選單
+                M.script.menu.close();
+                M.script.menu.showMenuFile();
+            });
+            dom.querySelector(".js-showMenuCopy")?.addEventListener("click", () => { //複製 選單
+                M.script.menu.close();
+                M.script.menu.showMenuCopy();
+            });
+            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
                 M.script.menu.close();
                 M.script.menu.showMenuSort();
+            });
+            dom.querySelector(".js-showMenuImageSearch")?.addEventListener("click", () => { //搜圖
+                M.script.menu.close();
+                M.script.menu.showMenuImageSearch();
             });
 
             dom.querySelector(".js-rotate")?.addEventListener("click", () => {
@@ -497,34 +517,52 @@ class MainMenu {
                 M.script.img.zoomTo100();
             });
 
-            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { //在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
             });
-            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { //檔案右鍵選單
                 M.script.menu.close();
                 M.script.file.showContextMenu();
             });
-            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製影像
+            dom.querySelector(".js-renameFile")?.addEventListener("click", () => { //重新命名
                 M.script.menu.close();
-                M.script.copy.copyImg();
+                M.script.fileLoad.showRenameFileMsg();
             });
-            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
+            dom.querySelector(".js-showDeleteFileMsg")?.addEventListener("click", () => { //刪除圖片
                 M.script.menu.close();
                 M.script.fileLoad.showDeleteFileMsg();
             });
+
             dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
                 M.script.menu.close();
                 M.script.setting.showSetting();
             });
-            dom.querySelector(".js-help")?.addEventListener("click", () => { //說明
+
+            dom.querySelector(".js-copyFile")?.addEventListener("click", () => { //複製檔案
+                M.script.menu.close();
+                M.script.copy.copyFile();
+            });
+            dom.querySelector(".js-copyFileName")?.addEventListener("click", () => { //複製檔名
+                M.script.menu.close();
+                M.script.copy.copyName();
+            });
+            dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => { //複製檔案路徑
+                M.script.menu.close();
+                M.script.copy.copyPath();
+            });
+            dom.querySelector(".js-copyImage")?.addEventListener("click", () => { //複製影像
+                M.script.menu.close();
+                M.script.copy.copyImage();
+            });
+            /*dom.querySelector(".js-help")?.addEventListener("click", () => { //說明
                 M.script.menu.close();
                 WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')
             });
             dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
                 M.script.menu.close();
                 baseWindow.close();
-            });
+            });*/
         }
 
 
@@ -580,19 +618,19 @@ class MainMenu {
                 M.script.menu.showMenuSort();
             });
 
-            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { //在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
             });
-            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { //檔案右鍵選單
                 M.script.menu.close();
                 M.script.file.showContextMenu();
             });
-            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製影像
+            dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => { //複製影像
                 M.script.menu.close();
-                M.script.copy.copyImg();
+                M.script.copy.copyFilePath();
             });
-            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
+            dom.querySelector(".js-deleteFile")?.addEventListener("click", () => { //刪除圖片
                 M.script.menu.close();
                 M.script.fileLoad.showDeleteFileMsg();
             });
@@ -612,7 +650,7 @@ class MainMenu {
          */
         function initRightMenuBulkView() {
 
-            let dom = document.getElementById("menu-rightMenuBulkView")
+            let dom = document.getElementById("menu-rightMenuBulkView");
             if (dom === null) { return; }
 
             dom.querySelector(".js-back")?.addEventListener("click", () => { //返回
@@ -620,11 +658,45 @@ class MainMenu {
                 M.toolbarBack.runEvent();
             });
 
+            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
+            if (dragDropFile !== null) {
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 0) { //滑鼠左鍵
+                        M?.script.file.dragDropFile();
+                    }
+                });
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 2) { //滑鼠右鍵
+                        M?.script.file.showContextMenu();
+                    }
+                });
+            }
+
+            dom.querySelector(".js-showMenuFile")?.addEventListener("click", () => { //檔案 選單
+                M.script.menu.close();
+                M.script.menu.showMenuFile();
+            });
+            dom.querySelector(".js-showMenuCopy")?.addEventListener("click", () => { //複製 選單
+                M.script.menu.close();
+                M.script.menu.showMenuCopy();
+            });
+            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
+                M.script.menu.close();
+                M.script.menu.showMenuSort();
+            });
+            dom.querySelector(".js-prevDir")?.addEventListener("click", () => { //上一資料夾
+                M.script.fileLoad.prevDir();
+            });
+            dom.querySelector(".js-nextDir")?.addEventListener("click", () => { //下一資料夾
+                M.script.fileLoad.nextDir();
+            });
+
+
             dom.querySelector(".js-showBulkViewSetting")?.addEventListener("click", () => { //大量瀏覽模式設定
                 M.script.menu.close();
                 M.script.menu.showMenuBulkView();
             });
-            dom.querySelector(".js-open")?.addEventListener("click", () => { //在檔案總管中顯示
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { //在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
             });
@@ -632,28 +704,120 @@ class MainMenu {
                 M.script.menu.close();
                 M.script.file.showContextMenu();
             });
-            dom.querySelector(".js-copy")?.addEventListener("click", () => { //複製路徑
+            dom.querySelector(".js-showRenameDirMsg")?.addEventListener("click", () => { //重新命名
                 M.script.menu.close();
-                M.script.copy.copyPath();
+                M.script.fileLoad.showRenameDirMsg();
             });
-            dom.querySelector(".js-delete")?.addEventListener("click", () => { //刪除圖片
+            dom.querySelector(".js-showDeleteDirMsg")?.addEventListener("click", () => { //刪除
                 M.script.menu.close();
                 M.script.fileLoad.showDeleteDirMsg();
             });
+
             dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
                 M.script.menu.close();
                 M.script.setting.showSetting();
             });
-            dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
+
+            dom.querySelector(".js-copyDirName")?.addEventListener("click", () => { //複製資料夾名
+                M.script.menu.close();
+                M.script.copy.copyName();
+            });
+            dom.querySelector(".js-copyDirPath")?.addEventListener("click", () => { //複製資料夾路徑
+                M.script.menu.close();
+                M.script.copy.copyPath();
+            });
+
+            /*dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式
                 M.script.menu.close();
                 baseWindow.close();
+            });*/
+        }
+        /**
+         *  初始化 右鍵選單 - 大量瀏覽模式(檔案)
+         */
+        function initRightMenuBulkViewFileBox() {
+
+            let dom = document.querySelector("#menu-rightMenuBulkView .js-fileBox");
+            if (dom === null) { return; }
+
+            function getPath() {
+                if (dom === null) { return ""; }
+                let path = dom.getAttribute("data-path");
+                if (path === null) { return ""; }
+                return path;
+            }
+
+            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
+            if (dragDropFile !== null) {
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 0) { //滑鼠左鍵
+                        M?.script.file.dragDropFile(getPath());
+                    }
+                });
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 2) { //滑鼠右鍵
+                        M?.script.file.showContextMenu(getPath());
+                    }
+                });
+            }
+
+            dom.querySelector(".js-showMenuFile")?.addEventListener("click", () => { //檔案 選單
+                M.script.menu.close();
+                M.script.menu.showMenuFile(undefined, getPath());
+            });
+            dom.querySelector(".js-showMenuCopy")?.addEventListener("click", () => { //複製 選單
+                M.script.menu.close();
+                M.script.menu.showMenuCopy(undefined, getPath());
+            });
+            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
+                M.script.menu.close();
+                M.script.menu.showMenuSort(undefined, getPath());
+            });
+            dom.querySelector(".js-showMenuImageSearch")?.addEventListener("click", () => { //搜圖
+                M.script.menu.close();
+                M.script.menu.showMenuImageSearch(undefined, getPath());
+            });
+
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { //在檔案總管中顯示
+                M.script.menu.close();
+                M.script.open.revealInFileExplorer(getPath());
+            });
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { //檔案右鍵選單
+                M.script.menu.close();
+                M.script.file.showContextMenu(getPath());
+            });
+            dom.querySelector(".js-renameFile")?.addEventListener("click", () => { //重新命名
+                M.script.menu.close();
+                M.script.fileLoad.showRenameFileMsg(getPath());
+            });
+            dom.querySelector(".js-showDeleteFileMsg")?.addEventListener("click", () => { //刪除圖片
+                M.script.menu.close();
+                M.script.fileLoad.showDeleteFileMsg(undefined, getPath());
+            });
+
+
+            dom.querySelector(".js-copyFile")?.addEventListener("click", () => { //複製檔案
+                M.script.menu.close();
+                M.script.copy.copyFile(getPath());
+            });
+            dom.querySelector(".js-copyFileName")?.addEventListener("click", () => { //複製檔名
+                M.script.menu.close();
+                M.script.copy.copyFileName(getPath());
+            });
+            dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => { //複製檔案路徑
+                M.script.menu.close();
+                M.script.copy.copyFilePath(getPath());
+            });
+            dom.querySelector(".js-copyImage")?.addEventListener("click", () => { //複製影像
+                M.script.menu.close();
+                M.script.copy.copyImage(getPath());
             });
         }
 
         /**
          *  初始化 右鍵選單 - 輸入框
          */
-        async function initText() {
+        async function initTextbox() {
 
             var dom_menu = document.getElementById("menu-text");
             if (dom_menu !== null) {
@@ -718,7 +882,7 @@ class MainMenu {
         /**
          *  初始化 右鍵選單 - 一般文字
          */
-        async function initTxt() {
+        async function initText() {
 
             var dom_menu = document.getElementById("menu-txt");
             if (dom_menu !== null) {
@@ -730,9 +894,7 @@ class MainMenu {
             var dom_copy = document.getElementById("menuitem-txt-copy"); //複製
             if (dom_copy !== null) {
                 dom_copy.onclick = async () => {
-
                     M.menu.close(); //關閉menu
-
                     let selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿

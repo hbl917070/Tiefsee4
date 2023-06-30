@@ -521,6 +521,8 @@ class BulkView {
             temp_dirPath = getDirPath();
             temp_fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
             temp_pageNow = pageNow;
+
+            //M.fileLoad.setWaitingFile(arFile);
         }
 
 
@@ -601,6 +603,7 @@ class BulkView {
 
             }
 
+            temp_dirPath = getDirPath();
 
         }
 
@@ -954,72 +957,11 @@ class BulkView {
                 if (fileInfo2.Path.length > 255) {
                     fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
                 }
-                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
-                let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
-                if (configItem === null) {
-                    configItem = { ext: "", type: "vips", vipsType: "magick" }
-                }
-                let configType = configItem.type;
 
-                let vipsType = configItem.vipsType as string;
-                let arUrl: { scale: number, url: string }[] = [];
-                let width = -1;
-                let height = -1;
-
-                if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
-
-                    let imgInitInfo = await WebAPI.Img.webInit(fileInfo2);
-                    if (imgInitInfo.code == "1") {
-                        width = imgInitInfo.width;
-                        height = imgInitInfo.height;
-                        arUrl.push({ scale: 1, url: imgInitInfo.path });
-                    }
-
-                } else if (configType === "vips") {
-
-                    let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
-                    if (imgInitInfo.code == "1") {
-
-                        width = imgInitInfo.width;
-                        height = imgInitInfo.height;
-
-                        let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
-                        if (isNaN(ratio)) { ratio = 0.8; }
-                        if (ratio > 0.95) { ratio = 0.95; }
-                        if (ratio < 0.5) { ratio = 0.5; }
-
-                        //設定縮放的比例
-                        arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
-                        for (let i = 1; i <= 30; i++) {
-                            let scale = Number(Math.pow(ratio, i).toFixed(3));
-                            if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { //如果圖片太小就不處理
-                                break;
-                            }
-                            let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
-                            arUrl.push({ scale: scale, url: imgU })
-                        }
-
-                    }
-
-                } else { //直接開啟網址
-
-                    let url = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
-                    let imgInitInfo = await WebAPI.Img.webInit(url);
-                    if (imgInitInfo.code == "1") {
-                        width = imgInitInfo.width;
-                        height = imgInitInfo.height;
-                        arUrl.push({ scale: 1, url: imgInitInfo.path });
-                    }
-
-                }
-
-                if (width === -1) {
-                    let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
-                    width = 256;
-                    height = 256;
-                    arUrl.push({ scale: 1, url: url });
-                }
+                let imgData = await M.script.img.getImgData(fileInfo2);
+                let width = imgData.width;
+                let height = imgData.height;
+                let arUrl = imgData.arUrl;
 
                 //--------
 
@@ -1071,7 +1013,7 @@ class BulkView {
                     } else if (n !== 0) {
 
                         M.fileLoad.setIsBulkViewSub(true);
-                        await M.script.bulkView.close(n - 1);
+                        await M.script.bulkView.close(arFile.indexOf(fileInfo2.Path));
 
                         //設定返回按鈕
                         M.toolbarBack.visible(true);

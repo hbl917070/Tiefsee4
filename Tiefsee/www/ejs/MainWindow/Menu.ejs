@@ -2,41 +2,45 @@
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-file">
 
-        <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-openFile">
+        <div class="menu-box js-openFileBox">
+            <div class="menu-hor-item js-openFile">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.openFile">載入檔案</div>
             </div>
         </div>
 
         <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-openNewWindow">
+
+            <div class="menu-hor-item js-openNewWindow">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
             </div>
-
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item" id="menuitem-RevealInFileExplorer">
+            <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-systemContextMenu">
+            <div class="menu-hor-item js-systemContextMenu">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenu">檔案右鍵選單</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-renameFile">
+            <div class="menu-hor-item js-renameFile" show-not="bulkView,">
                 <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名</div>
+                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
+            </div>
+            <div class="menu-hor-item js-renameDir" show-only="bulkView,">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
             </div>
 
             <div class="menu-hor-hr" show-not="bulkView,"></div>
 
-            <div class="menu-hor-item" id="menuitem-print" show-not="bulkView,">
+            <div class="menu-hor-item js-print" show-not="bulkView,">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.print">列印</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-setAsDesktop" show-only="img,">
+            <div class="menu-hor-item js-setAsDesktop" show-only="img,">
                 <div class="menu-hor-icon"></div>
                 <div class="menu-hor-txt" i18n="menu.setAsDesktop">設成桌布</div>
             </div>
@@ -44,7 +48,7 @@
         </div>
 
         <div class="menu-box" show-not="bulkView,">
-            <div class="menu-hor-item" id="menuitem-openWith">
+            <div class="menu-hor-item js-openWith">
                 <div class="menu-hor-icon">
                 </div>
                 <div class="menu-hor-txt" i18n="menu.openWith">用其他程式開啟</div>
@@ -71,36 +75,43 @@
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-copy">
         <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-img-copyFile" show-not="bulkView,">
+            <div class="menu-hor-item js-copyFile" show-not="bulkView,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyFile">複製檔案</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyName">
+            <div class="menu-hor-item js-copyFileName" show-not="bulkView,">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt">
-                    <span i18n="menu.copyFileName" show-not="bulkView,">複製檔名</span>
-                    <span i18n="menu.copyDirName" show-only="bulkView,">複製資料夾名</span>
-                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFileName">複製檔名</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyPath">
+            <div class="menu-hor-item js-copyFilePath" show-not="bulkView,">
                 <div class="menu-hor-icon"> </div>
-                <div class="menu-hor-txt">
-                    <span i18n="menu.copyFilePath" show-not="bulkView,">複製檔案路徑</span>
-                    <span i18n="menu.copyDirPath" show-only="bulkView,">複製資料夾路徑</span>
-                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFilePath">複製檔案路徑</div>
+            </div>
+
+            <div class="menu-hor-item js-copyDirName" show-only="bulkView,">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="menu.copyDirName">複製資料夾名</div>
+            </div>
+            <div class="menu-hor-item js-copyDirPath" show-only="bulkView,">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="menu.copyDirPath">複製資料夾路徑</div>
             </div>
 
             <div class="menu-hor-hr" show-not="bulkView,pdf,office,"></div>
 
-            <div class="menu-hor-item" id="menuitem-img-copyImg" show-only="img,imgs,video,">
+            <div class="menu-hor-item js-copyImage" show-only="img,imgs,video,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyImage">複製影像</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyBase64" show-only="img,imgs,video,">
+            <div class="menu-hor-item js-copyImageBase64" show-only="img,imgs,video,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyImageBase64">複製影像 Base64</div>
             </div>
-            <div class="menu-hor-item" id="menuitem-img-copyTxt" show-not="bulkView,pdf,office,">
+            <div class="menu-hor-item js-copyBase64" show-only="txt,monacoEditor,md,">
+                <div class="menu-hor-icon"> </div>
+                <div class="menu-hor-txt" i18n="menu.copyBase64">複製 Base64</div>
+            </div>
+            <div class="menu-hor-item js-copyText" show-not="bulkView,pdf,office,">
                 <div class="menu-hor-icon"> </div>
                 <div class="menu-hor-txt" i18n="menu.copyText">複製文字</div>
             </div>
@@ -303,7 +314,6 @@
 
             <div class="menu-bulkView-box">
                 <div class="menu-bulkView-title" i18n="bulkView.columns">每行圖片數</div>
-
                 <div class="menu-bulkView-columns js-columns">
                     <div class="menu-bulkView-columns-item" value="1" active="true">1</div>
                     <div class="menu-bulkView-columns-item" value="2">2</div>
@@ -314,17 +324,6 @@
                     <div class="menu-bulkView-columns-item" value="7">7</div>
                     <div class="menu-bulkView-columns-item" value="8">8</div>
                 </div>
-
-                <!-- <select class="menu-bulkView-select js-columns" style="display: none;">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                </select> -->
             </div>
 
             <div class="menu-bulkView-box js-box-waterfall">
@@ -421,6 +420,9 @@
 
         <div class="menu-box" style="width:200px">
             <div class="menu-grid">
+                <div class="menu-grid-item js-bulkView" title="" i18n="menu.bulkView">
+                    <%- await readFile("./img/default/tool-bulkView.svg"); %>
+                </div>
                 <div class="menu-grid-item js-prev" title="" i18n="menu.prevFile">
                     <%- await readFile("./img/default/tool-prev.svg"); %>
                 </div>
@@ -433,11 +435,31 @@
                 <div class="menu-grid-item js-nextDir" title="" i18n="menu.nextDir">
                     <%- await readFile("./img/default/tool-nextDir.svg"); %>
                 </div>
-                <div class="menu-grid-item js-sort" title="" i18n="menu.showMenuSort">
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
+                    <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile">
+                    <%- await readFile("./img/default/tool-open.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy">
+                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuSort" title="" i18n="menu.showMenuSort">
                     <%- await readFile("./img/default/tool-sort.svg"); %>
                 </div>
+                <div class="menu-grid-item js-showMenuImageSearch" title="" i18n="menu.showMenuImageSearch" show-only="img,imgs,video,">
+                    <%- await readFile("./img/default/tool-search.svg"); %>
+                </div>
             </div>
-            <div class="menu-grid">
+
+        </div>
+
+
+        <div class="menu-box">
+            <div class="menu-grid" show-only="img,imgs,video,">
                 <div class="menu-grid-item js-rotate" title="" i18n="menu.showMenuRotation">
                     <%- await readFile("./img/default/tool-rotate.svg"); %>
                 </div>
@@ -457,28 +479,27 @@
                 </div>
             </div>
 
-        </div>
+            <div class="menu-hor-hr" show-only="img,imgs,video,"></div>
 
-        <div class="menu-box">
-            <div class="menu-hor-item js-open">
+            <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-open.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
-            <div class="menu-hor-item js-rightMenu">
+            <div class="menu-hor-item js-systemContextMenu">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rightMenu.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenu">系統選單</div>
             </div>
-            <div class="menu-hor-item js-copy">
+            <div class="menu-hor-item js-renameFile">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                    <%- await readFile("./img/default/tool-rename.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.copyImage">複製影像</div>
+                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名</div>
             </div>
-            <div class="menu-hor-item js-delete">
+            <div class="menu-hor-item js-showDeleteFileMsg">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-delete.svg"); %>
                 </div>
@@ -493,21 +514,30 @@
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
-            <!-- <div class="menu-hor-item js-help">
-                <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-help.svg"); %>
-                </div>
-                <div class="menu-hor-txt" i18n="menu.help">說明</div>
-            </div> -->
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item js-close">
+            <div class="menu-hor-item js-copyFile">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/no.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.exit">關閉程式</div>
+                <div class="menu-hor-txt" i18n="menu.copyFile">複製檔案</div>
             </div>
+            <div class="menu-hor-item js-copyFileName">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFileName">複製檔名</div>
+            </div>
+            <div class="menu-hor-item js-copyFilePath">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFilePath">複製檔案路徑</div>
+            </div>
+            <div class="menu-hor-item js-copyImage" show-only="img,imgs,video,">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyImage">複製影像</div>
+            </div>
+
         </div>
 
     </div>
@@ -577,25 +607,25 @@
         </div>
 
         <div class="menu-box">
-            <div class="menu-hor-item js-open">
+            <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-open.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
-            <div class="menu-hor-item js-rightMenu">
+            <div class="menu-hor-item js-systemContextMenu">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rightMenu.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenu">系統選單</div>
             </div>
-            <div class="menu-hor-item js-copy">
+            <div class="menu-hor-item js-copyFilePath">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-copy.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.copyFilePath">複製檔案路徑</div>
             </div>
-            <div class="menu-hor-item js-delete">
+            <div class="menu-hor-item js-deleteFile">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-delete.svg"); %>
                 </div>
@@ -670,16 +700,44 @@
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-rightMenuBulkView">
 
-        <div class="menu-box">
+        <!-- <div class="menu-box">
             <div class="menu-hor-item js-back">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-back.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.back">返回</div>
             </div>
-        </div>
+        </div> -->
 
         <div class="menu-box">
+
+            <div class="menu-grid">
+                <div class="menu-grid-item js-back" title="" i18n="menu.back">
+                    <%- await readFile("./img/default/tool-back.svg"); %>
+                </div>
+                <div class="menu-grid-hr"></div>
+                <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
+                    <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile">
+                    <%- await readFile("./img/default/tool-open.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy">
+                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuSort" title="" i18n="menu.showMenuSort">
+                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                </div>
+                <div class="menu-grid-item js-prevDir" title="" i18n="menu.prevDir">
+                    <%- await readFile("./img/default/tool-prevDir.svg"); %>
+                </div>
+                <div class="menu-grid-item js-nextDir" title="" i18n="menu.nextDir">
+                    <%- await readFile("./img/default/tool-nextDir.svg"); %>
+                </div>
+            </div>
+
+            <div class="menu-hor-hr"></div>
+
             <div class="menu-hor-item js-showBulkViewSetting">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-setting2.svg"); %>
@@ -689,29 +747,29 @@
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item js-open">
+            <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-open.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
+                <div class="menu-hor-txt" i18n="menu.revealInFileExplorerDir">在檔案總管中顯示資料夾</div>
             </div>
             <div class="menu-hor-item js-rightMenu">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rightMenu.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.systemContextMenu">檔案右鍵選單</div>
+                <div class="menu-hor-txt" i18n="menu.systemContextMenuDir">資料夾系統選單</div>
             </div>
-            <div class="menu-hor-item js-copy">
+            <div class="menu-hor-item js-showRenameDirMsg">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                    <%- await readFile("./img/default/tool-rename.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.copyDirPath">複製資料夾路徑</div>
+                <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
             </div>
-            <div class="menu-hor-item js-delete">
+            <div class="menu-hor-item js-showDeleteDirMsg">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-delete.svg"); %>
                 </div>
-                <div class="menu-hor-txt" i18n="menu.deleteDir">刪除檔案</div>
+                <div class="menu-hor-txt" i18n="menu.deleteDir">刪除資料夾</div>
             </div>
 
             <div class="menu-hor-hr"></div>
@@ -725,12 +783,107 @@
 
             <div class="menu-hor-hr"></div>
 
+            <div class="menu-hor-item js-copyDirName">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyDirName">複製資料夾名</div>
+            </div>
+            <div class="menu-hor-item js-copyDirPath">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyDirPath">複製資料夾路徑</div>
+            </div>
+
+            <!-- <div class="menu-hor-hr"></div>
+
             <div class="menu-hor-item js-close">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/no.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.exit">關閉程式</div>
+            </div> -->
+        </div>
+
+
+        <div class="menu-box js-fileBox">
+            <!-- <div class="menu-hor-title" i18n="menu.showMenuFile"> 檔案 </div> -->
+            <input class="menu-text js-fileName" type="text" readonly="true" value="">
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-grid">
+                <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
+                    <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile">
+                    <%- await readFile("./img/default/tool-open.svg"); %>
+                </div>
+
+                <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy">
+                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                </div>
+                <div class="menu-grid-item js-showMenuImageSearch" title="" i18n="menu.showMenuImageSearch">
+                    <%- await readFile("./img/default/tool-search.svg"); %>
+                </div>
             </div>
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-revealInFileExplorer">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-open.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.revealInFileExplorerFile">在檔案總管中顯示檔案</div>
+            </div>
+            <div class="menu-hor-item js-systemContextMenu">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.systemContextMenuFile">檔案系統選單</div>
+            </div>
+            <div class="menu-hor-item js-renameFile">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
+            </div>
+            <div class="menu-hor-item js-showDeleteFileMsg">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-delete.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.deleteFile">刪除檔案</div>
+            </div>
+
+            <!-- <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-showMenuImageSearch">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-search.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.showMenuImageSearch">搜圖</div>
+            </div> -->
+
+            <div class="menu-hor-hr"></div>
+
+            <div class="menu-hor-item js-copyFile">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFile">複製檔案</div>
+            </div>
+            <div class="menu-hor-item js-copyFileName">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFileName">複製檔名</div>
+            </div>
+            <div class="menu-hor-item js-copyFilePath">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyFilePath">複製檔案路徑</div>
+            </div>
+            <div class="menu-hor-item js-copyImage">
+                <div class="menu-hor-icon">
+                </div>
+                <div class="menu-hor-txt" i18n="menu.copyImage">複製影像</div>
+            </div>
+
         </div>
 
     </div>

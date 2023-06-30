@@ -19,6 +19,24 @@ class Hotkey {
                     M.menu.close();
                     return;
                 }
+
+                //選單裡面的輸入框
+                if (Lib.isTextFocused()) {
+                    return;
+                    /*if (e.code === "ArrowRight"
+                        || e.code === "ArrowLeft"
+                        || e.code === "KeyA"
+                        || e.code === "KeyZ"
+                        || e.code === "KeyX"
+                        || e.code === "KeyC"
+                        || e.code === "KeyV"
+                        || e.key === "Control"
+                        || e.key === "Shift"
+                    ) {
+                        return;
+                    }*/
+                }
+
             }
 
             //如果有開啟msg視窗
@@ -119,7 +137,7 @@ class Hotkey {
 
             if (e.code === "KeyC" && e.ctrlKey) {
                 if (Lib.isTxtSelect() === false) {
-                    M.script.copy.copyImg();
+                    M.script.copy.copyImage();
                 }
             }
             if (e.code === "ArrowRight") {

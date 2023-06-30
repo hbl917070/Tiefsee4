@@ -44,13 +44,10 @@ class FileShow {
         this.iframes = iframes;
 
 
-
         /** 
          * 取得 目前顯示的類型
          */
         function getGroupType() { return _groupType }
-
-
 
 
         /**
@@ -239,12 +236,37 @@ class FileShow {
         async function openImage(fileInfo2: FileInfo2) {
 
             isLoaded = false;
-            let _path = fileInfo2.Path;
             setShowType(GroupType.img); //改變顯示類型
-            let imgurl = _path; //圖片網址
+            let imgurl = fileInfo2.Path; //圖片網址
 
             tiefseeview.setLoading(true, 200);
 
+            let imgData = await M.script.img.getImgData(fileInfo2);
+            let width = imgData.width;
+            let height = imgData.height;
+            let arUrl = imgData.arUrl;
+            let isAnimation = imgData.isAnimation;
+
+            if (isAnimation) { //判斷是否為動圖
+
+                imgurl = await WebAPI.Img.getUrl("web", fileInfo2); //取得圖片網址並且預載入
+                await tiefseeview.loadImg(imgurl); //使用<img>渲染
+
+            } else {
+
+                //縮放方式與對齊方式
+                let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
+                let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
+                if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
+
+                await tiefseeview.loadBigimgscale(
+                    arUrl,
+                    width, height,
+                    _zoomType, _zoomVal
+                );
+            }
+
+            /*
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
             let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
@@ -285,11 +307,9 @@ class FileShow {
                     }
 
                     //縮放方式與對齊方式
-                    let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                     let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
-                    //let _alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[M.config.settings.image.tiefseeviewAlignType];
+                    let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                     if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
-                    //if (_alignType === undefined) { _alignType = TiefseeviewAlignType["C"] }
 
                     await tiefseeview.loadBigimgscale(
                         arUrl,
@@ -315,7 +335,7 @@ class FileShow {
                     await tiefseeview.loadImg(imgurl);
                 }
 
-            }
+            }*/
 
             initTiefseeview(fileInfo2);
             isLoaded = true;

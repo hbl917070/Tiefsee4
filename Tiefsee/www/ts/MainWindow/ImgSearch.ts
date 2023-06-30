@@ -8,7 +8,17 @@ class ImgSearch {
 
         function initMenu() {
 
-            var dom_menuImgSearch = document.getElementById("menu-imgSearch-list");
+            let domMenu = document.getElementById("menu-imgSearch") as HTMLElement;
+            var domMenuList = document.getElementById("menu-imgSearch-list") as HTMLElement;
+
+            function getPath() {
+                let path = domMenu.getAttribute("data-path");
+                if (path !== null && path !== "") {
+                    return path;
+                } else {
+                    return M.fileLoad.getFilePath();
+                }
+            }
 
             for (let i = 0; i < arData.length; i++) {
 
@@ -32,7 +42,7 @@ class ImgSearch {
                     M.menu.close(); //關閉menu
 
                     if (url == "googleSearch") {
-                        let imgSearchUrl = await googleSearch();
+                        let imgSearchUrl = await googleSearch(getPath());
                         if (imgSearchUrl === "") {
                             M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); //圖片搜尋失敗
                             return;
@@ -40,7 +50,7 @@ class ImgSearch {
                         WV_RunApp.OpenUrl(imgSearchUrl);
 
                     } else {
-                        let imgUrl = await getWebUrl();
+                        let imgUrl = await getWebUrl(getPath());
                         if (imgUrl === "") {
                             M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); //圖片搜尋失敗
                             return;
@@ -49,27 +59,62 @@ class ImgSearch {
                         WV_RunApp.OpenUrl(imgSearchUrl);
                     }
                 };
-                dom_menuImgSearch?.append(dom);
+                domMenuList?.append(dom);
             }
 
         }
 
 
         /**
-         * Google搜圖
+         * 
+         * @param path 檔案路徑
+         * @returns Blob
          */
-        async function googleSearch() {
+        async function getBlob(path: string) {
 
             //壓縮圖片
             let max = 1000; //圖片最大面積不可以超過這個值的平方
-            let w = M.fileShow.tiefseeview.getOriginalWidth();
-            let h = M.fileShow.tiefseeview.getOriginalHeight();
-            let zoom = 1;
-            if (w * h > max * max) {
-                zoom = Math.sqrt((max * max) / (w * h));
+            let blob: Blob | null;
+            if (M.fileLoad.getIsBulkView() === false && path === M.fileLoad.getFilePath()) {
+                let w = M.fileShow.tiefseeview.getOriginalWidth();
+                let h = M.fileShow.tiefseeview.getOriginalHeight();
+                let zoom = 1;
+                if (w * h > max * max) {
+                    zoom = Math.sqrt((max * max) / (w * h));
+                }
+                blob = await M.fileShow.tiefseeview.getCanvasBlob(zoom, "medium", "jpg");
+
+            } else {
+
+                let fileInfo2 = await WebAPI.getFileInfo2(path);
+                let imgData = await M.script.img.getImgData(fileInfo2);
+                let w = imgData.width;
+                let h = imgData.height;
+                let zoom = 1;
+                if (w * h > max * max) {
+                    zoom = Math.sqrt((max * max) / (w * h));
+                }
+                let imtUrl = imgData.arUrl[0].url;
+                let p = await M.script.img.preloadImg(imtUrl);
+                if (p === false) {
+                    console.log("搜圖失敗。無法載入圖片");
+                    return null;
+                }
+                let canvas = await M.script.img.urlToCanvas(imtUrl);
+                blob = await M.script.img.getCanvasBlob(canvas, zoom, "medium", "jpg");
             }
 
-            let blob = await M.fileShow.tiefseeview.getCanvasBlob(zoom, "medium", "jpg");
+            if (blob === undefined) { return null; }
+            return blob;
+        }
+
+
+        /**
+         * Google搜圖
+         */
+        async function googleSearch(path: string) {
+
+            let blob = await getBlob(path);
             if (blob === null) { return ""; }
 
             let formData = new FormData();
@@ -96,17 +141,9 @@ class ImgSearch {
          * 把當前的圖片壓縮後上傳到伺服器，取得圖片的網址
          * @returns 
          */
-        async function getWebUrl() {
+        async function getWebUrl(path: string) {
 
-            //壓縮圖片
-            let max = 1000; //圖片最大面積不可以超過這個值的平方
-            let w = M.fileShow.tiefseeview.getOriginalWidth();
-            let h = M.fileShow.tiefseeview.getOriginalHeight();
-            let zoom = 1;
-            if (w * h > max * max) {
-                zoom = Math.sqrt((max * max) / (w * h));
-            }
-            let blob = await M.fileShow.tiefseeview.getCanvasBlob(zoom, "medium", "jpg");
+            let blob = await getBlob(path);
             if (blob === null) { return ""; }
 
             //上傳圖片

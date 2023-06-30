@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
+	<g style="fill:var(--color-white)">
+		<polygon points="20,7 20,8 23,8 23,17 20,17 20,18 24,18 24,7"/>
+		<polygon points="15,8 15,7 1,7 1,18 15,18 15,17 2,17 2,8"/>
+		<polygon points="17.5,3.5 19.5,3.5 17.5,3.5 17.5,21.5"/>
+		<polygon points="20,3 18,3 17,3 15,3 15,4 17,4 17,21 15,21 15,22 20,22 20,21 18,21 18,4 20,4 20,3"/>
+		<rect x="2.8" y="11.7" transform="matrix(-0.3254 0.9456 -0.9456 -0.3254 18.2872 11.3019)" width="4.7" height="1"/>
+		<rect x="5.8" y="11.7" transform="matrix(-0.3254 0.9456 -0.9456 -0.3254 22.2635 8.4652)" width="4.7" height="1"/>
+		<rect x="8.8" y="11.7" transform="matrix(-0.3254 0.9456 -0.9456 -0.3254 26.2398 5.6285)" width="4.7" height="1"/>
+	</g>
+</svg>

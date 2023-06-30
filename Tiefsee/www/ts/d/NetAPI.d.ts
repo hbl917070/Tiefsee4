@@ -495,9 +495,6 @@ interface WV_RunApp {
     /**取得開始選單裡面的所有lnk */
     GetStartMenuList(): string[]
 
-    /** 以3D小畫家開啟 */
-    Open3DMSPaint(path: string): void;
-
     /** 以UWP開啟檔案 */
     RunUwp(uwpId: string, filePath: string): void;
 

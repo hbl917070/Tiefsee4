@@ -26,6 +26,9 @@
   position: absolute;
   overflow-y: auto;
   overflow-x: hidden;
+  //display: flex;
+  //flex-direction: column;
+  //align-items: start;
 }
 .menu-box {
   margin-left: 5px;
@@ -75,10 +78,16 @@
   text-align: center;
   //transform:scaleX(0.6)
 }
+.menu-grid-hr {
+  height: 35px;
+  width: 1px;
+  background-color: var(--color-white10);
+  margin: 0px 3px;
+}
 
 /* 水平項目 */
 .menu-hor-item {
-  max-width: 300px;
+  max-width: 330px;
   padding: 4px 4px;
   padding-right: 35px;
   color: var(--color-white);
@@ -92,12 +101,23 @@
   cursor: pointer;
 }
 
+//標題
 .menu-hor-title {
   padding: 5px 5px;
-  // padding-left: 30px;
+  //padding-left: 30px;
   padding-right: 33px;
   color: var(--color-blue);
   user-select: none;
+}
+//文字框
+.menu-text {
+  height: 33px;
+  color: var(--color-blue);
+  border: none;
+  outline: none;
+  background-color: rgba(0, 0, 0, 0);
+  width: 100%;
+  user-select: all;
 }
 
 /*圖示*/

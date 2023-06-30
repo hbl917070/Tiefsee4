@@ -963,7 +963,7 @@ class Tiefseeview {
             let context0 = domCan.getContext("2d");
             context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
 
-            return domCan
+            return domCan;
         }
 
 
@@ -992,7 +992,6 @@ class Tiefseeview {
 
             await new Promise((resolve, reject) => {
                 if (can === null) { return null; }
-
 
                 let outputType = "image/png";
                 if (dataType === "video") {

@@ -194,8 +194,8 @@ var langData = {
             },
             directoryDefaultSort: {
                 "zh-TW": "資料夾預設排序",
-                "en": "Directory default sort",
-                "ja": "ディレクトリのデフォルトソート",
+                "en": "Folder default sort",
+                "ja": "フォルダのデフォルトソート",
             },
             name: {
                 "zh-TW": "檔名",
@@ -521,7 +521,7 @@ var langData = {
                 "ja": "ファイルパネル",
             },
             displayPanel: {
-                "zh-TW": "顯示檔案預覽面板",
+                "zh-フォルダTW": "顯示檔案預覽面板",
                 "en": "Display file panel",
                 "ja": "ファイルパネルを表示する",
             },
@@ -541,13 +541,13 @@ var langData = {
         directoryPanel: {
             title: {
                 "zh-TW": "資料夾預覽面板",
-                "en": "Directory Panel",
-                "ja": "ディレクトリパネル",
+                "en": "Folder Panel",
+                "ja": "フォルダパネル",
             },
             displayPanel: {
                 "zh-TW": "顯示資料夾預覽面板",
-                "en": "Display directory panel",
-                "ja": "ディレクトリパネルを表示する",
+                "en": "Display folder panel",
+                "ja": "フォルダパネルを表示する",
             },
             displayNumber: {
                 "zh-TW": "顯示編號",
@@ -556,8 +556,8 @@ var langData = {
             },
             displayName: {
                 "zh-TW": "顯示資料夾名",
-                "en": "Display directory name",
-                "ja": "ディレクトリ名を表示する",
+                "en": "Display folder name",
+                "ja": "フォルダ名を表示する",
             },
             numberOfImages: {
                 "zh-TW": "圖片數量",
@@ -836,8 +836,8 @@ var langData = {
             },
             disabledDirectoryPanel: {
                 "zh-TW": "資料夾數量太多時，禁用「資料夾預覽面板」",
-                "en": `Disable "Directory Panel" when there are too many directories`,
-                "ja": "ディレクトリが多すぎる場合は「ディレクトリパネル」を無効化する",
+                "en": `Disable "Folder Panel" when there are too many directories`,
+                "ja": "フォルダが多すぎる場合は「フォルダパネル」を無効化する",
             },
             alwaysDisable: {
                 "zh-TW": "一律禁用",
@@ -938,8 +938,8 @@ var langData = {
             },
             temporaryDirectory: {
                 "zh-TW": "暫存資料夾",
-                "en": "Temporary Directory",
-                "ja": "キャッシュディレクトリ",
+                "en": "Temporary Folder",
+                "ja": "キャッシュフォルダ",
             },
 
         },
@@ -1015,12 +1015,12 @@ var langData = {
             },
             step2: {
                 "zh-TW": "2、把ZIP解壓縮，然後放到「Plugin」資料夾內",
-                "en": `2. Unzip the ZIP and put it in the "Plugin" directory`,
+                "en": `2. Unzip the ZIP and put it in the "Plugin" folder`,
                 "ja": `2. ZIPを解凍し、「Plugin」フォルダに配置する`,
             },
             openPluginDir: {
                 "zh-TW": "開啟「Plugin」資料夾",
-                "en": `Open the "Plugin" directory`,
+                "en": `Open the "Plugin" folder`,
                 "ja": "「Plugin」フォルダを開く",
             },
             step3: {
@@ -1045,7 +1045,7 @@ var langData = {
         quickLook: {
             title: {
                 "zh-TW": "在桌面或資料夾快速預覽檔案",
-                "en": "Quick preview of file on the desktop or in the directory",
+                "en": "Quick preview of file on the desktop or in the folder",
                 "ja": "デスクトップやフォルダー内のファイルをすばやくプレビューできる",
             },
             subtitle: {
@@ -1114,13 +1114,13 @@ var langData = {
         },
         prevDir: {
             "zh-TW": "上一個資料夾",
-            "en": "Prev Directory",
-            "ja": "前のディレクトリ",
+            "en": "Prev Folder",
+            "ja": "前のフォルダ",
         },
         nextDir: {
             "zh-TW": "下一個資料夾",
-            "en": "Next Directory",
-            "ja": "次のディレクトリ",
+            "en": "Next Folder",
+            "ja": "次のフォルダ",
         },
         showMenuSort: {
             "zh-TW": "排序",
@@ -1144,8 +1144,8 @@ var langData = {
         },
         showDeleteDirMsg: {
             "zh-TW": "刪除資料夾",
-            "en": "Delete Directory",
-            "ja": "ディレクトリを削除",
+            "en": "Delete Folder",
+            "ja": "フォルダを削除",
         },
         showMenuImageSearch: {
             "zh-TW": "搜圖",
@@ -1221,20 +1221,60 @@ var langData = {
             "en": "Open New Window",
             "ja": "新しいウィンドウで開く",
         },
+
         revealInFileExplorer: {
             "zh-TW": "在檔案總管中顯示",
             "en": "Reveal in File Explorer",
             "ja": "エクスプローラーで表示",
         },
+        revealInFileExplorerFile: {
+            "zh-TW": "在檔案總管中顯示檔案",
+            "en": "Reveal File in File Explorer",
+            "ja": `
+                <span style="letter-spacing:-2px">
+                    ファイルをエクスプローラーで表示
+                </span>`,
+        },
+        revealInFileExplorerDir: {
+            "zh-TW": "在檔案總管中顯示資料夾",
+            "en": "Reveal Folder in File Explorer",
+            "ja": `
+                <span style="letter-spacing:-2px">
+                    フォルダをエクスプローラーで表示
+                </span>`,
+        },
+
         systemContextMenu: {
             "zh-TW": "系統選單",
             "en": "System Context Menu",
             "ja": "コンテキストメニュー",
         },
+        systemContextMenuFile: {
+            "zh-TW": "檔案系統選單",
+            "en": "File System Context Menu",
+            "ja": `
+                <span style="letter-spacing:-4px">
+                    ファイルのシステムコンテキストメニュー
+                </span>`,
+        },
+        systemContextMenuDir: {
+            "zh-TW": "資料夾系統選單",
+            "en": "Folder System Context Menu",
+            "ja": `
+                <span style="letter-spacing:-4px;">
+                    フォルダのシステムコンテキストメニュー
+                </span>`,
+        },
+
         renameFile: {
-            "zh-TW": "重新命名",
-            "en": "Rename",
-            "ja": "リネーム",
+            "zh-TW": "重新命名檔案",
+            "en": "Rename File",
+            "ja": "ファイルの名前を変更",
+        },
+        renameDir: {
+            "zh-TW": "重新命名資料夾",
+            "en": "Rename Folder",
+            "ja": "フォルダの名前を変更",
         },
         print: {
             "zh-TW": "列印",
@@ -1267,8 +1307,8 @@ var langData = {
         },
         copyDirName: {
             "zh-TW": "複製資料夾名",
-            "en": "Copy Directory Name",
-            "ja": "コピーディレクトリ名",
+            "en": "Copy Folder Name",
+            "ja": "コピーフォルダ名",
         },
         copyFilePath: {
             "zh-TW": "複製檔案路徑",
@@ -1277,8 +1317,8 @@ var langData = {
         },
         copyDirPath: {
             "zh-TW": "複製資料夾路徑",
-            "en": "Copy Directory Path",
-            "ja": "コピーディレクトリパス",
+            "en": "Copy Folder Path",
+            "ja": "コピーフォルダパス",
         },
         copyImage: {
             "zh-TW": "複製影像",
@@ -1289,6 +1329,11 @@ var langData = {
             "zh-TW": "複製影像 Base64",
             "en": "Copy Image Base64",
             "ja": "コピー画像 Base64",
+        },
+        copyBase64: {
+            "zh-TW": "複製 Base64",
+            "en": "Copy Base64",
+            "ja": "コピー Base64",
         },
         copyText: {
             "zh-TW": "複製文字",
@@ -1335,8 +1380,8 @@ var langData = {
         },
         directorySortBy: {
             "zh-TW": "資料夾排序方式",
-            "en": "Directory Sort by",
-            "ja": "ディレクトリソート方式",
+            "en": "Folder Sort by",
+            "ja": "フォルダソート方式",
         },
         name: {
             "zh-TW": "檔名",
@@ -1389,8 +1434,8 @@ var langData = {
         },
         deleteDir: {
             "zh-TW": "刪除資料夾",
-            "en": "Delete Directory",
-            "ja": "ディレクトリを削除",
+            "en": "Delete Folder",
+            "ja": "フォルダを削除",
         },
         setting: {
             "zh-TW": "設定",
@@ -1433,8 +1478,8 @@ var langData = {
         },
         showDirectoryPanel: {
             "zh-TW": "資料夾預覽面板",
-            "en": "Directory Panel",
-            "ja": "ディレクトリパネル",
+            "en": "Folder Panel",
+            "ja": "フォルダパネル",
         },
         showInformationPanel: {
             "zh-TW": "詳細資料面板",
@@ -1646,8 +1691,8 @@ var langData = {
         },
         copyDirName: {
             "zh-TW": "已將「資料夾名稱」複製至剪貼簿",
-            "en": `"Directory Name" copying completed`,
-            "ja": "コピー「ディレクトリ名」完了",
+            "en": `"Folder Name" copying completed`,
+            "ja": "コピー「フォルダ名」完了",
         },
         copyImage: {
             "zh-TW": "已將「影像」複製至剪貼簿",
@@ -1661,13 +1706,18 @@ var langData = {
         },
         copyDirPath: {
             "zh-TW": "已將「資料夾路徑」複製至剪貼簿",
-            "en": `"Directory Path" copying completed`,
-            "ja": "コピー「ディレクトリパス」完了",
+            "en": `"Folder Path" copying completed`,
+            "ja": "コピー「フォルダパス」完了",
         },
         copyIamgeBase64: {
             "zh-TW": "已將「影像 Base64」複製至剪貼簿",
             "en": `"Iamge Base64" copying completed`,
             "ja": "コピー「画像 Base64」完了",
+        },
+        copyBase64: {
+            "zh-TW": "已將「Base64」複製至剪貼簿",
+            "en": `"Base64" copying completed`,
+            "ja": "コピー「Base64」完了",
         },
         copyText: {
             "zh-TW": "已將「文字」複製至剪貼簿",
@@ -1683,9 +1733,14 @@ var langData = {
 
         //#region 重新命名
         renameFile: {
-            "zh-TW": "重新命名",
-            "en": "Rename",
-            "ja": "リネーム",
+            "zh-TW": "重新命名檔案",
+            "en": "Rename File",
+            "ja": "ファイルの名前を変更",
+        },
+        renameDir: {
+            "zh-TW": "重新命名資料夾",
+            "en": "Rename Folder",
+            "ja": "フォルダの名前を変更",
         },
         nameIsEmpty: {
             "zh-TW": "必須輸入檔名",
@@ -1717,8 +1772,8 @@ var langData = {
         },
         deleteDir: {
             "zh-TW": "刪除資料夾",
-            "en": "Delete Directory",
-            "ja": "ディレクトリを削除",
+            "en": "Delete Folder",
+            "ja": "フォルダを削除",
         },
         fileToRecycleBin: {
             "zh-TW": "移至資源回收桶",
@@ -2210,13 +2265,13 @@ var langData = {
         },
         firstDir: {
             "zh-TW": "第一個資料夾",
-            "en": "First Directory",
-            "ja": "最初のディレクトリ"
+            "en": "First Folder",
+            "ja": "最初のフォルダ"
         },
         lastDir: {
             "zh-TW": "最後一個資料夾",
-            "en": "Last Directory",
-            "ja": "最後のディレクトリ"
+            "en": "Last Folder",
+            "ja": "最後のフォルダ"
         },
         revealInFileExplorer: "menu.revealInFileExplorer", //在檔案總管中顯示
         systemContextMenu: "menu.systemContextMenu", //系統選單
