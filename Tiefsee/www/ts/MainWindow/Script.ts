@@ -1098,6 +1098,7 @@ class ScriptCopy {
         }
         let fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } //如果檔案不存在
+        let imgType = Lib.GetFileType(fileInfo2); //取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path
@@ -1105,6 +1106,11 @@ class ScriptCopy {
         ) {
 
             let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，再取得base64
+            await WV_System.SetClipboard_Txt(base64);
+
+        } else if (imgType === "svg") {
+            //await WV_System.SetClipboard_FileToImage(path, false); //直接用C#讀取圖片
+            let base64: string = await Lib.sendGet("base64", path); //取得檔案的base64
             await WV_System.SetClipboard_Txt(base64);
 
         } else {
