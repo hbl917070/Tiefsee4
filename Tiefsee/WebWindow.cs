@@ -293,6 +293,7 @@ namespace Tiefsee {
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
             await wv2.EnsureCoreWebView2Async(webView2Environment); //等待初始化完成
+            wv2.CoreWebView2.Profile.PreferredColorScheme = Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark; //指定為深色主題
 
             //wv2.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44";
             wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false; //是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
