@@ -570,13 +570,14 @@ class SettingWindow {
 
         //視窗 圓角
         addLoadEvent(() => {
-            var jq_windowBorderRadius = $("#text-windowBorderRadius");
-            jq_windowBorderRadius.val(config.settings.theme["--window-border-radius"]);
+            var domText = getDom("#text-windowBorderRadius") as HTMLInputElement;
+            domText.value = config.settings.theme["--window-border-radius"].toString();
 
-            jq_windowBorderRadius.on("change", () => {
-                let val = Number(jq_windowBorderRadius.val());
+            domText.addEventListener("change", () => {
+                let val = Number(domText.value);
                 if (val < 0) { val = 0; }
                 if (val > 15) { val = 15; }
+                domText.value = val.toString();
 
                 config.settings["theme"]["--window-border-radius"] = val;
                 appleSettingOfMain();
@@ -585,28 +586,28 @@ class SettingWindow {
 
         //視窗 縮放比例
         addLoadEvent(() => {
-            var jq_zoomFactor = $("#text-zoomFactor");
-            jq_zoomFactor.val(config.settings.theme["zoomFactor"]);
-            jq_zoomFactor.on("change", () => {
-                let val = Number(jq_zoomFactor.val());
+            var domText = getDom("#text-zoomFactor") as HTMLInputElement;
+            domText.value = config.settings.theme["zoomFactor"].toString();
+            domText.addEventListener("change", () => {
+                let val = Number(domText.value);
                 if (isNaN(val)) { val = 1; }
                 if (val === 0) { val = 1; }
                 if (val < 0.5) { val = 0.5; }
                 if (val > 3) { val = 3; }
+                domText.value = val.toString();
 
                 config.settings["theme"]["zoomFactor"] = val;
                 appleSettingOfMain();
             })
-
         })
 
         //文字粗細
         addLoadEvent(() => {
-            var jqselect_fontWeight = $("#select-fontWeight");
-            jqselect_fontWeight.val(config.settings.theme["fontWeight"]);
+            var domSelect = getDom("#select-fontWeight") as HTMLInputElement;
+            domSelect.value = config.settings.theme["fontWeight"];
 
-            jqselect_fontWeight.on("change", () => {
-                let val = jqselect_fontWeight.val() as string;
+            domSelect.addEventListener("change", () => {
+                let val = domSelect.value;
                 config.settings["theme"]["fontWeight"] = val;
                 appleSettingOfMain();
             });
@@ -614,11 +615,11 @@ class SettingWindow {
 
         //圖示粗細
         addLoadEvent(() => {
-            var jqselect_svgWeight = $("#select-svgWeight");
-            jqselect_svgWeight.val(config.settings.theme["svgWeight"]);
+            var domSelect = getDom("#select-svgWeight") as HTMLInputElement;
+            domSelect.value = config.settings.theme["svgWeight"];
 
-            jqselect_svgWeight.on("change", () => {
-                let val = jqselect_svgWeight.val() as string;
+            domSelect.addEventListener("change", () => {
+                let val = domSelect.value;
                 config.settings["theme"]["svgWeight"] = val;
                 appleSettingOfMain();
             });
@@ -931,6 +932,24 @@ class SettingWindow {
             });
         })
 
+        // 大量瀏覽模式一頁顯示的圖片數量
+        addLoadEvent(() => {
+            var domText = getDom("#text-bulkViewImgMaxCount") as HTMLInputElement;
+            domText.value = config.settings.bulkView.imgMaxCount.toString();
+
+            domText.addEventListener("change", () => {
+                let val = Number(domText.value);
+                if (isNaN(val)) { val = 100; }
+                if (val > 300) { val = 300; }
+                if (val < 1) { val = 1; }
+                val = Math.floor(val);
+                domText.value = val.toString();
+                config.settings.bulkView.imgMaxCount = val;
+                appleSettingOfMain();
+            });
+        })
+
+
         // 圖片 縮放模式
         addLoadEvent(() => {
 
@@ -1039,6 +1058,14 @@ class SettingWindow {
                 btn_restart.style.display = "";
             });
 
+            text_startPort.addEventListener("change", () => {
+                let startPort = parseInt(text_startPort.value);
+                if (isNaN(startPort)) { startPort = 4876; }
+                if (startPort > 65535) { startPort = 65535; }
+                if (startPort < 1024) { startPort = 1024; }
+                text_startPort.value = startPort.toString();
+            })
+
             //關閉視窗前觸發
             baseWindow.closingEvents.push(async () => {
                 //儲存 start.ini
@@ -1058,16 +1085,13 @@ class SettingWindow {
                 if (serverCache < 0) { serverCache = 0; }
 
                 await WV_Window.SetStartIni(startPort, startType, serverCache);
-
             });
 
             //重新啟動Tiefsee
             btn_restart.addEventListener("click", async () => {
                 restartTiefsee();
             })
-
         })
-
 
 
         //重設設定 
@@ -1081,7 +1105,7 @@ class SettingWindow {
 
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         msgbox.close(dom);
-                 
+
                         config.settings = defaultConfig;
 
                         //啟動模式
@@ -1095,12 +1119,12 @@ class SettingWindow {
                         var switch_autoStart = getDom("#switch-autoStart") as HTMLInputElement;
                         switch_autoStart.checked = false;
                         switch_autoStart.dispatchEvent(new Event("change"));
-                       
+
                         await Lib.sleep(300);
 
                         await WV_System.DeleteAllTemp(); //立即刪除所有圖片暫存
                         await WV_Window.ClearBrowserCache(); //清理webview2的暫存
-        
+
                         restartTiefsee(); //重新啟動 Tiefsee
                     }
                 });

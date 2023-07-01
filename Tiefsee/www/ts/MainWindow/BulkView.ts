@@ -13,6 +13,7 @@ class BulkView {
     public setFocus;
     public saveCurrentState;
     public updateFileWatcher;
+    public setImgMaxCount;
 
     constructor(M: MainWindow) {
 
@@ -42,7 +43,7 @@ class BulkView {
 
         /** 名單列表 */
         var arFile: string[] = [];
-        /** 一頁顯示幾張圖片*/
+        /** 一頁顯示幾張圖片 */
         var imgMaxCount = 100;
         /** 當前頁數 */
         var pageNow = 1;
@@ -81,6 +82,7 @@ class BulkView {
         this.setColumns = setColumns;
         this.saveCurrentState = saveCurrentState;
         this.updateFileWatcher = updateFileWatcher;
+        this.setImgMaxCount = setImgMaxCount;
         /** 取得焦點 */
         this.setFocus = () => {
             dom_bulkViewContent.tabIndex = 0;
@@ -1111,6 +1113,27 @@ class BulkView {
                 showPage();
             }
         }
+
+
+        /**
+         * 設定 一頁顯示幾張圖片
+         * @param n 
+         */
+        function setImgMaxCount(n: number) {
+            n = Math.floor(n);
+            if (n < 1) { n = 1; }
+
+            if (isVisible && n !== imgMaxCount) { //如果當前正在大量瀏覽模式，且有修改
+                imgMaxCount = n;
+                load();
+            } if (isVisible === false && n !== imgMaxCount) { //如果當前不在大量瀏覽模式，且有修改
+                imgMaxCount = n;
+                temp_dirPath = ""; //避免回到大量瀏覽模式後沒有觸發更新
+            } else {
+                imgMaxCount = n;
+            }
+        }
+
 
         /** 取得當前資料夾路徑 */
         function getDirPath() {

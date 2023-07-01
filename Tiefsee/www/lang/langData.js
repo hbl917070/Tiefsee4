@@ -498,12 +498,12 @@ var langData = {
                 `,
                 "en": `
                     1. After using "AERO" or "Acrylic", you must also adjust the opacity of "Window background color" to get the best look.<br>
-                    2. Some computers will make Tiefsee LAG after using "AERO" or "Acrylic".<br>
+                    2. Using AERO or Acrylic may cause Tiefsee to stutter when moving the window.<br>
                     3. Windows 11 may not be able to use "AERO".
                 `,
                 "ja": `
                     1. 「AERO」または「Acrylic」を使用した後、「ウィンドウの背景色」の不透明度も調整すると、最適な見た目になります。<br>
-                    2. 一部のコンピュータでは、「AERO」や「Acrylic」を使用した後に Tiefsee が LAG になります。<br>
+                    2. 「AERO」または「Acrylic」を使用すると、Tiefseeがウィンドウを移動するときにカクつく可能性があります。<br>
                     3. Windows 11 では、「AERO」が使用できない場合があります。
                     `,
             }
@@ -521,7 +521,7 @@ var langData = {
                 "ja": "ファイルパネル",
             },
             displayPanel: {
-                "zh-フォルダTW": "顯示檔案預覽面板",
+                "zh-TW": "顯示檔案預覽面板",
                 "en": "Display file panel",
                 "ja": "ファイルパネルを表示する",
             },
@@ -676,7 +676,7 @@ var langData = {
             },
             bulkViewToolbar: {
                 "zh-TW": "大量瀏覽模式工具列",
-                "en": " Bulk View Toolbar",
+                "en": "Bulk View Toolbar",
                 "ja": "バルクビューツールバー",
             },
             adjustOrderByDragging: {
@@ -834,6 +834,7 @@ var langData = {
                 "en": "Performance",
                 "ja": "パフォーマンス",
             },
+
             disabledDirectoryPanel: {
                 "zh-TW": "資料夾數量太多時，禁用「資料夾預覽面板」",
                 "en": `Disable "Folder Panel" when there are too many directories`,
@@ -854,6 +855,40 @@ var langData = {
                 "en": "Always enable",
                 "ja": "常に有効にする",
             },
+
+            useCreateImageBitmap: {
+                "zh-TW": "圖片面積過大時，停用 createImageBitmap (停用高品質縮放)",
+                "en": "Disable createImageBitmap when image is too large (disable high-quality scaling)",
+                "ja": "画像が大きすぎる場合、createImageBitmap を無効にする (高品質の拡大を無効にする)",
+            },
+            /*alwaysDisable: {
+                "zh-TW": "一律停用",
+                "en": "Always disable",
+                "ja": "常に無効にする",
+            },*/
+            disableWhenGreaterThan: {
+                "zh-TW": "大於 {v} x {v} 時停用",
+                "en": "Disable when greater than {v} x {v}",
+                "ja": "{v} x {v} 以上の場合は無効にする",
+            },
+            alwaysUse: {
+                "zh-TW": "一律使用",
+                "en": "Always use",
+                "ja": "常に使用する",
+            },
+
+            useLibvips: {
+                "zh-TW": "當圖片縮小至特定比例以下，就使用 libvips 重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間)",
+                "en": "When image is resized to a specific ratio or smaller, use libvips to re-process the image (usually, a higher value results in better image quality, but resizing will take more time)",
+                "ja": "画像が特定の割合または小さくなった場合、libvips を使用して画像を再処理する (通常、高い値は画像品質が向上しますが、リサイズにはより多くの時間がかかります)",
+            },
+
+            bulkViewImgMaxCount: {
+                "zh-TW": "大量瀏覽模式一頁顯示的圖片數量 (範圍:1~300，預設:100，設定太高可能造成卡頓)",
+                "en": "Number of images displayed per page in Bulk View mode (range: 1~300, default: 100, setting too high may cause stuttering)",
+                "ja": "バルクビューモードで1ページに表示される画像の数（範囲：1〜300、デフォルト：100、設定が高すぎるとカクつきが発生する可能性があります）",
+            },
+
         },
 
         // 實驗性功能
@@ -868,32 +903,7 @@ var langData = {
                 "en": "Image DPI",
                 "ja": "画像のDPI",
             },
-            useCreateImageBitmap: {
-                "zh-TW": "圖片面積過大時，停用 createImageBitmap (停用高品質縮放)",
-                "en": "Disable createImageBitmap when image is too large (disable high-quality scaling)",
-                "ja": "画像が大きすぎる場合、createImageBitmap を無効にする (高品質の拡大を無効にする)",
-            },
-            alwaysDisable: {
-                "zh-TW": "一律停用",
-                "en": "Always disable",
-                "ja": "常に無効にする",
-            },
-            disableWhenGreaterThan: {
-                "zh-TW": "大於{v}*{v}時停用",
-                "en": "Disable when greater than {v}*{v}",
-                "ja": "{v}*{v}以上の場合は無効にする",
-            },
-            alwaysUse: {
-                "zh-TW": "一律使用",
-                "en": "Always use",
-                "ja": "常に使用する",
-            },
 
-            useLibvips: {
-                "zh-TW": "當圖片縮小至特定比例以下，就使用 libvips 重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間)",
-                "en": "When image is resized to a specific ratio or smaller, use libvips to re-process the image (usually, a higher value results in better image quality, but resizing will take more time)",
-                "ja": "画像が特定の割合または小さくなった場合、libvips を使用して画像を再処理する (通常、高い値は画像品質が向上しますが、リサイズにはより多くの時間がかかります)",
-            },
         },
 
         // 重設設定

@@ -217,6 +217,7 @@ class Config {
                 { "n": "showMenuCopy", "v": true },
                 { "n": "dragDropFile", "v": true },
                 { "n": "showDeleteMsg", "v": true },
+                { "n": "bulkView", "v": true },
                 { "n": "showSetting", "v": true }
             ],
             txt: [
@@ -229,6 +230,7 @@ class Config {
                 { "n": "showMenuCopy", "v": true },
                 { "n": "dragDropFile", "v": true },
                 { "n": "showDeleteMsg", "v": true },
+                { "n": "bulkView", "v": true },
                 { "n": "showSetting", "v": true }
             ],
             bulkView: [
@@ -293,6 +295,8 @@ class Config {
                 /** 顯示資訊-修改時間 */
                 lastWriteTime: false,
             },
+            /** 一頁顯示幾張圖片 */
+            imgMaxCount: 100,
         },
 
         /** 其他 */

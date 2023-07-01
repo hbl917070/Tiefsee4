@@ -939,6 +939,11 @@ class MainWindow {
 
             //大型切換按鈕
             largeBtn.setShowType(config.settings.layout.largeBtn);
+          
+            //-----------
+
+            //大量瀏覽模式一頁顯示的圖片數量
+           bulkView.setImgMaxCount(config.settings.bulkView.imgMaxCount);
 
             //-----------
 

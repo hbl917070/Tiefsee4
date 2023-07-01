@@ -513,6 +513,20 @@ class MainToolbar {
                 },
             })
 
+            //進入 大量瀏覽模式
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.bulkView",
+                group: GroupType.pdf,
+                name: "bulkView",
+                icon: "tool-bulkView.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", async () => {
+                        M?.script.bulkView.show();
+                    });
+                },
+            })
+
             //設定
             ar.push({
                 type: "button", html: "",
@@ -714,6 +728,20 @@ class MainToolbar {
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.showDeleteMsg();
+                    });
+                },
+            })
+
+            //進入 大量瀏覽模式
+            ar.push({
+                type: "button", html: "",
+                i18n: "menu.bulkView",
+                group: GroupType.txt,
+                name: "bulkView",
+                icon: "tool-bulkView.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", async () => {
+                        M?.script.bulkView.show();
                     });
                 },
             })

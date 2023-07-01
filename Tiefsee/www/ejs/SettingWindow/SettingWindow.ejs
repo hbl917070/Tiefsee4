@@ -62,8 +62,7 @@
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵 </div> -->
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-mouse" i18n="sw.tabs.mouse"> 滑鼠 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association"
-                    show-not="storeApp"> 設為預設程式 </div>
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association" show-not="storeApp"> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
 
                 <div class="page-tabsHr"> </div>
@@ -141,8 +140,7 @@
                                 <option value="windowWidthRatio" i18n="sw.zoomMode.windowWidthRatio">視窗寬度(%)</option>
                                 <option value="windowHeightRatio" i18n="sw.zoomMode.windowHeightRatio">視窗高度(%)</option>
                             </select>
-                            <input class="text-input" id="text-tiefseeviewZoomValue"
-                                style="width:60px; margin-left:5px; flex:0;" type="number">
+                            <input class="text-input" id="text-tiefseeviewZoomValue" style="width:60px; margin-left:5px; flex:0;" type="number">
                         </div>
 
                         <div class="text-title" i18n="sw.imageAlign.title"> 圖片預設對齊位置 </div>
@@ -754,13 +752,9 @@
                                     大於10000時禁用</option>
                                 <option value="30000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":30000}'>
                                     大於30000時禁用</option>
-                                <option value="-1" i18n="sw.performance.alwaysEnable">一律不禁用</option>
+                                <option value="-1" i18n="sw.performance.alwaysEnable">一律啟用</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="box">
-                        <div class="box-title" i18n="sw.experimentalFeatures.title"> 實驗性功能 </div>
 
                         <div class="text-title" i18n="sw.experimentalFeatures.imageDPI" style="display:none;"> 圖片DPI
                         </div>
@@ -779,29 +773,23 @@
                             </select>
                         </div>
 
-                        <div class="text-title" i18n="sw.experimentalFeatures.useCreateImageBitmap">
+                        <div class="text-title" i18n="sw.performance.useCreateImageBitmap">
                             圖片面積過大時，停用 createImageBitmap(停用高品質縮放
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-highQualityLimit">
-                                <option value="0" i18n="sw.experimentalFeatures.alwaysDisable">一律停用</option>
-                                <option value="2000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
-                                <option value="3000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":3000}'>大於3000*3000時停用</option>
-                                <option value="4000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":4000}'>大於4000*4000時停用</option>
-                                <option value="5000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":5000}'>大於5000*5000時停用</option>
-                                <option value="6000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":6000}'>大於6000*6000時停用</option>
-                                <option value="7000" i18n="sw.experimentalFeatures.disableWhenGreaterThan"
-                                    i18n-v='{"v":7000}'>大於7000*7000時停用</option>
-                                <option value="-1" i18n="sw.experimentalFeatures.alwaysUse">一律使用</option>
+                                <option value="0" i18n="sw.performance.alwaysDisable">一律禁用</option>
+                                <option value="2000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
+                                <option value="3000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":3000}'>大於3000*3000時停用</option>
+                                <option value="4000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":4000}'>大於4000*4000時停用</option>
+                                <option value="5000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":5000}'>大於5000*5000時停用</option>
+                                <option value="6000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":6000}'>大於6000*6000時停用</option>
+                                <option value="7000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":7000}'>大於7000*7000時停用</option>
+                                <option value="-1" i18n="sw.performance.alwaysUse">一律使用</option>
                             </select>
                         </div>
 
-                        <div class="text-title" i18n="sw.experimentalFeatures.useLibvips">
+                        <div class="text-title" i18n="sw.performance.useLibvips">
                             當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
                         </div>
                         <div class="text-content">
@@ -816,6 +804,13 @@
                                 <option value="0.55">55%^n (55、30、16、9...</option>
                                 <option value="0.5">50%^n (50、25、12、6...</option>
                             </select>
+                        </div>
+
+                        <div class="text-title" i18n="sw.performance.bulkViewImgMaxCount" >
+                            大量瀏覽模式一頁顯示的圖片數量 (範圍:1~300，預設:100，設定太高可能造成卡頓)
+                        </div>
+                        <div class="text-content">
+                            <input type="number" class="text-input" id="text-bulkViewImgMaxCount">
                         </div>
                     </div>
 
@@ -876,8 +871,7 @@
 
                         <div class="box-title">
                             <span i18n="sw.about.softwareUpdates">軟體更新:</span>
-                            <span class="link"
-                                onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')"> Microsoft
+                            <span class="link" onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')"> Microsoft
                                 Store </span>
                         </div>
 
@@ -885,13 +879,11 @@
 
                         <div class="box-title">
                             <span i18n="sw.about.developer">開發者:</span>
-                            <span class="link"
-                                onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+                            <span class="link" onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
                         </div>
                         <div class="box-title">
                             <span i18n="sw.about.repository">儲存庫:</span>
-                            <span class="link"
-                                onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
+                            <span class="link" onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
                         </div>
 
                     </div>
