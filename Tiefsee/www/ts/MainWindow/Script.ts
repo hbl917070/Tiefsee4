@@ -30,184 +30,208 @@ class Script {
 
         if (option === undefined) { option = {} }
 
+        //#region 圖片
         if (s === "imageFitWindowOrImageOriginal") { //縮放至適合視窗 或 圖片原始大小
             this.img.fitWindowOrImageOriginal();
         }
-        if (s === "imageFitWindow") { //強制縮放至適合視窗
+        else if (s === "imageFitWindow") { //強制縮放至適合視窗
             this.img.zoomToFit();
         }
-        if (s === "imageOriginal") { //圖片原始大小
+        else if (s === "imageOriginal") { //圖片原始大小
             this.img.zoomTo100(option.x, option.y);
         }
-        if (s === "imageZoomIn") { //放大
+        else if (s === "imageZoomIn") { //放大
             this.img.zoomIn(option.x, option.y);
         }
-        if (s === "imageZoomOut") { //縮小
+        else if (s === "imageZoomOut") { //縮小
             this.img.zoomOut(option.x, option.y);
         }
-        if (s === "imageRotateCw") { //順時針90°
+        else if (s === "imageRotateCw") { //順時針90°
             this.img.degForward(option.x, option.y);
         }
-        if (s === "imageRotateCcw") { //逆時針90°
+        else if (s === "imageRotateCcw") { //逆時針90°
             this.img.degReverse(option.x, option.y);
         }
-        if (s === "imageFlipHorizontal") { //水平鏡像
+        else if (s === "imageFlipHorizontal") { //水平鏡像
             this.img.mirrorHorizontal(option.x, option.y);
         }
-        if (s === "imageFlipVertical") { //垂直鏡像
+        else if (s === "imageFlipVertical") { //垂直鏡像
             this.img.mirrorVertica(option.x, option.y);
         }
-        if (s === "imageInitialRotation") { //圖初始化旋轉
+        else if (s === "imageInitialRotation") { //圖初始化旋轉
             this.img.transformRefresh();
         }
 
-        if (s === "imageMoveUp") { //圖片向上移動
+        else if (s === "imageMoveUp") { //圖片向上移動
             this.img.move("up");
         }
-        if (s === "imageMoveDown") { //圖片向下移動
+        else if (s === "imageMoveDown") { //圖片向下移動
             this.img.move("down");
         }
-        if (s === "imageMoveLeft") { //圖片向左移動
+        else if (s === "imageMoveLeft") { //圖片向左移動
             this.img.move("left");
         }
-        if (s === "imageMoveRight") { //圖片向右移動
+        else if (s === "imageMoveRight") { //圖片向右移動
             this.img.move("right");
         }
 
-        if (s === "imageMoveUpOrPrevFile") { //圖片向上移動 or 上一個檔案
+        else if (s === "imageMoveUpOrPrevFile") { //圖片向上移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
                 this.img.move("up");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        if (s === "imageMoveDownOrNextFile") { //圖片向下移動 or 下一個檔案
+        else if (s === "imageMoveDownOrNextFile") { //圖片向下移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
                 this.img.move("down");
             } else {
                 this.fileLoad.nextFile();
             }
         }
-        if (s === "imageMoveLeftOrPrevFile") { //圖片向左移動 or 上一個檔案
+        else if (s === "imageMoveLeftOrPrevFile") { //圖片向左移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("left");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        if (s === "imageMoveLeftOrNextFile") { //圖片向左移動 or 下一個檔案
+        else if (s === "imageMoveLeftOrNextFile") { //圖片向左移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("left");
             } else {
                 this.fileLoad.nextFile();
             }
         }
-        if (s === "imageMoveRightOrPrevFile") { ///圖片向右移動 or 上一個檔案
+        else if (s === "imageMoveRightOrPrevFile") { //圖片向右移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("right");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        if (s === "imageMoveRightOrNextFile") { //圖片向右移動 or 下一個檔案
+        else if (s === "imageMoveRightOrNextFile") { //圖片向右移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("right");
             } else {
                 this.fileLoad.nextFile();
             }
         }
+        //#endregion 
+
         //#region 檔案
-        if (s === "newWindow") { //另開視窗
+        else if (s === "newWindow") { //另開視窗
             await this.open.openNewWindow();
         }
-        if (s === "prevFile") { //上一個檔案
+        else if (s === "prevFile") { //上一個檔案
             this.fileLoad.prevFile();
         }
-        if (s === "nextFile") { //下一個檔案
+        else if (s === "nextFile") { //下一個檔案
             this.fileLoad.nextFile();
         }
-        if (s === "prevDir") { //上一個資料夾
+        else if (s === "prevDir") { //上一個資料夾
             this.fileLoad.prevDir();
         }
-        if (s === "nextDir") { //下一個資料夾
+        else if (s === "nextDir") { //下一個資料夾
             this.fileLoad.nextDir();
         }
-        if (s === "firstFile") { //第一個檔案
+        else if (s === "firstFile") { //第一個檔案
             this.fileLoad.firstFile();
         }
-        if (s === "lastFile") { //最後一個檔案
+        else if (s === "lastFile") { //最後一個檔案
             this.fileLoad.lastFile();
         }
-        if (s === "firstDir") { //第一個資料夾
+        else if (s === "firstDir") { //第一個資料夾
             this.fileLoad.firstDir();
         }
-        if (s === "lastDir") { //最後一個資料夾
+        else if (s === "lastDir") { //最後一個資料夾
             this.fileLoad.lastDir();
         }
-        if (s === "revealInFileExplorer") { //在檔案總管中顯示
+        else if (s === "revealInFileExplorer") { //在檔案總管中顯示
             this.open.revealInFileExplorer();
         }
-        if (s === "systemContextMenu") { //系統選單
+        else if (s === "systemContextMenu") { //系統選單
             this.open.systemContextMenu();
         }
-        if (s === "renameFile") { //重新命名
+        else if (s === "renameFile") { //重新命名
             this.fileLoad.showRenameMsg();
         }
-        if (s === "openWith") { //用其他程式開啟
+        else if (s === "openWith") { //用其他程式開啟
             this.open.openWith();
         }
-        if (s === "fileToRecycleBin") { //移至資源回收桶
+        else if (s === "fileToRecycleBin") { //移至資源回收桶
             this.fileLoad.showDeleteMsg("moveToRecycle");
         }
-        if (s === "fileToPermanentlyDelete") { //永久刪除
+        else if (s === "fileToPermanentlyDelete") { //永久刪除
             this.fileLoad.showDeleteMsg("delete");
         }
         //#endregion
 
         //#region 複製
-        if (s === "copyFile") { //複製檔案
+        else if (s === "copyFile") { //複製檔案
             this.copy.copyFile();
         }
-        if (s === "copyFileName") { //複製檔名
+        else if (s === "copyFileName") { //複製檔名
             this.copy.copyName();
         }
-        if (s === "copyFilePath") { //複製檔案路徑
+        else if (s === "copyFilePath") { //複製檔案路徑
             this.copy.copyPath();
         }
-        if (s === "copyImage") { //複製影像
+        else if (s === "copyImage") { //複製影像
             this.copy.copyImage();
         }
-        if (s === "copyImageBase64") { //複製影像 Base64
+        else if (s === "copyImageBase64") { //複製影像 Base64
             this.copy.copyImageBase64();
         }
-        if (s === "copyText") { //複製文字
+        else if (s === "copyText") { //複製文字
             this.copy.copyText();
         }
         //#endregion
 
         //#region layout
-        if (s === "maximizeWindow") { //視窗最大化
+        else if (s === "maximizeWindow") { //視窗最大化
             this.window.maximizeWindow();
         }
-        if (s === "topmost") { //視窗固定最上層
+        else if (s === "topmost") { //視窗固定最上層
             this.window.enabledTopmost();
         }
-        if (s === "fullScreen") { //全螢幕
+        else if (s === "fullScreen") { //全螢幕
             this.window.enabledFullScreen();
         }
-        if (s === "showToolbar") { //工具列
+        else if (s === "showToolbar") { //工具列
             this.window.enabledMainToolbar();
         }
-        if (s === "showFilePanel") { //檔案預覽面板
+        else if (s === "showFilePanel") { //檔案預覽面板
             this.window.enabledMainFileList();
         }
-        if (s === "showDirectoryPanel") { //資料夾預覽面板
+        else if (s === "showDirectoryPanel") { //資料夾預覽面板
             this.window.enabledMainDirList();
         }
-        if (s === "showInformationPanel") { //詳細資料面板
+        else if (s === "showInformationPanel") { //詳細資料面板
             this.window.enabledMainExif();
         }
         //#endregion
+
+        //#region 大量瀏覽模式
+        else if (s === "prevPage") { //上一頁
+            this.M.bulkView.pagePrev();
+        }
+        else if (s === "nextPage") { //下一頁
+            this.M.bulkView.pageNext();
+        }
+        else if (s === "incrColumns") { //增加「每行圖片數」
+            this.M.bulkView.incrColumns();
+        }
+        else if (s === "decColumns") { //減少「每行圖片數」
+            this.M.bulkView.decColumns();
+        }
+        else if (s === "incrFixedWidth") { //增加「鎖定寬度」
+            this.M.bulkView.incrFixedWidth();
+        }
+        else if (s === "decFixedWidth") { //減少「鎖定寬度」
+            this.M.bulkView.decFixedWidth();
+        }
+        //#endregion 
     }
 }
 

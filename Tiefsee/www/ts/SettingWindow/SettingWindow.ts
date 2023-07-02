@@ -668,7 +668,7 @@ class SettingWindow {
             });
         })
 
-        //滑鼠
+        //滑鼠按鍵 + 滑鼠滾輪
         addLoadEvent(() => {
 
             var select_leftDoubleClick = getDom("#select-leftDoubleClick") as HTMLSelectElement;
@@ -796,8 +796,64 @@ class SettingWindow {
 
             })
 
+        })
 
-            i18n.setAll()
+        //大量瀏覽模式 - 滑鼠滾輪
+        addLoadEvent(() => {
+
+            var select_scrollUpCtrl = getDom("#select-bulkViewScrollUpCtrl") as HTMLSelectElement;
+            var select_scrollDownCtrl = getDom("#select-bulkViewScrollDownCtrl") as HTMLSelectElement;
+            var select_scrollUpShift = getDom("#select-bulkViewScrollUpShift") as HTMLSelectElement;
+            var select_scrollDownShift = getDom("#select-bulkViewScrollDownShift") as HTMLSelectElement;
+            var select_scrollUpAlt = getDom("#select-bulkViewScrollUpAlt") as HTMLSelectElement;
+            var select_scrollDownAlt = getDom("#select-bulkViewScrollDownAlt") as HTMLSelectElement;
+
+            let arDom = [
+                { dom: select_scrollUpCtrl, config: "bulkViewScrollUpCtrl" },
+                { dom: select_scrollDownCtrl, config: "bulkViewScrollDownCtrl" },
+                { dom: select_scrollUpShift, config: "bulkViewScrollUpShift" },
+                { dom: select_scrollDownShift, config: "bulkViewScrollDownShift" },
+                { dom: select_scrollUpAlt, config: "bulkViewScrollUpAlt" },
+                { dom: select_scrollDownAlt, config: "bulkViewScrollDownAlt" },
+            ];
+
+            const data: { [key: string]: string[] } = {
+                "bulkView": [
+                    "prevPage", //上一頁
+                    "nextPage", //下一頁
+                    "incrColumns", //增加「每行圖片數」
+                    "decColumns", //減少「每行圖片數」
+                    "incrFixedWidth", //增加「鎖定寬度」
+                    "decFixedWidth", //減少「鎖定寬度」
+                ],
+
+            }
+            let htmlString = ``;
+            for (const key in data) {
+                htmlString += `<optgroup label="" i18n="script.${key}">`;
+                for (const value of data[key]) {
+                    htmlString += `<option value="${value}" i18n="script.${value}"></option>`;
+                }
+                htmlString += `</optgroup>`;
+            }
+
+            arDom.forEach(item => {
+
+                let dom = item.dom;
+
+                //初始化設定值
+                dom.innerHTML = htmlString;
+                //@ts-ignore
+                dom.value = config.settings.mouse[item.config];
+
+                dom.addEventListener("change", () => {
+                    //@ts-ignore
+                    config.settings.mouse[item.config] = dom.value;
+                    appleSettingOfMain();
+                });
+
+            })
+
         })
 
 
@@ -1288,6 +1344,12 @@ class SettingWindow {
                 appleSettingOfMain();
             });
         })
+
+
+        addLoadEvent(() => {
+            i18n.setAll();
+        })
+
 
         /** 
          * dom 交換順序

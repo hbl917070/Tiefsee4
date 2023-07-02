@@ -716,11 +716,10 @@ var langData = {
                 "en": "Mouse button 5",
                 "ja": "マウスボタン 5"
             },
-
             mouseScrollWheel: {
                 "zh-TW": "滑鼠滾輪",
                 "en": "Mouse scroll wheel",
-                "ja": "マウススクロールホイール"
+                "ja": "スクロールホイール"
             },
             scrollUp: {
                 "zh-TW": "向上捲動",
@@ -761,6 +760,11 @@ var langData = {
                 "zh-TW": "Alt + 向下捲動",
                 "en": "Alt + Scroll down",
                 "ja": "Alt + 下にスクロール"
+            },
+            bulkViewMouseScrollWheel: {
+                "zh-TW": "大量瀏覽模式 - 滑鼠滾輪",
+                "en": "Bulk View - Mouse scroll wheel",
+                "ja": "バルクビュー - スクロールホイール"
             },
         },
 
@@ -2347,6 +2351,41 @@ var langData = {
             "en": "Save",
             "ja": "アーカイブ",
         },
+        //#endregion
+
+        //#region 大量瀏覽模式
+
+        bulkView: "menu.bulkView", //大量瀏覽模式
+        prevPage: {
+            "zh-TW": "上一頁",
+            "en": "Previous Page",
+            "ja": "前のページ"
+        },
+        nextPage: {
+            "zh-TW": "下一頁",
+            "en": "Next Page",
+            "ja": "次のページ"
+        },
+        incrColumns: {
+            "zh-TW": "增加「每行圖片數」",
+            "en": "Increase 'Images per Row'",
+            "ja": "「行ごとの画像数」を増やす"
+        },
+        decColumns: {
+            "zh-TW": "減少「每行圖片數」",
+            "en": "Decrease 'Images per Row'",
+            "ja": "「行ごとの画像数」を減らす"
+        },
+        incrFixedWidth: {
+            "zh-TW": "增加「鎖定寬度」",
+            "en":  "Increase 'Fixed Width'",
+            "ja": "「固定幅」を増やす"
+        },
+        decFixedWidth: {
+            "zh-TW": "減少「鎖定寬度」",
+             "en": "Decrease 'Fixed Width'",
+             "ja": "「固定幅」を減らす"
+        }
         //#endregion
 
     },

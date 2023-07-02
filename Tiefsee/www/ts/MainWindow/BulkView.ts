@@ -14,6 +14,10 @@ class BulkView {
     public saveCurrentState;
     public updateFileWatcher;
     public setImgMaxCount;
+    public incrColumns;
+    public decColumns;
+    public incrFixedWidth;
+    public decFixedWidth;
 
     constructor(M: MainWindow) {
 
@@ -83,6 +87,10 @@ class BulkView {
         this.saveCurrentState = saveCurrentState;
         this.updateFileWatcher = updateFileWatcher;
         this.setImgMaxCount = setImgMaxCount;
+        this.incrColumns = incrColumns;
+        this.decColumns = decColumns;
+        this.incrFixedWidth = incrFixedWidth;
+        this.decFixedWidth = decFixedWidth;
         /** 取得焦點 */
         this.setFocus = () => {
             dom_bulkViewContent.tabIndex = 0;
@@ -161,7 +169,10 @@ class BulkView {
             //切換 欄 時
             dom_columns.addEventListener("click", (e) => {
 
-                apply();
+                let columns = Number.parseInt(getGroupRadioVal(dom_columns));
+                setColumns(columns)
+
+                /*apply();
 
                 let columns = Number.parseInt(getGroupRadioVal(dom_columns));
                 let indentation = dom_indentation.value;
@@ -170,8 +181,38 @@ class BulkView {
                         load(pageNow);
                     }
                 }
-                temp_columns = columns;
+                temp_columns = columns;*/
             });
+
+            //---------
+
+            //大量瀏覽模式 - 滑鼠滾輪
+            dom_bulkView.addEventListener("wheel", (e: WheelEvent) => {
+                let deltaY = e.deltaY; //上下滾動的量
+                let sc = "";
+                if (deltaY > 0) { //下
+                    if (e.ctrlKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollDownCtrl;
+                    } else if (e.shiftKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollDownShift;
+                    } else if (e.altKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollDownAlt;
+                    }
+                }
+                if (deltaY < 0) { //上
+                    if (e.ctrlKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollUpCtrl;
+                    } else if (e.shiftKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollUpShift;
+                    } else if (e.altKey) {
+                        sc = M.config.settings.mouse.bulkViewScrollUpAlt;
+                    }
+                }
+                if (sc !== "") {
+                    M.script.run(sc, { x: e.offsetX, y: e.offsetY });
+                    e.preventDefault(); //禁止頁面滾動
+                }
+            }, false);
 
         }
 
@@ -274,6 +315,12 @@ class BulkView {
         function getFixedWidth() {
             return M.config.settings.bulkView.fixedWidth;
         }
+        /** 設定 getFixedWidth */
+        function setFixedWidth(n: string) {
+            if (n === getFixedWidth()) { return; }
+            dom_fixedWidth.value = n;
+            dom_fixedWidth.dispatchEvent(new Event("input"));
+        }
         /** 取得 首圖進縮 */
         function getIndentation() {
             return M.config.settings.bulkView.indentation;
@@ -287,11 +334,23 @@ class BulkView {
             return M.config.settings.bulkView.columns;
         }
         /** 設定 欄 */
-        function setColumns(n: number) {
-            if (n < 1) { n = 1; }
-            if (n > 8) { n = 8; }
-            setGroupRadioVal(dom_columns, n.toString());
-            dom_columns.dispatchEvent(new Event("input"));
+        function setColumns(columns: number) {
+            if (columns < 1) { columns = 1; }
+            if (columns > 8) { columns = 8; }
+            if (columns === getColumns()) { return; }
+
+            setGroupRadioVal(dom_columns, columns.toString());
+            //dom_columns.dispatchEvent(new Event("input"));
+
+            apply();
+
+            let indentation = dom_indentation.value;
+            if (indentation === "on") { //在開啟首圖進縮的情況下
+                if (temp_columns === 2 || columns === 2) { //從2欄切換成其他，或從其他切換成2欄
+                    load(pageNow);
+                }
+            }
+            temp_columns = columns;
         }
 
 
@@ -796,12 +855,12 @@ class BulkView {
 
                         //確認刪除的目標在當前頁面
                         let isDelete = false;
+                        let domItem: Element | undefined;
                         let arDom = dom_bulkView.querySelectorAll(".bulkView-item");
                         for (let i = 0; i < arDom.length; i++) {
-                            const domItem = arDom[i];
+                            domItem = arDom[i];
                             let domItemPath = domItem.getAttribute("data-path");
                             if (domItemPath === fileWatcherData.FullPath) {
-                                domItem.remove();
                                 isDelete = true;
                                 break;
                             }
@@ -814,6 +873,7 @@ class BulkView {
                                 let thirdItem = items[items.length - 1];
                                 thirdItem.insertAdjacentElement("afterend", newItemDom);
                             }
+                            domItem?.remove();
                             updateItemNumber(); //更新左上角的圖片編號
                             updatePagination(); //更新分頁器
                         }
@@ -1012,10 +1072,15 @@ class BulkView {
                         div.insertAdjacentElement("afterend", newItemDom);
                         div.remove();
                         updateItemNumber(); //更新左上角的圖片編號
+
                     } else if (n !== 0) {
 
                         M.fileLoad.setIsBulkViewSub(true);
-                        await M.script.bulkView.close(arFile.indexOf(fileInfo2.Path));
+                        let index = arFile.indexOf(fileInfo2.FullPath);
+                        if (getIndentation() === "on" && getColumns() === 2) { //如果有使用首圖縮排
+                            index -= 1;
+                        }
+                        await M.script.bulkView.close(index);
 
                         //設定返回按鈕
                         M.toolbarBack.visible(true);
@@ -1134,12 +1199,39 @@ class BulkView {
             }
         }
 
+        /** 增加「每行圖片數」 */
+        function incrColumns() {
+            setColumns(getColumns() + 1);
+        }
+        /** 減少「每行圖片數」 */
+        function decColumns() {
+            setColumns(getColumns() - 1);
+        }
+        function incrFixedWidth() {
+            let n = Number(getFixedWidth());
+            if (isNaN(n)) {
+                n = 40;
+            }
+            n += 10;
+            if (n < 40) { n = 40; }
+            if (n > 100) { n = 100; }
+            setFixedWidth(n.toString());
+        }
+        function decFixedWidth() {
+            let n = Number(getFixedWidth());
+            if (isNaN(n)) {
+                n = 40;
+            }
+            n -= 10;
+            if (n < 40) { n = 40; }
+            if (n > 100) { n = 100; }
+            setFixedWidth(n.toString());
+        }
 
         /** 取得當前資料夾路徑 */
         function getDirPath() {
             return M.fileLoad.getDirPath();
         }
-
         /** 初始化群組按鈕 */
         function initGroupRadio(dom: HTMLElement) {
             dom.addEventListener("click", (e) => {

@@ -222,19 +222,18 @@ class MainWindow {
             });
 
             //在工具列滾動時，進行水平移動
-            dom_toolbar.addEventListener("mousewheel", (e: WheelEventInit) => {
+            dom_toolbar.addEventListener("wheel", (e: WheelEvent) => {
 
                 let scrollLeft = dom_toolbar.scrollLeft;
-                let deltaY: number = 0; //上下滾動的量
-                if (e.deltaY) { deltaY = e.deltaY }
-
+                let deltaY= e.deltaY; //上下滾動的量
+    
                 if (deltaY > 0) { //往右
-                    dom_toolbar.scroll(scrollLeft + 20, 0)
+                    dom_toolbar.scroll(scrollLeft + 20, 0);
                 }
                 if (deltaY < 0) { //往左
-                    dom_toolbar.scroll(scrollLeft - 20, 0)
+                    dom_toolbar.scroll(scrollLeft - 20, 0);
                 }
-            }, false)
+            }, false);
 
             new TiefseeScroll().initGeneral(dom_toolbar, "x"); //滾動條元件
 

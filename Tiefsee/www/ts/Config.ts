@@ -310,10 +310,13 @@ class Config {
 
         /** 滑鼠 */
         mouse: {
+            //滑鼠按鍵
             leftDoubleClick: "maximizeWindow",
             scrollWheelButton: "none",
             mouseButton4: "prevFile",
             mouseButton5: "nextFile",
+
+            //滑鼠滾輪
             scrollUp: "imageZoomIn",
             scrollDown: "imageZoomOut",
             scrollUpCtrl: "imageZoomIn",
@@ -321,7 +324,15 @@ class Config {
             scrollUpShift: "imageMoveRight",
             scrollDownShift: "imageMoveLeft",
             scrollUpAlt: "imageMoveUp",
-            scrollDownAlt: "imageMoveDown"
+            scrollDownAlt: "imageMoveDown",
+
+            //大量瀏覽模式 - 滑鼠滾輪
+            bulkViewScrollUpCtrl: "decColumns",
+            bulkViewScrollDownCtrl: "incrColumns",
+            bulkViewScrollUpShift: "incrFixedWidth",
+            bulkViewScrollDownShift: "decFixedWidth",
+            bulkViewScrollUpAlt: "prevPage",
+            bulkViewScrollDownAlt: "nextPage",
         },
     }
 

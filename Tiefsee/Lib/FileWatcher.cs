@@ -75,7 +75,7 @@ namespace Tiefsee {
                             ChangeType = "changed",
                             FileType = lastItem.FileType
                         });
-                    }  else if (group.Count() > 1 && group.Any(item => item.ChangeType == "deleted") && lastItem.ChangeType == "renamed" && Path.GetExtension(lastItem.OldFullPath).ToLower().Contains("tmp")) {
+                    } else if (group.Count() > 1 && group.Any(item => item.ChangeType == "deleted") && lastItem.ChangeType == "renamed" && Path.GetExtension(lastItem.OldFullPath).ToLower().Contains("tmp")) {
                         // 先 deleted 後 renamed，且副檔名包含tmp，則合併成 changed
                         toSubmit.Add(new FileWatcherData {
                             Key = key,
@@ -129,10 +129,12 @@ namespace Tiefsee {
         /// </summary>
         public void FileWatcherDispose() {
             foreach (string key in dicFileWatcher.Keys) {
-                dicFileWatcher[key].queue.Clear();
-                dicFileWatcher[key].timer.Stop();
-                dicFileWatcher[key].fileWatcher.Dispose();
-                dicFileWatcher[key] = null;
+                if (dicFileWatcher[key] != null) {
+                    dicFileWatcher[key].queue.Clear();
+                    dicFileWatcher[key].timer.Stop();
+                    dicFileWatcher[key].fileWatcher.Dispose();
+                    dicFileWatcher[key] = null;
+                }
             }
             dicFileWatcher = new Dictionary<string, WatcherInfo>();
         }

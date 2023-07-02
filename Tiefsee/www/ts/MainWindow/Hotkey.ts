@@ -8,7 +8,7 @@ class Hotkey {
         //快速鍵處理(暫時)
         window.addEventListener("keydown", async (e) => {
 
-            //console.log(e)
+            //console.log(e);
 
             if (e.code == "F5") { return; }
             if (e.code == "F12") { return; }
@@ -77,6 +77,10 @@ class Hotkey {
 
             //如果有開啟大量瀏覽模式
             if (M.fileLoad.getIsBulkView()) {
+
+                if (e.key === "Alt") { //避免焦點被搶走
+                    e.preventDefault();
+                }
 
                 M.bulkView.setFocus();
 
