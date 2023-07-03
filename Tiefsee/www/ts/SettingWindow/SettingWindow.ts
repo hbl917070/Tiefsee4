@@ -155,30 +155,6 @@ class SettingWindow {
 
         })
 
-        //初始化頁面分頁
-        addLoadEvent(() => {
-
-            //捲到最上面
-            function goTop() {
-                getDom("#window-body")?.scrollTo(0, 0)
-            }
-
-            var tabs = new Tabs();
-            tabs.add(getDom("#tabsBtn-general"), getDom("#tabsPage-general"), () => { goTop() }); //一般
-            tabs.add(getDom("#tabsBtn-appearance"), getDom("#tabsPage-appearance"), () => { goTop() }); //外觀
-            tabs.add(getDom("#tabsBtn-layout"), getDom("#tabsPage-layout"), () => { goTop() }); //版面
-            tabs.add(getDom("#tabsBtn-toolbar"), getDom("#tabsPage-toolbar"), () => { goTop() }); //工具列
-            tabs.add(getDom("#tabsBtn-mouse"), getDom("#tabsPage-mouse"), () => { goTop() }); //滑鼠
-            //tabs.add(getDom("#tabsBtn-image"), getDom("#tabsPage-image"), () => { goTop() });
-            //tabs.add(getDom("#tabsBtn-shortcutKeys"),getDom("#tabsPage-hotkey"), () => { goTop() });/快速鍵
-            tabs.add(getDom("#tabsBtn-extension"), getDom("#tabsPage-extension"), () => { goTop() }); //設為預設程式
-            tabs.add(getDom("#tabsBtn-advanced"), getDom("#tabsPage-advanced"), () => { goTop() }); //進階設定
-            tabs.add(getDom("#tabsBtn-about"), getDom("#tabsPage-about"), () => { goTop() }); //關於
-            tabs.add(getDom("#tabsBtn-plugin"), getDom("#tabsPage-plugin"), () => { goTop() }); //擴充套件
-            tabs.add(getDom("#tabsBtn-quickLook"), getDom("#tabsPage-quickLook"), () => { goTop() }); //快速預覽
-
-            tabs.set(getDom("#tabsBtn-general")); //預設選擇的頁面
-        })
 
         //自訂工具列
         addLoadEvent(() => {
@@ -1349,7 +1325,46 @@ class SettingWindow {
         addLoadEvent(() => {
             i18n.setAll();
         })
+        //初始化頁面分頁
+        addLoadEvent(() => {
 
+            //捲到最上面
+            function goTop() {
+                getDom("#window-body")?.scrollTo(0, 0)
+            }
+
+            var tabs = new Tabs();
+            tabs.add(getDom("#tabsBtn-general"), getDom("#tabsPage-general"), () => { goTop() }); //一般
+            tabs.add(getDom("#tabsBtn-appearance"), getDom("#tabsPage-appearance"), () => { goTop() }); //外觀
+            tabs.add(getDom("#tabsBtn-layout"), getDom("#tabsPage-layout"), () => { goTop() }); //版面
+            tabs.add(getDom("#tabsBtn-toolbar"), getDom("#tabsPage-toolbar"), () => { goTop() }); //工具列
+            tabs.add(getDom("#tabsBtn-mouse"), getDom("#tabsPage-mouse"), () => { goTop() }); //滑鼠
+            //tabs.add(getDom("#tabsBtn-image"), getDom("#tabsPage-image"), () => { goTop() });
+            //tabs.add(getDom("#tabsBtn-shortcutKeys"),getDom("#tabsPage-hotkey"), () => { goTop() });/快速鍵
+            tabs.add(getDom("#tabsBtn-extension"), getDom("#tabsPage-extension"), () => { goTop() }); //設為預設程式
+            tabs.add(getDom("#tabsBtn-advanced"), getDom("#tabsPage-advanced"), () => { goTop() }); //進階設定
+            tabs.add(getDom("#tabsBtn-about"), getDom("#tabsPage-about"), () => { goTop() }); //關於
+            tabs.add(getDom("#tabsBtn-plugin"), getDom("#tabsPage-plugin"), () => { goTop() }); //擴充套件
+            tabs.add(getDom("#tabsBtn-quickLook"), getDom("#tabsPage-quickLook"), () => { goTop() }); //快速預覽
+
+            tabs.set(getDom("#tabsBtn-general")); //預設選擇的頁面
+            
+            //----------
+            
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const toPage = urlParams.get("toPage");
+            const toDom = urlParams.get("toDom");
+            //指定預設頁面
+            if (toPage !== null && toPage !== "") {
+                tabs.set(getDom(`#tabsBtn-${toPage}`)); //預設選擇的頁面
+            }
+            //捲動到指定的dom的位置
+            if (toDom !== null && toDom !== "") {
+                const element = document.querySelector(`[data-toDom="${toDom}"]`);
+                element?.scrollIntoView();
+            }
+        })
 
         /** 
          * dom 交換順序

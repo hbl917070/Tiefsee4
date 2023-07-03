@@ -22,6 +22,7 @@ class FileLoad {
     public loadDropFile;
     public loadFile;
     public loadFiles;
+    public reloadFilePanel;
 
     public nextFile;
     public prevFile;
@@ -98,6 +99,7 @@ class FileLoad {
         this.loadDropFile = loadDropFile;
         this.loadFile = loadFile;
         this.loadFiles = loadFiles;
+        this.reloadFilePanel = reloadFilePanel;
         this.nextFile = nextFile;
         this.prevFile = prevFile;
         this.showFile = showFile;
@@ -407,7 +409,7 @@ class FileLoad {
          * 載入單一檔案
          * @param path 
          */
-        async function loadFile(path: string, _dirGroupType?: string) {
+        async function loadFile(path: string, _dirGroupType?: string, noLoad = false) {
 
             if (isLoadFileFinish === false) {
                 console.log("loadFile處理中");
@@ -470,7 +472,7 @@ class FileLoad {
                 arFile = [path];
                 flagFile = 0;
                 //M.mainFileList.init(); //檔案預覽視窗 初始化 
-                if (isBulkView === false) {
+                if (isBulkView === false && noLoad === false) { //在讀取完資料夾名單前，先顯示圖片
                     await showFileUpdataImg(fileInfo2);
                     M.mainExif.init(fileInfo2, true); //初始化exif
                 }
@@ -493,16 +495,17 @@ class FileLoad {
             M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
             //await showFile(); //載入圖片
 
-            if (isBulkView) {
-                await showFile(); //載入圖片
-            } else if (isFile) {
-                await showFileUpdataUI(); //載入圖片(僅更新檔案列表)
-            } else {
-                await showFile(); //載入圖片
+            if (noLoad === false) {
+                if (isBulkView) {
+                    await showFile(); //載入圖片
+                } else if (isFile) {
+                    await showFileUpdataUI(); //載入圖片(僅更新檔案列表)
+                } else {
+                    await showFile(); //載入圖片
+                }
+
+                loadDir(dirPathNow); //處理資料夾預覽視窗
             }
-
-            loadDir(dirPathNow); //處理資料夾預覽視窗
-
         }
 
         /**
@@ -511,6 +514,20 @@ class FileLoad {
         function getFilePath() {
             let p = arFile[flagFile];
             return p;
+        }
+
+        /** 
+         * 重新載入檔案預覽面板
+         */
+        function reloadFilePanel() {
+
+            if (fileLoadType === FileLoadType.dir) {
+                loadFile(getFilePath(), atLoadingExt, true);
+            } else {
+                M.mainFileList.init(); //檔案預覽視窗 初始化
+                M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
+            }
+
         }
 
         /**

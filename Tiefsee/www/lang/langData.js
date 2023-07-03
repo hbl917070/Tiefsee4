@@ -1226,6 +1226,11 @@ var langData = {
             "en": "Bulk View Settings",
             "ja": "バルクビュー設定",
         },
+        reload: {
+            "zh-TW": "重新載入",
+            "en": "Reload",
+            "ja": "リロード",
+        },
         //#endregion
 
 
@@ -2378,13 +2383,13 @@ var langData = {
         },
         incrFixedWidth: {
             "zh-TW": "增加「鎖定寬度」",
-            "en":  "Increase 'Fixed Width'",
+            "en": "Increase 'Fixed Width'",
             "ja": "「固定幅」を増やす"
         },
         decFixedWidth: {
             "zh-TW": "減少「鎖定寬度」",
-             "en": "Decrease 'Fixed Width'",
-             "ja": "「固定幅」を減らす"
+            "en": "Decrease 'Fixed Width'",
+            "ja": "「固定幅」を減らす"
         }
         //#endregion
 

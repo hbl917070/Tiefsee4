@@ -587,8 +587,6 @@ class ScriptFileLoad {
         this.M.fileLoad.showDeleteDirMsg(type, path);
     }
 
-
-
     /** 顯示 重新命名當前檔案或資料夾 的對話方塊 */
     public async showRenameMsg(path?: string) {
         if (path === undefined) {
@@ -613,6 +611,11 @@ class ScriptFileLoad {
     /** 顯示 重新命名資料夾 的對話方塊 */
     public showRenameDirMsg(path?: string) {
         this.M.fileLoad.showRenameDirMsg(path);
+    }
+
+    /** 重新載入檔案預覽面板 */
+    public reloadFilePanel() {
+        this.M.fileLoad.reloadFilePanel();
     }
 }
 
@@ -781,11 +784,27 @@ class ScriptMenu {
     }
 
     /** 顯示選單 排序 */
-    showMenuSort(btn?: HTMLElement, path?: string) {
-        if (btn === undefined) {
-            this.M.menu.openAtOrigin(document.getElementById("menu-sort"), 0, 0);
+    showMenuSort(btn?: HTMLElement, type?: ("file" | "dir" | undefined)) {
+
+        let domMenu = document.querySelector("#menu-sort") as HTMLElement;
+        let domMenuFilebox = domMenu.querySelector(".js-filebox") as HTMLElement;
+        let domMenuDirbox = domMenu.querySelector(".js-dirbox") as HTMLElement;
+
+        if (type === "file") {
+            domMenuFilebox.style.display = "";
+            domMenuDirbox.style.display = "none";
+        } else if (type === "dir") {
+            domMenuFilebox.style.display = "none";
+            domMenuDirbox.style.display = "";
         } else {
-            this.M.menu.openAtButton(document.getElementById("menu-sort"), btn, "menuActive");
+            domMenuFilebox.style.display = "";
+            domMenuDirbox.style.display = "";
+        }
+
+        if (btn === undefined) {
+            this.M.menu.openAtOrigin(domMenu, 0, 0);
+        } else {
+            this.M.menu.openAtButton(domMenu, btn, "menuActive");
         }
     }
 
@@ -824,11 +843,70 @@ class ScriptMenu {
             dom = dom.parentNode as HTMLElement; //往往上層找
         }
 
-        let domMenu = document.getElementById("menu-rightMenuBulkView") as HTMLElement;
-        let domFileBox = domMenu.querySelector(".js-fileBox") as HTMLElement;
-        let domFileName = domMenu.querySelector(".js-fileName") as HTMLInputElement;
+        let domMenu = document.querySelector("#menu-rightMenuBulkView") as HTMLElement;
+        let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
+        let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
         if (path !== null) {
             domFileBox.style.display = "";
+            domMenu.appendChild(domFileBox);
+            domFileBox.setAttribute("data-path", path);
+            domFileName.value = Lib.GetFileName(path); //顯示檔名
+        } else {
+            domFileBox.style.display = "none"; //隱藏檔案區塊
+        }
+        this.M.menu.openAtPosition(domMenu, 0, 0);
+    }
+
+    /** 顯示右鍵選單 檔案預覽面板 */
+    showRightMenuFilePanel(e: MouseEvent) {
+
+        let dom = e.target as HTMLElement;
+        let path = null;
+
+        while (true) { //取得 bulkView-item 的 data-path
+            if (dom.classList.contains("fileList-item")) {
+                path = dom.getAttribute("data-path");
+                break;
+            }
+            if (dom === document.body) { break; }
+            dom = dom.parentNode as HTMLElement; //往往上層找
+        }
+
+        let domMenu = document.querySelector("#menu-rightMenuFilePanel") as HTMLElement;
+        let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
+        let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        if (path !== null) {
+            domFileBox.style.display = "";
+            domMenu.appendChild(domFileBox);
+            domFileBox.setAttribute("data-path", path);
+            domFileName.value = Lib.GetFileName(path); //顯示檔名
+        } else {
+            domFileBox.style.display = "none"; //隱藏檔案區塊
+        }
+        this.M.menu.openAtPosition(domMenu, 0, -50);
+    }
+
+    /** 顯示右鍵選單 資料夾預覽面板 */
+    showRightMenuDirPanel(e: MouseEvent) {
+
+        let dom = e.target as HTMLElement;
+        let path = null;
+
+        while (true) { //取得 bulkView-item 的 data-path
+            if (dom.classList.contains("fileList-item")) {
+                path = dom.getAttribute("data-path");
+                break;
+            }
+            if (dom === document.body) { break; }
+            dom = dom.parentNode as HTMLElement; //往往上層找
+        }
+
+        let domMenu = document.querySelector("#menu-rightMenuDirPanel") as HTMLElement;
+        let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
+        let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        if (path !== null) {
+            domFileBox.style.display = "";
+            domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
             domFileName.value = Lib.GetFileName(path); //顯示檔名
         } else {
@@ -1193,8 +1271,12 @@ class ScriptSetting {
 
     temp_setting: WebWindow | null = null; //用於判斷視窗是否已經開啟
 
-    /** 開啟 設定 視窗 */
-    public async showSetting() {
+    /**
+     * 開啟 設定 視窗
+     * @param toPage 開啟指定的頁簽
+     * @param toDom 捲動到特定的標題
+     */
+    public async showSetting(toPage = "", toDom = "") {
 
         //如果視窗已經存在，就不再新開
         if (this.temp_setting != null) {
@@ -1218,7 +1300,7 @@ class ScriptSetting {
         await this.M.saveSetting(); //先儲存目前的設定值
 
         //新開視窗
-        this.temp_setting = await baseWindow.newWindow("SettingWindow.html");
+        this.temp_setting = await baseWindow.newWindow(`SettingWindow.html?toPage=${toPage}&toDom=${toDom}`);
     }
 
 }

@@ -1207,6 +1207,7 @@ class BulkView {
         function decColumns() {
             setColumns(getColumns() - 1);
         }
+        /** 增加「鎖定寬度」 */
         function incrFixedWidth() {
             let n = Number(getFixedWidth());
             if (isNaN(n)) {
@@ -1217,6 +1218,7 @@ class BulkView {
             if (n > 100) { n = 100; }
             setFixedWidth(n.toString());
         }
+        /** 減少「鎖定寬度」 */
         function decFixedWidth() {
             let n = Number(getFixedWidth());
             if (isNaN(n)) {

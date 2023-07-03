@@ -29,6 +29,8 @@ class MainMenu {
         initRightMenuWelcome();
         initRightMenuDefault();
         initRightMenuBulkView();
+        initRightMenuFilePanel();
+        initRightMenuDirPanel();
         initRightMenuBulkViewFileBox();
         initTextbox();
         initText();
@@ -88,9 +90,17 @@ class MainMenu {
 
                 } else if (Lib.isTextFocused()) { //焦點在輸入框上
                     M.script.menu.showRightMenuText();
+
                 } else if (Lib.isTxtSelect()) { //有選取文字的話
                     M.script.menu.showRightMenuTxt();
-                } else {
+
+                } else if (dataMenu === "filePanel") { //檔案預覽面板
+                    M.script.menu.showRightMenuFilePanel(e);
+
+                } /*else if (dataMenu === "dirPanel") { //資料夾預覽面板
+                    M.script.menu.showRightMenuDirPanel(e);
+
+                }*/ else {
                     //根據當前的顯示類型來決定右鍵選單
                     let showType = document.body.getAttribute("showType") ?? "";
                     if (showType === "img" || showType === "imgs" || showType === "video") {
@@ -733,11 +743,11 @@ class MainMenu {
             });*/
         }
         /**
-         *  初始化 右鍵選單 - 大量瀏覽模式(檔案)
+         *  初始化 右鍵選單 - filebox
          */
         function initRightMenuBulkViewFileBox() {
 
-            let dom = document.querySelector("#menu-rightMenuBulkView .js-fileBox");
+            let dom = document.querySelector("#menu-fileBox");
             if (dom === null) { return; }
 
             function getPath() {
@@ -812,6 +822,36 @@ class MainMenu {
                 M.script.menu.close();
                 M.script.copy.copyImage(getPath());
             });
+        }
+
+        /**
+         * 初始化 右鍵選單 - 檔案預覽面板
+         */
+        function initRightMenuFilePanel() {
+            let dom = document.querySelector("#menu-rightMenuFilePanel");
+            if (dom === null) { return; }
+
+            dom.querySelector(".js-reload")?.addEventListener("click", () => { //重新載入
+                M.script.menu.close();
+                M.script.fileLoad.reloadFilePanel();
+            });
+            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
+                M.script.menu.close();
+                M.script.menu.showMenuSort(undefined, "file");
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.setting.showSetting("layout", "filePanel");
+            });
+
+        }
+        /**
+         * 初始化 右鍵選單 - 資料夾預覽面板
+         */
+        function initRightMenuDirPanel() {
+            let dom = document.querySelector("#menu-rightMenuDirPanel");
+            if (dom === null) { return; }
+
         }
 
         /**

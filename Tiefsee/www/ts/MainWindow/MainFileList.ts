@@ -277,6 +277,7 @@ class MainFileList {
                     <div class="fileList-img" style="${style}"> </div>                                                            
                 </div>`);
             dom_fileListData.append(div);
+            div.setAttribute("data-path", path);
 
             //click載入圖片
             div.addEventListener("click", () => {
