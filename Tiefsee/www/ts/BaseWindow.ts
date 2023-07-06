@@ -288,7 +288,7 @@ class BaseWindow {
     public async onFileWatcher(arData: FileWatcherData[]) {
         console.log(arData)
         for (let i = 0; i < this.fileWatcherEvents.length; i++) {
-            let newArDate =  arData.map(a => {return {...a}});; //複製一個新的陣列(避免被修改)
+            let newArDate = arData.map(a => { return { ...a } }); //複製一個新的陣列(避免被修改)
             await this.fileWatcherEvents[i](newArDate);
         }
 
@@ -331,7 +331,6 @@ class TouchDrop {
     constructor(baseWindow: BaseWindow) {
         this.start = start;
 
-        var time_touchMoveFunc = async () => { }
         let temp_touchX = 0; //觸控的坐標
         let temp_touchY = 0;
         let temp_touchWindowX = 0; //視窗的坐標
@@ -340,14 +339,8 @@ class TouchDrop {
         let temp_touchWindowH = 0;
         let temp_start = false; //是否開始執行了
 
-        //定時執行
-        async function time_touchMove() {
-            await time_touchMoveFunc();
-            setTimeout(() => {
-                time_touchMove();
-            }, 60);
-        }
-        time_touchMove();
+        var touchMoveThrottle = new Throttle(20); //節流
+
 
         /**
          * 
@@ -378,8 +371,6 @@ class TouchDrop {
                 temp_touchWindowW = baseWindow.width;
                 temp_touchWindowH = baseWindow.height;
                 temp_start = true;
-                //console.log(temp_touchWindowX)
-
             }
 
             async function touchmove(e: TouchEvent) {
@@ -392,17 +383,60 @@ class TouchDrop {
                 let x = e.changedTouches[0].screenX - temp_touchX;
                 let y = e.changedTouches[0].screenY - temp_touchY;
 
-                time_touchMoveFunc = async () => {
+                touchMoveThrottle.run = async () => {
+
                     if (_type === "move") {
-                        WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY + y)
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY + y)
                         temp_touchWindowX = temp_touchWindowX + x;
                         temp_touchWindowY = temp_touchWindowY + y;
                     }
+                    else if (_type === "RB") { //右下
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH + y);
+                    }
+                    else if (_type === "CB") { //下
+                        await WV_Window.SetSize(temp_touchWindowW, temp_touchWindowH + y);
+                    }
+                    else if (_type === "RC") { //右
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH);
+                    }
+                    else if (_type === "CT") { //上
+                        await WV_Window.SetSize(temp_touchWindowW, temp_touchWindowH - y);
+                        await WV_Window.SetPosition(temp_touchWindowX, temp_touchWindowY + y);
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        temp_touchWindowH = temp_touchWindowH - y;
+                    }
+                    else if (_type === "LC") { //左
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH);
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY);
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        temp_touchWindowW = temp_touchWindowW - x;
+                    }
+                    else if (_type === "LT") { //左上
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH - y);
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY + y);
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        temp_touchWindowW = temp_touchWindowW - x;
+                        temp_touchWindowH = temp_touchWindowH - y;
+                    }
+                    else if (_type === "LB") { //左下
+                        await WV_Window.SetSize(temp_touchWindowW - x, temp_touchWindowH + y);
+                        await WV_Window.SetPosition(temp_touchWindowX + x, temp_touchWindowY);
+                        temp_touchWindowX = temp_touchWindowX + x;
+                        temp_touchWindowW = temp_touchWindowW - x;
+                    }
+                    else if (_type === "RT") { //右上
+                        await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH - y);
+                        await WV_Window.SetPosition(temp_touchWindowX, temp_touchWindowY + y);
+                        temp_touchWindowY = temp_touchWindowY + y;
+                        temp_touchWindowH = temp_touchWindowH - y;
+                    }
+
                 }
             }
 
             async function touchend(e: TouchEvent) {
-
+                /*
                 if (temp_start === true) {
                     let x = (e.changedTouches[0].screenX - temp_touchX) * window.devicePixelRatio / baseWindow.zoomFactor;
                     let y = (e.changedTouches[0].screenY - temp_touchY) * window.devicePixelRatio / baseWindow.zoomFactor;
@@ -442,7 +476,7 @@ class TouchDrop {
                         temp_touchWindowY = temp_touchWindowY + y;
                         await WV_Window.SetSize(temp_touchWindowW + x, temp_touchWindowH - y);
                     }
-                }
+                }*/
 
                 end();
             }
@@ -450,7 +484,6 @@ class TouchDrop {
             // 結束拖曳，並釋放註冊的事件
             function end() {
                 temp_start = false;
-                time_touchMoveFunc = async () => { }
                 _dom.removeEventListener("touchmove", touchmove);
                 _dom.removeEventListener("touchend", touchend);
             }

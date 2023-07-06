@@ -258,8 +258,13 @@ namespace Tiefsee {
         public async void Init() {
 
             this.Opacity = 0;
+ 
+            var panel = new Panel();
+            panel.Dock = DockStyle.Fill;
+            this.Controls.Add(panel);
+
             wv2 = new WebView2();
-            this.Controls.Add(wv2);
+            panel.Controls.Add(wv2);
 
             if (isDelayInit) {
 
@@ -288,7 +293,17 @@ namespace Tiefsee {
 
             wv2.ZoomFactor = 1;
             wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-            wv2.Dock = DockStyle.Fill;
+            //wv2.Dock = DockStyle.Fill;
+
+            //降低調整webview縮放頻率，可提升縮放視窗的流暢度
+            Adapter.LoopRun(20, () => {
+                var w = panel.Width;
+                var h = panel.Height;
+                if (wv2.Width != w || wv2.Height != h) {
+                    wv2.Width = panel.Width;
+                    wv2.Height = panel.Height;
+                }
+            });
 
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
             CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
