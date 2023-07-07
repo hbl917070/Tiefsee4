@@ -148,7 +148,7 @@ class ImgSearch {
 
             //上傳圖片
             let retUrl = "";
-            let imgServer = M.config.imgSearch.imgServer
+            let imgServer = M.config.imgSearch.imgServer;
             for (let i = 0; i < imgServer.length; i++) {
                 const url = imgServer[i].url;
                 const timeout = imgServer[i].timeout;
@@ -158,7 +158,7 @@ class ImgSearch {
                 formData.append("media", blob, "image.jpg");
 
                 retUrl = await submitPost(url, formData, timeout);
-                if (retUrl !== "") { return retUrl }
+                if (retUrl !== "") { return retUrl; }
             }
             return "";
         }

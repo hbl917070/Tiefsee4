@@ -613,10 +613,16 @@ class ScriptFileLoad {
         this.M.fileLoad.showRenameDirMsg(path);
     }
 
-    /** 重新載入檔案預覽面板 */
+    /** 重新載入 檔案預覽面板 */
     public reloadFilePanel() {
         this.M.fileLoad.reloadFilePanel();
     }
+
+    /** 重新載入 資料夾預覽面板 */
+    public reloadDirPanel() {
+        this.M.fileLoad.reloadDirPanel();
+    }
+
 }
 
 class ScriptFileShow {
@@ -633,25 +639,25 @@ class ScriptFile {
     }
 
     /** 快速拖曳(拖出檔案) */
-    public dragDropFile(path?: string | null) {
+    public dragDropFile(path?: string) {
         setTimeout(async () => {
-            if (path === undefined || path === null) {
+            if (path === undefined) {
                 if (this.M.fileLoad.getIsBulkView()) {
                     path = this.M.fileLoad.getDirPath();
                 } else {
                     path = this.M.fileLoad.getFilePath();
                 }
-                if (path.length > 255) {
-                    path = await WV_Path.GetShortPath(path); //把長路經轉回虛擬路徑，避免某些程式不支援長路經
-                }
+            }
+            if (path.length > 255) {
+                path = await WV_Path.GetShortPath(path); //把長路經轉回虛擬路徑，避免某些程式不支援長路經
             }
             WV_File.DragDropFile(path);
         }, 50);
     }
 
     /** 顯示檔案原生右鍵選單 */
-    public async showContextMenu(path?: string | null) {
-        if (path === undefined || path === null) {
+    public async showContextMenu(path?: string) {
+        if (path === undefined) {
             if (this.M.fileLoad.getIsBulkView()) {
                 path = this.M.fileLoad.getDirPath();
             } else {
@@ -691,16 +697,22 @@ class ScriptMenu {
     }
 
     /** 顯示選單 檔案 */
-    showMenuFile(btn?: HTMLElement, path?: string) {
+    showMenuFile(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-file") as HTMLElement;
         let domOpenFileBox = domMenu.querySelector(".js-openFileBox") as HTMLElement; //載入檔案
 
         if (path !== undefined) { //指定路徑
             domMenu.setAttribute("data-path", path);
-            let fileExt = Lib.GetExtension(path).replace(".", ""); //取得副檔名
-            let showType = this.M.fileLoad.fileExtToGroupType(fileExt); //從副檔名判斷GroupType
-            domMenu.setAttribute("showType", showType);
             domOpenFileBox.style.display = "none"; //隱藏「另開視窗」
+
+            if (type === "dir") {
+                domMenu.setAttribute("showType", GroupType.bulkView);
+            } else {
+                let fileExt = Lib.GetExtension(path).replace(".", "");
+                let showType = this.M.fileLoad.fileExtToGroupType(fileExt);
+                domMenu.setAttribute("showType", showType);
+            }
+
         } else {
             domMenu.setAttribute("data-path", "");
             domMenu.setAttribute("showType", "");
@@ -715,17 +727,23 @@ class ScriptMenu {
     }
 
     /** 顯示選單 複製 */
-    showMenuCopy(btn?: HTMLElement, path?: string) {
+    showMenuCopy(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-copy") as HTMLElement;
         let domMenuCopyText = domMenu.querySelector(".js-copyText") as HTMLElement;
 
         let showType: string;
         let fileExt: string;
         if (path !== undefined) {
-            fileExt = Lib.GetExtension(path).replace(".", "");
-            showType = this.M.fileLoad.fileExtToGroupType(fileExt);
-            domMenu.setAttribute("showType", showType);
+
             domMenu.setAttribute("data-path", path);
+            if (type === "dir") {
+                domMenu.setAttribute("showType", GroupType.bulkView);
+            } else {
+                fileExt = Lib.GetExtension(path).replace(".", "");
+                showType = this.M.fileLoad.fileExtToGroupType(fileExt);
+                domMenu.setAttribute("showType", showType);
+            }
+
         } else {
             fileExt = Lib.GetExtension(this.M.fileLoad.getFilePath()).replace(".", "");
             showType = this.M.fileLoad.fileExtToGroupType(fileExt);
@@ -893,7 +911,7 @@ class ScriptMenu {
         let path = null;
 
         while (true) { //取得 bulkView-item 的 data-path
-            if (dom.classList.contains("fileList-item")) {
+            if (dom.classList.contains("dirList-item")) {
                 path = dom.getAttribute("data-path");
                 break;
             }
@@ -902,7 +920,7 @@ class ScriptMenu {
         }
 
         let domMenu = document.querySelector("#menu-rightMenuDirPanel") as HTMLElement;
-        let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
+        let domFileBox = document.querySelector("#menu-dirBox") as HTMLElement;
         let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
         if (path !== null) {
             domFileBox.style.display = "";
@@ -981,11 +999,7 @@ class ScriptOpen {
         }
         let exePath = await WV_Window.GetAppPath();
         await this.M.saveSetting();
-        if (await WV_File.Exists(path)) {
-            WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
-        } else {
-            WV_RunApp.ProcessStart(exePath, "", true, false);
-        }
+        WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
     }
 
     /** 在檔案總管顯示 */

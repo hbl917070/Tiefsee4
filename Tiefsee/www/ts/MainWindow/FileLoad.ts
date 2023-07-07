@@ -18,6 +18,7 @@ class FileLoad {
     public getWaitingDirKey;
     public updateFlagDir;
     public getDirPath;
+    public reloadDirPanel;
 
     public loadDropFile;
     public loadFile;
@@ -95,6 +96,7 @@ class FileLoad {
         this.setFlagDir = (n: number) => { flagDir = n };
         this.updateFlagDir = updateFlagDir;
         this.getDirPath = getDirPath;
+        this.reloadDirPanel = reloadDirPanel;
 
         this.loadDropFile = loadDropFile;
         this.loadFile = loadFile;
@@ -120,11 +122,22 @@ class FileLoad {
 
         this.fileExtToGroupType = fileExtToGroupType;
 
+
         //#region Dir
+
+
+        /**
+         * 重新載入 資料夾預覽面板
+         */
+        function reloadDirPanel() {
+            atLoadingDirParent = "";
+
+            loadDir(getDirPath()); //處理資料夾預覽視窗
+        }
+
 
         /**
          * 取得當前資料夾
-         * @returns 
          */
         function getDirPath() {
             return dirPathNow;
@@ -140,7 +153,6 @@ class FileLoad {
 
         /**
          * 重新計算 flagDir
-         * @param _dirPath 
          */
         async function updateFlagDir(_dirPath: string) {
 
@@ -315,7 +327,8 @@ class FileLoad {
 
             if (await isUpdateDirList(_dirPath)) { //載入不同資料夾，需要重新讀取
 
-                clearDir();
+                //clearDir();
+                
                 await initDirList(_dirPath); //取得資料夾名單
 
                 let dirParentPath = Lib.GetDirectoryName(_dirPath); //使用 父親資料夾 當做key來取得排序
@@ -485,6 +498,11 @@ class FileLoad {
                 M.fileSort.readSortType(dirPathNow); //取得該資料夾設定的檔案排序方式
                 M.fileSort.updateMenu(); //更新menu選單
                 arFile = await M.fileSort.sort(arFile);
+            } else { //不存在
+
+                M.fileShow.openWelcome();
+                return;
+                
             }
 
             //目前檔案位置
@@ -950,7 +968,20 @@ class FileLoad {
                 if (err !== "") {
                     M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); //檔案刪除失敗
                 } else {
-                    await showDir();
+                    if(path === getDirPath()){
+                        await showDir();
+                    }else{
+                        delete arDir[path]; //刪除此筆
+                        arDirKey = Object.keys(arDir);
+        
+                        //showDir();
+                        //_showDir = async () => { };
+                        //updateFlagDir(dirPath);
+                        M.mainDirList.init(); //資料夾預覽視窗 初始化
+                        //M.mainDirList.select(); //
+                        //M.mainDirList.updateLocation(); //
+                    }
+                 
 
                     if (value == "1") {
                         Toast.show(M.i18n.t("msg.fileToRecycleBinCompleted"), 1000 * 3); //已將檔案「移至資源回收桶」

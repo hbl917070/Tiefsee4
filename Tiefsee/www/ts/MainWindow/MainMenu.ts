@@ -31,7 +31,8 @@ class MainMenu {
         initRightMenuBulkView();
         initRightMenuFilePanel();
         initRightMenuDirPanel();
-        initRightMenuBulkViewFileBox();
+        initRightMenuFileBox();
+        initRightMenuDirBox();
         initTextbox();
         initText();
         initLayout();
@@ -97,10 +98,10 @@ class MainMenu {
                 } else if (dataMenu === "filePanel") { //檔案預覽面板
                     M.script.menu.showRightMenuFilePanel(e);
 
-                } /*else if (dataMenu === "dirPanel") { //資料夾預覽面板
+                } else if (dataMenu === "dirPanel") { //資料夾預覽面板
                     M.script.menu.showRightMenuDirPanel(e);
 
-                }*/ else {
+                } else {
                     //根據當前的顯示類型來決定右鍵選單
                     let showType = document.body.getAttribute("showType") ?? "";
                     if (showType === "img" || showType === "imgs" || showType === "video") {
@@ -710,7 +711,7 @@ class MainMenu {
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
             });
-            dom.querySelector(".js-rightMenu")?.addEventListener("click", () => { //檔案右鍵選單
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { //檔案右鍵選單
                 M.script.menu.close();
                 M.script.file.showContextMenu();
             });
@@ -742,10 +743,11 @@ class MainMenu {
                 baseWindow.close();
             });*/
         }
+
         /**
          *  初始化 右鍵選單 - filebox
          */
-        function initRightMenuBulkViewFileBox() {
+        function initRightMenuFileBox() {
 
             let dom = document.querySelector("#menu-fileBox");
             if (dom === null) { return; }
@@ -778,10 +780,6 @@ class MainMenu {
             dom.querySelector(".js-showMenuCopy")?.addEventListener("click", () => { //複製 選單
                 M.script.menu.close();
                 M.script.menu.showMenuCopy(undefined, getPath());
-            });
-            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
-                M.script.menu.close();
-                M.script.menu.showMenuSort(undefined, getPath());
             });
             dom.querySelector(".js-showMenuImageSearch")?.addEventListener("click", () => { //搜圖
                 M.script.menu.close();
@@ -825,6 +823,71 @@ class MainMenu {
         }
 
         /**
+         *  初始化 右鍵選單 - dirbox
+         */
+        function initRightMenuDirBox() {
+            let dom = document.querySelector("#menu-dirBox");
+            if (dom === null) { return; }
+
+            function getPath() {
+                if (dom === null) { return ""; }
+                let path = dom.getAttribute("data-path");
+                if (path === null) { return ""; }
+                return path;
+            }
+
+            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
+            if (dragDropFile !== null) {
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 0) { //滑鼠左鍵
+                        M?.script.file.dragDropFile(getPath());
+                    }
+                });
+                dragDropFile.addEventListener("mousedown", (e) => {
+                    if (e.button === 2) { //滑鼠右鍵
+                        M?.script.file.showContextMenu(getPath());
+                    }
+                });
+            }
+            dom.querySelector(".js-showMenuFile")?.addEventListener("click", () => { //檔案 選單
+                M.script.menu.close();
+                M.script.menu.showMenuFile(undefined, getPath(), "dir");
+            });
+            dom.querySelector(".js-showMenuCopy")?.addEventListener("click", () => { //複製 選單
+                M.script.menu.close();
+                M.script.menu.showMenuCopy(undefined, getPath(), "dir");
+            });
+
+            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { //在檔案總管中顯示
+                M.script.menu.close();
+                M.script.open.revealInFileExplorer(getPath());
+            });
+            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { //檔案右鍵選單
+                M.script.menu.close();
+                M.script.file.showContextMenu(getPath());
+            });
+            dom.querySelector(".js-renameDir")?.addEventListener("click", () => { //重新命名資料夾
+                M.script.menu.close();
+                M.script.fileLoad.showRenameDirMsg(getPath());
+            });
+            dom.querySelector(".js-showDeleteDirMsg")?.addEventListener("click", () => { //刪除資料夾
+                M.script.menu.close();
+                M.script.fileLoad.showDeleteDirMsg(undefined, getPath());
+            });
+
+
+            dom.querySelector(".js-copyDirName")?.addEventListener("click", () => { //複製資料夾名
+                M.script.menu.close();
+                M.script.copy.copyDirName(getPath());
+            });
+            dom.querySelector(".js-copyDirPath")?.addEventListener("click", () => { //複製資料夾路徑
+                M.script.menu.close();
+                M.script.copy.copyDirPath(getPath());
+            });
+        }
+
+
+        /**
          * 初始化 右鍵選單 - 檔案預覽面板
          */
         function initRightMenuFilePanel() {
@@ -852,6 +915,19 @@ class MainMenu {
             let dom = document.querySelector("#menu-rightMenuDirPanel");
             if (dom === null) { return; }
 
+
+            dom.querySelector(".js-reload")?.addEventListener("click", () => { //重新載入
+                M.script.menu.close();
+                M.script.fileLoad.reloadDirPanel();
+            });
+            dom.querySelector(".js-showMenuSort")?.addEventListener("click", () => { //排序 選單
+                M.script.menu.close();
+                M.script.menu.showMenuSort(undefined, "dir");
+            });
+            dom.querySelector(".js-setting")?.addEventListener("click", () => { //設定
+                M.script.menu.close();
+                M.script.setting.showSetting("layout", "dirPanel");
+            });
         }
 
         /**

@@ -45,9 +45,9 @@ class MainDirList {
 		var temp_start = 0; //用於判斷是否需要重新渲染UI
 		var temp_count = 0;
 		var temp_itemHeight = 0; //用於判斷物件高度是否需要更新
-		
+
 		var sc = new TiefseeScroll(); //滾動條元件
-        sc.initGeneral(dom_dirList, "y");
+		sc.initGeneral(dom_dirList, "y");
 
 		//拖曳改變size
 		var dragbar = new Dragbar();
@@ -215,11 +215,14 @@ class MainDirList {
 				return;
 			}
 
+			let noDelay = temp_start === -999; // true=首次執行，載入圖片不需要延遲
+
 			let arDir = M.fileLoad.getWaitingDir();
 			let arDirKey = M.fileLoad.getWaitingDirKey();
 
 			if (arDirKey.length === 0) { //如果沒資料
 				dom_dirListData.innerHTML = ""; //移除之前的所有物件
+				console.error(5)
 				return;
 			}
 
@@ -244,7 +247,7 @@ class MainDirList {
 
 			if (start < 0) { start = 0 }
 			if (temp_start === start && temp_count === count) { //沒變化就離開
-				return
+				return;
 			}
 			temp_start = start;
 			temp_count = count;
@@ -255,7 +258,7 @@ class MainDirList {
 			let end = start + count;
 			if (end > arDirKey.length) { end = arDirKey.length }
 			for (let i = start; i < end; i++) {
-				newItem(i, arDirKey[i], arDir[arDirKey[i]]);
+				newItem(i, arDirKey[i], arDir[arDirKey[i]], noDelay);
 			}
 
 			select();
@@ -268,10 +271,10 @@ class MainDirList {
 		 * @param path 
 		 * @returns 
 		 */
-		function newItem(n: number, _dirPath: string, arPath: string[]) {
+		function newItem(n: number, _dirPath: string, arPath: string[], noDelay = false) {
 
 			let len = arPath.length;
-			if (len > imgNumber) { len = imgNumber }
+			if (len > imgNumber) { len = imgNumber; }
 
 			let imgHtml = "";
 			for (let i = 0; i < len; i++) {
@@ -281,20 +284,20 @@ class MainDirList {
 					let imgUrl = getImgUrl(path);
 					style = `background-image:url('${imgUrl}')`;
 				}
-				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}" style="${style}"></div>`
+				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}" style="${style}"></div>`;
 			}
 			if (len === 0) {
-				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`
+				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`;
 			}
 
 			let name = Lib.GetFileName(_dirPath); //檔名
-			let htmlNo = ``
-			let htmlName = ``
+			let htmlNo = ``;
+			let htmlName = ``;
 			if (isShowNo === true) {
-				htmlNo = `<div class="dirList-no">${n + 1}</div>`
+				htmlNo = `<div class="dirList-no">${n + 1}</div>`;
 			}
 			if (isShowName === true) {
-				htmlName = `<div class="dirList-name">${name}</div> `
+				htmlName = `<div class="dirList-name">${name}</div>`;
 			}
 
 			let div = Lib.newDom(`
@@ -306,9 +309,9 @@ class MainDirList {
                         ${imgHtml}   
                     </div>
                 </div>
-            `)
-
+            `);
 			dom_dirListData.append(div);
+			div.setAttribute("data-path", _dirPath);
 
 			//click載入圖片
 			div.addEventListener("click", () => {
@@ -316,22 +319,33 @@ class MainDirList {
 			})
 
 			if (arPath.length !== 0) {
-				setTimeout(() => {
-					if (dom_dirListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
+				if (noDelay === false) {
+					setTimeout(() => {
+						if (dom_dirListData.contains(div) === false) { return; } //如果物件不在網頁上，就不載入圖片
+						for (let i = 0; i < len; i++) {
+							const path = Lib.Combine([_dirPath, arPath[i]]);
+							if (temp_loaded.indexOf(n + "-" + i) === -1) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+								temp_loaded.push(n + "-" + i); //加到全域變數，表示已經載入過
+								let _url = getImgUrl(path);
+								let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
+								domImg.style.backgroundImage = `url("${_url}")`;
+							}
+						}
+					}, 30);
+				} else {
 					for (let i = 0; i < len; i++) {
 						const path = Lib.Combine([_dirPath, arPath[i]]);
-						if (temp_loaded.indexOf(n + "-" + i) === -1) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
-							temp_loaded.push(n + "-" + i); //加到全域變數，表示已經載入過
-							let _url = getImgUrl(path)
-							let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
-							domImg.style.backgroundImage = `url("${_url}")`;
-						}
+						//if (temp_loaded.indexOf(n + "-" + i) === -1) { //第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+						temp_loaded.push(n + "-" + i); //加到全域變數，表示已經載入過
+						let _url = getImgUrl(path);
+						let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
+						domImg.style.backgroundImage = `url("${_url}")`;
+						//}
 					}
-				}, 30);
+				}
 			}
 
-
-			return div
+			return div;
 		}
 
 

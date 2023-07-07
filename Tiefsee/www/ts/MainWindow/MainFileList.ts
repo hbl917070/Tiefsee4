@@ -220,7 +220,7 @@ class MainFileList {
 
 
             let end = start + count;
-            if (end > arWaitingFile.length) { end = arWaitingFile.length }
+            if (end > arWaitingFile.length) { end = arWaitingFile.length; }
             for (let i = start; i < end; i++) {
                 const path = arWaitingFile[i];
                 newItem(i, path, noDelay);
@@ -260,8 +260,8 @@ class MainFileList {
                 style = `background-image:url('${imgUrl}')`;
             }
 
-            let htmlNo = ``
-            let htmlName = ``
+            let htmlNo = ``;
+            let htmlName = ``;
             if (isShowNo === true) {
                 htmlNo = `<div class="fileList-no">${i + 1}</div>`;
             }

@@ -608,8 +608,9 @@ class MainWindow {
 
             }
 
-            if (json.quickLookRunType !== 0) { //快速啟動
+            if (json.quickLookRunType !== 0) { //快速預覽
 
+                msgbox.closeAll();
                 initSetting(json.settingTxt); //初始讀取設定
 
                 let isKeyboardSpace = json.quickLookRunType === 1; //按著空白鍵
@@ -1065,6 +1066,9 @@ class ToolbarBack {
 }
 
 
+/**
+ * 全螢幕
+ */
 class FullScreen {
 
     M: MainWindow;
