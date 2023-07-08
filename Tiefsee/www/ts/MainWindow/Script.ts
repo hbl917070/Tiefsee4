@@ -731,8 +731,8 @@ class ScriptMenu {
         let domMenu = document.getElementById("menu-copy") as HTMLElement;
         let domMenuCopyText = domMenu.querySelector(".js-copyText") as HTMLElement;
 
-        let showType: string;
-        let fileExt: string;
+        let showType = "";
+        let fileExt = "";
         if (path !== undefined) {
 
             domMenu.setAttribute("data-path", path);
@@ -901,7 +901,7 @@ class ScriptMenu {
         } else {
             domFileBox.style.display = "none"; //隱藏檔案區塊
         }
-        this.M.menu.openAtPosition(domMenu, 0, -50);
+        this.M.menu.openAtPosition(domMenu, 0, 0);
     }
 
     /** 顯示右鍵選單 資料夾預覽面板 */
@@ -930,7 +930,7 @@ class ScriptMenu {
         } else {
             domFileBox.style.display = "none"; //隱藏檔案區塊
         }
-        this.M.menu.openAtPosition(domMenu, 0, -50);
+        this.M.menu.openAtPosition(domMenu, 0, 0);
     }
 
     /** 顯示右鍵選單 預設 */

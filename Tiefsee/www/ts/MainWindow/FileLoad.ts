@@ -131,7 +131,6 @@ class FileLoad {
          */
         function reloadDirPanel() {
             atLoadingDirParent = "";
-
             loadDir(getDirPath()); //處理資料夾預覽視窗
         }
 
@@ -328,13 +327,17 @@ class FileLoad {
             if (await isUpdateDirList(_dirPath)) { //載入不同資料夾，需要重新讀取
 
                 //clearDir();
-                
+
+
                 await initDirList(_dirPath); //取得資料夾名單
 
                 let dirParentPath = Lib.GetDirectoryName(_dirPath); //使用 父親資料夾 當做key來取得排序
                 if (dirParentPath === null) {
                     dirParentPath = _dirPath;
                 }
+
+                await WV_System.NewFileWatcher("dirList", dirParentPath); //偵測檔案變化
+
                 M.dirSort.readSortType(dirParentPath); //取得該資料夾設定的檔案排序方式
                 M.dirSort.updateMenu(); //更新menu選單
                 await M.dirSort.sort(_dirPath);
@@ -502,7 +505,7 @@ class FileLoad {
 
                 M.fileShow.openWelcome();
                 return;
-                
+
             }
 
             //目前檔案位置
@@ -607,9 +610,13 @@ class FileLoad {
                 return;
             }
             if (arFile.length === 0) { //如果資料夾裡面沒有圖片
-                Toast.show(M.i18n.t("msg.imageNotFound"), 1000 * 3); //未找到圖片
+                Toast.show(M.i18n.t("msg.imageNotFound"), 1000 * 3); //未檢測到圖片     
                 M.fileShow.openWelcome();
-                showFileThrottle.run = async () => { }
+                showFileThrottle.run = async () => {
+                    atLoadingDirParent = "";
+                    arDir = {};
+                    arDirKey = [];
+                }
                 return;
             }
 
@@ -820,7 +827,7 @@ class FileLoad {
         /**
           * 顯示 重新載入檔案 的對話方塊
           */
-        function showReloadFileMsg(type: "delete" | "reload") {
+        function showReloadFileMsg(changeType: "delete" | "reload", fileType: "file" | "dir") {
 
             if (M.msgbox.isShow()) { return; }
 
@@ -833,7 +840,12 @@ class FileLoad {
                 txt: M.i18n.t("msg.reloadFile"), //檔案已被修改，你要重新載入此檔案嗎？
                 funcYes: async (dom: HTMLElement, inputTxt: string) => {
                     M.msgbox.close(dom);
-                    showFile(); //重新載入檔案
+
+                    if (fileType === "file") {
+                        showFile(); //重新載入檔案
+                    } else {
+                        showDir(); //重新載入資料夾
+                    }
                 },
                 funcClose: async (dom: HTMLElement) => {
                     M.msgbox.close(dom);
@@ -968,12 +980,12 @@ class FileLoad {
                 if (err !== "") {
                     M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); //檔案刪除失敗
                 } else {
-                    if(path === getDirPath()){
+                    if (path === getDirPath()) {
                         await showDir();
-                    }else{
+                    } else {
                         delete arDir[path]; //刪除此筆
                         arDirKey = Object.keys(arDir);
-        
+
                         //showDir();
                         //_showDir = async () => { };
                         //updateFlagDir(dirPath);
@@ -981,7 +993,7 @@ class FileLoad {
                         //M.mainDirList.select(); //
                         //M.mainDirList.updateLocation(); //
                     }
-                 
+
 
                     if (value == "1") {
                         Toast.show(M.i18n.t("msg.fileToRecycleBinCompleted"), 1000 * 3); //已將檔案「移至資源回收桶」
@@ -1138,11 +1150,20 @@ class FileLoad {
                         return;
                     }
 
+                    let isReload = path === getDirPath(); //判斷是否為當前顯示的資料夾
+
                     arDir = changeKey(arDir, path, newName);
                     arDirKey = Object.keys(arDir);
 
-                    M.mainDirList.init()
-                    showDir();
+                    M.mainDirList.init();
+
+                    if (isReload) {
+                        //showDir();
+                        //載入新資料夾內的同一張圖片
+                        let p = getFilePath();
+                        p = p.replace(path, newName);
+                        loadFile(p);
+                    }
 
                     M.msgbox.close(dom);
                 }
@@ -1169,7 +1190,87 @@ class FileLoad {
         //#endregion
 
 
-        //偵測檔案變化 - 檔案列表
+        //偵測檔案變化 - 資料夾預覽面板
+        baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
+
+            arData.forEach(async data => {
+
+                if (data.Key !== "dirList") { return; }
+                if (data.FileType === "file") { return; }
+
+                console.log(data)
+
+                if (data.ChangeType === "deleted") { //刪除檔案
+
+                    let flag = arDirKey.indexOf(data.FullPath);
+
+                    if (flag !== -1) {
+
+                        let path = arDirKey[flag];
+                        delete arDir[path]; //刪除此筆
+                        arDirKey = Object.keys(arDir);
+                        M.mainDirList.init(); //資料夾預覽視窗 初始化
+
+                        if (data.FullPath === getDirPath()) {
+                            showReloadFileMsg("delete", "dir");
+                        }
+
+                    } else {
+                        return;
+                    }
+
+                } else if (data.ChangeType === "renamed") { //檔案重新命名
+
+                    let flag = arDirKey.indexOf(data.OldFullPath);
+                    if (flag !== -1) { //名單中存在
+                        arFile[flag] = data.FullPath;
+
+
+                        arDir = changeKey(arDir, data.OldFullPath, data.FullPath);
+                        arDirKey = Object.keys(arDir);
+
+                        M.mainDirList.init();
+                        if (data.OldFullPath === getDirPath()) {
+
+                            if (isBulkView) {
+                                showReloadFileMsg("reload", "dir");
+                            } else {
+                                //showDir();
+                                //載入新資料夾內的同一張圖片
+                                let p = getFilePath();
+                                p = p.replace(data.OldFullPath, data.FullPath);
+                                loadFile(p);
+                            }
+
+                        }
+
+                    } else {
+                        //data.ChangeType = "created";
+                    }
+
+                    /*let flag = arFile.indexOf(data.OldFullPath);
+                    if (flag !== -1) { //名單中存在
+                        arFile[flag] = data.FullPath;
+                    } else {
+                        data.ChangeType = "created";
+                    }*/
+
+                } else if (data.ChangeType === "changed") { //檔案被修改
+
+                }
+
+                else if (data.ChangeType === "created") { //新增檔案
+
+
+                }
+
+
+
+            });
+
+        })
+
+        //偵測檔案變化 - 檔案預覽面板
         baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
 
             if (isBulkView) { return; }
@@ -1257,9 +1358,9 @@ class FileLoad {
                 updateTitle(); //更新視窗標題
             }
             if (isShowReloadFileMsgDelete) {
-                showReloadFileMsg("delete"); //顯示 重新載入檔案 的對話方塊
+                showReloadFileMsg("delete", "file"); //顯示 重新載入檔案 的對話方塊
             } else if (isShowReloadFileMsgReload) {
-                showReloadFileMsg("reload"); //顯示 重新載入檔案 的對話方塊
+                showReloadFileMsg("reload", "file"); //顯示 重新載入檔案 的對話方塊
             } else if (isShowFile) {
                 showFile(); //重新載入檔案
             }
@@ -1318,6 +1419,7 @@ class FileLoad {
             });
 
         })
+
     }
 
 }

@@ -222,7 +222,6 @@ class MainDirList {
 
 			if (arDirKey.length === 0) { //如果沒資料
 				dom_dirListData.innerHTML = ""; //移除之前的所有物件
-				console.error(5)
 				return;
 			}
 
