@@ -352,6 +352,27 @@ var langData = {
                 "en": "Display Delete confirmation dialog",
                 "ja": "削除の確認メッセージを表示する",
             },
+
+            whenInsertingFile: {
+                "zh-TW": "偵測到檔案新增時，插入於",
+                "en": "When a new file is detected, insert it at",
+                "ja": "新しいファイルが検出されたとき、挿入する場所",
+            },
+            auto: {
+                "zh-TW": "自動",
+                "en": "Auto",
+                "ja": "自動",
+            },
+            start: {
+                "zh-TW": "最前面",
+                "en": "Insert to the start",
+                "ja": "先頭に挿入",
+            },
+            end: {
+                "zh-TW": "最後面",
+                "en": "Insert to the end",
+                "ja": "最後に挿入",
+            },
         },
 
         //#endregion

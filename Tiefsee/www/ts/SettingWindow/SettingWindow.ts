@@ -1313,10 +1313,19 @@ class SettingWindow {
             //檔案刪除前顯示確認視窗
             var switch_fileDeletingShowCheckMsg = getDom("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
             switch_fileDeletingShowCheckMsg.checked = config.settings["other"]["fileDeletingShowCheckMsg"];
-
             switch_fileDeletingShowCheckMsg.addEventListener("change", () => {
                 let val = switch_fileDeletingShowCheckMsg.checked;
                 config.settings["other"]["fileDeletingShowCheckMsg"] = val;
+                appleSettingOfMain();
+            });
+
+            //檔案刪除前顯示確認視窗
+            var select_whenInsertingFile = getDom("#select-whenInsertingFile") as HTMLSelectElement;
+            select_whenInsertingFile.value = config.settings["other"]["whenInsertingFile"];
+
+            select_whenInsertingFile.addEventListener("change", () => {
+                let val = select_whenInsertingFile.value;
+                config.settings["other"]["whenInsertingFile"] = val;
                 appleSettingOfMain();
             });
         })
@@ -1348,9 +1357,9 @@ class SettingWindow {
             tabs.add(getDom("#tabsBtn-quickLook"), getDom("#tabsPage-quickLook"), () => { goTop() }); //快速預覽
 
             tabs.set(getDom("#tabsBtn-general")); //預設選擇的頁面
-            
+
             //----------
-            
+
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             const toPage = urlParams.get("toPage");

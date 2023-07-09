@@ -286,12 +286,10 @@ class BaseWindow {
      * @param arData 
      */
     public async onFileWatcher(arData: FileWatcherData[]) {
-        console.log(arData)
         for (let i = 0; i < this.fileWatcherEvents.length; i++) {
             let newArDate = arData.map(a => { return { ...a } }); //複製一個新的陣列(避免被修改)
             await this.fileWatcherEvents[i](newArDate);
         }
-
     }
 
     //由C#主動呼叫

@@ -1198,8 +1198,6 @@ class FileLoad {
                 if (data.Key !== "dirList") { return; }
                 if (data.FileType === "file") { return; }
 
-                console.log(data)
-
                 if (data.ChangeType === "deleted") { //刪除檔案
 
                     let flag = arDirKey.indexOf(data.FullPath);
@@ -1207,8 +1205,11 @@ class FileLoad {
                     if (flag !== -1) {
 
                         let path = arDirKey[flag];
+                        let p = getDirPath();
                         delete arDir[path]; //刪除此筆
                         arDirKey = Object.keys(arDir);
+                        flagDir = arDirKey.indexOf(p); //更新當前檔案位置
+
                         M.mainDirList.init(); //資料夾預覽視窗 初始化
 
                         if (data.FullPath === getDirPath()) {
@@ -1224,7 +1225,6 @@ class FileLoad {
                     let flag = arDirKey.indexOf(data.OldFullPath);
                     if (flag !== -1) { //名單中存在
                         arFile[flag] = data.FullPath;
-
 
                         arDir = changeKey(arDir, data.OldFullPath, data.FullPath);
                         arDirKey = Object.keys(arDir);
@@ -1248,19 +1248,11 @@ class FileLoad {
                         //data.ChangeType = "created";
                     }
 
-                    /*let flag = arFile.indexOf(data.OldFullPath);
-                    if (flag !== -1) { //名單中存在
-                        arFile[flag] = data.FullPath;
-                    } else {
-                        data.ChangeType = "created";
-                    }*/
-
                 } else if (data.ChangeType === "changed") { //檔案被修改
 
                 }
 
                 else if (data.ChangeType === "created") { //新增檔案
-
 
                 }
 
@@ -1295,7 +1287,9 @@ class FileLoad {
 
                         let flag = arFile.indexOf(data.FullPath);
                         if (flag !== -1) {
+                            let p = getFilePath();
                             arFile.splice(flag, 1); //刪除此筆
+                            flagFile = arFile.indexOf(p); //更新當前檔案位置
                             isMainFileListInit = true; //檔案預覽視窗 初始化
                             isUpdateTitle = true; //更新視窗標題
                         } else {
@@ -1340,7 +1334,23 @@ class FileLoad {
                     let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
                     let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
                     if (groupType === gt) {
-                        arFile.push(data.FullPath);
+
+                        //判斷要插入到最前面還是最後面
+                        let isEnd = false;
+                        let whenInsertingFile = M.config.settings.other.whenInsertingFile;
+                        if (whenInsertingFile === "end") {
+                            isEnd = true;
+                        } else if (whenInsertingFile === "auto" && M.fileSort.getOrderbyType() === "asc") {
+                            isEnd = true;
+                        }
+                        if (isEnd) {
+                            arFile.push(data.FullPath);
+                        } else {
+                            let p = getFilePath();
+                            arFile.unshift(data.FullPath);
+                            flagFile = arFile.indexOf(p); //更新當前檔案位置
+                        }
+
                         isMainFileListInit = true; //檔案預覽視窗 初始化
                         isUpdateTitle = true; //更新視窗標題
                     } else {
@@ -1407,7 +1417,21 @@ class FileLoad {
                     let fileExt = Lib.GetExtension(data.FullPath).replace(".", ""); //取得副檔名
                     let gt = fileExtToGroupType(fileExt); //根據副檔名判斷GroupType
                     if (groupType === gt) {
-                        arFile.push(data.FullPath);
+
+                        //判斷要插入到最前面還是最後面
+                        let isEnd = false;
+                        let whenInsertingFile = M.config.settings.other.whenInsertingFile;
+                        if (whenInsertingFile === "end") {
+                            isEnd = true;
+                        } else if (whenInsertingFile === "auto" && M.fileSort.getOrderbyType() === "asc") {
+                            isEnd = true;
+                        }
+                        if (isEnd) {
+                            arFile.push(data.FullPath);
+                        } else {
+                            arFile.unshift(data.FullPath);
+                        }
+
                     } else {
                         return;
                     }
