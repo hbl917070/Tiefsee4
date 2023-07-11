@@ -70,7 +70,7 @@ class BaseWindow {
         (async () => {
             //判斷目前的狀態是視窗化還是最大化
             this.windowState = await WV_Window.WindowState;
-            this.initWindowState();
+            this.updateWindowState();
         })()
 
 
@@ -112,7 +112,6 @@ class BaseWindow {
         }, false);
 
         //註冊視窗邊框拖曳
-
         windowBorder(<HTMLDivElement>document.querySelector(".window-CT"), "CT"); //上
         windowBorder(<HTMLDivElement>document.querySelector(".window-RC"), "RC"); //右
         windowBorder(<HTMLDivElement>document.querySelector(".window-CB"), "CB"); //下
@@ -138,18 +137,14 @@ class BaseWindow {
             });
             _dom.addEventListener("touchstart", async (e) => {
                 baseWindow.touchDrop.start(_dom, e, _type);
-            });
-            //pointerdown
-
+            });   
         }
-
 
     }
 
 
     /**
      * 取得拖曳進來的檔案路徑
-     * @returns 
      */
     public async getDropPath(): Promise<string> {
 
@@ -171,7 +166,6 @@ class BaseWindow {
 
     /**
      * 設定視窗標題
-     * @param txt 
      */
     public async setTitle(txt: string) {
         WV_Window.Text = txt;
@@ -220,24 +214,22 @@ class BaseWindow {
     /** 最大化 */
     public maximized() {
         WV_Window.WindowState = "Maximized";
-        this.initWindowState();
+        this.updateWindowState();
     }
-
+    
     /** 最小化 */
     public minimized() {
         WV_Window.WindowState = "Minimized";
-
     }
 
     /** 視窗化 */
     public normal() {
         WV_Window.WindowState = "Normal";
-        this.initWindowState();
+        this.updateWindowState();
     }
 
-
     /** 視窗化或最大化時，標題列右邊的按鈕 */
-    private initWindowState() {
+    private updateWindowState() {
         if (this.windowState === "Maximized") {
             this.dom_window.classList.add("maximized");
             this.btn_normal.style.display = "flex";
@@ -258,14 +250,8 @@ class BaseWindow {
         WV_Window.ShowWindow(); //顯示視窗 
     }
 
-
     /**
-     * 由C#主動呼叫。
-     * @param left 
-     * @param top 
-     * @param width 
-     * @param height 
-     * @param windowState 
+     * 由C#主動呼叫。視窗改變大小時
      */
     public async onSizeChanged(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
         this.left = left;
@@ -274,25 +260,16 @@ class BaseWindow {
         this.height = height;
         this.windowState = windowState;
 
-        this.initWindowState();
+        this.updateWindowState();
 
         for (let i = 0; i < this.sizeChangeEvents.length; i++) {
             await this.sizeChangeEvents[i]();
         }
     }
-
+    
     /**
-     * 由C#主動呼叫。檔案發生變化時
-     * @param arData 
+     * 由C#主動呼叫。視窗移動
      */
-    public async onFileWatcher(arData: FileWatcherData[]) {
-        for (let i = 0; i < this.fileWatcherEvents.length; i++) {
-            let newArDate = arData.map(a => { return { ...a } }); //複製一個新的陣列(避免被修改)
-            await this.fileWatcherEvents[i](newArDate);
-        }
-    }
-
-    //由C#主動呼叫
     public onMove(left: number, top: number, width: number, height: number, windowState: ("Maximized" | "Minimized" | "Normal")) {
         this.left = left;
         this.top = top;
@@ -301,12 +278,22 @@ class BaseWindow {
         this.windowState = windowState;
     }
 
-    /*public VisibleChanged() {
-        console.log("VisibleChanged");
+    /**
+     * 由C#主動呼叫。檔案發生變化時
+     */
+    public async onFileWatcher(arData: FileWatcherData[]) {
+        for (let i = 0; i < this.fileWatcherEvents.length; i++) {
+            let newArDate = arData.map(a => { return { ...a } }); //複製一個新的陣列(避免被修改)
+            await this.fileWatcherEvents[i](newArDate);
+        }
     }
-    public FormClosing() {
-         console.log("FormClosing");
-    }*/
+
+    /**
+     * 由C#主動呼叫。按下右鍵時。必要時覆寫此函數
+     */
+    public onRightClick(x: number, y: number) {
+        //console.log(x, y);
+    }
 
     /**
      * 由C#主動呼叫。wewbview2新建視窗時呼叫。必要時覆寫此函數
@@ -315,6 +302,13 @@ class BaseWindow {
     public onNewWindowRequested(url: string) {
         console.log("onNewWindowRequested：" + url)
     }
+
+    /*public VisibleChanged() {
+        console.log("VisibleChanged");
+    }
+    public FormClosing() {
+         console.log("FormClosing");
+    }*/
 }
 
 

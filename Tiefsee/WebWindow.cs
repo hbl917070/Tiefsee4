@@ -258,7 +258,7 @@ namespace Tiefsee {
         public async void Init() {
 
             this.Opacity = 0;
- 
+
             var panel = new Panel();
             panel.Dock = DockStyle.Fill;
             this.Controls.Add(panel);
@@ -333,6 +333,22 @@ namespace Tiefsee {
             wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", WV_RunApp);
             wv2.CoreWebView2.AddHostObjectToScript("WV_Image", WV_Image);
             wv2.CoreWebView2.AddHostObjectToScript("WV_T", new WV_T());
+
+            //按下右鍵時
+            SetOnRightClick((Point p) => {
+                //最大化時，視窗內縮
+                int border = 0;
+                if (this.WindowState == FormWindowState.Maximized) {
+                    border = System.Windows.Forms.Screen.FromHandle(this.Handle).WorkingArea.X
+                            - this.RectangleToScreen(new Rectangle()).X; //程式所在的螢幕工作區域-程式目前坐標
+                    border = Math.Abs(border);
+                }
+                p.X -= border;
+                p.Y -= border;
+                RunJs($@"
+                    if(window.baseWindow !== undefined) baseWindow.onRightClick({p.X},{p.Y});
+                ");
+            });
 
             // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
@@ -551,7 +567,6 @@ namespace Tiefsee {
         }
 
 
-
         /// <summary>
         /// 啟用或關閉 全螢幕
         /// </summary>
@@ -666,6 +681,8 @@ namespace Tiefsee {
 
         private int oldX;
         private int oldY;
+        private bool allowSetSize = false; //暫時允許調整視窗size跟坐標
+
 
         // 句柄創建事件
         protected override void OnHandleCreated(EventArgs e) {
@@ -684,8 +701,6 @@ namespace Tiefsee {
             oldY = this.Top;
 
             this.SetPosition(-9999, -9999); //避免設定坐標前，視窗就已經被看到
-
-            //base.OnHandleCreated(e);
         }
 
 
@@ -699,6 +714,7 @@ namespace Tiefsee {
                 //style.ExStyle |= 0x02000000;
                 //style.ExStyle |= 0x8000000; // NoActive
                 style.ExStyle |= 0x00200000;
+                style.Style &= ~0x80000; //WS_SYSMENU 移除標題列的右鍵選單
                 return style;
             }
         }
@@ -711,34 +727,37 @@ namespace Tiefsee {
             this.SetPosition(this.oldX, this.oldY);
         }
 
-        /*protected override void OnShown(EventArgs e) {
-            base.OnShown(e);
-        }*/
-
-
-        private bool allowSetSize = false; //暫時允許調整視窗size跟坐標
 
         /// <summary>
         /// 必須以此方法來修改視窗size
         /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
         public void SetSize(int width, int height) {
             allowSetSize = true;
             this.Size = new Size(width, height);
         }
 
+
         /// <summary>
         /// 必須以此方法來修改視窗的坐標
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="top"></param>
         public void SetPosition(int left, int top) {
             allowSetSize = true;
             this.Left = left;
             allowSetSize = true;
             this.Top = top;
         }
+
+
+        /// <summary>
+        /// 按下右鍵時
+        /// </summary>
+        public void SetOnRightClick(Action<Point> func) {
+            OnRightClick = func;
+        }
+        private Action<Point> OnRightClick = (Point pos) => {
+            //System.Diagnostics.Debug.WriteLine(pos.X + ", " + pos.Y);
+        };
+
 
         /// <summary>
         /// 避免最大化跟視窗化時，視窗大小錯誤
@@ -752,16 +771,29 @@ namespace Tiefsee {
         }
 
 
-        // https://rjcodeadvance.com/final-modern-ui-aero-snap-window-resizing-sliding-menu-c-winforms/
-        //移除標題列
+        /// <summary>
+        /// 
+        /// </summary>
         protected override void WndProc(ref Message m) {
 
+            //移除標題列
+            // https://rjcodeadvance.com/final-modern-ui-aero-snap-window-resizing-sliding-menu-c-winforms/
             const int WM_NCCALCSIZE = 0x0083; //Standar Title Bar - Snap Window
-
-            //Remove border and keep snap window
-            if (m.Msg == WM_NCCALCSIZE && m.WParam.ToInt32() == 1) {
+            if (m.Msg == WM_NCCALCSIZE && m.WParam.ToInt32() == 1) { //Remove border and keep snap window
                 return;
             }
+
+            //按下右鍵時
+            const int WM_PARENTNOTIFY = 528;
+            if (m.Msg == WM_PARENTNOTIFY) {
+                var wParam = m.WParam;
+                if (wParam == 516) { //按下右鍵時
+                    var pos = new Point(m.LParam.ToInt32());
+                    OnRightClick(pos);
+                }
+            }
+
+            //System.Diagnostics.Debug.WriteLine(m.Msg);
 
             base.WndProc(ref m);
         }

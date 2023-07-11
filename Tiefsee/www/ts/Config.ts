@@ -305,7 +305,7 @@ class Config {
             fileDeletingShowCheckMsg: true,
 
             /** 偵測到檔案新增時，插入於 (auto | start | end) */
-            whenInsertingFile: "",
+            whenInsertingFile: "auto",
 
             /** 語言 */
             lang: "",

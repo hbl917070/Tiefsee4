@@ -225,8 +225,8 @@ class MainWindow {
             dom_toolbar.addEventListener("wheel", (e: WheelEvent) => {
 
                 let scrollLeft = dom_toolbar.scrollLeft;
-                let deltaY= e.deltaY; //上下滾動的量
-    
+                let deltaY = e.deltaY; //上下滾動的量
+
                 if (deltaY > 0) { //往右
                     dom_toolbar.scroll(scrollLeft + 20, 0);
                 }
@@ -571,6 +571,16 @@ class MainWindow {
                 if (url.indexOf("https://maps.google.com/") === 0) {
                     WV_RunApp.OpenUrl(url);
                     temp_dropPath = "";
+                }
+            }
+
+            //按下右鍵時
+            baseWindow.onRightClick = (x: number, y: number) => {
+                console.log(x, y);
+                x = x / window.devicePixelRatio;
+                y = y / window.devicePixelRatio;
+                if (y <= 30) {
+                    mainMenu.showMenu(new MouseEvent("mouseup"), x, y);
                 }
             }
 
@@ -939,11 +949,11 @@ class MainWindow {
 
             //大型切換按鈕
             largeBtn.setShowType(config.settings.layout.largeBtn);
-          
+
             //-----------
 
             //大量瀏覽模式一頁顯示的圖片數量
-           bulkView.setImgMaxCount(config.settings.bulkView.imgMaxCount);
+            bulkView.setImgMaxCount(config.settings.bulkView.imgMaxCount);
 
             //-----------
 

@@ -5,6 +5,7 @@ class MainMenu {
     public updateRightMenuImageZoomRatioTxt;
     public updateMenuLayoutCheckState;
     public setMenuLayoutCheckState;
+    public showMenu;
     //public menu_layout;
 
     constructor(M: MainWindow) {
@@ -22,6 +23,7 @@ class MainMenu {
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
         this.updateMenuLayoutCheckState = updateMenuLayoutCheckState;
         this.setMenuLayoutCheckState = setMenuLayoutCheckState;
+        this.showMenu = showMenu;
 
         initCopy();
         initRotate();
@@ -79,47 +81,55 @@ class MainMenu {
         });
 
         document.body.addEventListener("mouseup", (e: MouseEvent) => {
-
-            //點擊右鍵時
-            if (e.button === 2) {
+            if (e.button === 2) { //點擊右鍵時
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (dataMenu === "") {
+                showMenu(e);
 
-                } if (dataMenu === "none") {
-
-                } else if (Lib.isTextFocused()) { //焦點在輸入框上
-                    M.script.menu.showRightMenuText();
-
-                } else if (Lib.isTxtSelect()) { //有選取文字的話
-                    M.script.menu.showRightMenuTxt();
-
-                } else if (dataMenu === "filePanel") { //檔案預覽面板
-                    M.script.menu.showRightMenuFilePanel(e);
-
-                } else if (dataMenu === "dirPanel") { //資料夾預覽面板
-                    M.script.menu.showRightMenuDirPanel(e);
-
-                } else {
-                    //根據當前的顯示類型來決定右鍵選單
-                    let showType = document.body.getAttribute("showType") ?? "";
-                    if (showType === "img" || showType === "imgs" || showType === "video") {
-                        M.script.menu.showRightMenuImage();
-                    } else if (showType === "bulkView") {
-                        M.script.menu.showRightMenuBulkView(e);
-                    } else if (showType === "welcome") {
-                        M.script.menu.showRightMenuWelcome();
-                    } else {
-                        //M.script.menu.showRightMenuDefault();
-                        M.script.menu.showRightMenuImage();
-                    }
-                }
                 dataMenu = "";
             }
-
         });
 
+
+        /** 
+         * 根據當前的狀態來顯示對應的選單
+         */
+        function showMenu(e: MouseEvent, x?: number, y?: number) {
+
+            if (M.menu.getIsShow()) { return; }
+
+            if (dataMenu === "") {
+
+            } if (dataMenu === "none") {
+
+            } else if (Lib.isTextFocused()) { //焦點在輸入框上
+                M.script.menu.showRightMenuTextbox(x, y);
+
+            } else if (Lib.isTxtSelect()) { //有選取文字的話
+                M.script.menu.showRightMenuTxt(x, y);
+
+            } else if (dataMenu === "filePanel") { //檔案預覽面板
+                M.script.menu.showRightMenuFilePanel(e);
+
+            } else if (dataMenu === "dirPanel") { //資料夾預覽面板
+                M.script.menu.showRightMenuDirPanel(e);
+
+            } else {
+                //根據當前的顯示類型來決定右鍵選單
+                let showType = document.body.getAttribute("showType") ?? "";
+                if (showType === "img" || showType === "imgs" || showType === "video") {
+                    M.script.menu.showRightMenuImage(x, y);
+                } else if (showType === "bulkView") {
+                    M.script.menu.showRightMenuBulkView(e, x, y);
+                } else if (showType === "welcome") {
+                    M.script.menu.showRightMenuWelcome(x, y);
+                } else {
+                    //M.script.menu.showRightMenuDefault();
+                    M.script.menu.showRightMenuImage(x, y);
+                }
+            }
+        }
 
 
         /**

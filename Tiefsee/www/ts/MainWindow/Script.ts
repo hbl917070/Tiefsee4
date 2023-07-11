@@ -836,29 +836,39 @@ class ScriptMenu {
     }
 
     /** 顯示右鍵選單 圖片 */
-    showRightMenuImage() {
+    showRightMenuImage(x?: number, y?: number) {
         let dom = document.getElementById("menu-rightMenuImage");
-        this.M.menu.openAtPosition(dom, 0, -85);
+        if (x !== undefined && y !== undefined) {
+            this.M.menu.openAtPoint(dom, x, y);
+        } else {
+            this.M.menu.openAtMouse(dom, 0, -85);
+        }
         this.M.mainMenu.updateRightMenuImageZoomRatioTxt(); //更新 右鍵選單的圖片縮放比例
     }
     /** 顯示右鍵選單 起始畫面 */
-    showRightMenuWelcome() {
+    showRightMenuWelcome(x?: number, y?: number) {
         let dom = document.getElementById("menu-rightMenuWelcome");
-        this.M.menu.openAtPosition(dom, 0, 0);
+        if (x !== undefined && y !== undefined) {
+            this.M.menu.openAtPoint(dom, x, y);
+        } else {
+            this.M.menu.openAtMouse(dom, 0, 0);
+        }
     }
     /** 顯示右鍵選單 大量瀏覽模式 */
-    showRightMenuBulkView(e: MouseEvent) {
+    showRightMenuBulkView(e: MouseEvent, x?: number, y?: number) {
 
         let dom = e.target as HTMLElement;
         let path = null;
 
-        while (true) { //取得 bulkView-item 的 data-path
-            if (dom.classList.contains("bulkView-item")) {
-                path = dom.getAttribute("data-path");
-                break;
+        if (dom !== null) {
+            while (true) { //取得 bulkView-item 的 data-path
+                if (dom.classList.contains("bulkView-item")) {
+                    path = dom.getAttribute("data-path");
+                    break;
+                }
+                if (dom === document.body) { break; }
+                dom = dom.parentNode as HTMLElement; //往往上層找
             }
-            if (dom === document.body) { break; }
-            dom = dom.parentNode as HTMLElement; //往往上層找
         }
 
         let domMenu = document.querySelector("#menu-rightMenuBulkView") as HTMLElement;
@@ -872,7 +882,12 @@ class ScriptMenu {
         } else {
             domFileBox.style.display = "none"; //隱藏檔案區塊
         }
-        this.M.menu.openAtPosition(domMenu, 0, 0);
+
+        if (x !== undefined && y !== undefined) {
+            this.M.menu.openAtPoint(domMenu, x, y);
+        } else {
+            this.M.menu.openAtMouse(domMenu, 0, 0);
+        }
     }
 
     /** 顯示右鍵選單 檔案預覽面板 */
@@ -901,7 +916,7 @@ class ScriptMenu {
         } else {
             domFileBox.style.display = "none"; //隱藏檔案區塊
         }
-        this.M.menu.openAtPosition(domMenu, 0, 0);
+        this.M.menu.openAtMouse(domMenu, 0, 0);
     }
 
     /** 顯示右鍵選單 資料夾預覽面板 */
@@ -930,17 +945,17 @@ class ScriptMenu {
         } else {
             domFileBox.style.display = "none"; //隱藏檔案區塊
         }
-        this.M.menu.openAtPosition(domMenu, 0, 0);
+        this.M.menu.openAtMouse(domMenu, 0, 0);
     }
 
     /** 顯示右鍵選單 預設 */
     showRightMenuDefault() {
         let dom = document.getElementById("menu-rightMenuDefault");
-        this.M.menu.openAtPosition(dom, 0, -55);
+        this.M.menu.openAtMouse(dom, 0, -55);
     }
 
     /** 顯示右鍵選單 輸入框 */
-    showRightMenuText() {
+    showRightMenuTextbox(x?: number, y?: number) {
         let domInput = document.activeElement;
         if (domInput === null) { return false; }
         let isReadonly = domInput.getAttribute("readonly") != null;
@@ -955,13 +970,21 @@ class ScriptMenu {
         }
 
         var dom = document.getElementById("menu-text");
-        this.M.menu.openAtPosition(dom, 0, 0);
+        if (x !== undefined && y !== undefined) {
+            this.M.menu.openAtPoint(dom, x, y);
+        } else {
+            this.M.menu.openAtMouse(dom, 0, 0);
+        }
     }
 
     /** 顯示右鍵選單 一般文字 */
-    showRightMenuTxt() {
+    showRightMenuTxt(x?: number, y?: number) {
         var dom = document.getElementById("menu-txt");
-        this.M.menu.openAtPosition(dom, 0, 0);
+        if (x !== undefined && y !== undefined) {
+            this.M.menu.openAtPoint(dom, x, y);
+        } else {
+            this.M.menu.openAtMouse(dom, 0, 0);
+        }
     }
 
 
