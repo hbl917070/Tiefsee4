@@ -576,7 +576,7 @@ class MainWindow {
 
             //按下右鍵時
             baseWindow.onRightClick = (x: number, y: number) => {
-                console.log(x, y);
+                //console.log(x, y);
                 x = x / window.devicePixelRatio;
                 y = y / window.devicePixelRatio;
                 if (y <= 30) {

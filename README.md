@@ -24,7 +24,7 @@ Tiefsee 是一款開源的圖片檢視器
 
 ## 下載
 
-當前版本：Tiefsee 4.1.1
+當前版本：Tiefsee 4.1.2
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/>
@@ -65,20 +65,20 @@ Tiefsee 是一款開源的圖片檢視器
 
 沒有特別需求的話，我推薦使用商店版
 
-### 2、啟動程式時顯示「WebView2 must be installed to run this application」
+### 2、為什麼商店版比免安裝版還要大
+商店版在編譯的時候會把 NET 的執行環境整個打包進程式裡面，微軟目前尚未提出有效的解決方案。
+
+### 3、啟動程式時顯示「WebView2 must be installed to run this application」
  可能的原因如下
  - 電腦尚未安裝 WebView2：「<a href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">點此</a>」進行下載。
  - 已經安裝 WebView2 但安裝失敗：移除舊的 WebView2 後，對「WebView2 的安裝檔」右鍵→系統管理員身份執行。
  - WebView2 初始化錯誤：避免在 Tiefsee 的路徑裡面包含中文日文韓文之類的特殊字元。
 
-### 3、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
- 毛玻璃視窗效果並非 Windows 正式公開的 API，這項功能在某些裝置上可能存在BUG，或是無法使用。常見的問題為：
+### 4、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
+ 毛玻璃視窗效果並非 Windows 正式公開的 API，這項功能在某些裝置上可能存在 BUG，或是無法使用。常見的問題為：
  - 模糊區域溢出到視窗外
- - Tiefsee的視窗在移動時嚴重延遲
+ - Tiefsee 的視窗在移動時嚴重延遲
 
-
-### 4、在觸控螢幕上以觸控來移動Tiefsee視窗時，流暢度不佳
- WebView2 會將「觸控指令」攔截，導致無法使用 winAPI 來移動視窗。目前尚無解決方案。
 
 <br>
 
