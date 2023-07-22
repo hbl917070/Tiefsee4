@@ -741,11 +741,11 @@ class MainMenu {
 
             dom.querySelector(".js-copyDirName")?.addEventListener("click", () => { //複製資料夾名
                 M.script.menu.close();
-                M.script.copy.copyName();
+                M.script.copy.copyDirName();
             });
             dom.querySelector(".js-copyDirPath")?.addEventListener("click", () => { //複製資料夾路徑
                 M.script.menu.close();
-                M.script.copy.copyPath();
+                M.script.copy.copyDirPath();
             });
 
             /*dom.querySelector(".js-close")?.addEventListener("click", () => { //關閉程式

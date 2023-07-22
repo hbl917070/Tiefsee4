@@ -1119,7 +1119,7 @@ class ScriptCopy {
     /** 複製 檔名 */
     public async copyFileName(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getDirPath();
+            path = this.M.fileLoad.getFilePath();
         }
         let name = Lib.GetFileName(path);
         await WV_System.SetClipboard_Txt(name);
