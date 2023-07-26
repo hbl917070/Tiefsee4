@@ -110,7 +110,7 @@ class ImgSearch {
 
 
         /**
-         * Google搜圖
+         * Google搜圖 (高機率失敗)
          */
         async function googleSearch(path: string) {
 
@@ -119,7 +119,7 @@ class ImgSearch {
 
             let formData = new FormData();
             formData.append("encoded_image", blob, "image.jpg");
-            formData.append("sbisrc", "Google Chrome 107.0.5304.107 (Official) Windows");
+            formData.append("sbisrc", "Google Chrome 110.0.5481.78 (Official) Windows");
             let rsp = await fetch("https://www.google.com/searchbyimage/upload", {
                 "body": formData,
                 "method": "POST",
