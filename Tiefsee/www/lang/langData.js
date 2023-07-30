@@ -1935,6 +1935,16 @@ var langData = {
                 "en": "Artist",
                 "ja": "作成者",
             },
+            "Copyright": {
+                "zh-TW": "版權",
+                "en": "Copyright",
+                "ja": "著作権",
+            },
+            "Image Description": {
+                "zh-TW": "描述",
+                "en": "Description",
+                "ja": "説明",
+            },
             "Windows XP Comment": {
                 "zh-TW": "註解",
                 "en": "Comment",

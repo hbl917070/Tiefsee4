@@ -60,6 +60,8 @@ class Config {
             "Length", //檔案大小
             "Windows XP Title", //標題
             "Artist", //作者
+            "Copyright", //版權
+            "Image Description", //描述
             "Windows XP Comment", //註解
             "User Comment", //註解
             "Make", //相機型號
