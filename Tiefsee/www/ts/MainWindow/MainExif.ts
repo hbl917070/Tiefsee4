@@ -225,35 +225,58 @@ class MainExif {
 
 							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 
-								let promptSplit = val.indexOf("Negative prompt: "); //負面提示
-								let otherSplit = val.indexOf("Steps: "); //其他參數
+								/**
+									  剖析參數，例如
+									  傳入 Sampler: DPM++ 2M Karras, ADetailer prompt: "\"blue eyes\", smileing: 0.8, open mouth"
+									  回傳 [
+											{title:"Sampler", text: "DPM++ 2M Karras"}, 
+											{title:"ADetailer prompt", text: `"blue eyes", smileing: 0.8, open mouth`}
+									  ]
+								 */
+								function parseParameters(input: string) {
+
+									// 先把 \" 替換成其他符號，避免剖析失敗
+									input = input.replace(/\\"/g, "\uFDD9");
+									let parts = input.split(/,(?=(?:[^"]|"[^"]*")*$)/).map(s => s.replace(/\uFDD9/g, '\\"').trim());
+
+									let result = [];
+									for (let i = 0; i < parts.length; i++) {
+										let subParts = parts[i].split(":");
+										let title = subParts[0].trim();
+										let text = subParts.slice(1).join(":").trim();
+										if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "
+											text = text.slice(1, -1); // 去除開頭跟結尾的"
+											text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
+										}
+
+										result.push({ title: title, text: text });
+									}
+									return result;
+								}
+
+								let promptSplit: number = val.indexOf("Negative prompt: "); //負面提示
+								let otherSplit: number = val.indexOf("Steps: "); //其他參數
 								if (promptSplit !== -1 && otherSplit !== -1) {
 									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, promptSplit))); //提示
 									dom_mainExifList.appendChild(getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit))); //負面提示
 									//html += getItemHtml("Other", val.substring(otherSplit));
-									let arOther = val.substring(otherSplit).split(", "); //其他參數
+									let otherText = val.substring(otherSplit);
+									let arOther = parseParameters(otherText);
 									for (let i = 0; i < arOther.length; i++) {
-										const itemOther = arOther[i];
-										let itemOtherSplit = itemOther.split(": ");
-										if (itemOtherSplit.length > 0) {
-											dom_mainExifList.appendChild(getItemHtml(itemOtherSplit[0], itemOtherSplit[1]));
-										} else {
-											dom_mainExifList.appendChild(getItemHtml("", itemOther));
-										}
+										const title = arOther[i].title;
+										const text = arOther[i].text;
+										dom_mainExifList.appendChild(getItemHtml(title, text));
 									}
 
 								} else if (promptSplit === -1 && otherSplit !== -1) { //沒有輸入負面詞的情況
 
 									dom_mainExifList.appendChild(getItemHtml("Prompt", val.substring(0, otherSplit))); //提示
-									let arOther = val.substring(otherSplit).split(", "); //其他參數
+									let otherText = val.substring(otherSplit);
+									let arOther = parseParameters(otherText);
 									for (let i = 0; i < arOther.length; i++) {
-										const itemOther = arOther[i];
-										let itemOtherSplit = itemOther.split(": ");
-										if (itemOtherSplit.length > 0) {
-											dom_mainExifList.appendChild(getItemHtml(itemOtherSplit[0], itemOtherSplit[1]));
-										} else {
-											dom_mainExifList.appendChild(getItemHtml("", itemOther));
-										}
+										const title = arOther[i].title;
+										const text = arOther[i].text;
+										dom_mainExifList.appendChild(getItemHtml(title, text));
 									}
 
 								} else {
