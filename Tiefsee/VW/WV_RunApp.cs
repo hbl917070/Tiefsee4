@@ -42,16 +42,27 @@ namespace Tiefsee {
         /// <returns></returns>
         public string[] GetStartMenuList() {
 
-            string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
-            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs"); //開始選單的路徑
-
             List<String> arFile = new List<string>();
+            string path;
 
+            //全域的開始選單
+            path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
+            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs"); //開始選單的路徑
             if (Directory.Exists(path)) {
                 GetDirForeachFiles(path, arFile); //windows的開始
             }
 
-            return arFile.ToArray();
+            //使用者的開始選單
+            path = System.Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+            path = Path.Combine(path, "Programs");
+            if (Directory.Exists(path)) {
+                GetDirForeachFiles(path, arFile); //windows的開始
+            }
+
+            // 使用 LINQ 篩選出副檔名是 .lnk 的檔案路徑
+            var lnkFiles = arFile.Where(file => Path.GetExtension(file).ToLower() == ".lnk");
+
+            return lnkFiles.ToArray();
         }
 
 
@@ -121,7 +132,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="uwpId"> 例如 Microsoft.ScreenSketch_8wekyb3d8bbwe </param>
         /// <param name="filePath"></param>
-        async public void RunUwp(string uwpId , string filePath) {
+        async public void RunUwp(string uwpId, string filePath) {
             var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
             if (file != null) {
                 var options = new Windows.System.LauncherOptions();
@@ -143,9 +154,9 @@ namespace Tiefsee {
         /// </summary>
         public string GetUwpList() {
 
-            bool isFirstRun = false; 
+            bool isFirstRun = false;
             if (temp_UwpItem == null) { //判斷是否為首次執行
-                isFirstRun = true;     
+                isFirstRun = true;
                 try {
                     //如果存在 UwpList.json 的暫存檔，就讀取此檔案
                     string jsonString = "{}";
