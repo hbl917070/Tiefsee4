@@ -22,7 +22,7 @@
         }
 
         .cherry-bubble {
-            display: none !important;
+            /* display: none !important; */
         }
     </style>
     <script src="./../js/LibIframe.js"></script>
@@ -43,7 +43,7 @@
 
             //只開放特定網域呼叫
             if (e.origin !== "file://") {
-                console.error("錯誤的請求來源：" + e.origin)
+                console.error("錯誤的請求來源：" + e.origin);
                 return;
             }
 
@@ -100,6 +100,7 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
             cherryObj = initCherry();
+            setTheme();
             await libIframe.closeIME(); //嘗試關閉輸入法
             initFinish();
         });
@@ -147,25 +148,30 @@
          */
         function initCherry() {
 
-            //自訂選單
-            let customMenuImg = Cherry.createMenuHook('Image', {
-                iconName: 'image',
-                onClick: function(selection) {
-                    // 獲取用戶選中的文字，調用getSelection方法後，如果用戶沒有選中任何文字，會嘗試獲取光標所在位置的單詞或句子
-                    let $selection = this.getSelection(selection) || 'url';
-                    this.registerAfterClickCb(() => {
-                        this.setLessSelection('![](', ')');
-                    });
-                    return $selection.replace(/(^)([^\n]+)($)/gm, '$1![]($2)$3');
-                }
-            });
-
             let lang = libIframe.getLang(); //取得使用者選擇的語言
             if (lang == "zh-TW") {
                 lang = "zh_TW";
             } else {
                 lang = "en_US";
             }
+
+            //自訂選單
+            let btnImageName = "Image";
+            if (lang === "zh_TW") {
+                btnImageName = "圖片";
+            }
+            let customMenuImg = Cherry.createMenuHook(btnImageName, {
+                iconName: "image",
+                onClick: function(selection) {
+                    // 獲取用戶選中的文字，調用getSelection方法後，如果用戶沒有選中任何文字，會嘗試獲取光標所在位置的單詞或句子
+                    let $selection = this.getSelection(selection) || "url";
+                    this.registerAfterClickCb(() => {
+                        this.setLessSelection("![](", ")");
+                    });
+                    return $selection.replace(/(^)([^\n]+)($)/gm, "$1![]($2)$3");
+                }
+            });
+
 
             let cherryObj = new Cherry({
                 locale: lang,
@@ -189,21 +195,23 @@
                          * @returns
                          */
                         urlProcessor: (url) => {
-                            //console.log(url)
-                            if (url.indexOf("http:") == 0 || url.indexOf("https:") == 0 || url.indexOf("mailto:") == 0) {
+                            //console.log(url);
+                            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("mailto:") || url.startsWith("file:")) {
                                 return url;
                             } else if (url.length > 2 && url.substring(1, 2) === ":") { // C:\123.jppg
+                                return libIframe.pathToURL(url);
+                            } else if (url.startsWith("\\\\")) { // \\Desktop-abc\AA
                                 return url;
-                            } else if (url.length > 2 && url.substring(0, 2) === "\\\\") { // \\Desktop-abc\AA
+                            } else if (url.startsWith("data:image/")) { // base64，例如 data:image/
                                 return url;
                             } else {
-                                return getRoot() + url;
+                                return getRoot() + url.replace(/\\/g, "/");
                             }
                         },
                     }
                 },
                 toolbars: {
-                    theme: "light", // light or dark                                                                            
+                    theme: "light", // light or dark
                     codeBlock: {
                         theme: "dark", // 默認為深色主題
                         wrap: true, // 超出長度是否換行，false則顯示捲軸
@@ -211,7 +219,8 @@
                     },
 
                     toolbar: [
-                        "togglePreview",
+                        //"togglePreview",
+                        "settings",
                         "|",
                         "header",
                         "list",
@@ -243,8 +252,8 @@
                         },
                         "graph",
                     ],
-                    //bubble: false, // 選中文字彈出工具列
-                    bubble: [], // 選中文字彈出工具列
+                    bubble: false, // 選中文字彈出工具列
+                    //bubble: [], // 選中文字彈出工具列
                     float: false, // 建立新行彈出工具列
                     customMenu: { //自定義的按鈕
                         customMenuImg: customMenuImg,
@@ -294,7 +303,7 @@
          * 套用主題
          */
         function setTheme() {
-
+            cherryObj.setTheme("default"); //default / light / dark / violet
         }
 
         /**

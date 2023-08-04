@@ -253,4 +253,15 @@ class LibIframe {
             this.postMsg(json);
         }
     }
+
+
+    /**
+     * 路徑 轉 URL
+     */
+    public pathToURL(path: string): string {
+        return "file:///" + encodeURIComponent(path)
+            .replace(/[%]3A/g, ":")
+            .replace(/[%]2F/g, "/")
+            .replace(/[%]5C/g, "/");
+    }
 }
