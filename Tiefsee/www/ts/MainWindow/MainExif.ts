@@ -244,8 +244,9 @@ class MainExif {
 										let subParts = parts[i].split(":");
 										let title = subParts[0].trim();
 										let text = subParts.slice(1).join(":").trim();
-										if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "
+										if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "									
 											text = text.slice(1, -1); // 去除開頭跟結尾的"
+											text = text.replace(/\\n/g, "\n"); //處理換行
 											text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
 										}
 
