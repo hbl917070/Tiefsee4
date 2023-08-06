@@ -6,6 +6,8 @@ on:
     branches: [master]
     types:
       - completed
+  schedule:
+    - cron: '0 2 * * *'
 
 jobs:
   nightly-release:
