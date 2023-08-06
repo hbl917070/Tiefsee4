@@ -11,10 +11,10 @@ jobs:
   nightly-release:
     permissions:
       id-token: write
-      contents: read
+      contents: write
       pull-requests: write
       actions: read
-    name: Download artifact
+    name: Create Nightly Release
     runs-on: windows-latest
     steps:
       - name: Download artifact
