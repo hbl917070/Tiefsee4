@@ -35,4 +35,4 @@ jobs:
           prerelease: true
           body: 'TODO: Add nightly release notes'
           files: |
-            ./*.zip
+            ./Tiefsee/Tiefsee.zip
