@@ -9,6 +9,11 @@ on:
 
 jobs:
   nightly-release:
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      actions: read
     name: Download artifact
     runs-on: windows-latest
     steps:
