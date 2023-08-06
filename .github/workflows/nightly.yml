@@ -2,7 +2,7 @@ name: Nightly Release
 
 on:
   schedule:
-    - cron: '35 16 * * *'
+    - cron: '00 18 * * *' # GitHub Actions use UTC time
 
 jobs:
   nightly-release:
