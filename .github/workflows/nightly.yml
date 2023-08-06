@@ -1,0 +1,34 @@
+
+name: Nightly Release
+
+on:
+  workflow_run:
+    workflows: ["Build Tiefsee"]
+    branches: [main]
+    types:
+      - completed
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  download-artifact:
+    name: Download artifact
+    runs-on: windows-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Tiefsee
+          path: ./Tiefsee.zip
+
+      - name: Update Nightly Release
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Tiefsee Nightly Release $$'
+          prerelease: true
+          body: 'TODO: Add nightly release notes'
+          files: |
+            ./*.zip

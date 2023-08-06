@@ -1,4 +1,4 @@
-name: Tiefsee
+name: Build Tiefsee
 
 on:
   push:
@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
- 
     runs-on: windows-latest
- 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -32,3 +30,4 @@ jobs:
       with:
         name: Tiefsee
         path: Tiefsee/Tiefsee.zip
+        if-no-files-found: error
