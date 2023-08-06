@@ -1,4 +1,3 @@
-
 name: Nightly Release
 
 on:
@@ -9,15 +8,17 @@ on:
       - completed
 
 jobs:
-  download-artifact:
+  nightly-release:
     name: Download artifact
     runs-on: windows-latest
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2
         with:
-          name: Tiefsee
-          path: ./Tiefsee.zip
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          workflow_conclusion: success
+          branch: master
 
       - name: Update Nightly Release
         uses: andelf/nightly-release@main
