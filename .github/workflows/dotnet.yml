@@ -1,4 +1,4 @@
-name: .NET
+name: Tiefsee
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build-local:
+  build:
  
     runs-on: windows-latest
  
@@ -27,19 +27,8 @@ jobs:
     - name: Build Solution and archive artifacts
       run: msbuild Tiefsee4.sln /t:Tiefsee /p:Configuration=Release /p:Platform="Any CPU" /p:DeleteExistingFiles=True
 
-  upload-artifacts:
-    needs: build-local
-    runs-on: windows-latest
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: Tiefsee
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Tiefsee
         path: Tiefsee/Tiefsee.zip
-      
