@@ -12,8 +12,8 @@ jobs:
     runs-on: windows-latest
  
     steps:
-    - uses: actions/checkout@v1
-      name: Checkout Code
+    - name: Checkout Code
+      uses: actions/checkout@v1
      
     - name: Setup MSBuild Path
       uses: microsoft/setup-msbuild@v1.1
@@ -24,11 +24,11 @@ jobs:
     - name: Restore NuGet Packages
       run: nuget restore Tiefsee4.sln
  
-    - name: Build and Publish Web App
-      run: msbuild Tiefsee4.sln /p:Configuration=Debug /p:DeployOnBuild=true /p:OutputPath="$(Build.ArtifactStagingDirectory)\\"
+    - name: Build Solution and archive artifacts
+      run: msbuild Tiefsee4.sln /t:Tiefsee /p:Configuration=Release /p:Platform="Any CPU" /p:DeleteExistingFiles=True
 
-    - name: Archive Artifacts
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Tiefsee4
-        path: $(Build.ArtifactStagingDirectory)
+        path: Tiefsee.zip
