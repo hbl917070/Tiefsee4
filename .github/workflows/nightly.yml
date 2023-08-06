@@ -5,7 +5,15 @@ on:
     - cron: '00 18 * * *' # GitHub Actions use UTC time
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - id: nightly-check
+        name: Check for changes since last nightly
+        uses: lukecarr/nightly-check@v0.2.0
   nightly-release:
+    needs: check
+    if: ${{ needs.check.outputs.changes == 'true' }}
     permissions:
       id-token: write
       contents: write
