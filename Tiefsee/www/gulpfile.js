@@ -96,7 +96,10 @@ gulp.task("copy-files", async () => {
         .pipe(gulp.dest(output2))
 });
 
-//檔案變化時
+// 打包 - 單次
+gulp.task("build", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting"));
+
+// 打包 - 持續監控檔案變化
 gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", () => {
     gulp.watch("./scss/**/*.scss", gulp.series("scss"));
     gulp.watch("./ts/**/*.ts", gulp.series("ts"));
@@ -106,7 +109,6 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
     gulp.watch("./img/default/*.svg", gulp.series("ejs-main")); //svg圖示
     gulp.watch("./img/default/*.svg", gulp.series("svg"));
 }));
-
 
 //------------------------------------------------
 
