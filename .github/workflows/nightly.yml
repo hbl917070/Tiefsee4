@@ -2,11 +2,11 @@ name: Nightly Release
 
 on:
   schedule:
-    - cron: '10 16 * * *'
+    - cron: '23 16 * * *'
 
 jobs:
   check:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - id: nightly-check
         name: Check for changes since last nightly
@@ -20,7 +20,7 @@ jobs:
       pull-requests: write
       actions: read
     name: Create Nightly Release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
