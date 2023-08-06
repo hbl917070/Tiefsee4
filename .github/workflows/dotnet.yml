@@ -13,7 +13,7 @@ jobs:
  
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
      
     - name: Setup MSBuild Path
       uses: microsoft/setup-msbuild@v1.1
@@ -27,8 +27,19 @@ jobs:
     - name: Build Solution and archive artifacts
       run: msbuild Tiefsee4.sln /t:Tiefsee /p:Configuration=Release /p:Platform="Any CPU" /p:DeleteExistingFiles=True
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+  upload-artifacts:
+    needs: build-local
+    runs-on: windows-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
       with:
-        name: Tiefsee4
-        path: Tiefsee.zip
+        name: Tiefsee
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Tiefsee
+        path: Tiefsee/Tiefsee.zip
+      
