@@ -2,18 +2,10 @@ name: Nightly Release
 
 on:
   schedule:
-    - cron: '23 16 * * *'
+    - cron: '35 16 * * *'
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - id: nightly-check
-        name: Check for changes since last nightly
-        uses: lukecarr/nightly-check@v0.1.0
   nightly-release:
-    needs: check
-    if: ${{ needs.check.outputs.changes == 'true' }}
     permissions:
       id-token: write
       contents: write
