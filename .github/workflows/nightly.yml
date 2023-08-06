@@ -4,7 +4,7 @@ name: Nightly Release
 on:
   workflow_run:
     workflows: ["Build Tiefsee"]
-    branches: [main]
+    branches: [master]
     types:
       - completed
 
