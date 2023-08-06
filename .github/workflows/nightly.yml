@@ -1,16 +1,19 @@
 name: Nightly Release
 
 on:
-  workflow_run:
-    workflows: ["Build Tiefsee"]
-    branches: [master]
-    types:
-      - completed
   schedule:
     - cron: '0 2 * * *'
 
 jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - id: nightly-check
+        name: Check for changes since last nightly
+        uses: lukecarr/nightly-check@v0.1.0
   nightly-release:
+    needs: check
+    if: ${{ needs.check.outputs.changes == 'true' }}
     permissions:
       id-token: write
       contents: write
