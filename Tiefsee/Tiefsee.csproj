@@ -87,5 +87,12 @@
 		<Content Remove="www\ts\**" />
 		<Content Remove="www\scss\**" />
 	</ItemGroup>
+
+  <!-- Generate zip file after build -->
+  <Target Name="ZipOutputPath" AfterTargets="Build">
+        <ZipDirectory
+            SourceDirectory="$(OutputPath)"
+            DestinationFile="$(MSBuildProjectDirectory)\Tiefsee.zip" />
+  </Target>
 		
 </Project>
