@@ -1,0 +1,34 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-local:
+ 
+    runs-on: windows-latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+      name: Checkout Code
+     
+    - name: Setup MSBuild Path
+      uses: microsoft/setup-msbuild@v1.1
+       
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.2.0
+     
+    - name: Restore NuGet Packages
+      run: nuget restore Tiefsee4.sln
+ 
+    - name: Build and Publish Web App
+      run: msbuild Tiefsee4.sln /p:Configuration=Debug /p:DeployOnBuild=true /p:OutputPath="$(Build.ArtifactStagingDirectory)\\"
+
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Tiefsee4
+        path: $(Build.ArtifactStagingDirectory)
