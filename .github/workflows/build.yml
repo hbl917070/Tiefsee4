@@ -12,6 +12,25 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
+
+    - name: Spinning up Node.js
+      id: node-with-cache
+      uses: magnetikonline/action-node-modules-cache@v1
+      with:
+        node-version: 18.x
+        node-modules-path: Tiefsee/www/node_modules
+        package-lock-path: Tiefsee/www/package-lock.json
+
+    - name: Install Node.js dependencies
+      if: steps.node-with-cache.outputs.cache-hit != 'true'
+      run: |
+        cd Tiefsee/www
+        npm ci
+
+    - name: Gulp build Tiefsee
+      run: |
+        cd Tiefsee/www
+        gulp build
      
     - name: Setup MSBuild Path
       uses: microsoft/setup-msbuild@v1.1
