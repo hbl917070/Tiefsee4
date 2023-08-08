@@ -10,7 +10,7 @@ jobs:
     steps:
       - id: nightly-check
         name: Check for changes since last nightly
-        uses: lukecarr/nightly-check@v0.2.0
+        uses: lukecarr/nightly-check@v0.3.0
   nightly-release:
     needs: check
     if: ${{ needs.check.outputs.changes == 'true' }}
