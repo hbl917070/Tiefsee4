@@ -45,6 +45,8 @@ class FileLoad {
 
     public fileExtToGroupType;
 
+    public stopFileWatcher;
+
     constructor(M: MainWindow) {
 
         /** unknown=未知 img=圖片  pdf=pdf、ai  video=影片  imgs=多幀圖片  txt=文字 */
@@ -121,7 +123,8 @@ class FileLoad {
         this.setIsBulkViewSub = function (val: boolean) { isBulkViewSub = val; };
 
         this.fileExtToGroupType = fileExtToGroupType;
-
+        
+        this.stopFileWatcher = stopFileWatcher;
 
         //#region Dir
 
@@ -336,7 +339,7 @@ class FileLoad {
                     dirParentPath = _dirPath;
                 }
 
-                await WV_System.NewFileWatcher("dirList", dirParentPath); //偵測檔案變化
+                await WV_System.NewFileWatcher("dirList", dirParentPath); //偵測資料夾變化
 
                 M.dirSort.readSortType(dirParentPath); //取得該資料夾設定的檔案排序方式
                 M.dirSort.updateMenu(); //更新menu選單
@@ -1189,6 +1192,14 @@ class FileLoad {
 
         //#endregion
 
+
+        /**
+         * 停止監控檔案變化
+         */
+        async function stopFileWatcher() {
+            await WV_System.NewFileWatcher("fileList", ""); //偵測檔案變化
+            await WV_System.NewFileWatcher("dirList", ""); //偵測資料夾變化
+        }
 
         //偵測檔案變化 - 資料夾預覽面板
         baseWindow.fileWatcherEvents.push((arData: FileWatcherData[]) => {
