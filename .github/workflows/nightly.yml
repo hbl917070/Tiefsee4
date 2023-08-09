@@ -1,0 +1,43 @@
+name: Nightly Release
+
+on:
+  schedule:
+    - cron: '00 18 * * *' # GitHub Actions use UTC time
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - id: nightly-check
+        name: Check for changes since last nightly
+        uses: lukecarr/nightly-check@v0.3.0
+  nightly-release:
+    needs: check
+    if: ${{ needs.check.outputs.changes == 'true' }}
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      actions: read
+    name: Create Nightly Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          workflow_conclusion: success
+          branch: master
+
+      - name: Update Nightly Release
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Tiefsee Nightly Release $$'
+          prerelease: true
+          body: 'TODO: Add nightly release notes'
+          files: |
+            ./Tiefsee/Tiefsee.zip

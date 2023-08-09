@@ -1,0 +1,52 @@
+name: Build Tiefsee
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Spinning up Node.js
+      id: node-with-cache
+      uses: magnetikonline/action-node-modules-cache@v1
+      with:
+        node-version: 18.x
+        node-modules-path: Tiefsee/www/node_modules
+        package-lock-path: Tiefsee/www/package-lock.json
+
+    - name: Install Node.js dependencies
+      if: steps.node-with-cache.outputs.cache-hit != 'true'
+      run: |
+        cd Tiefsee/www
+        npm ci
+
+    - name: Gulp build Tiefsee
+      run: |
+        cd Tiefsee/www
+        gulp build
+     
+    - name: Setup MSBuild Path
+      uses: microsoft/setup-msbuild@v1.1
+       
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.2.0
+     
+    - name: Restore NuGet Packages
+      run: nuget restore Tiefsee4.sln
+ 
+    - name: Build Solution and archive artifacts
+      run: msbuild Tiefsee4.sln /t:Tiefsee /p:Configuration=Release /p:Platform="Any CPU" /p:DeleteExistingFiles=True
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Tiefsee
+        path: Tiefsee/Tiefsee.zip
+        if-no-files-found: error
