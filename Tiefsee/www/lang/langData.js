@@ -957,9 +957,9 @@ var langData = {
         // 相關檔案
         relatedSettings: {
             title: {
-                "zh-TW": "相關檔案",
-                "en": "Related Files",
-                "ja": "関連するファイル",
+                "zh-TW": "相關連結",
+                "en": "Related Links",
+                "ja": "関連リンク",
             },
             appData: {
                 "zh-TW": "AppData (設定檔)",
@@ -1552,6 +1552,35 @@ var langData = {
         },
         //#endregion
 
+
+        //#region 詳細資料面板
+        information: {
+            "zh-TW": "資訊",
+            "en": "Information",
+            "ja": "情報",
+        },
+        relatedFiles: {
+            "zh-TW": "相關檔案",
+            "en": "Related Files",
+            "ja": "関連ファイル",
+        },
+        new: {
+            "zh-TW": "新增",
+            "en": "New",
+            "ja": "新機能",
+        },
+        edit: {
+            "zh-TW": "編輯",
+            "en": "Edit",
+            "ja": "編集",
+        },
+        formatJson: {
+            "zh-TW": "格式化 JSON",
+            "en": "Format JSON",
+            "ja": "JSON をフォーマット",
+        },
+        //#endregion
+
     },
 
     //大量瀏覽模式
@@ -1705,16 +1734,22 @@ var langData = {
         },
         //#endregion
 
-        //#region save
+        //#region 文字編輯器
+      
+        saveComplete: {
+            "zh-TW": "儲存完成",
+            "en": "Save complete",
+            "ja": "保存完了",
+        },
         saveFailed: {
             "zh-TW": "儲存失敗",
             "en": "Save failed",
             "ja": "保存に失敗",
         },
-        saveComplete: {
-            "zh-TW": "儲存完成",
-            "en": "Save complete",
-            "ja": "保存完了",
+        formattingFailed: {
+            "zh-TW": "格式化失敗",
+            "en": "Formatting Failed",
+            "ja": "フォーマットに失敗しました",
         },
         //#endregion
 

@@ -919,6 +919,36 @@ class ScriptMenu {
         this.M.menu.openAtMouse(domMenu, 0, 0);
     }
 
+    /** 顯示右鍵選單 檔案 */
+    showRightMenuFile(e: MouseEvent) {
+
+        let dom = e.target as HTMLElement;
+        let path = null;
+
+        while (true) { //取得 data-path
+            let p = dom.getAttribute("data-path");
+            if (p !== null) {
+                path = p;
+                break;
+            }
+            if (dom === document.body) { break; }
+            dom = dom.parentNode as HTMLElement; //往往上層找
+        }
+
+        let domMenu = document.querySelector("#menu-rightMenuFile") as HTMLElement;
+        let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
+        let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        if (path !== null) {
+            domFileBox.style.display = "";
+            domMenu.appendChild(domFileBox);
+            domFileBox.setAttribute("data-path", path);
+            domFileName.value = Lib.GetFileName(path); //顯示檔名
+        } else {
+            domFileBox.style.display = "none"; //隱藏檔案區塊
+        }
+        this.M.menu.openAtMouse(domMenu, 0, 0);
+    }
+
     /** 顯示右鍵選單 資料夾預覽面板 */
     showRightMenuDirPanel(e: MouseEvent) {
 

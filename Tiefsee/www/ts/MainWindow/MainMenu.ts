@@ -115,6 +115,9 @@ class MainMenu {
             } else if (dataMenu === "dirPanel") { //資料夾預覽面板
                 M.script.menu.showRightMenuDirPanel(e);
 
+            } else if (dataMenu === "file") { //純檔案
+                M.script.menu.showRightMenuFile(e);
+
             } else {
                 //根據當前的顯示類型來決定右鍵選單
                 let showType = document.body.getAttribute("showType") ?? "";

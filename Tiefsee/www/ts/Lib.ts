@@ -462,6 +462,111 @@ class Lib {
         }
     }
 
+
+    /**
+     * 折疊面板
+     * @param domTitle 標題區塊
+     * @param type  "init-true" | "init-false" | "toggle" 
+     */
+    public static async collapse(domBox: HTMLElement, type: string, funcChange?: (type: string) => void) {
+       
+        let domContent = domBox.querySelector(".collapse-content") as HTMLElement;
+        if (domContent === null) { return; }
+
+        let div = domContent.querySelector("div");
+        if (div === null) { return; }
+
+        if (funcChange === undefined) {
+            funcChange = (type: string) => { };
+        }
+
+        //自動
+        if (type === "toggle") {
+            if (domBox.getAttribute("open") === "false") {
+                type = "true";
+            } else {
+                type = "false";
+            }
+        }
+
+        if (type === "false") {
+            if (domContent.style.maxHeight === "") {
+                domContent.style.maxHeight = div.scrollHeight + "px";
+                await Lib.sleep(1);
+            }
+            domContent.style.maxHeight = 0 + "px";
+            domBox.setAttribute("open", "false");
+            funcChange(type);
+        }
+
+        if (type === "true") {
+            domContent.style.maxHeight = div.scrollHeight + "px";
+            domBox.setAttribute("open", "true");
+
+            //把最大高度切換自動
+            setTimeout(() => {
+                if (domBox.getAttribute("open") === "true") {
+                    domContent.style.maxHeight = "";
+                }
+            }, 300);
+            funcChange(type);
+        }
+
+        // 無動畫，用於初始化
+        if (type === "init-false") {
+            domContent.style.maxHeight = 0 + "px";
+            domBox.setAttribute("open", "false");
+            funcChange("false");
+        }
+        if (type === "init-true") {
+            domContent.style.maxHeight = "";
+            domBox.setAttribute("open", "true");
+            funcChange("true");
+        }
+
+
+    }
+
+
+    /**
+     * 註冊一個 mousedown ，在移動一定距離後才觸發運行
+     * @param domElement 
+     * @param thresholdDistance 
+     * @param eventHandler 
+     */
+    public static addDragThresholdListener(domElement: HTMLElement, thresholdDistance: number, eventHandler: (e: MouseEvent) => void) {
+        let isDragging = false;
+        let startX = 0;
+
+        domElement.addEventListener("mousedown", (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+                startX = e.clientX;
+            }
+        });
+
+        domElement.addEventListener("mousemove", (e) => {
+            if (isDragging) {
+                const deltaX = Math.abs(e.clientX - startX);
+                if (deltaX >= thresholdDistance) {
+                    eventHandler(e);
+                    isDragging = false;
+                }
+            }
+        });
+
+        domElement.addEventListener("mouseup", () => {
+            isDragging = false;
+        });
+
+        domElement.addEventListener("mouseleave", () => {
+            isDragging = false;
+        });
+    }
+
+
+
+
     /**
      * 取得 radio 值
      */

@@ -172,6 +172,7 @@ class Config {
             mainExifShowWidth: 150, //寬度
             mainExifMaxLine: 20, //顯示的最大行數
             mainExifHorizontal: true, //寬度足夠時，橫向排列
+            mainExifCollapse: {} as { [key: string]: boolean },
 
             /** 啟用 工具列 */
             mainToolbarEnabled: true,
@@ -480,6 +481,7 @@ class Config {
                 { ext: "gitignore", type: "auto" },
                 { ext: "csv", type: "auto" },
                 { ext: "vue", type: "vue" },
+                { ext: "info", type: "json" },
             ]
 
             // monaco.languages.getLanguages()

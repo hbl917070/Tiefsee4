@@ -123,11 +123,10 @@ class FileLoad {
         this.setIsBulkViewSub = function (val: boolean) { isBulkViewSub = val; };
 
         this.fileExtToGroupType = fileExtToGroupType;
-        
+
         this.stopFileWatcher = stopFileWatcher;
 
         //#region Dir
-
 
         /**
          * 重新載入 資料夾預覽面板
@@ -373,6 +372,7 @@ class FileLoad {
 
             M.msgbox.closeAll(); //關閉所有訊息視窗
             M.menu.close();
+            M.textEditor.close();
 
             if (files.length > 1) {
                 let dirPath = Lib.GetDirectoryName(_dropPath);
@@ -1193,6 +1193,8 @@ class FileLoad {
         //#endregion
 
 
+        //#region 監控檔案變化
+
         /**
          * 停止監控檔案變化
          */
@@ -1287,6 +1289,8 @@ class FileLoad {
             arData.forEach(async data => {
 
                 if (data.Key !== "fileList") { return; }
+
+                M.mainExif.updateFileWatcher(data);
 
                 if (data.ChangeType === "deleted") { //刪除檔案
 
@@ -1455,8 +1459,9 @@ class FileLoad {
 
         })
 
-    }
+        //#endregion
 
+    }
 }
 
 

@@ -13,6 +13,19 @@ class Hotkey {
             if (e.code == "F5") { return; }
             if (e.code == "F12") { return; }
 
+            //如果開啟側邊的文字編輯器
+            if (M.textEditor.getIsShow()) {
+                /*if (e.code == "Escape") {
+                    M.textEditor.close();
+                    return;
+                }*/
+                if (e.code === "KeyS" && e.ctrlKey) {
+                    M.textEditor.save();
+                    return;
+                }
+                return;
+            }
+
             //如果有開啟選單
             if (M.menu.getIsShow()) {
                 if (e.code == "Escape") {

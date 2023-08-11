@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -289,8 +290,9 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public void SetText(string path, string t) {
+            var utf8WithoutBom = new System.Text.UTF8Encoding(false);
             using (FileStream fs = new FileStream(path, FileMode.Create)) {
-                using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8)) {
+                using (StreamWriter sw = new StreamWriter(fs, utf8WithoutBom)) {
                     sw.Write(t);
                 }
             }

@@ -29,6 +29,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getFileInfo2", getFileInfo2);
             webServer.RouteAdd("/api/getFileInfo2List", getFileInfo2List);
             webServer.RouteAdd("/api/getUwpList", getUwpList);
+            webServer.RouteAdd("/api/getRelatedFileList", getRelatedFileList);
 
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
@@ -448,13 +449,60 @@ namespace Tiefsee {
 
 
         /// <summary>
-        /// 
+        /// 取得 UWP 列表
         /// </summary>
         private void getUwpList(RequestData d) {
             WV_RunApp wv = new WV_RunApp();
             string srtStrJson = wv.GetUwpList();
             WriteString(d, srtStrJson); //回傳
         }
+
+        /// <summary>
+        /// 取得 相關檔案
+        /// </summary>
+        /// <param name="d"></param>
+        private void getRelatedFileList(RequestData d) {
+
+            string filePath = d.args["path"];
+            filePath = Uri.UnescapeDataString(filePath);
+            string[] arTextExt = d.args["textExt"].Split(','); //要讀取文字的副檔名名單
+
+            FileInfo fileInfo = new FileInfo(filePath);  // 取得檔案資訊
+            DirectoryInfo directoryInfo = fileInfo.Directory; // 取得檔案所在的目錄
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath); // 取得檔案名稱（不含副檔名）
+
+            // 取得與該檔案相同檔名但不同副檔名的所有檔案陣列
+            /*FileInfo[] files = directoryInfo.GetFiles()
+                .Where(file => file.Name != fileInfo.Name && Path.GetFileNameWithoutExtension(file.Name) == fileNameWithoutExtension)
+                .ToArray();*/
+      
+            string fileNamePrefix = fileInfo.Name.Split('.')[0]; // 取得檔名中第一個「.」前面的部分
+            // 取得與該檔案相同檔名但不同副檔名的所有檔案陣列
+            FileInfo[] files = directoryInfo.GetFiles()
+                .Where(file => (file.Name != fileInfo.Name) && file.Name.Split('.')[0].Equals(fileNamePrefix, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            //string[] arTextExt = new[] { ".txt", ".json", ".xml", ".info", ".ini", ".config" };
+            var result = new List<object>();
+            foreach (FileInfo file in files) {
+                string ext = file.Extension.Replace(".", "");
+                string text = null;
+                if (arTextExt.Contains(ext)) {
+                    text = File.ReadAllText(file.FullName, Encoding.UTF8);
+                }
+                result.Add(new {
+                    path = file.FullName,
+                    text = text
+                });
+            }
+
+            string retJson = JsonConvert.SerializeObject(result);
+
+            WriteString(d, retJson); //回傳
+        }
+
+
+
 
         /// <summary>
         /// 

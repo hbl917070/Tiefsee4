@@ -268,7 +268,7 @@ class WebAPI {
     }
 
     /**
-     * 取得文字檔內容
+     * 取得 文字檔內容
      */
     static async getText(path: string) {
         let encodePath = encodeURIComponent(path);
@@ -278,7 +278,7 @@ class WebAPI {
     }
 
     /**
-     * 取得pdf的網址
+     * 取得 pdf的網址
      */
     static getPdf(fileInfo2: FileInfo2) {
         let path = fileInfo2.Path;
@@ -289,7 +289,7 @@ class WebAPI {
     }
 
     /**
-     * 取得檔案exif
+     * 取得 檔案exif
      */
     static async getExif(fileInfo2: FileInfo2, maxLength: number) {
         let path = fileInfo2.Path;
@@ -308,7 +308,7 @@ class WebAPI {
     }
 
     /**
-     * 取得檔案基本資料
+     * 取得 檔案基本資料
      */
     static async getFileInfo2(path: string) {
         let s = await WV_File.GetFileInfo2(path);
@@ -323,7 +323,7 @@ class WebAPI {
 
 
     /**
-    * 取得多筆檔案基本資料
+    * 取得 多筆檔案基本資料
     */
     static async getFileInfo2List(arPath: string[]) {
         let url = APIURL + "/api/getFileInfo2List";
@@ -335,9 +335,9 @@ class WebAPI {
         return retAr as FileInfo2[];
     }
 
-    
+
     /**
-     * 取得UWP列表
+     * 取得 UWP列表
      */
     static async getUwpList() {
         let url = APIURL + "/api/getUwpList";
@@ -345,4 +345,24 @@ class WebAPI {
         let ret = await WebAPI.sendPost(url, postData);
         return ret as { Logo: string, Name: string, Id: string }[];
     }
+
+
+    /**
+      * 取得 相關檔案
+      */
+    static async getRelatedFileList(path: string, arTextExt: string[]) {
+        //let arTextExt = ["txt", "json", "xml", "info", "ini", "config"];
+        let textExt = arTextExt.join(",")
+        let encodePath = encodeURIComponent(path);
+        let url = APIURL + `/api/getRelatedFileList?path=${encodePath}&textExt=${textExt}&r=${Math.random()}`;
+        let json = await Lib.sendGet("json", url);
+        return json as { path: string, text: string | null }[];
+    }
+
 }
+
+
+var s = [
+    { path: "C:\\aa\a.txt", text: "123456" },
+    { path: "C:\\aa\a.jpg", text: null },
+]

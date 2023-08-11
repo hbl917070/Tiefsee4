@@ -32,6 +32,7 @@ class MainWindow {
     public bulkView;
     public toolbarBack;
     public fullScreen;
+    public textEditor;
     public updateDomVisibility;
 
     public applySetting;
@@ -79,6 +80,7 @@ class MainWindow {
         var bulkView = this.bulkView = new BulkView(this);
         var toolbarBack = this.toolbarBack = new ToolbarBack();
         var fullScreen = this.fullScreen = new FullScreen(this);
+        var textEditor = this.textEditor = new TextEditor(this);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;

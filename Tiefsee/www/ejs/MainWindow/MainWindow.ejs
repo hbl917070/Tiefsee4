@@ -80,8 +80,7 @@
                 <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="佈局" i18n="menu.layout">
                     <%- await readFile("./img/default/window-layout.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-exitFullScreen" title="結束全螢幕"
-                    i18n="menu.exitFullScreen" style="display:none;">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-exitFullScreen" title="結束全螢幕" i18n="menu.exitFullScreen" style="display:none;">
                     <%- await readFile("./img/default/window-exitFullScreen.svg"); %>
                 </div>
                 <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
@@ -111,12 +110,11 @@
 
                 <div id="main-T" class="main-T">
                     <!-- 工具列 -->
-                    <div id="main-toolbar" class="main-toolbar" toolbarAlign="center">
+                    <div id="main-toolbar" class="main-toolbar main-toolbar__scrollbar " toolbarAlign="center">
 
                         <div id="toolbar-content" class="toolbar-content">
                             <!-- 共通的 返回按鈕 -->
-                            <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back"
-                                title="" i18n="menu.back">
+                            <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back" title="" i18n="menu.back">
                                 <%- await readFile("./img/default/tool-back.svg"); %>
                             </div>
                         </div>
@@ -149,7 +147,7 @@
                         <div id="mView-welcome" class="mView-welcome">
                             <div>
                                 <img class="mView-welcome-logo" src="./img/logo.svg">
-                                <div class="mView-welcome-txt">Tiefsee 4.1.2</div>
+                                <div class="mView-welcome-txt">Tiefsee 4.1.2.3</div>
                             </div>
                         </div>
                         <textarea id="mView-txt" class="mView-text base-scrollbar" readonly2=""></textarea>
@@ -205,10 +203,19 @@
 
                         <!-- exif 視窗 -->
                         <div class="mainExif" id="mainExif">
+
                             <div class="mainExifTop">
+                                <div class="mainExifTabs js-tabBtns main-toolbar__scrollbar ">
+                                    <div class="mainExifTabsContent">
+                                        <div class="mainExifTabsItem js-tabBtn-info" mark="true" i18n="menu.information">資訊</div>
+                                        <div class="mainExifTabsItem js-tabBtn-related" mark="true" i18n="menu.relatedFiles">相關檔案</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="mainExifList base-scrollbar" id="mainExifList">
+                            <div class="mainExifList base-scrollbar js-tabContent-info">
+                            </div>
+                            <div class="mainExifRelated base-scrollbar js-tabContent-related">
                             </div>
                         </div>
                     </div>
@@ -230,6 +237,25 @@
         <div class="window-LB window-border"></div>
         <div class="window-RB window-border"></div>
 
+    </div>
+
+    <!-- 文字編輯器 -->
+    <div class="textEditor" id="textEditor" style="display:none;">
+        <div class="textEditor-box">
+            <div class="textEditor-toolbar">
+                <div class="textEditor-toolbarItem js-save" title="" i18n="menu.showSave">
+                    <%- await readFile("./img/default/tool-save.svg"); %>
+                </div>
+                <div class="textEditor-toolbarItem js-pretty" title="" i18n="menu.formatJson">
+                    <%- await readFile("./img/default/tool-code.svg"); %>
+                </div>
+                <div class="textEditor-toolbarItem textEditor-toolbarItem__close js-close">
+                </div>
+            </div>
+            <div class="textEditor-content">
+                <textarea class="textEditor-textarea base-scrollbar"></textarea>
+            </div>
+        </div>
     </div>
 
     <!-- 開啟setting視窗時的loading -->
