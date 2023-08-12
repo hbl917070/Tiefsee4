@@ -554,19 +554,17 @@ class MainExif {
 				`);
 
 				//快速拖曳
-				Lib.addDragThresholdListener(domContent, 5, (e) => {
-					if (e.button === 0) { //滑鼠左鍵
-						let path = domBox.getAttribute("data-path");
-						if (path != null) {
-							M.script.file.dragDropFile(path);
-						}
+				Lib.addDragThresholdListener(domBox, 5, () => {
+					let path = domBox.getAttribute("data-path");
+					if (path !== null) {
+						M.script.file.dragDropFile(path);
 					}
-				})
+				});
 
 				//雙擊左鍵
 				Lib.addEventDblclick(domContent, async (e: MouseEvent) => { //圖片物件
 					let path = domBox.getAttribute("data-path");
-					if (path != null) {
+					if (path !== null) {
 						M.fileLoad.loadFile(path);
 					}
 				});

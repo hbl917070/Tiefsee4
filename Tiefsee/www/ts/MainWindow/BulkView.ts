@@ -1149,6 +1149,11 @@ class BulkView {
                     }
                 });
 
+                //快速拖曳
+                Lib.addDragThresholdListener(div, 5, () => {
+                    M.script.file.dragDropFile(fileInfo2.FullPath);
+                });
+
                 let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
                 let dom_center = div.querySelector(".bulkView-center") as HTMLDivElement;
                 let dom_header = div.querySelector(".bulkView-header") as HTMLDivElement;

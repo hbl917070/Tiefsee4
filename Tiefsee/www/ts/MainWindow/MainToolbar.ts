@@ -206,10 +206,8 @@ class MainToolbar {
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
-                    btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) { //滑鼠左鍵
-                            M?.script.file.dragDropFile();
-                        }
+                    Lib.addDragThresholdListener(btn, 3, () => {
+                        M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 2) { //滑鼠右鍵
@@ -485,10 +483,8 @@ class MainToolbar {
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
-                    btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) { //滑鼠左鍵
-                            M?.script.file.dragDropFile();
-                        }
+                    Lib.addDragThresholdListener(btn, 3, () => {
+                        M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 2) { //滑鼠右鍵
@@ -704,10 +700,8 @@ class MainToolbar {
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
-                    btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) { //滑鼠左鍵
-                            M?.script.file.dragDropFile();
-                        }
+                    Lib.addDragThresholdListener(btn, 3, () => {
+                        M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 2) { //滑鼠右鍵
@@ -945,10 +939,8 @@ class MainToolbar {
                 name: "dragDropFile",
                 icon: "tool-dragDropFile.svg",
                 func: (btn) => {
-                    btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 0) { //滑鼠左鍵
-                            M?.script.file.dragDropFile();
-                        }
+                    Lib.addDragThresholdListener(btn, 3, () => {
+                        M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
                         if (e.button === 2) { //滑鼠右鍵

@@ -469,7 +469,7 @@ class Lib {
      * @param type  "init-true" | "init-false" | "toggle" 
      */
     public static async collapse(domBox: HTMLElement, type: string, funcChange?: (type: string) => void) {
-       
+
         let domContent = domBox.querySelector(".collapse-content") as HTMLElement;
         if (domContent === null) { return; }
 
@@ -545,7 +545,7 @@ class Lib {
             }
         });
 
-        domElement.addEventListener("mousemove", (e) => {
+        window.addEventListener("mousemove", (e) => {
             if (isDragging) {
                 const deltaX = Math.abs(e.clientX - startX);
                 if (deltaX >= thresholdDistance) {
@@ -555,13 +555,13 @@ class Lib {
             }
         });
 
-        domElement.addEventListener("mouseup", () => {
+        window.addEventListener("mouseup", () => {
             isDragging = false;
         });
 
-        domElement.addEventListener("mouseleave", () => {
+        /*domElement.addEventListener("mouseleave", () => {
             isDragging = false;
-        });
+        });*/
     }
 
 

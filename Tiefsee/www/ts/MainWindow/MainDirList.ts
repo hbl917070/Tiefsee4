@@ -317,6 +317,11 @@ class MainDirList {
 				M.fileLoad.showDir(n);
 			})
 
+			//快速拖曳
+			Lib.addDragThresholdListener(div, 5, () => {
+				M.script.file.dragDropFile(_dirPath);
+			})
+
 			if (arPath.length !== 0) {
 				if (noDelay === false) {
 					setTimeout(() => {

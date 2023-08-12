@@ -495,10 +495,8 @@ class MainMenu {
 
             let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
             if (dragDropFile !== null) {
-                dragDropFile.addEventListener("mousedown", (e) => {
-                    if (e.button === 0) { //滑鼠左鍵
-                        M?.script.file.dragDropFile();
-                    }
+                Lib.addDragThresholdListener(dragDropFile, 3, () => {
+                    M.script.file.dragDropFile();
                 });
                 dragDropFile.addEventListener("mousedown", (e) => {
                     if (e.button === 2) { //滑鼠右鍵
@@ -684,10 +682,8 @@ class MainMenu {
 
             let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
             if (dragDropFile !== null) {
-                dragDropFile.addEventListener("mousedown", (e) => {
-                    if (e.button === 0) { //滑鼠左鍵
-                        M?.script.file.dragDropFile();
-                    }
+                Lib.addDragThresholdListener(dragDropFile, 3, () => {
+                    M.script.file.dragDropFile();
                 });
                 dragDropFile.addEventListener("mousedown", (e) => {
                     if (e.button === 2) { //滑鼠右鍵
@@ -774,10 +770,8 @@ class MainMenu {
 
             let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
             if (dragDropFile !== null) {
-                dragDropFile.addEventListener("mousedown", (e) => {
-                    if (e.button === 0) { //滑鼠左鍵
-                        M?.script.file.dragDropFile(getPath());
-                    }
+                Lib.addDragThresholdListener(dragDropFile, 3, () => {
+                    M.script.file.dragDropFile(getPath());
                 });
                 dragDropFile.addEventListener("mousedown", (e) => {
                     if (e.button === 2) { //滑鼠右鍵
@@ -851,10 +845,8 @@ class MainMenu {
 
             let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; //快速拖曳
             if (dragDropFile !== null) {
-                dragDropFile.addEventListener("mousedown", (e) => {
-                    if (e.button === 0) { //滑鼠左鍵
-                        M?.script.file.dragDropFile(getPath());
-                    }
+                Lib.addDragThresholdListener(dragDropFile, 3, () => {
+                    M?.script.file.dragDropFile(getPath());
                 });
                 dragDropFile.addEventListener("mousedown", (e) => {
                     if (e.button === 2) { //滑鼠右鍵

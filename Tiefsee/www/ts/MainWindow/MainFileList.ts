@@ -279,9 +279,14 @@ class MainFileList {
             dom_fileListData.append(div);
             div.setAttribute("data-path", path);
 
-            //click載入圖片
+            //click 載入圖片
             div.addEventListener("click", () => {
                 M.fileLoad.showFile(i);
+            })
+
+            //快速拖曳
+            Lib.addDragThresholdListener(div, 5, () => {
+                M.script.file.dragDropFile(path);
             })
 
             return div;

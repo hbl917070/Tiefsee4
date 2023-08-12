@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -198,11 +197,25 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         public void DragDropFile(string path) {
-            if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }
-            string[] files = { path };
+            if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }    
             try {
-                var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
-                M.DoDragDrop(file, DragDropEffects.All);
+                //string[] files = { path };
+                //var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
+                //M.DoDragDrop(file, DragDropEffects.All);
+
+                // get IDataObject from the Shell so it can handle more formats
+                var dataObject = DataObjectUtilities.GetFileDataObject(path);
+
+                // add the thumbnail to the data object
+                int size = 92;
+                Bitmap bitmap = WindowsThumbnailProvider.GetThumbnail(
+                    path, size, size, ThumbnailOptions.ScaleUp
+                );
+                DataObjectUtilities.AddPreviewImage(dataObject, bitmap);
+                bitmap.Dispose();
+
+                M.DoDragDrop(dataObject, DragDropEffects.All);
+
             } catch { }
         }
 
