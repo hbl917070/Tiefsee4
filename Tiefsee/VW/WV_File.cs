@@ -197,24 +197,30 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         public void DragDropFile(string path) {
-            if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }    
+            if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }
+
             try {
-                //string[] files = { path };
-                //var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
-                //M.DoDragDrop(file, DragDropEffects.All);
 
-                // get IDataObject from the Shell so it can handle more formats
-                var dataObject = DataObjectUtilities.GetFileDataObject(path);
+                if (path == Path.GetFullPath(path)) { //如果是一般路徑
+                    
+                    //有縮圖(不支援長路經)
+                    var dataObject = DataObjectUtilities.GetFileDataObject(path);
+                    int size = 92;
+                    Bitmap bitmap = WindowsThumbnailProvider.GetThumbnail(
+                        path, size, size, ThumbnailOptions.ScaleUp
+                    );
+                    DataObjectUtilities.AddPreviewImage(dataObject, bitmap);
+                    bitmap.Dispose();
+                    M.DoDragDrop(dataObject, DragDropEffects.All);
 
-                // add the thumbnail to the data object
-                int size = 92;
-                Bitmap bitmap = WindowsThumbnailProvider.GetThumbnail(
-                    path, size, size, ThumbnailOptions.ScaleUp
-                );
-                DataObjectUtilities.AddPreviewImage(dataObject, bitmap);
-                bitmap.Dispose();
+                } else { //如果是長路經
 
-                M.DoDragDrop(dataObject, DragDropEffects.All);
+                    //無縮圖
+                    string[] files = { path };
+                    var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
+                    M.DoDragDrop(file, DragDropEffects.All);
+
+                }
 
             } catch { }
         }
