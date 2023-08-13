@@ -179,7 +179,6 @@ class MainExif {
 			loadRelated(noCheckPath);
 		}
 
-
 		/**
 		 * 讀取 資訊(於初始化後呼叫)
 		 */
@@ -331,7 +330,11 @@ class MainExif {
 
 		}
 
-
+		/**
+		 * 
+		 * @param val 
+		 * @returns 
+		 */
 		function getSdwebuiDom(val: string) {
 			let arDom: HTMLElement[] = [];
 			/**
@@ -538,31 +541,46 @@ class MainExif {
 					})
 
 				} else { //一般的文字檔
-					text = getText(itemText);
+
 					domContent = Lib.newDom(`
 						<div class="mainExifRelatedContent collapse-content">
 							<div class="mainExifRelatedText">
-								<span>${text}</span>
+								<span>${getText(itemText)}</span>
 							</div>
 						</div>
 					`);
+
 				}
 
+				//按鈕 - civitai
+				if (title.toLowerCase() === ".civitai.info") {
+					try {
+						let civitaiInfo = JSON.parse(text);
+						let modelId = civitaiInfo.modelId;
+						if (modelId !== undefined) {
+							let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
+							domTitle.appendChild(btnCivitai);
+							btnCivitai.addEventListener("click", async () => {
+								let url = "https://civitai.com/models/" + modelId;
+								WV_RunApp.OpenUrl(url);
+							})
+						}
+					} catch (e) { }
+				}
+
+				//按鈕 - 編輯
 				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
 				domTitle.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
 					M.textEditor.setOnSave(async (t: string) => { //儲存時更新面板裡面的文字
-						/*let domSpan = domContent.querySelector("span");
-						if (domSpan !== null) {
-							domSpan.innerHTML = getText(t);
-						}*/
 						let newItemDom = await getRelatedDom(itemPath, t);
 						domBox.insertAdjacentElement("afterend", newItemDom);
 						domBox.remove();
 					});
 				})
 
+				//按鈕 - 複製
 				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>`)
 				domTitle.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
