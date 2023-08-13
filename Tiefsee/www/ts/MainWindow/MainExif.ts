@@ -194,7 +194,7 @@ class MainExif {
 				return;
 			}
 
-			let path = fileInfo2.Path;
+			let path = fileInfo2.FullPath;
 			let maxLength = M.config.settings.advanced.exifReadMaxLength;
 			let json = await WebAPI.getExif(fileInfo2, maxLength);
 
@@ -261,11 +261,11 @@ class MainExif {
 						let val = vals[i];
 						let x = val.indexOf(": "); //資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
-							domTabContentInfo.appendChild(getItemHtml(name, val));
+							domTabContentInfo.appendChild(getItemDom(name, val));
 
 						} else {
 
-							name = val.substring(0, x);
+							let name = val.substring(0, x);
 							val = val.substring(x + 1);
 
 							if (name === "Comment") { // NovelAI 才有的欄位
@@ -278,80 +278,31 @@ class MainExif {
 										for (let i = 0; i < arCommentkey.length; i++) {
 											let keyComment = arCommentkey[i];
 											let valComment = jsonComment[keyComment];
-											domTabContentInfo.appendChild(getItemHtml(keyComment, valComment));
+											domTabContentInfo.appendChild(getItemDom(keyComment, valComment));
 										}
 									} else {
-										domTabContentInfo.appendChild(getItemHtml(name, val));
+										domTabContentInfo.appendChild(getItemDom(name, val));
 									}
 								} catch (e) {
-									domTabContentInfo.appendChild(getItemHtml(name, val));
+									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 
 							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 
-								/**
-									剖析參數，例如
-									傳入 Sampler: DPM++ 2M Karras, ADetailer prompt: "\"blue eyes\", smileing: 0.8, open mouth"
-									回傳 [
-										{title:"Sampler", text: "DPM++ 2M Karras"}, 
-										{title:"ADetailer prompt", text: `"blue eyes", smileing: 0.8, open mouth`}
-									]
-								 */
-								function parseParameters(input: string) {
-
-									// 先把 \" 替換成其他符號，避免剖析失敗
-									input = input.replace(/\\"/g, "\uFDD9");
-									let parts = input.split(/,(?=(?:[^"]|"[^"]*")*$)/).map(s => s.replace(/\uFDD9/g, '\\"').trim());
-
-									let result = [];
-									for (let i = 0; i < parts.length; i++) {
-										let subParts = parts[i].split(":");
-										let title = subParts[0].trim();
-										let text = subParts.slice(1).join(":").trim();
-										if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "									
-											text = text.slice(1, -1); // 去除開頭跟結尾的"
-											text = text.replace(/\\n/g, "\n"); //處理換行
-											text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
-										}
-
-										result.push({ title: title, text: text });
-									}
-									return result;
-								}
-
 								let promptSplit: number = val.indexOf("Negative prompt: "); //負面提示
 								let otherSplit: number = val.indexOf("Steps: "); //其他參數
-								if (promptSplit !== -1 && otherSplit !== -1) {
-									domTabContentInfo.appendChild(getItemHtml("Prompt", val.substring(0, promptSplit))); //提示
-									domTabContentInfo.appendChild(getItemHtml("Negative prompt", val.substring(promptSplit + 17, otherSplit))); //負面提示
-									//html += getItemHtml("Other", val.substring(otherSplit));
-									let otherText = val.substring(otherSplit);
-									let arOther = parseParameters(otherText);
-									for (let i = 0; i < arOther.length; i++) {
-										const title = arOther[i].title;
-										const text = arOther[i].text;
-										domTabContentInfo.appendChild(getItemHtml(title, text));
-									}
 
-								} else if (promptSplit === -1 && otherSplit !== -1) { //沒有輸入負面詞的情況
-
-									domTabContentInfo.appendChild(getItemHtml("Prompt", val.substring(0, otherSplit))); //提示
-									let otherText = val.substring(otherSplit);
-									let arOther = parseParameters(otherText);
-									for (let i = 0; i < arOther.length; i++) {
-										const title = arOther[i].title;
-										const text = arOther[i].text;
-										domTabContentInfo.appendChild(getItemHtml(title, text));
-									}
-
+								if (promptSplit !== -1 || otherSplit !== -1) {
+									getSdwebuiDom(val).forEach(dom => {
+										domTabContentInfo.appendChild(dom);
+									})
 								} else {
-									domTabContentInfo.appendChild(getItemHtml(name, val));
+									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 
 							} else {
-								domTabContentInfo.appendChild(getItemHtml(name, val));
+								domTabContentInfo.appendChild(getItemDom(name, val));
 							}
-
 						}
 
 					}
@@ -374,12 +325,74 @@ class MainExif {
 						value = Lib.getFileLength(Number(value));
 					}
 					name = M.i18n.t(`exif.name.${name}`);
-					domTabContentInfo.appendChild(getItemHtml(name, value, nameI18n, valueI18n));
+					domTabContentInfo.appendChild(getItemDom(name, value, nameI18n, valueI18n));
 				}
 			}
 
 		}
 
+
+		function getSdwebuiDom(val: string) {
+			let arDom: HTMLElement[] = [];
+			/**
+				剖析參數，例如
+				傳入 Sampler: DPM++ 2M Karras, ADetailer prompt: "\"blue eyes\", smileing: 0.8, open mouth"
+				回傳 [
+					{title:"Sampler", text: "DPM++ 2M Karras"}, 
+					{title:"ADetailer prompt", text: `"blue eyes", smileing: 0.8, open mouth`}
+				]
+			*/
+			function parseParameters(input: string) {
+
+				// 先把 \" 替換成其他符號，避免剖析失敗
+				input = input.replace(/\\"/g, "\uFDD9");
+				let parts = input.split(/,(?=(?:[^"]|"[^"]*")*$)/).map(s => s.replace(/\uFDD9/g, '\\"').trim());
+
+				let result = [];
+				for (let i = 0; i < parts.length; i++) {
+					let subParts = parts[i].split(":");
+					let title = subParts[0].trim();
+					let text = subParts.slice(1).join(":").trim();
+					if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "									
+						text = text.slice(1, -1); // 去除開頭跟結尾的"
+						text = text.replace(/\\n/g, "\n"); //處理換行
+						text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
+					}
+
+					result.push({ title: title, text: text });
+				}
+				return result;
+			}
+
+			let promptSplit: number = val.indexOf("Negative prompt: "); //負面提示
+			let otherSplit: number = val.indexOf("Steps: "); //其他參數
+			if (promptSplit !== -1 && otherSplit !== -1) {
+				arDom.push(getItemDom("Prompt", val.substring(0, promptSplit))); //提示
+				arDom.push(getItemDom("Negative prompt", val.substring(promptSplit + 17, otherSplit))); //負面提示
+				//html += getItemHtml("Other", val.substring(otherSplit));
+				let otherText = val.substring(otherSplit);
+				let arOther = parseParameters(otherText);
+				for (let i = 0; i < arOther.length; i++) {
+					const title = arOther[i].title;
+					const text = arOther[i].text;
+					arDom.push(getItemDom(title, text));
+				}
+
+			} else if (promptSplit === -1 && otherSplit !== -1) { //沒有輸入負面詞的情況
+
+				arDom.push(getItemDom("Prompt", val.substring(0, otherSplit))); //提示
+				let otherText = val.substring(otherSplit);
+				let arOther = parseParameters(otherText);
+				for (let i = 0; i < arOther.length; i++) {
+					const title = arOther[i].title;
+					const text = arOther[i].text;
+					arDom.push(getItemDom(title, text));
+				}
+
+			}
+
+			return arDom;
+		}
 
 		/**
 		 * 讀取 相關檔案(於初始化後呼叫)
@@ -395,7 +408,7 @@ class MainExif {
 				return;
 			}
 
-			let path = fileInfo2.Path;
+			let path = fileInfo2.FullPath;
 			let json = await WebAPI.getRelatedFileList(path, relatedFileExtList);
 
 			if (noCheckPath === false) {
@@ -429,7 +442,7 @@ class MainExif {
 		 * @returns dom
 		 */
 		async function getRelatedBtnAdd() {
-			let path = fileInfo2.Path;
+			let path = fileInfo2.FullPath;
 			let btnNew = Lib.newDom(`
 				<div class="mainExifRelatedBtnAdd" i18n="menu.new">
 					${M.i18n.t("menu.new")}
@@ -503,24 +516,50 @@ class MainExif {
 			let domContent: HTMLElement;
 			if (itemText !== null) {
 
-				let text = getText(itemText);
-				domContent = Lib.newDom(`
-					<div class="mainExifRelatedContent collapse-content">
-						<div class="mainExifRelatedText">
-							<span>${text}</span>
+				let text = itemText;
+
+				if (title.toLowerCase().endsWith(".txt")
+					&&
+					(
+						text.indexOf("Negative prompt: ") !== -1 //負面提示
+						|| text.indexOf("Steps: ") !== -1 //其他參數
+					)
+				) { //如果是 SDwebUI 的 info
+
+					domContent = Lib.newDom(`
+						<div class="mainExifRelatedContent collapse-content">
+							<div class="mainExifList">
+							</div>
 						</div>
-					</div>
-				`);
+					`);
+					let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
+					getSdwebuiDom(text).forEach(dom => {
+						domContentList.appendChild(dom);
+					})
+
+				} else { //一般的文字檔
+					text = getText(itemText);
+					domContent = Lib.newDom(`
+						<div class="mainExifRelatedContent collapse-content">
+							<div class="mainExifRelatedText">
+								<span>${text}</span>
+							</div>
+						</div>
+					`);
+				}
 
 				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
 				domTitle.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
-					M.textEditor.setOnSave((t: string) => { //儲存時更新面板裡面的文字
-						let domSpan = domContent.querySelector("span");
+					M.textEditor.setOnSave(async (t: string) => { //儲存時更新面板裡面的文字
+						/*let domSpan = domContent.querySelector("span");
 						if (domSpan !== null) {
 							domSpan.innerHTML = getText(t);
-						}
+						}*/
+						let newItemDom = await getRelatedDom(itemPath, t);
+						domBox.insertAdjacentElement("afterend", newItemDom);
+						domBox.remove();
 					});
 				})
 
@@ -595,9 +634,9 @@ class MainExif {
 
 
 		/** 
-		 * exif項目的html
+		 * exif項目的dom
 		 */
-		function getItemHtml(name: string, value: string, nameI18n = "", valueI18n = "") {
+		function getItemDom(name: string, value: string, nameI18n = "", valueI18n = "") {
 
 			let oVal = value; //原始資料
 
@@ -688,7 +727,7 @@ class MainExif {
 
 			//取得標題，null 表示不是相關檔案，例如 .min.js
 			function getTitle() {
-				let name = Lib.GetFileName(fileInfo2.Path); //目前檔案的檔名
+				let name = Lib.GetFileName(fileInfo2.FullPath); //目前檔案的檔名
 				let itemName = Lib.GetFileName(fileWatcherData.FullPath);
 				let nameF = name.split(".")[0]; //取得檔名第一個.之前的部分
 				let itemNameF = itemName.split(".")[0];
@@ -727,6 +766,12 @@ class MainExif {
 							relatedTitle.innerText = Lib.escape(title);
 						} else { //取得標題失敗表示不是相關檔案，則移除舊項目
 							relatedBox.remove();
+
+							//如果沒有其他檔案，就顯示 新增按鈕
+							if (domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
+								let btnNew = await getRelatedBtnAdd()
+								domTabContentRelated.appendChild(btnNew);
+							}
 						}
 					}
 
