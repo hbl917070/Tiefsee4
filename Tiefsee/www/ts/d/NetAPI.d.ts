@@ -407,9 +407,8 @@ interface WV_System {
      * 刪除圖片暫存
      * @param maxImgProcessed 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量
      * @param maxImgZoom 暫存資料夾 tempDirImgZoom 最多保留的檔案數量
-     * @param maxWebFile 暫存資料夾 tempDirWebFile 最多保留的檔案數量
      */
-    DeleteTemp(maxImgProcessed: number, maxImgZoom: number, maxWebFile: number): void;
+    DeleteTemp(maxImgProcessed: number, maxImgZoom: number): void;
 
     /**
      * 模擬鍵盤

@@ -147,7 +147,6 @@ namespace Tiefsee {
         public void DeleteAllTemp() {
             DeleteTemp(AppPath.tempDirImgProcessed, 0);
             DeleteTemp(AppPath.tempDirImgZoom, 0);
-            DeleteTemp(AppPath.tempDirWebFile, 0);
         }
 
 
@@ -156,14 +155,12 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="maxImgProcessed"> 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量 </param>
         /// <param name="maxImgZoom"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
-        /// <param name="maxWebFile"> 暫存資料夾 tempDirWebFile 最多保留的檔案數量 </param>
-        public void DeleteTemp(int maxImgProcessed, int maxImgZoom, int maxWebFile) {
+        public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
             new Thread(() => {
                 if (Program.startType == 3 || Program.startType == 5) { //常駐背景，關閉所有視窗才執行清除
                     if (QuickRun.runNumber <= 2) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
-                        DeleteTemp(AppPath.tempDirWebFile, maxWebFile);
                         Console.WriteLine("########## 刪除圖片暫存(常駐背景)");
                     }
                     return;
@@ -176,14 +173,13 @@ namespace Tiefsee {
                     if (QuickRun.runNumber <= 1) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
-                        DeleteTemp(AppPath.tempDirWebFile, maxWebFile);
                         Console.WriteLine("########## 刪除圖片暫存" + QuickRun.runNumber);
                     }
                 }
 
             }).Start();
         }
-        public void DeleteTemp(string path, int max) {
+        private void DeleteTemp(string path, int max) {
             if (Directory.Exists(path) == false) { return; }
             FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos(); //取得資料夾內的所有檔案與資料夾
             if (ar.Length <= max) { return; } //如果檔案數量未達上限，就不做任何事情

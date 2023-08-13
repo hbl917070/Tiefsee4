@@ -121,7 +121,7 @@ class MainWindow {
                             await Lib.sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
                         }
                     }
-                    WV_System.DeleteTemp(100, 300, 100); //刪除圖片暫存
+                    WV_System.DeleteTemp(100, 300); //刪除圖片暫存
                     await saveSetting(); //儲存 setting.json
                     return true;
 

@@ -63,9 +63,12 @@ namespace Tiefsee {
             appDataSetting = Path.Combine(appData, "Setting.json");
             appDataUwpList = Path.Combine(appData, "UwpList.json");
 
+            string downloadsPath = KnownFolders.GetPath(KnownFolder.Downloads); //使用者的 下載
+            
             tempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed");
             tempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom");
-            tempDirWebFile = Path.Combine(Path.GetTempPath(), "Tiefsee\\WebFile");
+            tempDirWebFile = Path.Combine(downloadsPath, "Tiefsee");
+            //tempDirWebFile = Path.Combine(Path.GetTempPath(), "Tiefsee\\WebFile");
 
             logoIcon = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "www/img/logo.ico");
 
