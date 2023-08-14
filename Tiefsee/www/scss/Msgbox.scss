@@ -31,13 +31,14 @@
   position: relative;
 
   /*用於顯示時的動畫*/
-  transition: all 0.2s;
+  transition: all 0.1s;
+  transition-timing-function: cubic-bezier(0.6, 0.3, 0.33, 1.67);
   opacity: 0.8;
-  transform: scale(0.98);
+  transform: scaleY(1.05) translateY(0px);
 }
 .msgbox-box[active="true"] {
   opacity: 1;
-  transform: scale(1);
+  transform: scaleY(1) translateY(0px);
 }
 
 .msgbox-txt {
