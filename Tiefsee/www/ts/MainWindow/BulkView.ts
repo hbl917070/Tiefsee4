@@ -1278,7 +1278,7 @@ class BulkView {
                 n = 40;
             }
             n += 10;
-            if (n < 40) { n = 40; }
+            if (n < 10) { n = 10; }
             if (n > 100) { n = 100; }
             setFixedWidth(n.toString());
         }
@@ -1289,7 +1289,7 @@ class BulkView {
                 n = 40;
             }
             n -= 10;
-            if (n < 40) { n = 40; }
+            if (n < 10) { n = 10; }
             if (n > 100) { n = 100; }
             setFixedWidth(n.toString());
         }
