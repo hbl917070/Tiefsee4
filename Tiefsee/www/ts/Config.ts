@@ -147,7 +147,7 @@ class Config {
             tiefseeviewBigimgscaleRatio: 0.8
         },
 
-        /** 預設裴谞 */
+        /** 預設排序 */
         sort: {
             /** 預設檔案排序 */
             fileSort: "name",
@@ -157,31 +157,48 @@ class Config {
 
         /** 佈局 */
         layout: {
-            fileListEnabled: true, //啟用 檔案預覽視窗
-            fileListShowNo: true, //顯示編號
-            fileListShowName: true, //顯示檔名
-            fileListShowWidth: 100, //寬度
+            /** 啟用 檔案預覽視窗 */
+            fileListEnabled: true,
+            /** 顯示編號 */
+            fileListShowNo: true,
+            /** 顯示檔名 */
+            fileListShowName: true,
+            /** 寬度 */
+            fileListShowWidth: 100,
 
-            dirListEnabled: false, //啟用 資料夾預覽視窗
-            dirListShowNo: true, //顯示編號
-            dirListShowName: true, //顯示檔名
-            dirListShowWidth: 200, //寬度
-            dirListImgNumber: 3, //圖片數量
+            /** 啟用 資料夾預覽視窗 */
+            dirListEnabled: false,
+            /** 顯示編號 */
+            dirListShowNo: true,
+            /** 顯示檔名 */
+            dirListShowName: true,
+            /** 寬度 */
+            dirListShowWidth: 200,
+            /** 圖片數量 */
+            dirListImgNumber: 3,
 
-            mainExifEnabled: false, //啟用 詳細資料視窗
-            mainExifShowWidth: 150, //寬度
-            mainExifMaxLine: 20, //顯示的最大行數
-            mainExifHorizontal: true, //寬度足夠時，橫向排列
+            /** 啟用 詳細資料視窗 */
+            mainExifEnabled: false,
+            /** 寬度 */
+            mainExifShowWidth: 150,
+            /** 顯示的最大行數 */
+            mainExifMaxLine: 20,
+            /** 寬度足夠時，橫向排列 */
+            mainExifHorizontal: false,
+            /** 記錄折疊狀態 */
             mainExifCollapse: {} as { [key: string]: boolean },
+            /** 記錄頁籤選擇的頁面。 [info, related] */
+            mainExifTabs: "info",
+            /** 啟用 相關檔案 */
+            relatedFilesEnabled: true,
 
             /** 啟用 工具列 */
             mainToolbarEnabled: true,
-            /** 工具列對齊。 left / center */
+            /** 工具列對齊。 [lef, center] */
             mainToolbarAlign: "left",
 
-            /** 大型切換按鈕。 leftRight / bottom / none  */
+            /** 大型切換按鈕。 [leftRight, bottom, none]  */
             largeBtn: "bottom",
-
         },
 
         /** 記錄程式上次關閉時的位置 */
@@ -256,7 +273,6 @@ class Config {
             dirListMaxCount: 5000,
             /** 圖片面積大於這個數值的平方，就禁用高品質縮放 */
             highQualityLimit: 4000,
-
             /** exif 最大讀取長度 */
             exifReadMaxLength: 200000,
         },
@@ -271,10 +287,9 @@ class Config {
 
         /** 大量瀏覽模式 */
         bulkView: {
-
             /** 每行圖片數 */
             columns: 5,
-            /**  */
+            /** 瀑布流。 [off, vertical, horizontal] */
             waterfall: "horizontal",
             /** 無間距模式 */
             gaplessMode: "off",
@@ -307,10 +322,8 @@ class Config {
         other: {
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
-
-            /** 偵測到檔案新增時，插入於 (auto | start | end) */
+            /** 偵測到檔案新增時，插入於。 [auto, start, end] */
             whenInsertingFile: "auto",
-
             /** 語言 */
             lang: "",
         },

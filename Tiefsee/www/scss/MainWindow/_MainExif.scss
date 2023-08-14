@@ -13,23 +13,24 @@
 
   .mainExifTop {
     width: 100%;
-
     display: flex;
     align-items: center;
-    //justify-content: center;
-    border-bottom: 1px solid var(--color-blue20);
 
     .mainExifTabs {
       flex: 1;
-      //max-width: 150px;
       width: 100%;
       height: 33px;
-      //margin: 5px;
       margin-bottom: -3px;
-      display: flex;
       overflow-x: visible;
       overflow-y: hidden;
-      // border: 1px solid var(--color-blue20);
+
+      display: none;
+      border-bottom: 1px solid var(--color-blue20);
+
+      &[active="true"] {
+        display: flex;
+      }
+
       .mainExifTabsContent {
         display: flex;
         flex-direction: row;
@@ -184,13 +185,14 @@
 
     //折疊內容
     .mainExifRelatedContent {
-      transition: all 0.2s;
+      transition: all 0.1s;
       overflow: hidden;
 
       .mainExifRelatedText {
         padding-bottom: 20px;
         span {
           color: var(--color-white);
+          margin: 0 5px;
 
           //行數太多時結尾以...呈現
           overflow: hidden;
@@ -210,7 +212,6 @@
           max-height: 400px;
           margin: auto;
           pointer-events: none;
-      
         }
       }
     }
@@ -227,6 +228,7 @@
       justify-content: center;
       max-width: 100px;
       margin-top: 5px;
+      user-select: none;
       cursor: pointer;
     }
   }
@@ -366,7 +368,7 @@
   top: 35px;
   //backdrop-filter: saturate(180%) blur(5px);
   transform: translateX(420px);
-  transition: all 0.2s;
+  transition: all 0.1s;
   opacity: 0;
   pointer-events: none;
 

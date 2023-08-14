@@ -2,6 +2,7 @@ class MainExif {
 
 	public init;
 	public setEnabled;
+	public setRelatedFilesEnabled;
 	public setHide;
 	public setItemWidth;
 	public setHorizontal;
@@ -11,6 +12,7 @@ class MainExif {
 
 		this.init = init;
 		this.setEnabled = setEnabled;
+		this.setRelatedFilesEnabled = setRelatedFilesEnabled;
 		this.setHide = setHide;
 		this.setItemWidth = setItemWidth;
 		this.setHorizontal = setHorizontal;
@@ -57,15 +59,22 @@ class MainExif {
 
 		new TiefseeScroll().initGeneral(domTabBtns, "x"); //滾動條元件
 
-
-		setTab(tabType);
 		domTabBtnInfo.addEventListener("click", () => {
 			setTab(TabType.info);
+			if (fileInfo2 !== undefined) {
+				loadInfo();
+				loadRelated();
+			}
 		})
 		domTabBtnRelated.addEventListener("click", () => {
 			setTab(TabType.related);
+			if (fileInfo2 !== undefined) {
+				loadInfo();
+				loadRelated();
+			}
 		})
 		function setTab(type: string) {
+
 			if (type === TabType.related) {
 				tabType = TabType.related;
 				domTabBtnInfo.setAttribute("active", "");
@@ -79,10 +88,8 @@ class MainExif {
 				domTabContentInfo.style.display = "";
 				domTabContentRelated.style.display = "none";
 			}
-			if (fileInfo2 !== undefined) {
-				loadInfo();
-				loadRelated();
-			}
+
+			M.config.settings.layout.mainExifTabs = tabType;
 		}
 
 		//拖曳改變size
@@ -124,14 +131,17 @@ class MainExif {
 
 
 		/**
-		 * 設定是否啟用
-		 * @param val 
-		 * @returns 
+		 * 啟用 或 關閉
 		 */
 		function setEnabled(val: boolean) {
 
 			if (val) {
 				domMainExif.setAttribute("active", "true");
+
+				//讀取上次的設定
+				tabType = M.config.settings.layout.mainExifTabs;
+				setTab(tabType);
+
 			} else {
 				domMainExif.setAttribute("active", "");
 			}
@@ -145,6 +155,23 @@ class MainExif {
 
 			loadInfo();
 			loadRelated();
+		}
+
+
+		/**
+		 * 設定是否顯示 相關檔案
+		 */
+		function setRelatedFilesEnabled(val: boolean) {
+
+			if (val) {
+				domTabBtns.setAttribute("active", "true");
+			} else {
+				domTabBtns.setAttribute("active", "false");
+				if (tabType === TabType.related) {
+					setTab(TabType.info);
+					loadInfo();
+				}
+			}
 		}
 
 
@@ -611,7 +638,7 @@ class MainExif {
 				`);
 
 				//快速拖曳
-				Lib.addDragThresholdListener(domBox, 5, () => {
+				Lib.addDragThresholdListener(domContent, 5, () => {
 					let path = domBox.getAttribute("data-path");
 					if (path !== null) {
 						M.script.file.dragDropFile(path);

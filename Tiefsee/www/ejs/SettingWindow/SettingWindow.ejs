@@ -295,16 +295,16 @@
                         <div class="text-title" i18n="sw.other.whenInsertingFile"> 偵測到檔案新增時，插入於 </div>
                         <div class="text-content">
                             <select class="text-input" id="select-whenInsertingFile">
-                                <option value="auto"  i18n="sw.other.auto"> 自動 </option>
+                                <option value="auto" i18n="sw.other.auto"> 自動 </option>
                                 <option value="start" i18n="sw.other.start"> 最前面 </option>
-                                <option value="end"   i18n="sw.other.end"> 最後面 </option>
+                                <option value="end" i18n="sw.other.end"> 最後面 </option>
                             </select>
                         </div>
-               
+
                     </div>
 
                     <div class="box">
-                        <div class="box-title" > Language </div>
+                        <div class="box-title"> Language </div>
                         <div class="text-title"> </div>
                         <div class="text-content">
                             <select class="text-input" id="select-lang">
@@ -408,16 +408,16 @@
                         </div>
 
                         <div class="text-title">
-                            <span i18n="sw.windowSetting.windowAero">視窗效果</span>
+                            <span i18n="sw.windowSetting.windowAero"> 視窗效果 </span>
                             <div class="img-help" data-i18n="sw.windowSetting.tooltip">
                                 <%- await readFile("./img/default/tool-help.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-aeroType">
-                                <option value="none" i18n="sw.windowSetting.aeroNone">透明 (預設)</option>
-                                <option value="win7" i18n="sw.windowSetting.aeroWin7">win7 樣式</option>
-                                <option value="win10" i18n="sw.windowSetting.aeroWin10">win10 樣式</option>
+                                <option value="none" i18n="sw.windowSetting.aeroNone"> 預設 </option>
+                                <option value="win7" i18n="sw.windowSetting.aeroWin7"> AERO </option>
+                                <option value="win10" i18n="sw.windowSetting.aeroWin10"> Acrylic </option>
                             </select>
                         </div>
                         <div class="text-content">
@@ -507,7 +507,7 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.filePanel.displayNumber"> 顯示編號</div>
+                        <div class="text-title" i18n="sw.filePanel.displayNumber"> 顯示編號 </div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-fileListShowNo">
@@ -515,7 +515,7 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.filePanel.displayName"> 顯示檔名</div>
+                        <div class="text-title" i18n="sw.filePanel.displayName"> 顯示檔名 </div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-fileListShowName">
@@ -529,7 +529,7 @@
                         <div class="box-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
                         <div class="text-title"> </div>
 
-                        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板</div>
+                        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板 </div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-mainExifEnabled">
@@ -537,7 +537,7 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.informationPanel.horizontal">寬度足夠時，橫向排列</div>
+                        <div class="text-title" i18n="sw.informationPanel.horizontal"> 寬度足夠時，橫向排列 </div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-mainExifHorizontal">
@@ -545,10 +545,24 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.informationPanel.maxLine">顯示的最大行數 (1~1000)</div>
+                        <div class="text-title">
+                            <span i18n="sw.informationPanel.relatedFiles"> 顯示相關檔案 </span>
+                            <div class="img-help" data-i18n="sw.informationPanel.relatedFilesTooltip">
+                                <%- await readFile("./img/default/tool-help.svg"); %>
+                            </div>
+                        </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-relatedFilesEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.informationPanel.maxLine"> 顯示的最大行數 (1~1000) </div>
                         <div class="text-content">
                             <input class="text-input" type="number" id="text-mainExifMaxLine">
                         </div>
+
                     </div>
 
 
@@ -678,7 +692,7 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="box">
                         <div class="box-title" i18n="sw.mouse.bulkViewMouseScrollWheel"> 大量瀏覽模式 - 滑鼠滾輪 </div>
 
@@ -849,7 +863,7 @@
                             </select>
                         </div>
 
-                        <div class="text-title" i18n="sw.performance.bulkViewImgMaxCount" >
+                        <div class="text-title" i18n="sw.performance.bulkViewImgMaxCount">
                             大量瀏覽模式一頁顯示的圖片數量 (範圍:1~300，預設:100，設定太高可能造成卡頓)
                         </div>
                         <div class="text-content">

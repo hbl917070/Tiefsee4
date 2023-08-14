@@ -609,6 +609,17 @@ var langData = {
                 "en": "Horizontal arrangement when width enough",
                 "ja": "横幅配置、幅の十分なとき",
             },
+            relatedFiles: {
+                "zh-TW": "顯示相關檔案",
+                "en": "Display related files",
+                "ja": "関連ファイルを表示"
+            },
+            relatedFilesTooltip: {
+                "zh-TW": `自動找出相同檔名的檔案。<br> 例如 "dog.jpg", "dog.txt", "dog.preview.png"`,
+                "en": `Automatically find files with the same file name. <br> For example, "dog.jpg", "dog.txt", "dog.preview.png"`,
+                "ja": `同じファイル名のファイルを自動的に見つけます。<br> 例えば、"dog.jpg", "dog.txt", "dog.preview.png"`
+            }
+    
         },
 
         // 工具列
@@ -1735,7 +1746,7 @@ var langData = {
         //#endregion
 
         //#region 文字編輯器
-      
+
         saveComplete: {
             "zh-TW": "儲存完成",
             "en": "Save complete",

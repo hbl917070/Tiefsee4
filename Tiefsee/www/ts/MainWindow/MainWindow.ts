@@ -352,6 +352,17 @@ class MainWindow {
                 console.log(e.dataTransfer.getData("text/html"))
                 console.log(files)*/
 
+                // 下載檔案後，判斷是否需要重新載入圖片 
+                async function reloadImageAfterDownload(path: string) {
+                    if (fileLoad.getIsBulkView() === false) { //一般圖片模式，直接重新載入
+                        await fileLoad.loadFile(path);
+                    } else { //大量瀏覽模式，與目前所在目錄不同才重新載入
+                        if (Lib.GetDirectoryName(path) !== fileLoad.getDirPath()) {
+                            await fileLoad.loadFile(path);
+                        }
+                    }
+                }
+
                 if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) { //本機的檔案
 
                     let arFile = [];
@@ -398,7 +409,7 @@ class MainWindow {
                         let extension = await getExtensionFromBase64(base64); //取得副檔名
                         if (extension !== "") {
                             let path = await WV_File.Base64ToTempFile(base64, extension);
-                            await fileLoad.loadFile(path);
+                            await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
                         }
                     }
                 } else if (text.search(/^((blob:)?http[s]?|file):[/][/]/) === 0 && files.length > 0) { //網頁的圖片
@@ -410,8 +421,7 @@ class MainWindow {
 
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
-                        await fileLoad.loadFile(path);
-
+                        await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
                     } else { //檔案解析失敗的話，嘗試從網址下載
                         let file = await downloadFileFromUrl(text);
                         if (file != null) {
@@ -419,7 +429,7 @@ class MainWindow {
                             let extension = await getExtensionFromBase64(base64); //取得副檔名
                             if (extension !== "") {
                                 let path = await WV_File.Base64ToTempFile(base64, extension);
-                                await fileLoad.loadFile(path);
+                                await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
                             }
                         }
                         //Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
@@ -433,7 +443,7 @@ class MainWindow {
                     let extension = await getExtensionFromBase64(base64); //取得副檔名
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
-                        await fileLoad.loadFile(path);
+                        await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
                     }
 
                 } else if (text.search(/^http[s]:[/][/]/) === 0) { //如果是超連結
@@ -446,7 +456,7 @@ class MainWindow {
                         let extension = await getExtensionFromBase64(base64); //取得副檔名
                         if (extension !== "") {
                             let path = await WV_File.Base64ToTempFile(base64, extension);
-                            await fileLoad.loadFile(path);
+                            await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
                         }
                     }
                 } else if (textUrl.search(/^file:[/][/]/) === 0) { //某些應用程式的檔案連結，例如vscode
@@ -941,6 +951,7 @@ class MainWindow {
             if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
             cssRoot.style.setProperty("--mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); //顯示的最大行數(1~1000)
             mainExif.setHorizontal(config.settings.layout.mainExifHorizontal); //寬度足夠時，橫向排列
+            mainExif.setRelatedFilesEnabled(config.settings.layout.relatedFilesEnabled); //顯示相關檔案
 
             //-----------
 

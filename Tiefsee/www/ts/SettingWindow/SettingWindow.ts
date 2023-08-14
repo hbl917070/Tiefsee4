@@ -912,6 +912,15 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
+            //顯示相關檔案
+            var switch_relatedFilesEnabled = getDom("#switch-relatedFilesEnabled") as HTMLInputElement;
+            switch_relatedFilesEnabled.checked = config.settings["layout"]["relatedFilesEnabled"]; //
+            switch_relatedFilesEnabled.addEventListener("change", () => {
+                let val = switch_relatedFilesEnabled.checked;
+                config.settings["layout"]["relatedFilesEnabled"] = val;
+                appleSettingOfMain();
+            });
+
             //顯示的最大行數(1~100)
             var text_mainExifMaxLine = getDom("#text-mainExifMaxLine") as HTMLInputElement;
             text_mainExifMaxLine.value = config.settings["layout"]["mainExifMaxLine"] + "";
