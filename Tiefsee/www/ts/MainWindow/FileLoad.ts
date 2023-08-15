@@ -1081,11 +1081,13 @@ class FileLoad {
                         return;
                     }
 
-                    if (path === getFilePath() && isBulkView === false) {
+                    /*if (path === getFilePath() && isBulkView === false) {
                         arFile[flagFile] = newName;
-                        M.mainFileList.init(); //檔案預覽視窗 初始化
+                        updateTitle();
                         showFile(); //重新載入檔案
-                    }
+                        M.mainFileList.init(); //檔案預覽視窗 初始化
+                    }*/
+                    //檔案重新命名後會觸發fileWatcher，所以不需要處理
 
                     //如果是自定義名單，就主動觸發檔案變更的事件
                     if (fileLoadType === FileLoadType.userDefined) {

@@ -571,7 +571,7 @@ class MainMenu {
             });
             dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => { //複製檔案路徑
                 M.script.menu.close();
-                M.script.copy.copyPath();
+                M.script.copy.copyFilePath();
             });
             dom.querySelector(".js-copyImage")?.addEventListener("click", () => { //複製影像
                 M.script.menu.close();
