@@ -2,14 +2,16 @@ name: Nightly Release
 
 on:
   schedule:
-    - cron: '00 18 * * *' # GitHub Actions use UTC time
+    - cron: '00 16 * * *' # GitHub Actions use UTC time
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.nightly-check.outputs.changes }}
     steps:
       - id: nightly-check
-        name: Check for changes since last nightly
+        name: Check for changes since the last nightly
         uses: lukecarr/nightly-check@v0.3.0
   nightly-release:
     needs: check
