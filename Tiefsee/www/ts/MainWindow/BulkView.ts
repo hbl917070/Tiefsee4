@@ -1151,7 +1151,9 @@ class BulkView {
 
                 //快速拖曳
                 Lib.addDragThresholdListener(div, 5, () => {
-                    M.script.file.dragDropFile(fileInfo2.FullPath);
+                    if (n !== 0) {
+                        M.script.file.dragDropFile(fileInfo2.FullPath);
+                    }
                 });
 
                 let dom_img = div.querySelector(".bulkView-img") as HTMLImageElement;
