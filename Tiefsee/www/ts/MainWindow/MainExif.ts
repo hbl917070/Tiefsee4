@@ -292,7 +292,7 @@ class MainExif {
 						} else {
 
 							let name = val.substring(0, x);
-							val = val.substring(x + 1);
+							val = val.substring(x + 1).trim();
 
 							if (name === "Comment") { // NovelAI 才有的欄位
 								try {
@@ -315,10 +315,7 @@ class MainExif {
 
 							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 
-								let promptSplit: number = val.indexOf("Negative prompt: "); //負面提示
-								let otherSplit: number = val.indexOf("Steps: "); //其他參數
-
-								if (promptSplit !== -1 || otherSplit !== -1) {
+								if (val.includes("Steps: ")) {
 									getSdwebuiDom(val).forEach(dom => {
 										domTabContentInfo.appendChild(dom);
 									})
@@ -363,7 +360,7 @@ class MainExif {
 		 * @returns 
 		 */
 		function getSdwebuiDom(val: string) {
-			let arDom: HTMLElement[] = [];
+
 			/**
 				剖析參數，例如
 				傳入 Sampler: DPM++ 2M Karras, ADetailer prompt: "\"blue eyes\", smileing: 0.8, open mouth"
@@ -376,7 +373,31 @@ class MainExif {
 
 				// 先把 \" 替換成其他符號，避免剖析失敗
 				input = input.replace(/\\"/g, "\uFDD9");
-				let parts = input.split(/,(?=(?:[^"]|"[^"]*")*$)/).map(s => s.replace(/\uFDD9/g, '\\"').trim());
+
+				// 切割
+				let parts = [];
+				let stack = [];
+				let partStart = 0;
+				for (let i = 0; i < input.length; i++) {
+					if (input[i] === '{') {
+						stack.push('{');
+					} else if (input[i] === '}') {
+						if (stack.length > 0 && stack[stack.length - 1] === '{') {
+							stack.pop();
+						}
+					} else if (input[i] === '"') {
+						if (stack.length > 0 && stack[stack.length - 1] === '"') {
+							stack.pop();
+						} else {
+							stack.push('"');
+						}
+					} else if (input[i] === ',' && stack.length === 0) {
+						parts.push(input.slice(partStart, i));
+						partStart = i + 1;
+					}
+				}
+				parts.push(input.slice(partStart));
+				parts = parts.map(s => s.replace(/\uFDD9/g, '\\"').trim());
 
 				let result = [];
 				for (let i = 0; i < parts.length; i++) {
@@ -385,40 +406,74 @@ class MainExif {
 					let text = subParts.slice(1).join(":").trim();
 					if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "									
 						text = text.slice(1, -1); // 去除開頭跟結尾的"
-						text = text.replace(/\\n/g, "\n"); //處理換行
+						text = text.replace(/\\n/g, "\n"); // 處理換行
 						text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
 					}
-
+					if (text.startsWith('{') && text.endsWith('}')) { // 如果是json (例如 Hashes
+						try {
+							text = JSON.stringify(JSON.parse(text), null, 2); // 格式化json再顯示
+						} catch (e) { }
+					}
+					if (title === "Tiled Diffusion" && text.startsWith('{') && text.endsWith('}')) { //格式例如 {'Method': 'MultiDiffusion', 'Tile tile width': 96}
+						text = text.replace(/[,][ ]/g, `, \n`);
+					}
+					if (title === "Lora hashes" || title === "TI hashes") {
+						text = text.replace(/[,][ ]/g, `, \n`);
+					}
+					if (title === "ControlNet 0" || title === "ControlNet 1" || title === "ControlNet 2") {
+						let lines = text.split(/,(?![^()]*\))(?![^\[\]]*\])(?![^{}]*})(?![^"]*")/).map(line => line.trim());
+						text = lines.join(", \n");
+					}
 					result.push({ title: title, text: text });
 				}
 				return result;
 			}
 
-			let promptSplit: number = val.indexOf("Negative prompt: "); //負面提示
-			let otherSplit: number = val.indexOf("Steps: "); //其他參數
-			if (promptSplit !== -1 && otherSplit !== -1) {
-				arDom.push(getItemDom("Prompt", val.substring(0, promptSplit))); //提示
-				arDom.push(getItemDom("Negative prompt", val.substring(promptSplit + 17, otherSplit))); //負面提示
-				//html += getItemHtml("Other", val.substring(otherSplit));
-				let otherText = val.substring(otherSplit);
-				let arOther = parseParameters(otherText);
-				for (let i = 0; i < arOther.length; i++) {
-					const title = arOther[i].title;
-					const text = arOther[i].text;
-					arDom.push(getItemDom(title, text));
+			/**
+			 * 依照大項目進行切割
+			 */
+			function parseString(str: string) {
+				let result: { key: string, value: string }[] = [];
+
+				let keys = ["Prompt", "Negative prompt", "Steps", "Template", "Negative Template"];
+				for (let i = 0; i < keys.length; i++) {
+					let key = keys[i];
+					let index = str.indexOf(key + ":");
+					if (index !== -1) {
+						let endIndex = str.length;
+						for (let j = i + 1; j < keys.length; j++) {
+							let nextIndex = str.indexOf(keys[j] + ":");
+							if (nextIndex !== -1) {
+								endIndex = nextIndex;
+								break;
+							}
+						}
+						let value = str.slice(index + key.length + 1, endIndex).trim();
+						result.push({ key, value });
+					}
 				}
+				return result;
+			}
 
-			} else if (promptSplit === -1 && otherSplit !== -1) { //沒有輸入負面詞的情況
+			//提示詞不會有 title，所以要補上
+			if (val.startsWith("Negative prompt:") === false && val.startsWith("Steps:") === false) {
+				val = "Prompt: " + val;
+			}
 
-				arDom.push(getItemDom("Prompt", val.substring(0, otherSplit))); //提示
-				let otherText = val.substring(otherSplit);
-				let arOther = parseParameters(otherText);
-				for (let i = 0; i < arOther.length; i++) {
-					const title = arOther[i].title;
-					const text = arOther[i].text;
-					arDom.push(getItemDom(title, text));
+			let arItem = parseString(val);
+			let arDom: HTMLElement[] = [];
+			for (let i = 0; i < arItem.length; i++) {
+				const item = arItem[i];
+				if (item.key === "Steps") {
+					let arOther = parseParameters("Steps: " + item.value);
+					for (let i = 0; i < arOther.length; i++) {
+						const title = arOther[i].title;
+						const text = arOther[i].text;
+						arDom.push(getItemDom(title, text));
+					}
+				} else {
+					arDom.push(getItemDom(item.key, item.value)); //提示
 				}
-
 			}
 
 			return arDom;
@@ -691,6 +746,7 @@ class MainExif {
 			value = Lib.escape(value);
 
 			value = value.replace(/\n/g, "<br>"); //處理換行
+			value = value.replace(/[ ]/g, "&nbsp;"); //處理空白
 
 			let html = `
 				<div class="mainExifItem">
