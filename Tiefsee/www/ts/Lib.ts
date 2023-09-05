@@ -565,7 +565,34 @@ class Lib {
     }
 
 
-
+    /**
+     * 格式化 json 字串
+     */
+    public static jsonStrFormat(str: string, space?: string | number | undefined) {
+        if (space === undefined) { space = 2; }
+        let jsonFormat;
+        let json;
+        let ok = false;
+        if (typeof str === "object") {
+            jsonFormat = JSON.stringify(str, null, space);
+            ok = true;
+        } else if (str.startsWith('{') && str.endsWith('}')) {
+            try {
+                json = JSON.parse(str);
+                jsonFormat = JSON.stringify(json, null, space);
+                ok = true;
+            } catch (e) {
+                jsonFormat = str;
+            }
+        } else {
+            jsonFormat = str;
+        }
+        return {
+            json,
+            jsonFormat,
+            ok
+        }
+    }
 
     /**
      * 取得 radio 值

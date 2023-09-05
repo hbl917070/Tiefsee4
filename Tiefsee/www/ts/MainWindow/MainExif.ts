@@ -250,6 +250,7 @@ class MainExif {
 				M.config.exif.whitelist[flashIndex] = "Flash";
 			}*/
 
+			let deferredFunc: (() => void)[] = []; //最後才執行的函數
 			let ar = json.data;
 			let whitelist = M.config.exif.whitelist;
 
@@ -295,39 +296,77 @@ class MainExif {
 							val = val.substring(x + 1).trim();
 
 							if (name === "Comment") { // NovelAI 才有的欄位
-								try {
-									//val = JSON.stringify(JSON.parse(val), null, 2); //格式化json再顯示
-									//html += getItemHtml(name, val);
-									if (val.indexOf(`"steps": `) !== -1) {
-										let jsonComment = JSON.parse(val); //把json裡面的每一筆資料進行剖析
-										let arCommentkey = Object.keys(jsonComment);
-										for (let i = 0; i < arCommentkey.length; i++) {
-											let keyComment = arCommentkey[i];
-											let valComment = jsonComment[keyComment];
-											domTabContentInfo.appendChild(getItemDom(keyComment, valComment));
-										}
-									} else {
-										domTabContentInfo.appendChild(getItemDom(name, val));
-									}
-								} catch (e) {
-									domTabContentInfo.appendChild(getItemDom(name, val));
-								}
-
-							} else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
-
-								if (val.includes("Steps: ")) {
-									getSdwebuiDom(val).forEach(dom => {
-										domTabContentInfo.appendChild(dom);
+								if (val.indexOf(`"steps": `) !== -1) {
+									AiDrawingPrompt.getNovelai(val).forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
 									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
+							}
 
-							} else {
+							else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
+								if (val.includes("Steps: ")) {
+									AiDrawingPrompt.getSdwebui(val).forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+									})
+								} else {
+									domTabContentInfo.appendChild(getItemDom(name, val));
+								}
+							}
+
+							else if (name === "prompt") { // ComfyUI
+								let jsonF = Lib.jsonStrFormat(val);
+								if (jsonF.ok) { // 解析欄位
+									AiDrawingPrompt.getComfyui(val).forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+									})
+								}
+								if (jsonF.ok) { // 如果是json
+									val = jsonF.jsonFormat; // 格式化json再顯示
+								}
+								domTabContentInfo.appendChild(getItemDom(name, val));
+							}
+							else if (name === "workflow") { // ComfyUI
+								let jsonF = Lib.jsonStrFormat(val);
+								if (jsonF.ok) { // 如果是json (例如 Hashes
+									val = jsonF.jsonFormat; // 格式化json再顯示
+								}
+								domTabContentInfo.appendChild(getItemDom(name, val));
+							}
+
+							else if (name === "sd-metadata" || name === "invokeai_metadata" || name === "invokeai_graph" || name === "Dream") { // invoke ai
+								if (name === "invokeai_graph") {
+									continue;
+								}
+
+								//這個資訊不重要，所以排到最後面
+								if (name === "Dream") {
+									let itemDom = getItemDom(name, val);
+									deferredFunc.push(() => {
+										domTabContentInfo.appendChild(itemDom);
+									})
+									continue;
+								}
+
+								let items = AiDrawingPrompt.getInvokeai(val);
+								if (items.length > 0) {
+									items.forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+									})
+								} else {
+									domTabContentInfo.appendChild(getItemDom(name, val));
+								}
+							}
+
+							else {
 								domTabContentInfo.appendChild(getItemDom(name, val));
 							}
 						}
 
+						deferredFunc.forEach(func => {
+							func();
+						});
 					}
 
 				} else {
@@ -354,130 +393,6 @@ class MainExif {
 
 		}
 
-		/**
-		 * 
-		 * @param val 
-		 * @returns 
-		 */
-		function getSdwebuiDom(val: string) {
-
-			/**
-				剖析參數，例如
-				傳入 Sampler: DPM++ 2M Karras, ADetailer prompt: "\"blue eyes\", smileing: 0.8, open mouth"
-				回傳 [
-					{title:"Sampler", text: "DPM++ 2M Karras"}, 
-					{title:"ADetailer prompt", text: `"blue eyes", smileing: 0.8, open mouth`}
-				]
-			*/
-			function parseParameters(input: string) {
-
-				// 先把 \" 替換成其他符號，避免剖析失敗
-				input = input.replace(/\\"/g, "\uFDD9");
-
-				// 切割
-				let parts = [];
-				let stack = [];
-				let partStart = 0;
-				for (let i = 0; i < input.length; i++) {
-					if (input[i] === '{') {
-						stack.push('{');
-					} else if (input[i] === '}') {
-						if (stack.length > 0 && stack[stack.length - 1] === '{') {
-							stack.pop();
-						}
-					} else if (input[i] === '"') {
-						if (stack.length > 0 && stack[stack.length - 1] === '"') {
-							stack.pop();
-						} else {
-							stack.push('"');
-						}
-					} else if (input[i] === ',' && stack.length === 0) {
-						parts.push(input.slice(partStart, i));
-						partStart = i + 1;
-					}
-				}
-				parts.push(input.slice(partStart));
-				parts = parts.map(s => s.replace(/\uFDD9/g, '\\"').trim());
-
-				let result = [];
-				for (let i = 0; i < parts.length; i++) {
-					let subParts = parts[i].split(":");
-					let title = subParts[0].trim();
-					let text = subParts.slice(1).join(":").trim();
-					if (text.startsWith('"') && text.endsWith('"')) { // 開頭跟結尾是 "									
-						text = text.slice(1, -1); // 去除開頭跟結尾的"
-						text = text.replace(/\\n/g, "\n"); // 處理換行
-						text = text.replace(/\\["]/g, '"'); // 把內容裡面的 \" 處理成 "
-					}
-					if (text.startsWith('{') && text.endsWith('}')) { // 如果是json (例如 Hashes
-						try {
-							text = JSON.stringify(JSON.parse(text), null, 2); // 格式化json再顯示
-						} catch (e) { }
-					}
-					if (title === "Tiled Diffusion" && text.startsWith('{') && text.endsWith('}')) { //格式例如 {'Method': 'MultiDiffusion', 'Tile tile width': 96}
-						text = text.replace(/[,][ ]/g, `, \n`);
-					}
-					if (title === "Lora hashes" || title === "TI hashes") {
-						text = text.replace(/[,][ ]/g, `, \n`);
-					}
-					if (title === "ControlNet 0" || title === "ControlNet 1" || title === "ControlNet 2") {
-						let lines = text.split(/,(?![^()]*\))(?![^\[\]]*\])(?![^{}]*})(?![^"]*")/).map(line => line.trim());
-						text = lines.join(", \n");
-					}
-					result.push({ title: title, text: text });
-				}
-				return result;
-			}
-
-			/**
-			 * 依照大項目進行切割
-			 */
-			function parseString(str: string) {
-				let result: { key: string, value: string }[] = [];
-
-				let keys = ["Prompt", "Negative prompt", "Steps", "Template", "Negative Template"];
-				for (let i = 0; i < keys.length; i++) {
-					let key = keys[i];
-					let index = str.indexOf(key + ":");
-					if (index !== -1) {
-						let endIndex = str.length;
-						for (let j = i + 1; j < keys.length; j++) {
-							let nextIndex = str.indexOf(keys[j] + ":");
-							if (nextIndex !== -1) {
-								endIndex = nextIndex;
-								break;
-							}
-						}
-						let value = str.slice(index + key.length + 1, endIndex).trim();
-						result.push({ key, value });
-					}
-				}
-				return result;
-			}
-
-			//提示詞不會有 title，所以要補上
-			if (val.startsWith("Negative prompt:") === false && val.startsWith("Steps:") === false) {
-				val = "Prompt: " + val;
-			}
-
-			let arItem = parseString(val);
-			let arDom: HTMLElement[] = [];
-			for (let i = 0; i < arItem.length; i++) {
-				const item = arItem[i];
-				if (item.key === "Steps") {
-					let arOther = parseParameters("Steps: " + item.value);
-					for (let i = 0; i < arOther.length; i++) {
-						const title = arOther[i].title;
-						const text = arOther[i].text;
-						arDom.push(getItemDom(title, text));
-					}
-				} else {
-					arDom.push(getItemDom(item.key, item.value)); //提示
-				}
-			}
-
-			return arDom;
-		}
 
 		/**
 		 * 讀取 相關檔案(於初始化後呼叫)
@@ -569,10 +484,7 @@ class MainExif {
 			function getText(text: string) {
 				let ext = Lib.GetExtension(itemPath);
 				if (ext === ".json" || ext === ".info") {
-					try {
-						let j = JSON.parse(text);
-						text = JSON.stringify(j, null, 2);
-					} catch (e) { }
+					text = Lib.jsonStrFormat(text).jsonFormat;
 				}
 				text = Lib.escape(text);
 				text = text.replace(/[ ]/g, "&nbsp;");
@@ -618,10 +530,9 @@ class MainExif {
 						</div>
 					`);
 					let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
-					getSdwebuiDom(text).forEach(dom => {
-						domContentList.appendChild(dom);
+					AiDrawingPrompt.getSdwebui(text).forEach(item => {
+						domContentList.appendChild(getItemDom(item.title, item.text));
 					})
-
 				} else { //一般的文字檔
 
 					domContent = Lib.newDom(`
@@ -738,8 +649,10 @@ class MainExif {
 		 */
 		function getItemDom(name: string, value: string, nameI18n = "", valueI18n = "") {
 
-			let oVal = value; //原始資料
+			if (name == undefined || name == null) { name = ""; }
+			if (value == undefined || value == null) { value = ""; }
 
+			let oVal = value; //原始資料
 			name = name.toString();
 			value = value.toString();
 			name = Lib.escape(name); //移除可能破壞html的跳脫符號
@@ -802,6 +715,10 @@ class MainExif {
 				domMainExif.classList.remove("mainExif--horizontal");
 			}
 		}
+
+
+
+
 
 		/**
 		 * 檔案被修改時呼叫
@@ -913,7 +830,6 @@ class MainExif {
 	}
 
 }
-
 
 
 class TextEditor {
