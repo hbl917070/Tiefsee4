@@ -16,6 +16,7 @@
 		<ApplicationIcon>logo.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 
 		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
 		<!-- <PublishReadyToRun>true</PublishReadyToRun> -->
@@ -35,10 +36,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.2.0" />
-		<PackageReference Include="MetadataExtractor" Version="2.8.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1901.177" />
+		<PackageReference Include="MetadataExtractor" Version="2.8.1" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1938.49" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
-		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.3" />
+		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.4" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
@@ -90,7 +91,18 @@
 
 	<!-- Generate zip file after build -->
 	<Target Name="ZipOutputPath" AfterTargets="Build">
+
+		<!-- 打包成壓縮檔前先刪除這些資料夾與檔案 -->
+		<RemoveDir Directories="$(OutputPath)\runtimes\linux-musl-x64" />
+		<RemoveDir Directories="$(OutputPath)\runtimes\linux-x64" />
+		<RemoveDir Directories="$(OutputPath)\runtimes\osx" />
+		<RemoveDir Directories="$(OutputPath)\runtimes\unix" />
+		<RemoveDir Directories="$(OutputPath)\runtimes\win-arm64" />
+		<RemoveDir Directories="$(OutputPath)\runtimes\win-x86" />
+		<Delete Files="$(OutputPath)\Tiefsee.pdb" />
+
 		<ZipDirectory
+			Overwrite="true"
 			SourceDirectory="$(OutputPath)"
 			DestinationFile="$(MSBuildProjectDirectory)\Tiefsee.zip" />
 	</Target>
