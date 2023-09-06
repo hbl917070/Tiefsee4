@@ -130,9 +130,9 @@
 
             //如果是錨點超連結，就允許執行
             let hrefURL = new URL(href);
-            let locationURL = new URL(href);
+            let locationURL = new URL(location.href);
             if (hrefURL.pathname === locationURL.pathname) {
-                if (hrefURL.hash != "") {
+                if (hrefURL.hash !== "") {
                     return;
                 }
             }

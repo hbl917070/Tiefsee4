@@ -48,13 +48,31 @@ class Iframes {
             }
             if (type === "openFile") {
                 let exePath = await WV_Window.GetAppPath();
-                let filePath = Lib.URLToPath(data);
 
-                if (await WV_File.Exists(filePath)) {
-                    WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
-                } else {
-                    M.msgbox.show({ txt: M.i18n.t("msg.notFound") + "<br>" + filePath });
+                let path = Lib.URLToPath(data);
+                let arMsg: string[] = [];
+
+                // 如果不是絕對路徑，則從目前檔案的資料夾尋找
+                if (path.startsWith("\\\\") === false && path.startsWith(":", 1) === false) { // \\Desktop-abc\AA  C:\123.jppg                   
+                    let filePath = Lib.Combine([M.fileLoad.getDirPath(), path]);
+                    arMsg.push(filePath);
+                    if (await WV_File.Exists(filePath)) {
+                        WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
+                        return;
+                    }
                 }
+
+                let filePath2 = path;
+                arMsg.push(filePath2);
+                if (await WV_File.Exists(filePath2)) {
+                    WV_RunApp.ProcessStart(exePath, `"${filePath2}"`, true, false);
+                    return;
+                }
+
+                M.msgbox.show({
+                    txt: M.i18n.t("msg.notFound") + "<br>"
+                        + arMsg.join("<br>")
+                });
             }
             if (type === "loadDropFile") {
                 await M.fileLoad.loadDropFile(data);

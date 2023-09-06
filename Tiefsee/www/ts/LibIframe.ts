@@ -237,7 +237,7 @@ class LibIframe {
      * 開啟網址或檔案
      */
     public openUrl(url: string) {
-        if (url.indexOf("http:") === 0 || url.indexOf("https:") === 0) {
+        if (url.startsWith("http:") || url.startsWith("https:") ) {
             //開啟網址
             let json = {
                 type: "openUrl",
