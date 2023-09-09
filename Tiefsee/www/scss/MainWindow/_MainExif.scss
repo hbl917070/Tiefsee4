@@ -310,37 +310,44 @@
     user-select: none;
   }
 
-  //右上角的 複製按鈕
-  .mainExifCopyBtn {
+  // 右上角的按鈕群
+  .mainExifBtns {
     position: absolute;
     top: 0;
     right: -5px;
-    width: 24px;
-    height: 24px;
-    background-color: var(--color-black80);
-    border: 1px solid var(--color-blue40);
-    border-radius: 4px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: 0s opacity;
+    flex-direction: row;
+    
+    .btn {
+      width: 24px;
+      height: 24px;
+      background-color: var(--color-black80);
+      border: 1px solid var(--color-blue40);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: 0s opacity;
+    }
+    // 移入按鈕時，顯示按鈕
+    .btn:hover {
+      cursor: pointer;
+      transition: 0s opacity !important;
+      opacity: 1 !important;
+    }
+    .btn svg {
+      pointer-events: none;
+      width: 18px;
+      height: 18px;
+    }
   }
-  //移入整個項目時，顯示半透明的按鈕
-  .mainExifItem:hover .mainExifCopyBtn {
+  // 移入整個項目時，顯示半透明的按鈕
+  .mainExifItem:hover .mainExifBtns .btn{
     opacity: 0.3;
     transition: 0.3s opacity;
   }
-  //移入按鈕時，顯示按鈕
-  .mainExifCopyBtn:hover {
-    cursor: pointer;
-    transition: 0s opacity !important;
-    opacity: 1 !important;
-  }
-  .mainExifCopyBtn svg {
-    width: 18px;
-    height: 18px;
-  }
+
 }
 
 //寬度足夠時，橫向排列

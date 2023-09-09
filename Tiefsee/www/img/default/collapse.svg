@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+	<g style="fill:var(--color-white)">
+		<polygon class="st0"
+			points="12,14 11.3,14.7 6.1,19.9 6.8,20.6 12,15.4 17.2,20.6 17.9,19.9 12.7,14.7 12,14" />
+		<polygon class="st0"
+			points="17.2,3.4 12,8.6 6.8,3.4 6.1,4.1 11.3,9.3 12,10 12.7,9.3 17.9,4.1 17.2,3.4" />
+	</g>
+</svg>

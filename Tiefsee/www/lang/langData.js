@@ -619,7 +619,7 @@ var langData = {
                 "en": `Automatically find files with the same file name. <br> For example, "dog.jpg", "dog.txt", "dog.preview.png"`,
                 "ja": `同じファイル名のファイルを自動的に見つけます。<br> 例えば、"dog.jpg", "dog.txt", "dog.preview.png"`
             }
-    
+
         },
 
         // 工具列
@@ -1589,6 +1589,16 @@ var langData = {
             "zh-TW": "格式化 JSON",
             "en": "Format JSON",
             "ja": "JSON をフォーマット",
+        },
+        expand: {
+            "zh-TW": "展開",
+            "en": "Expand",
+            "ja": "展開する",
+        },
+        collapse: {
+            "zh-TW": "折疊",
+            "en": "Collapse",
+            "ja": "折りたたむ",
         },
         //#endregion
 

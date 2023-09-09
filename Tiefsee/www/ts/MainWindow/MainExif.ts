@@ -652,28 +652,71 @@ class MainExif {
 			if (name == undefined || name == null) { name = ""; }
 			if (value == undefined || value == null) { value = ""; }
 
-			let oVal = value; //原始資料
+			let oVal = value; // 原始資料
 			name = name.toString();
 			value = value.toString();
-			name = Lib.escape(name); //移除可能破壞html的跳脫符號
+			name = Lib.escape(name); // 移除可能破壞html的跳脫符號
 			value = Lib.escape(value);
 
-			value = value.replace(/\n/g, "<br>"); //處理換行
-			value = value.replace(/[ ]/g, "&nbsp;"); //處理空白
+			value = value.replace(/\n/g, "<br>"); // 處理換行
+			value = value.replace(/[ ]/g, "&nbsp;"); // 處理空白
 
 			let html = `
 				<div class="mainExifItem">
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
-					<div class="mainExifCopyBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
-				</div>`
+					<div class="mainExifBtns">
+						<div class="btn mainExifBtnExpand" title="${M.i18n.t("menu.expand")}">${SvgList["expand.svg"]}</div>
+						<div class="btn mainExifBtnCollapse" title="${M.i18n.t("menu.collapse")}">${SvgList["collapse.svg"]}</div>
+						<div class="btn mainExifBtnCopy" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
+					</div>
+				</div>`;
 
 			let div = Lib.newDom(html);
-			let btn = div.querySelector(".mainExifCopyBtn") as HTMLElement;
-			btn.addEventListener("click", async () => {
+			let divValue = div.querySelector(".mainExifValue") as HTMLElement;
+			let btnCopy = div.querySelector(".mainExifBtnCopy") as HTMLElement; // 複製
+			let btnExpand = div.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
+			let btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
+
+			btnCopy.addEventListener("click", async () => { // 複製到剪貼簿
 				await WV_System.SetClipboard_Txt(oVal);
-				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); //已將「exifName」複製至剪貼簿
-			})
+				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); // 已將「exifName」複製至剪貼簿
+			});
+
+			let type: "collapse" | "expand" = "collapse"; // 狀態 折疊|展開
+
+			// 套用狀態
+			function setType(t: "collapse" | "expand") {
+				if (t === "collapse") { // 狀態是折疊，顯示展開按鈕
+					type = "collapse";
+					let lineClamp = divValue.scrollHeight > divValue.clientHeight; // 超出範圍，結尾顯示出「...」
+					if (lineClamp) {
+						btnExpand.style.display = "";
+						btnCollapse.style.display = "none";
+					} else {
+						btnExpand.style.display = "none";
+						btnCollapse.style.display = "none";
+					}
+				} else { // 狀態是展開，顯示折疊按鈕
+					type = "expand";
+					btnExpand.style.display = "none";
+					btnCollapse.style.display = "";
+				}
+			}
+
+			btnExpand.addEventListener("click", async () => { //折疊
+				divValue.style.webkitLineClamp = "9999"; // 最大顯示行數
+				setType("expand");
+			});
+
+			btnCollapse.addEventListener("click", async () => { //折疊
+				divValue.style.webkitLineClamp = ""; // 沒有設定就會使用設定值
+				setType("collapse");
+			});
+
+			div.addEventListener("mouseenter", async () => { // 滑鼠進入時
+				setType(type);
+			});
 
 			return div;
 		}
@@ -715,9 +758,6 @@ class MainExif {
 				domMainExif.classList.remove("mainExif--horizontal");
 			}
 		}
-
-
-
 
 
 		/**
