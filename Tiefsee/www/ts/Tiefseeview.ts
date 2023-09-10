@@ -32,6 +32,7 @@ class Tiefseeview {
     public getIsOverflowY; //取得 圖片是否大於視窗(垂直)
     public getOriginalWidth; //取得圖片原始寬度
     public getOriginalHeight; //取得圖片原始高度
+    public getZoomRatio; //取得縮放比例。原始1.00
     public zoomFull; //圖片全滿
     public zoomIn; //圖片放大
     public zoomOut; //圖片縮小
@@ -229,6 +230,7 @@ class Tiefseeview {
         this.getEventChangeXY = getEventChangeXY;
         this.getOriginalWidth = getOriginalWidth;
         this.getOriginalHeight = getOriginalHeight;
+        this.getZoomRatio = getZoomRatio;
         this.setMargin = setMargin;
         this.getMargin = getMargin;
         this.getDpizoom = getDpizoom;
@@ -1161,6 +1163,8 @@ class Tiefseeview {
             dom_dpizoom.style.zoom = (1 / val);
             dpizoom = val;
         }
+
+
 
         /**
          * 取得 允許拖曳的溢位距離

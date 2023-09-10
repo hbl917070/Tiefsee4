@@ -2276,6 +2276,11 @@ var langData = {
             "en": "Zoom to Fit or Image Original Size",
             "ja": "ズームトゥフィット or 画像原寸大",
         },
+        switchFitWindowAndOriginal: {
+            "zh-TW": "縮放至適合視窗/圖片原始大小 切換",
+            "en": `Switch between "Zoom to Fit" and "Image Original Size"`,
+            "ja": "ズームトゥフィット/画像原寸大 切り替え",
+        },
         imageFitWindow: {
             "zh-TW": "強制縮放至適合視窗",
             "en": "Always Zoom to Fit",

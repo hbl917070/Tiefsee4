@@ -34,6 +34,9 @@ class Script {
         if (s === "imageFitWindowOrImageOriginal") { //縮放至適合視窗 或 圖片原始大小
             this.img.fitWindowOrImageOriginal();
         }
+        else if (s === "switchFitWindowAndOriginal") { //縮放至適合視窗/圖片原始大小 切換
+            this.img.switchFitWindowAndOriginal(option.x, option.y);
+        }
         else if (s === "imageFitWindow") { //強制縮放至適合視窗
             this.img.zoomToFit();
         }
@@ -213,6 +216,9 @@ class Script {
         //#endregion
 
         //#region 大量瀏覽模式
+        else if (s === "bulkView") { //開啟大量瀏覽模式
+            this.M.script.bulkView.show();
+        }
         else if (s === "prevPage") { //上一頁
             this.M.bulkView.pagePrev();
         }
@@ -259,13 +265,13 @@ class ScriptImg {
         return false;
     }
 
-    /** 全滿 */
+    /** 縮放至適合視窗 */
     public zoomToFit() {
         if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindow"]);
     }
 
-    /** 原始大小 */
+    /** 縮放至圖片原始大小 */
     public zoomTo100(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"], undefined, x, y);
@@ -275,6 +281,16 @@ class ScriptImg {
     public fitWindowOrImageOriginal() {
         if (this.isImg() === false) { return; }
         this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindowOrImageOriginal"]);
+    }
+
+    /** 縮放至適合視窗/圖片原始大小 切換 */
+    public switchFitWindowAndOriginal(x?: number, y?: number) {
+        if (this.isImg() === false) { return; }
+        if (Math.abs(this.M.fileShow.tiefseeview.getZoomRatio() - 1) < 0.05) { //100%
+            this.zoomToFit();
+        } else { //不是100%
+            this.zoomTo100(x, y);
+        }
     }
 
     /** 順時針90° */

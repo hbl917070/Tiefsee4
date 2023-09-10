@@ -678,6 +678,7 @@ class SettingWindow {
             const data: { [key: string]: string[] } = {
                 "image": [
                     "imageFitWindowOrImageOriginal", //縮放至適合視窗 或 圖片原始大小
+                    "switchFitWindowAndOriginal", //縮放至適合視窗/圖片原始大小 切換
                     "imageFitWindow", //強制縮放至適合視窗
                     "imageOriginal", //圖片原始大小
                     "imageZoomIn", //放大
@@ -732,12 +733,13 @@ class SettingWindow {
                     "showToolbar", //工具列
                     "showDirectoryPanel", //資料夾預覽面板
                     "showFilePanel", //檔案預覽面板
-                    "showInformationPanel", //詳細資料面板        
+                    "showInformationPanel", //詳細資料面板
                 ],
-                //"other":[
-                //    "back", //返回
-                //    "showSetting", //設定       
-                //],
+                "other": [
+                    "bulkView", //大量瀏覽模式
+                    //"back", //返回
+                    //"showSetting", //設定
+                ],
                 //"textEditor":[
                 //    "save", //儲存檔案
                 //],
