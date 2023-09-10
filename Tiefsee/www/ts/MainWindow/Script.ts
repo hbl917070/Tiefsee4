@@ -629,14 +629,20 @@ class ScriptFileLoad {
         this.M.fileLoad.showRenameDirMsg(path);
     }
 
+    /** 重新載入 檔案+檔案預覽面板+資料夾預覽面板 */
+    public async reloadAll() {
+        await this.M.fileLoad.loadFile(this.M.fileLoad.getFilePath());
+        await this.reloadDirPanel();
+    }
+
     /** 重新載入 檔案預覽面板 */
-    public reloadFilePanel() {
-        this.M.fileLoad.reloadFilePanel();
+    public async reloadFilePanel() {
+        await this.M.fileLoad.reloadFilePanel();
     }
 
     /** 重新載入 資料夾預覽面板 */
-    public reloadDirPanel() {
-        this.M.fileLoad.reloadDirPanel();
+    public async reloadDirPanel() {
+        await this.M.fileLoad.reloadDirPanel();
     }
 
 }

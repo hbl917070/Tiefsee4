@@ -10,8 +10,19 @@ class Hotkey {
 
             //console.log(e);
 
-            if (e.code == "F5") { return; }
-            if (e.code == "F12") { return; }
+            if (e.code === "F12") { return; }
+
+            //if (e.code === "F5") { return; }
+            if (e.code === "F5") {
+                e.preventDefault();
+                let gt = M.fileLoad.getGroupType();
+                if (gt === GroupType.none || gt === GroupType.welcome) {
+                    return;
+                }
+                await M.script.fileLoad.reloadAll(); // 重新載入 檔案
+                return;
+            }
+
 
             //如果開啟側邊的文字編輯器
             if (M.textEditor.getIsShow()) {
