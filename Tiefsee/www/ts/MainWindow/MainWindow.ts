@@ -633,7 +633,6 @@ class MainWindow {
 
                     initSetting(json.settingTxt); //初始讀取設定
                     await initLastPosition(); //初始 套用上次的視窗狀態與坐標
-                    mainMenu.initOpen(); //初始化「開啟檔案」的menu
                     initLoad(json.args); //初始 載入檔案
                     initAERO(); //初始 套用aero毛玻璃效果
 
@@ -662,8 +661,7 @@ class MainWindow {
                     } else {
                         isQuickLook = true;
                         fileShow.openNone(); //避免卡在上一張圖片
-                        await initQuickLookPosition(); //初始 快速啟動的坐標
-                        mainMenu.initOpen(); //初始化「開啟檔案」的menu    
+                        await initQuickLookPosition(); //初始 快速啟動的坐標   
                         initLoad(json.args); //初始 載入檔案
                         initAERO(); //初始 套用aero毛玻璃效果
                     }

@@ -1,11 +1,11 @@
 
 class MainMenu {
 
-    public initOpen;
     public updateRightMenuImageZoomRatioTxt;
     public updateMenuLayoutCheckState;
     public setMenuLayoutCheckState;
     public showMenu;
+    public updateOtherAppList;
     //public menu_layout;
 
     constructor(M: MainWindow) {
@@ -19,12 +19,13 @@ class MainMenu {
         var btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
         var btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
 
-        this.initOpen = initOpen;
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
         this.updateMenuLayoutCheckState = updateMenuLayoutCheckState;
         this.setMenuLayoutCheckState = setMenuLayoutCheckState;
         this.showMenu = showMenu;
+        this.updateOtherAppList = updateOtherAppList;
 
+        initOpen();
         initCopy();
         initRotate();
         initRightMenuImage();
@@ -157,15 +158,10 @@ class MainMenu {
 
         //-----------------
 
-        let isInit = false;
-
         /**
          * 初始化 menu-開啟檔案
          */
         async function initOpen() {
-
-            if (isInit) { return; } //避免重複執行
-            isInit = true;
 
             let dom = document.getElementById("menu-file") as HTMLElement;
 
@@ -231,22 +227,54 @@ class MainMenu {
                 M.menu.close(); //關閉menu
                 M.script.open.openWith(getPath());
             })
+        }
+
+
+        var _isInitOtherAppList = false;
+        var _otherAppList: {
+            dom: HTMLElement,
+            isInit?: boolean,
+            imgUrl: string,
+            menuConfig: { name: RegExp | string, path: string, groupType?: string[], fileExt?: string[] }
+        }[] = [];
+        /**
+         * 初始化「用其他APP開啟檔案」的列表，只會執行一次
+         */
+        async function initOtherAppList() {
+
+            if (_isInitOtherAppList) { return; }
+            _isInitOtherAppList = true;
+
+            let dom = document.getElementById("menu-file") as HTMLElement;
+
+            function getPath() {
+                let path = dom.getAttribute("data-path");
+                if (path !== null && path !== "") {
+                    return path;
+                } else {
+                    return undefined;
+                }
+            }
 
             //以第三方程式開啟
             var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
             //讀取開始選單裡面的捷徑
             async function funcExe() {
 
-                let arExe: { path: string, name: string, type: string }[] = [];
+                let arExe: {
+                    path: string,
+                    name: string,
+                    menuConfig: { name: RegExp | string, path: string, groupType?: string[], fileExt?: string[] }
+                }[] = [];
 
                 //加入絕對路徑的exe
                 for (let i = 0; i < M.config.otherAppOpenList.absolute.length; i++) {
-                    let exePath = M.config.otherAppOpenList.absolute[i].path;
-                    let exeName = M.config.otherAppOpenList.absolute[i].name;
-                    let type = M.config.otherAppOpenList.absolute[i].type.join(",");
+                    let menuConfig = M.config.otherAppOpenList.absolute[i];
+                    let exePath = menuConfig.path;
+                    let exeName = menuConfig.name;
                     exePath = exePath.replace(/[/]/g, "\\");
                     if (arExe.some(e => e.path === exePath) === false) {
-                        arExe.push({ path: exePath, name: exeName, type: type });
+                        arExe.push({ path: exePath, name: exeName, menuConfig: menuConfig });
                     }
                 }
 
@@ -258,11 +286,11 @@ class MainMenu {
                     name = name.substring(0, name.length - 4);
 
                     for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
-                        const item = M.config.otherAppOpenList.startMenu[j];
-                        if (name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
+                        const menuConfig = M.config.otherAppOpenList.startMenu[j];
+                        if (name.search(menuConfig.name) !== -1) {
                             let exePath = await WV_System.LnkToExePath(lnk);
                             if (arExe.some(e => e.path === exePath) === false) {
-                                arExe.push({ path: exePath, name: name, type: item.type.join(",") });
+                                arExe.push({ path: exePath, name: name, menuConfig: menuConfig });
                             }
                         }
                     }
@@ -279,7 +307,7 @@ class MainMenu {
                     let dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
-                                <img src="${imgBase64}">
+                                <img>
                             </div>
                             <div class="menu-hor-txt">${name}</div>
                         </div>
@@ -292,24 +320,30 @@ class MainMenu {
                         WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); //開啟檔案
                     };
                     dom_menuOtherAppOpen?.append(dom);
+                    _otherAppList.push({ dom: dom, menuConfig: exe.menuConfig, imgUrl: imgBase64 });
                 }
 
             }
             //讀取UWP列表
             async function funcUwp() {
-                let arUwp: { id: string, path: string, name: string, type: string }[] = [];
+                let arUwp: {
+                    id: string,
+                    path: string,
+                    name: string,
+                    menuConfig: { name: RegExp, path: string, groupType?: string[], fileExt?: string[] }
+                }[] = [];
 
-                //加入uw[]
+                //加入uwp
                 let arLnk = await WebAPI.getUwpList();
                 for (let i = 0; i < arLnk.length; i++) {
                     const uwpItem = arLnk[i];
 
                     for (let j = 0; j < M.config.otherAppOpenList.startMenu.length; j++) {
                         const item = M.config.otherAppOpenList.startMenu[j];
-                        if (uwpItem.Name.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1 ||
-                            uwpItem.Id.toLocaleLowerCase().indexOf(item.name.toLocaleLowerCase()) !== -1) {
+                        if (uwpItem.Name.search(item.name) !== -1 ||
+                            uwpItem.Id.search(item.name) !== -1) {
                             if (arUwp.some(e => e.id === uwpItem.Id) === false) {
-                                arUwp.push({ id: uwpItem.Id, path: uwpItem.Logo, name: uwpItem.Name, type: item.type.join(",") });
+                                arUwp.push({ id: uwpItem.Id, path: uwpItem.Logo, name: uwpItem.Name, menuConfig: item });
                             }
                         }
                     }
@@ -323,7 +357,7 @@ class MainMenu {
                     let dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
-                                <img src="${logo}">
+                                <img>
                             </div>
                             <div class="menu-hor-txt">${name}</div>
                         </div>
@@ -336,13 +370,48 @@ class MainMenu {
                         WV_RunApp.RunUwp(uwpItem.id, filePath); //開啟檔案
                     };
                     dom_menuOtherAppOpen?.append(dom);
+                    _otherAppList.push({ dom: dom, menuConfig: uwpItem.menuConfig, imgUrl: logo });
                 }
             }
-            setTimeout(async () => {
-                await funcUwp();
-                await funcExe();
-            }, 10);
+            //setTimeout(async () => {
+            await funcUwp();
+            await funcExe();
+            //}, 10);
         }
+        /**
+         * 更新「用其他APP開啟檔案」的列表，於開啟選單時呼叫
+         */
+        async function updateOtherAppList(path: string) {
+
+            await initOtherAppList();
+
+            _otherAppList.forEach(item => {
+                let fileExt = Lib.GetExtension(path).replace(".", ""); //取得副檔名
+                let configFileExt = item.menuConfig.fileExt ?? [];
+                let isExtOK = configFileExt.includes(fileExt);
+
+                let groupType = M.fileLoad.fileExtToGroupType(fileExt);
+                let configGroupType = item.menuConfig.groupType ?? [];
+                let isGroupTypeOK = configGroupType.includes(groupType);
+
+                if (isExtOK || isGroupTypeOK) {
+
+                    item.dom.style.display = "";
+
+                    if (item.isInit !== true) { // 如果是首次顯示，則載入圖片
+                        item.isInit = true;
+
+                        let imgDom = item.dom.querySelector(".menu-hor-icon img") as HTMLImageElement;
+                        if (imgDom !== null) {
+                            imgDom.src = item.imgUrl;
+                        }
+                    }
+                } else {
+                    item.dom.style.display = "none";
+                }
+            });
+        }
+
 
 
         /**

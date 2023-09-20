@@ -719,7 +719,7 @@ class ScriptMenu {
     }
 
     /** 顯示選單 檔案 */
-    showMenuFile(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
+    async showMenuFile(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-file") as HTMLElement;
         let domOpenFileBox = domMenu.querySelector(".js-openFileBox") as HTMLElement; //載入檔案
 
@@ -734,11 +734,12 @@ class ScriptMenu {
                 let showType = this.M.fileLoad.fileExtToGroupType(fileExt);
                 domMenu.setAttribute("showType", showType);
             }
-
+            await this.M.mainMenu.updateOtherAppList(path);
         } else {
             domMenu.setAttribute("data-path", "");
             domMenu.setAttribute("showType", "");
             domOpenFileBox.style.display = "";
+            await this.M.mainMenu.updateOtherAppList(this.M.fileLoad.getFilePath());
         }
 
         if (btn === undefined) {
@@ -746,6 +747,7 @@ class ScriptMenu {
         } else {
             this.M.menu.openAtButton(domMenu, btn, "menuActive");
         }
+
     }
 
     /** 顯示選單 複製 */

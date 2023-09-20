@@ -8,46 +8,91 @@ class Config {
     }
 
 
+    /**
+     * 「用其他APP開啟檔案」的列表
+     */
     public otherAppOpenList = {
+
+        /**
+         * 從絕對路徑新增
+         */
         absolute: [
-            //{ name: "小畫家", path: "C:/Windows/system32/mspaint.exe", type: ["img"] },
-            //{ name: "Google Chrome", path: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", type: ["*"] },
-            //{ name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", type: ["img"] },
-        ] as { name: string, path: string, type: string[], }[],
+            //{ name: "小畫家", path: "C:/Windows/system32/mspaint.exe", groupType: ["img"] },
+            //{ name: "Google Chrome", path: "C:/Program Files/Google/Chrome/Application/chrome.exe", groupType: ["img"] },
+        ] as { name: string, path: string, groupType?: string[], fileExt?: string[] }[],
+
+        /**
+         * 從 開始選單 或 APP列表 裡面匹配
+         * name：要匹配的名稱
+         * groupType：使用於這些 檔案類型
+         * fileExt：使用於這些 副檔名
+         */
         startMenu: [
-            { name: "mspaint", type: ["img"] },
-            { name: "photoshop", type: ["img"] },
-            { name: "illustrator", type: ["img"] },
-            { name: "Lightroom", type: ["img"] },
-            { name: "Paint", type: ["img"] },
-            { name: "photo", type: ["img"] },
-            { name: "gimp", type: ["img"] },
-            { name: "FireAlpaca", type: ["img"] },
-            { name: "openCanvas", type: ["img"] },
-            { name: "SAI", type: ["img"] },
-            { name: "Pixia", type: ["img"] },
-            { name: "AzPainter2", type: ["img"] },
-            { name: "CorelDRAW", type: ["img"] },
-            { name: "Krita", type: ["img"] },
-            { name: "Artweaver", type: ["img"] },
-            { name: "Lightroom", type: ["img"] },
-            { name: "Perfect Effects", type: ["img"] },
-            { name: "Artweaver ", type: ["img"] },
-            { name: "Honeyview", type: ["img"] },
-            { name: "ACDSee", type: ["img"] },
-            { name: "IrfanView", type: ["img"] },
-            { name: "XnView", type: ["img"] },
-            { name: "FastStone", type: ["img"] },
-            { name: "Hamana", type: ["img"] },
-            { name: "Vieas", type: ["img"] },
-            { name: "FreeVimager", type: ["img"] },
-            { name: "Imagine", type: ["img"] },
-            { name: "XnConvert", type: ["img"] },
-            { name: "FotoSketcher", type: ["img"] },
-            { name: "PhoXo", type: ["img"] },
-            { name: "ScreenSketch", type: ["img"] }, //Windows的剪裁工具
-            { name: "imageGlass", type: ["img"] },
-        ]
+            { name: /mspaint/i, groupType: ["img"] },
+            { name: /photoshop/i, groupType: ["img"] },
+            { name: /illustrator/i, groupType: ["img"] },
+            { name: /Lightroom/i, groupType: ["img"] },
+            { name: /Paint/i, groupType: ["img"] },
+            { name: /photo/i, groupType: ["img"] },
+            { name: /^gimp/i, groupType: ["img"] },
+            { name: /FireAlpaca/i, groupType: ["img"] },
+            { name: /openCanvas/i, groupType: ["img"] },
+            { name: /^SAI/i, groupType: ["img"] },
+            { name: /Pixia/i, groupType: ["img"] },
+            { name: /AzPainter2/i, groupType: ["img"] },
+            { name: /CorelDRAW/i, groupType: ["img"] },
+            { name: /Krita/i, groupType: ["img"] },
+            { name: /Artweaver/i, groupType: ["img"] },
+            { name: /Lightroom/i, groupType: ["img"] },
+            { name: /Perfect Effects/i, groupType: ["img"] },
+            { name: /Artweaver /i, groupType: ["img"] },
+            { name: /Honeyview/i, groupType: ["img"] },
+            { name: /ACDSee/i, groupType: ["img"] },
+            { name: /IrfanView/i, groupType: ["img"] },
+            { name: /XnView/i, groupType: ["img"] },
+            { name: /FastStone/i, groupType: ["img"] },
+            { name: /Hamana/i, groupType: ["img"] },
+            { name: /Vieas/i, groupType: ["img"] },
+            { name: /FreeVimager/i, groupType: ["img"] },
+            { name: /Imagine/i, groupType: ["img"] },
+            { name: /XnConvert/i, groupType: ["img"] },
+            { name: /FotoSketcher/i, groupType: ["img"] },
+            { name: /PhoXo/i, groupType: ["img"] },
+            { name: /ScreenSketch/i, groupType: ["img"] }, // Windows的剪裁工具
+            { name: /imageGlass/i, groupType: ["img"] },
+
+            { name: /Visual Studio Code/i, groupType: ["txt"] },
+            { name: /Notepad/i, groupType: ["txt"] },
+            { name: /Sublime Text/i, groupType: ["txt"] },
+            { name: /Atom Editor/i, groupType: ["txt"] },
+            { name: /Adobe Brackets/i, groupType: ["txt"] },
+
+            { name: /ZuneVideo/i, groupType: ["video"] },
+            { name: /VLC Media Player/i, groupType: ["video"] },
+            { name: /PotPlayer/i, groupType: ["video"] },
+            { name: /GOM Player/i, groupType: ["video"] },
+            { name: /KMPlayer/i, groupType: ["video"] },
+            { name: /RealPlayer/i, groupType: ["video"] },
+            { name: /QuickTime/i, groupType: ["video"] },
+
+            { name: /^Google Chrome$/i, groupType: ["pdf"], fileExt: ["html"] },
+            { name: /^Firefox$/i, fileExt: ["html", "pdf"] },
+            { name: /^Brave$/i, fileExt: ["html", "pdf"] },
+
+            //{ name: /Microsoft Edge/i, fileExt: ["pdf"] }, // 會讀到無法使用的空白UWP連結
+            { name: /Adobe Illustrator/i, fileExt: ["pdf"] },
+            { name: /Adobe Acrobat/i, fileExt: ["pdf"] },
+            { name: /pdf/i, fileExt: ["pdf"] },
+
+            //{ name: /Word/i, fileExt: ["doc", "docx", "odt"] }, // 無法使用
+            { name: /WPS Writer/i, fileExt: ["doc", "docx", "odt"] },
+            { name: /LibreOfficeWriter/i, fileExt: ["doc", "docx", "odt"] },
+
+            //{ name: /PowerPoint/i, fileExt: ["ppt", "pptx", "odp"] }, // 無法使用
+            { name: /WPS Presentation/i, fileExt: ["ppt", "pptx", "odp"] },
+            { name: /LibreOfficeImpress/i, fileExt: ["ppt", "pptx", "odp"] },
+
+        ] as { name: RegExp, path: string, groupType?: string[], fileExt?: string[] }[]
     }
 
 
