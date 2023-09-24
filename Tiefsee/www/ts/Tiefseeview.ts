@@ -60,6 +60,7 @@ class Tiefseeview {
 
     public getEventMouseWheel; //滑鼠滾輪捲動時
     public setEventMouseWheel;
+    public sendWheelEvent;
     public getEventChangeZoom; //圖片發生縮放，或顯示圖片的區域改變大小時
     public setEventChangeZoom;
     public getEventChangeDeg; //圖片發生旋轉時
@@ -213,8 +214,9 @@ class Tiefseeview {
         this.setAlign = setAlign;
         this.zoomOut = zoomOut;
         this.zoomIn = zoomIn;
-        this.setEventMouseWheel = setEventMouseWheel;
         this.getEventMouseWheel = getEventMouseWheel;
+        this.setEventMouseWheel = setEventMouseWheel;
+        this.sendWheelEvent = sendWheelEvent;
         this.getEventLimitMax = getEventLimitMax;
         this.setEventLimitMax = setEventLimitMax;
         this.getEventLimitMin = getEventLimitMin;
@@ -2143,7 +2145,23 @@ class Tiefseeview {
         function setEventMouseWheel(_func: (_type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => void) {
             eventMouseWheel = _func;
         }
+        /**
+         * 主動觸發 wheel 事件
+         */
+        function sendWheelEvent(event: WheelEvent) {
+            // 創建一個新的滾輪事件，並設置相應的坐標
+            var newEvent = new WheelEvent("wheel", {
+                clientX: event.x * getDpizoom(),
+                clientY: event.y * getDpizoom(),
+                deltaX: event.deltaX,
+                deltaY: event.deltaY,
+                deltaZ: event.deltaZ,
+                deltaMode: event.deltaMode
+            });
 
+            // 主動觸發 wheel 事件
+            dom_dpizoom.dispatchEvent(newEvent);
+        }
 
         /**
          * 判斷圖片是否大於視窗(寬度)

@@ -190,11 +190,15 @@
                         </div>
 
                         <!-- 大型切換按鈕 -->
-                        <div class="largeBtn" data-style="leftRight-L" id="largeBtnLeft">
-                            <%- await readFile("./img/default/tool-prev.svg"); %>
+                        <div id="largeBtnLeft" class="largeBtn" data-style="leftRight-L">
+                            <div class="box">
+                                <%- await readFile("./img/default/tool-prev.svg"); %>
+                            </div>
                         </div>
-                        <div class="largeBtn" data-style="leftRight-R" id="largeBtnRight">
-                            <%- await readFile("./img/default/tool-next.svg"); %>
+                        <div id="largeBtnRight" class="largeBtn" data-style="leftRight-R">
+                            <div class="box">
+                                <%- await readFile("./img/default/tool-next.svg"); %>
+                            </div>
                         </div>
 
                         <!-- <embed  id="main-pdfview" class="main-pdfview" src="" type="application/pdf"> -->

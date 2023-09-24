@@ -3,27 +3,50 @@
  */
 class LargeBtn {
 
-    public dom_largeBtnLeft: HTMLElement;
-    public dom_largeBtnRight: HTMLElement;
+    public domLargeBtnLeft: HTMLElement;
+    public domLargeBtnRight: HTMLElement;
     public setShowType;
     public setHide;
 
     constructor(M: MainWindow) {
-        var dom_largeBtnLeft = document.getElementById("largeBtnLeft") as HTMLElement; //上一頁大按鈕
-        var dom_largeBtnRight = document.getElementById("largeBtnRight") as HTMLElement;
 
-        this.dom_largeBtnLeft = dom_largeBtnLeft;
-        this.dom_largeBtnRight = dom_largeBtnRight;
+        var domMainV = document.querySelector(".main-V") as HTMLElement;
+        var domLargeBtnLeft = domMainV.querySelector("#largeBtnLeft") as HTMLElement; //上一頁大按鈕
+        var domLargeBtnRight = domMainV.querySelector("#largeBtnRight") as HTMLElement;
+
+        this.domLargeBtnLeft = domLargeBtnLeft;
+        this.domLargeBtnRight = domLargeBtnRight;
         this.setShowType = setShowType;
         this.setHide = setHide;
 
         //大型換頁按鈕
-        dom_largeBtnLeft.addEventListener("click", function (e) {
+        domLargeBtnLeft.addEventListener("click", function (e) {
             M.script.fileLoad.prevFile();
-        })
-        dom_largeBtnRight.addEventListener("click", function (e) {
+        });
+        domLargeBtnRight.addEventListener("click", function (e) {
             M.script.fileLoad.nextFile();
-        })
+        });
+
+
+        // 把滑鼠的滾動事件傳遞給 tiefseeview
+        ([domLargeBtnLeft, domLargeBtnRight]).forEach(btn => {
+            btn.addEventListener("wheel", (event) => {
+
+                event.preventDefault();
+
+                if (M.script.img.isImg() === false) { return; }
+
+                let newEvent = new WheelEvent("wheel", {
+                    clientX: event.x,
+                    clientY: event.y,
+                    deltaX: event.deltaX,
+                    deltaY: event.deltaY,
+                    deltaZ: event.deltaZ,
+                    deltaMode: event.deltaMode
+                });
+                M.fileShow.tiefseeview.sendWheelEvent(newEvent);
+            });
+        });
 
 
         /**
@@ -31,17 +54,17 @@ class LargeBtn {
          */
         function setShowType(type: string) {
             if (type == "leftRight") {
-                dom_largeBtnLeft.setAttribute("data-style", "leftRight-L");
-                dom_largeBtnRight.setAttribute("data-style", "leftRight-R");
+                domLargeBtnLeft.setAttribute("data-style", "leftRight-L");
+                domLargeBtnRight.setAttribute("data-style", "leftRight-R");
             } else if (type == "leftRight2") {
-                dom_largeBtnLeft.setAttribute("data-style", "leftRight2-L");
-                dom_largeBtnRight.setAttribute("data-style", "leftRight2-R");
+                domLargeBtnLeft.setAttribute("data-style", "leftRight2-L");
+                domLargeBtnRight.setAttribute("data-style", "leftRight2-R");
             } else if (type == "bottom") {
-                dom_largeBtnLeft.setAttribute("data-style", "bottom-L");
-                dom_largeBtnRight.setAttribute("data-style", "bottom-R");
+                domLargeBtnLeft.setAttribute("data-style", "bottom-L");
+                domLargeBtnRight.setAttribute("data-style", "bottom-R");
             } else {
-                dom_largeBtnLeft.setAttribute("data-style", "none-L");
-                dom_largeBtnRight.setAttribute("data-style", "none-R");
+                domLargeBtnLeft.setAttribute("data-style", "none-L");
+                domLargeBtnRight.setAttribute("data-style", "none-R");
             }
         }
 
@@ -51,11 +74,11 @@ class LargeBtn {
          */
         function setHide(val: boolean) {
             if (val) {
-                dom_largeBtnLeft.setAttribute("hide", "true");
-                dom_largeBtnRight.setAttribute("hide", "true");
+                domLargeBtnLeft.setAttribute("hide", "true");
+                domLargeBtnRight.setAttribute("hide", "true");
             } else {
-                dom_largeBtnLeft.setAttribute("hide", "");
-                dom_largeBtnRight.setAttribute("hide", "");
+                domLargeBtnLeft.setAttribute("hide", "");
+                domLargeBtnRight.setAttribute("hide", "");
             }
         }
 
