@@ -14,7 +14,13 @@ namespace Tiefsee {
         /// <summary> 用於鎖定port檔案 </summary>
         private FileStream fsPort;
 
+        private bool isWin11 = false;
+        private string desktopDir;
+
         public StartWindow() {
+
+            isWin11 = Environment.OSVersion.Version.Build >= 22000;
+            desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
             Adapter.Initialize();
             Plugin.Init();
@@ -88,6 +94,14 @@ namespace Tiefsee {
                         isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); //按著空白鍵
                         isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
                         if (isMouseMiddle == false && isKeyboardSpace == false) { return; }
+
+                        // win11對資料夾按下滑鼠滾輪會觸發新開檔案總管的分頁，停止使用此功能避免衝突
+                        if (isMouseMiddle && isWin11 && Directory.Exists(selectedItem)) {
+                            // 桌面不會衝突
+                            if (Path.GetDirectoryName(selectedItem) != desktopDir) {
+                                return;
+                            }
+                        }
 
                         if (Program.startType == 2 || Program.startType == 3) {
                             if (WebWindow.tempWindow == null) { return; }
