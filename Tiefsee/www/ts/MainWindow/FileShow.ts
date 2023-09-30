@@ -189,45 +189,6 @@ class FileShow {
             return isLoaded;
         }
 
-        /**
-         * 取得圖片網址並且預載入
-         */
-        /*async function loadImage(fileInfo2: FileInfo2) {
-
-            let _path = fileInfo2.Path;
-            let encodePath = encodeURIComponent(_path);
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let imgurl = _path; //圖片網址
-
-            let imgType = Lib.GetFileType(fileInfo2); //取得檔案類型
-            let fileItem = M.config.getAllowFileTypeItem(GroupType.img, imgType); // ex. { ext: "avif", type: ["wpf", "magick"] }
-            let loadOk = false;
-            if (fileItem !== null) {
-                let arType = fileItem.type; //ex. ["wpf", "magick"]
-                for (let i = 0; i < arType.length; i++) {
-                    const type = arType[i];
-                    imgurl = await getUrl(type);
-
-                    loadOk = await tiefseeview.preloadImg(imgurl); //預載入
-                    if (loadOk) { //如果載入失敗就使用下一種模式來解析
-                        break;
-                    }
-                }
-            } else {
-                imgurl = await getUrl("magick");
-                loadOk = await tiefseeview.preloadImg(imgurl); //預載入
-            }
-
-            //如果都載入失敗，就顯示檔案的圖示
-            if (loadOk == false) {
-                imgurl = await getUrl("icon")
-                await tiefseeview.preloadImg(imgurl); //預載入
-            }
-
-            return imgurl;
-        }*/
-
-
 
         /**
          * 載入圖片
@@ -246,6 +207,15 @@ class FileShow {
             let height = imgData.height;
             let arUrl = imgData.arUrl;
             let isAnimation = imgData.isAnimation;
+            let isFail = imgData.isFail;
+
+            // 如果圖片載入失敗，就接著判斷是否為文字檔
+            if (isFail) {
+                if (await WebAPI.isBinary(fileInfo2) === false) {
+                    await openTxt(fileInfo2);
+                    return;
+                }
+            }
 
             if (isAnimation) { //判斷是否為動圖
 
@@ -265,77 +235,6 @@ class FileShow {
                     _zoomType, _zoomVal
                 );
             }
-
-            /*
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-
-            let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
-            let configItem = M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
-            if (configItem === null) {
-                configItem = { ext: "", type: "vips", vipsType: "magick" }
-            }
-            let configType = configItem.type;
-
-            if (Lib.IsAnimation(fileInfo2) === true) { //判斷是否為動圖
-
-                imgurl = await WebAPI.Img.getUrl("web", fileInfo2); //取得圖片網址並且預載入
-                await tiefseeview.loadImg(imgurl); //使用<img>渲染
-
-            } else if (configType === "vips") { //
-
-                let vipsType = configItem.vipsType as string;
-                let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
-
-                if (imgInitInfo.code == "1") {
-
-                    let ratio = Number(M.config.settings.image.tiefseeviewBigimgscaleRatio);
-                    if (isNaN(ratio)) { ratio = 0.8; }
-                    if (ratio > 0.95) { ratio = 0.95; }
-                    if (ratio < 0.5) { ratio = 0.5; }
-
-                    //設定縮放的比例
-                    let arUrl: { scale: number, url: string }[] = [];
-                    arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
-
-                    for (let i = 1; i <= 30; i++) {
-                        let scale = Number(Math.pow(ratio, i).toFixed(3));
-                        if (imgInitInfo.width * scale < 300 || imgInitInfo.height * scale < 300) { //如果圖片太小就不處理
-                            break;
-                        }
-                        let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
-                        arUrl.push({ scale: scale, url: imgU })
-                    }
-
-                    //縮放方式與對齊方式
-                    let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
-                    let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
-                    if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
-
-                    await tiefseeview.loadBigimgscale(
-                        arUrl,
-                        imgInitInfo.width, imgInitInfo.height,
-                        _zoomType, _zoomVal
-                    );
-
-                } else { //載入失敗就顯示圖示
-
-                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
-                    await tiefseeview.loadImg(imgurl);
-
-                }
-
-            } else { //使用<canvas>直接開啟網址
-
-                imgurl = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
-                let loadOk = await tiefseeview.preloadImg(imgurl); //預載入
-                if (loadOk) {
-                    await tiefseeview.loadBigimg(imgurl); //使用<canvas>渲染
-                } else { //載入失敗就顯示圖示
-                    imgurl = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
-                    await tiefseeview.loadImg(imgurl);
-                }
-
-            }*/
 
             initTiefseeview(fileInfo2);
             isLoaded = true;
@@ -547,7 +446,7 @@ class FileShow {
             M.fileLoad.setGroupType(GroupType.none);
             setShowType(GroupType.none); //改變顯示類型
             M.fileLoad.stopFileWatcher();
-            
+
             tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
             let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`); //圖片長寬
             let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`); //檔案類型

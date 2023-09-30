@@ -357,6 +357,7 @@ class ScriptImg {
         let width = -1;
         let height = -1;
         let isAnimation = Lib.IsAnimation(fileInfo2); //判斷是否為動圖
+        let isFail = false; // true表示圖片載入失敗，回傳 icon
 
         if (isAnimation) {
 
@@ -406,6 +407,8 @@ class ScriptImg {
         }
 
         if (width === -1) {
+            isFail = true;
+            
             let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
             width = 256;
             height = 256;
@@ -419,6 +422,7 @@ class ScriptImg {
             height: height,
             configItem: configItem,
             arUrl: arUrl,
+            isFail: isFail
         }
     }
 
@@ -631,6 +635,8 @@ class ScriptFileLoad {
 
     /** 重新載入 檔案+檔案預覽面板+資料夾預覽面板 */
     public async reloadAll() {
+        this.M.msgbox.closeAll();
+        this.M.menu.close();
         await this.M.fileLoad.loadFile(this.M.fileLoad.getFilePath());
         await this.reloadDirPanel();
     }

@@ -36,6 +36,35 @@ namespace Tiefsee {
 
 
         /// <summary>
+        /// 檢查檔案是否為二進制檔
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="requiredConsecutiveNul"></param>
+        /// <returns></returns>
+        public bool IsBinary(string filePath, int requiredConsecutiveNul = 1) {
+            const int charsToCheck = 8000;
+            const char nulChar = '\0';
+            int nulCount = 0;
+            using (var streamReader = new StreamReader(filePath)) {
+                for (var i = 0; i < charsToCheck; i++) {
+                    if (streamReader.EndOfStream)
+                        return false;
+
+                    if ((char)streamReader.Read() == nulChar) {
+                        nulCount++;
+
+                        if (nulCount >= requiredConsecutiveNul)
+                            return true;
+                    } else {
+                        nulCount = 0;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        /// <summary>
         /// 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑
         /// </summary>
         /// <param name="base64"></param>
@@ -202,7 +231,7 @@ namespace Tiefsee {
             try {
 
                 if (path == Path.GetFullPath(path)) { //如果是一般路徑
-                    
+
                     //有縮圖(不支援長路經)
                     var dataObject = DataObjectUtilities.GetFileDataObject(path);
                     int size = 92;

@@ -359,6 +359,19 @@ class WebAPI {
         return json as { path: string, text: string | null }[];
     }
 
+
+    /**
+     * 檢查檔案是否為二進制檔
+     */
+    static async isBinary(fileInfo2: FileInfo2) {
+        let path = fileInfo2.Path;
+        let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        let encodePath = encodeURIComponent(path);
+        let url = APIURL + `/api/isBinary?path=${encodePath}&${fileTime}`;
+        let ret = await Lib.sendGet("text", url);
+        return ret === "True";
+    }
+
 }
 
 

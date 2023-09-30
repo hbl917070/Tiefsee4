@@ -30,6 +30,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getFileInfo2List", getFileInfo2List);
             webServer.RouteAdd("/api/getUwpList", getUwpList);
             webServer.RouteAdd("/api/getRelatedFileList", getRelatedFileList);
+            webServer.RouteAdd("/api/isBinary", IsBinary);
 
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
@@ -475,7 +476,7 @@ namespace Tiefsee {
             /*FileInfo[] files = directoryInfo.GetFiles()
                 .Where(file => file.Name != fileInfo.Name && Path.GetFileNameWithoutExtension(file.Name) == fileNameWithoutExtension)
                 .ToArray();*/
-      
+
             string fileNamePrefix = fileInfo.Name.Split('.')[0]; // 取得檔名中第一個「.」前面的部分
             // 取得與該檔案相同檔名但不同副檔名的所有檔案陣列
             FileInfo[] files = directoryInfo.GetFiles()
@@ -502,6 +503,16 @@ namespace Tiefsee {
         }
 
 
+        /// <summary>
+        /// 檢查檔案是否為二進制檔
+        /// </summary>
+        private void IsBinary(RequestData d) {
+            string path = d.args["path"];
+            path = Uri.UnescapeDataString(path);
+            var wv = new WV_File();
+            var ret = wv.IsBinary(path).ToString();
+            WriteString(d, ret); //回傳
+        }
 
 
         /// <summary>
