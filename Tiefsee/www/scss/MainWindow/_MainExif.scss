@@ -103,7 +103,7 @@
     .mainExifRelatedTitle {
       color: var(--color-blue);
 
-      height: 35px;
+      //height: 35px;
       border: 1px solid var(--color-blue40);
       border-radius: 8px;
       padding: 5px;
@@ -119,18 +119,26 @@
       position: relative;
       user-select: none;
 
+      word-wrap: break-word;
+      word-break: break-all;
+
       span {
-        position: absolute;
-        left: 30px;
+        //position: absolute;
+        margin-left: 25px;
         pointer-events: none;
         flex: 1;
       }
     }
+
     //標題右邊的按鈕
+    .mainExifRelatedTitleBtnList {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      bottom: 0;
+      display: flex;
+    }
     .mainExifRelatedTitleBtn {
-      //position: absolute;
-      //top: 0;
-      //right: -5px;
       width: 24px;
       height: 24px;
       background-color: var(--color-black80);
@@ -142,6 +150,7 @@
       opacity: 0;
       transition: 0s opacity;
       z-index: 1;
+
       //移入按鈕時，顯示按鈕
       &:hover {
         cursor: pointer;
@@ -193,6 +202,9 @@
         span {
           color: var(--color-white);
           margin: 0 5px;
+
+          word-wrap: break-word;
+          word-break: break-all;
 
           //行數太多時結尾以...呈現
           overflow: hidden;
@@ -317,7 +329,7 @@
     right: -5px;
     display: flex;
     flex-direction: row;
-    
+
     .btn {
       width: 24px;
       height: 24px;
@@ -343,11 +355,10 @@
     }
   }
   // 移入整個項目時，顯示半透明的按鈕
-  .mainExifItem:hover .mainExifBtns .btn{
+  .mainExifItem:hover .mainExifBtns .btn {
     opacity: 0.3;
     transition: 0.3s opacity;
   }
-
 }
 
 //寬度足夠時，橫向排列
