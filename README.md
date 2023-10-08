@@ -1,97 +1,90 @@
-﻿# Tiefsee4
+﻿English | [中文](README.zh_TW.md)
 
-Tiefsee 是一款開源的圖片檢視器
+# Tiefsee4
 
-特點功能：
-- 支援多種特殊圖片格式：svg、webp、webm、psd、clip、heic、avif、qoi ...
-- 快速啟動：只要 Tiefsee 尚未完全關閉，就能快速開啟 Tiefsee
-- 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
-- 開啟網頁圖片：可將瀏覽器上的圖片直接拖曳進 Tiefsee 來進行開啟
-- 線上搜圖：支援 sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing
-- 檔案預覽面板：預覽同資料夾內的圖片
-- 資料夾預覽面板：顯示資料夾列表，並預覽資料夾內的圖片
-- 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數(A1111, NovelAI, ComfyUI, InvokeAI)
-- 大量瀏覽模式：一次載入多張圖片，以垂直捲動的方式查看圖片
-- QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
-- 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器
+> An open-source image viewer for Windows with powerful features and ease of use
 
-界面語言：
+Special features:
+ - Quick start: Tiefsee can be opened quickly as long as Tiefsee is not completely closed.
+ - Quick Drag File: Drag and drop pictures directly to other programs for opening or uploading.
+ - Open Web Image: You can drag and drop images from your browser directly into Tiefsee to open it.
+ - Online image search: support sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing.
+ - File Panel: Preview the pictures in the same folder.
+ - Directory Panel: Show the list of folders and preview the pictures in the folders.
+ - Information Panel: EXIF information, location where the picture was taken, AI drawing prompt (A1111, NovelAI, ComfyUI, InvokeAI).
+ - Bulk View：Load multiple pictures at once and view them in a vertical scrolling manner.
+ - QuickLook: Long press on the spacebar to preview the file selected on the desktop or in the folder.
+ - Other additional features: PDF reader, MD editor, text file editor, docx and pptx readers.
+
+Supported Languages:
 - English
 - 中文
 - 日本語
 
 <br>
 
-官網：  
-[https://hbl917070.github.io/aeropic/](https://hbl917070.github.io/aeropic/)
-
+Website:<br>
+[https://hbl917070.github.io/aeropic/en/](https://hbl917070.github.io/aeropic/en/)
 
 <br>
 
-## 下載
+## Download
 
-當前版本：Tiefsee 4.1.4
+### Current version：Tiefsee 4.1.4
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
-	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/>
-</a>
+	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
 
- - 下載 [免安裝版](https://github.com/hbl917070/Tiefsee4/releases)
+ - Download [Portable version](https://github.com/hbl917070/Tiefsee4/releases)
 
-<br>
-
-## 運行需求
-- x64
-- Windows 10 或 Windows 11
+## System requirements
+64-bit Windows 10 or Windows 11
 
 <br>
 
+## Screenshot
 
-## 程式截圖
-![](https://cdn.discordapp.com/attachments/896768892003823627/1113369753160011826/2023-05-29_22-46-03.png)
+![](https://hbl917070.github.io/aeropic/img/index/windowTheme.jpg)
 
-![](https://cdn.discordapp.com/attachments/896768892003823627/1079441646439104532/GIF_2023-2-26_11-04-49.gif)
+![](https://hbl917070.github.io/aeropic/img/index/filePanel.jpg)
 
-![](https://cdn.discordapp.com/attachments/896768892003823627/1102959644990767144/ezgif-3-9a6f5460a7.webp)
+![](https://hbl917070.github.io/aeropic/img/index/bulkView.webp)
 
-![](https://cdn.discordapp.com/attachments/896768892003823627/1113369952985022544/2023-05-29_22-07-57.png)
-
-
+![](https://hbl917070.github.io/aeropic/img/index/openWebImage.webp)
 
 <br>
 
-## 常見問題
+## FAQ
 
-### 1、商店版與免安裝版有什麼差異
+### 1、What is the difference between the Store and Portable versions?
 
- - 商店版與免安裝版功能上沒有差異
- - 商店版可以透過商店來進行更新，且刪除 Tiefsee 後不會留下任何資料
- - 免安裝版需要安裝 [.NET Desktop Runtime 7 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) 才能運行
- - 免安裝版可以使用「便攜模式」 ，在 Tiefsee.exe 旁邊新建一個`portableMode`資料夾，資料就都會儲存在裡面
+ - There is no functional difference between the Store and Portable versions
+ - The Store version can be updated through the store and will not leave any data after Tiefsee is deleted
+ - The Portable version requires the installation of [.NET Desktop Runtime 7 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) to run
+ - The Portable version can use 'portable mode' by creating a `portableMode` folder next to Tiefsee.exe, and all data will be stored inside
 
-沒有特別需求的話，我推薦使用商店版
+> If there are no special requirements, it is recommended to use the Store version
 
-### 2、為什麼商店版比免安裝版還要大
-商店版在編譯的時候會把 NET 的執行環境整個打包進程式裡面，微軟目前尚未提出有效的解決方案。
+### 2、Why is the Store version larger than the Portable version?
+The Store version packages the entire .NET runtime environment into the program during compilation, and Microsoft has not yet proposed an effective solution
 
-### 3、啟動程式時顯示「WebView2 must be installed to run this application」
- 可能的原因如下
- - 電腦尚未安裝 WebView2：「<a href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">點此</a>」進行下載。
- - 已經安裝 WebView2 但安裝失敗：移除舊的 WebView2 後，對「WebView2 的安裝檔」右鍵→系統管理員身份執行。
- - WebView2 初始化錯誤：避免在 Tiefsee 的路徑裡面包含中文日文韓文之類的特殊字元。
+### 3、Program displays `WebView2 must be installed to run this application` when starting
+Possible reasons are:
+ - WebView2 is not installed on the computer:「<a href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">Click here</a>」 to download
+ - WebView2 is installed but failed to install: Remove the old WebView2, then right-click on 'WebView2 installer' and run as administrator
+ - WebView2 initialization error: Avoid special characters such as Chinese, Japanese, and Korean in the Tiefsee path
 
-### 4、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
- 毛玻璃視窗效果並非 Windows 正式公開的 API，這項功能在某些裝置上可能存在 BUG，或是無法使用。常見的問題為：
- - 模糊區域溢出到視窗外
- - Tiefsee 的視窗在移動時嚴重延遲
-
+### 4、Abnormalities occur after using frosted glass (AERO, Acrylic) window effects
+The frosted glass window effect is not an officially released API of Windows. This feature may have bugs or be unusable on some devices. Common problems include:
+ - The blurred area overflows outside the window
+ - Tiefsee's window is severely delayed when moving
 
 <br>
 
-# 專案說明
-- 專案類型：C# WinForm (net 7)
-- 開發語言：C#、TypeScript
-- [專案建立步驟](/Building.md)
+# Project Description
+- Project Type: C# WinForm (net 7)
+- Development Language：C#、TypeScript
+- [Project Build Steps](Building.md)
 
 <br>
 
@@ -100,9 +93,3 @@ Tiefsee 是一款開源的圖片檢視器
 The Tiefsee4 project is open source under the [MIT license](/LICENSE).<br>
 However, the extensions that are installed separately are not part of the Tiefsee4 project.<br>
 They all have their own licenses!
-
-<br>
-
-Tiefsee4 的原始碼以[MIT授權](/LICENSE)形式開源，<br>
-但另外安裝那些的擴充套件，並不屬於 Tiefsee4 專案的一部分，<br>
-他們都有各自的授權條款！
