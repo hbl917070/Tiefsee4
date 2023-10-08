@@ -10,7 +10,7 @@ Tiefsee 是一款開源的圖片檢視器
 - 線上搜圖：支援 sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing
 - 檔案預覽面板：預覽同資料夾內的圖片
 - 資料夾預覽面板：顯示資料夾列表，並預覽資料夾內的圖片
-- 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數
+- 詳細資料面板：EXIF資訊、圖片拍攝地點、AI繪圖參數(A1111, NovelAI, ComfyUI, InvokeAI)
 - 大量瀏覽模式：一次載入多張圖片，以垂直捲動的方式查看圖片
 - QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
 - 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器
@@ -30,7 +30,7 @@ Tiefsee 是一款開源的圖片檢視器
 
 ## 下載
 
-當前版本：Tiefsee 4.1.3
+當前版本：Tiefsee 4.1.4
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/>

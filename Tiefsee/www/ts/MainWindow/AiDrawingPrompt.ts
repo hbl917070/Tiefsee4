@@ -67,12 +67,11 @@ class AiDrawingPrompt {
 					if (title === "Lora hashes" || title === "TI hashes") {
 						text = text.replace(/[,][ ]/g, `, \n`);
 					}
-					if (title === "ControlNet 0" || title === "ControlNet 1" || title === "ControlNet 2") {
+					if (title === "ControlNet" || title === "ControlNet 0" || title === "ControlNet 1" || title === "ControlNet 2") {
 						let lines = text.split(/,(?![^()]*\))(?![^\[\]]*\])(?![^{}]*})(?![^"]*")/).map(line => line.trim());
 						text = lines.join(", \n");
 					}
 				}
-
 
 				result.push({ title: title, text: text });
 			}
@@ -302,14 +301,14 @@ class AiDrawingPrompt {
 					let model = getModel(getKey(mianInputs.model), ["model"]);
 					let size = getSize(getKey(mianInputs.latent_image));
 
-					let prompt = getPrompt(getKey(mianInputs.positive), ["positive", "text"]);
+					let prompt = getPrompt(getKey(mianInputs.positive), ["positive", "text", "conditioning"]);
 					if (prompt == _prompt) { //如果已經加入過相同的提示詞，則略過
 						prompt = undefined;
 					} else {
 						_prompt = prompt;
 					}
 
-					let negativePrompt = getPrompt(getKey(mianInputs.negative), ["negative", "text"]);
+					let negativePrompt = getPrompt(getKey(mianInputs.negative), ["negative", "text", "conditioning"]);
 					if (negativePrompt == _negativePrompt) {
 						negativePrompt = undefined;
 					} else {

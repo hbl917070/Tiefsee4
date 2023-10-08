@@ -272,8 +272,9 @@ class MainExif {
 							</div>
 						</div>`;
 					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
-
-				} else if (name === "User Comment" && value.indexOf("Steps: ") !== -1 && value.indexOf("Seed: ") !== -1) { // Stable Diffusion webui 輸出的jpg或webp
+					
+				} else if ((name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") 
+						&& value.includes("Steps: ") && value.includes("Seed: ")) { // Stable Diffusion webui 輸出的jpg或webp
 
 					ar.push({
 						group: "PNG-tEXt",
@@ -296,7 +297,7 @@ class MainExif {
 							val = val.substring(x + 1).trim();
 
 							if (name === "Comment") { // NovelAI 才有的欄位
-								if (val.indexOf(`"steps": `) !== -1) {
+								if (val.includes(`"steps": `)) {
 									AiDrawingPrompt.getNovelai(val).forEach(item => {
 										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
@@ -505,9 +506,12 @@ class MainExif {
 			let domTitle = Lib.newDom(`
 				<div class="mainExifRelatedTitle collapse-title">
 					<span>${Lib.escape(title)}</span>
+					<div class="mainExifRelatedTitleBtnList"></div>
 				</div>
 			`);
 			domBox.appendChild(domTitle);
+
+			let btnList = domTitle.querySelector(".mainExifRelatedTitleBtnList") as HTMLElement;
 
 			// 內容物件
 			let domContent: HTMLElement;
@@ -518,8 +522,8 @@ class MainExif {
 				if (title.toLowerCase().endsWith(".txt")
 					&&
 					(
-						text.indexOf("Negative prompt: ") !== -1 //負面提示
-						|| text.indexOf("Steps: ") !== -1 //其他參數
+						text.includes("Negative prompt: ")  //負面提示
+						|| text.includes("Steps: ") //其他參數
 					)
 				) { //如果是 SDwebUI 的 info
 
@@ -552,7 +556,7 @@ class MainExif {
 						let modelId = civitaiInfo.modelId;
 						if (modelId !== undefined) {
 							let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
-							domTitle.appendChild(btnCivitai);
+							btnList.appendChild(btnCivitai);
 							btnCivitai.addEventListener("click", async () => {
 								let url = "https://civitai.com/models/" + modelId;
 								WV_RunApp.OpenUrl(url);
@@ -563,7 +567,7 @@ class MainExif {
 
 				//按鈕 - 編輯
 				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
-				domTitle.appendChild(btnEdit);
+				btnList.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
 					M.textEditor.setOnSave(async (t: string) => { //儲存時更新面板裡面的文字
@@ -575,7 +579,7 @@ class MainExif {
 
 				//按鈕 - 複製
 				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>`)
-				domTitle.appendChild(btnCoyp);
+				btnList.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
 					await WV_System.SetClipboard_Txt(itemText ?? "");
 					Toast.show(M.i18n.t("msg.copyExif", { v: title }), 1000 * 3); //已將「.txt」複製至剪貼簿

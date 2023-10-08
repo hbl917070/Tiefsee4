@@ -755,7 +755,7 @@ class MainWindow {
         /** 
          * 初始 載入檔案
          */
-        function initLoad(args: string[]) {
+        async function initLoad(args: string[]) {
             msgbox.closeAll(); //關閉所有訊息視窗
             menu.close();
 
@@ -773,7 +773,7 @@ class MainWindow {
                 if (args[0] === "") {
                     fileShow.openWelcome();
                 } else {
-                    fileLoad.loadFile(args[0]); //載入單張圖片
+                    await fileLoad.loadFile(args[0]); //載入單張圖片
                 }
 
             } else {
@@ -782,11 +782,15 @@ class MainWindow {
                     arFile.push(Lib.GetFileName(args[i]));
                 }
                 let dirPath = Lib.GetDirectoryName(args[0]);
-                if (dirPath != null) {
-                    fileLoad.loadFiles(dirPath, arFile); //載入多張圖片
+                if (dirPath !== null) {
+                    await fileLoad.loadFiles(dirPath, arFile); //載入多張圖片
                 }
             }
 
+            // 在圖片載入完成後，更新「用其他APP開啟檔案」的列表
+            setTimeout(() => {
+                mainMenu.updateOtherAppList(undefined);
+            }, 1000 * 2);
         }
 
 

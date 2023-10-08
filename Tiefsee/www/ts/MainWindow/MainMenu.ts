@@ -381,9 +381,11 @@ class MainMenu {
         /**
          * 更新「用其他APP開啟檔案」的列表，於開啟選單時呼叫
          */
-        async function updateOtherAppList(path: string) {
+        async function updateOtherAppList(path: string | undefined) {
 
             await initOtherAppList();
+            
+            if (path === undefined) { return; }
 
             _otherAppList.forEach(item => {
                 let fileExt = Lib.GetExtension(path).replace(".", ""); //取得副檔名

@@ -101,10 +101,7 @@
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-x86" />
 		<Delete Files="$(OutputPath)\Tiefsee.pdb" />
 
-		<ZipDirectory
-			Overwrite="true"
-			SourceDirectory="$(OutputPath)"
-			DestinationFile="$(MSBuildProjectDirectory)\Tiefsee.zip" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(OutputPath)" DestinationFile="$(MSBuildProjectDirectory)\Tiefsee.zip" />
 	</Target>
 
 </Project>

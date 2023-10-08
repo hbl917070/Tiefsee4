@@ -480,7 +480,10 @@ class FileLoad {
             } else if (fileInfo2.Type === "file") { //如果是檔案
 
                 let _dirPath = Lib.GetDirectoryName(path); //取得檔案所在的資料夾路徑
-                if (_dirPath === null) { return; }
+                if (_dirPath === null) {
+                    isLoadFileFinish = true;
+                    return;
+                }
                 dirPathNow = _dirPath;
                 groupType = fileToGroupType(fileInfo2);
                 atLoadingGroupType = groupType;
@@ -507,6 +510,7 @@ class FileLoad {
             } else { //不存在
 
                 M.fileShow.openWelcome();
+                isLoadFileFinish = true;
                 return;
 
             }
