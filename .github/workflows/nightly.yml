@@ -1,8 +1,11 @@
 name: Nightly Release
 
 on:
-  schedule:
-    - cron: '00 16 * * *' # GitHub Actions use UTC time
+  push:
+    paths:
+      - '**' # 當任何檔案被修改時觸發
+  #schedule:
+  #  - cron: '00 16 * * *' # GitHub Actions use UTC time
 
 jobs:
   check:

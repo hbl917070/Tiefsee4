@@ -18,18 +18,18 @@ jobs:
       uses: magnetikonline/action-node-modules-cache@v1
       with:
         node-version: 18.x
-        node-modules-path: Tiefsee/www/node_modules
-        package-lock-path: Tiefsee/www/package-lock.json
+        node-modules-path: Www/node_modules
+        package-lock-path: Www/package-lock.json
 
     - name: Install Node.js dependencies
       if: steps.node-with-cache.outputs.cache-hit != 'true'
       run: |
-        cd Tiefsee/www
+        cd Www
         npm ci
 
     - name: Gulp build Tiefsee
       run: |
-        cd Tiefsee/www
+        cd Www
         gulp build
      
     - name: Setup MSBuild Path
