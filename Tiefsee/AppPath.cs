@@ -70,12 +70,12 @@ namespace Tiefsee {
             tempDirWebFile = Path.Combine(downloadsPath, "Tiefsee");
             //tempDirWebFile = Path.Combine(Path.GetTempPath(), "Tiefsee\\WebFile");
 
-            logoIcon = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "www/img/logo.ico");
+            logoIcon = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www\\img\\logo.ico");
 
             //------
 
             //把Tiefsee4資料夾轉移成Tiefsee
-            string appData_old = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
+            /*string appData_old = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee4");
             if (Directory.Exists(appData) == false && Directory.Exists(appData_old) == true) {
                 try {
                     Directory.Move(appData_old, appData);
@@ -94,7 +94,7 @@ namespace Tiefsee {
                 try {
                     Directory.Delete(imgScale, true);
                 } catch { }
-            }
+            }*/
 
             //------
 

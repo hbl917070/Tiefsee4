@@ -643,10 +643,10 @@ namespace Tiefsee {
             String exeDir = System.AppDomain.CurrentDomain.BaseDirectory; //程式的目錄
 
             String path;
-            if (d.value.IndexOf("www/") == 0) {
+            if (d.value.StartsWith("Www/", StringComparison.OrdinalIgnoreCase)) {
                 path = System.IO.Path.Combine(exeDir, d.value);
             } else {
-                path = System.IO.Path.Combine(exeDir, "www", d.value);
+                path = System.IO.Path.Combine(exeDir, "Www", d.value);
             }
 
             //如果檔案不存在就返回404錯誤

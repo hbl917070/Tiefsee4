@@ -6,11 +6,13 @@
 /Tiefsee/obj
 /Tiefsee/bin
 
-/Tiefsee/www/node_modules
-/Tiefsee/www/js
-/Tiefsee/www/css
-/Tiefsee/www/MainWindow.html
-/Tiefsee/www/SettingWindow.html
+/Www/node_modules
+/Www/js
+/Www/css
+/Www/obj
+/Www/MainWindow.html
+/Www/SettingWindow.html
+/Www/package-lock.json
 
 /TiefseeAppPackager/Package.StoreAssociation.xml
 /TiefseeAppPackager/obj
@@ -18,6 +20,7 @@
 /TiefseeAppPackager/AppPackages
 /TiefseeAppPackager/TiefseeAppPackager.assets.cache
 /TiefseeAppPackager/BundleArtifacts
+
 
 
 

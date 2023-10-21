@@ -133,7 +133,7 @@ class MainWindow {
 
             //設定icon
             async function initIcon() {
-                let path = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
+                let path = Lib.Combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
                 WV_Window.SetIcon(path);
             }
             initIcon();

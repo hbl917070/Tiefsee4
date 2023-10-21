@@ -55,7 +55,7 @@ class SettingWindow {
             await WV_Window.ShowWindowAtCenter(600 * window.devicePixelRatio, 450 * window.devicePixelRatio); //顯示視窗 
             WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio); //設定視窗最小size
             WV_Window.Text = "Setting";
-            let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "www\\img\\logo.ico"]);
+            let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
             WV_Window.SetIcon(iconPath);
 
             //如果是商店APP版，就隱藏某些區塊
@@ -1034,7 +1034,7 @@ class SettingWindow {
             //開啟 www(原始碼)
             btn_openWww.addEventListener("click", async () => {
                 let path = await WV_Window.GetAppDirPath();
-                path = Lib.Combine([path, "www"]);
+                path = Lib.Combine([path, "Www"]);
                 WV_RunApp.OpenUrl(path);
             });
 

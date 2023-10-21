@@ -11,7 +11,7 @@ const newer = require("gulp-newer");
 const fc2json = require("gulp-file-contents-to-json"); //處理svg
 const jsonTransform = require("gulp-json-transform"); //處理svg
 
-const output2 = "./../bin/x64/Debug/net7.0-windows10.0.17763.0/www"; //把打包後的檔案也複製到開發資料夾 (用於方便測試)
+const output2 = "./../Tiefsee/bin/x64/Debug/net7.0-windows10.0.17763.0/Www"; //把打包後的檔案也複製到開發資料夾 (用於方便測試)
 
 //資料夾內的所有svg 封裝成一個 js
 gulp.task("svg", async () => {
@@ -90,14 +90,19 @@ gulp.task("ts", async () => {
 gulp.task("copy-files", async () => {
     await sleep(1);
     return gulp
-        .src(["./**/**", "!./node_modules/**", "!./scss/**", "!./ts/**", "!./ejs/**", "!./img/default/**"])
-        // ↑↑↑ 使用 "!" 前綴符號來排除指定的目錄
+        .src([
+            "./**/**",
+            "!./node_modules/**", "!./scss/**", "!./ts/**", "!./ejs/**", "!./img/default/**", "!./img/.vscode/**",
+            "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
+            "!./Www.esproj", "!./Www.esproj.user"
+        ])
+        // ↑↑↑ 使用 "!" 前綴符號來排除指定的檔案跟目錄
         .pipe(newer(output2)) // 使用 gulp-newer 檢查目標資料夾中的檔案是否已更新
         .pipe(gulp.dest(output2))
 });
 
 // 打包 - 單次
-gulp.task("build", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting"));
+gulp.task("build", gulp.series("copy-files", "scss", "ts", "svg", "ejs-main", "ejs-setting"));
 
 // 打包 - 持續監控檔案變化
 gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", () => {

@@ -179,7 +179,7 @@ class BaseWindow {
      * @returns 
      */
     public async newWindow(_name: string) {
-        //let url = location.protocol + '//' + location.host + "/www/" + _name
+        //let url = location.protocol + '//' + location.host + "/Www/" + _name
         let url = _name
         //var w = await WV_Window.NewWindow(url, []);
         //WV_Window.SetOwner(w); //設為子視窗

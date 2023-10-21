@@ -104,14 +104,14 @@ The frosted glass window effect is not an officially released API of Windows. Th
 
 <br>
 
-# Project Description
+## Project Description
 - Project Type: C# WinForm (net 7)
 - Development Language：C#、TypeScript
 - [Project Build Steps](Building.md)
 
 <br>
 
-# Licenses
+## Licenses
 
 The Tiefsee4 project is open source under the [MIT license](/LICENSE).<br>
 However, the extensions that are installed separately are not part of the Tiefsee4 project.<br>

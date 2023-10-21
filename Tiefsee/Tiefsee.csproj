@@ -75,18 +75,29 @@
 
 	<!-- 編譯時複製這些資料夾 -->
 	<ItemGroup>
-		<Content Include="data\**">
+		<Content Include="Data\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-		<Content Include="www\**">
+		<Content Include="..\Www\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Link>Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Content>
-		<Content Remove="www\node_modules\**" />
-		<Content Remove="www\ejs\**" />
-		<Content Remove="www\ts\**" />
-		<Content Remove="www\scss\**" />
+		<Content Remove="..\Www\node_modules\**" />
+		<Content Remove="..\Www\ejs\**" />
+		<Content Remove="..\Www\ts\**" />
+		<Content Remove="..\Www\scss\**" />
+		<Content Remove="..\Www\.vscode\**" />
+
+		<Content Remove="..\Www\package-lock.json" />
+		<Content Remove="..\Www\.eslintrc.json" />
+		<Content Remove="..\Www\Www.esproj" />
+		<Content Remove="..\Www\Www.esproj.user" />
+		<Content Remove="..\Www\gulpfile.js" />
+		<Content Remove="..\Www\package.json" />
+		<Content Remove="..\Www\tsconfig.json" />
+		<Content Remove="..\Www\nuget.config" />
 	</ItemGroup>
 
 	<!-- Generate zip file after build -->

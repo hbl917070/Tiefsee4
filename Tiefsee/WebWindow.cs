@@ -47,7 +47,7 @@ namespace Tiefsee {
         public static WebWindow Create(String _url, string[] _args, WebWindow _parentWindow) {
 
             //如果開啟非mainwindow的window
-            if (_url.IndexOf("MainWindow.html") == -1) { //$"http://localhost:{Program.bserver.port}/www/MainWindow.html"
+            if (_url.IndexOf("MainWindow.html") == -1) { //$"http://localhost:{Program.bserver.port}/Www/MainWindow.html"
                 var ww = new WebWindow();
                 ww.isDelayInit = false;
                 ww.Init();
