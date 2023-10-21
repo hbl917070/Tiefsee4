@@ -191,7 +191,7 @@ namespace Tiefsee {
         /// </summary>
         private static string GetHtmlFilePath(string fileName) {
             string p = "file:///" + Path.Combine(
-                          System.AppDomain.CurrentDomain.BaseDirectory, "www", fileName
+                          System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName
                        ) + "#" + Program.webServer.port; // post 用於讓 js 識別 webAPI 的網址
             return p;
         }

@@ -238,7 +238,7 @@ class BulkView {
             apply();
 
             if (svgIndentation === "" && baseWindow.appInfo !== undefined) {
-                svgIndentation = Lib.Combine([baseWindow.appInfo.appDirPath, "\\www\\img\\indentation.svg"]);
+                svgIndentation = Lib.Combine([baseWindow.appInfo.appDirPath, "\\Www\\img\\indentation.svg"]);
             }
         }
 
