@@ -355,11 +355,9 @@ namespace Tiefsee {
 
             bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304) { return; }
-
-            string ret = "";
-            using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
-                ret = sr.ReadToEnd();
-            }
+ 
+            var wvFile = new WV_File();
+            string ret = wvFile.GetText(path);          
 
             WriteString(d, ret);
         }

@@ -324,11 +324,14 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public String GetText(string path) {
-            String s;
+            /*String s;
             using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
                 s = sr.ReadToEnd();
             }
-            return s;
+            return s;*/
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
         }
 
 
