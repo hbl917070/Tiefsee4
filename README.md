@@ -9,18 +9,10 @@ Tiefsee
 </h1>
 
 <p align="center">
-<a style="text-decoration:none" target="_blank" href="https://github.com/hbl917070/Tiefsee4/blob/master/LICENSE">
-	<img alt="GitHub" src="https://img.shields.io/github/license/hbl917070/Tiefsee4?style=for-the-badge">
-</a>
-<a style="text-decoration:none" target="_blank" href="https://github.com/hbl917070/Tiefsee4/releases">
-	<img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/hbl917070/Tiefsee4?style=for-the-badge">
-</a>
-<a style="text-decoration:none" target="_blank" href="https://github.com/hbl917070/Tiefsee4/releases">
-	<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/hbl917070/Tiefsee4/total?style=for-the-badge">
-</a>
-<a style="text-decoration:none" target="_blank" href="https://github.com/hbl917070/Tiefsee4/commits/master">
-	<img alt="GitHub last commit (branch)" src="https://img.shields.io/github/last-commit/hbl917070/TIefsee4/master?style=for-the-badge">
-</a>
+<a target="_blank" href="https://github.com/hbl917070/Tiefsee4/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/hbl917070/Tiefsee4?style=for-the-badge"></a>
+<a target="_blank" href="https://github.com/hbl917070/Tiefsee4/releases"><img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/hbl917070/Tiefsee4?style=for-the-badge"></a>
+<a target="_blank" href="https://github.com/hbl917070/Tiefsee4/releases"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/hbl917070/Tiefsee4/total?style=for-the-badge"></a>
+<a target="_blank" href="https://github.com/hbl917070/Tiefsee4/commits/master"><img alt="GitHub last commit (branch)" src="https://img.shields.io/github/last-commit/hbl917070/TIefsee4/master?style=for-the-badge"></a>
 </p>
 
 <p align="center">
