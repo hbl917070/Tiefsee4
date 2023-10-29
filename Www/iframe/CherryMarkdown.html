@@ -33,7 +33,6 @@
 
     <div id="markdown-container"></div>
 
-
     <link rel="stylesheet" href="./../vender/cherry-markdown/cherry-markdown.min.css">
     <script src="./../vender/cherry-markdown/tex-svg.js"></script>
     <script src="./../vender/cherry-markdown/cherry-markdown.min.js"></script>
@@ -293,6 +292,7 @@
          */
         function setRoot(path) {
             _root = path;
+            document.querySelector("#root").href = path;
         }
 
         function getRoot() {
