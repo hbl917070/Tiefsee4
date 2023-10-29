@@ -125,7 +125,7 @@ namespace Tiefsee {
         }
         public FileInfo2 _GetFileInfo2(string path) {
 
-            FileInfo2 info = new FileInfo2();
+            FileInfo2 info = new();
             info.Path = Path.GetFullPath(path);
 
             if (File.Exists(path)) {
@@ -135,19 +135,28 @@ namespace Tiefsee {
                 info.CreationTimeUtc = GetCreationTimeUtc(path);
                 info.LastWriteTimeUtc = GetLastWriteTimeUtc(path);
 
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 try {
-                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                        using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs)) {
-                            for (int i = 0; i < 100; i++) {
-                                string hexValue = br.ReadByte().ToString("X2");
-                                sb.Append(hexValue + " ");
-                            }
-                            if (fs != null) {
-                                fs.Close();
-                                br.Close();
+                    using FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using BinaryReader br = new(fs);
+                    int readLength = 100;
+
+                    for (int i = 0; i < readLength; i++) {
+                        if (fs.Position >= fs.Length) break; // 如果已經讀取到文件的結尾，則跳出循環
+
+                        string hexValue = br.ReadByte().ToString("X2");
+                        sb.Append(hexValue + " ");
+
+                        // 如果是 png，就把 hex 的讀取長度增加，避免 apng 無法辨識
+                        if (i == 7) {
+                            if (sb.ToString() == "89 50 4E 47 0D 0A 1A 0A ") {
+                                readLength = 2000;
                             }
                         }
+                    }
+                    if (fs != null) {
+                        fs.Close();
+                        br.Close();
                     }
                 } catch { }
 
