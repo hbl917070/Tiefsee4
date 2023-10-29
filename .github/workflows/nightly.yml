@@ -1,9 +1,11 @@
 name: Nightly Release
 
 on:
-  push:
-    paths:
-      - '**' # 當任何檔案被修改時觸發
+  # 當 Build Tiefsee 工作流程完成時
+  workflow_run:
+    workflows: ["Build Tiefsee"]
+    types:
+      - completed
   #schedule:
   #  - cron: '00 16 * * *' # GitHub Actions use UTC time
 
@@ -41,8 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: nightly
-          name: 'Tiefsee Nightly Release $$'
+          name: "Tiefsee Nightly Release $$"
           prerelease: true
-          body: 'This is the Nightly version, compiled from the latest code committed to GitHub, and may be unstable.<br>此為 Nightly 版，以 GitHub 最新提交的程式碼編譯而成，可能存在不穩定。'
+          body: "This is the Nightly version, compiled from the latest code committed to GitHub, and may be unstable.<br>此為 Nightly 版，以 GitHub 最新提交的程式碼編譯而成，可能存在不穩定。"
           files: |
             ./Tiefsee/Tiefsee.zip
