@@ -1,7 +1,7 @@
 ﻿﻿[English](README.md) | 中文
 
 <p align="center">
-<img width="120" align="center" src="https://hbl917070.github.io/aeropic/img/tiefseeLogo.png">
+<img width="120" align="center" src="Assets/tiefseeLogo.png">
 </p>
 
 <h1 align="center">
@@ -54,13 +54,13 @@ Tiefsee
  
 <br>
 
-![](https://hbl917070.github.io/aeropic/img/index/windowTheme.jpg)
+![](Assets/windowTheme.jpg)
 
-![](https://hbl917070.github.io/aeropic/img/index/filePanel.jpg)
+![](Assets/filePanel.jpg)
 
-![](https://hbl917070.github.io/aeropic/img/index/bulkView.webp)
+![](Assets/bulkView.webp)
 
-![](https://hbl917070.github.io/aeropic/img/index/openWebImage.webp)
+![](Assets/openWebImage.webp)
 
 <br>
 
@@ -100,7 +100,7 @@ Tiefsee
 ## 專案說明
 - 專案類型：C# WinForm (net 7)
 - 開發語言：C#、TypeScript
-- [專案建立步驟](/Building.md)
+- [專案建立步驟](/Building.zh_TW.md)
 
 <br>
 

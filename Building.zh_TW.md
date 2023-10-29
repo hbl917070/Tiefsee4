@@ -1,3 +1,5 @@
+[English](Building.md) | 中文
+
 # Tiefsee 專案說明
 
 Tiefsee4 裡面包含 3 個專案

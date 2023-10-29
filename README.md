@@ -1,7 +1,7 @@
 ﻿English | [中文](README.zh_TW.md)
 
 <p align="center">
-<img width="120" align="center" src="https://hbl917070.github.io/aeropic/img/tiefseeLogo.png">
+<img width="120" align="center" src="Assets/tiefseeLogo.png">
 </p>
 
 <h1 align="center">
@@ -53,13 +53,13 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
  - Other additional features: PDF reader, MD editor, text file editor, docx and pptx readers.
  - Supported Languages: English、中文、中文
 
-![](https://hbl917070.github.io/aeropic/img/index/windowTheme.jpg)
+![](Assets/windowTheme.jpg)
 
-![](https://hbl917070.github.io/aeropic/img/index/filePanel.jpg)
+![](Assets/filePanel.jpg)
 
-![](https://hbl917070.github.io/aeropic/img/index/bulkView.webp)
+![](Assets/bulkView.webp)
 
-![](https://hbl917070.github.io/aeropic/img/index/openWebImage.webp)
+![](Assets/openWebImage.webp)
 
 <br>
 
