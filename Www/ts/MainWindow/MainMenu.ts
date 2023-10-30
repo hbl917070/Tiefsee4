@@ -384,7 +384,7 @@ class MainMenu {
         async function updateOtherAppList(path: string | undefined) {
 
             await initOtherAppList();
-            
+
             if (path === undefined) { return; }
 
             _otherAppList.forEach(item => {
@@ -404,6 +404,12 @@ class MainMenu {
                         item.isInit = true;
 
                         let imgDom = item.dom.querySelector(".menu-hor-icon img") as HTMLImageElement;
+
+                        // 如果圖示載入失敗，表示是不可用的捷徑
+                        imgDom.onerror = () => {
+                            item.dom.remove();
+                        }
+
                         if (imgDom !== null) {
                             imgDom.src = item.imgUrl;
                         }

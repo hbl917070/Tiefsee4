@@ -79,7 +79,7 @@ class Config {
             { name: /^Firefox$/i, fileExt: ["html", "pdf"] },
             { name: /^Brave$/i, fileExt: ["html", "pdf"] },
 
-            //{ name: /Microsoft Edge/i, fileExt: ["pdf"] }, // 會讀到無法使用的空白UWP連結
+            { name: /Microsoft Edge/i, fileExt: ["pdf", "html"] },
             { name: /Adobe Illustrator/i, fileExt: ["pdf"] },
             { name: /Adobe Acrobat/i, fileExt: ["pdf"] },
             { name: /pdf/i, fileExt: ["pdf"] },
