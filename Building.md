@@ -6,7 +6,7 @@ The Tiefsee4 contains 3 projects
 
 ## Tiefsee
 - The main project, which uses WinForm to host WebView2
-- Project type: .NET Framework 7
+- Project type: .NET 7
 
 <br>
 

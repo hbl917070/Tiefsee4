@@ -6,7 +6,7 @@ Tiefsee4 裡面包含 3 個專案
 
 ## Tiefsee
 - 主專案，以 WinForm 來承載 WebView2
-- 專案類型： .NET Framework 7
+- 專案類型： .NET 7
 
 <br>
 
