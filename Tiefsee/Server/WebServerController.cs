@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Tiefsee {
@@ -700,17 +701,29 @@ namespace Tiefsee {
             if (time >= 31536000) { time = 31536000; } //一年
             CacheTime = time;
         }
-
+        
 
         /// <summary>
         /// 回傳字串
         /// </summary>
         /// <param name="context"></param>
         /// <param name="str"></param>
-        private void WriteString(RequestData d, string str) {
+        private void WriteString(RequestData d, string str) {   
+            d.context.Response.AddHeader("Content-Encoding", "br"); // 告訴瀏覽器使用了Brotli壓縮
             d.context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
-            byte[] _responseArray = Encoding.UTF8.GetBytes(str);
+            byte[] _responseArray = CompressString(str);
             d.context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+        }
+        // 使用 Brotli 壓縮
+        private byte[] CompressString(string text) {
+            var bytes = Encoding.UTF8.GetBytes(text);
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream()) {
+                using (var br = new BrotliStream(mso, CompressionLevel.Fastest)) {
+                    msi.CopyTo(br);
+                }
+                return mso.ToArray();
+            }
         }
 
 
