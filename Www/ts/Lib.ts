@@ -145,8 +145,10 @@ class Lib {
                 return true;
             }
         }
-        if (hex.indexOf("57 45 42 50 56 50 38 58 0A") > 0) { //WEBPVP8X 動圖
-            return true;
+        if (hex.indexOf("57 45 42 50 56 50 38") > 0) { // WEBPVP8
+            if (hex.indexOf("41 4E 49 4D") > 0) { // ANIM
+                return true;
+            }
         }
         return false;
     }
@@ -160,8 +162,8 @@ class Lib {
 
         let fileExt = Lib.GetExtension(fileInfo2.FullPath); //取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
-
         let hex = fileInfo2.HexValue;
+
         if (hex.indexOf("FF D8 FF") === 0) {
             return "jpg";
         }
@@ -178,10 +180,7 @@ class Lib {
                 return "png";
             }
         }
-        if (hex.indexOf("57 45 42 50 56 50 38 58 0A") > 0) { //WEBPVP8X 動圖
-            return "webp";
-        }
-        if (hex.indexOf("57 45 42 50 56 50 38") > 0) { //WEBPVP8 靜態
+        if (hex.indexOf("57 45 42 50 56 50 38") > 0) { //WEBPVP8
             return "webp";
         }
         if (hex.indexOf("6D 69 6D 65 74 79 70 65 61 70 70 6C 69 63 61 74 69 6F 6E 2F 76 6E 64 2E 61 64 6F 62 65 2E 73 70 61 72 6B 6C 65 72 2E 70 72 6F 6A 65 63 74 2B 64 63 78 75 63 66 50 4B") > 0) {

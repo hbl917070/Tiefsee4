@@ -163,11 +163,11 @@ class WebAPI {
         /**
          * 取得圖片網址 (以vips縮放過的圖片)
          */
-        static vipsResize(scale: number, fileInfo2: FileInfo2) {
+        static vipsResize(scale: number, fileInfo2: FileInfo2, type: string) {
             let _path = fileInfo2.Path;
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&${fileTime}`;
+            let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&type=${type}&${fileTime}`;
             return imgU;
         }
 

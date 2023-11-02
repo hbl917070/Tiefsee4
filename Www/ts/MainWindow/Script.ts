@@ -388,7 +388,7 @@ class ScriptImg {
                     if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { //如果圖片太小就不處理
                         break;
                     }
-                    let imgU = WebAPI.Img.vipsResize(scale, fileInfo2);
+                    let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType);
                     arUrl.push({ scale: scale, url: imgU })
                 }
 
@@ -408,7 +408,7 @@ class ScriptImg {
 
         if (width === -1) {
             isFail = true;
-            
+
             let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
             width = 256;
             height = 256;

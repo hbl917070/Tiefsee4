@@ -136,13 +136,14 @@ namespace Tiefsee {
         void vipsResize(RequestData d) {
             string path = d.args["path"];
             double scale = Double.Parse(d.args["scale"]);
+            string type = d.args["type"];
 
             path = Uri.UnescapeDataString(path);
 
             bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304) { return; }
 
-            string imgPath = ImgLib.VipsResize(path, scale);
+            string imgPath = ImgLib.VipsResize(path, scale, type);
             WriteFile(d, imgPath); //回傳檔案
         }
 

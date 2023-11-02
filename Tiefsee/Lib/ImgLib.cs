@@ -497,7 +497,7 @@ namespace Tiefsee {
         /// <summary>
         /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要using
         /// </summary>
-        public static NetVips.Image GetNetVips(string path) {
+        public static NetVips.Image GetNetVips(string path, string type) {
 
             lock (tempArNewVips) {
 
@@ -511,7 +511,7 @@ namespace Tiefsee {
                 NetVips.Cache.MaxFiles = 0; //避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
                 NetVips.Image im;
 
-                if (Path.GetExtension(path).ToLower() == ".webp") { //如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
+                if (type == "webp") { //如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
                     using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                         im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
                     }
@@ -608,7 +608,7 @@ namespace Tiefsee {
             }
 
             if (type == "tif" || type == "tiff") {
-                NetVips.Image vImg = GetNetVips(path);
+                NetVips.Image vImg = GetNetVips(path, "tif");
 
                 //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual); //套用顏色
                 VipsSave(vImg, path100, "auto");
@@ -620,7 +620,7 @@ namespace Tiefsee {
 
                 if (IsCMYK(path)) { //如果是CMYK，就先套用顏色
 
-                    NetVips.Image Vimg = GetNetVips(path);
+                    NetVips.Image Vimg = GetNetVips(path, "jpg");
                     using (var Vimg2 = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { //套用顏色
                         Vimg2.Jpegsave(path100);
                     }
@@ -725,7 +725,7 @@ namespace Tiefsee {
         /// <summary>
         /// 縮放圖片，並且存入暫存資料夾 (只支援jpg、png、tif、webp)
         /// </summary>
-        public static string VipsResize(string path, double scale) {
+        public static string VipsResize(string path, double scale, string type) {
 
             string hashName = $"{FileToHash(path)}_{scale}.jpg"; //暫存檔案名稱
             string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); //暫存檔案的路徑
@@ -746,7 +746,7 @@ namespace Tiefsee {
                 img100 = path; //直接只用原檔
             }
 
-            NetVips.Image im = GetNetVips(img100);
+            NetVips.Image im = GetNetVips(img100, type);
             using (NetVips.Image imR = im.Resize(scale: scale, kernel: Enums.Kernel.Lanczos3, gap: 4)) {
                 VipsSave(imR, filePath, "auto");
             }
