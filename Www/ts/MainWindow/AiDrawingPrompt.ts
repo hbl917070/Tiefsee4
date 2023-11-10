@@ -27,19 +27,28 @@ class AiDrawingPrompt {
 			let stack = [];
 			let partStart = 0;
 			for (let i = 0; i < input.length; i++) {
-				if (input[i] === '{') {
+				if (input[i] === '[') {
+					stack.push('[');
+				} else if (input[i] === ']') {
+					if (stack.length > 0 && stack[stack.length - 1] === '[') {
+						stack.pop();
+					}
+				}
+				else if (input[i] === '{') {
 					stack.push('{');
 				} else if (input[i] === '}') {
 					if (stack.length > 0 && stack[stack.length - 1] === '{') {
 						stack.pop();
 					}
-				} else if (input[i] === '"') {
+				}
+				else if (input[i] === '"') {
 					if (stack.length > 0 && stack[stack.length - 1] === '"') {
 						stack.pop();
 					} else {
 						stack.push('"');
 					}
-				} else if (input[i] === ',' && stack.length === 0) {
+				}
+				else if (input[i] === ',' && stack.length === 0) {
 					parts.push(input.slice(partStart, i));
 					partStart = i + 1;
 				}
@@ -106,12 +115,10 @@ class AiDrawingPrompt {
 
 		function retPush(title: string, text: string | undefined) {
 			if (text !== undefined && text !== "") {
-				retData.push(
-					{
-						title: title,
-						text: text
-					}
-				);
+				retData.push({
+					title: title,
+					text: text
+				});
 			}
 		}
 
@@ -164,12 +171,10 @@ class AiDrawingPrompt {
 
 		function retPush(title: string, text: string | undefined) {
 			if (text !== undefined && text !== null && text !== "") {
-				retData.push(
-					{
-						title: title,
-						text: text.toString().trim()
-					}
-				);
+				retData.push({
+					title: title,
+					text: text.toString().trim()
+				});
 			}
 		}
 		function getKey(obj: any) {
@@ -351,12 +356,10 @@ class AiDrawingPrompt {
 
 		function retPush(title: string, text: string | undefined) {
 			if (text !== undefined && text !== null && text !== "") {
-				retData.push(
-					{
-						title: title,
-						text: text.toString().trim()
-					}
-				);
+				retData.push({
+					title: title,
+					text: text.toString().trim()
+				});
 			}
 		}
 
@@ -380,9 +383,7 @@ class AiDrawingPrompt {
 			retPush(title, text);
 		}
 
-
 		if (objImage !== undefined) {
-
 			let prompt = objImage.prompt[0].prompt;
 			let seed = objImage.seed;
 			let steps = objImage.steps;
@@ -417,12 +418,10 @@ class AiDrawingPrompt {
 
 		function retPush(title: string, text: string | undefined) {
 			if (text !== undefined && text !== null && text !== "") {
-				retData.push(
-					{
-						title: title,
-						text: text.toString().trim()
-					}
-				);
+				retData.push({
+					title: title,
+					text: text.toString().trim()
+				});
 			}
 		}
 

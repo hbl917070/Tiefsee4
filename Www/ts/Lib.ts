@@ -522,8 +522,6 @@ class Lib {
             domBox.setAttribute("open", "true");
             funcChange("true");
         }
-
-
     }
 
 
@@ -575,7 +573,10 @@ class Lib {
         if (typeof str === "object") {
             jsonFormat = JSON.stringify(str, null, space);
             ok = true;
-        } else if (str.startsWith('{') && str.endsWith('}')) {
+        } else if (
+            (str.startsWith('{') && str.endsWith('}'))
+            || (str.startsWith('[') && str.endsWith(']'))
+        ) {
             try {
                 json = JSON.parse(str);
                 jsonFormat = JSON.stringify(json, null, space);
