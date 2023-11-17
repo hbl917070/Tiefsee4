@@ -89,7 +89,6 @@ namespace Tiefsee {
             webvviewArguments = $@"
 --disable-web-security 
 --disable-features=""msWebOOUI,msPdfOOUI"" 
---disable-backing-store-limit 
 --user-agent=""{Program.webvviewUserAgent}"" 
 --enable-features=""msWebView2EnableDraggableRegions"" 
 ";
