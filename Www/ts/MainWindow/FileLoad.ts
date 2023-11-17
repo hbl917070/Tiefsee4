@@ -267,7 +267,7 @@ class FileLoad {
             if (arDirKey.length === 0) { //如果已經沒有沒有資料夾
                 //M.fileShow.openWelcome();
                 //_show = async () => { }
-                showDirThrottle.run = async () => { };
+                showDirThrottle.run = undefined;
                 return;
             }
 
@@ -652,7 +652,7 @@ class FileLoad {
                 arFile.splice(flagFile, 1); //刪除此筆
                 M.mainFileList.init(); //檔案預覽視窗 初始化
                 showFile(flagFile);
-                showFileThrottle.run = async () => { }
+                showFileThrottle.run = undefined;
                 return;
             }
 

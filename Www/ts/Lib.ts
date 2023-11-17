@@ -726,7 +726,7 @@ interface Date {
  * 節流 (定時執行，時間內重複執行，則只會執行最後一個指令)
  */
 class Throttle {
-    public run = async () => { };
+    public run: (() => void) | undefined = undefined;
     public timeout = 50;
 
     constructor(_timeout = 50) {
@@ -735,11 +735,16 @@ class Throttle {
     }
 
     private async timer() {
-        let _func = this.run;
-        this.run = async () => { };
-        await _func();
-        setTimeout(() => {
-            this.timer(); //遞迴
-        }, this.timeout);
+
+        if (this.run !== undefined) {
+            let _func: (() => void) | undefined = this.run;
+            this.run = undefined;
+            await _func();
+            _func = undefined;
+        }
+
+        // 遞迴
+        await Lib.sleep(this.timeout);
+        this.timer();
     }
 }
