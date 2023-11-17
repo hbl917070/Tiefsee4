@@ -75,11 +75,12 @@ class Config {
             { name: /RealPlayer/i, groupType: ["video"] },
             { name: /QuickTime/i, groupType: ["video"] },
 
-            { name: /^Google Chrome$/i, groupType: ["pdf"], fileExt: ["html"] },
+            { name: /^Google Chrome$/i, fileExt: ["html", "pdf", "doc", "docx", "odt", "ppt", "pptx", "odp", "csv"] }, // chrome 也可以開啟 office
+
             { name: /^Firefox$/i, fileExt: ["html", "pdf"] },
             { name: /^Brave$/i, fileExt: ["html", "pdf"] },
+            { name: /Microsoft Edge/i, fileExt: ["html", "pdf"] },
 
-            { name: /Microsoft Edge/i, fileExt: ["pdf", "html"] },
             { name: /Adobe Illustrator/i, fileExt: ["pdf"] },
             { name: /Adobe Acrobat/i, fileExt: ["pdf"] },
             { name: /pdf/i, fileExt: ["pdf"] },
@@ -89,8 +90,8 @@ class Config {
             { name: /LibreOfficeWriter/i, fileExt: ["doc", "docx", "odt"] },
 
             //{ name: /PowerPoint/i, fileExt: ["ppt", "pptx", "odp"] }, // 無法使用
-            { name: /WPS Presentation/i, fileExt: ["ppt", "pptx", "odp"] },
-            { name: /LibreOfficeImpress/i, fileExt: ["ppt", "pptx", "odp"] },
+            { name: /WPS Presentation/i, fileExt: ["ppt", "pptx", "odp", "csv"] },
+            { name: /LibreOfficeImpress/i, fileExt: ["ppt", "pptx", "odp", "csv"] },
 
         ] as { name: RegExp, path: string, groupType?: string[], fileExt?: string[] }[]
     }
