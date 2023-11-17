@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using static Tiefsee.ClipboardLib;
 
 namespace Tiefsee {
     public class WebServerController {
@@ -32,6 +33,7 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getUwpList", getUwpList);
             webServer.RouteAdd("/api/getRelatedFileList", getRelatedFileList);
             webServer.RouteAdd("/api/isBinary", IsBinary);
+            webServer.RouteAdd("/api/getClipboardContent", GetClipboardContent);
 
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
@@ -51,7 +53,6 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/img/vipsResize", vipsResize);
             webServer.RouteAdd("/api/img/clip", clip);
             webServer.RouteAdd("/api/img/extractPng", extractPng);
-
 
             webServer.RouteAdd("/www/{*}", getWww);
             webServer.RouteAdd("/{*}", getWww);
@@ -357,9 +358,9 @@ namespace Tiefsee {
 
             bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             if (is304) { return; }
- 
+
             var wvFile = new WV_File();
-            string ret = wvFile.GetText(path);          
+            string ret = wvFile.GetText(path);
 
             WriteString(d, ret);
         }
@@ -514,6 +515,23 @@ namespace Tiefsee {
             WriteString(d, ret); //回傳
         }
 
+        /// <summary>
+        /// 取得 剪貼簿內容
+        /// </summary>
+        /// <param name="d"></param>
+        private void GetClipboardContent(RequestData d) {
+
+            int maxTextLength = int.Parse(d.args["maxTextLength"]);
+
+            ClipboardContent json = null;
+            Adapter.UIThread(() => {
+                var clipboardLib = new ClipboardLib();
+                json = clipboardLib.GetClipboardContent(maxTextLength);
+            });
+
+            string retJson = JsonConvert.SerializeObject(json);
+            WriteString(d, retJson);
+        }
 
         /// <summary>
         /// 
@@ -702,14 +720,14 @@ namespace Tiefsee {
             if (time >= 31536000) { time = 31536000; } //一年
             CacheTime = time;
         }
-        
+
 
         /// <summary>
         /// 回傳字串
         /// </summary>
         /// <param name="context"></param>
         /// <param name="str"></param>
-        private void WriteString(RequestData d, string str) {   
+        private void WriteString(RequestData d, string str) {
             d.context.Response.AddHeader("Content-Encoding", "br"); // 告訴瀏覽器使用了Brotli壓縮
             d.context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
             byte[] _responseArray = CompressString(str);

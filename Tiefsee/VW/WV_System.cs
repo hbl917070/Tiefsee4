@@ -1,13 +1,9 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using Windows.ApplicationModel;
 
 namespace Tiefsee {
@@ -18,14 +14,13 @@ namespace Tiefsee {
     public class WV_System {
 
         WebWindow M;
-        FileWatcher fileWatcher = new FileWatcher();
+        FileWatcher fileWatcher = new();
+        ClipboardLib clipboardLib = new();
 
         public WV_System(WebWindow m) {
             this.M = m;
         }
 
-       
-      
         /// <summary>
         /// 偵測檔案變化
         /// </summary>
@@ -37,7 +32,7 @@ namespace Tiefsee {
                 Adapter.UIThread(() => {
                     M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
                 });
-            });   
+            });
         }
 
         /// <summary>
@@ -242,22 +237,6 @@ namespace Tiefsee {
         #region Clipboard 剪貼簿
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="base64String"></param>
-        /// <returns></returns>
-        private MemoryStream Base64ToMemoryStream(string base64String) {
-            //去掉開頭的 data:image/png;base64,
-            int x = base64String.IndexOf("base64,");
-            if (x != -1) { base64String = base64String.Substring(x + 7); }
-
-            byte[] Buffer = Convert.FromBase64String(base64String);
-            MemoryStream oMemoryStream = new MemoryStream(Buffer);
-            oMemoryStream.Position = 0;
-            return oMemoryStream;
-        }
-
-        /// <summary>
         /// 存入剪貼簿 - 傳入base64，儲存成圖片。
         /// isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
         /// </summary>
@@ -265,25 +244,8 @@ namespace Tiefsee {
         /// <param name="isTransparent"> 是否要支援透明色 </param>
         /// <returns></returns>
         public bool SetClipboard_Base64ToImage(string base64, bool isTransparent) {
-            try {
-                using (MemoryStream ms = Base64ToMemoryStream(base64)) {
-                    using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
-                        System.Windows.Forms.Clipboard.Clear(); //清理剪貼簿
-                        System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
-                        data_object.SetData(DataFormats.Bitmap, true, bm); //無透明色的圖片，所有軟體都支援
-                        if (isTransparent) {
-                            data_object.SetData("PNG", true, ms); //含有透明色，但並非所有軟體都支援
-                        }
-                        System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
-                        return true;
-                    }
-                }
-            } catch (Exception e2) {
-                MessageBox.Show(e2.ToString());
-                return false;
-            }
+            return clipboardLib.SetClipboard_Base64ToImage(base64, isTransparent);
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，儲存成圖片。
@@ -293,46 +255,17 @@ namespace Tiefsee {
         /// <param name="isTransparent"> 是否要支援透明色 </param>
         /// <returns></returns>
         public bool SetClipboard_FileToImage(string path, bool isTransparent) {
-            try {
-                if (File.Exists(path) == false) { return false; }
-
-                using (Stream ms = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    using (System.Drawing.Bitmap bm = new Bitmap(ms)) {
-
-                        System.Windows.Forms.Clipboard.Clear(); //先清理剪貼簿
-                        System.Windows.Forms.IDataObject data_object = new System.Windows.Forms.DataObject();
-                        data_object.SetData(DataFormats.Bitmap, true, bm);
-                        if (isTransparent) {
-                            data_object.SetData("PNG", true, ms); //含有透明色，但並非所有軟體都支援
-                        }
-                        System.Windows.Forms.Clipboard.SetDataObject(data_object, true);
-                        return true;
-                    }
-                }
-            } catch (Exception e2) {
-                MessageBox.Show(e2.ToString());
-                return false;
-            }
+            return clipboardLib.SetClipboard_FileToImage(path, isTransparent);
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public bool SetClipboard_FileToTxt(string path) {
-            try {
-                if (File.Exists(path) == false) { return false; }
-                using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
-                    System.Windows.Forms.Clipboard.SetDataObject(sr.ReadToEnd(), false, 5, 200);
-                }
-                return true;
-            } catch (Exception) {
-                return false;
-            }
+        public bool SetClipboard_FileToText(string path) {
+            return clipboardLib.SetClipboard_FileToText(path);
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，複製成base64
@@ -340,77 +273,17 @@ namespace Tiefsee {
         /// <param name="txt"></param>
         /// <returns></returns>
         public bool SetClipboard_FileToBase64(string path) {
-
-            try {
-
-                if (File.Exists(path) == false) { return false; }
-
-                byte[] temp = File.ReadAllBytes(path);
-                string base64String = "";
-
-                String ext = Path.GetExtension(path).ToUpper();
-
-                if (ext == ".PNG") {
-                    base64String = "data:image/png;base64," + Convert.ToBase64String(temp);
-
-                } else if (ext == ".GIF") {
-                    base64String = "data:image/gif;base64," + Convert.ToBase64String(temp);
-
-                } else if (ext == ".SVG") {
-                    base64String = "data:image/svg+xml;base64," + Convert.ToBase64String(temp);
-
-                } else if (ext == ".BMP") {
-                    base64String = "data:image/bmp;base64," + Convert.ToBase64String(temp);
-
-                } else if (ext == ".WEBP") {
-                    base64String = "data:image/webp;base64," + Convert.ToBase64String(temp);
-
-                } else {
-                    base64String = "data:image/jpeg;base64," + Convert.ToBase64String(temp);
-                }
-
-                System.Windows.Forms.Clipboard.SetDataObject(base64String, false, 5, 200); //存入剪貼簿
-                return true;
-
-            } catch (Exception e) {
-                MessageBox.Show(e.ToString());
-                return false;
-            }
+            return clipboardLib.SetClipboard_FileToBase64(path);
         }
-
-
-        /// <summary>
-        /// 存入剪貼簿 - 圖片
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <returns></returns>
-        /*public bool SetClipboard_FileToImg(string path) {
-            try {
-                using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
-                    System.Windows.Forms.Clipboard.SetImage(bm_transparent);
-                    bm_transparent.Dispose();
-                }
-                return true;
-            } catch (Exception) {
-                return false;
-            }
-        }*/
-
 
         /// <summary>
         /// 存入剪貼簿 - 字串
         /// </summary>
-        /// <param name="txt"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public bool SetClipboard_Txt(string txt) {
-            try {
-                System.Windows.Forms.Clipboard.SetDataObject(txt, false, 5, 200); //存入剪貼簿
-                return true;
-            } catch (Exception) {
-                return false;
-            }
+        public bool SetClipboard_Text(string text) {
+            return clipboardLib.SetClipboard_Text(text);
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 檔案
@@ -418,19 +291,7 @@ namespace Tiefsee {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool SetClipboard_File(string path) {
-            try {
-                //檔案或資料夾存在才複製
-                if (File.Exists(path) || Directory.Exists(path)) {
-                    var f = new System.Collections.Specialized.StringCollection();
-                    f.Add(path);
-                    Clipboard.SetFileDropList(f);
-                } else {
-                    return false;
-                }
-                return true;
-            } catch (Exception) {
-                return false;
-            }
+            return clipboardLib.SetClipboard_File(path);
         }
 
         #endregion
@@ -591,9 +452,7 @@ namespace Tiefsee {
                     User_Explorer.CreateSubKey("UserChoice").SetValue("ProgId", @"Applications\" + ExecutableName);
                 }
                 SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
-            } catch (Exception excpt) {
-                //Your code here
-            }
+            } catch { }
         }
 
         /// <summary>

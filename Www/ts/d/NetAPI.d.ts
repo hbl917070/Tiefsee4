@@ -434,7 +434,7 @@ interface WV_System {
     SetClipboard_FileToImage(path: string, isTransparent: bool): bool;
 
     /** 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字 */
-    SetClipboard_FileToTxt(path: string): bool;
+    SetClipboard_FileToText(path: string): bool;
 
     /** 存入剪貼簿 - 傳入檔案路徑，複製成base64 */
     SetClipboard_FileToBase64(path: string): bool;
@@ -443,7 +443,7 @@ interface WV_System {
     SetClipboard_File(path: string): bool;
 
     /** 存入剪貼簿 - 字串 */
-    SetClipboard_Txt(txt: string): bool;
+    SetClipboard_Text(txt: string): bool;
 
     /** 取得作業系統所在的槽，例如 「C:\」 */
     GetSystemRoot(): string;

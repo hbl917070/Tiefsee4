@@ -756,6 +756,18 @@ class ScriptMenu {
 
     }
 
+    /** 顯示選單 開啟檔案 (用於 起始畫面) */
+    async showMenuOpenFile(btn?: HTMLElement) {
+        let domMenu = document.getElementById("menu-openfile") as HTMLElement;
+
+        if (btn === undefined) {
+            this.M.menu.openAtOrigin(domMenu, 0, 0);
+        } else {
+            this.M.menu.openAtButton(domMenu, btn, "menuActive");
+        }
+    }
+
+
     /** 顯示選單 複製 */
     showMenuCopy(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-copy") as HTMLElement;
@@ -1075,6 +1087,43 @@ class ScriptOpen {
         }
     }
 
+    /** 載入剪貼簿內容 */
+    public async openClipboard() {
+
+        // if (M.fileLoad.getIsBulkView()) { return; }
+
+        let clipboardContent = await WebAPI.getClipboardContent();
+
+        if (clipboardContent.Type == "url") {
+            let file = await this.M.downloadFileFromUrl(clipboardContent.Data);
+            if (file != null) {
+                let base64 = await Lib.readFileAsDataURL(file);
+                let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+                if (extension !== "") {
+                    let path = await WV_File.Base64ToTempFile(base64, extension);
+                    await this.M.fileLoad.loadFile(path); // 下載檔案後，重新載入圖片
+                }
+            }
+        }
+
+        else if (clipboardContent.Type == "file" || clipboardContent.Type == "dir") {
+            await this.M.fileLoad.loadFile(clipboardContent.Data); // 重新載入圖片
+        }
+
+        else if (clipboardContent.Type == "img") {
+            let base64 = clipboardContent.Data;
+            let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+            if (extension !== "") {
+                let path = await WV_File.Base64ToTempFile(base64, extension);
+                await this.M.fileLoad.loadFile(path); // 重新載入圖片
+            }
+        }
+
+        else {
+            Toast.show(this.M.i18n.t("msg.cannotOpenClipboard"), 1000 * 3); // 無法開啟剪貼簿的內容
+        }
+    }
+
     /** 另開視窗 */
     public async openNewWindow(path?: string) {
         if (path === undefined) {
@@ -1182,7 +1231,7 @@ class ScriptCopy {
             path = this.M.fileLoad.getFilePath();
         }
         let name = Lib.GetFileName(path);
-        await WV_System.SetClipboard_Txt(name);
+        await WV_System.SetClipboard_Text(name);
         Toast.show(this.M.i18n.t("msg.copyFileName"), 1000 * 3); //已將「檔案名稱」複製至剪貼簿
     }
     /** 複製 資料夾名 */
@@ -1191,7 +1240,7 @@ class ScriptCopy {
             path = this.M.fileLoad.getDirPath();
         }
         let name = Lib.GetFileName(path);
-        await WV_System.SetClipboard_Txt(name);
+        await WV_System.SetClipboard_Text(name);
         Toast.show(this.M.i18n.t("msg.copyDirName"), 1000 * 3); //已將「資料夾名稱」複製至剪貼簿
     }
 
@@ -1208,7 +1257,7 @@ class ScriptCopy {
         if (path === undefined) {
             path = this.M.fileLoad.getFilePath();
         }
-        await WV_System.SetClipboard_Txt(path);
+        await WV_System.SetClipboard_Text(path);
         Toast.show(this.M.i18n.t("msg.copyFilePath"), 1000 * 3); //已將「檔案路徑」複製至剪貼簿
     }
     /** 複製 資料夾路徑 */
@@ -1216,7 +1265,7 @@ class ScriptCopy {
         if (path === undefined) {
             path = this.M.fileLoad.getDirPath();
         }
-        await WV_System.SetClipboard_Txt(path);
+        await WV_System.SetClipboard_Text(path);
         Toast.show(this.M.i18n.t("msg.copyDirPath"), 1000 * 3); //已將「資料夾路徑」複製至剪貼簿
     }
 
@@ -1305,12 +1354,12 @@ class ScriptCopy {
         ) {
 
             let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，再取得base64
-            await WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Text(base64);
 
         } else if (imgType === "svg") {
             //await WV_System.SetClipboard_FileToImage(path, false); //直接用C#讀取圖片
             let base64: string = await Lib.sendGet("base64", path); //取得檔案的base64
-            await WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Text(base64);
 
         } else {
             let imgData = await this.M.script.img.getImgData(fileInfo2);
@@ -1325,7 +1374,7 @@ class ScriptCopy {
             if (blob === null) { return; }
             let base64 = await this.M.script.img.blobToBase64(blob);
             if (typeof base64 !== "string") { return; }
-            await WV_System.SetClipboard_Txt(base64);
+            await WV_System.SetClipboard_Text(base64);
         }
 
         Toast.show(this.M.i18n.t("msg.copyIamgeBase64"), 1000 * 3); //已將「影像base64」複製至剪貼簿
@@ -1339,7 +1388,7 @@ class ScriptCopy {
         if (await WV_File.Exists(path) === false) { return; }
 
         let base64: string = await Lib.sendGet("base64", path); //取得檔案的base64
-        await WV_System.SetClipboard_Txt(base64);
+        await WV_System.SetClipboard_Text(base64);
 
         //WV_System.SetClipboard_FileToBase64(path);
 
@@ -1352,7 +1401,7 @@ class ScriptCopy {
             path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
-        await WV_System.SetClipboard_FileToTxt(path);
+        await WV_System.SetClipboard_FileToText(path);
         Toast.show(this.M.i18n.t("msg.copyText"), 1000 * 3); //已將「文字」複製至剪貼簿
 
     }

@@ -1153,6 +1153,11 @@ var langData = {
             "en": "Open File",
             "ja": "ファイルを開く",
         },
+        openClipboard: {
+            "zh-TW": "載入剪貼簿內容",
+            "en": "Open Clipboard",
+            "ja": "クリップボードを開く",
+        },
         showMenuFile: {
             "zh-TW": "檔案",
             "en": "File",
@@ -1736,6 +1741,11 @@ var langData = {
             "ja": "ファイルが変更されました。このファイルを再読み込みしますか？",
         },
 
+        cannotOpenClipboard: {
+            "zh-TW": "無法開啟剪貼簿的內容",
+            "en": "Cannot open the contents of the clipboard",
+            "ja": "クリップボードの内容を開くことができません",
+        },
 
         //#region download
         fileDownloadFailed: {
@@ -1756,7 +1766,6 @@ var langData = {
         //#endregion
 
         //#region 文字編輯器
-
         saveComplete: {
             "zh-TW": "儲存完成",
             "en": "Save complete",

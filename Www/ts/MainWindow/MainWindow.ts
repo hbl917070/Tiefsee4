@@ -38,6 +38,7 @@ class MainWindow {
     public applySetting;
     public saveSetting;
     public getIsQuickLook;
+    public downloadFileFromUrl;
 
     constructor() {
 
@@ -86,6 +87,7 @@ class MainWindow {
         this.saveSetting = saveSetting;
         this.getIsQuickLook = getIsQuickLook;
         this.updateDomVisibility = updateDomVisibility;
+        this.downloadFileFromUrl = downloadFileFromUrl;
 
         new Hotkey(this);
         init();
@@ -405,8 +407,8 @@ class MainWindow {
 
                     let file = await downloadFileFromUrl(text);
                     if (file != null) {
-                        let base64 = await readFileAsDataURL(file);
-                        let extension = await getExtensionFromBase64(base64); //取得副檔名
+                        let base64 = await Lib.readFileAsDataURL(file);
+                        let extension = await Lib.getExtensionFromBase64(base64); //取得副檔名
                         if (extension !== "") {
                             let path = await WV_File.Base64ToTempFile(base64, extension);
                             await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
@@ -416,8 +418,8 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    let base64 = await readFileAsDataURL(files[0]);
-                    let extension = await getExtensionFromBase64(base64); //取得副檔名
+                    let base64 = await Lib.readFileAsDataURL(files[0]);
+                    let extension = await Lib.getExtensionFromBase64(base64); //取得副檔名
 
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
@@ -425,8 +427,8 @@ class MainWindow {
                     } else { //檔案解析失敗的話，嘗試從網址下載
                         let file = await downloadFileFromUrl(text);
                         if (file != null) {
-                            let base64 = await readFileAsDataURL(file);
-                            let extension = await getExtensionFromBase64(base64); //取得副檔名
+                            let base64 = await Lib.readFileAsDataURL(file);
+                            let extension = await Lib.getExtensionFromBase64(base64); //取得副檔名
                             if (extension !== "") {
                                 let path = await WV_File.Base64ToTempFile(base64, extension);
                                 await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
@@ -440,7 +442,7 @@ class MainWindow {
                     e.preventDefault();
 
                     let base64 = text;
-                    let extension = await getExtensionFromBase64(base64); //取得副檔名
+                    let extension = await Lib.getExtensionFromBase64(base64); //取得副檔名
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
                         await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
@@ -452,8 +454,8 @@ class MainWindow {
 
                     let file = await downloadFileFromUrl(text);
                     if (file != null) {
-                        let base64 = await readFileAsDataURL(file);
-                        let extension = await getExtensionFromBase64(base64); //取得副檔名
+                        let base64 = await Lib.readFileAsDataURL(file);
+                        let extension = await Lib.getExtensionFromBase64(base64); //取得副檔名
                         if (extension !== "") {
                             let path = await WV_File.Base64ToTempFile(base64, extension);
                             await reloadImageAfterDownload(path); //下載檔案後，判斷是否需要重新載入圖片
@@ -469,125 +471,6 @@ class MainWindow {
 
                     e.preventDefault();
 
-                }
-
-            }
-
-            /** file 轉 base64 */
-            async function readFileAsDataURL(file: File): Promise<string> {
-                return await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        resolve(event.target?.result as string);
-                    };
-                    reader.onerror = (event) => {
-                        reject(event.target?.error);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-            /** 從base64判斷副檔名 */
-            async function getExtensionFromBase64(base64: string) {
-                if (base64.length < 100) { return ""; }
-                const base64Header = base64.slice(0, 100);
-                const mimeMatch = base64Header.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
-                if (!mimeMatch) { return ""; }
-                const mimeType = mimeMatch[1];
-                switch (mimeType) {
-                    case "image/png":
-                        return "png";
-                    case "image/gif":
-                        return "gif";
-                    case "image/jpeg":
-                    case "image/pjpeg":
-                        return "jpg";
-                    case "image/bmp":
-                        return "bmp";
-                    case "image/tiff":
-                        return "tiff";
-                    case "image/svg+xml":
-                        return "svg";
-                    case "image/webp":
-                        return "webp";
-                    case "image/avif":
-                        return "avif";
-                    case "image/x-icon":
-                    case "image/vnd.microsoft.icon":
-                        return "ico";
-                    case "image/octet-stream": //如果是未知類型
-                        if (await isValidImageBase64(base64)) { //檢查是否為圖片
-                            return "png";
-                        } else {
-                            return "";
-                        }
-                    default:
-                        return "";
-                }
-            }
-            /** 檢測未知類型的base64是否為合法的圖片 */
-            async function isValidImageBase64(base64: string): Promise<boolean> {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.src = base64;
-                    img.onload = () => {
-                        try {
-                            const canvas = document.createElement("canvas");
-                            canvas.width = 1;
-                            canvas.height = 1;
-                            const ctx = canvas.getContext("2d") as CanvasDrawImage;
-                            ctx.drawImage(img, 0, 0, 1, 1, 0, 0, 1, 1);
-                            resolve(true);
-                        } catch (e) {
-                            resolve(false);
-                        }
-                    };
-                    img.onerror = () => {
-                        resolve(false);
-                    };
-                });
-            }
-            /** 下載檔案 */
-            async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
-                const timeout = 20 * 1000; // 逾時
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-                script.window.enabledLoading(true);
-
-                try {
-                    const response = await fetch(imageUrl, { signal: controller.signal });
-
-                    //判斷請求是否成功
-                    if (response.status !== 200) {
-                        Toast.show(i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); //檔案下載失敗
-                        return null;
-                    }
-
-                    //判斷檔案大小
-                    const contentLength = response.headers.get("content-length");
-                    if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { //50m
-                        Toast.show(i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); //檔案大小超過限制
-                        return null;
-                    }
-
-                    //判斷檔案類型是否為圖片
-                    const contentType = response.headers.get("content-type");
-                    //console.log(contentType)
-                    if (!contentType || !contentType.startsWith("image/")) {
-                        Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
-                        return null;
-                    }
-
-                    const blob = await response.blob();
-                    const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-                    return new File([blob], fileName, { type: response.headers.get("content-type") ?? "application/octet-stream" });
-                } catch (error) {
-                    Toast.show(i18n.t("msg.fileDownloadFailed"), 1000 * 3); //檔案下載失敗
-                    console.error(error);
-                    return null;
-                } finally {
-                    clearTimeout(timeoutId);
-                    script.window.enabledLoading(false);
                 }
             }
 
@@ -613,6 +496,53 @@ class MainWindow {
 
         }
 
+
+        /**
+         * 下載檔案
+         */
+        async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
+            const timeout = 20 * 1000; // 逾時
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            script.window.enabledLoading(true);
+
+            try {
+                const response = await fetch(imageUrl, { signal: controller.signal });
+
+                //判斷請求是否成功
+                if (response.status !== 200) {
+                    Toast.show(i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); //檔案下載失敗
+                    return null;
+                }
+
+                //判斷檔案大小
+                const contentLength = response.headers.get("content-length");
+                if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { //50m
+                    Toast.show(i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); //檔案大小超過限制
+                    return null;
+                }
+
+                //判斷檔案類型是否為圖片
+                const contentType = response.headers.get("content-type");
+                //console.log(contentType)
+                if (!contentType || !contentType.startsWith("image/")) {
+                    Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); //不支援的檔案類型
+                    return null;
+                }
+
+                const blob = await response.blob();
+                const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+                return new File([blob], fileName, { type: response.headers.get("content-type") ?? "application/octet-stream" });
+            } catch (error) {
+                Toast.show(i18n.t("msg.fileDownloadFailed"), 1000 * 3); //檔案下載失敗
+                console.error(error);
+                return null;
+            } finally {
+                clearTimeout(timeoutId);
+                script.window.enabledLoading(false);
+            }
+        }
 
         /**
          * 覆寫 onCreate (由C#呼叫)

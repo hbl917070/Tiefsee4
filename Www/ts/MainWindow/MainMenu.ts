@@ -25,7 +25,8 @@ class MainMenu {
         this.showMenu = showMenu;
         this.updateOtherAppList = updateOtherAppList;
 
-        initOpen();
+        initFile();
+        initOpenFile();
         initCopy();
         initRotate();
         initRightMenuImage();
@@ -159,9 +160,9 @@ class MainMenu {
         //-----------------
 
         /**
-         * 初始化 menu-開啟檔案
+         * 初始化 menu-檔案
          */
-        async function initOpen() {
+        async function initFile() {
 
             let dom = document.getElementById("menu-file") as HTMLElement;
 
@@ -178,6 +179,12 @@ class MainMenu {
             dom.querySelector(".js-openFile")?.addEventListener("click", () => {
                 M.menu.close(); //關閉menu
                 M.script.open.openFile();
+            })
+
+            // 載入剪貼簿內容
+            dom.querySelector(".js-openClipboard")?.addEventListener("click", async () => {
+                M.menu.close(); //關閉menu
+                await M.script.open.openClipboard();
             })
 
             //另開視窗
@@ -420,6 +427,26 @@ class MainMenu {
             });
         }
 
+
+        /**
+          * 初始化 menu-開啟檔案 (用於 起始畫面)
+          */
+        function initOpenFile() {
+
+            let dom = document.getElementById("menu-openfile") as HTMLElement;
+
+            // 載入檔案
+            dom.querySelector(".js-openFile")?.addEventListener("click", () => {
+                M.menu.close();
+                M.script.open.openFile();
+            })
+
+            // 載入剪貼簿內容
+            dom.querySelector(".js-openClipboard")?.addEventListener("click", async () => {
+                M.menu.close();
+                await M.script.open.openClipboard();
+            })
+        }
 
 
         /**
@@ -1039,7 +1066,7 @@ class MainMenu {
 
                     let txt = dom_input.value;
                     let select = txt.substring(start, end);
-                    WV_System.SetClipboard_Txt(select); //存入剪貼簿
+                    WV_System.SetClipboard_Text(select); //存入剪貼簿
 
                     dom_input.value = txt.substring(0, start) + txt.substring(end); //去除中間的文字
                     dom_input.setSelectionRange(start, start); //把焦點放回開頭*/
@@ -1051,7 +1078,7 @@ class MainMenu {
                 dom_copy.onclick = async () => {
                     let selection = document.getSelection();
                     if (selection === null) { return; }
-                    WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿
+                    WV_System.SetClipboard_Text(selection.toString()); //存入剪貼簿
                     M.menu.close(); //關閉menu
                 }
             }
@@ -1095,7 +1122,7 @@ class MainMenu {
                     M.menu.close(); //關閉menu
                     let selection = document.getSelection();
                     if (selection === null) { return; }
-                    WV_System.SetClipboard_Txt(selection.toString()); //存入剪貼簿
+                    WV_System.SetClipboard_Text(selection.toString()); //存入剪貼簿
                 }
             }
         }

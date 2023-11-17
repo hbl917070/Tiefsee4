@@ -795,7 +795,7 @@ class MainToolbar {
         */
         function initToolbarWelcome() {
 
-            // 載入檔案
+            // 顯示選單 開啟檔案
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.openFile",
@@ -804,7 +804,7 @@ class MainToolbar {
                 icon: "tool-open.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.open.openFile();
+                        M?.script.menu.showMenuOpenFile(btn);
                     });
                 },
             })

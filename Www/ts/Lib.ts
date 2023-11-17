@@ -594,6 +594,81 @@ class Lib {
         }
     }
 
+
+    /** file 轉 base64 */
+    public static async readFileAsDataURL(file: File): Promise<string> {
+        return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target?.result as string);
+            };
+            reader.onerror = (event) => {
+                reject(event.target?.error);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    /** 從base64判斷副檔名 */
+    public static async getExtensionFromBase64(base64: string) {
+        if (base64.length < 100) { return ""; }
+        const base64Header = base64.slice(0, 100);
+        const mimeMatch = base64Header.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+        if (!mimeMatch) { return ""; }
+        const mimeType = mimeMatch[1];
+        switch (mimeType) {
+            case "image/png":
+                return "png";
+            case "image/gif":
+                return "gif";
+            case "image/jpeg":
+            case "image/pjpeg":
+                return "jpg";
+            case "image/bmp":
+                return "bmp";
+            case "image/tiff":
+                return "tiff";
+            case "image/svg+xml":
+                return "svg";
+            case "image/webp":
+                return "webp";
+            case "image/avif":
+                return "avif";
+            case "image/x-icon":
+            case "image/vnd.microsoft.icon":
+                return "ico";
+            case "image/octet-stream": //如果是未知類型
+                if (await this.isValidImageBase64(base64)) { //檢查是否為圖片
+                    return "png";
+                } else {
+                    return "";
+                }
+            default:
+                return "";
+        }
+    }
+    /** 檢測未知類型的base64是否為合法的圖片 */
+    public static async isValidImageBase64(base64: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = 1;
+                    canvas.height = 1;
+                    const ctx = canvas.getContext("2d") as CanvasDrawImage;
+                    ctx.drawImage(img, 0, 0, 1, 1, 0, 0, 1, 1);
+                    resolve(true);
+                } catch (e) {
+                    resolve(false);
+                }
+            };
+            img.onerror = () => {
+                resolve(false);
+            };
+        });
+    }
+
     /**
      * 取得 radio 值
      */

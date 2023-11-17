@@ -107,7 +107,10 @@ class Hotkey {
                 }
 
                 M.bulkView.setFocus();
-
+                if (e.code === "KeyV" && e.ctrlKey) {
+                    await M.script.open.openClipboard();
+                    return;
+                }
                 if (e.code === "ArrowRight") {
                     M.script.bulkView.pageNext();
                 }
@@ -167,6 +170,10 @@ class Hotkey {
                 if (Lib.isTxtSelect() === false) {
                     M.script.copy.copyImage();
                 }
+            }
+            if (e.code === "KeyV" && e.ctrlKey) {
+                await M.script.open.openClipboard();
+                return;
             }
             if (e.code === "ArrowRight") {
                 M.script.fileLoad.nextFile();

@@ -581,7 +581,7 @@ class MainExif {
 				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>`)
 				btnList.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
-					await WV_System.SetClipboard_Txt(itemText ?? "");
+					await WV_System.SetClipboard_Text(itemText ?? "");
 					Toast.show(M.i18n.t("msg.copyExif", { v: title }), 1000 * 3); //已將「.txt」複製至剪貼簿
 				})
 
@@ -683,7 +683,7 @@ class MainExif {
 			let btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
 
 			btnCopy.addEventListener("click", async () => { // 複製到剪貼簿
-				await WV_System.SetClipboard_Txt(oVal);
+				await WV_System.SetClipboard_Text(oVal);
 				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); // 已將「exifName」複製至剪貼簿
 			});
 

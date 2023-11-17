@@ -372,6 +372,15 @@ class WebAPI {
         return ret === "True";
     }
 
+    /**
+     * 取得剪貼簿內容
+     */
+    static async getClipboardContent() {
+        let maxTextLength = 1000;
+        let url = APIURL + `/api/getClipboardContent?maxTextLength=${maxTextLength}`;
+        let ret = await Lib.sendGet("json", url);
+        return ret as { Type: string, Data: string };
+    }
 }
 
 
