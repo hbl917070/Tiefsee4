@@ -153,7 +153,15 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="post"></param>
         public void PortFreed() {
-            fsPort.Close();
+
+            if (fsPort == null) { return; }
+
+            try {
+                fsPort.Close();
+                fsPort.Dispose();
+                fsPort = null;
+            } catch { }
+
             int port = Program.webServer.port;
             string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
             if (File.Exists(portFile) == true) {
