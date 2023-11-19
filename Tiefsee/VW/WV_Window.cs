@@ -18,6 +18,24 @@ namespace Tiefsee {
             this.M = m;
         }
 
+        public string GetMemoryLevel() {
+            if (M.wv2.CoreWebView2.MemoryUsageTargetLevel
+                    == Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal) {        
+                return "Normal";
+            }
+            return "Low";
+        }
+
+        public void SetMemoryLevel(string type) {
+            if (type.ToLower() == "n") {
+                M.wv2.CoreWebView2.MemoryUsageTargetLevel
+                    = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal;
+            } else {
+                M.wv2.CoreWebView2.MemoryUsageTargetLevel
+                    = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Low;
+            }
+        }
+
         /// <summary>
         /// 清理webview2的暫存
         /// </summary>
