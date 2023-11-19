@@ -364,6 +364,11 @@ class WebAPI {
      * 檢查檔案是否為二進制檔
      */
     static async isBinary(fileInfo2: FileInfo2) {
+     
+        // 如果檔案大於 10M，就直接視為二進制檔
+        if (fileInfo2.Lenght > 1024 * 1024 * 10) {
+            return true;
+        }
         let path = fileInfo2.Path;
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         let encodePath = encodeURIComponent(path);
