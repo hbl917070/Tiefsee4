@@ -11,7 +11,7 @@ class LargeBtn {
     constructor(M: MainWindow) {
 
         var domMainV = document.querySelector(".main-V") as HTMLElement;
-        var domLargeBtnLeft = domMainV.querySelector("#largeBtnLeft") as HTMLElement; //上一頁大按鈕
+        var domLargeBtnLeft = domMainV.querySelector("#largeBtnLeft") as HTMLElement; // 上一頁大按鈕
         var domLargeBtnRight = domMainV.querySelector("#largeBtnRight") as HTMLElement;
 
         this.domLargeBtnLeft = domLargeBtnLeft;
@@ -19,14 +19,13 @@ class LargeBtn {
         this.setShowType = setShowType;
         this.setHide = setHide;
 
-        //大型換頁按鈕
+        // 大型換頁按鈕
         domLargeBtnLeft.addEventListener("click", function (e) {
             M.script.fileLoad.prevFile();
         });
         domLargeBtnRight.addEventListener("click", function (e) {
             M.script.fileLoad.nextFile();
         });
-
 
         // 把滑鼠的滾動事件傳遞給 tiefseeview
         ([domLargeBtnLeft, domLargeBtnRight]).forEach(btn => {
@@ -48,7 +47,6 @@ class LargeBtn {
             });
         });
 
-
         /**
          * 改變顯示類型
          */
@@ -68,7 +66,6 @@ class LargeBtn {
             }
         }
 
-
         /** 
          * 暫時隱藏 
          */
@@ -81,6 +78,6 @@ class LargeBtn {
                 domLargeBtnRight.setAttribute("hide", "");
             }
         }
-
+        
     }
 }

@@ -8,12 +8,12 @@ const gulpEsbuild = require("gulp-esbuild");
 const sass = require("gulp-sass")(require("sass"));
 const newer = require("gulp-newer");
 
-const fc2json = require("gulp-file-contents-to-json"); //處理svg
-const jsonTransform = require("gulp-json-transform"); //處理svg
+const fc2json = require("gulp-file-contents-to-json"); // 處理 svg
+const jsonTransform = require("gulp-json-transform"); // 處理 svg
 
-const output2 = "./../Tiefsee/bin/x64/Debug/net7.0-windows10.0.17763.0/Www"; //把打包後的檔案也複製到開發資料夾 (用於方便測試)
+const output2 = "./../Tiefsee/bin/x64/Debug/net7.0-windows10.0.17763.0/Www"; // 把打包後的檔案也複製到開發資料夾 (用於方便測試)
 
-//資料夾內的所有svg 封裝成一個 js
+// 資料夾內的所有svg 封裝成一個 js
 gulp.task("svg", async () => {
     await sleep(1);
     return gulp.src("./img/default/*.svg")
@@ -46,7 +46,7 @@ gulp.task("scss", async () => {
     await sleep(1);
     return gulp.src("./scss/**/*.scss") // 指定要處理的 Scss 檔案目錄
         .pipe(sass({
-            //outputStyle: "compressed", //壓縮
+            // outputStyle: "compressed", // 壓縮
         }))
         .pipe(gulp.dest("./css")) // 指定編譯後的 css 檔案目錄
         .pipe(gulp.dest(output2 + "/css"))
@@ -58,7 +58,7 @@ gulp.task("ejs-main", async () => {
     await sleep(1);
     return gulp.src("./ejs/MainWindow/MainWindow.ejs")
         .pipe(ejs({ readFile: readFile }, { async: true }))
-        .pipe(rename({ extname: ".html" })) //修改輸出的副檔名
+        .pipe(rename({ extname: ".html" })) // 修改輸出的副檔名
         .pipe(gulp.dest("./"))
         .pipe(gulp.dest(output2 + "/"))
 });
@@ -77,18 +77,19 @@ gulp.task("ts", async () => {
     await sleep(1);
     return gulp.src("./ts/**/*.ts")
         .pipe(gulpEsbuild({
-            //minify: true, //壓縮
-            //outfile: "bundle.js",
-            //bundle: true,
-            //loader: { ".tsx": "tsx", },
+            // minify: true, // 壓縮
+            // outfile: "bundle.js",
+            // bundle: true,
+            // loader: { ".tsx": "tsx", },
         }))
         .pipe(gulp.dest("./js"))
         .pipe(gulp.dest(output2 + "/js"))
 });
 
-//把檔案複製到開發資料夾。 (有非ts、scss、ejs的資源需要複製到開發資料夾時使用
+// 把檔案複製到開發資料夾。 (有非ts、scss、ejs的資源需要複製到開發資料夾時使用
 gulp.task("copy-files", async () => {
     await sleep(1);
+    // 使用 "!" 前綴符號來排除指定的檔案跟目錄
     return gulp
         .src([
             "./**/**",
@@ -96,7 +97,6 @@ gulp.task("copy-files", async () => {
             "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
             "!./Www.esproj", "!./Www.esproj.user"
         ])
-        // ↑↑↑ 使用 "!" 前綴符號來排除指定的檔案跟目錄
         .pipe(newer(output2)) // 使用 gulp-newer 檢查目標資料夾中的檔案是否已更新
         .pipe(gulp.dest(output2))
 });
@@ -111,12 +111,11 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
     gulp.watch("./ejs/MainWindow/*.ejs", gulp.series("ejs-main"));
     gulp.watch("./ejs/SettingWindow/*.ejs", gulp.series("ejs-setting"));
 
-    gulp.watch("./img/default/*.svg", gulp.series("ejs-main")); //svg圖示
+    gulp.watch("./img/default/*.svg", gulp.series("ejs-main")); // svg 圖示
     gulp.watch("./img/default/*.svg", gulp.series("svg"));
 }));
 
 //------------------------------------------------
-
 
 /**
  * 讀取文字檔(用於ejs匯入svg
@@ -126,17 +125,16 @@ gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", (
 async function readFile(path) {
     let t = await new Promise((resolve, reject) => {
         fs.readFile(path, "utf8", function (err, data) {
-            resolve(data); //繼續往下執行
+            resolve(data);
         });
     })
     return t;
 }
 
-
 async function sleep(ms) {
     await new Promise((resolve, reject) => {
         setTimeout(function () {
-            resolve(); //繼續往下執行
+            resolve();
         }, ms);
     })
 }

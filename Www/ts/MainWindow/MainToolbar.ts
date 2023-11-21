@@ -1,4 +1,3 @@
-
 class MainToolbar {
 
     public setEnabled;
@@ -57,7 +56,6 @@ class MainToolbar {
                 }
 
                 if (item.type === "button") {
-
                     addToolbarBtn({
                         group: item.group,
                         name: item.name,
@@ -69,7 +67,6 @@ class MainToolbar {
             }
         }
 
-
         /**
          * 
          * @returns 
@@ -77,7 +74,6 @@ class MainToolbar {
         function getArrray() {
             return ar;
         }
-
 
         /**
          * 設定是否啟用
@@ -93,13 +89,12 @@ class MainToolbar {
             M.config.settings.layout.mainToolbarEnabled = val;
         }
 
-
         /**
          * 初始化 工具列 圖片
          */
         function initToolbarImg() {
 
-            //上一個檔案
+            // 上一個檔案
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
@@ -113,7 +108,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個檔案
+            // 下一個檔案
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
@@ -126,7 +121,6 @@ class MainToolbar {
                     });
                 },
             })
-
 
             // 檔案
             ar.push({
@@ -142,7 +136,7 @@ class MainToolbar {
                 },
             })
 
-            //上一個資料夾
+            // 上一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
@@ -156,7 +150,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個資料夾
+            // 下一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
@@ -170,7 +164,7 @@ class MainToolbar {
                 },
             })
 
-            //排序
+            // 排序
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
@@ -184,7 +178,7 @@ class MainToolbar {
                 },
             })
 
-            //複製
+            // 複製
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
@@ -198,7 +192,7 @@ class MainToolbar {
                 },
             })
 
-            //快速拖曳
+            // 快速拖曳
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
@@ -214,11 +208,11 @@ class MainToolbar {
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); // 避免顯示右鍵選單
                 },
             })
 
-            //刪除
+            // 刪除
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
@@ -232,7 +226,7 @@ class MainToolbar {
                 },
             })
 
-            //搜圖
+            // 搜圖
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuImageSearch",
@@ -246,7 +240,7 @@ class MainToolbar {
                 },
             })
 
-            //進入 大量瀏覽模式
+            // 進入 大量瀏覽模式
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
@@ -260,7 +254,7 @@ class MainToolbar {
                 },
             })
 
-            //設定
+            // 設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
@@ -274,7 +268,7 @@ class MainToolbar {
                 },
             })
 
-            //旋轉與鏡像
+            // 旋轉與鏡像
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuRotation",
@@ -288,7 +282,7 @@ class MainToolbar {
                 },
             })
 
-            //縮放至適合視窗
+            // 縮放至適合視窗
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.zoomToFit",
@@ -304,7 +298,7 @@ class MainToolbar {
 
             //----------------   
 
-            //縮放比例
+            // 縮放比例
             ar.push({
                 type: "html",
                 html: `
@@ -323,7 +317,7 @@ class MainToolbar {
                 },
             })
 
-            //圖片長寬
+            // 圖片長寬
             ar.push({
                 type: "html",
                 html: `
@@ -367,17 +361,14 @@ class MainToolbar {
                 icon: "",
                 func: (btn) => { },
             })
-
-
         }
-
 
         /**
         * 初始化 工具列 pdf
         */
         function initToolbarPdf() {
 
-            //上一張
+            // 上一張
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
@@ -391,7 +382,7 @@ class MainToolbar {
                 },
             })
 
-            //下一張
+            // 下一張
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
@@ -419,7 +410,7 @@ class MainToolbar {
                 },
             })
 
-            //上一個資料夾
+            // 上一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
@@ -433,7 +424,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個資料夾
+            // 下一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
@@ -447,7 +438,7 @@ class MainToolbar {
                 },
             })
 
-            //排序
+            // 排序
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
@@ -461,7 +452,7 @@ class MainToolbar {
                 },
             })
 
-            //複製
+            // 複製
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
@@ -475,7 +466,7 @@ class MainToolbar {
                 },
             })
 
-            //快速拖曳
+            // 快速拖曳
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
@@ -487,15 +478,15 @@ class MainToolbar {
                         M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) { //滑鼠右鍵
+                        if (e.button === 2) { // 滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); // 避免顯示右鍵選單
                 },
             })
 
-            //刪除
+            // 刪除
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
@@ -509,7 +500,7 @@ class MainToolbar {
                 },
             })
 
-            //進入 大量瀏覽模式
+            // 進入 大量瀏覽模式
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
@@ -523,7 +514,7 @@ class MainToolbar {
                 },
             })
 
-            //設定
+            // 設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
@@ -569,17 +560,14 @@ class MainToolbar {
                 icon: "",
                 func: (btn) => { },
             })
-
-
         }
-
 
         /**
          * 初始化 工具列 txt
          */
         function initToolbarTxt() {
 
-            //上一個檔案
+            // 上一個檔案
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
@@ -593,7 +581,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個檔案
+            // 下一個檔案
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
@@ -606,7 +594,6 @@ class MainToolbar {
                     });
                 },
             })
-
 
             // 檔案
             ar.push({
@@ -636,7 +623,7 @@ class MainToolbar {
                 },
             })
 
-            //上一個資料夾
+            // 上一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
@@ -650,7 +637,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個資料夾
+            // 下一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
@@ -664,7 +651,7 @@ class MainToolbar {
                 },
             })
 
-            //排序
+            // 排序
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
@@ -678,7 +665,7 @@ class MainToolbar {
                 },
             })
 
-            //複製
+            // 複製
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
@@ -692,7 +679,7 @@ class MainToolbar {
                 },
             })
 
-            //快速拖曳
+            // 快速拖曳
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
@@ -704,15 +691,15 @@ class MainToolbar {
                         M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) { //滑鼠右鍵
+                        if (e.button === 2) { // 滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); // 避免顯示右鍵選單
                 },
             })
 
-            //刪除
+            // 刪除
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
@@ -726,7 +713,7 @@ class MainToolbar {
                 },
             })
 
-            //進入 大量瀏覽模式
+            // 進入 大量瀏覽模式
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
@@ -740,7 +727,7 @@ class MainToolbar {
                 },
             })
 
-            //設定
+            // 設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
@@ -789,7 +776,6 @@ class MainToolbar {
 
         }
 
-
         /**
         * 初始化 工具列 welcome
         */
@@ -809,7 +795,7 @@ class MainToolbar {
                 },
             })
 
-            //設定
+            // 設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
@@ -822,7 +808,6 @@ class MainToolbar {
                     });
                 },
             })
-
         }
 
 
@@ -830,35 +815,6 @@ class MainToolbar {
          * 初始化 工具列 BulkView
          */
         function initBulkView() {
-
-            //結束 大量瀏覽模式
-            /*ar.push({
-                type: "button", html: "",
-                i18n: "menu.closeBulkView",
-                group: GroupType.bulkView,
-                name: "closeBulkView",
-                icon: "tool-back.svg",
-                func: (btn) => {
-                    btn.style.width = "50px";
-                    btn.addEventListener("click", () => {
-                        M?.script.bulkView.close();
-                    });
-                },
-            })
-
-            ar.push({
-                type: "hr",
-                group: GroupType.bulkView,
-                i18n: "",
-                name: "hr",
-                icon: "",
-                html: "",
-                func: (domHr: HTMLElement) => {
-                    //domHr.style.marginLeft = "6px";
-                    //domHr.style.marginRight = "6px";
-                    //domHr.style.height = "20px";
-                }
-            })*/
 
             // 開啟檔案
             ar.push({
@@ -874,7 +830,7 @@ class MainToolbar {
                 },
             })
 
-            //上一個資料夾
+            // 上一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
@@ -888,7 +844,7 @@ class MainToolbar {
                 },
             })
 
-            //下一個資料夾
+            // 下一個資料夾
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
@@ -902,7 +858,7 @@ class MainToolbar {
                 },
             })
 
-            //排序
+            // 排序
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
@@ -916,8 +872,7 @@ class MainToolbar {
                 },
             })
 
-
-            //複製
+            // 複製
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
@@ -931,7 +886,7 @@ class MainToolbar {
                 },
             })
 
-            //快速拖曳
+            // 快速拖曳
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
@@ -943,15 +898,15 @@ class MainToolbar {
                         M?.script.file.dragDropFile();
                     });
                     btn.addEventListener("mousedown", (e) => {
-                        if (e.button === 2) { //滑鼠右鍵
+                        if (e.button === 2) { // 滑鼠右鍵
                             M?.script.file.showContextMenu();
                         }
                     });
-                    btn.setAttribute("data-menu", "none"); //避免顯示右鍵選單
+                    btn.setAttribute("data-menu", "none"); // 避免顯示右鍵選單
                 },
             })
 
-            //刪除
+            // 刪除
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteDirMsg",
@@ -965,7 +920,7 @@ class MainToolbar {
                 },
             })
 
-            //設定
+            // 設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
@@ -994,7 +949,7 @@ class MainToolbar {
                 func: (btn) => { },
             })
 
-            //大量瀏覽模式設定
+            // 大量瀏覽模式設定
             ar.push({
                 type: "button", html: "",
                 i18n: "menu.showBulkViewSetting",
@@ -1002,7 +957,7 @@ class MainToolbar {
                 name: "showBulkViewSetting",
                 icon: "tool-setting2.svg",
                 func: (btn) => {
-                    btn.style.order = "2001"; //靠右對齊
+                    btn.style.order = "2001"; // 靠右對齊
 
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuBulkView(btn);
@@ -1010,7 +965,6 @@ class MainToolbar {
                 },
             })
         }
-
 
         //---------------------
 
@@ -1035,7 +989,6 @@ class MainToolbar {
             });
         }
 
-
         /**
          * 新增 垂直線
          * @param item 
@@ -1053,7 +1006,6 @@ class MainToolbar {
             });
         }
 
-
         /**
          * 新增 button
          * @param item 
@@ -1066,19 +1018,18 @@ class MainToolbar {
             func: (domBtn: HTMLElement) => void,
         }) {
 
-            //產生按鈕
+            // 產生按鈕
             let div = Lib.newDom(`
                 <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
-            div.style.order = "888"; //未定義順序的按鈕就放在最後面
+            div.style.order = "888"; // 未定義順序的按鈕就放在最後面
             addToolbarDom({
                 group: item.group,
                 dom: div,
                 func: item.func,
             });
         }
-
 
         /**
          * 
@@ -1091,7 +1042,7 @@ class MainToolbar {
 
             if (M === null) { return }
 
-            //如果群組不存在，就先產生群組
+            // 如果群組不存在，就先產生群組
             let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (dom_group === null) {
                 let div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
@@ -1104,7 +1055,6 @@ class MainToolbar {
                 dom_group.appendChild(item.dom);
             }
         }
-
 
     }
 }

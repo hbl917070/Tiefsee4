@@ -1,7 +1,11 @@
 ﻿namespace Tiefsee {
+
     public static class Adapter {
+
         public static SynchronizationContext Dispacher { get; private set; }
-        public static bool isRuning = true; //用於判斷程式是否還在運行
+
+        /// <summary> 用於判斷程式是否還在運行 </summary>
+        public static bool isRuning = true;
 
         /// <summary>
         /// 請於UI執行緒呼叫此方法。
@@ -24,6 +28,7 @@
         public static void Invoke(SendOrPostCallback d, object state) {
             Dispacher.Send(d, state);
         }
+
         /// <summary>
         /// 在 Dispatcher 關聯的執行緒上以非同步方式執行指定的委派。
         /// </summary>
@@ -82,10 +87,8 @@
         /// </summary>
         /// <param name="interval"></param>
         private static void ThreadSleep(int interval) {
-
             int x = interval;
-
-            while (isRuning) { //每100毫秒檢查一次程式是否還在運行
+            while (isRuning) { // 每 100毫秒 檢查一次程式是否還在運行
                 if (x > 100) {
                     Thread.Sleep(100);
                 } else {
@@ -94,9 +97,7 @@
                 }
                 x -= 100;
             }
-
         }
-
 
     }
 }

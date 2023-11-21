@@ -7,7 +7,6 @@ class Config {
         this.baseWindow = _baseWindow;
     }
 
-
     /**
      * 「用其他APP開啟檔案」的列表
      */
@@ -96,43 +95,41 @@ class Config {
         ] as { name: RegExp, path: string, groupType?: string[], fileExt?: string[] }[]
     }
 
-
     public exif = {
         whitelist: [
-            "Date/Time Original", //拍攝日期
-            "Windows XP Keywords", //標籤
-            "Rating", //評等
-            "Image Width/Height", //圖片尺寸
-            "Length", //檔案大小
-            "Windows XP Title", //標題
-            "Artist", //作者
-            "Copyright", //版權
-            "Image Description", //描述
-            "Windows XP Comment", //註解
-            "User Comment", //註解
-            "Make", //相機型號
-            "Model", //相機製造商
-            "Windows XP Subject", //主旨
-            "F-Number", //光圈孔徑
-            "Exposure Time", //曝光時間
-            "ISO Speed Ratings", //ISO速度
-            "Exposure Bias Value", //曝光補償
-            "Focal Length", //焦距
-            "Max Aperture Value", //最大光圈
-            "Metering Mode", //測光模式
-            "Flash", //閃光燈模式
-            "Focal Length 35", //35mm焦距
-            "Orientation", //旋轉資訊
-            "Software", //軟體
-            //"Color Space", //色彩空間
-            "Creation Time", //建立日期
-            "Last Write Time", //修改日期
-            //"Last Access Time", //存取時間
-            "Textual Data", //PNG tEXt
-            "Map", //Google Map
+            "Date/Time Original", // 拍攝日期
+            "Windows XP Keywords", // 標籤
+            "Rating", // 評等
+            "Image Width/Height", // 圖片尺寸
+            "Length", // 檔案大小
+            "Windows XP Title", // 標題
+            "Artist", // 作者
+            "Copyright", // 版權
+            "Image Description", // 描述
+            "Windows XP Comment", // 註解
+            "User Comment", // 註解
+            "Make", // 相機型號
+            "Model", // 相機製造商
+            "Windows XP Subject", // 主旨
+            "F-Number", // 光圈孔徑
+            "Exposure Time", // 曝光時間
+            "ISO Speed Ratings", // ISO速度
+            "Exposure Bias Value", // 曝光補償
+            "Focal Length", // 焦距
+            "Max Aperture Value", // 最大光圈
+            "Metering Mode", // 測光模式
+            "Flash", // 閃光燈模式
+            "Focal Length 35", // 35mm焦距
+            "Orientation", // 旋轉資訊
+            "Software", // 軟體
+            // "Color Space", // 色彩空間
+            "Creation Time", // 建立日期
+            "Last Write Time", // 修改日期
+            // "Last Access Time", // 存取時間
+            "Textual Data", // PNG tEXt
+            "Map", // Google Map
         ]
     }
-
 
     /** 搜圖 */
     public imgSearch = {
@@ -154,7 +151,6 @@ class Config {
             { url: "https://tiefseesearchimageserver.onrender.com/imgSearch/upload", timeout: 10 * 1000 },
         ]
     };
-
 
     public settings = {
         theme: {
@@ -402,7 +398,6 @@ class Config {
         },
     }
 
-
     private _allowFile_img: { ext: string; type: string; vipsType?: string; }[] = [];
     private _allowFile_video: { ext: string; type: string; vipsType?: string; }[] = [];
     private _allowFile_pdf: { ext: string; type: string; vipsType?: string; }[] = [];
@@ -415,10 +410,10 @@ class Config {
         let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
         if (plugin == null) { return; }
 
-        //img
+        // img
         (() => {
             this._allowFile_img = [
-                { ext: "jpg", type: "vips", vipsType: "jpg" }, //如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
+                { ext: "jpg", type: "vips", vipsType: "jpg" }, // 如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
                 { ext: "jpe", type: "vips", vipsType: "jpg" },
@@ -438,10 +433,10 @@ class Config {
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },
                 { ext: "heic", type: "vips", vipsType: "magick" },
-                { ext: "avif", type: "vips", vipsType: "wpf,magick" }, //如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
+                { ext: "avif", type: "vips", vipsType: "wpf,magick" }, // 如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: "vips", vipsType: "magick" },
-                //{ ext: "dcm",type:"vips", vipsType:"magick" }, //多幀
-                { ext: "hdr", type: "vips", vipsType: "magick" }, //必須輸出成png顏色才不會跑掉
+                // { ext: "dcm",type:"vips", vipsType:"magick" }, // 多幀
+                { ext: "hdr", type: "vips", vipsType: "magick" }, // 必須輸出成png顏色才不會跑掉
                 { ext: "miff", type: "vips", vipsType: "magick" },
                 { ext: "mng", type: "vips", vipsType: "magick" },
                 { ext: "otb", type: "vips", vipsType: "magick" },
@@ -455,12 +450,12 @@ class Config {
                 { ext: "pbm", type: "vips", vipsType: "magick" },
                 { ext: "exr", type: "vips", vipsType: "magick" },
                 { ext: "jpf", type: "vips", vipsType: "magick" },
-                { ext: "jp2", type: "vips", vipsType: "magick" }, //開啟速度很慢
+                { ext: "jp2", type: "vips", vipsType: "magick" }, // 開啟速度很慢
                 { ext: "sct", type: "vips", vipsType: "magick" },
-                { ext: "mef", type: "vips", vipsType: "magick" }, //向量
+                { ext: "mef", type: "vips", vipsType: "magick" }, // 向量
                 { ext: "wmf", type: "vips", vipsType: "magick" },
-                { ext: "mpo", type: "vips", vipsType: "magick" }, //相機
-                { ext: "jxl", type: "vips", vipsType: "magick" }, //JPEG XL，開啟速度很慢
+                { ext: "mpo", type: "vips", vipsType: "magick" }, // 相機
+                { ext: "jxl", type: "vips", vipsType: "magick" }, // JPEG XL，開啟速度很慢
 
                 { ext: "crw", type: "vips", vipsType: "dcraw" },
                 { ext: "raf", type: "vips", vipsType: "dcraw" },
@@ -482,7 +477,7 @@ class Config {
                 { ext: "clip", type: "vips", vipsType: "clip" },
             ]
 
-            //有安裝NConvert才使用
+            // 有安裝NConvert才使用
             /*if (plugin.NConvert === true) {
                 this._allowFile_img.push(
                     { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
@@ -495,8 +490,7 @@ class Config {
 
         })();
 
-
-        //video
+        // video
         (() => {
             this._allowFile_video = [
                 { ext: "mp4", type: "video" },
@@ -505,8 +499,7 @@ class Config {
             ]
         })();
 
-
-        //pdf
+        // pdf
         (() => {
             this._allowFile_pdf = [
                 { ext: "pdf", type: "pdf" },
@@ -518,15 +511,14 @@ class Config {
                     { ext: "docx", type: "PDFTronWebviewer" },
                     { ext: "ppt", type: "PDFTronWebviewer" },
                     { ext: "pptx", type: "PDFTronWebviewer" },
-                    //{ ext: "odt", type: "PDFTronWebviewer" },
-                    //{ ext: "odp", type: "PDFTronWebviewer" },
-                    //{ ext: "xlsx", type: "PDFTronWebviewer" },
+                    // { ext: "odt", type: "PDFTronWebviewer" },
+                    // { ext: "odp", type: "PDFTronWebviewer" },
+                    // { ext: "xlsx", type: "PDFTronWebviewer" },
                 );
             }
         })();
 
-
-        //txt
+        // txt
         (() => {
             this._allowFile_txt = [
                 { ext: "sass", type: "auto" },
@@ -565,11 +557,9 @@ class Config {
             for (let i = 0; i < arExt.length; i++) {
                 this._allowFile_txt.push({ ext: arExt[i], type: "auto" })
             }
-
         })();
 
     }
-
 
     /**
      * 取得 檔案關聯列表
@@ -580,7 +570,7 @@ class Config {
         let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
         if (plugin == null) { return []; }
 
-        //首次執行進行初始化
+        // 首次執行進行初始化
         if (this._allowFile_img.length === 0) {
             this.initAllowFileType();
         }
@@ -601,7 +591,6 @@ class Config {
         return []
     }
 
-
     /**
      * 取得 檔案關聯列表
      * @param type 例如 GroupType.img
@@ -618,10 +607,7 @@ class Config {
         }
         return null;
     }
-
-
 }
-
 
 var GroupType = {
 

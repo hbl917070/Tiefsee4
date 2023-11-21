@@ -13,30 +13,9 @@ namespace Tiefsee {
 
     public class ImgLib {
 
-
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        /*public static BitmapSource PathToBitmapSource(String path) {
-            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))) {
-                FileInfo fi = new FileInfo(path);
-                byte[] bytes = reader.ReadBytes((int)fi.Length);
-                MemoryStream ms = new MemoryStream(bytes);
-                BitmapDecoder bd = BitmapDecoder.Create(ms, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
-                reader.Close();
-                reader.Dispose();
-                return bd.Frames[0];
-            }
-        }*/
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="func"></param>
         public static void PathToBitmapSource(String path, Action<BitmapSource> func) {
             using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 BitmapDecoder bd = BitmapDecoder.Create(sr, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
@@ -47,19 +26,14 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ms"></param>
-        /// <returns></returns>
         public static BitmapSource StreamToBitmapSource(MemoryStream ms) {
             BitmapDecoder bd = BitmapDecoder.Create(ms, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
             return bd.Frames[0];
         }
 
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="bs"></param>
-        /// <returns></returns>
         public static Stream BitmapSourceToStream(BitmapSource bs) {
             BitmapEncoder encoder = new BmpBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bs));
@@ -69,14 +43,13 @@ namespace Tiefsee {
             return stream;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         public static MagickImage GetMagickImage(string path) {
 
             var settings = new MagickReadSettings {
-                //BackgroundColor = MagickColors.None,
+                // BackgroundColor = MagickColors.None,
                 Defines = new DngReadDefines {
                     OutputColor = DngOutputColor.SRGB,
                     UseCameraWhitebalance = true,
@@ -88,16 +61,15 @@ namespace Tiefsee {
             /*if (image.ColorSpace == ColorSpace.RGB || image.ColorSpace == ColorSpace.sRGB || image.ColorSpace == ColorSpace.scRGB) {
                 image.SetProfile(ColorProfile.SRGB);
             }*/
-            image.AutoOrient(); //自動調整方向
-            image.SetProfile(ColorProfile.SRGB); //如果不是RGB格式的圖片，需要更多時間來轉檔
+            image.AutoOrient(); // 自動調整方向
+            image.SetProfile(ColorProfile.SRGB); // 如果不是RGB格式的圖片，需要更多時間來轉檔
 
-            if (image.ColorSpace == ColorSpace.RGB) { //用於處理hdr圖片
+            if (image.ColorSpace == ColorSpace.RGB) { // 用於處理hdr圖片
                 image.ColorSpace = ColorSpace.sRGB;
             }
 
             return image;
         }
-
 
         /// <summary>
         /// 
@@ -113,14 +85,14 @@ namespace Tiefsee {
                 MagickFormat imgType;
 
                 if (type == "png") {
-                    image.Quality = 0; //壓縮品質
+                    image.Quality = 0; // 壓縮品質
                     imgType = MagickFormat.Png24;
                 } else if (type == "jpg" || type == "jpeg") {
                     imgType = MagickFormat.Jpeg;
                 } else if (type == "tif" || type == "tiff") {
                     imgType = MagickFormat.Tiff;
                 } else {
-                    imgType = MagickFormat.Bmp; //bpm也支援透明色
+                    imgType = MagickFormat.Bmp; // bpm也支援透明色
                 }
 
                 var ms = new MemoryStream();
@@ -134,12 +106,9 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public static Stream Wpf_PathToStream(string path) {
             Stream stream = null;
             ImgLib.PathToBitmapSource(path, (BitmapSource bs) => {
@@ -147,7 +116,6 @@ namespace Tiefsee {
             });
             return stream;
         }
-
 
         /// <summary>
         /// 
@@ -179,7 +147,7 @@ namespace Tiefsee {
                     }
                 }
 
-                //如果縮圖小於800，就不使用縮圖       
+                // 如果縮圖小於800，就不使用縮圖       
                 if (thumbnail) {
                     try {
                         var bs = StreamToBitmapSource(memoryStream);
@@ -191,15 +159,15 @@ namespace Tiefsee {
                             memoryStream.Position = 0;
                             return memoryStream;
                         }
-                    } catch (Exception) {
+                    } catch {
                         Console.WriteLine("縮圖失敗: " + path);
                     }
                 }
 
                 try {
                     memoryStream.Position = 0;
-                    using (MagickImage image = new MagickImage(memoryStream)) {
-                        MemoryStream imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Jpeg));
+                    using (MagickImage image = new(memoryStream)) {
+                        MemoryStream imgMs = new(image.ToByteArray(MagickFormat.Jpeg));
                         memoryStream.Close();
                         memoryStream.Dispose();
                         if (thumbnail) {
@@ -212,7 +180,7 @@ namespace Tiefsee {
                         }
                         return imgMs;
                     }
-                } catch (Exception) {
+                } catch {
                     Console.WriteLine("Magick RAW 失敗: " + path);
                 }
 
@@ -226,22 +194,14 @@ namespace Tiefsee {
                     return imgMs;
                 }
 
-            } catch (Exception ee) {
+            } catch {
                 throw;
             }
         }
 
-
         /// <summary>
         /// 以檔案的路徑跟大小來產生雜湊字串(用於暫存檔名)
         /// </summary>
-        /*public static String FileToHash(String path) {
-            var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-            long fileSize = new FileInfo(path).Length; //檔案大小
-            long ticks = new FileInfo(path).LastWriteTime.Ticks; //檔案最後修改時間
-            String s = Convert.ToBase64String(sha1.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
-            return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
-        }*/
         public static string FileToHash(string path) {
             using (var sha256 = System.Security.Cryptography.SHA256.Create()) {
                 long fileSize = new FileInfo(path).Length; // File size
@@ -255,22 +215,18 @@ namespace Tiefsee {
         /// 檢查圖片的 ICC Profile 是否為 CMYK
         /// </summary>
         public static bool IsCMYK(string path) {
-
             using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                 int len = (int)sr.Length;
-                if (len > 30000) { len = 30000; } //只讀取前30000個字，避免開啟大檔案讀取很久
+                if (len > 30000) { len = 30000; } // 只讀取前30000個字，避免開啟大檔案讀取很久
                 byte[] bytes = new byte[len];
                 sr.Read(bytes, 0, len);
                 string s = System.Text.Encoding.ASCII.GetString(bytes);
-
                 if (s.Contains("prtrCMYK")) {
                     return true;
                 }
             }
-
             return false;
         }
-
 
         /// <summary>
         /// BitmapSource 轉 Bitmap
@@ -292,7 +248,6 @@ namespace Tiefsee {
             bmp.UnlockBits(data);
             return bmp;
         }
-
 
         /// <summary>
         /// 從 stream 內查詢字串第一次出現的位置
@@ -325,9 +280,7 @@ namespace Tiefsee {
             }
 
             return -1;
-
         }
-
 
         /// <summary>
         /// Clip Studio Paint 產生的 clip檔
@@ -337,13 +290,13 @@ namespace Tiefsee {
                 string tempFilePath = Path.GetTempFileName();
                 using (FileStream fs = new FileStream(clipPath, FileMode.Open, FileAccess.Read)) {
 
-                    //取得 sqlite標頭 的位置。"SQLite format 3"
+                    // 取得 sqlite標頭 的位置。"SQLite format 3"
                     byte[] header = new byte[] { 0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, 0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33 };
                     long startIndex = FindStrIndexOf(fs, header);
 
                     if (startIndex == -1) { return null; }
 
-                    //把 sqlite 寫入到暫存當
+                    // 把 sqlite 寫入到暫存當
                     using (FileStream temp = new FileStream(tempFilePath, FileMode.Create)) {
                         long size = new FileInfo(clipPath).Length;
                         byte[] data = new byte[size];
@@ -353,7 +306,7 @@ namespace Tiefsee {
                     }
                 }
 
-                //從 sqlite 裡面提取圖片
+                // 從 sqlite 裡面提取圖片
                 Stream stream = new MemoryStream();
                 using (var db = new SQLiteConnection(tempFilePath)) {
                     var data = db.ExecuteScalar<byte[]>("SELECT ImageData FROM CanvasPreview");
@@ -368,14 +321,13 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 以 hex 的方式掃描檔案內的 png，並將其提取出來。可用於 afphoto
         /// </summary>
         public static Stream ExtractPngToStream(string filePath) {
             try {
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
-                    byte[] startHex = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; //png檔的開頭       
+                    byte[] startHex = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // png 檔的開頭       
                     int startIndex = FindStrIndexOf(fs, startHex);
                     if (startIndex == -1) { return null; }
                     byte[] endHex = new byte[] { 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 }; //png檔的結尾
@@ -391,11 +343,10 @@ namespace Tiefsee {
                     stream.Write(outputData, 0, outputData.Length);
                     return stream;
                 }
-            } catch (Exception) {
+            } catch {
                 return null;
             }
         }
-
 
         #region Nconvert
 
@@ -479,20 +430,18 @@ namespace Tiefsee {
 
         #endregion
 
-
         #region vips
 
         private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
 
         /// <summary> vips的暫存 </summary>
-        class DataVips {
+        private class DataVips {
             public string key;
             public NetVips.Image vips;
         }
 
         /// <summary> vips的暫存 </summary>
-        static List<DataVips> tempArNewVips = new List<DataVips>();
-
+        private static List<DataVips> tempArNewVips = new List<DataVips>();
 
         /// <summary>
         /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要using
@@ -508,10 +457,10 @@ namespace Tiefsee {
                     }
                 }
 
-                NetVips.Cache.MaxFiles = 0; //避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
+                NetVips.Cache.MaxFiles = 0; // 避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
                 NetVips.Image im;
 
-                if (type == "webp") { //如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
+                if (type == "webp") { // 如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
                     using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                         im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
                     }
@@ -523,7 +472,7 @@ namespace Tiefsee {
                     key = key, vips = im
                 });
 
-                if (tempArNewVips.Count > 5) { //最多保留5個檔案
+                if (tempArNewVips.Count > 5) { // 最多保留5個檔案
                     using (tempArNewVips[0].vips) { }
                     tempArNewVips[0].vips = null;
                     tempArNewVips.RemoveAt(0);
@@ -531,7 +480,6 @@ namespace Tiefsee {
                 return im;
             }
         }
-
 
         /// <summary>
         /// 使用wpf來取得圖片size
@@ -580,20 +528,17 @@ namespace Tiefsee {
             return ret;
         }
 
-
         /// <summary>
         /// 取得圖片的size，然後把檔案處理成vips可以載入的格式，寫入到暫存資料夾
         /// </summary>
         public static ImgInitInfo GetImgInitInfo(string path, string type) {
 
-            //Console.WriteLine("p:" + path + "  t:" + type);
-
-            ImgInitInfo imgInfo = new ImgInitInfo();
+            ImgInitInfo imgInfo = new();
             string path100 = PathToImg100(path);
 
-            //如果已經處理過了，就改成回傳處理過的檔案
+            // 如果已經處理過了，就改成回傳處理過的檔案
             if (File.Exists(path100)) {
-                File.SetLastWriteTime(path100, DateTime.Now); //調整最後修改時間，延後暫存被清理
+                File.SetLastWriteTime(path100, DateTime.Now); // 調整最後修改時間，延後暫存被清理
                 return GetImgInitInfo(path100, "vips");
             }
 
@@ -604,7 +549,7 @@ namespace Tiefsee {
                 imgInfo.code = "1";
                 imgInfo.path = path;
             } else {
-                StartWindow.isRunGC = true; //定時執行GC
+                StartWindow.isRunGC = true; // 定時執行GC
             }
 
             if (type == "tif" || type == "tiff") {
@@ -618,14 +563,14 @@ namespace Tiefsee {
 
             if (type == "jpg") {
 
-                if (IsCMYK(path)) { //如果是CMYK，就先套用顏色
+                if (IsCMYK(path)) { // 如果是CMYK，就先套用顏色
 
                     NetVips.Image Vimg = GetNetVips(path, "jpg");
                     using (var Vimg2 = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { //套用顏色
                         Vimg2.Jpegsave(path100);
                     }
                     return GetImgInitInfo(path100, "vips");
-                } else { //直接回傳
+                } else { // 直接回傳
                     return GetImgInitInfo(path, "vips");
                 }
             }
@@ -652,12 +597,12 @@ namespace Tiefsee {
 
             if (type == "magick") {
                 using (MagickImage image = GetMagickImage(path)) {
-                    if (image.IsOpaque) { //如果不透明
+                    if (image.IsOpaque) { // 如果不透明
                         image.Write(path100, MagickFormat.Jpeg);
 
                     } else {
                         using (var ms = new MemoryStream()) {
-                            //image.Quality = 1;
+                            // image.Quality = 1;
                             image.Write(ms, MagickFormat.Tiff);
                             ms.Position = 0;
                             using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, "", NetVips.Enums.Access.Random)) {
@@ -668,19 +613,12 @@ namespace Tiefsee {
                     image.Dispose();
                 }
 
-                /*
-                using (var ms = MagickImage_PathToStream(path, magickType)) {
-                    using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, "", NetVips.Enums.Access.Random)) {
-                        VipsSave(vImg, path100, "auto");
-                    }
-                }*/
-
                 return GetImgInitInfo(path100, "vips");
             }
 
             if (type == "dcraw") {
                 using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
-                    using (FileStream fileStream = File.Create(path100)) { //儲存檔案
+                    using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
                         stream.Seek(0, SeekOrigin.Begin);
                         stream.CopyTo(fileStream);
                     }
@@ -690,7 +628,7 @@ namespace Tiefsee {
 
             if (type == "clip") {
                 using (Stream stream = ImgLib.ClipToStream(path)) {
-                    using (FileStream fileStream = File.Create(path100)) { //儲存檔案
+                    using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
                         stream.Seek(0, SeekOrigin.Begin);
                         stream.CopyTo(fileStream);
                     }
@@ -700,7 +638,7 @@ namespace Tiefsee {
 
             if (type == "extractPng") {
                 using (Stream stream = ImgLib.ExtractPngToStream(path)) {
-                    using (FileStream fileStream = File.Create(path100)) { //儲存檔案
+                    using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
                         stream.Seek(0, SeekOrigin.Begin);
                         stream.CopyTo(fileStream);
                     }
@@ -721,40 +659,38 @@ namespace Tiefsee {
             return imgInfo;
         }
 
-
         /// <summary>
         /// 縮放圖片，並且存入暫存資料夾 (只支援jpg、png、tif、webp)
         /// </summary>
         public static string VipsResize(string path, double scale, string type) {
 
-            string hashName = $"{FileToHash(path)}_{scale}.jpg"; //暫存檔案名稱
-            string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); //暫存檔案的路徑
+            string hashName = $"{FileToHash(path)}_{scale}.jpg"; // 暫存檔案名稱
+            string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); // 暫存檔案的路徑
 
-            if (File.Exists(filePath)) { //如果檔案已經存在，就直接回傳
-                File.SetLastWriteTime(filePath, DateTime.Now); //調整最後修改時間，延後暫存被清理
+            if (File.Exists(filePath)) { // 如果檔案已經存在，就直接回傳
+                File.SetLastWriteTime(filePath, DateTime.Now); // 調整最後修改時間，延後暫存被清理
                 return filePath;
             }
 
-            if (Directory.Exists(AppPath.tempDirImgZoom) == false) { //如果暫存資料夾不存在就建立
+            if (Directory.Exists(AppPath.tempDirImgZoom) == false) { // 如果暫存資料夾不存在就建立
                 Directory.CreateDirectory(AppPath.tempDirImgZoom);
             }
 
             string img100 = PathToImg100(path);
             if (File.Exists(img100)) {
-                File.SetLastWriteTime(img100, DateTime.Now); //調整最後修改時間，延後暫存被清理
-            } else { //如果沒有處理過的暫存檔
-                img100 = path; //直接只用原檔
+                File.SetLastWriteTime(img100, DateTime.Now); // 調整最後修改時間，延後暫存被清理
+            } else { // 如果沒有處理過的暫存檔
+                img100 = path; // 直接只用原檔
             }
 
             NetVips.Image im = GetNetVips(img100, type);
             using (NetVips.Image imR = im.Resize(scale: scale, kernel: Enums.Kernel.Lanczos3, gap: 4)) {
                 VipsSave(imR, filePath, "auto");
             }
-            StartWindow.isRunGC = true; //定時執行GC
+            StartWindow.isRunGC = true; // 定時執行GC
 
             return filePath;
         }
-
 
         /// <summary>
         /// vips儲存檔案
@@ -769,13 +705,12 @@ namespace Tiefsee {
 
             } else if (type == "png") {
                 vImg.Pngsave(
-                      filename: path,
-                      compression: 0,
-                      interlace: false,
-                      filter: Enums.ForeignPngFilter.None
-               );
+                    filename: path,
+                    compression: 0,
+                    interlace: false,
+                    filter: Enums.ForeignPngFilter.None
+                );
             } else {
-
                 bool transparent = VipsHasTransparent(vImg);
                 if (transparent) {
                     VipsSave(vImg, path, "png");
@@ -785,29 +720,31 @@ namespace Tiefsee {
             }
         }
 
-
-        /// <summary> 檢查vips是否包含透明色 </summary>
+        /// <summary>
+        /// 檢查vips是否包含透明色
+        /// </summary>
         public static bool VipsHasTransparent(NetVips.Image im) {
 
-            //if (im.HasAlpha() == false) { return false; } //使用Bitmap的話會失效
-
-            int bands = im.Bands; //取得色板的數量，例如rgb=4、rgba=4
+            int bands = im.Bands; // 取得色板的數量，例如rgb=4、rgba=4
             bool hasAlpha =
                bands == 2 ||
                bands > 4 ||
                (bands == 4 && im.Interpretation != Enums.Interpretation.Cmyk);
 
-            if (hasAlpha == false) { return false; } //如果不含透明色板就直接回傳
+            if (hasAlpha == false) { return false; } // 如果不含透明色板就直接回傳
 
-            var d = im[im.Bands - 1].Min(); //取得最後一個色板的最小值
-            return d != 255; //如果不是255，表示有不透明的顏色
+            var d = im[im.Bands - 1].Min(); // 取得最後一個色板的最小值
+            return d != 255; // 如果不是255，表示有不透明的顏色
         }
 
-
-        /// <summary> 取得「img100」暫存資料夾裡面的檔案名稱  </summary>
+        /// <summary>
+        /// 取得「img100」暫存資料夾裡面的檔案名稱
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string PathToImg100(string path) {
-            string hashName = $"{FileToHash(path)}.jpg"; //暫存檔案名稱
-            string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); //暫存檔案的路徑
+            string hashName = $"{FileToHash(path)}.jpg"; // 暫存檔案名稱
+            string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
             if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
                 Directory.CreateDirectory(AppPath.tempDirImgProcessed);
             }
@@ -816,10 +753,7 @@ namespace Tiefsee {
 
         #endregion
 
-
     }
-
-
 
     public class ImgInitInfo {
         public string code = "-1";

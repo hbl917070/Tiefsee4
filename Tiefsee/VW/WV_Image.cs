@@ -12,7 +12,6 @@ namespace Tiefsee {
             this.M = m;
         }
 
-
         /// <summary>
         /// 取得任何檔案的圖示
         /// </summary>
@@ -21,15 +20,14 @@ namespace Tiefsee {
         /// <returns></returns>
         public string GetFileIcon(String path, int size) {
             if (File.Exists(path) == false) { return ""; }
-            //取得圖片在Windows系統的縮圖
+            // 取得圖片在Windows系統的縮圖
             Bitmap icon = WindowsThumbnailProvider.GetThumbnail(
-                            path, size, size, ThumbnailOptions.ScaleUp
-                        );
+                path, size, size, ThumbnailOptions.ScaleUp
+            );
             string base64 = BitmapToBase64(icon);
             icon.Dispose();
             return base64;
         }
-
 
         /// <summary>
         /// 
@@ -48,9 +46,6 @@ namespace Tiefsee {
             }
             return base64String;
         }
-
-
-
 
     }
 }

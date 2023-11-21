@@ -12,24 +12,24 @@ namespace Tiefsee {
     /// 自定義樣式的 winfrom 選單
     /// </summary>
     public class RJDropdownMenu : ContextMenuStrip {
-        //Fields
+        // Fields
         private bool isMainMenu;
         private int menuItemHeight = 25;
-        private Color menuItemTextColor = Color.Empty; //No color, The default color is set in the MenuRenderer class
-        private Color primaryColor = Color.Empty; //No color, The default color is set in the MenuRenderer class
+        private Color menuItemTextColor = Color.Empty; // No color, The default color is set in the MenuRenderer class
+        private Color primaryColor = Color.Empty; // No color, The default color is set in the MenuRenderer class
 
         private Bitmap menuItemHeaderSize;
 
-        //Constructor
+        // Constructor
         public RJDropdownMenu(IContainer container)
             : base(container) {
         }
 
         public RJDropdownMenu() { }
-        //Properties
-        //Optionally, hide the properties in the toolbox to avoid the problem of displaying and/or 
-        //saving control property changes in the designer at design time in Visual Studio.
-        //If the problem I mention does not occur you can expose the properties and manipulate them from the toolbox.
+        // Properties
+        // Optionally, hide the properties in the toolbox to avoid the problem of displaying and/or 
+        // saving control property changes in the designer at design time in Visual Studio.
+        // If the problem I mention does not occur you can expose the properties and manipulate them from the toolbox.
         [Browsable(false)]
         public bool IsMainMenu {
             get { return isMainMenu; }
@@ -54,7 +54,7 @@ namespace Tiefsee {
             set { primaryColor = value; }
         }
 
-        //Private methods
+        // Private methods
         private void LoadMenuItemHeight() {
             if (isMainMenu)
                 menuItemHeaderSize = new Bitmap(20, 25);
@@ -75,14 +75,14 @@ namespace Tiefsee {
                         foreach (ToolStripMenuItem menuItemL4 in menuItemL3.DropDownItems) {
                             menuItemL4.ImageScaling = ToolStripItemImageScaling.None;
                             if (menuItemL4.Image == null) menuItemL4.Image = menuItemHeaderSize;
-                            ///Level 5++
+                            // Level 5++
                         }
                     }
                 }
             }
         }
 
-        //Overrides
+        // Overrides
         protected override void OnHandleCreated(EventArgs e) {
             base.OnHandleCreated(e);
             if (this.DesignMode == false) {
@@ -92,9 +92,9 @@ namespace Tiefsee {
 
             //-----------
 
-            //下面為 修復開啟選單後，選單會自己關閉
+            // 下面為 修復開啟選單後，選單會自己關閉
 
-            //顯示選單後，讓選單取得焦點
+            // 顯示選單後，讓選單取得焦點
             VisibleChanged += (sender, e) => {
                 if (Visible) {
                     Adapter.DelayRun(1, () => {
@@ -103,7 +103,7 @@ namespace Tiefsee {
                 }
             };
 
-            //不在工作列顯示
+            // 不在工作列顯示
             SetWindowLong(Handle, GWL_EXSTYLE, (GetWindowLong(Handle, GWL_EXSTYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
         }
 
@@ -120,13 +120,13 @@ namespace Tiefsee {
     }
 
     public class MenuColorTable : ProfessionalColorTable {
-        //Fields
+        // Fields
         private Color backColor;
         private Color leftColumnColor;
         private Color borderColor;
         private Color menuItemBorderColor;
         private Color menuItemSelectedColor;
-        //Constructor
+        // Constructor
         public MenuColorTable(bool isMainMenu, Color primaryColor) {
             if (isMainMenu) {
                 backColor = Color.FromArgb(43, 43, 43);
@@ -142,7 +142,7 @@ namespace Tiefsee {
                 menuItemSelectedColor = primaryColor;
             }
         }
-        //Overrides
+        // Overrides
         public override Color ToolStripDropDownBackground { get { return backColor; } }
         public override Color MenuBorder { get { return borderColor; } }
         public override Color MenuItemBorder { get { return menuItemBorderColor; } }
@@ -156,35 +156,35 @@ namespace Tiefsee {
     }
 
     public class MenuRenderer : ToolStripProfessionalRenderer {
-        //Fields
+        // Fields
         private Color primaryColor;
         private Color textColor;
         private int arrowThickness;
-        //Constructor
+        // Constructor
         public MenuRenderer(bool isMainMenu, Color primaryColor, Color textColor)
             : base(new MenuColorTable(isMainMenu, primaryColor)) {
             this.primaryColor = primaryColor;
             if (isMainMenu) {
                 arrowThickness = 3;
-                if (textColor == Color.Empty) //Set Default Color
+                if (textColor == Color.Empty) // Set Default Color
                     this.textColor = Color.Gainsboro;
-                else //Set custom text color 
+                else // Set custom text color 
                     this.textColor = textColor;
             } else {
                 arrowThickness = 2;
-                if (textColor == Color.Empty) //Set Default Color
+                if (textColor == Color.Empty) // Set Default Color
                     this.textColor = Color.DimGray;
-                else //Set custom text color
+                else // Set custom text color
                     this.textColor = textColor;
             }
         }
-        //Overrides
+        // Overrides
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e) {
             base.OnRenderItemText(e);
             e.Item.ForeColor = e.Item.Selected ? Color.White : textColor;
         }
         protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e) {
-            //Fields
+            // Fields
             var graph = e.Graphics;
             var arrowSize = new Size(5, 12);
             var arrowColor = e.Item.Selected ? Color.White : primaryColor;
@@ -192,7 +192,7 @@ namespace Tiefsee {
                 arrowSize.Width, arrowSize.Height);
             using (GraphicsPath path = new GraphicsPath())
             using (Pen pen = new Pen(arrowColor, arrowThickness)) {
-                //Drawing
+                // Drawing
                 graph.SmoothingMode = SmoothingMode.AntiAlias;
                 path.AddLine(rect.Left, rect.Top, rect.Right, rect.Top + rect.Height / 2);
                 path.AddLine(rect.Right, rect.Top + rect.Height / 2, rect.Left, rect.Top + rect.Height);
@@ -201,5 +201,4 @@ namespace Tiefsee {
         }
     }
 
- 
 }

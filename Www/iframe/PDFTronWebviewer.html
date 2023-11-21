@@ -30,16 +30,15 @@
     <div id="viewer"></div>
 
     <script>
-
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
@@ -54,7 +53,6 @@
             }
         });
 
-
         /**
          * 告知父物件 已經初始化完成
          */
@@ -65,11 +63,9 @@
             };
             libIframe.postMsg(json);
         }
-
     </script>
 
     <script>
-
         var libIframe = new LibIframe();
         var instance;
 
@@ -77,10 +73,8 @@
             initPDFTronWebviewer();
         });
 
-
-
         /**
-         *   初始化套件
+         *  初始化套件
          */
         async function initPDFTronWebviewer() {
 
@@ -92,19 +86,18 @@
 
             //-------------
 
-            WebViewer(
-                {
+            WebViewer({
                     path: pathLib,
-                    //licenseKey: "Insert commercial license key here after purchase",
+                    // licenseKey: "Insert commercial license key here after purchase",
                 },
                 document.getElementById("viewer")
             ).then(_instance => {
                 instance = _instance;
 
                 setTheme();
-                initFinish(); //告知父物件 已經初始化完成
+                initFinish(); // 告知父物件 已經初始化完成
 
-                let lang = libIframe.getLang(); //取得使用者選擇的語言
+                let lang = libIframe.getLang(); // 取得使用者選擇的語言
                 if (lang == "zh-TW") {
                     lang = "zh_tw";
                 } else if (lang == "ja") {
@@ -115,11 +108,11 @@
                 instance.UI.setLanguage(lang);
 
                 let iframeWindow = document.body.querySelector("iframe").contentWindow;
-                libIframe.initEventDrop(iframeWindow); //註冊 drop 事件，拖曳檔案進來時 開啟檔案
+                libIframe.initEventDrop(iframeWindow); // 註冊 drop 事件，拖曳檔案進來時 開啟檔案
 
-                //點擊超連結時
-                iframeWindow.open = function (href) {
-                    libIframe.openUrl(href); //開啟網址或檔案
+                // 點擊超連結時
+                iframeWindow.open = function(href) {
+                    libIframe.openUrl(href); // 開啟網址或檔案
                 }
             });
         }
@@ -148,13 +141,11 @@
          */
         async function loadFile(path) {
             instance.UI.loadDocument(path);
-            instance.UI.setFitMode("FitWidth"); //縮放模式為寬度全滿
-            instance.UI.setToolbarGroup('toolbarGroup-View'); //工具列預設選擇為view            
-
-
+            instance.UI.setFitMode("FitWidth"); // 縮放模式為寬度全滿
+            instance.UI.setToolbarGroup('toolbarGroup-View'); // 工具列預設選擇為view            
         }
-
     </script>
+
 </body>
 
 </html>

@@ -61,7 +61,7 @@ class Lib {
      */
     public static GetExtension = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
-        let name = path.substring(path.lastIndexOf("\\") + 1); //取得檔名
+        let name = path.substring(path.lastIndexOf("\\") + 1); // 取得檔名
         let index = name.lastIndexOf(".");
         if (index === -1) { return ""; }
         return "." + name.substring(index + 1).toLocaleLowerCase();
@@ -106,20 +106,20 @@ class Lib {
 
         dom.addEventListener("mousedown", async (e: MouseEvent) => {
 
-            if (e.button !== 0) { //如果不是滑鼠左鍵
+            if (e.button !== 0) { // 如果不是滑鼠左鍵
                 return;
             }
 
-            if (clickTimeout !== -1) { //double click      
+            if (clickTimeout !== -1) { // double click      
                 clearTimeout(clickTimeout);
                 clickTimeout = -1;
-                if (Math.abs(_x - e.offsetX) < 4 && Math.abs(_y - e.offsetY) < 4) { //如果點擊位置一樣
+                if (Math.abs(_x - e.offsetX) < 4 && Math.abs(_y - e.offsetY) < 4) { // 如果點擊位置一樣
                     func(e)
                 }
             } else {
                 _x = e.offsetX;
                 _y = e.offsetY;
-                clickTimeout = setTimeout(() => { //click
+                clickTimeout = setTimeout(() => { // click
                     clickTimeout = -1;
                 }, dealy);
             }
@@ -137,11 +137,11 @@ class Lib {
         if (Lib.GetExtension(fileInfo2.Path) === ".svg") {
             return true;
         }
-        if (hex.indexOf("47 49 46 38") === 0) { //gif
+        if (hex.indexOf("47 49 46 38") === 0) { // gif
             return true;
         }
-        if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) { //apng
-            if (hex.indexOf("08 61 63 54") > 10) { //acTL
+        if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) { // apng
+            if (hex.indexOf("08 61 63 54") > 10) { // acTL
                 return true;
             }
         }
@@ -160,7 +160,7 @@ class Lib {
      */
     public static GetFileType(fileInfo2: FileInfo2) {
 
-        let fileExt = Lib.GetExtension(fileInfo2.FullPath); //取得附檔名
+        let fileExt = Lib.GetExtension(fileInfo2.FullPath); // 取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
         let hex = fileInfo2.HexValue;
 
@@ -170,21 +170,21 @@ class Lib {
         if (hex.indexOf("42 4D") === 0 && hex.length > 30 && hex.substring(18, 29) === "00 00 00 00") {
             return "bmp";
         }
-        if (hex.indexOf("47 49 46 38") === 0) { //GIF8
+        if (hex.indexOf("47 49 46 38") === 0) { // GIF8
             return "gif";
         }
         if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) {
-            if (hex.indexOf("08 61 63 54") > 10) { //acTL
+            if (hex.indexOf("08 61 63 54") > 10) { // acTL
                 return "apng";
             } else {
                 return "png";
             }
         }
-        if (hex.indexOf("57 45 42 50 56 50 38") > 0) { //WEBPVP8
+        if (hex.indexOf("57 45 42 50 56 50 38") > 0) { // WEBPVP8
             return "webp";
         }
         if (hex.indexOf("6D 69 6D 65 74 79 70 65 61 70 70 6C 69 63 61 74 69 6F 6E 2F 76 6E 64 2E 61 64 6F 62 65 2E 73 70 61 72 6B 6C 65 72 2E 70 72 6F 6A 65 63 74 2B 64 63 78 75 63 66 50 4B") > 0) {
-            //mimetypeapplication/vnd.adobe.sparkler.projectdcxucfPK
+            // mimetypeapplication/vnd.adobe.sparkler.projectdcxucfPK
             return "xd";
         }
         if (hex.indexOf("25 50 44 46") === 0) { // %PDF
@@ -195,36 +195,36 @@ class Lib {
             return "lnk";
         }
 
-        if (hex.indexOf("66 74 79 70 69 73 6F") === 12) { //00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 69(i) 73(s) 6F(o)
+        if (hex.indexOf("66 74 79 70 69 73 6F") === 12) { // 00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 69(i) 73(s) 6F(o)
             return "mp4";
         }
-        if (hex.indexOf("66 74 79 70 6D 70 34") === 12) { //00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 70(p) 34(4)
+        if (hex.indexOf("66 74 79 70 6D 70 34") === 12) { // 00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 70(p) 34(4)
             return "mp4";
         }
-        if (hex.indexOf("66 74 79 70 6D 6D 70 34") === 12) { //00() 00() 00() 18(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 6D(m) 70(p) 34(4)
+        if (hex.indexOf("66 74 79 70 6D 6D 70 34") === 12) { // 00() 00() 00() 18(*) 66(f) 74(t) 79(y) 70(p) 6D(m) 6D(m) 70(p) 34(4)
             return "mp4";
         }
-        if (hex.indexOf("66 74 79 70 4D 34 56") === 12) { //00() 00() 00() 28(() 66(f) 74(t) 79(y) 70(p) 4D(M) 34(4) 56(V)
+        if (hex.indexOf("66 74 79 70 4D 34 56") === 12) { // 00() 00() 00() 28(() 66(f) 74(t) 79(y) 70(p) 4D(M) 34(4) 56(V)
             return "mp4";
         }
-        if (hex.indexOf("66 74 79 70 61 76 69 66") === 12) { //00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 61(a) 76(v) 69(i) 66(f)
+        if (hex.indexOf("66 74 79 70 61 76 69 66") === 12) { // 00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p) 61(a) 76(v) 69(i) 66(f)
             return "avif";
         }
-        /*if (hex.indexOf("66 74 79 70") === 12) { //00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p)
-            return "mp4"; //可能將其他影片格式也誤判成mp4
+        /*if (hex.indexOf("66 74 79 70") === 12) { // 00() 00() 00() *(*) 66(f) 74(t) 79(y) 70(p)
+            return "mp4"; // 可能將其他影片格式也誤判成mp4
         }*/
 
 
-        if (hex.indexOf("1A 45 DF A3") === 0) { //可擴展二進位元語言
-            if (hex.indexOf("77 65 62 6D 42 87") > 0) { //77(w) 65(e) 62(b) 6D(m) 42(B) 87()
+        if (hex.indexOf("1A 45 DF A3") === 0) { // 可擴展二進位元語言
+            if (hex.indexOf("77 65 62 6D 42 87") > 0) { // 77(w) 65(e) 62(b) 6D(m) 42(B) 87()
                 return "webm"
             }
         }
-        if (hex.indexOf("4F 67 67 53") === 0) { //4F(O) 67(g) 67(g) 53(S)
+        if (hex.indexOf("4F 67 67 53") === 0) { // 4F(O) 67(g) 67(g) 53(S)
             return "ogv";
         }
 
-        if (hex.indexOf("38 42 50 53") === 0) { //38(8) 42(B) 50(P) 53(S)
+        if (hex.indexOf("38 42 50 53") === 0) { // 38(8) 42(B) 50(P) 53(S)
             return "psd";
         }
 
@@ -262,9 +262,9 @@ class Lib {
      * URL 轉 路徑
      */
     public static URLToPath(path: string): string {
-        if (path.indexOf("file:///") === 0) { //一般檔案
+        if (path.indexOf("file:///") === 0) { // 一般檔案
             path = path.substring(8);
-        } else if (path.indexOf("file://") === 0) { //網路路徑，例如 \\Desktop-abc\AA
+        } else if (path.indexOf("file://") === 0) { // 網路路徑，例如 \\Desktop-abc\AA
             path = path.substring(5);
         }
         path = decodeURIComponent(path).replace(/[/]/g, "\\");
@@ -301,7 +301,7 @@ class Lib {
     public static isTxtSelect() {
         let selection = window.getSelection();
         if (selection === null) { return false; }
-        //let isElect = selection.anchorOffset !== selection.focusOffset;
+        // let isElect = selection.anchorOffset !== selection.focusOffset;
         let isElect = selection.toString() !== "";
         return isElect;
     }
@@ -342,10 +342,10 @@ class Lib {
         if (browserLang == "zh" || browserLang.indexOf("zh-") === 0) {
             return "zh-TW";
         }
-        if (browserLang.indexOf("ja") === 0) { //日本
+        if (browserLang.indexOf("ja") === 0) { // 日本
             return "ja";
         }
-        /*if (browserLang.indexOf("ko") === 0) { //韓文
+        /*if (browserLang.indexOf("ko") === 0) { // 韓文
             return "ko";
         }*/
         /*if (browserLang == "en" || browserLang.indexOf("en-") === 0) {
@@ -406,9 +406,9 @@ class Lib {
                     reader.onloadend = function () {
                         let d = reader.result;
                         if (typeof d === "string") {
-                            resolve(d); //繼續往下執行
+                            resolve(d);
                         } else {
-                            resolve(""); //繼續往下執行
+                            resolve("");
                         }
                     }
                     reader.readAsDataURL(xhr.response);
@@ -429,7 +429,7 @@ class Lib {
     public static async sleep(ms: number) {
         await new Promise((resolve, reject) => {
             setTimeout(function () {
-                resolve(0); //繼續往下執行
+                resolve(0);
             }, ms);
         })
     }
@@ -438,8 +438,8 @@ class Lib {
      * 轉 number
      */
     public static toNumber(t: string | number): number {
-        if (typeof (t) === "number") { return t } //如果本來就是數字，直接回傳     
-        if (typeof t === "string") { return Number(t.replace("px", "")); } //如果是string，去掉px後轉型成數字
+        if (typeof (t) === "number") { return t } // 如果本來就是數字，直接回傳     
+        if (typeof t === "string") { return Number(t.replace("px", "")); } // 如果是 string，去掉 px 後轉型成數字
         return 0;
     }
 
@@ -461,7 +461,6 @@ class Lib {
         }
     }
 
-
     /**
      * 折疊面板
      * @param domTitle 標題區塊
@@ -479,7 +478,7 @@ class Lib {
             funcChange = (type: string) => { };
         }
 
-        //自動
+        // 自動
         if (type === "toggle") {
             if (domBox.getAttribute("open") === "false") {
                 type = "true";
@@ -502,7 +501,7 @@ class Lib {
             domContent.style.maxHeight = div.scrollHeight + "px";
             domBox.setAttribute("open", "true");
 
-            //把最大高度切換自動
+            // 把最大高度切換自動
             setTimeout(() => {
                 if (domBox.getAttribute("open") === "true") {
                     domContent.style.maxHeight = "";
@@ -523,7 +522,6 @@ class Lib {
             funcChange("true");
         }
     }
-
 
     /**
      * 註冊一個 mousedown ，在移動一定距離後才觸發運行
@@ -560,7 +558,6 @@ class Lib {
             isDragging = false;
         });*/
     }
-
 
     /**
      * 格式化 json 字串
@@ -636,8 +633,8 @@ class Lib {
             case "image/x-icon":
             case "image/vnd.microsoft.icon":
                 return "ico";
-            case "image/octet-stream": //如果是未知類型
-                if (await this.isValidImageBase64(base64)) { //檢查是否為圖片
+            case "image/octet-stream": // 如果是未知類型
+                if (await this.isValidImageBase64(base64)) { // 檢查是否為圖片
                     return "png";
                 } else {
                     return "";
@@ -681,12 +678,10 @@ class Lib {
      * @param {*} value 
      */
     public static setRadio(queryName: string, value: string) {
-        $(`${queryName}[value="${value}"]`).prop("checked", true); //radio 賦值
+        $(`${queryName}[value="${value}"]`).prop("checked", true); // radio 賦值
     }
 
 }
-
-
 
 /**
  * 對Date的擴充套件，將 Date 轉化為指定格式的String
@@ -698,13 +693,13 @@ class Lib {
  */
 Date.prototype.format = function (this: Date, format: string): string {
     const o: { [key: string]: number } = {
-        "M+": this.getMonth() + 1, //month
-        "d+": this.getDate(), //day
-        "h+": this.getHours(), //hour
-        "m+": this.getMinutes(), //minute
-        "s+": this.getSeconds(), //second
-        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
-        "S": this.getMilliseconds() //millisecond
+        "M+": this.getMonth() + 1, // month
+        "d+": this.getDate(), // day
+        "h+": this.getHours(), // hour
+        "m+": this.getMinutes(), // minute
+        "s+": this.getSeconds(), // second
+        "q+": Math.floor((this.getMonth() + 3) / 3), // quarter
+        "S": this.getMilliseconds() // millisecond
     }
 
     format = format.replace(/(y+)/, (match) => {
@@ -720,7 +715,6 @@ Date.prototype.format = function (this: Date, format: string): string {
 interface Date {
     format(format: string): string;
 }
-
 
 /**
  * 節流 (定時執行，時間內重複執行，則只會執行最後一個指令)

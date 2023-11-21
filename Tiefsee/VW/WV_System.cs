@@ -10,7 +10,6 @@ namespace Tiefsee {
 
 
     [ComVisible(true)]
-
     public class WV_System {
 
         WebWindow M;
@@ -77,13 +76,12 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 取得當前是否按著空白鍵跟滑鼠滾輪
         /// </summary>
         public string GetDownKey() {
-            bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); //按著空白鍵
-            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
+            bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
+            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; // 按著滑鼠滾輪
 
             var obj = new {
                 isKeyboardSpace = isKeyboardSpace,
@@ -94,21 +92,20 @@ namespace Tiefsee {
             return json;
         }
 
-
         /// <summary>
         /// 產生捷徑
         /// </summary>
-        /// <param name="exePath">exe路徑</param>
-        /// <param name="lnkPath">要儲存的ink路徑</param>
-        /// <param name="args">啟動參數</param>
+        /// <param name="exePath"> exe路徑 </param>
+        /// <param name="lnkPath"> 要儲存的ink路徑 </param>
+        /// <param name="args"> 啟動參數 </param>
         public void NewLnk(string exePath, string lnkPath, string args) {
 
             if (File.Exists(exePath) == false) { return; }
 
-            //產生捷徑
+            // 產生捷徑
             using (ShellLink slLinkObject = new ShellLink()) {
-                slLinkObject.WorkPath = Directory.GetParent(exePath).ToString(); //工作資料夾
-                slLinkObject.IconLocation = exePath + ",0";   //圖示檔案。 0圖示檔的 Index
+                slLinkObject.WorkPath = Directory.GetParent(exePath).ToString(); // 工作資料夾
+                slLinkObject.IconLocation = exePath + ",0";   // 圖示檔案。 0圖示檔的 Index
                 slLinkObject.ExecuteFile = exePath;
                 slLinkObject.ExecuteArguments = args;
                 slLinkObject.Save(lnkPath);
@@ -116,7 +113,6 @@ namespace Tiefsee {
                 slLinkObject.Dispose();
             }
         }
-
 
         /// <summary>
         /// 取得某一個點所在的螢幕資訊
@@ -135,7 +131,6 @@ namespace Tiefsee {
             return mouse;
         }
 
-
         /// <summary>
         /// 立即刪除所有圖片暫存
         /// </summary>
@@ -144,7 +139,6 @@ namespace Tiefsee {
             DeleteTemp(AppPath.tempDirImgZoom, 0);
         }
 
-
         /// <summary>
         /// 刪除圖片暫存 (保留一定數量
         /// </summary>
@@ -152,11 +146,10 @@ namespace Tiefsee {
         /// <param name="maxImgZoom"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
         public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
             new Thread(() => {
-                if (Program.startType == 3 || Program.startType == 5) { //常駐背景，關閉所有視窗才執行清除
+                if (Program.startType == 3 || Program.startType == 5) { // 常駐背景，關閉所有視窗才執行清除
                     if (QuickRun.runNumber <= 2) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
-                        Console.WriteLine("########## 刪除圖片暫存(常駐背景)");
                     }
                     return;
                 }
@@ -168,7 +161,6 @@ namespace Tiefsee {
                     if (QuickRun.runNumber <= 1) {
                         DeleteTemp(AppPath.tempDirImgProcessed, maxImgProcessed);
                         DeleteTemp(AppPath.tempDirImgZoom, maxImgZoom);
-                        Console.WriteLine("########## 刪除圖片暫存" + QuickRun.runNumber);
                     }
                 }
 
@@ -176,8 +168,8 @@ namespace Tiefsee {
         }
         private void DeleteTemp(string path, int max) {
             if (Directory.Exists(path) == false) { return; }
-            FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos(); //取得資料夾內的所有檔案與資料夾
-            if (ar.Length <= max) { return; } //如果檔案數量未達上限，就不做任何事情
+            FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos(); // 取得資料夾內的所有檔案與資料夾
+            if (ar.Length <= max) { return; } // 如果檔案數量未達上限，就不做任何事情
             List<FileSystemInfo> sortedFiles = ar.OrderBy(f => f.LastWriteTime).ToList();
             for (int i = 0; i < sortedFiles.Count - max; i++) {
                 try {
@@ -185,7 +177,6 @@ namespace Tiefsee {
                 } catch { }
             }
         }
-
 
         #region 模擬鍵盤
 
@@ -232,7 +223,6 @@ namespace Tiefsee {
             }
         }
         #endregion
-
 
         #region Clipboard 剪貼簿
 
@@ -296,46 +286,39 @@ namespace Tiefsee {
 
         #endregion
 
-
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
         /// </summary>
         /// <returns></returns>
         public String GetSystemRoot() {
             string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
-            //path = path.Substring(0, 1);
             return path;
         }
-
 
         /// <summary>
         /// 取得滑鼠的坐標
         /// </summary>
         public int[] GetMousePosition() {
             var p = System.Windows.Forms.Cursor.Position;
-            //Dictionary<string, int> dic = new Dictionary<string, int>();
-            //dic.Add("X", p.X);
-            //dic.Add("Y", p.Y);
             return new int[2] { p.X, p.Y };
         }
-
 
         /// <summary>
         /// 設定桌布
         /// </summary>
         /// <param name="path"></param>
         public void SetWallpaper(string path) {
-            if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
-                try {
-                    SystemParametersInfo(20, 1, path, 0x1 | 0x2); //存在成立，修改桌布　　(uActuin 20 參數為修改wallpaper
-                } catch (Exception e2) {
-                    MessageBox.Show("\"Set as Desktop Background\" failed：\n" + e2.ToString(), "Error");
-                }
+            if (File.Exists(path) == false) {
+                return;
+            }
+            try {
+                SystemParametersInfo(20, 1, path, 0x1 | 0x2); // 存在成立，修改桌布　(uActuin 20 參數為修改wallpaper
+            } catch (Exception e2) {
+                MessageBox.Show("\"Set as Desktop Background\" failed：\n" + e2.ToString(), "Error");
             }
         }
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int uWinlni);
-
 
         /// <summary>
         /// 判斷是否為 win10
@@ -350,19 +333,17 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 判斷是否為 win7
         /// </summary>
         public bool IsWindows7() {
             try {
-                String os = System.Environment.OSVersion.Version.ToString(); //取得作業系統地版本
-                return os.Length > 3 && os.Substring(0, 3) == "6.1"; //win7
+                String os = System.Environment.OSVersion.Version.ToString(); // 取得作業系統地版本
+                return os.Length > 3 && os.Substring(0, 3) == "6.1"; // win7
             } catch {
                 return false;
             }
         }
-
 
         /// <summary>
         /// lnk 轉 exe路徑
@@ -373,7 +354,6 @@ namespace Tiefsee {
             return LnkToExe.GetExePate(path);
         }
 
-
         /// <summary>
         /// 回傳程式目前記憶體使用量（MB
         /// </summary>
@@ -382,7 +362,6 @@ namespace Tiefsee {
             var xx = proc.WorkingSet64;
             return xx / 1024 / 1024;
         }
-
 
         /// <summary>
         /// 回收記憶體
@@ -405,10 +384,6 @@ namespace Tiefsee {
             t.Start();
         }
 
-
-        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
-
         /// <summary>
         /// 關聯副檔名
         /// </summary>
@@ -417,13 +392,13 @@ namespace Tiefsee {
         /// <param name="ExecutableName"></param>
         public void AssociationExtension(object[] arExtension, string appPath) {
 
-            //如果檔案不存在
+            // 如果檔案不存在
             if (File.Exists(appPath) == false) { return; }
 
-            string appName = Path.GetFileName(appPath); //程式檔名，例如 Tiefsee.exe
+            string appName = Path.GetFileName(appPath); // 程式檔名，例如 Tiefsee.exe
 
             for (int i = 0; i < arExtension.Length; i++) {
-                string Extension = arExtension[i].ToString(); //副檔名
+                string Extension = arExtension[i].ToString(); // 副檔名
                 _AssociationExtension(Extension, appPath, appName);
             }
         }
@@ -454,6 +429,8 @@ namespace Tiefsee {
                 SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
             } catch { }
         }
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
         /// <summary>
         /// 解除關聯副檔名
@@ -463,13 +440,13 @@ namespace Tiefsee {
         /// <param name="ExecutableName"></param>
         public void RemoveAssociationExtension(object[] arExtension, string appPath) {
 
-            //如果檔案不存在
+            // 檔案不存在
             if (File.Exists(appPath) == false) { return; }
 
-            string appName = Path.GetFileName(appPath); //程式檔名，例如 Tiefsee.exe
+            string appName = Path.GetFileName(appPath); // 程式檔名，例如 Tiefsee.exe
 
             for (int i = 0; i < arExtension.Length; i++) {
-                string Extension = arExtension[i].ToString(); //副檔名
+                string Extension = arExtension[i].ToString(); // 副檔名
 
                 using (RegistryKey User_Classes = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey("SOFTWARE\\Classes\\", true)) {
                     User_Classes.DeleteSubKeyTree("." + Extension, false);
@@ -490,8 +467,6 @@ namespace Tiefsee {
             SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
         }
 
-
-
         /// <summary>
         /// 對檔案進行排序
         /// </summary>
@@ -506,7 +481,6 @@ namespace Tiefsee {
             var filesort = new FileSort();
             return filesort.Sort(arFile, type);
         }
-
 
         /// <summary>
         /// 對檔案進行排序。同一資料夾內的檔案就不傳入與回傳完整路徑，減少傳輸成本

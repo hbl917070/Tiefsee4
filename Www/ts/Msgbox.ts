@@ -20,9 +20,7 @@ class Msgbox {
 
             this.i18n = _i18n
         }
-
     }
-
 
     /**
      * 判斷目前是否有任何顯示中的訊息方塊
@@ -30,8 +28,6 @@ class Msgbox {
     public isShow(): boolean {
         return this._isShow;
     }
-
-
 
     /**
      * 顯示
@@ -51,13 +47,13 @@ class Msgbox {
 
         this._isShow = true;
 
-        let txt = ""; //內容文字
-        let type: ("txt" | "text" | "radio") = "txt"; //類型
-        let inputTxt = ""; //預設的輸入框內容
-        let isAllowClose = true; //是否允許關閉
-        let isShowBtn = true; //是否顯示按鈕
-        let arRadio: { value: string; name: string; }[] = []; //radio選項
-        let radioValue: string = ""; //radio預設值
+        let txt = ""; // 內容文字
+        let type: ("txt" | "text" | "radio") = "txt"; // 類型
+        let inputTxt = ""; // 預設的輸入框內容
+        let isAllowClose = true; // 是否允許關閉
+        let isShowBtn = true; // 是否顯示按鈕
+        let arRadio: { value: string; name: string; }[] = []; // radio選項
+        let radioValue: string = ""; // radio預設值
         let funcYes = (dom: HTMLElement, value: string) => { this.close(dom); }
         let funcClose = (dom: HTMLElement) => { this.close(dom); }
 
@@ -115,25 +111,25 @@ class Msgbox {
             donBox.setAttribute("active", "true");
         }, 1);
 
-        if (json.funcYes === undefined) { //如果沒有指定按下「確定」的事件，就隱藏「取消」按鈕
+        if (json.funcYes === undefined) { // 如果沒有指定按下「確定」的事件，就隱藏「取消」按鈕
             donBtnNo.style.display = "none";
         }
-        if (isAllowClose === false) { //禁止關閉
+        if (isAllowClose === false) { // 禁止關閉
             donBtnClose.style.display = "none";
             donBtnNo.style.display = "none";
         }
         if (isShowBtn === false) {
-            donBottom.style.display = "none"; //不顯示按鈕
+            donBottom.style.display = "none"; // 不顯示按鈕
         }
         if (type !== "text") {
-            donInput.style.display = "none"; //隱藏輸入框
+            donInput.style.display = "none"; // 隱藏輸入框
         }
 
         donInput.value = inputTxt;
 
         donBtnClose.addEventListener("click", () => { funcClose(dom) })
         donBtnNo.addEventListener("click", () => { funcClose(dom) })
-        donBtnYes.addEventListener("click", () => { //按下確認時
+        donBtnYes.addEventListener("click", () => { // 按下確認時
             let value: string = "";
             if (type === "txt") { }
             if (type === "text") {
@@ -149,26 +145,25 @@ class Msgbox {
         document.body.appendChild(dom);
 
         if (type === "text") {
-            donInput.focus(); //取得焦點
+            donInput.focus(); // 取得焦點
             donInput.select();
         }
 
         return {
             domMsg: dom,
             domInput: donInput,
-            //close: () => { this.close(dom) }
+            // close: () => { this.close(dom) }
         };
     }
-
 
     /**
      * 關閉特定的訊息方塊
      * @param dom 
      */
     public close(dom: HTMLElement) {
-        dom.parentNode?.removeChild(dom); //移除dom
+        dom.parentNode?.removeChild(dom); // 移除dom
 
-        //判斷是否還有其他的 訊息方塊
+        // 判斷是否還有其他的 訊息方塊
         let arMsgbox = document.querySelectorAll(".msgbox-box");
         for (let i = 0; i < arMsgbox.length; i++) {
             const item = arMsgbox[i];
@@ -179,7 +174,6 @@ class Msgbox {
         }
         this._isShow = false;
     }
-
 
     /**
      * 關閉全部
@@ -192,7 +186,6 @@ class Msgbox {
         }
         this._isShow = false;
     }
-
 
     /**
     * 當前的Msg 關閉
@@ -207,7 +200,6 @@ class Msgbox {
         const dom = arMsgbox[arMsgbox.length - 1];
         dom.parentNode?.removeChild(dom);
     }
-
 
     /**
      * 當前的Msg 按下

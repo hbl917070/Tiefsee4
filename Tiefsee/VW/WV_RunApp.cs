@@ -22,7 +22,7 @@ namespace Tiefsee {
         /// </summary>
         /// <param name="path"></param>
         public void ShowMenu(string path) {
-            if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
+            if (File.Exists(path)) { // 判別檔案是否存在於對應的路徑
                 try {
                     Process.Start(new ProcessStartInfo("rundll32.exe") {
                         Arguments = $"shell32.dll,OpenAs_RunDLL {path}",
@@ -35,9 +35,8 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
-        /// 取得開始選單裡面的所有lnk
+        /// 取得開始選單裡面的所有 lnk
         /// </summary>
         /// <returns></returns>
         public string[] GetStartMenuList() {
@@ -45,31 +44,31 @@ namespace Tiefsee {
             List<String> arFile = new List<string>();
             string path;
 
-            //全域的開始選單
+            // 全域的開始選單
             path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
-            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs"); //開始選單的路徑
+            path = Path.Combine(path, @"ProgramData\Microsoft\Windows\Start Menu\Programs"); // 開始選單的路徑
             if (Directory.Exists(path)) {
-                GetDirForeachFiles(path, arFile); //windows的開始
+                GetDirForeachFiles(path, arFile);
             }
 
-            //使用者的開始選單
+            // 使用者的開始選單
             path = System.Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
             path = Path.Combine(path, "Programs");
             if (Directory.Exists(path)) {
-                GetDirForeachFiles(path, arFile); //windows的開始
+                GetDirForeachFiles(path, arFile);
             }
 
-            // 使用 LINQ 篩選出副檔名是 .lnk 的檔案路徑
-            var lnkFiles = arFile.Where(file => Path.GetExtension(file).ToLower() == ".lnk");
+            // 篩選出副檔名是 .lnk 的檔案路徑
+            var lnkFiles = arFile
+                .Where(file => Path.GetExtension(file).ToLower() == ".lnk")
+                .ToArray();
 
-            return lnkFiles.ToArray();
+            return lnkFiles;
         }
 
-
         /// <summary>
-        /// 取得資料夾內所有檔案
+        /// 遞迴以取得資料夾內所有檔案 (攤開成一維陣列)
         /// </summary>
-        /// <param name="s_資料夾"></param>
         private void GetDirForeachFiles(String sDir, List<String> arFile) {
             var arDir = Directory.EnumerateFileSystemEntries(sDir);
             foreach (var item in arDir) {
@@ -81,9 +80,8 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
-        /// 
+        /// 取得系統槽，例如 C:\
         /// </summary>
         /// <returns></returns>
         public String GetSystemRoot() {
@@ -91,41 +89,6 @@ namespace Tiefsee {
             //path = path.Substring(0, 1);
             return path;
         }
-
-
-        /// <summary>
-        /// 以3D小畫家開啟
-        /// </summary>
-        /// <param name="path"></param>
-        public void Open3DMSPaint(string path) {
-            if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
-                try {
-                    //System.Diagnostics.Process.Start("mspaint", '"' + path + '"' + " /ForceBootstrapPaint3D");             
-                    Process.Start(new ProcessStartInfo("mspaint") {
-                        Arguments = '"' + path + '"' + " /ForceBootstrapPaint3D",
-                        WorkingDirectory = Path.GetDirectoryName(path),
-                        UseShellExecute = true
-                    });
-                } catch (Exception e2) {
-                    System.Windows.Forms.MessageBox.Show(e2.ToString(), "失敗");
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 使用內建的相簿APP來開啟
-        /// </summary>
-        /// <param name="filePath"></param>
-        async public void OpenPhotoApp(string filePath) {
-            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
-            if (file != null) {
-                var options = new Windows.System.LauncherOptions();
-                options.TargetApplicationPackageFamilyName = "60852WEN-HONGLIAO.Tiefsee_zgbpcvardp742";
-                await Windows.System.Launcher.LaunchFileAsync(file, options);
-            }
-        }
-
 
         /// <summary>
         /// 以UWP開啟檔案
@@ -141,7 +104,6 @@ namespace Tiefsee {
             }
         }
 
-
         class UwpItem {
             public string Logo;
             public string Name;
@@ -155,10 +117,10 @@ namespace Tiefsee {
         public string GetUwpList() {
 
             bool isFirstRun = false;
-            if (temp_UwpItem == null) { //判斷是否為首次執行
+            if (temp_UwpItem == null) { // 判斷是否為首次執行
                 isFirstRun = true;
                 try {
-                    //如果存在 UwpList.json 的暫存檔，就讀取此檔案
+                    // 如果存在 UwpList.json 的暫存檔，就讀取此檔案
                     string jsonString = "{}";
                     if (File.Exists(AppPath.appDataUwpList)) {
                         using (StreamReader sr = new StreamReader(AppPath.appDataUwpList, Encoding.UTF8)) {
@@ -178,12 +140,12 @@ namespace Tiefsee {
             var packages = packageManager.FindPackagesForUser("");
             foreach (var package in packages) {
 
-                string fullName = package.Id.FullName; //名稱+版本
+                string fullName = package.Id.FullName; // 名稱+版本
 
-                //如果暫存不存在此筆資料，則重新抓資料
+                // 如果暫存不存在此筆資料，則重新抓資料
                 if (temp_UwpItem.ContainsKey(fullName) == false) {
-                    string name = package.DisplayName; //APP在地化的名稱 (取得成本高)
-                    string logo = package.Logo.ToString(); //圖示的路徑 (取得成本高)
+                    string name = package.DisplayName; // APP在地化的名稱 (取得成本高)
+                    string logo = package.Logo.ToString(); // 圖示的路徑 (取得成本高)
                     string id = package.Id.Name + "_" + package.Id.PublisherId;
                     UwpItem uwpItem = new UwpItem {
                         Logo = logo,
@@ -200,7 +162,7 @@ namespace Tiefsee {
                 ar.Add(temp_UwpItem[fullName]);
             }
 
-            //如果是首次執行，就產生暫存檔，減少下次讀取的時間
+            // 如果是首次執行，就產生暫存檔，減少下次讀取的時間
             if (isFirstRun) {
                 using (FileStream fs = new FileStream(AppPath.appDataUwpList, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8)) {
@@ -213,23 +175,6 @@ namespace Tiefsee {
         }
 
         /// <summary>
-        /// 以 photos APP開啟(已失效)
-        /// </summary>
-        /// <param name="path"></param>
-        /*public void OpenPhotoApp(string path) {
-            if (File.Exists(path)) { //判別檔案是否存在於對應的路徑
-                try {
-                    String url_path = Uri.EscapeDataString(path);
-                    System.Diagnostics.Process.Start("ms-photos:viewer?fileName=" + url_path);
-                } catch (Exception e2) {
-                    System.Windows.Forms.MessageBox.Show(e2.ToString(), "失敗");
-                }
-            }
-        }*/
-
-
-
-        /// <summary>
         /// 執行其他程式
         /// </summary>
         /// <param name="FileName"></param>
@@ -238,14 +183,13 @@ namespace Tiefsee {
         /// <param name="UseShellExecute"></param>
         public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
             var psi = new System.Diagnostics.ProcessStartInfo();
-            psi.FileName = FileName; //執行檔路徑
-            psi.WorkingDirectory = Path.GetDirectoryName(FileName); //設定執行檔所在的目錄
-            psi.Arguments = Arguments; //命令參數
-            psi.CreateNoWindow = CreateNoWindow; //是否使用新視窗
-            psi.UseShellExecute = UseShellExecute; //false=新視窗個體 
+            psi.FileName = FileName; // 執行檔路徑
+            psi.WorkingDirectory = Path.GetDirectoryName(FileName); // 設定執行檔所在的目錄
+            psi.Arguments = Arguments; // 命令參數
+            psi.CreateNoWindow = CreateNoWindow; // 是否使用新視窗
+            psi.UseShellExecute = UseShellExecute; // false=新視窗個體 
             System.Diagnostics.Process.Start(psi);
         }
-
 
         /// <summary>
         /// 用瀏覽器開啟網址
@@ -254,7 +198,6 @@ namespace Tiefsee {
         /// <returns></returns>
         public bool OpenUrl(string url) {
             try {
-                //System.Diagnostics.Process.Start(url);
                 var psi = new ProcessStartInfo {
                     FileName = url,
                     UseShellExecute = true
@@ -265,8 +208,6 @@ namespace Tiefsee {
                 return false;
             }
         }
-
-
 
     }
 }

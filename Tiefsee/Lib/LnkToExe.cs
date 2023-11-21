@@ -3,26 +3,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Tiefsee {
+
     public class LnkToExe {
-
-
 
         /// <summary>
         /// 從lnk捷徑抓取真實檔案位置
         /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
         public static string GetExePate(string filename) {
             ShellLink link = new ShellLink();
             ((IPersistFile)link).Load(filename, STGM_READ);
-            // TODO: if I can get hold of the hwnd call resolve first. This handles moved and renamed files.  
+            // TODO: if I can get hold of the hwnd call resolve first. This handles moved and renamed files.
             // ((IShellLinkW)link).Resolve(hwnd, 0) 
             StringBuilder sb = new StringBuilder(MAX_PATH);
             WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
             ((IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
             return GetTruePath(sb.ToString());
         }
-
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
@@ -32,7 +28,6 @@ namespace Tiefsee {
             string path = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows));
             return path;
         }
-
 
         /// <summary>
         /// 判斷檔案
@@ -64,8 +59,6 @@ namespace Tiefsee {
             }
 
         }
-
-
 
         #region 從lnk捷徑取得真實路徑 （Signitures imported from http://pinvoke.net
 
@@ -217,7 +210,6 @@ namespace Tiefsee {
         }
 
         #endregion
-
 
     }
 

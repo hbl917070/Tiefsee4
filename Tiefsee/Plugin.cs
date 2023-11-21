@@ -9,8 +9,7 @@ namespace Tiefsee {
         public static string pathQuickLook;
         public static string pathPDFTronWebviewer;
         public static string pathMonacoEditor;
-        public static DataPlugin dataPlugin = new DataPlugin();
-
+        public static DataPlugin dataPlugin = new();
 
         /// <summary>
         /// 初始化
@@ -26,24 +25,22 @@ namespace Tiefsee {
             pathMonacoEditor = Path.Combine(AppPath.appDataPlugin, "monaco-editor/min/vs/loader.js");
             dataPlugin.MonacoEditor = File.Exists(pathMonacoEditor);
 
-            pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib/webviewer.min.js"); //從瀏覽器下載的zip
+            pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib/webviewer.min.js"); // 從瀏覽器下載的zip
             dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
             if (dataPlugin.PDFTronWebviewer) {
                 dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
                 dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib");
             } else {
-                pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "webviewer/webviewer.min.js"); //從npm下載
+                pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "webviewer/webviewer.min.js"); // 從npm下載
                 dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
                 if (dataPlugin.PDFTronWebviewer) {
                     dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
                     dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "webviewer/public");
                 }
             }
-
         }
 
     }
-
 
     /// <summary>
     /// 快速預覽檔案
@@ -64,18 +61,16 @@ namespace Tiefsee {
 
             if (meth == null) {
                 string dllPath = Plugin.pathQuickLook;
-                Assembly ass = Assembly.LoadFile(dllPath); //加載dll文件
-                Type tp = ass.GetType("Tiefsee.QuickLook"); //獲取類名，必須 命名空間+類名
-                obj = Activator.CreateInstance(tp); //建立實例
-                meth = tp.GetMethod("GetCurrentSelection"); //獲取方法
+                Assembly ass = Assembly.LoadFile(dllPath); // 加載dll文件
+                Type tp = ass.GetType("Tiefsee.QuickLook"); // 獲取類名，必須 命名空間+類名
+                obj = Activator.CreateInstance(tp); // 建立實例
+                meth = tp.GetMethod("GetCurrentSelection"); // 獲取方法
             }
 
-            string ret = (string)meth.Invoke(obj, new Object[] { }); //Invoke調用方法
+            string ret = (string)meth.Invoke(obj, new Object[] { }); // Invoke調用方法
             return ret;
         }
     }
-
-
 
     public class DataPlugin {
         public bool NConvert = false;

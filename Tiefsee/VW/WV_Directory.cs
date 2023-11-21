@@ -2,14 +2,9 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-
 namespace Tiefsee {
 
     [ComVisible(true)]
-
-    /// <summary>
-    /// 網頁呼叫C#方法
-    /// </summary>
     public class WV_Directory {
 
         WebWindow M;
@@ -40,41 +35,40 @@ namespace Tiefsee {
                 arExt[i] = "." + ((String)_arExt[i]).ToLower();
             }
 
-            string parentPath = Path.GetDirectoryName(siblingPath); //取得父親資料夾
+            string parentPath = Path.GetDirectoryName(siblingPath); // 取得父親資料夾
             Dictionary<string, List<string>> output = new Dictionary<string, List<string>>();
 
             string[] arDir = new string[0];
-            try { //如果取得所有資料夾失敗，就只處理自己目前的資料夾
-                if (parentPath == null) { //如果沒有上一層資料夾
-                    arDir = new string[] { siblingPath }; //只處理自己
+            try { // 如果取得所有資料夾失敗，就只處理自己目前的資料夾
+                if (parentPath == null) { // 如果沒有上一層資料夾
+                    arDir = new string[] { siblingPath }; // 只處理自己
                 } else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) { //如果開啟的是 user資料夾 裡面的資料(例如桌面
-                    arDir = new string[] { siblingPath }; //只處理自己
+                    arDir = new string[] { siblingPath }; // 只處理自己
                 } else if (maxCount == 0) {
-                    arDir = new string[] { siblingPath }; //只處理自己
+                    arDir = new string[] { siblingPath }; // 只處理自己
                 } else {
-                    arDir = Directory.GetDirectories(parentPath); //取得所有子資料夾
-                    if (arDir.Length > maxCount) { //如果資料夾太多
-                        arDir = new string[] { siblingPath }; //只處理自己
+                    arDir = Directory.GetDirectories(parentPath); // 取得所有子資料夾
+                    if (arDir.Length > maxCount) { // 如果資料夾太多
+                        arDir = new string[] { siblingPath }; // 只處理自己
                     }
                 }
             } catch {
-                arDir = new string[] { siblingPath }; //只處理自己
+                arDir = new string[] { siblingPath }; // 只處理自己
             }
 
-            foreach (var dirPath in arDir) { //所有子資料夾
+            foreach (var dirPath in arDir) { // 所有子資料夾
                 string dirName = Path.GetFileName(dirPath);
                 string[] arFile;
                 try {
-                    //arFile = Directory.GetFiles(dirPath);
+                    // arFile = Directory.GetFiles(dirPath);
                     if (arExt.Length == 0) {
-                        //取得資料夾內前4個檔案的檔名
+                        // 取得資料夾內前4個檔案的檔名
                         arFile = Directory.EnumerateFiles(dirPath, "*.*")
-                              .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
+                            .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
                     } else {
-                        //以副檔名來篩選，取得資料夾內前4個檔案的檔名
-                        var query = from file in Directory.EnumerateFiles(dirPath, "*.*", SearchOption.TopDirectoryOnly)
-                                    where arExt.Contains(Path.GetExtension(file).ToLower(), StringComparer.Ordinal)
-                                    select file;
+                        // 以副檔名來篩選，取得資料夾內前4個檔案的檔名
+                        var query = Directory.EnumerateFiles(dirPath, "*.*", SearchOption.TopDirectoryOnly)
+                            .Where(file => arExt.Contains(Path.GetExtension(file).ToLower(), StringComparer.Ordinal));
                         arFile = query.Take(4).Select(f => Path.GetFileName(f)).ToArray();
                     }
                 } catch {
@@ -90,7 +84,7 @@ namespace Tiefsee {
                 Array.Sort(arFile,  new NaturalSort());*/
 
                 foreach (string item in arFile) {
-                    if (output.ContainsKey(dirName) == false) { //以資料夾名稱當做key
+                    if (output.ContainsKey(dirName) == false) { // 以資料夾名稱當做 key
                         output.Add(dirName, new List<string>());
                     }
                     output[dirName].Add(item);
@@ -98,12 +92,12 @@ namespace Tiefsee {
 
             }
 
-            //如果取得的名單內不包含自己，就補上
+            // 如果取得的名單內不包含自己，就補上
             string siblingPathName = Path.GetFileName(siblingPath);
             if (output.ContainsKey(siblingPathName) == false) {
                 output.Add(siblingPathName, new List<string>());
                 try {
-                    //取得資料夾內前4個檔案的檔名
+                    // 取得資料夾內前4個檔案的檔名
                     string[] arFile = Directory.EnumerateFiles(siblingPath, "*.*")
                               .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
                     foreach (string item in arFile) {
@@ -115,7 +109,6 @@ namespace Tiefsee {
             return JsonConvert.SerializeObject(output);
         }
 
-
         /// <summary>
         /// 檔名陣列 轉 路徑陣列 (用於載入複數檔案
         /// </summary>
@@ -126,22 +119,22 @@ namespace Tiefsee {
 
             List<string> arWaitingList = new List<string>();
 
-            bool useFullPath = arName.Length < 1000; //
+            bool useFullPath = arName.Length < 1000;
 
             for (int i = 0; i < arName.Length; i++) {
                 string item = arName[i].ToString();
                 string filePath;
                 if (useFullPath) {
-                    filePath = Path.GetFullPath(Path.Combine(dirPath, item)); //避免長路經被轉換成虛擬路徑
+                    filePath = Path.GetFullPath(Path.Combine(dirPath, item)); // 避免長路經被轉換成虛擬路徑
                 } else {
                     filePath = Path.Combine(dirPath, item);
                 }
 
-                if (File.Exists(filePath)) { //如果是檔案
+                if (File.Exists(filePath)) { // 如果是檔案
                     arWaitingList.Add(filePath);
 
-                } else if (Directory.Exists(filePath)) { //如果是資料夾
-                    string[] arFile = Directory.GetFiles(filePath, "*.*"); //取得資料夾內所有檔案
+                } else if (Directory.Exists(filePath)) { // 如果是資料夾
+                    string[] arFile = Directory.GetFiles(filePath, "*.*"); // 取得資料夾內所有檔案
                     for (int j = 0; j < arFile.Length; j++) {
                         arWaitingList.Add(arFile[j]);
                     }
@@ -151,7 +144,6 @@ namespace Tiefsee {
             return arWaitingList.ToArray();
         }
 
-
         /// <summary>
         /// 判斷指定路徑是否參考磁碟上的現有目錄
         /// </summary>
@@ -160,7 +152,6 @@ namespace Tiefsee {
         public bool Exists(string path) {
             return Directory.Exists(path);
         }
-
 
         /// <summary>
         /// 新建目錄
@@ -179,7 +170,6 @@ namespace Tiefsee {
             return Directory.GetParent(path);
         }
 
-
         /// <summary>
         /// 刪除資料夾(包含子目錄與檔案)
         /// </summary>
@@ -193,7 +183,6 @@ namespace Tiefsee {
             }
             return "";
         }
-
 
         /// <summary>
         /// 資料夾移到資源回收桶
@@ -214,7 +203,6 @@ namespace Tiefsee {
             return "";
         }
 
-
         /// <summary>
         /// 移動檔案或目錄和其內容到新位置
         /// </summary>
@@ -229,7 +217,6 @@ namespace Tiefsee {
             return "";
         }
 
-
         /// <summary>
         /// 回傳資料夾裡面的檔案
         /// </summary>
@@ -242,7 +229,6 @@ namespace Tiefsee {
             }
             return Directory.GetFiles(path, searchPattern);
         }
-
 
         /// <summary>
         /// 傳回指定目錄中符合指定搜尋模式的子目錄名稱 (包括檔案的路徑)
@@ -257,13 +243,11 @@ namespace Tiefsee {
             return Directory.GetDirectories(path, searchPattern);
         }
 
-
-        long toUnix(DateTime time) {
+        private long toUnix(DateTime time) {
             var t = time.Subtract(new DateTime(1970, 1, 1));
             String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
             return long.Parse(unixTimestamp);
         }
-
 
         /// <summary>
         /// 取得資料夾的建立時間
@@ -277,7 +261,6 @@ namespace Tiefsee {
             return unixTimestamp;
         }
 
-
         /// <summary>
         /// 傳回指定檔案或目錄上次被寫入的日期和時間
         /// </summary>
@@ -289,7 +272,6 @@ namespace Tiefsee {
             long unixTimestamp = toUnix(time);
             return unixTimestamp;
         }
-
 
         /// <summary>
         /// 取得資料夾的建立時間(於js使用的話，必須在加上時區)

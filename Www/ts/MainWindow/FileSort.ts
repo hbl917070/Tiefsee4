@@ -61,7 +61,6 @@ class FileSort {
             updateSort();
         });
 
-
         /**
          * 不重新載入圖片，只更新排序(用於排序選單的按鈕
          * @param _sortType 
@@ -90,7 +89,7 @@ class FileSort {
             setFileSortType(dirPath);
 
             let ar = await sort(M.fileLoad.getWaitingFile())
-            //目前檔案位置
+            // 目前檔案位置
             M.fileLoad.setFlagFile(0);
             for (let i = 0; i < ar.length; i++) {
                 if (ar[i] == path) {
@@ -100,20 +99,17 @@ class FileSort {
             }
 
             M.fileLoad.setWaitingFile(ar);
-            M.fileLoad.updateTitle(); //更新視窗標題
+            M.fileLoad.updateTitle(); // 更新視窗標題
 
-            M.mainFileList.init(); //檔案預覽視窗 初始化
-            M.mainFileList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
+            M.mainFileList.init(); // 檔案預覽視窗 初始化
+            M.mainFileList.updateLocation(); // 檔案預覽視窗 自動捲動到選中項目的地方
 
             updateMenu();
 
-            if (M.fileLoad.getIsBulkView()) { //如果是在大量瀏覽模式，則重新載入名單
+            if (M.fileLoad.getIsBulkView()) { // 如果是在大量瀏覽模式，則重新載入名單
                 M.bulkView.load();
             }
-
-            //M.menu.close(); //關閉menu
         }
-
 
         /**
          * 更新menu選單
@@ -158,7 +154,6 @@ class FileSort {
             }
         }
 
-
         /**
          * 排序檔案
          * @param _type 排序類型
@@ -169,7 +164,6 @@ class FileSort {
             return arWaitingFile;
         }
 
-
         /**
          * 設定該資料夾設定的檔案排序方式
          * @param dirPath 
@@ -177,20 +171,17 @@ class FileSort {
          */
         function setFileSortType(dirPath: string) {
 
-            //取得原來的排序
+            // 取得原來的排序
             let t = window.localStorage.getItem("sortFile");
             let json: any = {};
             if (t !== null) {
                 json = JSON.parse(t);
             }
 
-            //儲存排序
+            // 儲存排序
             json[dirPath] = sortType;
             window.localStorage.setItem("sortFile", JSON.stringify(json));
-
-            //console.log(`set ` + sortType)
         }
-
 
         /**
          * 取得該資料夾設定的檔案排序方式
@@ -201,7 +192,7 @@ class FileSort {
 
             let t = window.localStorage.getItem("sortFile");
 
-            if (t === null) { t = "{}" } //避免從來沒有儲存過
+            if (t === null) { t = "{}" } // 避免從來沒有儲存過
             let json = JSON.parse(t);
             let _sortType = json[dirPath];
 
@@ -209,25 +200,22 @@ class FileSort {
                 sortType = _sortType;
             } else {
                 let defaultSort = M.config.settings.sort["fileSort"];
-                if (Object.keys(FileSortType).indexOf(defaultSort) === -1) { //如果找不到
+                if (Object.keys(FileSortType).indexOf(defaultSort) === -1) { // 如果找不到
                     defaultSort = FileSortType.name;
                 }
                 sortType = defaultSort;
             }
 
-            //console.log(`get ` + sortType)
             if (sortType.indexOf("Desc") !== -1) {
                 orderbyType = FileOrderbyType.desc;
             } else {
                 orderbyType = FileOrderbyType.asc;
             }
-
         }
 
     }
 
 }
-
 
 /**
  * 排序類型

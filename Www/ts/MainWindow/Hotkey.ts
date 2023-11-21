@@ -5,14 +5,14 @@ class Hotkey {
 
     constructor(M: MainWindow) {
 
-        //快速鍵處理(暫時)
+        // 快速鍵處理(暫時)
         window.addEventListener("keydown", async (e) => {
 
-            //console.log(e);
+            // console.log(e);
 
             if (e.code === "F12") { return; }
 
-            //if (e.code === "F5") { return; }
+            // if (e.code === "F5") { return; }
             if (e.code === "F5") {
                 e.preventDefault();
                 let gt = M.fileLoad.getGroupType();
@@ -23,8 +23,7 @@ class Hotkey {
                 return;
             }
 
-
-            //如果開啟側邊的文字編輯器
+            // 如果開啟側邊的文字編輯器
             if (M.textEditor.getIsShow()) {
                 /*if (e.code == "Escape") {
                     M.textEditor.close();
@@ -37,14 +36,14 @@ class Hotkey {
                 return;
             }
 
-            //如果有開啟選單
+            // 如果有開啟選單
             if (M.menu.getIsShow()) {
                 if (e.code == "Escape") {
                     M.menu.close();
                     return;
                 }
 
-                //選單裡面的輸入框
+                // 選單裡面的輸入框
                 if (Lib.isTextFocused()) {
                     return;
                     /*if (e.code === "ArrowRight"
@@ -63,7 +62,7 @@ class Hotkey {
 
             }
 
-            //如果有開啟msg視窗
+            // 如果有開啟msg視窗
             if (M.msgbox.isShow()) {
                 if (e.code == "Escape") {
                     M.msgbox.closeNow();
@@ -76,7 +75,7 @@ class Hotkey {
                 return;
             }
 
-            //如果可以返回上一頁
+            // 如果可以返回上一頁
             if (M.toolbarBack.getVisible()) {
                 if (e.code == "Escape" || e.code == "Backspace") {
                     M.toolbarBack.runEvent();
@@ -85,7 +84,7 @@ class Hotkey {
                 }
             }
 
-            //如果在全螢幕狀態下
+            // 如果在全螢幕狀態下
             if (M.fullScreen.getEnabled()) {
                 if (e.code == "Escape") {
                     M.fullScreen.setEnabled(false);
@@ -99,10 +98,10 @@ class Hotkey {
                 return;
             }
 
-            //如果有開啟大量瀏覽模式
+            // 如果有開啟大量瀏覽模式
             if (M.fileLoad.getIsBulkView()) {
 
-                if (e.key === "Alt") { //避免焦點被搶走
+                if (e.key === "Alt") { // 避免焦點被搶走
                     e.preventDefault();
                 }
 
@@ -135,7 +134,7 @@ class Hotkey {
                 if (e.code === "KeyM") {
                     M.script.open.systemContextMenu();
                 }
-                if (e.code === "Space" && M.getIsQuickLook()) { //避免跟快速預覽的空白鍵衝突
+                if (e.code === "Space" && M.getIsQuickLook()) { // 避免跟快速預覽的空白鍵衝突
                     e.preventDefault();
                 }
                 for (let i = 1; i <= 8; i++) {
@@ -147,7 +146,7 @@ class Hotkey {
                 return;
             }
 
-            //如果顯示的類型是 文字編輯器，則不使用快速鍵
+            // 如果顯示的類型是 文字編輯器，則不使用快速鍵
             if (M.fileShow.getGroupType() == GroupType.txt) {
                 if (Lib.isTextFocused()) {
                     if (e.code === "KeyS" && e.ctrlKey) {
@@ -157,14 +156,13 @@ class Hotkey {
                 }
             }
 
-            //允許的名單
+            // 允許的名單
             let allow = (e.code === "KeyC" && e.ctrlKey)
                 || (e.code === "KeyD" && e.ctrlKey)
 
             if (allow === false) {
                 e.preventDefault();
             }
-
 
             if (e.code === "KeyC" && e.ctrlKey) {
                 if (Lib.isTxtSelect() === false) {
@@ -236,7 +234,6 @@ class Hotkey {
                 M.script.bulkView.show();
             }
         });
-
 
     }
 }

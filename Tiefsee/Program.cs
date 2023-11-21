@@ -3,17 +3,21 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 
 namespace Tiefsee {
+
     static class Program {
 
-        public static int startPort; //程式開始的port
-        public static int startType; //1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐
-        public static int serverCache; //伺服器對靜態資源快取的時間(秒)
-        public static WebServer webServer; //本地伺服器
-        public static StartWindow startWindow; //起始視窗，關閉此視窗就會結束程式
-
+        /// <summary> 程式開始的port </summary>
+        public static int startPort;
+        /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
+        public static int startType;
+        /// <summary> 伺服器對靜態資源快取的時間(秒) </summary>
+        public static int serverCache;
+        /// <summary> 本地伺服器 </summary>
+        public static WebServer webServer;
+        /// <summary> 起始視窗，關閉此視窗就會結束程式 </summary>
+        public static StartWindow startWindow;
         /// <summary> 透過UserAgent來驗證是否有權限請求localhost server API </summary>
         public static string webvviewUserAgent = "Tiefsee";
-
         /// <summary> webview2的啟動參數 </summary>
         public static string webvviewArguments;
 
@@ -23,11 +27,11 @@ namespace Tiefsee {
         [STAThread]
         static void Main(string[] args) {
 
-            //修改 工作目錄 為程式資料夾 (如果有傳入args的話，工作目錄會被修改，所以需要改回來
+            // 修改 工作目錄 為程式資料夾 (如果有傳入args的話，工作目錄會被修改，所以需要改回來
             Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
             AppPath.Init();
 
-            //如果是商店APP版，且是來自「開機自動啟動」
+            // 如果是商店APP版，且是來自「開機自動啟動」
             if (StartWindow.isStoreApp) {
                 try {
                     var args2 = AppInstance.GetActivatedEventArgs();
@@ -44,14 +48,11 @@ namespace Tiefsee {
             startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
-            bool argsIsNone = (args.Length == 1 && args[0] == "none"); //啟動參數是 none
+            bool argsIsNone = (args.Length == 1 && args[0] == "none"); // 啟動參數是 none
 
-            if (args.Length >= 1 && args[0] == "restart") { //啟動參數是 restart
-
-                args = args.Skip(1).ToArray(); //刪除陣列的第一筆
-
+            if (args.Length >= 1 && args[0] == "restart") { // 啟動參數是 restart
+                args = args.Skip(1).ToArray(); // 刪除陣列的第一筆
             } else {
-
                 // 啟動模式不是常駐背景，就直接離開
                 if (argsIsNone) {
                     if (startType == 3 || startType == 5) {
@@ -59,17 +60,16 @@ namespace Tiefsee {
                         return;
                     }
                 }
-
-                //如果允許快速啟動，就不開啟新個體
+                // 如果允許快速啟動，就不開啟新個體
                 if (QuickRun.Check(args)) { return; }
             }
 
-            //「直接啟動」之外的，都要避免連續啟動
+            // 「直接啟動」之外的，都要避免連續啟動
             if (startType != 1) {
                 if (AppLock(true)) { return; }
             }
 
-            //在本地端建立server
+            // 在本地建立 server
             webServer = new WebServer();
             bool webServerState = webServer.Init();
             if (webServerState == false) {
@@ -93,19 +93,18 @@ namespace Tiefsee {
 --enable-features=""msWebView2EnableDraggableRegions"" 
 ";
 
-            if (startType != 1) { AppLock(false); } //解除鎖定
+            if (startType != 1) { AppLock(false); } // 解除鎖定
             startWindow = new StartWindow();
 
             if (argsIsNone == false) {
-                WebWindow.Create("MainWindow.html", args, null); //顯示初始視窗
+                WebWindow.Create("MainWindow.html", args, null); // 顯示初始視窗
             }
-            if (argsIsNone == true) { //如果args是none
-                WebWindow.NewTempWindow("MainWindow.html"); //新增一個看不見的視窗，用於下次顯示
+            if (argsIsNone == true) { // 如果args是none
+                WebWindow.NewTempWindow("MainWindow.html"); // 新增一個看不見的視窗，用於下次顯示
             }
 
             Application.Run(startWindow);
         }
-
 
         /// <summary>
         /// 在程式完全啟動前，禁止再次啟動
@@ -122,7 +121,7 @@ namespace Tiefsee {
                             ticks = long.Parse(sr.ReadToEnd());
                         }
 
-                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) { //在5秒內連續啟動，就禁止啟動
+                        if (DateTime.Now.Ticks - ticks < 5 * 10000000) { // 在5秒內連續啟動，就禁止啟動
                             return true;
                         } else {
                             return false;
@@ -147,8 +146,6 @@ namespace Tiefsee {
             }
             return false;
         }
-
-
 
     }
 }

@@ -7,24 +7,17 @@ using System.Text;
 
 namespace Tiefsee {
 
-
     [ComVisible(true)]
     public class FileInfo2 {
         public string Type = "none"; // file / dir / none
-        public string Path = ""; //檔案路徑
-        public long Lenght = 0; //檔案大小
-        public long CreationTimeUtc = 0; //建立時間
-        public long LastWriteTimeUtc = 0; //修改時間
-        public string HexValue = ""; //用於辨識檔案類型
+        public string Path = ""; // 檔案路徑
+        public long Lenght = 0; // 檔案大小
+        public long CreationTimeUtc = 0; // 建立時間
+        public long LastWriteTimeUtc = 0; // 修改時間
+        public string HexValue = ""; // 用於辨識檔案類型
     }
 
-
-
     [ComVisible(true)]
-
-    /// <summary>
-    /// 網頁呼叫C#方法
-    /// </summary>
     public class WV_File {
 
         WebWindow M;
@@ -33,7 +26,6 @@ namespace Tiefsee {
             this.M = m;
         }
         public WV_File() { }
-
 
         /// <summary>
         /// 檢查檔案是否為二進制檔
@@ -63,7 +55,6 @@ namespace Tiefsee {
             return false;
         }
 
-
         /// <summary>
         /// 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑
         /// </summary>
@@ -74,7 +65,7 @@ namespace Tiefsee {
 
             try {
 
-                //取得亂數檔名
+                // 取得亂數檔名
                 string path = "";
                 while (true) {
                     string name = DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + GenerateRandomString(10) + "." + extension;
@@ -85,8 +76,8 @@ namespace Tiefsee {
                     Directory.CreateDirectory(AppPath.tempDirWebFile);
                 }
 
-                //把base646儲存成檔案
-                int x = base64.IndexOf("base64,"); //去掉開頭的 data:image/png;base64,
+                // 把base646儲存成檔案
+                int x = base64.IndexOf("base64,"); // 去掉開頭的 data:image/png;base64,
                 if (x != -1) { base64 = base64.Substring(x + 7); }
                 byte[] buffer = Convert.FromBase64String(base64);
                 File.WriteAllBytes(path, buffer);
@@ -99,19 +90,17 @@ namespace Tiefsee {
             }
 
         }
-        //取得亂數字串
-        private static string GenerateRandomString(int length) {
+        // 取得亂數字串
+        private string GenerateRandomString(int length) {
             string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            StringBuilder sb = new StringBuilder();
-            Random random = new Random();
+            StringBuilder sb = new();
+            Random random = new();
             for (int i = 0; i < length; i++) {
                 int index = random.Next(chars.Length);
                 sb.Append(chars[index]);
             }
             return sb.ToString();
         }
-
-
 
         /// <summary>
         /// 取得基本檔案資訊
@@ -161,7 +150,6 @@ namespace Tiefsee {
                 } catch { }
 
                 info.HexValue = sb.ToString();
-                //return info;
 
             } else if (Directory.Exists(path)) {
 
@@ -170,7 +158,6 @@ namespace Tiefsee {
                 info.CreationTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
                 info.LastWriteTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
                 info.HexValue = "";
-                //return info;
 
             } else {
                 info.Type = "none";
@@ -178,7 +165,6 @@ namespace Tiefsee {
 
             return info;
         }
-
 
         /// <summary>
         /// 取得作業系統所在的槽，例如 「C:\」
@@ -189,7 +175,6 @@ namespace Tiefsee {
             //path = path.Substring(0, 1);
             return path;
         }
-
 
         /// <summary>
         /// 在檔案總管顯示檔案
@@ -205,7 +190,6 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 開啟 選擇檔案 的視窗
         /// </summary>
@@ -215,12 +199,12 @@ namespace Tiefsee {
         /// <returns></returns>
         public string[] OpenFileDialog(bool Multiselect, string Filter, string Title) {
             using (OpenFileDialog openFileDialog = new OpenFileDialog()) {
-                openFileDialog.Multiselect = Multiselect; //是否允許多選，false表示單選
-                openFileDialog.Filter = Filter; //檔案類型 All files (*.*)|*.*
-                openFileDialog.Title = Title; //標題
-                                              //openFileDialog.InitialDirectory = InitialDirectory; //初始目錄
-                openFileDialog.RestoreDirectory = true; //恢復到之前選擇的目錄
-                                                        //openFileDialog.FilterIndex = 2;
+                openFileDialog.Multiselect = Multiselect; // 是否允許多選，false表示單選
+                openFileDialog.Filter = Filter; // 檔案類型 All files (*.*)|*.*
+                openFileDialog.Title = Title; // 標題
+                // openFileDialog.InitialDirectory = InitialDirectory; // 初始目錄
+                openFileDialog.RestoreDirectory = true; // 恢復到之前選擇的目錄
+                // openFileDialog.FilterIndex = 2;
                 if (openFileDialog.ShowDialog() == DialogResult.OK) {
                     var files = openFileDialog.FileNames;
                     return files;
@@ -228,7 +212,6 @@ namespace Tiefsee {
                 return new string[0];
             }
         }
-
 
         /// <summary>
         /// 快速拖曳 (拖出檔案
@@ -239,9 +222,9 @@ namespace Tiefsee {
 
             try {
 
-                if (path == Path.GetFullPath(path)) { //如果是一般路徑
+                if (path == Path.GetFullPath(path)) { // 一般路徑
 
-                    //有縮圖(不支援長路經)
+                    // 有縮圖(不支援長路經)
                     var dataObject = DataObjectUtilities.GetFileDataObject(path);
                     int size = 92;
                     Bitmap bitmap = WindowsThumbnailProvider.GetThumbnail(
@@ -251,9 +234,9 @@ namespace Tiefsee {
                     bitmap.Dispose();
                     M.DoDragDrop(dataObject, DragDropEffects.All);
 
-                } else { //如果是長路經
+                } else { // 如果是長路經
 
-                    //無縮圖
+                    // 無縮圖
                     string[] files = { path };
                     var file = new System.Windows.Forms.DataObject(System.Windows.Forms.DataFormats.FileDrop, files);
                     M.DoDragDrop(file, DragDropEffects.All);
@@ -262,7 +245,6 @@ namespace Tiefsee {
 
             } catch { }
         }
-
 
         /// <summary>
         /// 顯示檔案原生右鍵選單
@@ -301,12 +283,10 @@ namespace Tiefsee {
                     }
                 }
 
-
             } catch {
                 MessageBox.Show("ShowContextMenu error");
             }
         }
-
 
         /// <summary>
         /// 列印文件
@@ -326,23 +306,17 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 取得文字資料
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public String GetText(string path) {
-            /*String s;
-            using (StreamReader sr = new StreamReader(path, Encoding.UTF8)) {
-                s = sr.ReadToEnd();
-            }
-            return s;*/
+            // 檔案被鎖定一樣可以讀取
             using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
-
 
         /// <summary>
         /// 儲存文字資料
@@ -358,7 +332,6 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -368,7 +341,6 @@ namespace Tiefsee {
             return new FileInfo(path);
         }
 
-
         /// <summary>
         /// 判斷指定的檔案是否存在
         /// </summary>
@@ -377,7 +349,6 @@ namespace Tiefsee {
         public bool Exists(string path) {
             return File.Exists(path);
         }
-
 
         /// <summary>
         /// 刪除檔案
@@ -392,7 +363,6 @@ namespace Tiefsee {
             }
             return "";
         }
-
 
         /// <summary>
         /// 檔案移到資源回收桶
@@ -413,15 +383,12 @@ namespace Tiefsee {
             return "";
         }
 
-
         /// <summary>
         /// 移動檔案到新位置
         /// </summary>
         /// <param name="sourceFileName"></param>
         /// <param name="destFileName"></param>
         public string Move(string sourceFileName, string destFileName) {
-            //if (File.Exists(sourceFileName) == false) { return false; }
-            //if (File.Exists(destFileName) == true) { return false; }
             try {
                 File.Move(sourceFileName, destFileName);
             } catch (Exception e) {
@@ -429,7 +396,6 @@ namespace Tiefsee {
             }
             return "";
         }
-
 
         /// <summary>
         /// 
@@ -441,7 +407,6 @@ namespace Tiefsee {
             String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
             return long.Parse(unixTimestamp);
         }
-
 
         /// <summary>
         /// 取得檔案的建立時間
@@ -455,7 +420,6 @@ namespace Tiefsee {
             return unixTimestamp;
         }
 
-
         /// <summary>
         /// 傳回指定檔案或目錄上次被寫入的日期和時間
         /// </summary>
@@ -467,8 +431,6 @@ namespace Tiefsee {
             long unixTimestamp = ToUnix(time);
             return unixTimestamp;
         }
-
-
 
     }
 }

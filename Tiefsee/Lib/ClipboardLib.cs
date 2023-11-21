@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Tiefsee {
 
     public class ClipboardLib {
 
-        public class ClipboardContent {
-            public string Type { get; set; }
-            public string Data { get; set; }
-        }
-
         /// <summary>
         /// 取得剪貼簿內容
         /// </summary>
-        /// <param name="maxTextLength"> 文字最大讀取長度，超過會返回 exceededLength </param>
+        /// <param name="maxTextLength"> 文字最大讀取長度，超過會返回 type: exceededLength </param>
         /// <returns></returns>
         public ClipboardContent GetClipboardContent(int maxTextLength = 5000) {
             try {
                 if (Clipboard.ContainsImage()) {
                     using (var ms = new MemoryStream()) {
                         Clipboard.GetImage().Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        return new ClipboardContent { Type = "img", Data = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray()) };
+                        return new() {
+                            Type = "img",
+                            Data = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray())
+                        };
                     }
                 }
                 if (Clipboard.ContainsFileDropList()) {
@@ -32,9 +26,9 @@ namespace Tiefsee {
                     if (files.Count > 0) {
                         string filePath = files[0];
                         if (Directory.Exists(filePath)) {
-                            return new ClipboardContent { Type = "dir", Data = filePath };
+                            return new() { Type = "dir", Data = filePath };
                         } else if (File.Exists(filePath)) {
-                            return new ClipboardContent { Type = "file", Data = filePath };
+                            return new() { Type = "file", Data = filePath };
                         }
                     }
                 }
@@ -50,19 +44,15 @@ namespace Tiefsee {
                     if (text.Length > maxTextLength) {
                         return new ClipboardContent { Type = "exceededLength", Data = text.Substring(0, maxTextLength) };
                     }
-
                     if (File.Exists(text)) {
                         return new ClipboardContent { Type = "file", Data = text };
                     }
-
                     if (Directory.Exists(text)) {
                         return new ClipboardContent { Type = "dir", Data = text };
                     }
-
                     if (Uri.IsWellFormedUriString(text, UriKind.Absolute)) {
                         return new ClipboardContent { Type = "url", Data = text };
                     }
-
                     return new ClipboardContent { Type = "text", Data = oldText };
                 }
             } catch (Exception ex) {
@@ -71,7 +61,10 @@ namespace Tiefsee {
 
             return new ClipboardContent { Type = "unknown", Data = "" };
         }
-
+        public class ClipboardContent {
+            public string Type { get; set; }
+            public string Data { get; set; }
+        }
 
         /// <summary>
         /// 
@@ -90,7 +83,7 @@ namespace Tiefsee {
         }
 
         /// <summary>
-        /// 存入剪貼簿 - 傳入base64，儲存成圖片。
+        /// 存入剪貼簿 - 傳入 base64，儲存成圖片。
         /// isTransparent=true時，同時把png跟一般圖片存入剪貼簿，支援透明圖片的程式會優先使用png格式
         /// </summary>
         /// <param name="base64"></param>
@@ -100,11 +93,11 @@ namespace Tiefsee {
             try {
                 using (MemoryStream ms = Base64ToMemoryStream(base64)) {
                     using (var bm = new Bitmap(ms)) {
-                        Clipboard.Clear(); //清理剪貼簿
+                        Clipboard.Clear(); // 清理剪貼簿
                         IDataObject data_object = new DataObject();
-                        data_object.SetData(DataFormats.Bitmap, true, bm); //無透明色的圖片，所有軟體都支援
+                        data_object.SetData(DataFormats.Bitmap, true, bm); // 無透明色的圖片，所有軟體都支援
                         if (isTransparent) {
-                            data_object.SetData("PNG", true, ms); //含有透明色，但並非所有軟體都支援
+                            data_object.SetData("PNG", true, ms); // 含有透明色，但並非所有軟體都支援
                         }
                         Clipboard.SetDataObject(data_object, true);
                         return true;
@@ -115,7 +108,6 @@ namespace Tiefsee {
                 return false;
             }
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，儲存成圖片。
@@ -147,7 +139,6 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字
         /// </summary>
@@ -160,11 +151,10 @@ namespace Tiefsee {
                     Clipboard.SetDataObject(sr.ReadToEnd(), false, 5, 200);
                 }
                 return true;
-            } catch (Exception) {
+            } catch {
                 return false;
             }
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 傳入檔案路徑，複製成base64
@@ -210,7 +200,6 @@ namespace Tiefsee {
             }
         }
 
-
         /// <summary>
         /// 存入剪貼簿 - 圖片
         /// </summary>
@@ -228,7 +217,6 @@ namespace Tiefsee {
             }
         }*/
 
-
         /// <summary>
         /// 存入剪貼簿 - 字串
         /// </summary>
@@ -238,11 +226,10 @@ namespace Tiefsee {
             try {
                 Clipboard.SetDataObject(text, false, 5, 200); // 存入剪貼簿
                 return true;
-            } catch (Exception) {
+            } catch {
                 return false;
             }
         }
-
 
         /// <summary>
         /// 存入剪貼簿 - 檔案
@@ -260,11 +247,10 @@ namespace Tiefsee {
                     return false;
                 }
                 return true;
-            } catch (Exception) {
+            } catch {
                 return false;
             }
         }
-
 
     }
 }

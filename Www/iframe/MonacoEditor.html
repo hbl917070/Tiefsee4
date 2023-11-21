@@ -35,16 +35,15 @@
     <div id="viewer"></div>
 
     <script>
-
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
@@ -74,7 +73,6 @@
 
         });
 
-
         /**
          * 告知父物件 已經初始化完成
          */
@@ -85,14 +83,12 @@
             };
             libIframe.postMsg(json);
         }
-
     </script>
 
     <script>
-
         var libIframe = new LibIframe();
-        libIframe.initEventDrop(window); //註冊 drop 事件，拖曳檔案進來時 開啟檔案
-        libIframe.initTextHotkey(); //按 ctrl + S 時，儲存文字檔
+        libIframe.initEventDrop(window); // 註冊 drop 事件，拖曳檔案進來時 開啟檔案
+        libIframe.initTextHotkey(); // 按 ctrl + S 時，儲存文字檔
 
         var editor;
 
@@ -100,13 +96,13 @@
             initFinishMonacoEditor();
         });
 
-        //點擊超連結時
-        window.open = function (href) {
-            libIframe.openUrl(href); //開啟網址或檔案
+        // 點擊超連結時
+        window.open = function(href) {
+            libIframe.openUrl(href); // 開啟網址或檔案
         }
 
         /**
-         *   初始化套件
+         * 初始化套件
          */
         async function initFinishMonacoEditor() {
 
@@ -117,7 +113,7 @@
 
             //-------------
 
-            let lang = libIframe.getLang(); //取得使用者選擇的語言
+            let lang = libIframe.getLang(); // 取得使用者選擇的語言
             if (lang == "zh-TW") {
                 lang = "zh-tw";
             } else if (lang == "ja") {
@@ -127,21 +123,27 @@
             }
 
             require.config({
-                paths: { "vs": pathLib, },
-                "vs/nls": { availableLanguages: { "*": lang } }
+                paths: {
+                    "vs": pathLib,
+                },
+                "vs/nls": {
+                    availableLanguages: {
+                        "*": lang
+                    }
+                }
             });
             require(["vs/editor/editor.main"], async () => {
 
-                setTheme(); //編輯器主題
+                setTheme(); // 編輯器主題
 
                 editor = monaco.editor.create(document.getElementById("viewer"), {
-                    mouseWheelZoom: true, //允許使用ctrl+滑鼠滾輪來縮放文字
-                    fontSize: 18, //預設文字大小
-                    automaticLayout: true, //自動縮放版面
-                    //wordWrap: true, // 是否自動換行
+                    mouseWheelZoom: true, // 允許使用ctrl+滑鼠滾輪來縮放文字
+                    fontSize: 18, // 預設文字大小
+                    automaticLayout: true, // 自動縮放版面
+                    // wordWrap: true, // 是否自動換行
                 });
 
-                //alt + Z 切換自動換行
+                // alt + Z 切換自動換行
                 var isWordWrap = false;
                 editor.addAction({
                     id: 'my-toggleWordWrap',
@@ -149,18 +151,19 @@
                     keybindings: [
                         monaco.KeyMod.Alt | monaco.KeyCode.KeyZ,
                     ],
-                    run: function (ed) {
+                    run: function(ed) {
                         isWordWrap = !isWordWrap;
-                        editor.updateOptions({ wordWrap: isWordWrap })
+                        editor.updateOptions({
+                            wordWrap: isWordWrap
+                        })
                     }
                 });
 
-                await libIframe.closeIME(); //嘗試關閉輸入法
+                await libIframe.closeIME(); // 嘗試關閉輸入法
                 initFinish();
             });
 
         }
-
 
         /**
          * 清空文件
@@ -173,7 +176,7 @@
          * 載入檔案
          */
         async function loadFile(txt, path) {
-            monaco.editor.getModels().forEach(model => model.dispose()); //清除所有已存在的 Model
+            monaco.editor.getModels().forEach(model => model.dispose()); // 清除所有已存在的 Model
             var model = monaco.editor.createModel(txt, undefined, monaco.Uri.file(path));
             editor.setModel(model);
         }
@@ -182,7 +185,7 @@
          * 載入文字
          */
         function loadTxt(txt, fileType) {
-            monaco.editor.getModels().forEach(model => model.dispose()); //清除所有已存在的 Model
+            monaco.editor.getModels().forEach(model => model.dispose()); // 清除所有已存在的 Model
             var model = monaco.editor.createModel(txt, fileType);
             editor.setModel(model);
         }
@@ -199,7 +202,7 @@
          */
         function setTheme() {
 
-            //判斷是深色還是淺色主題
+            // 判斷是深色還是淺色主題
             let theme = libIframe.initTheme();
             let themeName = "vs";
             if (theme["theme"] === "dark") {
@@ -233,18 +236,21 @@
          */
         function setReadonly(val) {
             if (val === true) {
-                libIframe.setReadonly(true); //攔截鍵盤
-                editor.updateOptions({ readOnly: true }); //文字編輯器設定成唯讀
-                document.querySelector("textarea").setAttribute("readonly", "readonly"); //直接鎖死編輯功能
+                libIframe.setReadonly(true); // 攔截鍵盤
+                editor.updateOptions({
+                    readOnly: true
+                }); // 文字編輯器設定成唯讀
+                document.querySelector("textarea").setAttribute("readonly", "readonly"); // 直接鎖死編輯功能
             } else {
-                libIframe.setReadonly(false); //攔截鍵盤
-                editor.updateOptions({ readOnly: false }); //文字編輯器設定成唯讀
+                libIframe.setReadonly(false);
+                editor.updateOptions({
+                    readOnly: false
+                });
                 document.querySelector("textarea").removeAttribute("readonly", "readonly");
             }
-
         }
-
     </script>
+
 </body>
 
 </html>

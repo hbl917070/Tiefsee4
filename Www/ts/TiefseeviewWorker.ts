@@ -1,3 +1,4 @@
+// 讓 Tiefseeview 在背景載入圖片
 self.addEventListener("message", async (e) => {
 
     let url = e.data.url;
@@ -8,14 +9,9 @@ self.addEventListener("message", async (e) => {
         (r) => r.blob()
     );
 
-    //var time = new Date();
-
     const img = await createImageBitmap(imgBlob);
 
-    //var ms = (new Date()).getTime() - time.getTime();
-    //console.log(`worker 載入圖片:${scale}   耗時：${ms}`)
-
-    //@ts-ignore
+    // @ts-ignore
     self.postMessage({ img: img, scale: scale, tempUrl: tempUrl, url: url, }, [img]);
 
 }, false)

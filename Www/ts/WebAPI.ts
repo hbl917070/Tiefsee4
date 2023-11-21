@@ -1,25 +1,5 @@
 class WebAPI {
 
-    /**
-     * 
-     */
-    static async sendPost(url: string, postData: any,) {
-        let json: any;
-        await fetch(url, {
-            "body": JSON.stringify(postData),
-            "method": "POST",
-        }).then((response) => {
-            return response.json();
-        }).then((html) => {
-            json = html;
-            //console.log(html);
-        }).catch((err) => {
-            console.log("sendPost Error: ", err);
-        });
-        return json;
-    }
-
-
     static Directory = class {
 
         /**
@@ -41,7 +21,7 @@ class WebAPI {
                 if (retJson.hasOwnProperty(key) == false) { continue; }
                 var newKey = Lib.Combine([parentPath, key]);
                 json[newKey] = retJson[key].map((value: string) => {
-                    //return newKey + "\\" + value;
+                    // return newKey + "\\" + value;
                     return value;
                 })
             }
@@ -58,7 +38,7 @@ class WebAPI {
             let url = APIURL + "/api/directory/getFiles2";
             let postData = { dirPath: dirPath, arName: arName };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = dirPath + retAr[i];
             }
             return retAr;
@@ -71,7 +51,7 @@ class WebAPI {
             let url = APIURL + "/api/directory/getFiles";
             let postData = { path: path, searchPattern: searchPattern };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
             return retAr;
@@ -84,13 +64,12 @@ class WebAPI {
             let url = APIURL + "/api/directory/getDirectories";
             let postData = { path: path, searchPattern: searchPattern };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
-            for (let i = 0; i < retAr.length; i++) { //把檔名轉成完整路徑
+            for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
             return retAr;
         }
     }
-
 
     static Img = class {
 
@@ -194,15 +173,15 @@ class WebAPI {
             await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     code = "1";
-                    width = img.naturalWidth; //初始化圖片size
+                    width = img.naturalWidth; // 初始化圖片size
                     height = img.naturalHeight;
-                    resolve(true); //繼續往下執行
+                    resolve(true);
                 });
                 img.addEventListener("error", (e) => {
                     code = "-1";
                     width = 1;
                     height = 1;
-                    resolve(false); //繼續往下執行
+                    resolve(false);
                 });
                 img.src = url;
             })
@@ -216,6 +195,23 @@ class WebAPI {
         }
     }
 
+    /**
+     * 
+     */
+    static async sendPost(url: string, postData: any) {
+        let json: any;
+        await fetch(url, {
+            "body": JSON.stringify(postData),
+            "method": "POST",
+        }).then((response) => {
+            return response.json();
+        }).then((t) => {
+            json = t;
+        }).catch((err) => {
+            console.log("sendPost Error: ", err);
+        });
+        return json;
+    }
 
     /**
      * 排序
@@ -233,7 +229,7 @@ class WebAPI {
 
         if (ar.length === 0) { return [] }
 
-        //取得共同的開頭(通常是資料夾路徑)
+        // 取得共同的開頭(通常是資料夾路徑)
         let dirPath = Lib.GetDirectoryName(ar[0]) as string;
         if (dirPath === null) { return [] }
 
@@ -245,7 +241,7 @@ class WebAPI {
         }
 
         let retAr = [];
-        //把每一筆資料都剪成只有結尾的部分(通常是檔名)
+        // 把每一筆資料都剪成只有結尾的部分(通常是檔名)
         let dirPathLen = dirPath.length;
         for (let i = 0; i < ar.length; i++) {
             retAr.push(ar[i].substring(dirPathLen));
@@ -259,7 +255,7 @@ class WebAPI {
             retAr = await WebAPI.sendPost(url, postData);
         }
 
-        //把排序後的資料恢復到完整路徑
+        // 把排序後的資料恢復到完整路徑
         for (let i = 0; i < retAr.length; i++) {
             retAr[i] = dirPath + retAr[i];
         }
@@ -321,7 +317,6 @@ class WebAPI {
         return json;*/
     }
 
-
     /**
     * 取得 多筆檔案基本資料
     */
@@ -335,7 +330,6 @@ class WebAPI {
         return retAr as FileInfo2[];
     }
 
-
     /**
      * 取得 UWP列表
      */
@@ -345,7 +339,6 @@ class WebAPI {
         let ret = await WebAPI.sendPost(url, postData);
         return ret as { Logo: string, Name: string, Id: string }[];
     }
-
 
     /**
       * 取得 相關檔案
@@ -359,12 +352,11 @@ class WebAPI {
         return json as { path: string, text: string | null }[];
     }
 
-
     /**
      * 檢查檔案是否為二進制檔
      */
     static async isBinary(fileInfo2: FileInfo2) {
-     
+
         // 如果檔案大於 10M，就直接視為二進制檔
         if (fileInfo2.Lenght > 1024 * 1024 * 10) {
             return true;
@@ -387,9 +379,3 @@ class WebAPI {
         return ret as { Type: string, Data: string };
     }
 }
-
-
-var s = [
-    { path: "C:\\aa\a.txt", text: "123456" },
-    { path: "C:\\aa\a.jpg", text: null },
-]

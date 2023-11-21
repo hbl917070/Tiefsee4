@@ -23,7 +23,7 @@ class LibIframe {
      */
     public async closeIME() {
 
-        var domFocus = document.activeElement as HTMLElement | null; //當前擁有焦點的dom
+        var domFocus = document.activeElement as HTMLElement | null; // 當前擁有焦點的dom
 
         var text = document.createElement("input");
         text.setAttribute("type", "url");
@@ -39,14 +39,12 @@ class LibIframe {
                 text.blur();
                 document.body.removeChild(text);
                 if (domFocus !== null) {
-                    domFocus.focus(); //把焦點設定回去
+                    domFocus.focus(); // 把焦點設定回去
                 }
-                resolve(0); //繼續往下執行
+                resolve(0);
             }, 10);
         })
-
     }
-
 
     /**
      * 註冊 drop 事件，拖曳檔案進來時 開啟檔案
@@ -64,7 +62,6 @@ class LibIframe {
         }, false);
 
         dom.addEventListener("drop", (e: DragEvent) => {
-
             // 直接把 drop 傳遞給父頁面
             const dropEvent = new CustomEvent("drop", {
                 bubbles: true,
@@ -73,25 +70,8 @@ class LibIframe {
                 }
             });
             window.parent.dispatchEvent(dropEvent);
-
-            /*if (e.dataTransfer === null) { return; }
-            let files = e.dataTransfer.files;
-            let arFile = [];
-            for (let i = 0; i < files.length; i++) {
-                const item = files[i];
-                arFile.push(item.name);
-            }
-            let json = {
-                type: "loadDropFile",
-                data: arFile,
-            };
-            this.postMsg(json);
-
-            e.stopPropagation();
-            //e.preventDefault();*/
         }, true);
     }
-
 
     /**
      * 按 ctrl + S 時，儲存文字檔
@@ -106,7 +86,6 @@ class LibIframe {
             }
         }, true);
     }
-
 
     /**
      * 傳送資料給父物件
@@ -149,9 +128,7 @@ class LibIframe {
         return lang;
     }
 
-
     _theme: any = {}
-
     /**
      * 初始化 Theme
      */
@@ -161,10 +138,10 @@ class LibIframe {
 
         let theme = JSON.parse(strTheme);
 
-        //用背景色判斷是淺色還是深色主題
+        // 用背景色判斷是淺色還是深色主題
         function getTheme(): "light" | "dark" {
             let bg = theme["--color-window-background"];
-            //判斷顏色接近黑色還是白色
+            // 判斷顏色接近黑色還是白色
             let n = ((bg.r > 127) ? 1 : 0) + ((bg.g > 127) ? 1 : 0) + ((bg.b > 127) ? 1 : 0);
             if (n >= 2) { return "light"; }
             return "dark";
@@ -182,7 +159,6 @@ class LibIframe {
         return theme;
     }
 
-
     /**
      * {r, g, b} to 16進制
      */
@@ -192,7 +168,6 @@ class LibIframe {
             + this.decimalToHex(color.b, 2);
         return c;
     }
-
 
     /**
      * 10進制 to 16進制
@@ -206,8 +181,7 @@ class LibIframe {
         return hex;
     }
 
-
-    private isReadonly = false; //是否為唯讀
+    private isReadonly = false; // 是否為唯讀
     /**
      * 設定是否為唯讀
      * @param val 
@@ -215,7 +189,6 @@ class LibIframe {
     public setReadonly(val: boolean): void {
         this.isReadonly = val;
     }
-
 
     /**
      * 載入新的 JS
@@ -232,20 +205,17 @@ class LibIframe {
         })
     }
 
-
     /**
      * 開啟網址或檔案
      */
     public openUrl(url: string) {
-        if (url.startsWith("http:") || url.startsWith("https:") ) {
-            //開啟網址
+        if (url.startsWith("http:") || url.startsWith("https:")) { // 開啟網址    
             let json = {
                 type: "openUrl",
                 data: url,
             };
             this.postMsg(json);
-        } else {
-            //開啟檔案
+        } else { // 開啟檔案  
             let json = {
                 type: "openFile",
                 data: url,
@@ -253,7 +223,6 @@ class LibIframe {
             this.postMsg(json);
         }
     }
-
 
     /**
      * 路徑 轉 URL

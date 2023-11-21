@@ -3,7 +3,6 @@
  */
 class AiDrawingPrompt {
 
-
 	/**
 	 * Automatic1111 (字串分割)
 	 */
@@ -122,7 +121,7 @@ class AiDrawingPrompt {
 			}
 		}
 
-		//提示詞不會有 title，所以要補上
+		// 提示詞不會有 title，所以要補上
 		if (val.startsWith("Negative prompt:") === false && val.startsWith("Steps:") === false) {
 			val = "Prompt: " + val;
 		}
@@ -139,20 +138,19 @@ class AiDrawingPrompt {
 					retPush(title, text);
 				}
 			} else {
-				retPush(item.key, item.value); //提示
+				retPush(item.key, item.value); // 提示
 			}
 		}
 
 		return retData;
 	}
 
-
 	/**
 	 * ComfyUI (找到起始節點後，以遞迴方式找出相關節點)
 	 */
 	public static getComfyui(jsonStr: string) {
-		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer"]; //起始節點(不一定找得到)
-		var MODEL_TYPES = ["ckpt_name", "lora_name"]; //模型名稱
+		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer"]; // 起始節點(不一定找得到)
+		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
 		var SEED_TYPES = ["seed", "noise_seed"];
 
 		let json: any;
@@ -217,7 +215,7 @@ class AiDrawingPrompt {
 			return undefined;
 		}
 
-		//取得模型名稱
+		// 取得模型名稱
 		function getModel(key: string, key2: string[]) {
 			if (key === undefined) { return undefined; }
 			let obj = json[key];
@@ -240,7 +238,7 @@ class AiDrawingPrompt {
 			return undefined;
 		}
 
-		//取得提示詞
+		// 取得提示詞
 		function getPrompt(key: string, key2: string[]) {
 			if (key === undefined) { return undefined; }
 			let obj = json[key];
@@ -248,7 +246,7 @@ class AiDrawingPrompt {
 			let inputs = obj.inputs;
 			if (inputs === undefined) { return undefined; }
 
-			//取得 text | text_g | text_l
+			// 取得 text | text_g | text_l
 			let text;
 			let arKey = Object.keys(inputs);
 			for (let i = 0; i < key2.length; i++) {
@@ -272,7 +270,7 @@ class AiDrawingPrompt {
 			return undefined;
 		}
 
-		//取得 寬度與高度
+		// 取得 寬度與高度
 		function getSize(key: string) {
 			if (key === undefined) { return undefined; }
 			let obj = json[key];
@@ -307,7 +305,7 @@ class AiDrawingPrompt {
 					let size = getSize(getKey(mianInputs.latent_image));
 
 					let prompt = getPrompt(getKey(mianInputs.positive), ["positive", "text", "conditioning"]);
-					if (prompt == _prompt) { //如果已經加入過相同的提示詞，則略過
+					if (prompt == _prompt) { // 如果已經加入過相同的提示詞，則略過
 						prompt = undefined;
 					} else {
 						_prompt = prompt;
@@ -337,7 +335,6 @@ class AiDrawingPrompt {
 		return retData;
 	}
 
-
 	/**
 	 * InvokeAI (解析 json)
 	 */
@@ -352,7 +349,7 @@ class AiDrawingPrompt {
 
 		var retData: { title: string, text: string }[] = [];
 		let arkey = Object.keys(json);
-		let objImage; // json裡面的圖片節點
+		let objImage; // json 裡面的圖片節點
 
 		function retPush(title: string, text: string | undefined) {
 			if (text !== undefined && text !== null && text !== "") {
@@ -367,7 +364,7 @@ class AiDrawingPrompt {
 			let title = arkey[i];
 			let text = json[title];
 
-			if (title === "images" && text.length > 0) { //如果是圖片陣列(連續產圖)，則只抓第一張
+			if (title === "images" && text.length > 0) { // 如果是圖片陣列(連續產圖)，則只抓第一張
 				objImage = text[0];
 				continue;
 			}
@@ -399,7 +396,6 @@ class AiDrawingPrompt {
 
 		return retData;
 	}
-
 
 	/**
 	 * NovelAI (解析 json)
@@ -438,4 +434,5 @@ class AiDrawingPrompt {
 
 		return retData;
 	}
+
 }

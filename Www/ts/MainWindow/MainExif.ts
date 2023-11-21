@@ -19,7 +19,7 @@ class MainExif {
 		this.updateFileWatcher = updateFileWatcher;
 
 		var domMainExif = document.getElementById("mainExif") as HTMLElement;
-		var domDragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement; //拖曳條
+		var domDragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement; // 拖曳條
 
 		var domTabBtns = domMainExif.querySelector(".js-tabBtns") as HTMLElement;
 		var domTabBtnInfo = domMainExif.querySelector(".js-tabBtn-info") as HTMLElement;
@@ -30,8 +30,8 @@ class MainExif {
 		var relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
 		var fileInfo2: FileInfo2;
 
-		var isHide = false; //暫時隱藏
-		var isEnabled = true; //啟用 檔案預覽視窗
+		var isHide = false; // 暫時隱藏
+		var isEnabled = true; // 啟用 檔案預覽視窗
 
 		/** 頁籤的類型 */
 		var TabType = {
@@ -43,21 +43,21 @@ class MainExif {
 		/** 當前頁籤的類型 */
 		var tabType = TabType.info;
 
-		//在工具列滾動時，進行水平移動
+		// 在工具列滾動時，進行水平移動
 		domTabBtns.addEventListener("wheel", (e: WheelEvent) => {
 
 			let scrollLeft = domTabBtns.scrollLeft;
-			let deltaY = e.deltaY; //上下滾動的量
+			let deltaY = e.deltaY; // 上下滾動的量
 
-			if (deltaY > 0) { //往右
+			if (deltaY > 0) { // 往右
 				domTabBtns.scroll(scrollLeft + 20, 0);
 			}
-			if (deltaY < 0) { //往左
+			if (deltaY < 0) { // 往左
 				domTabBtns.scroll(scrollLeft - 20, 0);
 			}
 		}, false);
 
-		new TiefseeScroll().initGeneral(domTabBtns, "x"); //滾動條元件
+		new TiefseeScroll().initGeneral(domTabBtns, "x"); // 滾動條元件
 
 		domTabBtnInfo.addEventListener("click", () => {
 			setTab(TabType.info);
@@ -92,14 +92,14 @@ class MainExif {
 			M.config.settings.layout.mainExifTabs = tabType;
 		}
 
-		//拖曳改變size
+		// 拖曳改變 size
 		var dragbar = new Dragbar();
 		dragbar.init("left", domMainExif, domDragbar_mainFileList, M.dom_mainR);
-		//拖曳開始
+		// 拖曳開始
 		dragbar.setEventStart(() => { })
-		//拖曳
+		// 拖曳
 		dragbar.setEventMove((val: number) => {
-			if (val < 10) { //小於10的話就暫時隱藏
+			if (val < 10) { // 小於10的話就暫時隱藏
 				domMainExif.style.opacity = "0";
 				dragbar.setPosition(0);
 			} else {
@@ -107,13 +107,12 @@ class MainExif {
 				setItemWidth(val);
 			}
 		})
-		//拖曳 結束
+		// 拖曳 結束
 		dragbar.setEventEnd((val: number) => {
-			if (val < 10) { //小於10的話，關閉檔案預覽視窗
+			if (val < 10) { // 小於10的話，關閉檔案預覽視窗
 				setEnabled(false);
 			}
 		})
-
 
 		/**
 		 * 暫時隱藏(不影響設定值，強制隱藏
@@ -129,7 +128,6 @@ class MainExif {
 			}
 		}
 
-
 		/**
 		 * 啟用 或 關閉
 		 */
@@ -138,7 +136,7 @@ class MainExif {
 			if (val) {
 				domMainExif.setAttribute("active", "true");
 
-				//讀取上次的設定
+				// 讀取上次的設定
 				tabType = M.config.settings.layout.mainExifTabs;
 				setTab(tabType);
 
@@ -157,12 +155,10 @@ class MainExif {
 			loadRelated();
 		}
 
-
 		/**
 		 * 設定是否顯示 相關檔案
 		 */
 		function setRelatedFilesEnabled(val: boolean) {
-
 			if (val) {
 				domTabBtns.setAttribute("active", "true");
 			} else {
@@ -173,7 +169,6 @@ class MainExif {
 				}
 			}
 		}
-
 
 		/**
 		 * 設定size
@@ -188,12 +183,11 @@ class MainExif {
 
 			M.config.settings.layout.mainExifShowWidth = val;
 
-			//var cssRoot = document.body;
-			//cssRoot.style.setProperty("--mainExif-width", val + "px");
+			// var cssRoot = document.body;
+			// cssRoot.style.setProperty("--mainExif-width", val + "px");
 			domMainExif.style.width = val + "px";
 			dragbar.setPosition(val);
 		}
-
 
 		/**
 		 * 初始化
@@ -216,7 +210,7 @@ class MainExif {
 
 			domTabContentInfo.innerHTML = "";
 
-			if (fileInfo2.Type === "none") { //如果檔案不存在
+			if (fileInfo2.Type === "none") { // 如果檔案不存在
 				return;
 			}
 
@@ -228,29 +222,29 @@ class MainExif {
 				return;
 			}
 			if (noCheckPath === false) {
-				if (M.fileLoad.getFilePath() !== path) { //如果已經在載入期間已經切換到其他檔案
+				if (M.fileLoad.getFilePath() !== path) { // 如果已經在載入期間已經切換到其他檔案
 					return;
 				}
 			}
-			//取得經緯度
-			let GPS_lat = getItem(json.data, "GPS Latitude"); //緯度
-			let GPS_lng = getItem(json.data, "GPS Longitude"); //經度
-			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) { //避免空白資料
+			// 取得經緯度
+			let GPS_lat = getItem(json.data, "GPS Latitude"); // 緯度
+			let GPS_lng = getItem(json.data, "GPS Longitude"); // 經度
+			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) { // 避免空白資料
 				GPS_lat = undefined;
 				GPS_lng = undefined;
 			}
 			let hasGPS = GPS_lat !== undefined && GPS_lng !== undefined;
-			if (hasGPS) { //如果經緯度不是空，就新增「Map」欄位
+			if (hasGPS) { // 如果經緯度不是空，就新增「Map」欄位
 				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
 			}
 
-			//更新舊資料，Flash(key) 改為 Flash
+			// 更新舊資料，Flash(key) 改為 Flash
 			/*let flashIndex = M.config.exif.whitelist.indexOf("Flash(key)");
 			if (flashIndex !== -1) {
 				M.config.exif.whitelist[flashIndex] = "Flash";
 			}*/
 
-			let deferredFunc: (() => void)[] = []; //最後才執行的函數
+			let deferredFunc: (() => void)[] = []; // 最後才執行的函數
 			let ar = json.data;
 			let whitelist = M.config.exif.whitelist;
 
@@ -263,7 +257,7 @@ class MainExif {
 
 				} else if (name === "Map") {
 
-					value = encodeURIComponent(value); //移除可能破壞html的跳脫符號
+					value = encodeURIComponent(value); // 移除可能破壞html的跳脫符號
 
 					let mapHtml = `
 						<div class="mainExifItem">
@@ -272,9 +266,9 @@ class MainExif {
 							</div>
 						</div>`;
 					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
-					
-				} else if ((name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") 
-						&& value.includes("Steps: ") && value.includes("Seed: ")) { // Stable Diffusion webui 輸出的jpg或webp
+
+				} else if ((name === "User Comment" || name === "Windows XP Comment" || name === "Image Description")
+					&& value.includes("Steps: ") && value.includes("Seed: ")) { // Stable Diffusion webui 輸出的jpg或webp
 
 					ar.push({
 						group: "PNG-tEXt",
@@ -282,12 +276,12 @@ class MainExif {
 						value: "parameters: " + value
 					})
 
-				} else if (name === "Textual Data") { //PNG iTXt / zTXt / tEXt
+				} else if (name === "Textual Data") { // PNG iTXt / zTXt / tEXt
 
 					let vals = getItems(ar, name);
 					for (let i = 0; i < vals.length; i++) {
 						let val = vals[i];
-						let x = val.indexOf(": "); //資料格式通常為 aaaaa: xxxxxx
+						let x = val.indexOf(": "); // 資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
 							domTabContentInfo.appendChild(getItemDom(name, val));
 
@@ -341,7 +335,7 @@ class MainExif {
 									continue;
 								}
 
-								//這個資訊不重要，所以排到最後面
+								// 這個資訊不重要，所以排到最後面
 								if (name === "Dream") {
 									let itemDom = getItemDom(name, val);
 									deferredFunc.push(() => {
@@ -375,7 +369,7 @@ class MainExif {
 					let nameI18n = `exif.name.${name}`;
 					let valueI18n = "";
 
-					//處理value的值
+					// 處理value的值
 					if (name === "Metering Mode") {
 						value = M.i18n.t(`exif.value.${name}.${value}`);
 						valueI18n = `exif.value.${name}.${value}`;
@@ -405,7 +399,7 @@ class MainExif {
 
 			domTabContentRelated.innerHTML = "";
 
-			if (fileInfo2.Type === "none") { //如果檔案不存在
+			if (fileInfo2.Type === "none") { // 如果檔案不存在
 				return;
 			}
 
@@ -413,7 +407,7 @@ class MainExif {
 			let json = await WebAPI.getRelatedFileList(path, relatedFileExtList);
 
 			if (noCheckPath === false) {
-				if (M.fileLoad.getFilePath() !== path) { //如果已經在載入期間已經切換到其他檔案
+				if (M.fileLoad.getFilePath() !== path) { // 如果已經在載入期間已經切換到其他檔案
 					return;
 				}
 			}
@@ -424,7 +418,7 @@ class MainExif {
 				let itemText = item.text;
 				let domBox = await getRelatedDom(itemPath, itemText);
 				if (noCheckPath === false) {
-					if (M.fileLoad.getFilePath() !== path) { //如果已經在載入期間已經切換到其他檔案
+					if (M.fileLoad.getFilePath() !== path) { // 如果已經在載入期間已經切換到其他檔案
 						return;
 					}
 				}
@@ -436,7 +430,6 @@ class MainExif {
 				domTabContentRelated.appendChild(btnNew);
 			}
 		}
-
 
 		/**
 		 * 取得 相關檔案的 新增按鈕
@@ -453,10 +446,10 @@ class MainExif {
 			btnNew.addEventListener("click", async () => {
 				let dirPath = Lib.GetDirectoryName(path);
 				if (dirPath === null) { return; }
-				//let pathF = Lib.GetExtension(path).split(".")[0];
+				// let pathF = Lib.GetExtension(path).split(".")[0];
 				let txtName = Lib.GetFileName(path).split(".")[0] + ".txt";
 				let txtPath = Lib.Combine([dirPath, txtName]);
-				if (await WV_File.Exists(txtPath) === true) { //如果檔案已經存在
+				if (await WV_File.Exists(txtPath) === true) { // 如果檔案已經存在
 					txtName = Lib.GetFileName(path).split(".")[0] + ".1.txt";
 					txtPath = Lib.Combine([dirPath, txtName]);
 				}
@@ -466,10 +459,8 @@ class MainExif {
 					btnNew.remove();
 				})
 			})
-
 			return btnNew;
 		}
-
 
 		/**
 		 * 取得 相關檔案的 項目
@@ -499,7 +490,7 @@ class MainExif {
 				</div>
 			`);
 			domBox.setAttribute("data-path", itemPath);
-			//domTabContentRelated.appendChild(domBox);
+			// domTabContentRelated.appendChild(domBox);
 
 			// 標題物件
 			let title = itemName.substring(name.split(".")[0].length);
@@ -520,12 +511,11 @@ class MainExif {
 				let text = itemText;
 
 				if (title.toLowerCase().endsWith(".txt")
-					&&
-					(
-						text.includes("Negative prompt: ")  //負面提示
-						|| text.includes("Steps: ") //其他參數
+					&& (
+						text.includes("Negative prompt: ")  // 負面提示
+						|| text.includes("Steps: ") // 其他參數
 					)
-				) { //如果是 SDwebUI 的 info
+				) { // 如果是 SDwebUI 的 info
 
 					domContent = Lib.newDom(`
 						<div class="mainExifRelatedContent collapse-content">
@@ -537,7 +527,7 @@ class MainExif {
 					AiDrawingPrompt.getSdwebui(text).forEach(item => {
 						domContentList.appendChild(getItemDom(item.title, item.text));
 					})
-				} else { //一般的文字檔
+				} else { // 一般的文字檔
 
 					domContent = Lib.newDom(`
 						<div class="mainExifRelatedContent collapse-content">
@@ -549,7 +539,7 @@ class MainExif {
 
 				}
 
-				//按鈕 - civitai
+				// 按鈕 - civitai
 				if (title.toLowerCase() === ".civitai.info") {
 					try {
 						let civitaiInfo = JSON.parse(text);
@@ -565,24 +555,24 @@ class MainExif {
 					} catch (e) { }
 				}
 
-				//按鈕 - 編輯
+				// 按鈕 - 編輯
 				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
 				btnList.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
-					M.textEditor.setOnSave(async (t: string) => { //儲存時更新面板裡面的文字
+					M.textEditor.setOnSave(async (t: string) => { // 儲存時更新面板裡面的文字
 						let newItemDom = await getRelatedDom(itemPath, t);
 						domBox.insertAdjacentElement("afterend", newItemDom);
 						domBox.remove();
 					});
 				})
 
-				//按鈕 - 複製
+				// 按鈕 - 複製
 				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>`)
 				btnList.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
 					await WV_System.SetClipboard_Text(itemText ?? "");
-					Toast.show(M.i18n.t("msg.copyExif", { v: title }), 1000 * 3); //已將「.txt」複製至剪貼簿
+					Toast.show(M.i18n.t("msg.copyExif", { v: title }), 1000 * 3); // 已將「.txt」複製至剪貼簿
 				})
 
 			} else {
@@ -607,7 +597,7 @@ class MainExif {
 					</div>
 				`);
 
-				//快速拖曳
+				// 快速拖曳
 				Lib.addDragThresholdListener(domContent, 5, () => {
 					let path = domBox.getAttribute("data-path");
 					if (path !== null) {
@@ -615,8 +605,8 @@ class MainExif {
 					}
 				});
 
-				//雙擊左鍵
-				Lib.addEventDblclick(domContent, async (e: MouseEvent) => { //圖片物件
+				// 雙擊左鍵
+				Lib.addEventDblclick(domContent, async (e: MouseEvent) => { // 圖片物件
 					let path = domBox.getAttribute("data-path");
 					if (path !== null) {
 						M.fileLoad.loadFile(path);
@@ -626,13 +616,13 @@ class MainExif {
 			}
 			domBox.appendChild(domContent);
 
-			//初始化 折疊面板
-			let open = M.config.settings.layout.mainExifCollapse[title]; //從設定讀取折疊狀態
-			if (open === undefined) { open = true; } //不存在就預設為開
-			Lib.collapse(domBox, "init-" + open); //不使用動畫直接初始化狀態
+			// 初始化 折疊面板
+			let open = M.config.settings.layout.mainExifCollapse[title]; // 從設定讀取折疊狀態
+			if (open === undefined) { open = true; } // 不存在就預設為開
+			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
 			domTitle.addEventListener("click", (e) => {
 
-				//如果是右上角的按鈕，則不處理
+				// 如果是右上角的按鈕，則不處理
 				let target = e.target as HTMLElement;
 				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
 					return;
@@ -708,12 +698,12 @@ class MainExif {
 				}
 			}
 
-			btnExpand.addEventListener("click", async () => { //折疊
+			btnExpand.addEventListener("click", async () => { // 折疊
 				divValue.style.webkitLineClamp = "9999"; // 最大顯示行數
 				setType("expand");
 			});
 
-			btnCollapse.addEventListener("click", async () => { //折疊
+			btnCollapse.addEventListener("click", async () => { // 折疊
 				divValue.style.webkitLineClamp = ""; // 沒有設定就會使用設定值
 				setType("collapse");
 			});
@@ -763,7 +753,6 @@ class MainExif {
 			}
 		}
 
-
 		/**
 		 * 檔案被修改時呼叫
 		 */
@@ -787,14 +776,14 @@ class MainExif {
 				return null;
 			}
 
-			//取得標題，null 表示不是相關檔案，例如 .min.js
+			// 取得標題，null 表示不是相關檔案，例如 .min.js
 			function getTitle() {
-				let name = Lib.GetFileName(fileInfo2.FullPath); //目前檔案的檔名
+				let name = Lib.GetFileName(fileInfo2.FullPath); // 目前檔案的檔名
 				let itemName = Lib.GetFileName(fileWatcherData.FullPath);
-				let nameF = name.split(".")[0]; //取得檔名第一個.之前的部分
+				let nameF = name.split(".")[0]; // 取得檔名第一個.之前的部分
 				let itemNameF = itemName.split(".")[0];
 
-				if (nameF.toLowerCase() === itemNameF.toLowerCase()) { //檔名與原先檔名一樣
+				if (nameF.toLowerCase() === itemNameF.toLowerCase()) { // 檔名與原先檔名一樣
 					let title = itemName.substring(nameF.length);
 					return title;
 				}
@@ -808,7 +797,7 @@ class MainExif {
 				if (relatedBox === null) { return; }
 				relatedBox.remove();
 
-				//如果沒有其他檔案，就顯示 新增按鈕
+				// 如果沒有其他檔案，就顯示 新增按鈕
 				if (domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
 					let btnNew = await getRelatedBtnAdd()
 					domTabContentRelated.appendChild(btnNew);
@@ -823,13 +812,13 @@ class MainExif {
 
 					let relatedTitle = relatedBox.querySelector(".mainExifRelatedTitle span") as HTMLElement;
 					if (relatedTitle !== null) {
-						let title = getTitle(); //取得新標題
+						let title = getTitle(); // 取得新標題
 						if (title !== null) {
 							relatedTitle.innerText = Lib.escape(title);
-						} else { //取得標題失敗表示不是相關檔案，則移除舊項目
+						} else { // 取得標題失敗表示不是相關檔案，則移除舊項目
 							relatedBox.remove();
 
-							//如果沒有其他檔案，就顯示 新增按鈕
+							// 如果沒有其他檔案，就顯示 新增按鈕
 							if (domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
 								let btnNew = await getRelatedBtnAdd()
 								domTabContentRelated.appendChild(btnNew);
@@ -838,7 +827,7 @@ class MainExif {
 					}
 
 				} else {
-					changeType = "created"; //如果更改檔名後是不存在於列表的項目，就視為新增
+					changeType = "created"; // 如果更改檔名後是不存在於列表的項目，就視為新增
 				}
 
 			}
@@ -860,7 +849,7 @@ class MainExif {
 					let domBox = await getRelatedDom(path, text);
 					domTabContentRelated.appendChild(domBox);
 
-					//新增檔案後就隱藏 新增按鈕
+					// 新增檔案後就隱藏 新增按鈕
 					let btnNew = domTabContentRelated.querySelector(".mainExifRelatedBtnAdd");
 					if (btnNew !== null) {
 						btnNew.remove();
@@ -872,7 +861,6 @@ class MainExif {
 		}
 
 	}
-
 }
 
 
@@ -904,8 +892,7 @@ class TextEditor {
 		this.setText = setText;
 		this.setOnSave = setOnSave;
 
-
-		//讓 Textarea 支援 tab
+		// 讓 Textarea 支援 tab
 		domTextarea.addEventListener("keydown", function (e) {
 
 			if (e.code === "Tab") {
@@ -976,7 +963,7 @@ class TextEditor {
 				t = JSON.stringify(j, null, "\t");
 				setText(t);
 			} catch (e) {
-				Toast.show(M.i18n.t("msg.formattingFailed"), 1000 * 3); //儲存完成
+				Toast.show(M.i18n.t("msg.formattingFailed"), 1000 * 3); // 儲存完成
 			}
 		})
 		domBtnClose.addEventListener("click", () => {
@@ -1009,7 +996,7 @@ class TextEditor {
 			}
 			setText(t);
 
-			//設定焦點
+			// 設定焦點
 			domTextarea.focus();
 			domTextarea.setSelectionRange(0, 0);
 
@@ -1056,9 +1043,9 @@ class TextEditor {
 			try {
 				await WV_File.SetText(filePath, t);
 				onSave(t);
-				Toast.show(M.i18n.t("msg.saveComplete"), 1000 * 3); //儲存完成
+				Toast.show(M.i18n.t("msg.saveComplete"), 1000 * 3); // 儲存完成
 			} catch (e) {
-				Toast.show(M.i18n.t("msg.saveFailed") + ":\n" + e, 1000 * 3); //儲存失敗
+				Toast.show(M.i18n.t("msg.saveFailed") + ":\n" + e, 1000 * 3); // 儲存失敗
 			}
 		}
 
@@ -1075,5 +1062,6 @@ class TextEditor {
 		function setText(t: string) {
 			domTextarea.value = t;
 		}
+
 	}
 }

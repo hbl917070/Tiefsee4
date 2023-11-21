@@ -1,52 +1,50 @@
-
 class I18n {
 
-    public getData; //取得 翻譯json
-    public setData; //設定 翻譯json
-    public pushData; //加入 翻譯json
+    public getData; // 取得 翻譯json
+    public setData; // 設定 翻譯json
+    public pushData; // 加入 翻譯json
 
-    public t; //取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
-    public tSpan; //取得 <span i18n="key">翻譯</span> 
-    public get; //取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
-    public setAll; //翻譯整個html頁面。 type=語言(選填)
-    public initNone; //有翻譯的地方都顯示空白(用於翻譯前)
+    public t; // 取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+    public tSpan; // 取得 <span i18n="key">翻譯</span> 
+    public get; // 取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+    public setAll; // 翻譯整個html頁面。 type=語言(選填)
+    public initNone; // 有翻譯的地方都顯示空白(用於翻譯前)
 
-    public getDefaultLang; //取得預設語言
-    public setDefaultLang; //設定預設語言
-    public getLang; //取得目前的語言
-    public setLang; //設定語言
+    public getDefaultLang; // 取得預設語言
+    public setDefaultLang; // 設定預設語言
+    public getLang; // 取得目前的語言
+    public setLang; // 設定語言
 
-    public getEventRun; //取得 回調函數（翻譯時觸發
-    public setEventRun; //設定 回調函數（翻譯時觸發
-
+    public getEventRun; // 取得 回調函數（翻譯時觸發
+    public setEventRun; // 設定 回調函數（翻譯時觸發
 
     constructor() {
 
-        this.getData = getData; //取得 翻譯json
-        this.setData = setData; //設定 翻譯json
-        this.pushData = pushData; //加入 翻譯json
+        this.getData = getData; // 取得 翻譯json
+        this.setData = setData; // 設定 翻譯json
+        this.pushData = pushData; // 加入 翻譯json
 
-        this.t = get; //取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+        this.t = get; // 取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
         this.tSpan = tSpan;
-        this.get = get; //取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
-        this.setAll = setAll; //翻譯整個html頁面。 type=語言(選填)
+        this.get = get; // 取得翻譯。 key(多層範例 aa.b.c), type=語言(選填)
+        this.setAll = setAll; // 翻譯整個html頁面。 type=語言(選填)
         this.initNone = initNone;
 
-        this.getDefaultLang = getDefaultLang; //取得預設語言
-        this.setDefaultLang = setDefaultLang; //設定預設語言
-        this.getLang = getLang; //取得目前的語言
-        this.setLang = setLang; //設定語言
+        this.getDefaultLang = getDefaultLang; // 取得預設語言
+        this.setDefaultLang = setDefaultLang; // 設定預設語言
+        this.getLang = getLang; // 取得目前的語言
+        this.setLang = setLang; // 設定語言
 
-        this.getEventRun = getEventRun; //取得 回調函數（翻譯時觸發
-        this.setEventRun = setEventRun; //設定 回調函數（翻譯時觸發
+        this.getEventRun = getEventRun; // 取得 回調函數（翻譯時觸發
+        this.setEventRun = setEventRun; // 設定 回調函數（翻譯時觸發
 
-        var lang = ""; //目前的語言
-        var defaultLang = "en"; //預設語言
-        var eventRun = (lang: string) => { }; //回調函數，翻譯時觸發
+        var lang = ""; // 目前的語言
+        var defaultLang = "en"; // 預設語言
+        var eventRun = (lang: string) => { }; // 回調函數，翻譯時觸發
 
         //--------------
 
-        //從 localStorage 取得使用者選擇的語言
+        // 從 localStorage 取得使用者選擇的語言
         if (window.localStorage.getItem("i18n") !== null) {
             let s = window.localStorage.getItem("i18n");
             if (s != null) {
@@ -54,7 +52,7 @@ class I18n {
             }
         }
 
-        //從 localStorage 取得使用者選擇的預設語言
+        // 從 localStorage 取得使用者選擇的預設語言
         if (window.localStorage.getItem("i18n_DefaultLang") !== null) {
             let s = window.localStorage.getItem("i18n_DefaultLang");
             if (s != null) {
@@ -112,7 +110,7 @@ class I18n {
          * @param {object} json 
          */
         function pushData(json: any) {
-            mergeJSON(data, json); //合併json
+            mergeJSON(data, json); // 合併json
             data = json
         }
 
@@ -138,7 +136,7 @@ class I18n {
          */
         function applyValue(str: string, value: any) {
 
-            //沒有輸入value，就只會回傳原文字
+            // 沒有輸入value，就只會回傳原文字
             if (value === undefined || value.length === 0) { return str; }
 
             let arkay = Object.keys(value);
@@ -172,27 +170,26 @@ class I18n {
                 }
             }
 
-            //未填入語言的話，就是用預設語言
+            // 未填入語言的話，就是用預設語言
             if (type === undefined) { type = lang }
 
-            if (typeof d === "string") { //連結到另一筆資料
+            if (typeof d === "string") { // 連結到另一筆資料
                 return get(d.toString(), value, type);
 
-            } else if (d.hasOwnProperty(type) && d[type] !== null) { //翻譯存在的話就回傳
+            } else if (d.hasOwnProperty(type) && d[type] !== null) { // 翻譯存在的話就回傳
                 return applyValue(d[type], value);
 
-            } else if (d.hasOwnProperty(defaultLang)) { //如果不存在該語言的翻譯，則回傳預設語言的翻譯
+            } else if (d.hasOwnProperty(defaultLang)) { // 如果不存在該語言的翻譯，則回傳預設語言的翻譯
                 return applyValue(d[defaultLang], value);
 
             }
 
-            //什麼都找不到，回傳key
+            // 什麼都找不到，回傳key
             if (key !== "") {
                 console.log(`i18n missing: "${key}"`);
             }
             return arkey[arkey.length - 1];
         }
-
 
         /**
          * 取得 <span i18n="key">翻譯</span> 
@@ -208,14 +205,13 @@ class I18n {
             return `<span i18n="${t}">${get(key, value, type)}</span>`
         }
 
-
         /**
-         * 翻譯整個html頁面
+         * 翻譯整個 html 頁面
          * @param {string} type 語言(選填)
          */
         function setAll(type: string | undefined = undefined) {
 
-            //未填入語言的話，就是用預設語言
+            // 未填入語言的話，就是用預設語言
             if (type === undefined) { type = lang }
 
             var ar_i18n = document.querySelectorAll("[i18n]");
@@ -233,10 +229,8 @@ class I18n {
                 updateDom(item, t);
             }
 
-            eventRun(type); //執行回調函數
-
+            eventRun(type); // 執行回調函數
         }
-
 
         /**
          * 有翻譯的地方都顯示空白(用於翻譯前)
@@ -249,35 +243,27 @@ class I18n {
             }
         }
 
-
         /**
          * 對dom進行翻譯
          */
         function updateDom(dom: Element, t: string) {
             if (dom.getAttribute("i18n") === "") {
-
                 return;
-
-            } else if (dom.getAttribute("placeholder") !== null) { //翻譯輸入框的提示文字
-
+            }
+            else if (dom.getAttribute("placeholder") !== null) { // 翻譯輸入框的提示文字
                 dom.setAttribute("placeholder", t);
-
-            } else if (dom.tagName == "TD" && dom.getAttribute("data-th") !== null) { //翻譯響應式table裡面的文字 data-th
-
+            }
+            else if (dom.tagName == "TD" && dom.getAttribute("data-th") !== null) { // 翻譯響應式table裡面的文字 data-th
                 dom.setAttribute("data-th", t);
-
-            }else if (dom.tagName == "OPTGROUP" ) { //翻譯響應式table裡面的文字 data-th
-
+            }
+            else if (dom.tagName == "OPTGROUP") { // 翻譯響應式table裡面的文字 data-th
                 dom.setAttribute("label", t);
-
-            } else if (dom.getAttribute("title") !== null) {
-
+            }
+            else if (dom.getAttribute("title") !== null) {
                 dom.setAttribute("title", t);
-
-            } else {
-
+            }
+            else {
                 dom.innerHTML = t;
-
             }
         }
 
@@ -290,19 +276,18 @@ class I18n {
          */
         function mergeJSON(minor: any, main: any) {
             for (var key in minor) {
-                if (main[key] === undefined) { //不衝突的，直接賦值
+                if (main[key] === undefined) { // 不衝突的，直接賦值
                     main[key] = minor[key];
                     continue;
                 }
-                //衝突了，如果是Object，看看有麼有不衝突的屬性
-                //不是Object 則以main為主，忽略即可。故不需要else
+                // 衝突了，如果是Object，看看有麼有不衝突的屬性
+                // 不是Object 則以main為主，忽略即可。故不需要else
                 if (isJSON(minor[key])) {
                     // arguments.callee 遞迴呼叫，並且與函式名解耦
                     arguments.callee(minor[key], main[key]);
                 }
             }
         }
-
 
         /**
          * 檢查是否為 json
@@ -311,8 +296,6 @@ class I18n {
         function isJSON(target: any) {
             return typeof target == "object" && target.constructor == Object;
         }
-
-
 
         var data: any = {
 
@@ -348,8 +331,4 @@ class I18n {
         }
 
     }
-
-
-
-
 }

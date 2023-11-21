@@ -25,7 +25,6 @@ namespace Tiefsee {
         );
     }
 
-
     public enum KnownFolder {
         Contacts,
         Downloads,

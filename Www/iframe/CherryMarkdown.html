@@ -40,13 +40,13 @@
     <script>
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin);
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
@@ -54,7 +54,7 @@
                 setRoot("");
                 setText(data.txt);
             }
-            if (type === "loadFile") { //載入檔案並且設定目錄
+            if (type === "loadFile") { // 載入檔案並且設定目錄
                 setRoot(data.dir);
                 setText(data.txt);
             }
@@ -92,25 +92,25 @@
 
     <script>
         var libIframe = new LibIframe();
-        libIframe.initEventDrop(window); //註冊 drop 事件，拖曳檔案進來時 開啟檔案
-        libIframe.initTextHotkey(); //按 ctrl + S 時，儲存文字檔
+        libIframe.initEventDrop(window); // 註冊 drop 事件，拖曳檔案進來時 開啟檔案
+        libIframe.initTextHotkey(); // 按 ctrl + S 時，儲存文字檔
 
         var cherryObj;
 
         document.addEventListener("DOMContentLoaded", async () => {
             cherryObj = initCherry();
             setTheme();
-            await libIframe.closeIME(); //嘗試關閉輸入法
+            await libIframe.closeIME(); // 嘗試關閉輸入法
             initFinish();
         });
 
-        //點擊超連結時
+        // 點擊超連結時
         document.querySelector("body").addEventListener("click", function(e) {
 
             let dom = e.target;
             let tagname = dom.tagName;
 
-            //點擊的如果不是A標籤，則搜尋父層dom
+            // 點擊的如果不是A標籤，則搜尋父層dom
             while (true) {
                 if (tagname === "A") {
                     break;
@@ -127,7 +127,7 @@
                 return;
             }
 
-            //如果是錨點超連結，就允許執行
+            // 如果是錨點超連結，就允許執行
             let hrefURL = new URL(href);
             let locationURL = new URL(location.href);
             if (hrefURL.pathname === locationURL.pathname) {
@@ -136,18 +136,17 @@
                 }
             }
 
-            libIframe.openUrl(href); //開啟網址或檔案
+            libIframe.openUrl(href); // 開啟網址或檔案
 
             e.preventDefault();
         });
-
 
         /**
          * 初始化 Cherry
          */
         function initCherry() {
 
-            let lang = libIframe.getLang(); //取得使用者選擇的語言
+            let lang = libIframe.getLang(); // 取得使用者選擇的語言
             if (lang == "zh-TW") {
                 lang = "zh_TW";
             } else {
@@ -177,11 +176,11 @@
                 id: "markdown-container",
                 value: "",
                 externals: { // 第三方包
-                    //echarts: window.echarts,
+                    // echarts: window.echarts,
                     MathJax: window.MathJax,
                 },
-                fileUpload: (e) => { //貼上剪貼簿裡面的圖片時
-                    //不做任何事情
+                fileUpload: (e) => { // 貼上剪貼簿裡面的圖片時
+                    // 不做任何事情
                 },
                 // 解析引擎組態
                 engine: {
@@ -254,7 +253,7 @@
                     bubble: false, // 選中文字彈出工具列
                     //bubble: [], // 選中文字彈出工具列
                     float: false, // 建立新行彈出工具列
-                    customMenu: { //自定義的按鈕
+                    customMenu: { // 自定義的按鈕
                         customMenuImg: customMenuImg,
                     },
                 }
@@ -262,7 +261,6 @@
 
             return cherryObj;
         }
-
 
         /**
          * get md
@@ -276,7 +274,7 @@
          */
         function setText(s) {
             cherryObj.setMarkdown(s);
-            cherryObj.editor.editor.clearHistory(); //清空歷史資料
+            cherryObj.editor.editor.clearHistory(); // 清空歷史資料
         }
 
         /**
@@ -303,7 +301,7 @@
          * 套用主題
          */
         function setTheme() {
-            cherryObj.setTheme("default"); //default / light / dark / violet
+            cherryObj.setTheme("default"); // default / light / dark / violet
         }
 
         /**
@@ -315,11 +313,10 @@
             } else {
                 val = false;
             }
-            libIframe.setReadonly(val); //攔截鍵盤
-            cherryObj.editor.editor.options.readOnly = val; //文字編輯器設定成唯讀
+            libIframe.setReadonly(val); // 攔截鍵盤
+            cherryObj.editor.editor.options.readOnly = val; // 文字編輯器設定成唯讀
         }
     </script>
-
 
 </body>
 

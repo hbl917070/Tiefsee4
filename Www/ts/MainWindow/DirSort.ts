@@ -1,6 +1,6 @@
 class DirSort {
 
-    //public getSortType;
+    // public getSortType;
     public readSortType;
     public updateMenu;
     public sort;
@@ -17,13 +17,13 @@ class DirSort {
         var dom_dirSort_desc = document.getElementById("menuitem-dirSort-desc") as HTMLInputElement;
 
         var yesSvgTxt = SvgList["yes.svg"];
-        var sortType = DirSortType.name; //排序方式
+        var sortType = DirSortType.name; // 排序方式
         var orderbyType = DirOrderbyType.asc;
 
-        //this.getSortType = () => { return sortType }
-        //this.setSortType = (val: string) => { sortType = val; }
+        // this.getSortType = () => { return sortType }
+        // this.setSortType = (val: string) => { sortType = val; }
         this.readSortType = readSortType;
-        //this.setDirSortType = setDirSortType;
+        // this.setDirSortType = setDirSortType;
         this.updateMenu = updateMenu;
         this.sort = sort;
 
@@ -57,14 +57,13 @@ class DirSort {
             updateSort();
         });
 
-
         /**
          * 不重新載入圖片，只更新排序(用於排序選單的按鈕
          * @param _sortType 
          */
         async function updateSort() {
 
-            //sortType = _sortType;
+            // sortType = _sortType;
             if (orderbyType === DirOrderbyType.desc) {
                 if (sortType === DirSortType.name) { sortType = DirSortType.nameDesc; }
                 if (sortType === DirSortType.lastWriteTime) { sortType = DirSortType.lastWriteTimeDesc; }
@@ -80,7 +79,7 @@ class DirSort {
 
             await sort()
 
-            //使用 父親資料夾 當做key來記錄排序
+            // 使用 父親資料夾 當做key來記錄排序
             let dirPath = M.fileLoad.getDirPath()
             let dirParentPath = Lib.GetDirectoryName(dirPath)
             if (dirParentPath === null) {
@@ -88,14 +87,13 @@ class DirSort {
             }
             setDirSortType(dirParentPath, sortType);
 
-            M.fileLoad.updateTitle(); //更新視窗標題
-            M.mainDirList.init(); //設定 檔案預覽視窗 目前選中的項目
-            M.mainDirList.updateLocation(); //檔案預覽視窗 自動捲動到選中項目的地方
+            M.fileLoad.updateTitle(); // 更新視窗標題
+            M.mainDirList.init(); // 設定 檔案預覽視窗 目前選中的項目
+            M.mainDirList.updateLocation(); // 檔案預覽視窗 自動捲動到選中項目的地方
 
             updateMenu();
-            //M.menu.close(); //關閉menu
+            // M.menu.close(); // 關閉menu
         }
-
 
         /**
          * 更新menu選單
@@ -134,9 +132,8 @@ class DirSort {
             if (orderbyType === DirOrderbyType.desc) {
                 dom_dirSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
             }
-            //M.menu.close(); //關閉menu
+            // M.menu.close(); // 關閉menu
         }
-
 
         /**
          * 排序檔案
@@ -151,11 +148,11 @@ class DirSort {
             let arDir = M.fileLoad.getWaitingDir();
             let arKey = M.fileLoad.getWaitingDirKey();
 
-            if (arKey.length <= 1) { return; } //只有1筆資料就不需要排序
+            if (arKey.length <= 1) { return; } // 只有1筆資料就不需要排序
 
             arKey = await WebAPI.sort2(arKey, sortType);
 
-            //排序後把資料放回 WaitingDir
+            // 排序後把資料放回 WaitingDir
             let ar: { [key: string]: string[] } = {}
             for (let i = 0; i < arKey.length; i++) {
                 const dirPath = arKey[i];
@@ -163,10 +160,9 @@ class DirSort {
             }
             M.fileLoad.setWaitingDir(ar);
 
-            //更新 flagDir (目前在哪一個資料夾
+            // 更新 flagDir (目前在哪一個資料夾
             await M.fileLoad.updateFlagDir(path);
         }
-
 
         /**
          * 設定該資料夾設定的檔案排序方式
@@ -175,20 +171,17 @@ class DirSort {
          */
         function setDirSortType(dirPath: string, _sortType: string) {
 
-            //取得原來的排序
+            // 取得原來的排序
             let t = window.localStorage.getItem("sortDir");
             let json: any = {};
             if (t !== null) {
                 json = JSON.parse(t);
             }
 
-            //儲存排序
+            // 儲存排序
             json[dirPath] = sortType;
             window.localStorage.setItem("sortDir", JSON.stringify(json));
-
-            //console.log(`Dir set ` + sortType)
         }
-
 
         /**
          * 取得該資料夾設定的檔案排序方式
@@ -199,7 +192,7 @@ class DirSort {
 
             let t = window.localStorage.getItem("sortDir");
 
-            if (t === null) { t = "{}" } //避免從來沒有儲存過
+            if (t === null) { t = "{}" } // 避免從來沒有儲存過
             let json = JSON.parse(t);
             let _sortType = json[dirPath];
             if (_sortType !== undefined) {
@@ -212,13 +205,11 @@ class DirSort {
                 sortType = defaultSort;
             }
 
-            //console.log(`Dir get ` + sortType + " " + dirPath)
             if (sortType.indexOf("Desc") !== -1) {
                 orderbyType = DirOrderbyType.desc;
             } else {
                 orderbyType = DirOrderbyType.asc;
             }
-
         }
 
     }
@@ -231,28 +222,20 @@ class DirSort {
 var DirSortType = {
     /** 檔名自然排序 */
     name: "name",
-
     /** 檔名自然排序(逆) */
     nameDesc: "nameDesc",
-
     /** 修改時間排序 */
     lastWriteTime: "lastWriteTime",
-
     /** 修改時間排序(逆) */
     lastWriteTimeDesc: "lastWriteTimeDesc",
-
     /** 檔案存取時間排序 */
     lastAccessTime: "lastAccessTime",
-
     /** 檔案存取時間排序(逆)   */
     lastAccessTimeDesc: "lastAccessTimeDesc",
-
     /** 檔案建立時間排序 */
     creationTime: "creationTime",
-
     /** 檔案建立時間排序(逆)  */
     creationTimeDesc: "creationTimeDesc",
-
     /** 隨機排序 */
     random: "random",
 }

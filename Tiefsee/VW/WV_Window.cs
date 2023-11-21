@@ -5,42 +5,19 @@ using System.Runtime.InteropServices;
 namespace Tiefsee {
 
     [ComVisible(true)]
-
-    /// <summary>
-    /// 網頁呼叫C#方法
-    /// </summary>
     public class WV_Window {
 
         public WebWindow M;
 
-
         public WV_Window(WebWindow m) {
             this.M = m;
-        }
-
-        public string GetMemoryLevel() {
-            if (M.wv2.CoreWebView2.MemoryUsageTargetLevel
-                    == Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal) {        
-                return "Normal";
-            }
-            return "Low";
-        }
-
-        public void SetMemoryLevel(string type) {
-            if (type.ToLower() == "n") {
-                M.wv2.CoreWebView2.MemoryUsageTargetLevel
-                    = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal;
-            } else {
-                M.wv2.CoreWebView2.MemoryUsageTargetLevel
-                    = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Low;
-            }
         }
 
         /// <summary>
         /// 清理webview2的暫存
         /// </summary>
         public void ClearBrowserCache() {
-            //M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync(); //會清除使用者資料
+            // M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync(); // 會清除使用者資料
             M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
         }
 
@@ -62,7 +39,6 @@ namespace Tiefsee {
             Program.webServer.controller.SetCacheTime(serverCache);
         }
 
-
         /// <summary>
         /// 取得 AppInfo
         /// </summary>
@@ -70,7 +46,6 @@ namespace Tiefsee {
         public string GetAppInfo() {
             return WebWindow.GetAppInfo(M.args, 0);
         }
-
 
         /// <summary>
         /// 新開子視窗
@@ -87,7 +62,6 @@ namespace Tiefsee {
             return w;
         }
 
-
         /// <summary>
         /// 新開子視窗
         /// </summary>
@@ -99,7 +73,6 @@ namespace Tiefsee {
             SetOwner(w);
             return null;
         }
-
 
         /// <summary>
         /// 關閉全部的視窗(結束程式)
@@ -115,7 +88,6 @@ namespace Tiefsee {
             M.ShowWindow();
         }
 
-
         /// <summary>
         /// 網頁載入完成後，呼叫此函數才會顯示視窗，指定起始坐標
         /// </summary>
@@ -128,7 +100,6 @@ namespace Tiefsee {
             M.ShowWindowAtPosition(x, y, width, height, windowState);
         }
 
-
         /// <summary>
         /// 網頁載入完成後，呼叫此函數才會顯示視窗，子視窗從父視窗中間開啟
         /// </summary>
@@ -138,16 +109,15 @@ namespace Tiefsee {
             M.ShowWindowAtCenter(width, height);
         }
 
-
         /// <summary>
         /// 設定視窗最小size
+        /// </summary>
         /// </summary>
         /// <param name="w"></param>
         /// <param name="h"></param>
         public void SetMinimumSize(int w, int h) {
-            M.MinimumSize = new System.Drawing.Size(w, h);
+            M.MinimumSize = new(w, h);
         }
-
 
         /// <summary>
         /// 設定視窗size
@@ -158,7 +128,6 @@ namespace Tiefsee {
             M.SetSize(w, h);
         }
 
-
         /// <summary>
         /// 設定視窗坐標
         /// </summary>
@@ -167,7 +136,6 @@ namespace Tiefsee {
         public void SetPosition(int left, int top) {
             M.SetPosition(left, top);
         }
-
 
         /// <summary>
         /// 視窗使用毛玻璃效果(只有win10、win11有效
@@ -192,7 +160,6 @@ namespace Tiefsee {
             return M.wv2.ZoomFactor;
         }
 
-
         /// <summary>
         /// 傳入 webWindow，將其設為目前視窗的子視窗
         /// </summary>
@@ -201,7 +168,7 @@ namespace Tiefsee {
             if (_window != null) {
                 WebWindow webwindow = (WebWindow)_window;
                 if (TopMost == true) {
-                    TopMost = false; //設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
+                    TopMost = false; // 設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
                     webwindow.Owner = M;
                     TopMost = true;
                 } else {
@@ -209,7 +176,6 @@ namespace Tiefsee {
                 }
             }
         }
-
 
         /// <summary>
         /// 在父親視窗運行js
@@ -219,17 +185,8 @@ namespace Tiefsee {
         public async Task<string> RunJsOfParent(string js) {
             if (M.parentWindow == null) { return ""; }
             if (M.parentWindow.wv2.CoreWebView2 == null) { return ""; }
-            string txt = await M.parentWindow.wv2.CoreWebView2.ExecuteScriptAsync(js);
-            return txt;
+            return await M.parentWindow.wv2.CoreWebView2.ExecuteScriptAsync(js);
         }
-
-
-        /*public async Task<string> RunJs(string js) {
-            if (M.wv2.CoreWebView2 == null) { return ""; }
-            string f = await M.wv2.CoreWebView2.ExecuteScriptAsync(js);
-            return f;
-        }*/
-
 
         /// <summary>
         /// 設定視窗的 icon
@@ -237,10 +194,9 @@ namespace Tiefsee {
         /// <param name="path"></param>
         public void SetIcon(string path) {
             if (File.Exists(path)) {
-                M.Icon = new System.Drawing.Icon(path);
+                M.Icon = new(path);
             }
         }
-
 
         /// <summary>
         /// 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee
@@ -253,7 +209,6 @@ namespace Tiefsee {
             return path;
         }
 
-
         /// <summary>
         /// 取得執行檔所在的資料夾
         /// </summary>
@@ -261,35 +216,27 @@ namespace Tiefsee {
             return System.AppDomain.CurrentDomain.BaseDirectory;
         }
 
-
         /// <summary>
         /// 取得執行檔路徑
         /// </summary>
-        /// <returns></returns>
         public string GetAppPath() {
-            //return M.GetType().Assembly.Location;
             string exePath = Process.GetCurrentProcess().MainModule.FileName;
             return exePath;
         }
 
-
         /// <summary>
         /// 取得命令列參數
         /// </summary>
-        /// <returns></returns>
         public string[] GetArguments() {
             return M.args;
         }
 
-
         /// <summary>
         /// 返回 WebWindow
         /// </summary>
-        /// <returns></returns>
         public WebWindow This() {
             return M;
         }
-
 
         /// <summary>
         /// 標題
@@ -313,6 +260,7 @@ namespace Tiefsee {
             get { return M.Width; }
             set { M.Width = value; }
         }
+
         public int Height {
             get { return M.Height; }
             set { M.Height = value; }
@@ -322,7 +270,6 @@ namespace Tiefsee {
             get { return M.Visible; }
             set { M.Visible = value; }
         }
-
 
         /// <summary>
         /// 視窗狀態
@@ -336,15 +283,15 @@ namespace Tiefsee {
             }
             set {
                 if (value == "Maximized") {
-                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
+                    // WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
                     M.WindowState = FormWindowState.Maximized;
                 }
                 if (value == "Minimized") {
-                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_MINIMIZE);
+                    // WebWindow.ShowWindow(M.Handle, WebWindow.SW_MINIMIZE);
                     M.WindowState = FormWindowState.Minimized;
                 }
                 if (value == "Normal") {
-                    //WebWindow.ShowWindow(M.Handle, WebWindow.SW_NORMAL);
+                    // WebWindow.ShowWindow(M.Handle, WebWindow.SW_NORMAL);
                     M.WindowState = FormWindowState.Normal;
                 }
             }
@@ -364,7 +311,6 @@ namespace Tiefsee {
             return M.GetFullScreen();
         }
 
-
         /// <summary>
         /// 關閉視窗
         /// </summary>
@@ -373,7 +319,6 @@ namespace Tiefsee {
             M.CloseWindow();
         }
 
-
         /// <summary>
         /// 隱藏視窗
         /// </summary>
@@ -381,27 +326,17 @@ namespace Tiefsee {
             M.HideWindow();
         }
 
-
         /// <summary>
         /// 視窗固定在最上層
         /// </summary>
         public Boolean TopMost {
-            get {
-                return M.TopMost;
-            }
-            set {
-                M.TopMost = value;
-                /*if (M.TopLevel) {
-                    M.TopLevel = true;
-                }*/
-            }
+            get { return M.TopMost; }
+            set { M.TopMost = value; }
         }
-
 
         /// <summary>
         /// 拖曳視窗
         /// </summary>
-        /// <param name="_type"></param>
         public void WindowDrag(String _type) {
 
             //避免滑鼠在沒有按下的情況下執行
@@ -428,45 +363,38 @@ namespace Tiefsee {
                 return;
             }*/
 
-            //System.Threading.SynchronizationContext.Current.Post((_) => {    
-            //}, null);
-
             ReleaseCapture();
             SendMessage(M.Handle, WM_SYSCOMMAND, (int)(_run), 0);
-
         }
-
-
 
         #region 視窗拖曳
         public enum ResizeDirection {
-            LC = 0xF001, //左
-            RC = 0xF002, //右
-            CT = 0xF003, //上
-            LT = 0xF004, //左上
-            RT = 0xF005, //右上
-            CB = 0xF006, //下
-            LB = 0xF007, //左下
-            RB = 0xF008, //右下
-            Move = 0xF009 //移動
+            LC = 0xF001, // 左
+            RC = 0xF002, // 右
+            CT = 0xF003, // 上
+            LT = 0xF004, // 左上
+            RT = 0xF005, // 右上
+            CB = 0xF006, // 下
+            LB = 0xF007, // 左下
+            RB = 0xF008, // 右下
+            Move = 0xF009 // 移動
         }
 
-        //指定滑鼠到特定視窗
+        // 指定滑鼠到特定視窗
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetCapture(IntPtr hWnd);
 
-        //釋放滑鼠
+        // 釋放滑鼠
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool ReleaseCapture();
 
-        //拖曳視窗
+        // 拖曳視窗
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern bool SendMessage(IntPtr hwnd, int wMsg, int wParam, int lParam);
         public const int WM_SYSCOMMAND = 0x0112;
         public const int WM_LBUTTONUP = 0x202;
 
         #endregion
-
 
         #region 毛玻璃
 
@@ -508,11 +436,11 @@ namespace Tiefsee {
             var accent = new AccentPolicy();
 
             if (type.ToLower() == "win10") {
-                //win10
+                // win10
                 accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
                 accent.GradientColor = (_blurOpacity << 24) | (_blurBackgroundColor & 0xFFFFFF);
             } else {
-                //win7
+                // win7
                 accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
             }
 
@@ -534,6 +462,5 @@ namespace Tiefsee {
         #endregion
 
     }
-
 
 }

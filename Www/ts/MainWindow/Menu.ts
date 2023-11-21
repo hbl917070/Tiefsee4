@@ -16,7 +16,7 @@ class Menu {
         this.getIsShow = getIsShow;
         this.close = close;
 
-        var temp_closeList: any[] = []; //記錄所有被開過的menu
+        var temp_closeList: any[] = []; // 記錄所有被開過的menu
         var mouseX = 0;
         var mouseY = 0;
 
@@ -24,7 +24,6 @@ class Menu {
             mouseX = e.x;
             mouseY = e.y;
         });
-
 
         /**
          * 判斷目前是否有開啟選單
@@ -43,7 +42,6 @@ class Menu {
             }
         }
 
-
         /**
          * 
          * @param _domMenu 
@@ -58,15 +56,15 @@ class Menu {
             let domMenuBg = _domMenu.parentNode as HTMLElement;
             if (domMenuBg === null) { return; }
 
-            M.updateDomVisibility(); //更新元素顯示或隱藏
+            M.updateDomVisibility(); // 更新元素顯示或隱藏
 
             domMenuBg.setAttribute("active", "true");
-            _domMenu.style.bottom = ""; //避免高度計算錯誤
+            _domMenu.style.bottom = ""; // 避免高度計算錯誤
 
             _funcPosition();
 
             let funcClose = () => {
-                domMenuBg.setAttribute("active", ""); //關閉menu
+                domMenuBg.setAttribute("active", ""); // 關閉menu
                 temp_closeList = temp_closeList.filter((item) => {
                     return item !== funcClose;
                 });
@@ -78,31 +76,30 @@ class Menu {
 
             let onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let dom = sender.target as HTMLElement;
-                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                let isScroll = Lib.isScrollbarVisible(_domMenu); // 判斷是否有捲軸
                 if (
-                    dom.classList.contains("menu") //透明背景
-                    || (isScroll === false && dom.classList.contains("menu-content")) //避免出現捲動條後，無法點擊捲動條
+                    dom.classList.contains("menu") // 透明背景
+                    || (isScroll === false && dom.classList.contains("menu-content")) // 避免出現捲動條後，無法點擊捲動條
                 ) {
                     sender.preventDefault();
-                    funcClose(); //關閉menu
+                    funcClose(); // 關閉menu
                 }
             }
             domMenuBg.addEventListener("touchstart", onmousedown);
             domMenuBg.addEventListener("mousedown", onmousedown);
 
-            //在非選單的區域捲動，就關閉選單
+            // 在非選單的區域捲動，就關閉選單
             domMenuBg.onwheel = (sender) => {
                 let dom = sender.target as HTMLElement;
-                let isScroll = Lib.isScrollbarVisible(_domMenu); //判斷是否有捲軸
+                let isScroll = Lib.isScrollbarVisible(_domMenu); // 判斷是否有捲軸
                 if (
-                    dom.classList.contains("menu") //透明背景
-                    || (isScroll === false && dom.classList.contains("menu-content")) //避免出現捲動條後，無法點擊捲動條
+                    dom.classList.contains("menu") // 透明背景
+                    || (isScroll === false && dom.classList.contains("menu-content")) // 避免出現捲動條後，無法點擊捲動條
                 ) {
-                    funcClose(); //關閉menu
+                    funcClose(); // 關閉menu
                 }
             }
         }
-
 
         /**
          * 開啟 - 下拉選單
@@ -133,9 +130,7 @@ class Menu {
                 _domBtn.classList.remove(_css);
             };
             openBase(_domMenu, funcPosition, funcClose);
-
         }
-
 
         /**
          * 開啟 - 滑鼠右鍵
@@ -161,8 +156,8 @@ class Menu {
                 if (left < 0) { left = 0; }
 
                 if (menuHeight + top + offsetY > bodyHeight) {
-                    //top = top - menuHeight + 5; //在滑鼠上方顯示
-                    top = bodyHeight - menuHeight - 5; //靠齊視窗下面
+                    // top = top - menuHeight + 5; //在滑鼠上方顯示
+                    top = bodyHeight - menuHeight - 5; // 靠齊視窗下面
                 } else {
                     top = top + offsetY;
                 }
@@ -174,13 +169,11 @@ class Menu {
             };
             let funcClose = () => { };
             openBase(_domMenu, funcPosition, funcClose);
-
         }
 
-
         /**
-        * 開啟 - 指定坐標
-        */
+         * 開啟 - 指定坐標
+         */
         function openAtPoint(_domMenu: HTMLElement | null, X = 0, Y = 0) {
 
             if (_domMenu === null) { return; }
@@ -202,8 +195,8 @@ class Menu {
                 if (left < 0) { left = 0; }
 
                 if (menuHeight + top > bodyHeight) {
-                    //top = top - menuHeight + 5; //在滑鼠上方顯示
-                    top = bodyHeight - menuHeight - 5; //靠齊視窗下面
+                    // top = top - menuHeight + 5; // 在滑鼠上方顯示
+                    top = bodyHeight - menuHeight - 5; // 靠齊視窗下面
                 } else {
                     top = top;
                 }
@@ -217,7 +210,6 @@ class Menu {
             openBase(_domMenu, funcPosition, funcClose);
         }
 
-
         /**
          * 開啟 - 原地
          */
@@ -226,9 +218,9 @@ class Menu {
             if (_domMenu === null) { return; }
 
             let funcPosition = () => {
-                let menuWidth = _domMenu.getBoundingClientRect().width; //menu 寬度
+                let menuWidth = _domMenu.getBoundingClientRect().width; // menu 寬度
                 let menuHeight = _domMenu.getBoundingClientRect().height;
-                let bodyWidth = document.body.getBoundingClientRect().width; //視窗 寬度
+                let bodyWidth = document.body.getBoundingClientRect().width; // 視窗 寬度
                 let bodyHeight = document.body.getBoundingClientRect().height;
 
                 let left = mouseX;
@@ -252,9 +244,7 @@ class Menu {
             };
             let funcClose = () => { };
             openBase(_domMenu, funcPosition, funcClose);
-
         }
-
 
     }
 }

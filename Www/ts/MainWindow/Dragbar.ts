@@ -14,9 +14,8 @@ class Dragbar {
     public setPosition;
 
     constructor() {
-
         let dom_windowBody = document.getElementById("window-body") as HTMLElement;
-        let dom_box: HTMLElement; //螢幕看得到的區域
+        let dom_box: HTMLElement; // 螢幕看得到的區域
         let dom_dragbar: HTMLElement;
         let dom_observe: HTMLElement;
         let temp_val = 0;
@@ -50,7 +49,6 @@ class Dragbar {
             }
         }
 
-
         /**
          * 初始化
          * @param _dom_box 要被修改size的物件
@@ -63,7 +61,7 @@ class Dragbar {
             dom_observe = _dom_observe;
             hammer_dragbar = new Hammer(dom_dragbar);
 
-            //區塊或body改變大小時，更新拖曳條的坐標
+            // 區塊或body改變大小時，更新拖曳條的坐標
             function updatePosition() {
                 requestAnimationFrame(() => {
                     if (type === "left") {
@@ -81,21 +79,20 @@ class Dragbar {
             new ResizeObserver(updatePosition).observe(dom_observe);
             new ResizeObserver(updatePosition).observe(document.body);
 
-
-            //拖曳開始
-            dom_dragbar.addEventListener("pointerdown", (ev) => { //mousedown + touchstart
+            // 拖曳開始
+            dom_dragbar.addEventListener("pointerdown", (ev) => { // mousedown + touchstart
                 ev.preventDefault();
-                dom_windowBody.style.pointerEvents = "none"; //避免畫面上的iframe造成無法識別滑鼠事件
+                dom_windowBody.style.pointerEvents = "none"; // 避免畫面上的iframe造成無法識別滑鼠事件
                 temp_val = Lib.toNumber(dom_dragbar.style.left);
                 temp_width = dom_box.getBoundingClientRect().width;
                 _eventStart();
             });
-            //拖曳 結束
+            // 拖曳 結束
             dom_dragbar.addEventListener("pointerup", () => {
-                dom_windowBody.style.pointerEvents = ""; //解除鎖定
+                dom_windowBody.style.pointerEvents = ""; // 解除鎖定
             })
 
-            //拖曳
+            // 拖曳
             hammer_dragbar.get("pan").set({ pointers: 0, threshold: 0, direction: Hammer.DIRECTION_ALL });
             hammer_dragbar.on("pan", (ev: HammerInput) => {
                 dom_dragbar.setAttribute("active", "true");
@@ -104,14 +101,13 @@ class Dragbar {
 
             });
 
-            //拖曳 結束
+            // 拖曳 結束
             hammer_dragbar.on("panend", (ev: HammerInput) => {
                 dom_windowBody.style.pointerEvents = ""; //解除鎖定
                 dom_dragbar.setAttribute("active", "");
                 let val = update(ev);
                 _eventEnd(val);
             });
-
 
             function update(ev: HammerInput) {
                 let val = 0;
@@ -124,11 +120,6 @@ class Dragbar {
                 return val;
             }
 
-
         }
     }
-
-
-
-
 }

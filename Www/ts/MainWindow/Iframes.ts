@@ -29,13 +29,13 @@ class Iframes {
 
         window.addEventListener("message", async (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
@@ -97,7 +97,7 @@ class Iframes {
                 return "";
             }
 
-            for (let i = 0; i < 2000; i++) { //等待套件初始化
+            for (let i = 0; i < 2000; i++) { // 等待套件初始化
                 if (_txt !== null) {
                     break;
                 }
@@ -108,16 +108,12 @@ class Iframes {
             return txt;
         }
 
-
         function setTheme() {
-
             let strTheme = JSON.stringify(M.config.settings.theme);
             window.localStorage.setItem("settings.theme", strTheme);
-
             let groupType = M.fileShow.getGroupType()
 
             if (groupType === GroupType.txt) {
-
             }
             if (groupType === GroupType.monacoEditor) {
                 monacoEditor.setTheme();
@@ -129,11 +125,9 @@ class Iframes {
                 pDFTronWebviewer.setTheme();
             }
         }
+
     }
-
-
 }
-
 
 class PDFTronWebviewer {
     public visible;
@@ -155,20 +149,19 @@ class PDFTronWebviewer {
 
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
             if (type === "PDFTronWebviewer.initFinish") {
                 isInitPDFTronWebviewer = true;
             }
-
         });
 
         /** 
@@ -234,9 +227,9 @@ class PDFTronWebviewer {
                 dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
             }
         }
+
     }
 }
-
 
 class MonacoEditor {
 
@@ -265,20 +258,19 @@ class MonacoEditor {
 
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
             if (type === "MonacoEditor.initFinish") {
                 isInitMonacoEditor = true;
             }
-
         });
 
         /** 
@@ -298,14 +290,13 @@ class MonacoEditor {
                 dom_monacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
             }
 
-            for (let i = 0; i < 2000; i++) { //等待套件初始化
+            for (let i = 0; i < 2000; i++) { // 等待套件初始化
                 if (isInitMonacoEditor === true) {
                     break;
                 }
                 await Lib.sleep(10);
             }
         }
-
 
         /**
          * 載入檔案
@@ -325,7 +316,6 @@ class MonacoEditor {
             };
             postMsg(json);
         }
-
 
         /**
          * 載入文字
@@ -427,13 +417,13 @@ class CherryMarkdown {
 
         window.addEventListener("message", (e) => {
 
-            //只開放特定網域呼叫
+            // 只開放特定網域呼叫
             if (e.origin !== "file://") {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
-            //接收到的資料
+            // 接收到的資料
             let type = e.data.type;
             let data = e.data.data;
 
@@ -460,14 +450,13 @@ class CherryMarkdown {
                 dom_iframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
             }
 
-            for (let i = 0; i < 2000; i++) { //等待套件初始化
+            for (let i = 0; i < 2000; i++) { // 等待套件初始化
                 if (isInitCherryMarkdown === true) {
                     break;
                 }
                 await Lib.sleep(10);
             }
         }
-
 
         /**
          * 載入檔案並且設定目錄
@@ -484,7 +473,6 @@ class CherryMarkdown {
             postMsg(json);
         }
 
-
         /**
          * 載入文字
          */
@@ -499,7 +487,6 @@ class CherryMarkdown {
             postMsg(json);
         }
 
-
         /**
          * 設定是否唯讀
          */
@@ -513,7 +500,6 @@ class CherryMarkdown {
             };
             postMsg(json);
         }
-
 
         /**
          * 清空內容
@@ -557,34 +543,32 @@ class CherryMarkdown {
     }
 }
 
-
 class Textview {
     public visible;
-    //public loadFile;
+    // public loadFile;
     public loadTxt;
     public loadNone;
     public setReadonly;
     public getText;
-    //public setTheme;
+    // public setTheme;
 
     constructor(M: MainWindow) {
 
         var dom_text = document.querySelector("#mView-txt") as HTMLTextAreaElement;
 
         this.visible = visible;
-        //this.loadFile = loadFile;
+        // this.loadFile = loadFile;
         this.loadTxt = loadText;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
         this.getText = getText;
-        //this.setTheme = setTheme;
+        // this.setTheme = setTheme;
 
-
-        //處理唯讀
+        // 處理唯讀
         dom_text.addEventListener("keydown", (e) => {
             if (isReadonly === false) { return; }
 
-            //只允許 Ctrl+C 跟 Ctrl+A ，其餘的按鍵都攔截
+            // 只允許 Ctrl+C 跟 Ctrl+A ，其餘的按鍵都攔截
             if (e.code == "KeyC" && e.ctrlKey === true) {
             } else if (e.code == "KeyA" && e.ctrlKey === true) {
             } else {
@@ -603,16 +587,15 @@ class Textview {
             }
         }
 
-
         /**
          * 載入文字
          */
         async function loadText(text: string) {
-            dom_text.scrollTo(0, 0); //捲到最上面
+            dom_text.scrollTo(0, 0); // 捲到最上面
             dom_text.value = text;
         }
 
-        var isReadonly = false; //是否為唯讀
+        var isReadonly = false; // 是否為唯讀
         /**
           * 設定是否唯讀
           */
@@ -637,10 +620,7 @@ class Textview {
         }
 
     }
-
-
 }
-
 
 class Pdfview {
     public visible;
@@ -705,5 +685,6 @@ class Welcomeview {
                 dom_welcomeview.style.display = "none";
             }
         }
+
     }
 }

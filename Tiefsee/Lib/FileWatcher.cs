@@ -1,6 +1,7 @@
 ﻿using System.IO;
 
 namespace Tiefsee {
+
     public class FileWatcher {
 
         private class WatcherInfo {
@@ -10,7 +11,6 @@ namespace Tiefsee {
         }
 
         private Dictionary<string, WatcherInfo> dicFileWatcher = new Dictionary<string, WatcherInfo>();
-
 
         /// <summary>
         /// 偵測檔案變化
@@ -52,16 +52,16 @@ namespace Tiefsee {
                 foreach (var group in queue.GroupBy(item => item.FullPath)) {
                     var lastItem = group.Last();
                     if (lastItem.ChangeType == "deleted") {
-                        //最後一筆是 deleted，就只處理 deleted
+                        // 最後一筆是 deleted，就只處理 deleted
                         toSubmit.Add(lastItem);
                     } else if (group.All(item => item.ChangeType == "changed")) {
-                        //每一筆都是 changed，就只合併成一筆 changed
+                        // 每一筆都是 changed，就只合併成一筆 changed
                         toSubmit.Add(lastItem);
                     } else if (group.First().ChangeType == "created" && group.Skip(1).All(item => item.ChangeType == "changed")) {
-                        //第一筆是created，之後的每一筆都是changed，則只處理created
+                        // 第一筆是created，之後的每一筆都是changed，則只處理created
                         toSubmit.Add(group.First());
                     } else if (group.Count() > 1 && group.Any(item => item.ChangeType == "deleted") && lastItem.ChangeType == "created") {
-                        //先 deleted 後 created，則合併成 changed
+                        // 先 deleted 後 created，則合併成 changed
                         toSubmit.Add(new FileWatcherData {
                             Key = key,
                             FullPath = lastItem.FullPath,
@@ -97,7 +97,7 @@ namespace Tiefsee {
                 } else {
                     fileType = "none";
                 }
-                FileWatcherData data = new FileWatcherData {
+                FileWatcherData data = new() {
                     Key = key,
                     FullPath = fullPath,
                     OldFullPath = oldFullPath,
@@ -134,7 +134,6 @@ namespace Tiefsee {
         }
     }
 
-
     public class FileWatcherData {
         public string Key;
         public string FullPath;
@@ -142,4 +141,5 @@ namespace Tiefsee {
         public string ChangeType;
         public string FileType;
     }
+
 }

@@ -30,214 +30,214 @@ class Script {
 
         if (option === undefined) { option = {} }
 
-        //#region 圖片
-        if (s === "imageFitWindowOrImageOriginal") { //縮放至適合視窗 或 圖片原始大小
+        // #region 圖片
+        if (s === "imageFitWindowOrImageOriginal") { // 縮放至適合視窗 或 圖片原始大小
             this.img.fitWindowOrImageOriginal();
         }
-        else if (s === "switchFitWindowAndOriginal") { //縮放至適合視窗/圖片原始大小 切換
+        else if (s === "switchFitWindowAndOriginal") { // 縮放至適合視窗/圖片原始大小 切換
             this.img.switchFitWindowAndOriginal(option.x, option.y);
         }
-        else if (s === "imageFitWindow") { //強制縮放至適合視窗
+        else if (s === "imageFitWindow") { // 強制縮放至適合視窗
             this.img.zoomToFit();
         }
-        else if (s === "imageOriginal") { //圖片原始大小
+        else if (s === "imageOriginal") { // 圖片原始大小
             this.img.zoomTo100(option.x, option.y);
         }
-        else if (s === "imageZoomIn") { //放大
+        else if (s === "imageZoomIn") { // 放大
             this.img.zoomIn(option.x, option.y);
         }
-        else if (s === "imageZoomOut") { //縮小
+        else if (s === "imageZoomOut") { // 縮小
             this.img.zoomOut(option.x, option.y);
         }
-        else if (s === "imageRotateCw") { //順時針90°
+        else if (s === "imageRotateCw") { // 順時針90°
             this.img.degForward(option.x, option.y);
         }
-        else if (s === "imageRotateCcw") { //逆時針90°
+        else if (s === "imageRotateCcw") { // 逆時針90°
             this.img.degReverse(option.x, option.y);
         }
-        else if (s === "imageFlipHorizontal") { //水平鏡像
+        else if (s === "imageFlipHorizontal") { // 水平鏡像
             this.img.mirrorHorizontal(option.x, option.y);
         }
-        else if (s === "imageFlipVertical") { //垂直鏡像
+        else if (s === "imageFlipVertical") { // 垂直鏡像
             this.img.mirrorVertica(option.x, option.y);
         }
-        else if (s === "imageInitialRotation") { //圖初始化旋轉
+        else if (s === "imageInitialRotation") { // 圖初始化旋轉
             this.img.transformRefresh();
         }
 
-        else if (s === "imageMoveUp") { //圖片向上移動
+        else if (s === "imageMoveUp") { // 圖片向上移動
             this.img.move("up");
         }
-        else if (s === "imageMoveDown") { //圖片向下移動
+        else if (s === "imageMoveDown") { // 圖片向下移動
             this.img.move("down");
         }
-        else if (s === "imageMoveLeft") { //圖片向左移動
+        else if (s === "imageMoveLeft") { // 圖片向左移動
             this.img.move("left");
         }
-        else if (s === "imageMoveRight") { //圖片向右移動
+        else if (s === "imageMoveRight") { // 圖片向右移動
             this.img.move("right");
         }
 
-        else if (s === "imageMoveUpOrPrevFile") { //圖片向上移動 or 上一個檔案
+        else if (s === "imageMoveUpOrPrevFile") { // 圖片向上移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
                 this.img.move("up");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        else if (s === "imageMoveDownOrNextFile") { //圖片向下移動 or 下一個檔案
+        else if (s === "imageMoveDownOrNextFile") { // 圖片向下移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowY()) {
                 this.img.move("down");
             } else {
                 this.fileLoad.nextFile();
             }
         }
-        else if (s === "imageMoveLeftOrPrevFile") { //圖片向左移動 or 上一個檔案
+        else if (s === "imageMoveLeftOrPrevFile") { // 圖片向左移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("left");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        else if (s === "imageMoveLeftOrNextFile") { //圖片向左移動 or 下一個檔案
+        else if (s === "imageMoveLeftOrNextFile") { // 圖片向左移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("left");
             } else {
                 this.fileLoad.nextFile();
             }
         }
-        else if (s === "imageMoveRightOrPrevFile") { //圖片向右移動 or 上一個檔案
+        else if (s === "imageMoveRightOrPrevFile") { // 圖片向右移動 or 上一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("right");
             } else {
                 this.fileLoad.prevFile();
             }
         }
-        else if (s === "imageMoveRightOrNextFile") { //圖片向右移動 or 下一個檔案
+        else if (s === "imageMoveRightOrNextFile") { // 圖片向右移動 or 下一個檔案
             if (this.M.fileShow.tiefseeview.getIsOverflowX()) {
                 this.img.move("right");
             } else {
                 this.fileLoad.nextFile();
             }
         }
-        //#endregion 
+        // #endregion 
 
-        //#region 檔案
-        else if (s === "newWindow") { //另開視窗
+        // #region 檔案
+        else if (s === "newWindow") { // 另開視窗
             await this.open.openNewWindow();
         }
-        else if (s === "prevFile") { //上一個檔案
+        else if (s === "prevFile") { // 上一個檔案
             this.fileLoad.prevFile();
         }
-        else if (s === "nextFile") { //下一個檔案
+        else if (s === "nextFile") { // 下一個檔案
             this.fileLoad.nextFile();
         }
-        else if (s === "prevDir") { //上一個資料夾
+        else if (s === "prevDir") { // 上一個資料夾
             this.fileLoad.prevDir();
         }
-        else if (s === "nextDir") { //下一個資料夾
+        else if (s === "nextDir") { // 下一個資料夾
             this.fileLoad.nextDir();
         }
-        else if (s === "firstFile") { //第一個檔案
+        else if (s === "firstFile") { // 第一個檔案
             this.fileLoad.firstFile();
         }
-        else if (s === "lastFile") { //最後一個檔案
+        else if (s === "lastFile") { // 最後一個檔案
             this.fileLoad.lastFile();
         }
-        else if (s === "firstDir") { //第一個資料夾
+        else if (s === "firstDir") { // 第一個資料夾
             this.fileLoad.firstDir();
         }
-        else if (s === "lastDir") { //最後一個資料夾
+        else if (s === "lastDir") { // 最後一個資料夾
             this.fileLoad.lastDir();
         }
-        else if (s === "revealInFileExplorer") { //在檔案總管中顯示
+        else if (s === "revealInFileExplorer") { // 在檔案總管中顯示
             this.open.revealInFileExplorer();
         }
-        else if (s === "systemContextMenu") { //系統選單
+        else if (s === "systemContextMenu") { // 系統選單
             this.open.systemContextMenu();
         }
-        else if (s === "renameFile") { //重新命名
+        else if (s === "renameFile") { // 重新命名
             this.fileLoad.showRenameMsg();
         }
-        else if (s === "openWith") { //用其他程式開啟
+        else if (s === "openWith") { // 用其他程式開啟
             this.open.openWith();
         }
-        else if (s === "fileToRecycleBin") { //移至資源回收桶
+        else if (s === "fileToRecycleBin") { // 移至資源回收桶
             this.fileLoad.showDeleteMsg("moveToRecycle");
         }
-        else if (s === "fileToPermanentlyDelete") { //永久刪除
+        else if (s === "fileToPermanentlyDelete") { // 永久刪除
             this.fileLoad.showDeleteMsg("delete");
         }
-        //#endregion
+        // #endregion
 
-        //#region 複製
-        else if (s === "copyFile") { //複製檔案
+        // #region 複製
+        else if (s === "copyFile") { // 複製檔案
             this.copy.copyFile();
         }
-        else if (s === "copyFileName") { //複製檔名
+        else if (s === "copyFileName") { // 複製檔名
             this.copy.copyName();
         }
-        else if (s === "copyFilePath") { //複製檔案路徑
+        else if (s === "copyFilePath") { // 複製檔案路徑
             this.copy.copyPath();
         }
-        else if (s === "copyImage") { //複製影像
+        else if (s === "copyImage") { // 複製影像
             this.copy.copyImage();
         }
-        else if (s === "copyImageBase64") { //複製影像 Base64
+        else if (s === "copyImageBase64") { // 複製影像 Base64
             this.copy.copyImageBase64();
         }
-        else if (s === "copyText") { //複製文字
+        else if (s === "copyText") { // 複製文字
             this.copy.copyText();
         }
-        //#endregion
+        // #endregion
 
-        //#region layout
-        else if (s === "maximizeWindow") { //視窗最大化
+        // #region layout
+        else if (s === "maximizeWindow") { // 視窗最大化
             this.window.maximizeWindow();
         }
-        else if (s === "topmost") { //視窗固定最上層
+        else if (s === "topmost") { // 視窗固定最上層
             this.window.enabledTopmost();
         }
-        else if (s === "fullScreen") { //全螢幕
+        else if (s === "fullScreen") { // 全螢幕
             this.window.enabledFullScreen();
         }
-        else if (s === "showToolbar") { //工具列
+        else if (s === "showToolbar") { // 工具列
             this.window.enabledMainToolbar();
         }
-        else if (s === "showFilePanel") { //檔案預覽面板
+        else if (s === "showFilePanel") { // 檔案預覽面板
             this.window.enabledMainFileList();
         }
-        else if (s === "showDirectoryPanel") { //資料夾預覽面板
+        else if (s === "showDirectoryPanel") { // 資料夾預覽面板
             this.window.enabledMainDirList();
         }
-        else if (s === "showInformationPanel") { //詳細資料面板
+        else if (s === "showInformationPanel") { // 詳細資料面板
             this.window.enabledMainExif();
         }
-        //#endregion
+        // #endregion
 
-        //#region 大量瀏覽模式
-        else if (s === "bulkView") { //開啟大量瀏覽模式
+        // #region 大量瀏覽模式
+        else if (s === "bulkView") { // 開啟大量瀏覽模式
             this.M.script.bulkView.show();
         }
-        else if (s === "prevPage") { //上一頁
+        else if (s === "prevPage") { // 上一頁
             this.M.bulkView.pagePrev();
         }
-        else if (s === "nextPage") { //下一頁
+        else if (s === "nextPage") { // 下一頁
             this.M.bulkView.pageNext();
         }
-        else if (s === "incrColumns") { //增加「每行圖片數」
+        else if (s === "incrColumns") { // 增加「每行圖片數」
             this.M.bulkView.incrColumns();
         }
-        else if (s === "decColumns") { //減少「每行圖片數」
+        else if (s === "decColumns") { // 減少「每行圖片數」
             this.M.bulkView.decColumns();
         }
-        else if (s === "incrFixedWidth") { //增加「鎖定寬度」
+        else if (s === "incrFixedWidth") { // 增加「鎖定寬度」
             this.M.bulkView.incrFixedWidth();
         }
-        else if (s === "decFixedWidth") { //減少「鎖定寬度」
+        else if (s === "decFixedWidth") { // 減少「鎖定寬度」
             this.M.bulkView.decFixedWidth();
         }
-        //#endregion 
+        // #endregion 
     }
 }
 
@@ -286,9 +286,9 @@ class ScriptImg {
     /** 縮放至適合視窗/圖片原始大小 切換 */
     public switchFitWindowAndOriginal(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        if (Math.abs(this.M.fileShow.tiefseeview.getZoomRatio() - 1) < 0.05) { //100%
+        if (Math.abs(this.M.fileShow.tiefseeview.getZoomRatio() - 1) < 0.05) { // 100%
             this.zoomToFit();
-        } else { //不是100%
+        } else { // 不是100%
             this.zoomTo100(x, y);
         }
     }
@@ -345,7 +345,7 @@ class ScriptImg {
     public async getImgData(fileInfo2: FileInfo2) {
 
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        let fileType = Lib.GetFileType(fileInfo2); //取得檔案類型
+        let fileType = Lib.GetFileType(fileInfo2); // 取得檔案類型
         let configItem = this.M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
         if (configItem === null) {
             configItem = { ext: "", type: "vips", vipsType: "magick" }
@@ -356,7 +356,7 @@ class ScriptImg {
         let arUrl: { scale: number, url: string }[] = [];
         let width = -1;
         let height = -1;
-        let isAnimation = Lib.IsAnimation(fileInfo2); //判斷是否為動圖
+        let isAnimation = Lib.IsAnimation(fileInfo2); // 判斷是否為動圖
         let isFail = false; // true表示圖片載入失敗，回傳 icon
 
         if (isAnimation) {
@@ -381,11 +381,11 @@ class ScriptImg {
                 if (ratio > 0.95) { ratio = 0.95; }
                 if (ratio < 0.5) { ratio = 0.5; }
 
-                //設定縮放的比例
+                // 設定縮放的比例
                 arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
                 for (let i = 1; i <= 30; i++) {
                     let scale = Number(Math.pow(ratio, i).toFixed(3));
-                    if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { //如果圖片太小就不處理
+                    if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { // 如果圖片太小就不處理
                         break;
                     }
                     let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType);
@@ -394,9 +394,9 @@ class ScriptImg {
 
             }
 
-        } else { //直接開啟網址
+        } else { // 直接開啟網址
 
-            let url = await WebAPI.Img.getUrl(configType, fileInfo2); //取得圖片網址
+            let url = await WebAPI.Img.getUrl(configType, fileInfo2); // 取得圖片網址
             let imgInitInfo = await WebAPI.Img.webInit(url);
             if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
@@ -409,7 +409,7 @@ class ScriptImg {
         if (width === -1) {
             isFail = true;
 
-            let url = await WebAPI.Img.getUrl("icon", fileInfo2); //取得圖片網址
+            let url = await WebAPI.Img.getUrl("icon", fileInfo2); // 取得圖片網址
             width = 256;
             height = 256;
             arUrl.push({ scale: 1, url: url });
@@ -435,16 +435,16 @@ class ScriptImg {
         let img = document.createElement("img");
         let p = await new Promise((resolve, reject) => {
             img.addEventListener("load", (e) => {
-                resolve(true); //繼續往下執行
+                resolve(true);
             });
             img.addEventListener("error", (e) => {
-                resolve(false); //繼續往下執行
+                resolve(false);
             });
             img.src = _url;
         })
 
         img.src = "";
-        //@ts-ignore
+        // @ts-ignore
         img = null;
         return <boolean>p;
     }
@@ -489,7 +489,7 @@ class ScriptImg {
      */
     public async getCanvasBlob(can: HTMLCanvasElement, zoom: number, quality: "high" | "low" | "medium", type = "png", q = 0.8) {
 
-        //let can = await getCanvas();
+        // let can = await getCanvas();
         if (can === null) { return null; }
 
         if (zoom < 1) {
@@ -509,12 +509,12 @@ class ScriptImg {
             if (type === "jpg" || type === "jpeg") {
                 outputType = "image/jpeg";
 
-                //背景色改成白色
+                // 背景色改成白色
                 let cc = document.createElement("canvas");
                 cc.width = can.width;
                 cc.height = can.height;
                 let context = cc.getContext("2d") as CanvasRenderingContext2D;
-                context.fillStyle = "#FFFFFF"; //填滿顏色
+                context.fillStyle = "#FFFFFF"; // 填滿顏色
                 context.fillRect(0, 0, can.width, can.height);
                 context.drawImage(can, 0, 0, can.width, can.height);
                 can = cc;
@@ -615,7 +615,7 @@ class ScriptFileLoad {
             } else {
                 this.showRenameFileMsg(path);
             }
-        } else { //如果有指定路徑，則根據路徑類型來處理
+        } else { // 如果有指定路徑，則根據路徑類型來處理
             if (await WV_Directory.Exists(path)) {
                 this.showRenameDirMsg(path);
             }
@@ -677,7 +677,7 @@ class ScriptFile {
                 }
             }
             if (path.length > 255) {
-                path = await WV_Path.GetShortPath(path); //把長路經轉回虛擬路徑，避免某些程式不支援長路經
+                path = await WV_Path.GetShortPath(path); // 把長路經轉回虛擬路徑，避免某些程式不支援長路經
             }
             WV_File.DragDropFile(path);
         }, 50);
@@ -699,14 +699,14 @@ class ScriptFile {
     public async save(btn?: HTMLElement) {
         let t = await this.M.fileShow.iframes.getText();
         let path = this.M.fileLoad.getFilePath();
-        this.M.msgbox.closeAll(); //關閉所有訊息視窗
+        this.M.msgbox.closeAll(); // 關閉所有訊息視窗
         if (t == null) {
-            Toast.show(this.M.i18n.t("msg.saveFailed"), 1000 * 3); //儲存失敗
+            Toast.show(this.M.i18n.t("msg.saveFailed"), 1000 * 3); // 儲存失敗
             return;
         }
         try {
             await WV_File.SetText(path, t);
-            Toast.show(this.M.i18n.t("msg.saveComplete"), 1000 * 3); //儲存完成
+            Toast.show(this.M.i18n.t("msg.saveComplete"), 1000 * 3); // 儲存完成
         } catch (e) {
             Toast.show(this.M.i18n.t("msg.saveFailed") + ":\n" + e, 1000 * 3);
         }
@@ -727,11 +727,11 @@ class ScriptMenu {
     /** 顯示選單 檔案 */
     async showMenuFile(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-file") as HTMLElement;
-        let domOpenFileBox = domMenu.querySelector(".js-openFileBox") as HTMLElement; //載入檔案
+        let domOpenFileBox = domMenu.querySelector(".js-openFileBox") as HTMLElement; // 載入檔案
 
-        if (path !== undefined) { //指定路徑
+        if (path !== undefined) { // 指定路徑
             domMenu.setAttribute("data-path", path);
-            domOpenFileBox.style.display = "none"; //隱藏「另開視窗」
+            domOpenFileBox.style.display = "none"; // 隱藏「另開視窗」
 
             if (type === "dir") {
                 domMenu.setAttribute("showType", GroupType.bulkView);
@@ -793,7 +793,7 @@ class ScriptMenu {
             domMenu.setAttribute("data-path", "");
         }
 
-        //顯示或隱藏複製文字
+        // 顯示或隱藏複製文字
         if (fileExt === "svg" || showType === GroupType.txt) {
             domMenuCopyText.style.display = "";
         } else {
@@ -885,7 +885,7 @@ class ScriptMenu {
         } else {
             this.M.menu.openAtMouse(dom, 0, -85);
         }
-        this.M.mainMenu.updateRightMenuImageZoomRatioTxt(); //更新 右鍵選單的圖片縮放比例
+        this.M.mainMenu.updateRightMenuImageZoomRatioTxt(); // 更新 右鍵選單的圖片縮放比例
     }
     /** 顯示右鍵選單 起始畫面 */
     showRightMenuWelcome(x?: number, y?: number) {
@@ -903,13 +903,13 @@ class ScriptMenu {
         let path = null;
 
         if (dom !== null) {
-            while (true) { //取得 bulkView-item 的 data-path
+            while (true) { // 取得 bulkView-item 的 data-path
                 if (dom.classList.contains("bulkView-item")) {
                     path = dom.getAttribute("data-path");
                     break;
                 }
                 if (dom === document.body) { break; }
-                dom = dom.parentNode as HTMLElement; //往往上層找
+                dom = dom.parentNode as HTMLElement; // 往往上層找
             }
         }
 
@@ -920,9 +920,9 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); //顯示檔名
+            domFileName.value = Lib.GetFileName(path); // 顯示檔名
         } else {
-            domFileBox.style.display = "none"; //隱藏檔案區塊
+            domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
 
         if (x !== undefined && y !== undefined) {
@@ -938,13 +938,13 @@ class ScriptMenu {
         let dom = e.target as HTMLElement;
         let path = null;
 
-        while (true) { //取得 bulkView-item 的 data-path
+        while (true) { // 取得 bulkView-item 的 data-path
             if (dom.classList.contains("fileList-item")) {
                 path = dom.getAttribute("data-path");
                 break;
             }
             if (dom === document.body) { break; }
-            dom = dom.parentNode as HTMLElement; //往往上層找
+            dom = dom.parentNode as HTMLElement; // 往往上層找
         }
 
         let domMenu = document.querySelector("#menu-rightMenuFilePanel") as HTMLElement;
@@ -954,9 +954,9 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); //顯示檔名
+            domFileName.value = Lib.GetFileName(path); // 顯示檔名
         } else {
-            domFileBox.style.display = "none"; //隱藏檔案區塊
+            domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
         this.M.menu.openAtMouse(domMenu, 0, 0);
     }
@@ -967,14 +967,14 @@ class ScriptMenu {
         let dom = e.target as HTMLElement;
         let path = null;
 
-        while (true) { //取得 data-path
+        while (true) { // 取得 data-path
             let p = dom.getAttribute("data-path");
             if (p !== null) {
                 path = p;
                 break;
             }
             if (dom === document.body) { break; }
-            dom = dom.parentNode as HTMLElement; //往往上層找
+            dom = dom.parentNode as HTMLElement; // 往往上層找
         }
 
         let domMenu = document.querySelector("#menu-rightMenuFile") as HTMLElement;
@@ -984,9 +984,9 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); //顯示檔名
+            domFileName.value = Lib.GetFileName(path); // 顯示檔名
         } else {
-            domFileBox.style.display = "none"; //隱藏檔案區塊
+            domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
         this.M.menu.openAtMouse(domMenu, 0, 0);
     }
@@ -997,13 +997,13 @@ class ScriptMenu {
         let dom = e.target as HTMLElement;
         let path = null;
 
-        while (true) { //取得 bulkView-item 的 data-path
+        while (true) { // 取得 bulkView-item 的 data-path
             if (dom.classList.contains("dirList-item")) {
                 path = dom.getAttribute("data-path");
                 break;
             }
             if (dom === document.body) { break; }
-            dom = dom.parentNode as HTMLElement; //往往上層找
+            dom = dom.parentNode as HTMLElement; // 往往上層找
         }
 
         let domMenu = document.querySelector("#menu-rightMenuDirPanel") as HTMLElement;
@@ -1013,9 +1013,9 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); //顯示檔名
+            domFileName.value = Lib.GetFileName(path); // 顯示檔名
         } else {
-            domFileBox.style.display = "none"; //隱藏檔案區塊
+            domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
         this.M.menu.openAtMouse(domMenu, 0, 0);
     }
@@ -1031,8 +1031,8 @@ class ScriptMenu {
         let domInput = document.activeElement;
         if (domInput === null) { return false; }
         let isReadonly = domInput.getAttribute("readonly") != null;
-        var dom_cut = document.getElementById("menuitem-text-cut") as HTMLElement; //剪下
-        var dom_paste = document.getElementById("menuitem-text-paste") as HTMLElement; //貼上
+        var dom_cut = document.getElementById("menuitem-text-cut") as HTMLElement; // 剪下
+        var dom_paste = document.getElementById("menuitem-text-paste") as HTMLElement; // 貼上
         if (isReadonly) {
             dom_cut.style.display = "none";
             dom_paste.style.display = "none";
@@ -1058,7 +1058,6 @@ class ScriptMenu {
             this.M.menu.openAtMouse(dom, 0, 0);
         }
     }
-
 
 }
 
@@ -1127,7 +1126,7 @@ class ScriptOpen {
     /** 另開視窗 */
     public async openNewWindow(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
         let exePath = await WV_Window.GetAppPath();
         await this.M.saveSetting();
@@ -1145,7 +1144,7 @@ class ScriptOpen {
                 if (await WV_File.Exists(path) === false) { return; }
             }
         }
-        //把長路經轉回虛擬路徑
+        // 把長路經轉回虛擬路徑
         if (path.length > 255) {
             path = await WV_Path.GetShortPath(path);
         }
@@ -1163,7 +1162,7 @@ class ScriptOpen {
                 if (await WV_File.Exists(path) === false) { return; }
             }
         }
-        //把長路經轉回虛擬路徑
+        // 把長路經轉回虛擬路徑
         if (path.length > 255) {
             path = await WV_Path.GetShortPath(path);
         }
@@ -1173,16 +1172,16 @@ class ScriptOpen {
     /** 列印 */
     public async print(path?: string) {
         if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); //目前顯示的檔案
+            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
         }
-        //if (await WV_File.Exists(path) === false) { return; }
+        // if (await WV_File.Exists(path) === false) { return; }
         WV_File.PrintFile(path);
     }
 
     /** 設成桌布 */
     public async setAsDesktop(path?: string) {
         if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); //目前顯示的檔案
+            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
         WV_System.SetWallpaper(path);
@@ -1191,7 +1190,7 @@ class ScriptOpen {
     /** 選擇其他應用程式*/
     public async openWith(path?: string) {
         if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); //目前顯示的檔案
+            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
         WV_RunApp.ShowMenu(path);
@@ -1210,11 +1209,11 @@ class ScriptCopy {
     /** 複製 檔案 */
     public async copyFile(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
         await WV_System.SetClipboard_File(path);
-        Toast.show(this.M.i18n.t("msg.copyFile"), 1000 * 3); //已將「檔案」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyFile"), 1000 * 3); // 已將「檔案」複製至剪貼簿
     }
 
     /** 複製 檔名或資料夾名 */
@@ -1232,7 +1231,7 @@ class ScriptCopy {
         }
         let name = Lib.GetFileName(path);
         await WV_System.SetClipboard_Text(name);
-        Toast.show(this.M.i18n.t("msg.copyFileName"), 1000 * 3); //已將「檔案名稱」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyFileName"), 1000 * 3); // 已將「檔案名稱」複製至剪貼簿
     }
     /** 複製 資料夾名 */
     public async copyDirName(path?: string) {
@@ -1241,7 +1240,7 @@ class ScriptCopy {
         }
         let name = Lib.GetFileName(path);
         await WV_System.SetClipboard_Text(name);
-        Toast.show(this.M.i18n.t("msg.copyDirName"), 1000 * 3); //已將「資料夾名稱」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyDirName"), 1000 * 3); // 已將「資料夾名稱」複製至剪貼簿
     }
 
     /** 複製 檔案路徑 或 資料夾路徑 */
@@ -1258,7 +1257,7 @@ class ScriptCopy {
             path = this.M.fileLoad.getFilePath();
         }
         await WV_System.SetClipboard_Text(path);
-        Toast.show(this.M.i18n.t("msg.copyFilePath"), 1000 * 3); //已將「檔案路徑」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyFilePath"), 1000 * 3); // 已將「檔案路徑」複製至剪貼簿
     }
     /** 複製 資料夾路徑 */
     public async copyDirPath(path?: string) {
@@ -1266,28 +1265,28 @@ class ScriptCopy {
             path = this.M.fileLoad.getDirPath();
         }
         await WV_System.SetClipboard_Text(path);
-        Toast.show(this.M.i18n.t("msg.copyDirPath"), 1000 * 3); //已將「資料夾路徑」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyDirPath"), 1000 * 3); // 已將「資料夾路徑」複製至剪貼簿
     }
 
     /** 複製 影像 */
     public async copyImage(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
 
         let fileInfo2 = await WebAPI.getFileInfo2(path);
-        if (fileInfo2.Type === "none") { return; } //如果檔案不存在
-        let imgType = Lib.GetFileType(fileInfo2); //取得檔案類型
+        if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
+        let imgType = Lib.GetFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path
             && this.M.fileLoad.getGroupType() === GroupType.video
         ) {
-            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，在取得base64
+            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，在取得base64
             await WV_System.SetClipboard_Base64ToImage(base64, false);
 
         } else if (imgType === "jpg") {
-            await WV_System.SetClipboard_FileToImage(path, false); //直接用C#讀取圖片
+            await WV_System.SetClipboard_FileToImage(path, false); // 直接用C#讀取圖片
 
         } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
             await WV_System.SetClipboard_FileToImage(path, true);
@@ -1308,32 +1307,32 @@ class ScriptCopy {
             await WV_System.SetClipboard_Base64ToImage(base64, true);
         }
 
-        let msg = this.M.i18n.t("msg.copyImage"); //已將「影像」複製至剪貼簿
+        let msg = this.M.i18n.t("msg.copyImage"); // 已將「影像」複製至剪貼簿
         Toast.show(msg, 1000 * 3);
 
         /*if (this.M.fileLoad.getGroupType() === GroupType.img) {
-            if (imgType === "apng" || imgType === "webp" || imgType === "svg") { //只有瀏覽器支援的圖片格式
-                let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，再取得base64
+            if (imgType === "apng" || imgType === "webp" || imgType === "svg") { // 只有瀏覽器支援的圖片格式
+                let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，再取得base64
                 await WV_System.SetClipboard_Base64ToImage(base64, true);
             } else if (imgType === "jpg") {
-                await WV_System.SetClipboard_FileToImage(path, false); //直接用C#讀取圖片
+                await WV_System.SetClipboard_FileToImage(path, false); // 直接用C#讀取圖片
             } else if (imgType === "png" || imgType === "gif" || imgType === "bmp") {
                 await WV_System.SetClipboard_FileToImage(path, true);
             } else {
-                let imgUrl = this.M.fileShow.tiefseeview.getUrl(); //取得圖片網址
-                let base64: string = await Lib.sendGet("base64", imgUrl); //取得檔案的base64
+                let imgUrl = this.M.fileShow.tiefseeview.getUrl(); // 取得圖片網址
+                let base64: string = await Lib.sendGet("base64", imgUrl); // 取得檔案的base64
                 await WV_System.SetClipboard_Base64ToImage(base64, true);
             }
             Toast.show(msg, 1000 * 3);
         }
         if (this.M.fileLoad.getGroupType() === GroupType.unknown) {
-            let imgUrl = this.M.fileShow.tiefseeview.getUrl(); //取得圖片網址
-            let base64: string = await Lib.sendGet("base64", imgUrl); //取得檔案的base64
+            let imgUrl = this.M.fileShow.tiefseeview.getUrl(); // 取得圖片網址
+            let base64: string = await Lib.sendGet("base64", imgUrl); // 取得檔案的base64
             await WV_System.SetClipboard_Base64ToImage(base64, true);
             Toast.show(msg, 1000 * 3);
         }
         if (this.M.fileLoad.getGroupType() === GroupType.video) {
-            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，在取得base64
+            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，在取得base64
             await WV_System.SetClipboard_Base64ToImage(base64, false);
             Toast.show(msg, 1000 * 3);
         }*/
@@ -1342,23 +1341,23 @@ class ScriptCopy {
     /** 複製 影像 Base64  */
     public async copyImageBase64(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
         let fileInfo2 = await WebAPI.getFileInfo2(path);
-        if (fileInfo2.Type === "none") { return; } //如果檔案不存在
-        let imgType = Lib.GetFileType(fileInfo2); //取得檔案類型
+        if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
+        let imgType = Lib.GetFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path
             && this.M.fileLoad.getGroupType() === GroupType.video
         ) {
 
-            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); //把圖片繪製到canvas上面，再取得base64
+            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，再取得base64
             await WV_System.SetClipboard_Text(base64);
 
         } else if (imgType === "svg") {
-            //await WV_System.SetClipboard_FileToImage(path, false); //直接用C#讀取圖片
-            let base64: string = await Lib.sendGet("base64", path); //取得檔案的base64
+            // await WV_System.SetClipboard_FileToImage(path, false); // 直接用C#讀取圖片
+            let base64: string = await Lib.sendGet("base64", path); // 取得檔案的base64
             await WV_System.SetClipboard_Text(base64);
 
         } else {
@@ -1377,32 +1376,32 @@ class ScriptCopy {
             await WV_System.SetClipboard_Text(base64);
         }
 
-        Toast.show(this.M.i18n.t("msg.copyIamgeBase64"), 1000 * 3); //已將「影像base64」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyIamgeBase64"), 1000 * 3); // 已將「影像base64」複製至剪貼簿
     }
 
     /** 複製 Base64  */
     public async copyTextBase64(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
 
-        let base64: string = await Lib.sendGet("base64", path); //取得檔案的base64
+        let base64: string = await Lib.sendGet("base64", path); // 取得檔案的base64
         await WV_System.SetClipboard_Text(base64);
 
-        //WV_System.SetClipboard_FileToBase64(path);
+        // WV_System.SetClipboard_FileToBase64(path);
 
-        Toast.show(this.M.i18n.t("msg.copyBase64"), 1000 * 3); //已將「base64」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyBase64"), 1000 * 3); // 已將「base64」複製至剪貼簿
     }
 
     /** 複製 文字 */
     public async copyText(path?: string) {
         if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); //目前顯示的檔案
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
         if (await WV_File.Exists(path) === false) { return; }
         await WV_System.SetClipboard_FileToText(path);
-        Toast.show(this.M.i18n.t("msg.copyText"), 1000 * 3); //已將「文字」複製至剪貼簿
+        Toast.show(this.M.i18n.t("msg.copyText"), 1000 * 3); // 已將「文字」複製至剪貼簿
 
     }
 }
@@ -1415,7 +1414,7 @@ class ScriptSetting {
         this.M = _M;
     }
 
-    temp_setting: WebWindow | null = null; //用於判斷視窗是否已經開啟
+    temp_setting: WebWindow | null = null; // 用於判斷視窗是否已經開啟
 
     /**
      * 開啟 設定 視窗
@@ -1424,15 +1423,15 @@ class ScriptSetting {
      */
     public async showSetting(toPage = "", toDom = "") {
 
-        //如果視窗已經存在，就不再新開
+        // 如果視窗已經存在，就不再新開
         if (this.temp_setting != null) {
             if (await this.temp_setting.Visible === true) {
-                this.temp_setting.WindowState = 0; //視窗化
+                this.temp_setting.WindowState = 0; // 視窗化
                 return;
             }
         }
 
-        //顯示loading畫面，避免短時間內重複開啟setting
+        // 顯示loading畫面，避免短時間內重複開啟setting
         let domLoading = document.querySelector("#loadingSetting") as HTMLElement;
         if (domLoading.getAttribute("active") == "true") {
             return;
@@ -1443,12 +1442,11 @@ class ScriptSetting {
             }, 1000);
         }
 
-        await this.M.saveSetting(); //先儲存目前的設定值
+        await this.M.saveSetting(); // 先儲存目前的設定值
 
-        //新開視窗
+        // 新開視窗
         this.temp_setting = await baseWindow.newWindow(`SettingWindow.html?toPage=${toPage}&toDom=${toDom}`);
     }
-
 }
 
 
@@ -1472,10 +1470,10 @@ class ScriptWindow {
 
     /** 取得當前的語言 */
     public getLang() {
-        //語言
+        // 語言
         let lang = this.M.config.settings.other.lang;
-        if (lang === "") { //如果未設定過語言
-            lang = Lib.getBrowserLang(); //從瀏覽器取得使用者當前使用的語言
+        if (lang === "") { // 如果未設定過語言
+            lang = Lib.getBrowserLang(); // 從瀏覽器取得使用者當前使用的語言
         }
         return lang;
     }
@@ -1546,7 +1544,6 @@ class ScriptWindow {
             baseWindow.normal();
         }
     }
-
 }
 
 
@@ -1573,9 +1570,9 @@ class ScriptBulkView {
         this.M.fileLoad.enableBulkView(false);
         await this.M.fileLoad.showFile(_flag);
 
-        //剛關閉大量瀏覽模式時，檔案預覽面板尚未顯示無法進行初始化，所以等待一段時間後才執行捲動
+        // 剛關閉大量瀏覽模式時，檔案預覽面板尚未顯示無法進行初始化，所以等待一段時間後才執行捲動
         await Lib.sleep(10);
-        this.M.mainFileList.setStartLocation(); //檔案預覽視窗 捲動到選中項目的中間
+        this.M.mainFileList.setStartLocation(); // 檔案預覽視窗 捲動到選中項目的中間
     }
 
     /** 下一頁 */
