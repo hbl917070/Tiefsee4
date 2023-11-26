@@ -1,9 +1,11 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+
 
 namespace Tiefsee {
 
@@ -357,13 +359,49 @@ namespace Tiefsee {
             // 開啟時視窗時
             wv2.CoreWebView2.NewWindowRequested += (sender2, e2) => {
                 String _fileurl = e2.Uri.ToString();
-                //if (_fileurl.IndexOf("http") != 0) {
                 e2.Handled = true;
-                //}
-                //System.Console.WriteLine(_fileurl);
+
                 RunJs($@"
-                    var temp_dropPath = ""{_fileurl}"";
                     if(window.baseWindow !== undefined) baseWindow.onNewWindowRequested(""{_fileurl}"");
+                ");
+            };
+
+            // js 將檔案傳遞進來時，取得檔案路徑，並將其回寫到 js 的全域變數裡面
+            wv2.CoreWebView2.WebMessageReceived += (sender, args) => {
+
+                // 用於組合 json
+                StringBuilder sb = new();
+                sb.Append("[");
+                var funcAdd = (string path) => {
+                    sb.Append("\"" + Path.GetFullPath(path).Replace("\\", "\\\\") + "\",");
+                };
+
+                // 取得所有檔案的路徑
+                var files = args.AdditionalObjects
+                    .Where(x => x is CoreWebView2File)
+                    .Select(x => ((CoreWebView2File)x).Path)
+                    .ToList();
+
+                if (files.Count() == 1) { // 項目只有一個時直接回傳，不論是檔案或資料夾
+                    string path = files[0];
+                    funcAdd(path);
+                } else { // 項目為多個時，將資料夾內的檔案一並回傳
+                    foreach (var path in files) {
+                        if (Directory.Exists(path)) { // 如果是資料夾
+                            // 取得資料夾內所有檔案
+                            foreach (var item in Directory.GetFiles(path, "*.*")) {
+                                funcAdd(item);
+                            }
+                        } else { // 如果是檔案
+                            funcAdd(path);
+                        }
+                    }
+                }
+
+                sb.Append("]");
+
+                RunJs($@"
+                    var temp_dropPath = {sb.ToString()};
                 ");
             };
 

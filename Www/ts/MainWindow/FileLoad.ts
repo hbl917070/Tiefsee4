@@ -339,22 +339,14 @@ class FileLoad {
          */
         async function loadDropFile(files: string[]) {
 
-            // 取得拖曳進來的檔案路徑
-            let _dropPath = await baseWindow.getDropPath();
-            if (_dropPath === "") { return; }
-
             M.msgbox.closeAll(); // 關閉所有訊息視窗
             M.menu.close();
             M.textEditor.close();
 
             if (files.length > 1) {
-                let dirPath = Lib.GetDirectoryName(_dropPath);
-                if (dirPath === null) { return; }
-                if (dirPath !== null) {
-                    await loadFiles(dirPath, files);
-                }
+                await loadFiles(files);
             } else {
-                await loadFile(_dropPath);
+                await loadFile(files[0]);
             }
         }
 
@@ -363,17 +355,15 @@ class FileLoad {
          * @param dirPath 
          * @param arName 
          */
-        async function loadFiles(dirPath: string, arName: string[] = []) {
+        async function loadFiles(ar: string[] = []) {
 
             await WV_System.NewFileWatcher("fileList", ""); // 取消偵測檔案變化
 
-            dirPath = await WV_Path.GetFullPath(dirPath); // 避免長路經被轉換成虛擬路徑
+            arFile = ar;
+            let dirPath = Lib.GetDirectoryName(arFile[0]);
+            if (dirPath === null) { return }
 
-            dirPathNow = dirPath;
             fileLoadType = FileLoadType.userDefined; // 名單類型，自訂義
-
-            // 改用C#處理，增加執行效率
-            arFile = await WebAPI.Directory.getFiles2(dirPath, arName);
 
             let path = arFile[0]; // 以拖曳進來的第一個檔案為開啟對象
 

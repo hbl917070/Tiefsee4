@@ -1,5 +1,5 @@
-//@ts-ignore
-const WV2 = window.chrome.webview.hostObjects;
+declare var chrome: any;
+const WV2 = chrome.webview.hostObjects;
 const WV_Window: WV_Window = WV2.WV_Window;
 const WV_Directory: WV_Directory = WV2.WV_Directory;
 const WV_File: WV_File = WV2.WV_File;
@@ -9,7 +9,7 @@ const WV_RunApp: WV_RunApp = WV2.WV_RunApp;
 const WV_Image: WV_Image = WV2.WV_Image;
 
 const APIURL = "http://127.0.0.1:" + location.hash.replace("#", ""); // api 網址
-var temp_dropPath = ""; // 暫存。取得拖曳進視窗的檔案路徑
+var temp_dropPath: string[] | undefined = undefined; // 暫存。取得拖曳進視窗的檔案路徑
 
 class BaseWindow {
 
@@ -142,19 +142,18 @@ class BaseWindow {
     /**
      * 取得拖曳進來的檔案路徑
      */
-    public async getDropPath(): Promise<string> {
+    public async getDropPath() {
 
         // 觸發拖曳檔案後，C#會修改全域變數temp_dropPath
-        let _dropPath: string = "";
+        let _dropPath: string[] | undefined = undefined;
         for (let i = 0; i < 100; i++) {
-            if (temp_dropPath !== "") {
-                _dropPath = Lib.URLToPath(temp_dropPath);
+            if (temp_dropPath !== undefined) {
+                _dropPath = temp_dropPath;
                 break;
             }
             await Lib.sleep(10);
         }
-        temp_dropPath = "";
-        _dropPath = _dropPath.replace(/[/]/g, "\\");
+        temp_dropPath = undefined;
         return _dropPath;
     }
 

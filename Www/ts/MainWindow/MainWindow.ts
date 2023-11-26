@@ -364,18 +364,7 @@ class MainWindow {
                     }
                 }
 
-                if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) { // 本機的檔案
-
-                    let arFile = [];
-                    for (let i = 0; i < files.length; i++) {
-                        const item = files[i];
-                        arFile.push(item.name);
-                    }
-                    await fileLoad.loadDropFile(arFile);
-
-                    e.preventDefault(); // 避免影響 baseWindow.getDropPath()
-
-                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
 
                     // ex: http://127.0.0.1:7860/file=D:/ai/a.png
 
@@ -465,8 +454,14 @@ class MainWindow {
                     let path = Lib.URLToPath(textUrl);
                     await fileLoad.loadFile(path);
 
-                } else {
+                } else if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) { // 本機的檔案
 
+                    // 取得拖曳進來的檔案路徑
+                    chrome.webview.postMessageWithAdditionalObjects("FilesDropped", files);
+                    let arFile = await baseWindow.getDropPath();
+
+                    if (arFile === undefined) { return; }
+                    await fileLoad.loadDropFile(arFile);
                     e.preventDefault();
 
                 }
@@ -478,7 +473,6 @@ class MainWindow {
             baseWindow.onNewWindowRequested = (url: string) => {
                 if (url.indexOf("https://maps.google.com/") === 0) {
                     WV_RunApp.OpenUrl(url);
-                    temp_dropPath = "";
                 }
             }
 
