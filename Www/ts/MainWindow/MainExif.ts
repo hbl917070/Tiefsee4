@@ -267,14 +267,32 @@ class MainExif {
 						</div>`;
 					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
 
-				} else if ((name === "User Comment" || name === "Windows XP Comment" || name === "Image Description")
-					&& value.includes("Steps: ") && value.includes("Seed: ")) { // Stable Diffusion webui 輸出的jpg或webp
+				} else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
 
-					ar.push({
-						group: "PNG-tEXt",
-						name: "Textual Data",
-						value: "parameters: " + value
-					})
+					// Stable Diffusion webui 輸出的jpg或webp
+					if (value.includes("Steps: ") && value.includes("Seed: ")) {
+						ar.push({
+							group: "PNG-tEXt",
+							name: "Textual Data",
+							value: "parameters: " + value
+						})
+					} else {
+						
+						let jsonF = Lib.jsonStrFormat(value);
+						if (jsonF.ok) { // 解析欄位
+							if (value.startsWith(`{"prompt":`)) { // ComfyUI
+								let prompt = JSON.parse(value)["prompt"];
+								prompt = JSON.stringify(prompt);
+								AiDrawingPrompt.getComfyui(prompt).forEach(item => {
+									domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+								})
+							}
+						}
+						if (jsonF.ok) { // 如果是 json
+							value = jsonF.jsonFormat; // 格式化 json 再顯示
+						}
+						domTabContentInfo.appendChild(getItemDom(name, value));
+					}
 
 				} else if (name === "Textual Data") { // PNG iTXt / zTXt / tEXt
 

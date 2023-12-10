@@ -108,6 +108,7 @@ class Config {
             "Image Description", // 描述
             "Windows XP Comment", // 註解
             "User Comment", // 註解
+            "Comment", // 註解
             "Make", // 相機型號
             "Model", // 相機製造商
             "Windows XP Subject", // 主旨

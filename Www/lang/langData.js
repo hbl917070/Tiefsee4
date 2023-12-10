@@ -2020,6 +2020,11 @@ var langData = {
                 "en": "Comment",
                 "ja": "コメント",
             },
+            "Comment": {
+                "zh-TW": "註解",
+                "en": "Comment",
+                "ja": "コメント",
+            },
             "Make": {
                 "zh-TW": "相機製造商",
                 "en": "Make",
