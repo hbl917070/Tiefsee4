@@ -238,16 +238,13 @@ class MainExif {
 				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
 			}
 
-			// 更新舊資料，Flash(key) 改為 Flash
-			/*let flashIndex = M.config.exif.whitelist.indexOf("Flash(key)");
-			if (flashIndex !== -1) {
-				M.config.exif.whitelist[flashIndex] = "Flash";
-			}*/
-
 			let deferredFunc: (() => void)[] = []; // 最後才執行的函數
+			//let comfyuiData: { title: string, text: string }[] = []; // 把 ComfyUI 的資料放在最下面
+			let comfyuiPrompt: string | undefined;
+			let comfyuiWorkflow: string | undefined;
+
 			let ar = json.data;
 			let whitelist = M.config.exif.whitelist;
-
 			for (let i = 0; i < whitelist.length; i++) {
 				let name = whitelist[i];
 				let value = getItem(ar, name);
@@ -255,7 +252,8 @@ class MainExif {
 				if (value === undefined) {
 					continue;
 
-				} else if (name === "Map") {
+				}
+				else if (name === "Map") {
 
 					value = encodeURIComponent(value); // 移除可能破壞html的跳脫符號
 
@@ -267,7 +265,18 @@ class MainExif {
 						</div>`;
 					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
 
-				} else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
+				}
+				else if (name === "Make" && value.startsWith("Prompt:{")) { // ComfyUI 的 webp
+
+					comfyuiPrompt = value.substring(7);
+
+				}
+				else if (name === "Image Description" && value.startsWith("Workflow:{")) { // ComfyUI 的 webp
+
+					comfyuiWorkflow = value.substring(9);
+
+				}
+				else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
 
 					// Stable Diffusion webui 輸出的jpg或webp
 					if (value.includes("Steps: ") && value.includes("Seed: ")) {
@@ -275,26 +284,19 @@ class MainExif {
 							group: "PNG-tEXt",
 							name: "Textual Data",
 							value: "parameters: " + value
-						})
+						});
 					} else {
-						
+
 						let jsonF = Lib.jsonStrFormat(value);
 						if (jsonF.ok) { // 解析欄位
 							if (value.startsWith(`{"prompt":`)) { // ComfyUI
-								let prompt = JSON.parse(value)["prompt"];
-								prompt = JSON.stringify(prompt);
-								AiDrawingPrompt.getComfyui(prompt).forEach(item => {
-									domTabContentInfo.appendChild(getItemDom(item.title, item.text));
-								})
+								comfyuiPrompt = (JSON.parse(value)["prompt"]);
 							}
 						}
-						if (jsonF.ok) { // 如果是 json
-							value = jsonF.jsonFormat; // 格式化 json 再顯示
-						}
-						domTabContentInfo.appendChild(getItemDom(name, value));
 					}
 
-				} else if (name === "Textual Data") { // PNG iTXt / zTXt / tEXt
+				}
+				else if (name === "Textual Data") { // PNG iTXt / zTXt / tEXt
 
 					let vals = getItems(ar, name);
 					for (let i = 0; i < vals.length; i++) {
@@ -329,23 +331,10 @@ class MainExif {
 							}
 
 							else if (name === "prompt") { // ComfyUI
-								let jsonF = Lib.jsonStrFormat(val);
-								if (jsonF.ok) { // 解析欄位
-									AiDrawingPrompt.getComfyui(val).forEach(item => {
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
-									})
-								}
-								if (jsonF.ok) { // 如果是json
-									val = jsonF.jsonFormat; // 格式化json再顯示
-								}
-								domTabContentInfo.appendChild(getItemDom(name, val));
+								comfyuiPrompt = value;
 							}
 							else if (name === "workflow") { // ComfyUI
-								let jsonF = Lib.jsonStrFormat(val);
-								if (jsonF.ok) { // 如果是json (例如 Hashes
-									val = jsonF.jsonFormat; // 格式化json再顯示
-								}
-								domTabContentInfo.appendChild(getItemDom(name, val));
+								comfyuiWorkflow = val;
 							}
 
 							else if (name === "sd-metadata" || name === "invokeai_metadata" || name === "invokeai_graph" || name === "Dream") { // invoke ai
@@ -376,13 +365,10 @@ class MainExif {
 								domTabContentInfo.appendChild(getItemDom(name, val));
 							}
 						}
-
-						deferredFunc.forEach(func => {
-							func();
-						});
 					}
 
-				} else {
+				}
+				else {
 
 					let nameI18n = `exif.name.${name}`;
 					let valueI18n = "";
@@ -404,6 +390,43 @@ class MainExif {
 				}
 			}
 
+			deferredFunc.forEach(func => {
+				func();
+			});
+
+			// ComfyUI 解析後的資料
+			if (comfyuiPrompt !== undefined) {
+				let jsonF = Lib.jsonStrFormat(comfyuiPrompt);
+				if (jsonF.ok) { // 解析欄位		
+					let cdata = AiDrawingPrompt.getComfyui(comfyuiPrompt);
+					for (let i = 0; i < cdata.length; i++) {
+						const node = cdata[i].node;
+						const data = cdata[i].data;
+
+						// 折疊面板
+						let collapseDom = getCollapseDom(node, true);
+						console.log()
+						data.forEach(item => {
+							collapseDom.domContent.appendChild(getItemDom(item.title, item.text));
+						});
+						domTabContentInfo.appendChild(collapseDom.domBox);
+					}
+				}
+			}
+
+			// 把 ComfyUI 的原始資料放在最下面，並預設折疊
+			if (comfyuiPrompt !== undefined || comfyuiWorkflow !== undefined) {
+				// 折疊面板
+				let collapseDom = getCollapseDom("ComfyUI Data", false);
+
+				if (comfyuiPrompt !== undefined) {
+					collapseDom.domContent.appendChild(getItemDom("Prompt", comfyuiPrompt));
+				}
+				if (comfyuiWorkflow !== undefined) {
+					collapseDom.domContent.appendChild(getItemDom("Workflow", comfyuiWorkflow));
+				}
+				domTabContentInfo.appendChild(collapseDom.domBox);
+			}
 		}
 
 
@@ -544,7 +567,7 @@ class MainExif {
 					let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
 					AiDrawingPrompt.getSdwebui(text).forEach(item => {
 						domContentList.appendChild(getItemDom(item.title, item.text));
-					})
+					});
 				} else { // 一般的文字檔
 
 					domContent = Lib.newDom(`
@@ -655,9 +678,58 @@ class MainExif {
 			return domBox;
 		}
 
+		/**
+		 * 折疊面板的 dom
+		 * @param title 標題
+		 * @param type 初始狀態
+		 */
+		function getCollapseDom(title: string, type: boolean) {
+
+			// 外框物件
+			let domBox = Lib.newDom(`
+				<div class="mainExifRelatedBox" data-menu="file">	
+				</div>
+			`);
+
+			// 標題物件
+			let domTitle = Lib.newDom(`
+				<div class="mainExifRelatedTitle collapse-title">
+					<span>${Lib.escape(title)}</span>
+					<div class="mainExifRelatedTitleBtnList"></div>
+				</div>
+			`);
+			domBox.appendChild(domTitle);
+
+			// 內容物件
+			let domContent: HTMLElement = Lib.newDom(`
+				<div class="mainExifRelatedContent collapse-content">
+					<div class="mainExifList">
+					</div>
+				</div>
+			`);
+			let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
+			domBox.appendChild(domContent);
+
+			// 初始化 折疊面板
+			Lib.collapse(domBox, "init-" + type); // 不使用動畫直接初始化狀態
+			domTitle.addEventListener("click", (e) => {
+				// 如果是右上角的按鈕，則不處理
+				let target = e.target as HTMLElement;
+				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
+					return;
+				}
+				Lib.collapse(domBox, "toggle", (type) => { }); // 切換折疊狀態
+			});
+
+			return {
+				domBox: domBox,
+				domTitle: domTitle,
+				domContent: domContentList,
+			};
+		}
 
 		/** 
-		 * exif項目的dom
+		 * exif 項目的 dom
 		 */
 		function getItemDom(name: string, value: string, nameI18n = "", valueI18n = "") {
 
@@ -734,7 +806,7 @@ class MainExif {
 		}
 
 		/** 
-		 * 從exif裡面取得全部的value
+		 * 從 exif 裡面取得全部的 value
 		 */
 		function getItems(ar: any, key: string) {
 			let arOutput = [];

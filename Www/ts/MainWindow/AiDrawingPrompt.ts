@@ -149,29 +149,48 @@ class AiDrawingPrompt {
 	 * ComfyUI (找到起始節點後，以遞迴方式找出相關節點)
 	 */
 	public static getComfyui(jsonStr: string) {
-		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer"]; // 起始節點(不一定找得到)
+		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer", "UltimateSDUpscale"]; // 起始節點(不一定找得到)
 		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
 		var SEED_TYPES = ["seed", "noise_seed"];
 
 		let json: any;
 
-		try {
-			json = JSON.parse(jsonStr);
-		} catch (e) {
-			return [];
+		if (typeof jsonStr == "string") {
+			try {
+				json = JSON.parse(jsonStr);
+			} catch (e) {
+				return [];
+			}
+		} else {
+			json = jsonStr;
 		}
 
-		var retData: { title: string, text: string }[] = [];
+		var retData: { node: string, data: { title: string, text: string }[] }[] = [];
 		var arKey = Object.keys(json);
 
 		var _prompt;
 		var _negativePrompt;
 
-		function retPush(title: string, text: string | undefined) {
-			if (text !== undefined && text !== null && text !== "") {
+		function retPush(node: string, data: { title: string, text: string | undefined }[]) {
+
+			let ar: { title: string, text: string }[] = [];
+
+			for (let i = 0; i < data.length; i++) {
+				const item = data[i];
+				const text = item.text;
+				const title = item.title;
+				if (text !== undefined && text !== null && text !== "") {
+					ar.push({
+						title: title,
+						text: text.toString().trim()
+					});
+				}
+			}
+
+			if (ar.length !== 0) {
 				retData.push({
-					title: title,
-					text: text.toString().trim()
+					node: node,
+					data: ar
 				});
 			}
 		}
@@ -294,6 +313,7 @@ class AiDrawingPrompt {
 				mianInputs = item.inputs;
 
 				if (mianInputs !== undefined) {
+					let node = classType;
 					let seed = getSeed(mianInputs);
 					let samplerName = getVal(mianInputs.sampler_name);
 					let cfg = getVal(mianInputs.cfg);
@@ -318,16 +338,18 @@ class AiDrawingPrompt {
 						_negativePrompt = negativePrompt;
 					}
 
-					retPush("Model", model);
-					retPush("Prompt", prompt);
-					retPush("Negative prompt", negativePrompt);
-					retPush("Size", size);
-					retPush("Seed", seed);
-					retPush("Steps", steps);
-					retPush("CFG scale", cfg);
-					retPush("Sampler", samplerName);
-					retPush("Scheduler", scheduler);
-					retPush("Denoise", denoise);
+					let ar: { title: string, text: string | undefined }[] = [];
+					ar.push({ title: "Model", text: model });
+					ar.push({ title: "Prompt", text: prompt });
+					ar.push({ title: "Negative prompt", text: negativePrompt });
+					ar.push({ title: "Size", text: size });
+					ar.push({ title: "Seed", text: seed });
+					ar.push({ title: "Steps", text: steps });
+					ar.push({ title: "CFG scale", text: cfg });
+					ar.push({ title: "Sampler", text: samplerName });
+					ar.push({ title: "Scheduler", text: scheduler });
+					ar.push({ title: "Denoise", text: denoise });
+					retPush(node, ar);
 				}
 			}
 		}
