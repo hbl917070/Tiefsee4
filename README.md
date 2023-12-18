@@ -51,7 +51,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
  - Bulk View：Load multiple pictures at once and view them in a vertical scrolling manner.
  - QuickLook: Long press on the spacebar to preview the file selected on the desktop or in the folder.
  - Other additional features: PDF reader, MD editor, text file editor, docx and pptx readers.
- - Supported Languages: English、中文、中文
+ - Supported Languages: English、中文
 
 ![](Assets/windowTheme.jpg)
 
