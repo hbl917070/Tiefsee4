@@ -751,6 +751,21 @@ namespace Tiefsee {
             return filePath;
         }
 
+        /// <summary>
+        /// 取得 webp 的 總幀數
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int GetWebpFrameCount(string path) {
+            int frameCount = -1;
+            try {
+                using var sr = new FileStream(path, FileMode.Open, FileAccess.Read);
+                using var image = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
+                frameCount = Int32.Parse(image.Get("n-pages").ToString());
+            } catch { }
+            return frameCount;
+        }
+
         #endregion
 
     }

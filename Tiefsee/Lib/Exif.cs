@@ -3,6 +3,7 @@ using MetadataExtractor.Formats.Exif;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;
+using System.Xml.Linq;
 using Windows.Storage;
 
 namespace Tiefsee {
@@ -79,50 +80,27 @@ namespace Tiefsee {
             ImgExif exif = new ImgExif();
 
             exif.data.Add(new ImgExifItem { // 建立時間
-                group = "base",
+                group = "Base",
                 name = "Creation Time",
                 value = File.GetCreationTime(path).ToString("yyyy-MM-dd HH:mm:ss")
             });
             exif.data.Add(new ImgExifItem { // 最後修改時間
-                group = "base",
+                group = "Base",
                 name = "Last Write Time",
                 value = File.GetLastWriteTime(path).ToString("yyyy-MM-dd HH:mm:ss")
             });
             /*exif.data.Add(new ImgExifItem { // 上次存取時間
-                group = "base",
+                group = "Base",
                 name = "Last Access Time",
                 value = File.GetLastAccessTime(path).ToString("yyyy-MM-dd HH:mm:ss")
             });*/
             exif.data.Add(new ImgExifItem { // 檔案 size
-                group = "base",
+                group = "Base",
                 name = "Length",
                 value = new FileInfo(path).Length.ToString()
             });
             string w = "";
             string h = "";
-
-            // 如果是影片，則另外讀取 Comment 資訊
-            string fileType = GetFileType(path);
-            if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
-
-                string comment = null;
-
-                Task.Run(async () => {
-                    try {
-                        var f = await StorageFile.GetFileFromPathAsync(path);
-                        var v = await f.Properties.GetDocumentPropertiesAsync();
-                        comment = v.Comment;
-                    } catch { }
-                }).Wait(); // 等待非同步操作完成
-
-                if (string.IsNullOrEmpty(comment) == false) {
-                    exif.data.Add(new ImgExifItem {
-                        group = "Shell",
-                        name = "Comment",
-                        value = comment.Trim()
-                    });
-                }
-            }
 
             try {
                 IEnumerable<MetadataExtractor.Directory> directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
@@ -213,6 +191,8 @@ namespace Tiefsee {
                         }
                     }
                 }
+
+                // 新增圖片 size 的資訊
                 if (w != "" && h != "") {
                     exif.data.Add(new ImgExifItem {
                         group = "Image",
@@ -220,6 +200,53 @@ namespace Tiefsee {
                         value = $"{w} x {h}"
                     });
                 }
+
+                // 如果是影片，則另外讀取 Comment 資訊
+                string fileType = GetFileType(path);
+                if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
+                    string comment = null;
+                    Task.Run(async () => {
+                        try {
+                            var f = await StorageFile.GetFileFromPathAsync(path);
+                            var v = await f.Properties.GetDocumentPropertiesAsync();
+                            comment = v.Comment;
+                        } catch { }
+                    }).Wait(); // 等待非同步操作完成
+
+                    if (string.IsNullOrEmpty(comment) == false) {
+                        exif.data.Add(new ImgExifItem {
+                            group = "Shell",
+                            name = "Comment",
+                            value = comment.Trim()
+                        });
+                    }
+                }
+                 // 如果是 webp 動圖，則另外讀取 總幀數 資訊
+                 else if (fileType == "webp-animation") {
+                    int frameCount = ImgLib.GetWebpFrameCount(path);
+                    if (frameCount > 1) {
+                        exif.data.Add(new ImgExifItem {
+                            group = "Frames",
+                            name = "Frame Count",
+                            value = frameCount.ToString()
+                        });
+                    }
+                }
+                // 如果檔案類型是 GIF，則新增「總幀數」的資訊
+                else if (fileType == "gif") {
+                    int frames = exif.data
+                        .Where(x => x.group == "GIF Control")
+                        .Where(x => x.name == "Delay")
+                        .Count();
+                    if (frames > 0) {
+                        exif.data.Add(new ImgExifItem {
+                            group = "Frames",
+                            name = "Frame Count",
+                            value = frames.ToString()
+                        });
+                    }
+                }
+
             } catch { }
 
             exif.code = "1";
@@ -239,7 +266,7 @@ namespace Tiefsee {
                 try {
                     using FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     using BinaryReader br = new(fs);
-                    int readLength = 20;
+                    int readLength = 100;
 
                     for (int i = 0; i < readLength; i++) {
                         if (fs.Position >= fs.Length) break; // 如果已經讀取到文件的結尾，則跳出循環
@@ -261,7 +288,11 @@ namespace Tiefsee {
                 } else if (hex.StartsWith("89 50 4E 47 0D 0A 1A 0A")) {
                     return "png";
                 } else if (hex.Contains("57 45 42 50 56 50 38")) { // WEBPVP8
-                    return "webp";
+                    if (hex.Contains("41 4E 49 4D")) { // ANIM
+                        return "webp-animation";
+                    } else {
+                        return "webp";
+                    }
                 } else if (hex.StartsWith("25 50 44 46")) { // %PDF
                     return "pdf";
                 } else if (hex.Contains("66 74 79 70")) { // 66(f) 74(t) 79(y) 70(p) 。其他影片格式也可能誤判成mp4

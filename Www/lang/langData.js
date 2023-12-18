@@ -2095,6 +2095,25 @@ var langData = {
                 "en": "Software",
                 "ja": "ソフトウェア",
             },
+
+            // 影片 ----------
+
+            "Duration": {
+                "zh-TW": "影片長度",
+                "en": "Video Length",
+                "ja": "ビデオの長さ"
+            },
+
+            // Gif ----------
+
+            "Frame Count": {
+                "zh-TW": "總幀數",
+                "en": "Frame Count",
+                "ja": "フレーム数"
+            },
+
+            // 每個檔案固定都會有的欄位 ----------
+
             "Creation Time": {
                 "zh-TW": "建立日期",
                 "en": "Creation Time",

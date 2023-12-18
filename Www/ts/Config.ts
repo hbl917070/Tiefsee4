@@ -124,6 +124,8 @@ class Config {
             "Orientation", // 旋轉資訊
             "Software", // 軟體
             // "Color Space", // 色彩空間
+            "Duration", // 影片長度
+            "Frame Count", // 總幀數
             "Creation Time", // 建立日期
             "Last Write Time", // 修改日期
             // "Last Access Time", // 存取時間

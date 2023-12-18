@@ -56,6 +56,7 @@ class Tiefseeview {
     public getCanvasBase64;
     public getCanvasBlob;
     public getIsZoomWithWindow; // 取得 是否圖片隨視窗縮放
+    public getVideoDuration; // 取得影片長度
     public setIsZoomWithWindow;
 
     public getEventMouseWheel; // 滑鼠滾輪捲動時
@@ -161,6 +162,8 @@ class Tiefseeview {
         var temp_TiefseeviewZoomType: TiefseeviewZoomType = TiefseeviewZoomType["imageOriginal"];
         var temp_TiefseeviewZoomTypeVal = 100;
 
+        var temp_videoDuration: number = -1; // 影片長度
+
         // 滑鼠滾輪的行為
         var eventMouseWheel = (_type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number): void => {
             if (_type === "up") { zoomIn(offsetX, offsetY); }
@@ -247,6 +250,7 @@ class Tiefseeview {
         this.getCanvasBase64 = getCanvasBase64; // 從Canvas取得base64
         this.getCanvasBlob = getCanvasBlob;
         this.getIsZoomWithWindow = getIsZoomWithWindow;
+        this.getVideoDuration = getVideoDuration;
         this.setIsZoomWithWindow = setIsZoomWithWindow;
 
 
@@ -752,9 +756,12 @@ class Tiefseeview {
                 video.addEventListener("loadedmetadata", (e) => {
                     temp_originalWidth = video.videoWidth; // 初始化圖片size
                     temp_originalHeight = video.videoHeight;
+                    temp_videoDuration = isNaN(video.duration) ? -1 : video.duration;
+
                     resolve(true);
                 });
                 video.addEventListener("error", (e) => {
+                    temp_videoDuration = -1;
                     temp_originalWidth = 1;
                     temp_originalHeight = 1;
                     resolve(false);
@@ -872,8 +879,6 @@ class Tiefseeview {
 
         /**
          * 載入已經縮放過的圖片並顯示 - canvas
-         * @param _url 
-         * @returns 
          */
         async function loadBigimgscale(
             _arUrl: { scale: number, url: string }[],
@@ -925,8 +930,6 @@ class Tiefseeview {
 
         /**
          * 取得 Bigimgscale 目前應該載入哪一個比例的圖片
-         * @param scale 
-         * @returns 
          */
         function getBigimgscaleItem(scale?: number) {
 
@@ -953,11 +956,8 @@ class Tiefseeview {
 
         /**
          * url 轉 Canvas 。只能在網址已經載入完成的情況下使用
-         * @param url 
-         * @returns 
          */
         function urlToCanvas(url: string) {
-
             let domImg = document.createElement("img");
             domImg.src = url;
 
@@ -1128,7 +1128,6 @@ class Tiefseeview {
 
         /**
          * 取得 外距
-         * @returns 
          */
         function getMargin(): { top: number, right: number, bottom: number, left: number } {
             return { top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft };
@@ -1167,21 +1166,17 @@ class Tiefseeview {
         }
 
 
-
         /**
          * 取得 允許拖曳的溢位距離
-         * @returns 
          */
         function getOverflowDistance(): number { return overflowDistance; }
         /**
          * 設定 允許拖曳的溢位距離
-         * @param _v 
          */
         function setOverflowDistance(_v: number): void { overflowDistance = _v; }
 
         /**
          * 取得 圖片的渲染模式
-         * @returns 
          */
         function getRendering(): TiefseeviewImageRendering { return rendering; }
         /**
@@ -1214,45 +1209,37 @@ class Tiefseeview {
 
         /**
          * 覆寫 圖片或顯示範圍改變的事件
-         * @param _func 
          */
         function setEventChangeZoom(_func: (ratio: number) => void) { eventChangeZoom = _func; }
         /**
          * 取得 圖片或顯示範圍改變的事件
-         * @returns 
          */
         function getEventChangeZoom() { return eventChangeZoom; }
 
         /**
          * 覆寫 角度改變的事件
-         * @param _func 
          */
         function setEventChangeDeg(_func: (deg: number) => {}) { eventChangeDeg = _func; }
         /**
          * 取得 角度改變的事件
-         * @returns 
          */
         function getEventChangeDeg() { return eventChangeDeg; }
 
         /**
          * 覆寫 鏡像改變的事件
-         * @param _func 
          */
         function setEventChangeMirror(_func: () => {}) { eventChangeMirror = _func; }
         /**
          * 取得 鏡像改變的事件
-         * @returns 
          */
         function getEventChangeMirror() { return eventChangeMirror; }
 
         /**
          * 覆寫 坐標改變的事件
-         * @param _func 
          */
         function setEventChangeXY(_func: (x: number, y: number) => {}) { eventChangeXY = _func; }
         /**
          * 取得 坐標改變的事件
-         * @returns 
          */
         function getEventChangeXY() { return eventChangeXY; }
 
@@ -1263,7 +1250,6 @@ class Tiefseeview {
 
         /**
          * (預設值)超出縮放上限，return true表示超過限制
-         * @returns 
          */
         function _eventLimitMax(): boolean {
 
@@ -1310,24 +1296,20 @@ class Tiefseeview {
         function getEventLimitMax() { return eventLimitMax; }
         /**
          * 覆寫 圖片放大上限
-         * @param _func 
          */
         function setEventLimitMax(_func: () => boolean) { eventLimitMax = _func; }
 
         /**
          * 取得 圖片縮小下限
-         * @returns 
          */
         function getEventLimitMin() { return eventLimitMin; }
         /**
          * 覆寫 圖片縮小下限
-         * @param _func 
          */
         function setEventLimitMin(_func: () => boolean) { eventLimitMin = _func; }
 
         /**
          * 覆寫 圖片面積大於這個數值，就停止使用高品質縮放
-         * @returns 
          */
         function setEventHighQualityLimit(_func: () => number) {
             eventHighQualityLimit = _func;
@@ -1413,7 +1395,6 @@ class Tiefseeview {
 
         /**
          * 取得圖片原始寬度
-         * @returns 
          */
         function getOriginalWidth(): number {
             return temp_originalWidth;
@@ -1421,16 +1402,21 @@ class Tiefseeview {
 
         /**
          * 取得圖片原始高度
-         * @returns 
          */
         function getOriginalHeight(): number {
             return temp_originalHeight;
         }
 
+        /**
+         * 取得影片長度，非影片或尚未載入完畢則回傳 -1
+         */
+        function getVideoDuration() {
+            if (dataType !== "video") { return -1; }
+            return temp_videoDuration;
+        }
 
         /**
          * 改變內容大小
-         * @param _width 
          */
         function setDataSize(_width: number) {
             if (dataType === "img") {
@@ -1455,6 +1441,8 @@ class Tiefseeview {
                 dom_video.style.height = (_width * ratio) + "px";
             }
         }
+
+
 
         // #region BigimgTemp
 

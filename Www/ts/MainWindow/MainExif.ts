@@ -226,33 +226,73 @@ class MainExif {
 					return;
 				}
 			}
+			let groupType = M.fileShow.getGroupType();
+
 			// 取得經緯度
-			let GPS_lat = getItem(json.data, "GPS Latitude"); // 緯度
-			let GPS_lng = getItem(json.data, "GPS Longitude"); // 經度
-			if (GPS_lat === `0° 0' 0"` && GPS_lng === `0° 0' 0"`) { // 避免空白資料
-				GPS_lat = undefined;
-				GPS_lng = undefined;
+			let gpsLat = getItem(json.data, "GPS Latitude")?.value; // 緯度
+			let gpsLng = getItem(json.data, "GPS Longitude")?.value; // 經度
+			if (gpsLat === `0° 0' 0"` && gpsLng === `0° 0' 0"`) { // 避免空白資料
+				gpsLat = undefined;
+				gpsLng = undefined;
 			}
-			let hasGPS = GPS_lat !== undefined && GPS_lng !== undefined;
+			let hasGPS = gpsLat !== undefined && gpsLng !== undefined;
 			if (hasGPS) { // 如果經緯度不是空，就新增「Map」欄位
-				json.data.push({ group: "GPS", name: "Map", value: `${GPS_lat},${GPS_lng}` });
+				json.data.push({ group: "GPS", name: "Map", value: `${gpsLat},${gpsLng}` });
 			}
 
 			let deferredFunc: (() => void)[] = []; // 最後才執行的函數
 			let comfyuiPrompt: string | undefined;
 			let comfyuiWorkflow: string | undefined;
 
+			// 待影片載入完畢，更新「影片長度」的資訊
+			async function updateVideoDuration(domVideo: HTMLElement) {
+				await Lib.sleep(10);
+				for (let i = 0; i < 100; i++) {
+
+					let duration = M.fileShow.tiefseeview.getVideoDuration();
+
+					if (isNaN(duration) === false) {
+
+						let value = formatVideoLength(duration);
+
+						// 產生新的 dom
+						let name = M.i18n.t(`exif.name.Duration`);
+						let domVideoNew = getItemDom(name, value);
+						domTabContentInfo.appendChild(domVideoNew);
+
+						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
+						domVideo.insertAdjacentElement("afterend", domVideoNew);
+						domVideo.parentNode?.removeChild(domVideo);
+
+						return;
+					}
+					await Lib.sleep(100);
+				}
+			}
+
 			let ar = json.data;
 			let whitelist = M.config.exif.whitelist;
 			for (let i = 0; i < whitelist.length; i++) {
+
 				let name = whitelist[i];
-				let value = getItem(ar, name);
 
-				if (value === undefined) {
+				// 如果是影片
+				if (groupType === GroupType.video && name === "Duration") {
+					// 先產生一個沒有資料的項目
+					let domVideo = getItemDom(M.i18n.t(`exif.name.${name}`), " ");
+					domTabContentInfo.appendChild(domVideo);
+					// 待影片載入完畢，更新「影片長度」的資訊
+					updateVideoDuration(domVideo);
 					continue;
-
 				}
-				else if (name === "Map") {
+
+				let exifItem = getItem(ar, name);
+				if (exifItem === undefined) { continue; }
+				let value = exifItem.value;
+				let group = exifItem.group;
+				if (value === "") { continue; }
+
+				if (name === "Map") {
 
 					value = encodeURIComponent(value); // 移除可能破壞html的跳脫符號
 
@@ -372,18 +412,19 @@ class MainExif {
 					let nameI18n = `exif.name.${name}`;
 					let valueI18n = "";
 
-					// 處理value的值
+					// 處理 value 的值
 					if (name === "Metering Mode") {
 						value = M.i18n.t(`exif.value.${name}.${value}`);
 						valueI18n = `exif.value.${name}.${value}`;
 					}
-					if (name === "Flash") {
+					else if (name === "Flash") {
 						value = M.i18n.t(`exif.value.${name}.${value}`);
 						valueI18n = `exif.value.${name}.${value}`
 					}
-					if (name === "Length") {
+					else if (name === "Length") {
 						value = Lib.getFileLength(Number(value));
 					}
+
 					name = M.i18n.t(`exif.name.${name}`);
 					domTabContentInfo.appendChild(getItemDom(name, value, nameI18n, valueI18n));
 				}
@@ -426,8 +467,8 @@ class MainExif {
 				}
 				domTabContentInfo.appendChild(collapseDom.domBox);
 			}
-		}
 
+		}
 
 		/**
 		 * 讀取 相關檔案(於初始化後呼叫)
@@ -500,6 +541,30 @@ class MainExif {
 				})
 			})
 			return btnNew;
+		}
+
+		/**
+		 * 格式化影片長度。毫秒 → 00:00
+		 */
+		function formatVideoLength(input: any): string {
+			if (input === undefined || input === null || input === "") { return ""; }
+
+			let milliseconds = Number(input);
+			if (isNaN(milliseconds)) { return input; }
+
+			//let totalSeconds = Math.floor(milliseconds / 1000);
+			let totalSeconds = Math.floor(milliseconds);
+			let hours = Math.floor(totalSeconds / 3600);
+			let minutes = Math.floor((totalSeconds % 3600) / 60);
+			let seconds = totalSeconds % 60;
+
+			// 如果小時數小於1，則只返回分鐘和秒數
+			if (hours < 1) {
+				return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+			} else {
+				// 否則，返回格式化的小時、分鐘和秒數
+				return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+			}
 		}
 
 		/**
@@ -807,7 +872,7 @@ class MainExif {
 		/** 
 		 * 從 exif 裡面取得全部的 value
 		 */
-		function getItems(ar: any, key: string) {
+		function getItems(ar: { group: string, name: string, value: string }[], key: string) {
 			let arOutput = [];
 			for (let i = 0; i < ar.length; i++) {
 				let item = ar[i];
@@ -819,13 +884,16 @@ class MainExif {
 		}
 
 		/**
-		 * 從exif裡面取得第一筆的value
+		 * 從 exif 裡面取得第一筆的 value
 		 */
-		function getItem(ar: any, key: string) {
+		function getItem(ar: { group: string, name: string, value: string }[], key: string) {
 			for (let i = 0; i < ar.length; i++) {
 				let item = ar[i];
 				if (item.name == key) {
-					return item.value;
+					return {
+						"group": item.group,
+						"value": item.value
+					};
 				}
 			}
 			return undefined;
