@@ -16,17 +16,18 @@
     display: flex;
     align-items: center;
 
+    // 上面的頁籤按鈕
     .mainExifTabs {
       flex: 1;
       width: 100%;
-      // height: 33px;
-      // margin-bottom: -3px;
+      height: 33px;
+      margin-bottom: -3px;
       overflow-x: visible;
       overflow-y: hidden;
       position: relative;
       display: none;
-      //border-bottom: 1px solid var(--color-blue20);
-
+  
+      // 頁籤按鈕下面的水平線
       &::before {
         content: "";
         position: absolute;
@@ -100,7 +101,7 @@
     }
   }
 
-  //相關檔案
+  // 相關檔案
   .mainExifRelated {
     padding: 0 5px;
     margin-top: 5px;

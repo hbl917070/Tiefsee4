@@ -317,7 +317,7 @@ class MainExif {
 				}
 				else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
 
-					// Stable Diffusion webui 輸出的jpg或webp
+					// Stable Diffusion webui 輸出的 jpg 或 webp
 					if (value.includes("Steps: ") && value.includes("Seed: ")) {
 						ar.push({
 							group: "PNG-tEXt",
@@ -329,7 +329,7 @@ class MainExif {
 						let jsonF = Lib.jsonStrFormat(value);
 						if (jsonF.ok) { // 解析欄位
 							if (value.startsWith(`{"prompt":`)) { // ComfyUI
-								comfyuiPrompt = (JSON.parse(value)["prompt"]);
+								comfyuiPrompt = JSON.parse(value)["prompt"];
 							}
 						}
 					}
@@ -460,6 +460,11 @@ class MainExif {
 				let collapseDom = getCollapseDom("ComfyUI Data", false);
 
 				if (comfyuiPrompt !== undefined) {
+					if (typeof comfyuiPrompt === "object") { // 從 mp4 提取出來的 Prompt 是 json，所以要轉回 string
+						try {
+							comfyuiPrompt = JSON.stringify(comfyuiPrompt);
+						} catch { }
+					}
 					collapseDom.domContent.appendChild(getItemDom("Prompt", comfyuiPrompt));
 				}
 				if (comfyuiWorkflow !== undefined) {

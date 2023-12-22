@@ -692,14 +692,9 @@ class MainWindow {
                 }
 
             } else {
-                let arFile = [];
-                for (let i = 0; i < args.length; i++) {
-                    arFile.push(Lib.GetFileName(args[i]));
-                }
-                let dirPath = Lib.GetDirectoryName(args[0]);
-                if (dirPath !== null) {
-                    await fileLoad.loadFiles(dirPath, arFile); // 載入多張圖片
-                }
+
+                await fileLoad.loadFiles(args); // 載入多張圖片
+
             }
 
             // 在圖片載入完成後，更新「用其他APP開啟檔案」的列表

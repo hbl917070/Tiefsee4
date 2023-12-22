@@ -1075,14 +1075,8 @@ class ScriptOpen {
         if (arFile.length === 1) {
             this.M.fileLoad.loadFile(arFile[0]);
         }
-        if (arFile.length > 1) {
-            let arName = [];
-            for (let i = 0; i < arFile.length; i++) {
-                arName.push(Lib.GetFileName(arFile[i]));
-            }
-            let dirPath = Lib.GetDirectoryName(arFile[0]);
-            if (dirPath == null) { return; }
-            this.M.fileLoad.loadFiles(dirPath, arName);
+        else {
+            this.M.fileLoad.loadFiles(arFile);
         }
     }
 
@@ -1131,6 +1125,16 @@ class ScriptOpen {
         let exePath = await WV_Window.GetAppPath();
         await this.M.saveSetting();
         WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
+    }
+
+    /** 解析多幀圖片 */
+    public async showFrames(path?: string) {
+        if (path === undefined) {
+            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
+        }
+        let exePath = await WV_Window.GetAppPath();
+        await this.M.saveSetting();
+        WV_RunApp.ProcessStart(exePath, `showFrames "${path}"`, true, false);
     }
 
     /** 在檔案總管顯示 */
