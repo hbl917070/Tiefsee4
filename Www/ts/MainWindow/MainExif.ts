@@ -277,7 +277,7 @@ class MainExif {
 				let name = whitelist[i];
 
 				// 如果是影片
-				if (groupType === GroupType.video && name === "Duration") {
+				if (groupType === GroupType.video && name === "Video Duration") {
 					// 先產生一個沒有資料的項目
 					let domVideo = getItemDom(M.i18n.t(`exif.name.${name}`), " ");
 					domTabContentInfo.appendChild(domVideo);
@@ -303,6 +303,26 @@ class MainExif {
 							</div>
 						</div>`;
 					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
+
+				}
+				else if (name === "Frame Count") { // 總幀數
+					let nameI18n = `exif.name.${name}`;
+					name = M.i18n.t(`exif.name.${name}`);
+
+					let domValue = Lib.newDom(`
+						<span>
+							${value}
+							<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div>
+						<span>
+					`);
+					let domBtn = domValue.querySelector(".btnExport") as HTMLElement;
+					domBtn.addEventListener("click", () => {
+						console.log(path)
+						M.script.open.showFrames(path);
+					})
+					let itemDom = getItemDom(name, domValue, nameI18n, "");
+
+					domTabContentInfo.appendChild(itemDom);
 
 				}
 				else if (name === "Make" && value.startsWith("Prompt:{")) { // ComfyUI 的 webp
@@ -650,7 +670,7 @@ class MainExif {
 				}
 
 				// 按鈕 - civitai
-				if (title.toLowerCase() === ".civitai.info") {
+				if (title.toLowerCase().endsWith(".civitai.info")) {
 					try {
 						let civitaiInfo = JSON.parse(text);
 						let modelId = civitaiInfo.modelId;
@@ -797,20 +817,34 @@ class MainExif {
 			};
 		}
 
+
 		/** 
 		 * exif 項目的 dom
 		 */
-		function getItemDom(name: string, value: string, nameI18n = "", valueI18n = "") {
+		function getItemDom(name: string, value: string | HTMLElement, nameI18n = "", valueI18n = "") {
 
-			if (name == undefined || name == null) { name = ""; }
-			if (value == undefined || value == null) { value = ""; }
+			if (name === undefined || name === null) { name = ""; }
+			if (value === undefined || value === null) { value = ""; }
 
-			let oVal = value; // 原始資料
 			name = name.toString();
-			value = value.toString();
 			name = Lib.escape(name); // 移除可能破壞html的跳脫符號
-			value = Lib.escape(value);
 
+			// 如果是 value 是 dom
+			if (typeof value !== "string") {
+				let div = Lib.newDom(`
+					<div class="mainExifItem">
+						<div class="mainExifName" i18n="${nameI18n}">${name}</div>
+						<div class="mainExifValue"></div>
+					</div>`
+				);
+				let divValue = div.querySelector(".mainExifValue") as HTMLElement;
+				divValue.appendChild(value);
+				return div;
+			}
+
+			value = value.toString();
+			let oVal = value; // 原始資料
+			value = Lib.escape(value);
 			value = value.replace(/\n/g, "<br>"); // 處理換行
 			value = value.replace(/[ ]/g, "&nbsp;"); // 處理空白
 

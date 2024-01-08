@@ -681,6 +681,23 @@ class MainWindow {
                 args.shift(); // 把陣列的第一個元素從其中刪除
             }
 
+            // 解析多幀圖片
+            if (args.length >= 2 && args[0] === "showFrames") {
+                script.window.enabledLoading(true);
+                args.shift(); // 把陣列的第一個元素從其中刪除
+                try {
+                    let dirPath = await WebAPI.extractFrames(args[0]);
+                    script.bulkView.show();
+                    await fileLoad.loadFile(dirPath); // 載入單張圖片
+                } catch {
+                    fileShow.openWelcome();
+                    Toast.show(i18n.t("msg.imageAnalysisFailed"), 1000 * 3); // 圖片解析失敗
+                }
+
+                script.window.enabledLoading(false);
+                return;
+            }
+
             if (args.length === 0) {
                 fileShow.openWelcome();
 

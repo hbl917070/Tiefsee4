@@ -75,7 +75,7 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        public static string GetExif(string path, int maxLength) {
+        public static ImgExif GetExif(string path, int maxLength) {
 
             ImgExif exif = new ImgExif();
 
@@ -101,158 +101,220 @@ namespace Tiefsee {
             });
             string w = "";
             string h = "";
+            IEnumerable<MetadataExtractor.Directory> directories;
 
             try {
-                IEnumerable<MetadataExtractor.Directory> directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
+                directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
+            } catch {
+                directories = new List<MetadataExtractor.Directory>();
+            }
 
-                foreach (var directory in directories) {
-                    foreach (var tag in directory.Tags) {
+            foreach (var directory in directories) {
+                foreach (var tag in directory.Tags) {
 
-                        string group = directory.Name ?? "";
-                        string name = tag.Name ?? "";
-                        string value = tag.Description ?? "";
-                        int tagType = tag.Type;
+                    string group = directory.Name ?? "";
+                    string name = tag.Name ?? "";
+                    string value = tag.Description ?? "";
+                    int tagType = tag.Type;
 
-                        if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
-                            continue;
-                        }
-                        if (value.Length > maxLength) { // 某些圖片可能把二進制資訊封裝進去
-                            continue;
-                        }
+                    if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
+                        continue;
+                    }
+                    if (value.Length > maxLength) { // 某些圖片可能把二進制資訊封裝進去
+                        continue;
+                    }
 
-                        /*if (name == "Textual Data") {
-                            try {
-                                if (group == "PNG-iTXt") { // utf8 格式
-                                    byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
-                                    string utf8 = Encoding.UTF8.GetString(unknow);
-                                    value = utf8;
-                                } else if (group == "PNG-tEXt") { // ISO-8859-1 格式
-                                    //byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
-                                    //string utf8 = Encoding.GetEncoding(28591).GetString(unknow);
-                                    //value = utf8;
-                                } else {
-                                    continue;
-                                }
-                            } catch (Exception ee) {
-                                Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
+                    /*if (name == "Textual Data") {
+                        try {
+                            if (group == "PNG-iTXt") { // utf8 格式
+                                byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
+                                string utf8 = Encoding.UTF8.GetString(unknow);
+                                value = utf8;
+                            } else if (group == "PNG-tEXt") { // ISO-8859-1 格式
+                                //byte[] unknow = Encoding.GetEncoding(28591).GetBytes(value);
+                                //string utf8 = Encoding.GetEncoding(28591).GetString(unknow);
+                                //value = utf8;
+                            } else {
+                                continue;
                             }
-                        }*/
-
-                        // sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
-                        if (tagType == ExifDirectoryBase.TagOrientation) { // 旋轉方向
-                            int orientation = directory.TryGetInt32(tag.Type, out int v) ? v : -1;
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = OrientationToString(orientation)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagDateTimeOriginal) { // 拍攝時間
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy-MM-dd HH:mm:ss")
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagExposureBias) { // 曝光補償
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = ExposureBiasToString(val)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagExposureTime) { // 曝光時間
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = ExposureTimeToString(val)
-                            });
-                        } else if (tagType == ExifDirectoryBase.TagFlash) { // 閃光燈模式
-                            string val = directory.GetString(tag.Type);
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = "Flash",
-                                value = val
-                            });
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = "Flash(text)",
-                                value = value
-                            });
-                        } else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖，所以不抓
-                            w = directory.GetString(tag.Type);
-                        } else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
-                            h = directory.GetString(tag.Type);
-                        } else {
-                            exif.data.Add(new ImgExifItem {
-                                group = group,
-                                name = name,
-                                value = value
-                            });
+                        } catch (Exception ee) {
+                            Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
                         }
+                    }*/
+
+                    // sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
+                    if (tagType == ExifDirectoryBase.TagOrientation) { // 旋轉方向
+                        int orientation = directory.TryGetInt32(tag.Type, out int v) ? v : -1;
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = name,
+                            value = OrientationToString(orientation)
+                        });
+                    } else if (tagType == ExifDirectoryBase.TagDateTimeOriginal) { // 拍攝時間
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = name,
+                            value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy-MM-dd HH:mm:ss")
+                        });
+                    } else if (tagType == ExifDirectoryBase.TagExposureBias) { // 曝光補償
+                        string val = directory.GetString(tag.Type);
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = name,
+                            value = ExposureBiasToString(val)
+                        });
+                    } else if (tagType == ExifDirectoryBase.TagExposureTime) { // 曝光時間
+                        string val = directory.GetString(tag.Type);
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = name,
+                            value = ExposureTimeToString(val)
+                        });
+                    } else if (tagType == ExifDirectoryBase.TagFlash) { // 閃光燈模式
+                        string val = directory.GetString(tag.Type);
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = "Flash",
+                            value = val
+                        });
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = "Flash(text)",
+                            value = value
+                        });
+                    } else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖，所以不抓
+                        w = directory.GetString(tag.Type);
+                    } else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
+                        h = directory.GetString(tag.Type);
+                    } else {
+                        exif.data.Add(new ImgExifItem {
+                            group = group,
+                            name = name,
+                            value = value
+                        });
                     }
                 }
+            }
 
-                // 新增圖片 size 的資訊
-                if (w != "" && h != "") {
+            // 新增圖片 size 的資訊
+            if (w != "" && h != "") {
+                exif.data.Add(new ImgExifItem {
+                    group = "Image",
+                    name = "Image Width/Height",
+                    value = $"{w} x {h}"
+                });
+            }
+
+            // 如果是影片，則另外讀取 Comment 資訊
+            string fileType = GetFileType(path);
+            if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
+                string comment = null;
+                Task.Run(async () => {
+                    try {
+                        var f = await StorageFile.GetFileFromPathAsync(path);
+                        var v = await f.Properties.GetDocumentPropertiesAsync();
+                        comment = v.Comment;
+                    } catch { }
+                }).Wait(); // 等待非同步操作完成
+
+                if (string.IsNullOrEmpty(comment) == false) {
                     exif.data.Add(new ImgExifItem {
-                        group = "Image",
-                        name = "Image Width/Height",
-                        value = $"{w} x {h}"
+                        group = "Movie",
+                        name = "Comment",
+                        value = comment.Trim()
+                    });
+                }
+            }
+            // 如果是 webp 動圖，則加入「總幀數、循環次數」資訊
+            else if (fileType == "webps") {
+                var animationInfo = ImgLib.GetWebpFrameCount(path);
+                if (animationInfo.FrameCount > 1) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Frame Count",
+                        value = animationInfo.FrameCount.ToString()
+                    });
+                }
+                if (animationInfo.LoopCount > 1) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Loop Count",
+                        value = animationInfo.LoopCount.ToString()
+                    });
+                }
+            }
+            // 如果檔案類型是 GIF，則加入「總幀數、循環次數」資訊
+            else if (fileType == "gif") {
+                // 總幀數
+                int frames = exif.data
+                    .Where(x => x.group == "GIF Control")
+                    .Where(x => x.name == "Delay")
+                    .Count();
+                if (frames > 0) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Frame Count",
+                        value = frames.ToString()
                     });
                 }
 
-                // 如果是影片，則另外讀取 Comment 資訊
-                string fileType = GetFileType(path);
-                if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
-                    string comment = null;
-                    Task.Run(async () => {
-                        try {
-                            var f = await StorageFile.GetFileFromPathAsync(path);
-                            var v = await f.Properties.GetDocumentPropertiesAsync();
-                            comment = v.Comment;
-                        } catch { }
-                    }).Wait(); // 等待非同步操作完成
+                // 循環次數
+                string loopString = exif.data
+                    .Where(x => x.group == "GIF Animation")
+                    .Where(x => x.name == "Iteration Count")
+                    .Select(x => x.value)
+                    .SingleOrDefault() ?? "";
+                if (loopString.Contains(" times")) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Loop Count",
+                        value = loopString.Replace(" times", "")
+                    });
+                }
+            }
+            // 如果檔案類型是 ICO，則加入「總幀數」資訊
+            else if (fileType == "ico") {
 
-                    if (string.IsNullOrEmpty(comment) == false) {
-                        exif.data.Add(new ImgExifItem {
-                            group = "Shell",
-                            name = "Comment",
-                            value = comment.Trim()
-                        });
-                    }
+                int frames = exif.data
+                    .Where(x => x.group == "ICO")
+                    .Where(x => x.name == "Image Size Bytes")
+                    .Count();
+                if (frames > 0) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Frame Count",
+                        value = frames.ToString()
+                    });
                 }
-                 // 如果是 webp 動圖，則另外讀取 總幀數 資訊
-                 else if (fileType == "webp-animation") {
-                    int frameCount = ImgLib.GetWebpFrameCount(path);
-                    if (frameCount > 1) {
-                        exif.data.Add(new ImgExifItem {
-                            group = "Frames",
-                            name = "Frame Count",
-                            value = frameCount.ToString()
-                        });
-                    }
+            }
+            // 如果檔案類型是 TIF，則加入「總幀數」資訊
+            else if (fileType == "tiff" || fileType == "tif") {
+                int frames = exif.data
+                    .Where(x => x.name == "Page Number")
+                    .Count();
+                if (frames > 1) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Frame Count",
+                        value = frames.ToString()
+                    });
                 }
-                // 如果檔案類型是 GIF，則新增「總幀數」的資訊
-                else if (fileType == "gif") {
-                    int frames = exif.data
-                        .Where(x => x.group == "GIF Control")
-                        .Where(x => x.name == "Delay")
-                        .Count();
-                    if (frames > 0) {
-                        exif.data.Add(new ImgExifItem {
-                            group = "Frames",
-                            name = "Frame Count",
-                            value = frames.ToString()
-                        });
-                    }
+            }
+            // 如果檔案類型是 DCM HEIC，則加入「總幀數」資訊
+            else if (fileType == "dcm" || fileType == "heic" || fileType == "heif") {
+                int frames = ImgLib.GetFrameCount(path);
+                if (frames > 1) {
+                    exif.data.Add(new ImgExifItem {
+                        group = "Frames",
+                        name = "Frame Count",
+                        value = frames.ToString()
+                    });
                 }
-
-            } catch { }
+            }
 
             exif.code = "1";
-            string json = JsonConvert.SerializeObject(exif);
 
-            return json;
+            return exif;
         }
 
         /// <summary>
@@ -289,14 +351,14 @@ namespace Tiefsee {
                     return "png";
                 } else if (hex.Contains("57 45 42 50 56 50 38")) { // WEBPVP8
                     if (hex.Contains("41 4E 49 4D")) { // ANIM
-                        return "webp-animation";
+                        return "webps";
                     } else {
                         return "webp";
                     }
                 } else if (hex.StartsWith("25 50 44 46")) { // %PDF
                     return "pdf";
-                } else if (hex.Contains("66 74 79 70")) { // 66(f) 74(t) 79(y) 70(p) 。其他影片格式也可能誤判成mp4
-                    return "mp4";
+                    // } else if (hex.Contains("66 74 79 70")) { // 66(f) 74(t) 79(y) 70(p) 。其他影片格式也可能誤判成mp4
+                    // return "mp4";
                 } else if (hex.StartsWith("1A 45 DF A3")) {
                     if (hex.IndexOf("77 65 62 6D 42 87") > 0) { // 77(w) 65(e) 62(b) 6D(m) 42(B) 87()
                         return "webm";
@@ -309,7 +371,7 @@ namespace Tiefsee {
             }
 
             // 如果無法從 hex 判斷檔案類型，則回傳副檔名
-            return Path.GetExtension(path).ToLower().Replace(".", "") + "---";
+            return Path.GetExtension(path).ToLower().Replace(".", "");
         }
 
     }

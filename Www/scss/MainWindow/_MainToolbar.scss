@@ -14,9 +14,9 @@
   min-width: 100%;
 }
 
-//----------
+// ----------
 
-//滾動條樣式
+// 滾動條樣式
 .main-toolbar__scrollbar {
   position: relative;
 
@@ -24,7 +24,7 @@
     display: none;
   }
 
-  /*水平滾動條*/
+  // 水平滾動條
   .scroll-x {
     height: 3px;
     position: absolute;
@@ -32,7 +32,7 @@
     z-index: 1;
   }
 
-  /*背景*/
+  // 背景
   .scroll-x .scroll-bg {
     height: 3px;
     width: 100%;
@@ -46,33 +46,33 @@
     opacity: 0;
   }
 
-  /*拖曳區域*/
+  // 拖曳區域
   .scroll-x .scroll-box {
     height: 3px;
     background-color: var(--color-white40);
     position: absolute;
     bottom: 0px;
-    //border: 3px solid rgba(0, 0, 0, 0);
-    //background-clip: content-box;
+    // border: 3px solid rgba(0, 0, 0, 0);
+    // background-clip: content-box;
   }
 
   .scroll-x:hover {
     cursor: pointer;
   }
 
-  /*移入與拖曳時-背景*/
+  // 移入與拖曳時-背景
   .scroll-x:hover .scroll-bg,
   .scroll-x[action="true"] .scroll-bg {
     opacity: 1;
   }
 
-  /*移入與拖曳時-拖曳區域*/
+  // 移入與拖曳時-拖曳區域
   .scroll-x:hover .scroll-box,
   .scroll-x[action="true"] .scroll-box {
   }
 }
 
-//----------
+// ----------
 
 .main-toolbar-group {
   display: none;
@@ -85,9 +85,9 @@
   align-items: center;
 }
 
-//----------
+// ----------
 
-//垂直線
+// 垂直線
 .main-toolbar-hr {
   width: 1px;
   min-width: 1px;
@@ -99,9 +99,9 @@
   margin: 0 3px;
 }
 
-//----------
+// ----------
 
-//純文字資訊
+// 純文字資訊
 .main-toolbar-txt {
   height: 35px;
   font-size: 15px;
@@ -114,7 +114,7 @@
   margin-left: 12px;
   position: relative;
 }
-//純文字資訊-左邊的垂直線
+// 純文字資訊-左邊的垂直線
 .main-toolbar-txt::after {
   position: absolute;
   content: "";
@@ -127,9 +127,9 @@
   margin: auto;
 }
 
-//----------
+// ----------
 
-//按鈕
+// 按鈕
 .main-toolbar-btn {
   min-width: 35px;
   height: 35px;
@@ -139,30 +139,30 @@
   border-radius: 4px;
   font-size: 15px;
   user-select: none;
-  flex-shrink: 0; /*避免壓縮*/
-}
-.main-toolbar-btn:hover {
-  cursor: pointer;
-  background-color: var(--color-white10);
-}
-.main-toolbar-btn:active {
-  background-color: var(--color-white30);
-}
-.main-toolbar-btn svg,
-.main-toolbar-btn img {
-  width: 25px;
-  height: 25px;
-  pointer-events: none;
+  flex-shrink: 0; // 避免壓縮
+  &:hover {
+    cursor: pointer;
+    background-color: var(--color-white10);
+  }
+  &:active {
+    background-color: var(--color-white30);
+  }
+  svg,
+  img {
+    width: 25px;
+    height: 25px;
+    pointer-events: none;
+  }
 }
 
-//開啟選單時
+// 開啟選單時
 .main-toolbar-btn.menuActive {
   background-color: var(--color-white20) !important;
 }
 
-//----------
+// ----------
 
-//置中
+// 置中
 #main-toolbar[toolbarAlign="center"] .main-toolbar-group::before {
   content: "";
   margin-left: auto;
@@ -176,7 +176,7 @@
   order: 2000;
 }
 
-//----------
+// ----------
 
 // 返回按鈕
 .main-toolbar-back {
@@ -189,7 +189,7 @@
   display: flex;
 }
 
-//返回按鈕-右邊的垂直線
+// 返回按鈕-右邊的垂直線
 .main-toolbar-back::after {
   position: absolute;
   content: "";

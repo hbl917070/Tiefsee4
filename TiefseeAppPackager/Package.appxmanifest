@@ -83,8 +83,10 @@
 							<uap:FileType>.psb</uap:FileType>
 							<uap:FileType>.pcx</uap:FileType>
 							<uap:FileType>.heic</uap:FileType>
+							<uap:FileType>.heif</uap:FileType>
 							<uap:FileType>.avif</uap:FileType>
 							<uap:FileType>.fits</uap:FileType>
+							<uap:FileType>.dcm</uap:FileType>
 							<uap:FileType>.hdr</uap:FileType>
 							<uap:FileType>.miff</uap:FileType>
 							<uap:FileType>.mng</uap:FileType>

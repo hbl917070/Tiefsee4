@@ -1605,6 +1605,11 @@ var langData = {
             "en": "Collapse",
             "ja": "折りたたむ",
         },
+        export: {
+            "zh-TW": "匯出",
+            "en": "Export",
+            "ja": "エクスポート",
+        },
         //#endregion
 
     },
@@ -1745,6 +1750,12 @@ var langData = {
             "zh-TW": "無法開啟剪貼簿的內容",
             "en": "Cannot open the contents of the clipboard",
             "ja": "クリップボードの内容を開くことができません",
+        },
+
+        imageAnalysisFailed: {
+            "zh-TW": "圖片解析失敗",
+            "en": "Image analysis failed",
+            "ja": "画像解析に失敗しました",
         },
 
         //#region download
@@ -2110,6 +2121,11 @@ var langData = {
                 "zh-TW": "總幀數",
                 "en": "Frame Count",
                 "ja": "フレーム数"
+            },
+            "Loop Count": {
+                "zh-TW": "循環次數",
+                "en": "Loop Count",
+                "ja": "ループ回数"
             },
 
             // 每個檔案固定都會有的欄位 ----------

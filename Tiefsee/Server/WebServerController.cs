@@ -34,7 +34,9 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getRelatedFileList", getRelatedFileList);
             webServer.RouteAdd("/api/isBinary", IsBinary);
             webServer.RouteAdd("/api/getClipboardContent", GetClipboardContent);
+            webServer.RouteAdd("/api/extractFrames", ExtractFrames);
 
+            
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
 
@@ -62,7 +64,7 @@ namespace Tiefsee {
         #region web API
 
         /// <summary>
-        /// 取得檔案的Exif資訊
+        /// 取得檔案的 Exif 資訊
         /// </summary>
         void getExif(RequestData d) {
 
@@ -79,9 +81,9 @@ namespace Tiefsee {
 
             //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //if (is304) { return; }
-
-            string json = Exif.GetExif(path, maxLength);
-
+         
+            var exif = Exif.GetExif(path, maxLength);
+            string json = JsonConvert.SerializeObject(exif);
             WriteString(d, json);
         }
 
@@ -475,7 +477,6 @@ namespace Tiefsee {
             WriteString(d, retJson); // 回傳
         }
 
-
         /// <summary>
         /// 檢查檔案是否為二進制檔
         /// </summary>
@@ -504,6 +505,21 @@ namespace Tiefsee {
             WriteString(d, retJson);
         }
 
+        /// <summary>
+        /// 解析多幀圖片，並儲存到指定資料夾
+        /// </summary>
+        private void ExtractFrames(RequestData d) {
+
+            string postData = d.postData;
+            var json = JObject.Parse(postData);
+            string imgPath = json["imgPath"].ToObject<string>();
+            string outputDir = json["outputDir"].ToObject<string>();
+        
+            var ret = ImgLib.ExtractFrames(imgPath, outputDir);
+            string srtStrJson = JsonConvert.SerializeObject(ret);
+            WriteString(d, srtStrJson); // 回傳
+        }
+        
         /// <summary>
         /// 
         /// </summary>

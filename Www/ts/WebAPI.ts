@@ -378,4 +378,14 @@ class WebAPI {
         let ret = await Lib.sendGet("json", url);
         return ret as { Type: string, Data: string };
     }
+
+    /**
+    * 解析多幀圖片
+    */
+    static async extractFrames(path: string) {
+        let url = APIURL + "/api/extractFrames";
+        let postData = { imgPath: path, outputDir: "" };
+        let retAr = await WebAPI.sendPost(url, postData);
+        return retAr as string;
+    }
 }

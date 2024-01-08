@@ -1562,9 +1562,10 @@ class ScriptBulkView {
     public show() {
         if (this.M.fileLoad.getIsBulkView() === true) { return; }
         if (this.M.fileLoad.getGroupType() === GroupType.welcome) { return; }
-        if (this.M.fileLoad.getGroupType() === GroupType.none) { return; }
         this.M.fileLoad.enableBulkView(true);
-        this.M.fileLoad.showFile();
+        if (this.M.fileLoad.getGroupType() !== GroupType.none) {
+            this.M.fileLoad.showFile();
+        }
     }
 
     /** 結束 大量瀏覽模式 */

@@ -124,8 +124,9 @@ class Config {
             "Orientation", // 旋轉資訊
             "Software", // 軟體
             // "Color Space", // 色彩空間
-            "Duration", // 影片長度
+            "Video Duration", // 影片長度
             "Frame Count", // 總幀數
+            "Loop Count", // 循環次數
             "Creation Time", // 建立日期
             "Last Write Time", // 修改日期
             // "Last Access Time", // 存取時間
@@ -436,9 +437,10 @@ class Config {
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },
                 { ext: "heic", type: "vips", vipsType: "magick" },
+                { ext: "heif", type: "vips", vipsType: "magick" },
                 { ext: "avif", type: "vips", vipsType: "wpf,magick" }, // 如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: "vips", vipsType: "magick" },
-                // { ext: "dcm",type:"vips", vipsType:"magick" }, // 多幀
+                { ext: "dcm", type: "vips", vipsType: "magick" }, // 多幀
                 { ext: "hdr", type: "vips", vipsType: "magick" }, // 必須輸出成png顏色才不會跑掉
                 { ext: "miff", type: "vips", vipsType: "magick" },
                 { ext: "mng", type: "vips", vipsType: "magick" },
