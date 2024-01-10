@@ -256,7 +256,7 @@ class MainExif {
 						let value = formatVideoLength(duration);
 
 						// 產生新的 dom
-						let name = M.i18n.t(`exif.name.Duration`);
+						let name = M.i18n.t(`exif.name.Video Duration`);
 						let domVideoNew = getItemDom(name, value);
 						domTabContentInfo.appendChild(domVideoNew);
 
@@ -351,6 +351,8 @@ class MainExif {
 							if (value.startsWith(`{"prompt":`)) { // ComfyUI
 								comfyuiPrompt = JSON.parse(value)["prompt"];
 							}
+						} else {
+							domTabContentInfo.appendChild(getItemDom(name, value));
 						}
 					}
 

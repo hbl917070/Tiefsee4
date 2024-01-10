@@ -92,7 +92,9 @@ class AiDrawingPrompt {
 		function parseString(str: string) {
 			let result: { key: string, value: string }[] = [];
 
-			let keys = ["Prompt", "Negative prompt", "Steps", "Template", "Negative Template"];
+			// v1.7後 Template 跟 Negative Template 直接當做一般項目來解析即可
+			// 而舊版的則需要當做大項目來剖析，所以在前面加上 \n ，與新版做區別
+			let keys = ["Prompt", "Negative prompt", "Steps", "\nTemplate", "\nNegative Template"];
 			for (let i = 0; i < keys.length; i++) {
 				let key = keys[i];
 				let index = str.indexOf(key + ":");
@@ -149,7 +151,7 @@ class AiDrawingPrompt {
 	 * ComfyUI (找到起始節點後，以遞迴方式找出相關節點)
 	 */
 	public static getComfyui(jsonStr: string) {
-		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer", "UltimateSDUpscale"]; // 起始節點(不一定找得到)
+		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer", "UltimateSDUpscale", "KSampler Adv. (Efficient)"]; // 起始節點(不一定找得到)
 		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
 		var SEED_TYPES = ["seed", "noise_seed"];
 
@@ -245,7 +247,11 @@ class AiDrawingPrompt {
 			for (let i = 0; i < MODEL_TYPES.length; i++) {
 				let text = inputs[MODEL_TYPES[i]];
 				if (text !== undefined) {
-					return text.toString();
+					if (typeof text === 'object') {
+						return JSON.stringify(text);
+					} else {
+						return text.toString();
+					}
 				}
 			}
 
