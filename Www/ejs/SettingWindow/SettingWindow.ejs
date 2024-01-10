@@ -802,7 +802,7 @@
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-dirListMaxCount">
-                                <option value="0" i18n="sw.performance.alwaysDisable">一律禁用</option>
+                                <option value="0" i18n="sw.performance.alwaysDisable">一律停用</option>
                                 <option value="5000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":5000}'>
                                     大於5000時禁用</option>
                                 <option value="10000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":10000}'>
@@ -831,23 +831,23 @@
                         </div>
 
                         <div class="text-title" i18n="sw.performance.useCreateImageBitmap">
-                            圖片面積過大時，停用 createImageBitmap(停用高品質縮放
+                            圖片面積過大時，停用高品質縮放
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-highQualityLimit">
-                                <option value="0" i18n="sw.performance.alwaysDisable">一律禁用</option>
-                                <option value="2000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
-                                <option value="3000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":3000}'>大於3000*3000時停用</option>
-                                <option value="4000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":4000}'>大於4000*4000時停用</option>
-                                <option value="5000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":5000}'>大於5000*5000時停用</option>
-                                <option value="6000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":6000}'>大於6000*6000時停用</option>
-                                <option value="7000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":7000}'>大於7000*7000時停用</option>
-                                <option value="-1" i18n="sw.performance.alwaysUse">一律使用</option>
+                                <option value="0" i18n="sw.performance.alwaysDisable">一律停用</option>
+                                <option value="2000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
+                                <option value="3000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":3000}'>大於3000*3000時停用</option>
+                                <option value="4000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":4000}'>大於4000*4000時停用</option>
+                                <option value="5000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":5000}'>大於5000*5000時停用</option>
+                                <option value="6000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":6000}'>大於6000*6000時停用</option>
+                                <option value="7000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":7000}'>大於7000*7000時停用</option>
+                                <option value="-1" i18n="sw.performance.alwaysEnable">一律啟用</option>
                             </select>
                         </div>
 
                         <div class="text-title" i18n="sw.performance.useLibvips">
-                            當圖片縮小至特定比例以下，就使用libvips重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間
+                            圖片縮放閾值：當圖片縮小至特定比例以下，就重新處理圖片以確保品質。(設定值愈高，圖片品質愈好，但處理時間也會相對增加)
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-tiefseeviewBigimgscaleRatio">

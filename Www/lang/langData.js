@@ -75,9 +75,9 @@ var langData = {
             },
 
             imageShowPixels: {
-                "zh-TW": "如果圖片縮放比例大於100%，則呈現像素",
+                "zh-TW": "圖片縮放比例大於 100% 時，呈現像素",
                 "en": "Show pixels if the image zoom ratio is above 100%",
-                "ja": "画像の拡大率が100%以上の場合、画素を表示します",
+                "ja": "画像の拡大率が 100% 以上の場合、画素を表示します",
             },
         },
 
@@ -807,7 +807,7 @@ var langData = {
             step1: {
                 "zh-TW": "步驟1、把 Tiefsee 關聯到特定副檔名",
                 "en": "Step 1: Associate Tiefsee to the specified File Extension",
-                "ja": "Step 1：Tiefsee を指定されたファイル名拡張子に関連付けます",
+                "ja": "Step 1: Tiefsee を指定されたファイル名拡張子に関連付けます",
             },
             step1Subtitle: {
                 "zh-TW": "(一行代表一種副檔名)",
@@ -821,8 +821,8 @@ var langData = {
             },
             step2: {
                 "zh-TW": "步驟2、選擇預設應用程式",
-                "en": "Step 2. Modify the default apps",
-                "ja": "Step 2：既定のアプリの選択",
+                "en": "Step 2: Modify the default apps",
+                "ja": "Step 2: 既定のアプリの選択",
             },
             step2Subtitle: {
                 "zh-TW": "開啟系統設定，將「相片檢視器」修改成「Tiefsee」",
@@ -872,19 +872,19 @@ var langData = {
             },
 
             disabledDirectoryPanel: {
-                "zh-TW": "資料夾數量太多時，禁用「資料夾預覽面板」",
+                "zh-TW": "資料夾數量太多時，停用「資料夾預覽面板」",
                 "en": `Disable "Folder Panel" when there are too many directories`,
                 "ja": "フォルダが多すぎる場合は「フォルダパネル」を無効化する",
             },
             alwaysDisable: {
-                "zh-TW": "一律禁用",
+                "zh-TW": "一律停用",
                 "en": "Always disable",
                 "ja": "常に無効にする",
             },
             disableWhenGreaterThan: {
-                "zh-TW": "大於{v}時禁用",
+                "zh-TW": "大於 {v} 時停用",
                 "en": "Disable when greater than {v}",
-                "ja": "{v}以上の場合は無効にする",
+                "ja": "{v} 以上の場合は無効にする",
             },
             alwaysEnable: {
                 "zh-TW": "一律啟用",
@@ -893,36 +893,26 @@ var langData = {
             },
 
             useCreateImageBitmap: {
-                "zh-TW": "圖片面積過大時，停用 createImageBitmap (停用高品質縮放)",
-                "en": "Disable createImageBitmap when image is too large (disable high-quality scaling)",
-                "ja": "画像が大きすぎる場合、createImageBitmap を無効にする (高品質の拡大を無効にする)",
+                "zh-TW": "圖片面積過大時，停用高品質縮放",
+                "en": "Disable high-quality scaling when the image area is too large",
+                "ja": "画像が大きすぎる場合、高品質のスケーリングを無効にする"
             },
-            /*alwaysDisable: {
-                "zh-TW": "一律停用",
-                "en": "Always disable",
-                "ja": "常に無効にする",
-            },*/
-            disableWhenGreaterThan: {
+            disableWhenGreaterThanSquare: {
                 "zh-TW": "大於 {v} x {v} 時停用",
                 "en": "Disable when greater than {v} x {v}",
                 "ja": "{v} x {v} 以上の場合は無効にする",
             },
-            alwaysUse: {
-                "zh-TW": "一律使用",
-                "en": "Always use",
-                "ja": "常に使用する",
-            },
 
             useLibvips: {
-                "zh-TW": "當圖片縮小至特定比例以下，就使用 libvips 重新處理圖片 (通常值愈高圖片呈現品質愈好，但縮放圖片將會耗費更多時間)",
-                "en": "When image is resized to a specific ratio or smaller, use libvips to re-process the image (usually, a higher value results in better image quality, but resizing will take more time)",
-                "ja": "画像が特定の割合または小さくなった場合、libvips を使用して画像を再処理する (通常、高い値は画像品質が向上しますが、リサイズにはより多くの時間がかかります)",
+                "zh-TW": "圖片縮放閾值：當圖片縮小至特定比例以下，就重新處理圖片以確保品質。(設定值愈高，圖片品質愈好，但處理時間也會相對增加)",
+                "en": "Image Scaling Threshold: When the image is reduced to a certain ratio, it is reprocessed to ensure quality. (The higher the setting, the better the image quality, but the processing time will also increase)",
+                "ja": "画像スケーリング閾値：画像が特定の比率まで縮小されたとき、品質を確保するために再処理されます。(設定値が高いほど、画像品質は良くなりますが、処理時間も増えます)"
             },
 
             bulkViewImgMaxCount: {
-                "zh-TW": "大量瀏覽模式一頁顯示的圖片數量 (範圍:1~300，預設:100，設定太高可能造成卡頓)",
-                "en": "Number of images displayed per page in Bulk View mode (range: 1~300, default: 100, setting too high may cause stuttering)",
-                "ja": "バルクビューモードで1ページに表示される画像の数（範囲：1〜300、デフォルト：100、設定が高すぎるとカクつきが発生する可能性があります）",
+                "zh-TW": "大量瀏覽模式一頁顯示的圖片數量。(範圍:1~300、預設:100、設定太高可能造成卡頓)",
+                "en": "Number of images displayed per page in Bulk View mode. (range: 1~300, default: 100, setting too high may cause stuttering)",
+                "ja": "バルクビューモードで1ページに表示される画像の数。(範囲:1〜300、デフォルト:100、設定が高すぎるとカクつきが発生する可能性があります)",
             },
 
         },
@@ -1090,7 +1080,7 @@ var langData = {
         //#region 快速預覽
         quickLook: {
             title: {
-                "zh-TW": "在桌面或資料夾快速預覽檔案",
+                "zh-TW": "在 桌面 或 資料夾 快速預覽檔案",
                 "en": "Quick preview of file on the desktop or in the folder",
                 "ja": "デスクトップやフォルダー内のファイルをすばやくプレビューできる",
             },
@@ -2109,7 +2099,7 @@ var langData = {
 
             // 影片 ----------
 
-            "Duration": {
+            "Video Duration": {
                 "zh-TW": "影片長度",
                 "en": "Video Length",
                 "ja": "ビデオの長さ"
