@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using static Tiefsee.ClipboardLib;
 
 namespace Tiefsee {
 
@@ -36,7 +35,6 @@ namespace Tiefsee {
             webServer.RouteAdd("/api/getClipboardContent", GetClipboardContent);
             webServer.RouteAdd("/api/extractFrames", ExtractFrames);
 
-            
             webServer.RouteAdd("/api/sort", sort);
             webServer.RouteAdd("/api/sort2", sort2);
 
@@ -81,7 +79,7 @@ namespace Tiefsee {
 
             //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
             //if (is304) { return; }
-         
+
             var exif = Exif.GetExif(path, maxLength);
             string json = JsonConvert.SerializeObject(exif);
             WriteString(d, json);
@@ -338,8 +336,7 @@ namespace Tiefsee {
             bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的Headers
             if (is304) { return; }
 
-            var wvFile = new WV_File();
-            string ret = wvFile.GetText(path);
+            string ret = FileLib.GetText(path);
 
             WriteString(d, ret);
         }
@@ -400,9 +397,8 @@ namespace Tiefsee {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
 
-            WV_File wvf = new WV_File();
-            string srtStrJson = wvf.GetFileInfo2(path);
-            //string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
+            var fileInfo2 = FileLib.GetFileInfo2(path);
+            string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
             WriteString(d, srtStrJson); // 回傳
         }
 
@@ -413,11 +409,11 @@ namespace Tiefsee {
             string postData = d.postData;
             var json = JObject.Parse(postData);
             string[] ar = json["ar"].ToObject<string[]>();
-            WV_File wvf = new WV_File();
+
             FileInfo2[] arFileInfo2 = new FileInfo2[ar.Length];
             for (int i = 0; i < ar.Length; i++) {
                 string path = ar[i];
-                arFileInfo2[i] = wvf._GetFileInfo2(path);
+                arFileInfo2[i] = FileLib.GetFileInfo2(path);
             }
 
             string srtStrJson = JsonConvert.SerializeObject(arFileInfo2);
@@ -483,8 +479,7 @@ namespace Tiefsee {
         private void IsBinary(RequestData d) {
             string path = d.args["path"];
             path = Uri.UnescapeDataString(path);
-            var wv = new WV_File();
-            var ret = wv.IsBinary(path).ToString();
+            var ret = FileLib.IsBinary(path).ToString();
             WriteString(d, ret); // 回傳
         }
 
@@ -495,7 +490,7 @@ namespace Tiefsee {
 
             int maxTextLength = int.Parse(d.args["maxTextLength"]);
 
-            ClipboardContent json = null;
+            ClipboardLib.ClipboardContent json = null;
             Adapter.UIThread(() => {
                 var clipboardLib = new ClipboardLib();
                 json = clipboardLib.GetClipboardContent(maxTextLength);
@@ -514,12 +509,12 @@ namespace Tiefsee {
             var json = JObject.Parse(postData);
             string imgPath = json["imgPath"].ToObject<string>();
             string outputDir = json["outputDir"].ToObject<string>();
-        
-            var ret = ImgLib.ExtractFrames(imgPath, outputDir);
+
+            var ret = ImgFrames.ExtractFrames(imgPath, outputDir);
             string srtStrJson = JsonConvert.SerializeObject(ret);
             WriteString(d, srtStrJson); // 回傳
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

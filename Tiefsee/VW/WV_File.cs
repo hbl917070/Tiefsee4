@@ -30,33 +30,12 @@ namespace Tiefsee {
         /// <summary>
         /// 檢查檔案是否為二進制檔
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="requiredConsecutiveNul"></param>
-        /// <returns></returns>
         public bool IsBinary(string filePath, int requiredConsecutiveNul = 1) {
-            const int charsToCheck = 8000;
-            const char nulChar = '\0';
-            int nulCount = 0;
-            using (var streamReader = new StreamReader(filePath)) {
-                for (var i = 0; i < charsToCheck; i++) {
-                    if (streamReader.EndOfStream)
-                        return false;
-
-                    if ((char)streamReader.Read() == nulChar) {
-                        nulCount++;
-
-                        if (nulCount >= requiredConsecutiveNul)
-                            return true;
-                    } else {
-                        nulCount = 0;
-                    }
-                }
-            }
-            return false;
+            return FileLib.IsBinary(filePath, requiredConsecutiveNul);
         }
 
         /// <summary>
-        /// 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑
+        /// 將 Base64 儲存至暫存資料夾 tempDirWebFile，並回傳路徑
         /// </summary>
         /// <param name="base64"></param>
         /// <param name="extension"> 副檔名 </param>
@@ -76,7 +55,7 @@ namespace Tiefsee {
                     Directory.CreateDirectory(AppPath.tempDirWebFile);
                 }
 
-                // 把base646儲存成檔案
+                // 把 Base64 儲存成檔案
                 int x = base64.IndexOf("base64,"); // 去掉開頭的 data:image/png;base64,
                 if (x != -1) { base64 = base64.Substring(x + 7); }
                 byte[] buffer = Convert.FromBase64String(base64);
@@ -105,65 +84,10 @@ namespace Tiefsee {
         /// <summary>
         /// 取得基本檔案資訊
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public String GetFileInfo2(string path) {
-            FileInfo2 info = _GetFileInfo2(path);
+            FileInfo2 info = FileLib.GetFileInfo2(path);
             String json = JsonConvert.SerializeObject(info);
             return json;
-        }
-        public FileInfo2 _GetFileInfo2(string path) {
-
-            FileInfo2 info = new();
-            info.Path = Path.GetFullPath(path);
-
-            if (File.Exists(path)) {
-
-                info.Type = "file";
-                info.Lenght = new FileInfo(path).Length;
-                info.CreationTimeUtc = GetCreationTimeUtc(path);
-                info.LastWriteTimeUtc = GetLastWriteTimeUtc(path);
-
-                StringBuilder sb = new();
-                try {
-                    using FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using BinaryReader br = new(fs);
-                    int readLength = 100;
-
-                    for (int i = 0; i < readLength; i++) {
-                        if (fs.Position >= fs.Length) break; // 如果已經讀取到文件的結尾，則跳出循環
-
-                        string hexValue = br.ReadByte().ToString("X2");
-                        sb.Append(hexValue + " ");
-
-                        // 如果是 png，就把 hex 的讀取長度增加，避免 apng 無法辨識
-                        if (i == 7) {
-                            if (sb.ToString() == "89 50 4E 47 0D 0A 1A 0A ") {
-                                readLength = 2000;
-                            }
-                        }
-                    }
-                    if (fs != null) {
-                        fs.Close();
-                        br.Close();
-                    }
-                } catch { }
-
-                info.HexValue = sb.ToString();
-
-            } else if (Directory.Exists(path)) {
-
-                info.Type = "dir";
-                info.Lenght = 0;
-                info.CreationTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
-                info.LastWriteTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
-                info.HexValue = "";
-
-            } else {
-                info.Type = "none";
-            }
-
-            return info;
         }
 
         /// <summary>
@@ -309,27 +233,15 @@ namespace Tiefsee {
         /// <summary>
         /// 取得文字資料
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public String GetText(string path) {
-            // 檔案被鎖定一樣可以讀取
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
+            return FileLib.GetText(path);
         }
 
         /// <summary>
         /// 儲存文字資料
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public void SetText(string path, string t) {
-            var utf8WithoutBom = new System.Text.UTF8Encoding(false);
-            using (FileStream fs = new FileStream(path, FileMode.Create)) {
-                using (StreamWriter sw = new StreamWriter(fs, utf8WithoutBom)) {
-                    sw.Write(t);
-                }
-            }
+        public void SetText(string path, string text) {
+            FileLib.SetText(path, text);
         }
 
         /// <summary>
@@ -367,8 +279,6 @@ namespace Tiefsee {
         /// <summary>
         /// 檔案移到資源回收桶
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public string MoveToRecycle(string path) {
             //if (File.Exists(path) == false) { return false; }
             try {
@@ -386,8 +296,6 @@ namespace Tiefsee {
         /// <summary>
         /// 移動檔案到新位置
         /// </summary>
-        /// <param name="sourceFileName"></param>
-        /// <param name="destFileName"></param>
         public string Move(string sourceFileName, string destFileName) {
             try {
                 File.Move(sourceFileName, destFileName);
@@ -400,36 +308,22 @@ namespace Tiefsee {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
         long ToUnix(DateTime time) {
-            var t = time.Subtract(new DateTime(1970, 1, 1));
-            String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
-            return long.Parse(unixTimestamp);
+            return FileLib.ToUnix(time);
         }
 
         /// <summary>
         /// 取得檔案的建立時間
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public long GetCreationTimeUtc(string path) {
-            if (File.Exists(path) == false) { return 0; }
-            var time = File.GetCreationTimeUtc(path);
-            long unixTimestamp = ToUnix(time);
-            return unixTimestamp;
+            return FileLib.GetCreationTimeUtc(path);
         }
 
         /// <summary>
         /// 傳回指定檔案或目錄上次被寫入的日期和時間
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public long GetLastWriteTimeUtc(string path) {
-            if (File.Exists(path) == false) { return 0; }
-            var time = File.GetLastWriteTimeUtc(path);
-            long unixTimestamp = ToUnix(time);
-            return unixTimestamp;
+            return FileLib.GetLastWriteTimeUtc(path);
         }
 
     }
