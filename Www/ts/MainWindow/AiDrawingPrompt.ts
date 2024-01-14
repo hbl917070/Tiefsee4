@@ -151,7 +151,13 @@ class AiDrawingPrompt {
 	 * ComfyUI (找到起始節點後，以遞迴方式找出相關節點)
 	 */
 	public static getComfyui(jsonStr: string) {
-		var KSAMPLER_TYPES = ["KSampler", "KSamplerAdvanced", "FaceDetailer", "UltimateSDUpscale", "KSampler Adv. (Efficient)"]; // 起始節點(不一定找得到)
+		var KSAMPLER_TYPES = [ // 起始節點(不一定找得到)
+			"KSampler",
+			"KSamplerAdvanced",
+			"FaceDetailer",
+			"UltimateSDUpscale",
+			"KSampler Adv. (Efficient)",
+		];
 		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
 		var SEED_TYPES = ["seed", "noise_seed"];
 
@@ -315,10 +321,19 @@ class AiDrawingPrompt {
 			const item = json[arKey[i]];
 			let classType = item.class_type;
 
-			if (classType !== undefined && KSAMPLER_TYPES.includes(classType)) {
+			if (classType !== undefined) {
 				mianInputs = item.inputs;
 
 				if (mianInputs !== undefined) {
+
+					// 如果是已知模型節點
+					let isModelNode = KSAMPLER_TYPES.includes(classType);
+					// 如果不是已知的節點，則嘗試以相容模式尋找
+					if (isModelNode === false && mianInputs.model !== undefined && mianInputs.cfg !== undefined && mianInputs.positive !== undefined) {
+						isModelNode = true;
+					}
+					if (isModelNode === false) { continue; }
+
 					let node = classType;
 					let seed = getSeed(mianInputs);
 					let samplerName = getVal(mianInputs.sampler_name);
@@ -358,6 +373,30 @@ class AiDrawingPrompt {
 					retPush(node, ar);
 				}
 			}
+		}
+
+		// 讀取 Lora 的名稱
+		let ar: { title: string, text: string | undefined }[] = [];
+		for (let i = 0; i < arKey.length; i++) {
+			const item = json[arKey[i]];
+			let intputs = item["inputs"];
+			if (intputs === undefined) { continue; }
+			let loraName = intputs["lora_name"];
+			if (loraName === undefined || loraName === null
+				|| loraName === "None" || loraName === "none") {
+				continue;
+			}
+
+			let arStrength: any = {};
+			let keys = Object.keys(intputs);
+			keys.forEach(key => {
+				if (key.includes("strength")) {
+					arStrength[key] = intputs[key];
+				}
+			});
+			let jsonFormat = Lib.jsonStrFormat(arStrength).jsonFormat;
+			retPush("Lora", [{ title: loraName, text: jsonFormat }]);
+			ar.push(loraName);
 		}
 
 		return retData;

@@ -380,7 +380,17 @@ class MainExif {
 									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
-
+							
+							else if (name === "metadata") { // 不明，資料為一般的 json
+								if (val.includes(`"seed": `)) {
+									AiDrawingPrompt.getNovelai(val).forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+									})
+								} else {
+									domTabContentInfo.appendChild(getItemDom(name, val));
+								}
+							}
+							
 							else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 								if (val.includes("Steps: ")) {
 									AiDrawingPrompt.getSdwebui(val).forEach(item => {
