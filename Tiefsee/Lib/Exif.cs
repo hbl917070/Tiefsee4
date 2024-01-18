@@ -40,7 +40,8 @@ public class Exif {
             double n3 = 1 / (n1 / n2);
             float n4 = (float)decimal.Round((decimal)n3, 1); // 小數兩位
             return "1/" + n4 + " sec";
-        } catch (Exception) {
+        }
+        catch (Exception) {
         }
         return "0";
     }
@@ -63,10 +64,12 @@ public class Exif {
             float n4 = (float)decimal.Round((decimal)n3, 2); // 小數兩位
             if (n4 > 0) {
                 return "+" + n4 + " EV";
-            } else {
+            }
+            else {
                 return "" + n4 + " EV";
             }
-        } catch { }
+        }
+        catch { }
         return "0";
     }
 
@@ -78,9 +81,7 @@ public class Exif {
         // 如果存在快取，則直接回傳
         string hash = FileLib.FileToHash(path);
         var lruExif = _lruGetExif.Get(hash);
-        if (lruExif != null) {
-            return lruExif;
-        }
+        if (lruExif != null) { return lruExif; }
 
         ImgExif exif = new ImgExif();
 
@@ -110,7 +111,8 @@ public class Exif {
 
         try {
             directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
-        } catch {
+        }
+        catch {
             directories = new List<MetadataExtractor.Directory>();
         }
 
@@ -155,27 +157,31 @@ public class Exif {
                         name = name,
                         value = OrientationToString(orientation)
                     });
-                } else if (tagType == ExifDirectoryBase.TagDateTimeOriginal) { // 拍攝時間
+                }
+                else if (tagType == ExifDirectoryBase.TagDateTimeOriginal) { // 拍攝時間
                     exif.data.Add(new ImgExifItem {
                         group = group,
                         name = name,
                         value = (directory.TryGetDateTime(tag.Type, out DateTime v) ? v : new DateTime(1970, 1, 1)).ToString("yyyy-MM-dd HH:mm:ss")
                     });
-                } else if (tagType == ExifDirectoryBase.TagExposureBias) { // 曝光補償
+                }
+                else if (tagType == ExifDirectoryBase.TagExposureBias) { // 曝光補償
                     string val = directory.GetString(tag.Type);
                     exif.data.Add(new ImgExifItem {
                         group = group,
                         name = name,
                         value = ExposureBiasToString(val)
                     });
-                } else if (tagType == ExifDirectoryBase.TagExposureTime) { // 曝光時間
+                }
+                else if (tagType == ExifDirectoryBase.TagExposureTime) { // 曝光時間
                     string val = directory.GetString(tag.Type);
                     exif.data.Add(new ImgExifItem {
                         group = group,
                         name = name,
                         value = ExposureTimeToString(val)
                     });
-                } else if (tagType == ExifDirectoryBase.TagFlash) { // 閃光燈模式
+                }
+                else if (tagType == ExifDirectoryBase.TagFlash) { // 閃光燈模式
                     string val = directory.GetString(tag.Type);
                     exif.data.Add(new ImgExifItem {
                         group = group,
@@ -187,11 +193,14 @@ public class Exif {
                         name = "Flash(text)",
                         value = value
                     });
-                } else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖，所以不抓
+                }
+                else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖，所以不抓
                     w = directory.GetString(tag.Type);
-                } else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
+                }
+                else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
                     h = directory.GetString(tag.Type);
-                } else {
+                }
+                else {
                     exif.data.Add(new ImgExifItem {
                         group = group,
                         name = name,
@@ -219,7 +228,8 @@ public class Exif {
                     var f = await StorageFile.GetFileFromPathAsync(path);
                     var v = await f.Properties.GetDocumentPropertiesAsync();
                     comment = v.Comment;
-                } catch { }
+                }
+                catch { }
             }).Wait(); // 等待非同步操作完成
 
             if (string.IsNullOrEmpty(comment) == false) {
@@ -358,4 +368,3 @@ public class ImgExifItem {
     public string name = "";
     public string value = "";
 }
-

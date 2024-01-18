@@ -1,11 +1,11 @@
-﻿using System.IO;
+﻿//
+// https://dotblogs.com.tw/danking/2013/11/19/130417
+//
+
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using ComTypes = System.Runtime.InteropServices.ComTypes;
-
-//產生捷徑
-//https://dotblogs.com.tw/danking/2013/11/19/130417
-
 
 /// <summary>
 /// 產生捷徑
@@ -258,7 +258,8 @@ public class ShellLink : IDisposable {
     public ShellLink(string FullLinkFileName) {
         try {
             shellLinkW = (IShellLinkW)new CShellLink();
-        } catch {
+        }
+        catch {
             throw new COMException("Failed to create ShellLink object.");
         }
 

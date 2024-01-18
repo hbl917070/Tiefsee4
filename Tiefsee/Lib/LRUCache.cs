@@ -26,16 +26,18 @@ public class LRUCache<TKey, TValue> {
     }
 
     public void Add(TKey key, TValue value) {
-        if (_cache.Count >= _capacity) {
-            // Remove least recently used item.
-            _cache.Remove(_lruList.Last.Value.Key);
-            _lruList.RemoveLast();
-        }
+        lock (_cache) {
+            if (_cache.Count >= _capacity) {
+                // Remove least recently used item.
+                _cache.Remove(_lruList.Last.Value.Key);
+                _lruList.RemoveLast();
+            }
 
-        var cacheItem = new CacheItem { Key = key, Value = value };
-        var newNode = new LinkedListNode<CacheItem>(cacheItem);
-        _lruList.AddFirst(newNode);
-        _cache.Add(key, newNode);
+            var cacheItem = new CacheItem { Key = key, Value = value };
+            var newNode = new LinkedListNode<CacheItem>(cacheItem);
+            _lruList.AddFirst(newNode);
+            _cache.Add(key, newNode);
+        }
     }
 
     private class CacheItem {

@@ -1,0 +1,30 @@
+{
+  // 使用 IntelliSense 以得知可用的屬性。
+  // 暫留以檢視現有屬性的描述。
+  // 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (build)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/Tiefsee/bin/Debug/net7.0-windows10.0.17763.0/Tiefsee.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Tiefsee",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": ".NET Core Launch (watch)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "watch",
+      "program": "${workspaceFolder}/Tiefsee/bin/Debug/net7.0-windows10.0.17763.0/Tiefsee.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Tiefsee",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

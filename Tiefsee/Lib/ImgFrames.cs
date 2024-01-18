@@ -31,7 +31,8 @@ public class ImgFrames {
                 // 如果資料夾已經存在，則在資料夾後面加上「 (2)」
                 if (i == 1) {
                     outputDir = Path.Combine(AppPath.tempDirWebFile, name);
-                } else {
+                }
+                else {
                     outputDir = Path.Combine(AppPath.tempDirWebFile, name) + $" ({i})";
                 }
 
@@ -56,11 +57,14 @@ public class ImgFrames {
                         bool allExists = arPng.All(x => arFile.Contains(x));
                         if (allExists) { // 如果所有圖片都存在，就直接回傳，不需要處理
                             return outputDir;
-                        } else {
+                        }
+                        else {
                             break; // 有缺漏圖片，需要處理
                         }
                     }
-                } else { // 如果找不到 info.json，表示可以使用此資料夾
+                }
+                // 如果找不到 info.json，表示可以使用此資料夾
+                else {
                     break;
                 }
             }
@@ -73,9 +77,11 @@ public class ImgFrames {
         string ext = FileLib.GetFileType(imgPath);
         if (ext == "gif") {
             ExtractGif(imgPath, outputDir);
-        } else if (ext == "apng") {
+        }
+        else if (ext == "apng") {
             ExtractApng(imgPath, outputDir);
-        } else {
+        }
+        else {
             ExtractMagickImage(imgPath, outputDir, ext);
         }
         return outputDir;
@@ -167,7 +173,8 @@ public class ImgFrames {
             NetVips.Image temp;
             if (blendOp == BlendOps.APNGBlendOpSource || i == 0) { // 覆蓋先前的幀
                 temp = background.Insert(frameImage, xOffset, yOffset);
-            } else { // 與先前的幀進行 alpha 混合
+            }
+            else { // 與先前的幀進行 alpha 混合
                 temp = background.Composite(frameImage, Enums.BlendMode.Over, xOffset, yOffset);
             }
 
@@ -184,9 +191,11 @@ public class ImgFrames {
                 temp.Dispose();
                 temp = temp3;
                 background.Dispose();
-            } else if (disposeOp == DisposeOps.APNGDisposeOpPrevious) { // 渲染下一幀之前，將目前幀的區域恢復為上一幀的內容
+            }
+            else if (disposeOp == DisposeOps.APNGDisposeOpPrevious) { // 渲染下一幀之前，將目前幀的區域恢復為上一幀的內容
                 temp = background;
-            } else {
+            }
+            else {
                 background.Dispose();
             }
 
@@ -291,7 +300,8 @@ public class ImgFrames {
                 frameCount = frameCount,
                 frames = frames
             };
-        } else if (frames != null && frames.Count > 0) {
+        }
+        else if (frames != null && frames.Count > 0) {
             data = new {
                 hase = hase,
                 path = path,
@@ -299,7 +309,8 @@ public class ImgFrames {
                 frameCount = frameCount,
                 frames = frames
             };
-        } else {
+        }
+        else {
             data = new {
                 hase = hase,
                 path = path,
@@ -339,7 +350,8 @@ public class ImgFrames {
                 _tempGetFrameCount.Add(hash, count);
                 return count;
             }
-        } catch { }
+        }
+        catch { }
         return -1;
     }
     private static Dictionary<string, int> _tempGetFrameCount = new();
@@ -355,7 +367,8 @@ public class ImgFrames {
             using var image = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
             frameCount = Int32.Parse(image.Get("n-pages").ToString());
             loopCount = Int32.Parse(image.Get("loop").ToString());
-        } catch { }
+        }
+        catch { }
 
         return new AnimationInfo { FrameCount = frameCount, LoopCount = loopCount };
     }
@@ -370,7 +383,8 @@ public class ImgFrames {
             var apngInfo = APNG.GetInfo(path);
             frameCount = (int)apngInfo.NumFrames;
             loopCount = (int)apngInfo.NumPlays;
-        } catch { }
+        }
+        catch { }
 
         return new AnimationInfo { FrameCount = frameCount, LoopCount = loopCount };
     }

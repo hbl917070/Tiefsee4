@@ -23,18 +23,14 @@
 #define USE_CSHARP_SQLITE
 #endif
 
-using System;
 using System.Collections;
 using System.Diagnostics;
 #if !USE_SQLITEPCL_RAW
 using System.Runtime.InteropServices;
 #endif
-using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 
 #if USE_CSHARP_SQLITE
 using Sqlite3 = Community.CsharpSqlite.Sqlite3;

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Concurrent;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Tiefsee;
@@ -25,7 +27,8 @@ public class FileLib {
 
                     if (nulCount >= requiredConsecutiveNul)
                         return true;
-                } else {
+                }
+                else {
                     nulCount = 0;
                 }
             }
@@ -34,34 +37,54 @@ public class FileLib {
     }
 
     /// <summary>
-    /// 
+    /// 取得 FileInfo2
     /// </summary>
     public static FileInfo2 GetFileInfo2(string path) {
+
+        string hash = FileToHash(path);
+        var lruData = _lruGetFileInfo2.Get(hash);
+        if (lruData != null) { return lruData; }
 
         FileInfo2 info = new();
         info.Path = Path.GetFullPath(path);
 
         if (File.Exists(path)) {
-
             info.Type = "file";
             info.Lenght = new FileInfo(path).Length;
             info.CreationTimeUtc = GetCreationTimeUtc(path);
             info.LastWriteTimeUtc = GetLastWriteTimeUtc(path);
             info.HexValue = GetFileHeaderHex(path);
-
-        } else if (Directory.Exists(path)) {
-
+        }
+        else if (Directory.Exists(path)) {
             info.Type = "dir";
             info.Lenght = 0;
             info.CreationTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
             info.LastWriteTimeUtc = ToUnix(Directory.GetLastWriteTimeUtc(path));
             info.HexValue = "";
-
-        } else {
+        }
+        else {
             info.Type = "none";
         }
 
+        _lruGetFileInfo2.Add(hash, info);
+
         return info;
+    }
+    private static LRUCache<string, FileInfo2> _lruGetFileInfo2 = new(1000);
+
+    /// <summary>
+    /// 取得多個檔案的 FileInfo2
+    /// </summary>
+    /// <param name="arPath"></param>
+    /// <returns></returns>
+    public static IEnumerable<FileInfo2> GetFileInfo2List(string[] arPath) {
+        int count = arPath.Length;
+        FileInfo2[] arFileInfo2 = new FileInfo2[count];
+        for (int i = 0; i < count; i++) {
+            string path = arPath[i];
+            arFileInfo2[i] = FileLib.GetFileInfo2(path);
+        }
+        return arFileInfo2;
     }
 
     /// <summary>
@@ -108,11 +131,12 @@ public class FileLib {
                 fs.Close();
                 br.Close();
             }
-        } catch { }
+        }
+        catch { }
 
         return sb.ToString();
     }
-    
+
     /// <summary>
     /// 取得檔案類型。一律小寫，例如 「jpg」
     /// </summary>
@@ -124,30 +148,38 @@ public class FileLib {
 
             if (hex.StartsWith("FF D8 FF")) {
                 return "jpg";
-            } else if (hex.StartsWith("47 49 46 38")) { // GIF8
+            }
+            else if (hex.StartsWith("47 49 46 38")) { // GIF8
                 return "gif";
-            } else if (hex.StartsWith("89 50 4E 47 0D 0A 1A 0A")) {
+            }
+            else if (hex.StartsWith("89 50 4E 47 0D 0A 1A 0A")) {
                 if (hex.IndexOf("08 61 63 54") > 10) { // acTL
                     return "apng";
                 }
                 return "png";
-            } else if (hex.Contains("57 45 42 50 56 50 38")) { // WEBPVP8
+            }
+            else if (hex.Contains("57 45 42 50 56 50 38")) { // WEBPVP8
                 if (hex.Contains("41 4E 49 4D")) { // ANIM
                     return "webps";
-                } else {
+                }
+                else {
                     return "webp";
                 }
-            } else if (hex.StartsWith("25 50 44 46")) { // %PDF
+            }
+            else if (hex.StartsWith("25 50 44 46")) { // %PDF
                 return "pdf";
                 // } else if (hex.Contains("66 74 79 70")) { // 66(f) 74(t) 79(y) 70(p) 。其他影片格式也可能誤判成mp4
                 // return "mp4";
-            } else if (hex.StartsWith("1A 45 DF A3")) {
+            }
+            else if (hex.StartsWith("1A 45 DF A3")) {
                 if (hex.IndexOf("77 65 62 6D 42 87") > 0) { // 77(w) 65(e) 62(b) 6D(m) 42(B) 87()
                     return "webm";
                 }
-            } else if (hex.StartsWith("4F 67 67 53")) { // 4F(O) 67(g) 67(g) 53(S)
+            }
+            else if (hex.StartsWith("4F 67 67 53")) { // 4F(O) 67(g) 67(g) 53(S)
                 return "ogv";
-            } else if (hex.StartsWith("38 42 50 53")) { // 38(8) 42(B) 50(P) 53(S)
+            }
+            else if (hex.StartsWith("38 42 50 53")) { // 38(8) 42(B) 50(P) 53(S)
                 return "psd";
             }
         }
@@ -160,18 +192,23 @@ public class FileLib {
     /// 以檔案的路徑跟大小來產生雜湊字串(用於暫存檔名)
     /// </summary>
     public static string FileToHash(string path) {
-        using (var sha256 = System.Security.Cryptography.SHA256.Create()) {
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        string s;
+        if (File.Exists(path)) {
             long fileSize = new FileInfo(path).Length; // File size
             long ticks = new FileInfo(path).LastWriteTime.Ticks; // File last modified time
-            string s = Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
-            return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
+            s = Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
         }
+        else {
+            s = path;
+        }
+        return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
     }
 
     /// <summary>
     /// 取得文字資料
     /// </summary>
-    public static String GetText(string path) {
+    public static string GetText(string path) {
         // 檔案被鎖定一樣可以讀取
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(stream);
@@ -193,9 +230,9 @@ public class FileLib {
     /// <summary>
     /// 
     /// </summary>
-    public static long  ToUnix(DateTime time) {
+    public static long ToUnix(DateTime time) {
         var t = time.Subtract(new DateTime(1970, 1, 1));
-        String unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
+        string unixTimestamp = (Int32)t.TotalSeconds + t.Milliseconds.ToString("000");
         return long.Parse(unixTimestamp);
     }
 
@@ -218,4 +255,20 @@ public class FileLib {
         long unixTimestamp = ToUnix(time);
         return unixTimestamp;
     }
+}
+
+[ComVisible(true)]
+public class FileInfo2 {
+    /// <summary> file / dir / none </summary>
+    public string Type = "none";
+    /// <summary> 檔案路徑 </summary>
+    public string Path = "";
+    /// <summary> 檔案大小 </summary>
+    public long Lenght = 0;
+    /// <summary> 建立時間 </summary>
+    public long CreationTimeUtc = 0;
+    /// <summary> 修改時間 </summary>
+    public long LastWriteTimeUtc = 0;
+    /// <summary> 檔案的 Hex (用於辨識檔案類型) </summary>
+    public string HexValue = "";
 }

@@ -1,4 +1,4 @@
-﻿using ImageMagick;
+using ImageMagick;
 using ImageMagick.Formats;
 using NetVips;
 using NetVips.Extensions;
@@ -13,9 +13,33 @@ namespace Tiefsee;
 public class ImgLib {
 
     /// <summary>
+    /// 取得任何檔案的圖示
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="size">16 32 64 128 256</param>
+    /// <returns></returns>
+    public static Bitmap GetFileIcon(string path, int size) {
+        if (File.Exists(path) == false) { return null; }
+
+        Bitmap icon = null;
+
+        CancellationTokenSource cts = new();
+        cts.CancelAfter(TimeSpan.FromSeconds(1)); // 設定超時時間為一秒
+
+        Task task = Task.Run(() => {
+            // 取得圖片在Windows系統的縮圖
+            icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
+        }, cts.Token); // 將 CancellationToken 傳遞給 Task.Run
+
+        task.Wait(cts.Token); // 等待任務完成或超時
+
+        return icon;
+    }
+
+    /// <summary>
     /// 
     /// </summary>
-    public static void PathToBitmapSource(String path, Action<BitmapSource> func) {
+    public static void PathToBitmapSource(string path, Action<BitmapSource> func) {
         using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
             BitmapDecoder bd = BitmapDecoder.Create(sr, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
             func(bd.Frames[0]);
@@ -86,11 +110,14 @@ public class ImgLib {
             if (type == "png") {
                 image.Quality = 0; // 壓縮品質
                 imgType = MagickFormat.Png24;
-            } else if (type == "jpg" || type == "jpeg") {
+            }
+            else if (type == "jpg" || type == "jpeg") {
                 imgType = MagickFormat.Jpeg;
-            } else if (type == "tif" || type == "tiff") {
+            }
+            else if (type == "tif" || type == "tiff") {
                 imgType = MagickFormat.Tiff;
-            } else {
+            }
+            else {
                 imgType = MagickFormat.Bmp; // bpm也支援透明色
             }
 
@@ -153,12 +180,14 @@ public class ImgLib {
                     if (bs.PixelWidth < minSize || bs.PixelHeight < minSize) {
                         Console.WriteLine("縮圖太小: " + path);
                         return Dcraw_PathToStream(path, false);
-                    } else {
+                    }
+                    else {
                         Console.WriteLine("縮圖ok: " + path);
                         memoryStream.Position = 0;
                         return memoryStream;
                     }
-                } catch {
+                }
+                catch {
                     Console.WriteLine("縮圖失敗: " + path);
                 }
             }
@@ -179,7 +208,8 @@ public class ImgLib {
                     }
                     return imgMs;
                 }
-            } catch {
+            }
+            catch {
                 Console.WriteLine("Magick RAW 失敗: " + path);
             }
 
@@ -193,7 +223,8 @@ public class ImgLib {
                 return imgMs;
             }
 
-        } catch {
+        }
+        catch {
             throw;
         }
     }
@@ -303,7 +334,8 @@ public class ImgLib {
             File.Delete(tempFilePath);
             return stream;
 
-        } catch {
+        }
+        catch {
             return null;
         }
     }
@@ -330,7 +362,8 @@ public class ImgLib {
                 stream.Write(outputData, 0, outputData.Length);
                 return stream;
             }
-        } catch {
+        }
+        catch {
             return null;
         }
     }
@@ -362,11 +395,14 @@ public class ImgLib {
         string argOut = "";
         if (type == "jpg" || type == "jpeg") {
             argOut = "-out jpeg";
-        } else if (type == "tif" || type == "tiff") {
+        }
+        else if (type == "tif" || type == "tiff") {
             argOut = "-out tiff";
-        } else if (type == "png") {
+        }
+        else if (type == "png") {
             argOut = "-clevel 0 -out png"; //輸出成不壓縮的png
-        } else {
+        }
+        else {
             argOut = "-out bmp";
         }
 
@@ -451,12 +487,14 @@ public class ImgLib {
                 using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                     im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
                 }
-            } else {
+            }
+            else {
                 im = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
             }
 
             tempArNewVips.Add(new DataVips {
-                key = key, vips = im
+                key = key,
+                vips = im
             });
 
             if (tempArNewVips.Count > 5) { // 最多保留5個檔案
@@ -501,7 +539,8 @@ public class ImgLib {
                                 h = img.PixelWidth;
                             }
                         }
-                    } catch { }
+                    }
+                    catch { }
                 }
             }
 
@@ -535,7 +574,8 @@ public class ImgLib {
             imgInfo.height = wh[1];
             imgInfo.code = "1";
             imgInfo.path = path;
-        } else {
+        }
+        else {
             StartWindow.isRunGC = true; // 定時執行GC
         }
 
@@ -557,7 +597,8 @@ public class ImgLib {
                     Vimg2.Jpegsave(path100);
                 }
                 return GetImgInitInfo(path100, "vips");
-            } else { // 直接回傳
+            }
+            else { // 直接回傳
                 return GetImgInitInfo(path, "vips");
             }
         }
@@ -587,7 +628,8 @@ public class ImgLib {
                 if (image.IsOpaque) { // 如果不透明
                     image.Write(path100, MagickFormat.Jpeg);
 
-                } else {
+                }
+                else {
                     using (var ms = new MemoryStream()) {
                         // image.Quality = 1;
                         image.Write(ms, MagickFormat.Tiff);
@@ -637,7 +679,8 @@ public class ImgLib {
             string nconvertPath;
             if (type == "nconvertPng") {
                 nconvertPath = ImgLib.Nconvert_PathToPath(path, false, "png");
-            } else {
+            }
+            else {
                 nconvertPath = ImgLib.Nconvert_PathToPath(path, false, "jpg");
             }
             return GetImgInitInfo(nconvertPath, "vips");
@@ -666,7 +709,8 @@ public class ImgLib {
         string img100 = PathToImg100(path);
         if (File.Exists(img100)) {
             File.SetLastWriteTime(img100, DateTime.Now); // 調整最後修改時間，延後暫存被清理
-        } else { // 如果沒有處理過的暫存檔
+        }
+        else { // 如果沒有處理過的暫存檔
             img100 = path; // 直接只用原檔
         }
 
@@ -690,18 +734,21 @@ public class ImgLib {
         if (type == "jpg") {
             vImg.Jpegsave(filename: path, q: 89);
 
-        } else if (type == "png") {
+        }
+        else if (type == "png") {
             vImg.Pngsave(
                 filename: path,
                 compression: 0,
                 interlace: false,
                 filter: Enums.ForeignPngFilter.None
             );
-        } else {
+        }
+        else {
             bool transparent = VipsHasTransparent(vImg);
             if (transparent) {
                 VipsSave(vImg, path, "png");
-            } else {
+            }
+            else {
                 VipsSave(vImg, path, "jpg");
             }
         }
@@ -747,5 +794,5 @@ public class ImgInitInfo {
     public string path = "";
     public int width = 0;
     public int height = 0;
-    //public string msg = "";
+    // public string msg = "";
 }
