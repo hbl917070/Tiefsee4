@@ -156,6 +156,7 @@ class AiDrawingPrompt {
 			"KSamplerAdvanced",
 			"FaceDetailer",
 			"UltimateSDUpscale",
+			"KSampler (Efficient)",
 			"KSampler Adv. (Efficient)",
 		];
 		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
@@ -181,8 +182,9 @@ class AiDrawingPrompt {
 
 		function retPush(node: string, data: { title: string, text: string | undefined }[]) {
 
-			let ar: { title: string, text: string }[] = [];
+			if (data.length === 0) { return; }
 
+			let ar: { title: string, text: string }[] = [];
 			for (let i = 0; i < data.length; i++) {
 				const item = data[i];
 				const text = item.text;
@@ -210,6 +212,8 @@ class AiDrawingPrompt {
 		}
 		function getVal(obj: any) {
 			if (obj === undefined) { return undefined; }
+			let type = typeof obj;
+			if (type !== "string" && type !== "number") { return undefined; }
 			return obj.toString();
 		}
 
@@ -313,7 +317,6 @@ class AiDrawingPrompt {
 			let height = inputs.height;
 			if (width === undefined || height === undefined) { return undefined; }
 			return `${width} x ${height}`;
-
 		}
 
 		let mianInputs;
@@ -375,29 +378,154 @@ class AiDrawingPrompt {
 			}
 		}
 
-		// 讀取 Lora 的名稱
-		let ar: { title: string, text: string | undefined }[] = [];
+		let arLora: { title: string, text: string | undefined }[] = [];
+
+		// 讀取 Lora 節點
 		for (let i = 0; i < arKey.length; i++) {
+
 			const item = json[arKey[i]];
 			let intputs = item["inputs"];
 			if (intputs === undefined) { continue; }
-			let loraName = intputs["lora_name"];
-			if (loraName === undefined || loraName === null
-				|| loraName === "None" || loraName === "none") {
-				continue;
+			let classType = item["class_type"];
+
+			// 讀取 LoRA Stacker 節點
+			if (classType === "LoRA Stacker") {
+				/*
+				"20": {
+					"inputs": {
+						"input_mode": "simple",
+						"lora_count": 5,
+						"lora_name_1": "\AAA.safetensors",
+						"lora_wt_1": 1.3,
+						"model_str_1": 1,
+						"clip_str_1": 1,
+						"lora_name_2": "\BBB.safetensors",
+						"lora_wt_2": -1.6,
+						"model_str_2": 1,
+						"clip_str_2": 1
+						...
+					},
+					"class_type": "LoRA Stacker"
+				}*/
+
+				// 數量
+				let loraCount = intputs["lora_count"];
+				// 如果無法取得數量，則設為 50
+				if (typeof loraCount !== "number") {
+					loraCount = 50;
+				}
+
+				let inputMode = intputs["input_mode"];
+				let isSimpleMode = inputMode === "simple";
+
+				for (let i = 1; i <= loraCount; i++) {
+					let modelStr;
+					let clipStr;
+					if (isSimpleMode) { // 如果是 simple mode，則只有 lora_wt
+						let loraWt = intputs["lora_wt_" + i];
+						if (loraWt === undefined) { break; }
+						modelStr = loraWt;
+						clipStr = loraWt;
+					}
+					else {
+						modelStr = intputs["model_str_" + i];
+						if (modelStr === undefined) { break; }
+						clipStr = intputs["clip_str_" + i];
+						if (clipStr === undefined) { break; }
+					}
+
+					let loraName = intputs["lora_name_" + i];
+					if (loraName === undefined) { break; }
+
+					if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
+					let jsonFormat = Lib.stringifyWithNewlines({
+						"Model Strength": modelStr,
+						"Clip Strength": clipStr
+					}, true, true);
+					arLora.push({ title: loraName, text: jsonFormat });
+				}
 			}
 
-			let arStrength: any = {};
-			let keys = Object.keys(intputs);
-			keys.forEach(key => {
-				if (key.includes("strength")) {
-					arStrength[key] = intputs[key];
+			// 讀取 CR LoRA Stack 節點
+			else if (classType === "CR LoRA Stack" || classType === "CR Random LoRA Stack") {
+				/*
+				"28": {
+					"inputs": {
+					"switch_1": "Off",
+					"lora_name_1": "None",
+					"model_weight_1": 1,
+					"clip_weight_1": 1,
+					"switch_2": "On",
+					"lora_name_2": "\AAA.safetensors",
+					"model_weight_2": 1,
+					"clip_weight_2": 1,
+					"switch_3": "Off",
+					"lora_name_3": "None",
+					"model_weight_3": 1,
+					"clip_weight_3": 1
+					},
+					"class_type": "CR LoRA Stack"
+				}*/
+
+				// CR Random LoRA Stack 才有的屬性
+				if (item["exclusive_mode"] === "Off") { continue; }
+
+				for (let i = 1; i <= 50; i++) {
+
+					// 只顯示開啟的
+					let switchName = intputs["switch_" + i];
+					if (switchName === "Off") { continue; }
+
+					let loraName = intputs["lora_name_" + i];
+					if (loraName === undefined) { break; }
+					let modelWeight = intputs["model_weight_" + i];
+					if (modelWeight === undefined) { break; }
+					let clipWeight = intputs["clip_weight_" + i];
+					if (clipWeight === undefined) { break; }
+
+					if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
+					let jsonFormat = Lib.stringifyWithNewlines({
+						"Model Strength": modelWeight,
+						"Clip Strength": clipWeight
+					}, true, true);
+					arLora.push({ title: loraName, text: jsonFormat });
 				}
-			});
-			let jsonFormat = Lib.jsonStrFormat(arStrength).jsonFormat;
-			retPush("Lora", [{ title: loraName, text: jsonFormat }]);
-			ar.push(loraName);
+
+			}
+
+			// 節點內有 lora_name 屬性，則視為 LoRA 節點
+			else {
+				let loraName = intputs["lora_name"];
+				if (loraName === undefined || loraName === null
+					|| loraName === "None" || loraName === "none") {
+					continue;
+				}
+
+				let arStrength: any = {};
+				let keys = Object.keys(intputs);
+				keys.forEach(key => {
+					let value = intputs[key];
+					let type = typeof value;
+					if (type === "number" || type === "string") {
+						if (key === "strength_model" || key === "lora_model_strength") {
+							arStrength["Model Strength"] = value;
+						}
+						else if (key === "strength_clip" || key === "lora_clip_strength") {
+							arStrength["Clip Strength"] = value;
+						}
+						else if (key.includes("strength")) {
+							arStrength[key] = value;
+						}
+					}
+				});
+				if (Object.keys(arStrength).length === 0) { continue; } // 如果沒有任何屬性，則略過
+				let jsonFormat = Lib.stringifyWithNewlines(arStrength, true, true);
+				arLora.push({ title: loraName, text: jsonFormat });
+			}
+
 		}
+
+		retPush("LoRA", arLora);
 
 		return retData;
 	}

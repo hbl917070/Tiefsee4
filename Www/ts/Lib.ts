@@ -560,7 +560,7 @@ class Lib {
     }
 
     /**
-     * 格式化 json 字串
+     * 格式化成 json 字串
      */
     public static jsonStrFormat(str: string, space?: string | number | undefined) {
         if (space === undefined) { space = 2; }
@@ -591,6 +591,30 @@ class Lib {
         }
     }
 
+    /**
+     * 單純只處理換行而沒有縮排的格式化
+     * @param obj 
+     * @param removeBrackets 去除前後的 { }
+     * @param removeQuotationMarks 去除"字元
+     * @returns 
+     */
+    public static stringifyWithNewlines(obj: any, removeBrackets: boolean = false, removeQuotationMarks: boolean = false) {
+
+        let jsonFormat = JSON.stringify(obj, null, "\uFDD9");
+        jsonFormat = jsonFormat.replace(/\uFDD9/g, "");
+
+        // 去除前後的 { }
+        if (removeBrackets) {
+            if (jsonFormat.startsWith("{") && jsonFormat.endsWith("}")) {
+                jsonFormat = jsonFormat.substring(2, jsonFormat.length - 1);
+            }
+        }
+        // 去除"字元
+        if (removeQuotationMarks) {
+            jsonFormat = jsonFormat.replace(/"/g, "");
+        }
+        return jsonFormat;
+    }
 
     /** file 轉 base64 */
     public static async readFileAsDataURL(file: File): Promise<string> {
