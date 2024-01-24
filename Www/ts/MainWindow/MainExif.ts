@@ -243,6 +243,9 @@ class MainExif {
 			let deferredFunc: (() => void)[] = []; // 最後才執行的函數
 			let comfyuiPrompt: string | undefined;
 			let comfyuiWorkflow: string | undefined;
+			let comfyuiGenerationData: any | undefined;
+			let comfyScript: any | undefined;
+
 
 			// 待影片載入完畢，更新「影片長度」的資訊
 			async function updateVideoDuration(domVideo: HTMLElement) {
@@ -268,6 +271,14 @@ class MainExif {
 					}
 					await Lib.sleep(100);
 				}
+			}
+
+			// 不重要的資訊，排到最後面才顯示
+			function lastItem(name: string, val: string) {
+				let itemDom = getItemDom(name, val);
+				deferredFunc.push(() => {
+					domTabContentInfo.appendChild(itemDom);
+				})
 			}
 
 			let ar = json.data;
@@ -371,6 +382,16 @@ class MainExif {
 							let name = val.substring(0, x);
 							val = val.substring(x + 1).trim();
 
+							//  NovelAI 才有的欄位。此欄位與解析後的 prompt 相同，所以不顯示
+							if (name === "Description") {
+								let prompt = ar.find(x => x.name === "Textual Data" && x.value.startsWith("Comment: {\"prompt\": "));
+								if (prompt !== undefined) {
+									if (prompt.value.indexOf(val) === 21) { // 開頭為「Comment: {"prompt": "」
+										continue;
+									}
+								}
+							}
+
 							if (name === "Comment") { // NovelAI 才有的欄位
 								if (val.includes(`"steps": `)) {
 									AiDrawingPrompt.getNovelai(val).forEach(item => {
@@ -380,17 +401,22 @@ class MainExif {
 									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
-							
+							else if (name === "Generation time") { // ComfyUI
+								// 這個資訊不重要，所以排到最後面
+								lastItem(name, val);
+								continue;
+							}
+
 							else if (name === "metadata") { // 不明，資料為一般的 json
 								if (val.includes(`"seed": `)) {
-									AiDrawingPrompt.getNovelai(val).forEach(item => {
+									AiDrawingPrompt.getNormalJson(val).forEach(item => {
 										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
 									domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
-							
+
 							else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 								if (val.includes("Steps: ")) {
 									AiDrawingPrompt.getSdwebui(val).forEach(item => {
@@ -407,6 +433,12 @@ class MainExif {
 							else if (name === "workflow") { // ComfyUI
 								comfyuiWorkflow = val;
 							}
+							else if (name === "generation_data") { // ComfyUI
+								comfyuiGenerationData = val;
+							}
+							else if (name === "ComfyScript") { // ComfyUI
+								comfyScript = val;
+							}
 
 							else if (name === "sd-metadata" || name === "invokeai_metadata" || name === "invokeai_graph" || name === "Dream") { // invoke ai
 								if (name === "invokeai_graph") {
@@ -415,10 +447,7 @@ class MainExif {
 
 								// 這個資訊不重要，所以排到最後面
 								if (name === "Dream") {
-									let itemDom = getItemDom(name, val);
-									deferredFunc.push(() => {
-										domTabContentInfo.appendChild(itemDom);
-									})
+									lastItem(name, val);
 									continue;
 								}
 
@@ -462,11 +491,12 @@ class MainExif {
 				}
 			}
 
+			// 最後才執行的函數
 			deferredFunc.forEach(func => {
 				func();
 			});
 
-			// ComfyUI 解析後的資料
+			// 解析 ComfyUI 
 			if (comfyuiPrompt !== undefined) {
 				let jsonF = Lib.jsonStrFormat(comfyuiPrompt);
 				if (jsonF.ok) { // 解析欄位		
@@ -477,7 +507,6 @@ class MainExif {
 
 						// 折疊面板
 						let collapseDom = getCollapseDom(node, true);
-						console.log()
 						data.forEach(item => {
 							collapseDom.domContent.appendChild(getItemDom(item.title, item.text));
 						});
@@ -486,11 +515,26 @@ class MainExif {
 				}
 			}
 
+			// 把 ComfyScript 放在最下面，並預設展開
+			if (comfyScript !== undefined) {
+				// 折疊面板
+				let collapseDom = getCollapseDom("ComfyScript", true);
+				collapseDom.domContent.appendChild(getItemDom("ComfyScript", comfyScript));
+				domTabContentInfo.appendChild(collapseDom.domBox);
+			}
 			// 把 ComfyUI 的原始資料放在最下面，並預設折疊
 			if (comfyuiPrompt !== undefined || comfyuiWorkflow !== undefined) {
 				// 折疊面板
 				let collapseDom = getCollapseDom("ComfyUI Data", false);
 
+				if (comfyuiGenerationData !== undefined) {
+					let jsonF = Lib.jsonStrFormat(comfyuiGenerationData);
+					if (jsonF.ok) { // 解析欄位
+						collapseDom.domContent.appendChild(getItemDom("Generation Data", jsonF.jsonFormat));
+					} else {
+						collapseDom.domContent.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
+					}
+				}
 				if (comfyuiPrompt !== undefined) {
 					if (typeof comfyuiPrompt === "object") { // 從 mp4 提取出來的 Prompt 是 json，所以要轉回 string
 						try {
@@ -504,6 +548,19 @@ class MainExif {
 				}
 				domTabContentInfo.appendChild(collapseDom.domBox);
 			}
+			// 不存在 ComfyUI 的資料，但是有 GenerationData，則直接顯示
+			else if (comfyuiGenerationData !== undefined) {
+
+				if (comfyuiGenerationData.includes(`"seed":`)) {
+					AiDrawingPrompt.getNormalJson(comfyuiGenerationData).forEach(item => {
+						domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+					})
+				} else {
+					domTabContentInfo.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
+				}
+
+			}
+
 
 		}
 
@@ -828,7 +885,6 @@ class MainExif {
 				domContent: domContentList,
 			};
 		}
-
 
 		/** 
 		 * exif 項目的 dom
