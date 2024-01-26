@@ -1,4 +1,4 @@
-﻿using MetadataExtractor;
+using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using System.IO;
 using System.Text;
@@ -250,7 +250,7 @@ public class Exif {
                     value = animationInfo.FrameCount.ToString()
                 });
             }
-            if (animationInfo.LoopCount > 1) {
+            if (animationInfo.LoopCount > 0) {
                 exif.data.Add(new ImgExifItem {
                     group = "Frames",
                     name = "Loop Count",
@@ -271,7 +271,7 @@ public class Exif {
             }
 
             // 循環次數
-            if (apngInfo.LoopCount > 1) {
+            if (apngInfo.LoopCount > 0) {
                 exif.data.Add(new ImgExifItem {
                     group = "Frames",
                     name = "Loop Count",
