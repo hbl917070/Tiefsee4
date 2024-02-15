@@ -1,4 +1,4 @@
-﻿using System.Drawing.Imaging;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -39,6 +39,13 @@ public class WV_Image {
             System.Windows.Forms.MessageBox.Show(e.ToString());
         }
         return base64String;
+    }
+
+    /// <summary>
+    /// 將圖片的 base64 存入暫存資料夾
+    /// </summary>
+    public string Base64ToTempImg(string path, string base64) {
+        return ImgLib.Base64ToTempImg(path, base64);
     }
 
 }

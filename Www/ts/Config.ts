@@ -402,10 +402,10 @@ class Config {
         },
     }
 
-    private _allowFile_img: { ext: string; type: string; vipsType?: string; }[] = [];
-    private _allowFile_video: { ext: string; type: string; vipsType?: string; }[] = [];
-    private _allowFile_pdf: { ext: string; type: string; vipsType?: string; }[] = [];
-    private _allowFile_txt: { ext: string; type: string; vipsType?: string; }[] = [];
+    private _allowFile_img: { ext: string; type: string; vipsType?: string; vipsType2?: string; }[] = [];
+    private _allowFile_video: { ext: string; type: string; vipsType?: string; vipsType2?: string; }[] = [];
+    private _allowFile_pdf: { ext: string; type: string; vipsType?: string; vipsType2?: string; }[] = [];
+    private _allowFile_txt: { ext: string; type: string; vipsType?: string; vipsType2?: string; }[] = [];
     /** 
      * 初始化 檔案關聯列表
      */
@@ -417,7 +417,7 @@ class Config {
         // img
         (() => {
             this._allowFile_img = [
-                { ext: "jpg", type: "vips", vipsType: "jpg" }, // 如果檔案的ICC Profile為CMYK，則先使用WPF處理圖片
+                { ext: "jpg", type: "vips", vipsType: "jpg" }, // 如果檔案的 ICC Profile 為 CMYK，則先使用 WPF 處理圖片
                 { ext: "jpeg", type: "vips", vipsType: "jpg" },
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
                 { ext: "jpe", type: "vips", vipsType: "jpg" },
@@ -429,6 +429,10 @@ class Config {
                 { ext: "svg", type: "web" },
                 { ext: "ico", type: "web" },
 
+                // 優先使用 vips 處理圖片，失敗則直接在瀏覽器用 canvase 處理成 base64
+                { ext: "avif", type: "vips", vipsType: "avif", vipsType2: "base64" },
+                { ext: "avifs", type: "web" },
+
                 { ext: "tif", type: "vips", vipsType: "tif" },
                 { ext: "tiff", type: "vips", vipsType: "tif" },
                 { ext: "dds", type: "vips", vipsType: "wpf" },
@@ -438,7 +442,7 @@ class Config {
                 { ext: "pcx", type: "vips", vipsType: "magick" },
                 { ext: "heic", type: "vips", vipsType: "magick" },
                 { ext: "heif", type: "vips", vipsType: "magick" },
-                { ext: "avif", type: "vips", vipsType: "wpf,magick" }, // 如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
+                // { ext: "avif", type: "vips", vipsType: "wpf,magick" }, // 如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: "vips", vipsType: "magick" },
                 { ext: "dcm", type: "vips", vipsType: "magick" }, // 多幀
                 { ext: "hdr", type: "vips", vipsType: "magick" }, // 必須輸出成png顏色才不會跑掉
@@ -481,17 +485,6 @@ class Config {
                 { ext: "afdesign", type: "vips", vipsType: "extractPng" },
                 { ext: "clip", type: "vips", vipsType: "clip" },
             ]
-
-            // 有安裝NConvert才使用
-            /*if (plugin.NConvert === true) {
-                this._allowFile_img.push(
-                    { ext: "afphoto", type: "vips", vipsType: "nconvertPng" },
-                    { ext: "afdesign", type: "vips", vipsType: "nconvertPng" },
-                    { ext: "dcm", type: "vips", vipsType: "magick,nconvertJpg" },
-                    //{ ext: "iff",    type:"vips", vipsType: "nconvertJpg" }, //必須使用 heif.zip 裡面的dll
-                    { ext: "clip", type: "vips", vipsType: "nconvertJpg" }, //必須使用 clip.dll
-                );
-            }*/
 
         })();
 

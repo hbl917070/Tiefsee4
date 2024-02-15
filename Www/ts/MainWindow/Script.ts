@@ -358,21 +358,44 @@ class ScriptImg {
         let height = -1;
         let isAnimation = Lib.IsAnimation(fileInfo2); // 判斷是否為動圖
         let isFail = false; // true表示圖片載入失敗，回傳 icon
+        let path = fileInfo2.Path;
 
         if (isAnimation) {
-
             let imgInitInfo = await WebAPI.Img.webInit(fileInfo2);
             if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
                 height = imgInitInfo.height;
                 arUrl.push({ scale: 1, url: imgInitInfo.path });
             }
-
-        } else if (configType === "vips") {
+        }
+        else if (configType === "vips") {
 
             let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
-            if (imgInitInfo.code == "1") {
+            
+            // 如果處理失敗，且 vipsType2 = base64，則先用 canvas 處理成 base64 再上傳到暫存資料夾
+            if (imgInitInfo.code != "1" && configItem.vipsType2 === "base64") {
+                // console.log("處理失敗，改用 canvas 來處理");
+                let url = Lib.pathToURL(path);
+                await this.preloadImg(url);
+                let can = this.urlToCanvas(url);
+                let blob = await this.getCanvasBlob(can, 1, "medium", "png", 0.9);
 
+                if (blob === null) {
+                    isFail = true;
+                } else {
+                    let base64 = await this.blobToBase64(blob);
+                    if (base64 !== null) {
+                        await WV_Image.Base64ToTempImg(path, base64 as string);
+                        imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+                    } else {
+                        isFail = true;
+                    }
+                }
+
+                imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+            }
+
+            if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
                 height = imgInitInfo.height;
 
@@ -391,11 +414,11 @@ class ScriptImg {
                     let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType);
                     arUrl.push({ scale: scale, url: imgU })
                 }
-
             }
 
-        } else { // 直接開啟網址
+        }
 
+        else { // 直接開啟網址
             let url = await WebAPI.Img.getUrl(configType, fileInfo2); // 取得圖片網址
             let imgInitInfo = await WebAPI.Img.webInit(url);
             if (imgInitInfo.code == "1") {
@@ -403,7 +426,6 @@ class ScriptImg {
                 height = imgInitInfo.height;
                 arUrl.push({ scale: 1, url: imgInitInfo.path });
             }
-
         }
 
         if (width === -1) {
@@ -468,7 +490,7 @@ class ScriptImg {
         return domCan;
     }
 
-    /** 取得縮放後的Canvas*/
+    /** 取得縮放後的 Canvas */
     public getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: ("high" | "low" | "medium")) {
 
         let width = Math.floor(img.width * zoom);
@@ -485,9 +507,9 @@ class ScriptImg {
     }
 
     /**
-     * 從Canvas取得Blob
+     * 從 canvas 取得 blob
      */
-    public async getCanvasBlob(can: HTMLCanvasElement, zoom: number, quality: "high" | "low" | "medium", type = "png", q = 0.8) {
+    public async getCanvasBlob(can: HTMLCanvasElement, zoom: number, quality: "high" | "low" | "medium", type = "png", q = 0.8, bg = "") {
 
         // let can = await getCanvas();
         if (can === null) { return null; }
@@ -514,7 +536,9 @@ class ScriptImg {
                 cc.width = can.width;
                 cc.height = can.height;
                 let context = cc.getContext("2d") as CanvasRenderingContext2D;
-                context.fillStyle = "#FFFFFF"; // 填滿顏色
+                if (bg !== "" && bg !== null && bg !== undefined) {
+                    context.fillStyle = bg; // 填滿顏色
+                }
                 context.fillRect(0, 0, can.width, can.height);
                 context.drawImage(can, 0, 0, can.width, can.height);
                 can = cc;
@@ -531,7 +555,7 @@ class ScriptImg {
     }
 
     /**
-     * blob to Base64
+     * blob to base64
      */
     public async blobToBase64(blob: Blob): Promise<string | ArrayBuffer | null> {
         return new Promise((resolve, _) => {
@@ -1300,11 +1324,11 @@ class ScriptCopy {
             let imtUrl = imgData.arUrl[0].url;
             let p = await this.M.script.img.preloadImg(imtUrl);
             if (p === false) {
-                console.log(" 複製影像失敗。無法載入圖片");
+                console.log("複製影像失敗。無法載入圖片");
                 return null;
             }
             let canvas = await this.M.script.img.urlToCanvas(imtUrl);
-            let blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png");
+            let blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png", 0.9);
             if (blob === null) { return; }
             let base64 = await this.M.script.img.blobToBase64(blob);
             if (typeof base64 !== "string") { return; }
@@ -1373,7 +1397,7 @@ class ScriptCopy {
                 return null;
             }
             let canvas = await this.M.script.img.urlToCanvas(imtUrl);
-            let blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png");
+            let blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png", 0.9);
             if (blob === null) { return; }
             let base64 = await this.M.script.img.blobToBase64(blob);
             if (typeof base64 !== "string") { return; }

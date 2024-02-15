@@ -100,7 +100,7 @@ class ImgSearch {
                     return null;
                 }
                 let canvas = await M.script.img.urlToCanvas(imtUrl);
-                blob = await M.script.img.getCanvasBlob(canvas, zoom, "medium", "jpg");
+                blob = await M.script.img.getCanvasBlob(canvas, zoom, "medium", "jpg", 0.8, "#FFFFFF");
             }
 
             if (blob === undefined) { return null; }

@@ -137,10 +137,10 @@ class Lib {
         if (Lib.GetExtension(fileInfo2.Path) === ".svg") {
             return true;
         }
-        if (hex.indexOf("47 49 46 38") === 0) { // gif
+        if (hex.startsWith("47 49 46 38")) { // gif
             return true;
         }
-        if (hex.indexOf("89 50 4E 47 0D 0A 1A 0A") === 0) { // apng
+        if (hex.startsWith("89 50 4E 47 0D 0A 1A 0A")) { // apng
             if (hex.indexOf("08 61 63 54") > 10) { // acTL
                 return true;
             }
@@ -149,6 +149,9 @@ class Lib {
             if (hex.indexOf("41 4E 49 4D") > 0) { // ANIM
                 return true;
             }
+        }
+        if (hex.includes("66 74 79 70 61 76 69 73")) { // avif
+            return true;
         }
         return false;
     }
@@ -163,6 +166,17 @@ class Lib {
         let fileExt = Lib.GetExtension(fileInfo2.FullPath); // 取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
         let hex = fileInfo2.HexValue;
+
+        /*console.log(fileInfo2.Path);
+        let sum = "";
+        let sum2 = "";
+        hex.split(" ").forEach(item => {
+            sum += String.fromCharCode(parseInt(item, 16));
+            sum2 += `${item}(${String.fromCharCode(parseInt(item, 16))}) `;
+        });
+        console.log(hex);
+        console.log(sum2);
+        console.log(sum);*/
 
         if (hex.indexOf("FF D8 FF") === 0) {
             return "jpg";
@@ -228,17 +242,6 @@ class Lib {
             return "psd";
         }
 
-        /*console.log("檔案類型辨識失敗: " + fileInfo2.Path);
-        let sum = "";
-        let sum2 = "";
-        hex.split(" ").forEach(item => {
-            sum += String.fromCharCode(parseInt(item, 16));
-            sum2 += `${item}(${String.fromCharCode(parseInt(item, 16))}) `;
-        });
-        console.log(hex);
-        console.log(sum2);
-        console.log(sum);*/
-
         return fileExt;
     }
 
@@ -262,6 +265,9 @@ class Lib {
      * URL 轉 路徑
      */
     public static URLToPath(path: string): string {
+
+        path = path.split("?")[0]; // 刪除 URL 中的查詢參數
+
         if (path.indexOf("file:///") === 0) { // 一般檔案
             path = path.substring(8);
         } else if (path.indexOf("file://") === 0) { // 網路路徑，例如 \\Desktop-abc\AA
@@ -366,7 +372,7 @@ class Lib {
     }
 
     /**
-     * 送出 GET 的http請求
+     * 送出 GET 的 http 請求
      */
     public static async sendGet(type: ("text" | "json" | "base64"), url: string) {
 
@@ -629,7 +635,7 @@ class Lib {
             reader.readAsDataURL(file);
         });
     }
-    /** 從base64判斷副檔名 */
+    /** 從 base64 判斷副檔名 */
     public static async getExtensionFromBase64(base64: string) {
         if (base64.length < 100) { return ""; }
         const base64Header = base64.slice(0, 100);
@@ -667,7 +673,7 @@ class Lib {
                 return "";
         }
     }
-    /** 檢測未知類型的base64是否為合法的圖片 */
+    /** 檢測未知類型的 base64 是否為合法的圖片 */
     public static async isValidImageBase64(base64: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const img = new Image();

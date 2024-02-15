@@ -123,7 +123,7 @@ class WebAPI {
         }
 
         /**
-         * 取得圖片的size，然後把檔案處理成vips可以載入的格式，寫入到暫存資料夾
+         * 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
          */
         static async vipsInit(vipsType: string, fileInfo2: FileInfo2) {
             let _path = fileInfo2.Path;
@@ -140,7 +140,7 @@ class WebAPI {
         }
 
         /**
-         * 取得圖片網址 (以vips縮放過的圖片)
+         * 取得圖片網址 (以 vips 縮放過的圖片)
          */
         static vipsResize(scale: number, fileInfo2: FileInfo2, type: string) {
             let _path = fileInfo2.Path;
@@ -151,7 +151,7 @@ class WebAPI {
         }
 
         /**
-         * 載入圖片，並取得圖片的size
+         * 載入圖片，並取得圖片的 size
          */
         static async webInit(data: FileInfo2 | string) {
 
@@ -173,7 +173,7 @@ class WebAPI {
             await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     code = "1";
-                    width = img.naturalWidth; // 初始化圖片size
+                    width = img.naturalWidth; // 初始化圖片 size
                     height = img.naturalHeight;
                     resolve(true);
                 });

@@ -222,11 +222,18 @@ class FileShow {
                 let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                 if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
 
-                await tiefseeview.loadBigimgscale(
-                    arUrl,
-                    width, height,
-                    _zoomType, _zoomVal
-                );
+                if (arUrl.length === 1) {
+                    await tiefseeview.loadBigimg(
+                        arUrl[0].url
+                    );
+
+                } else {
+                    await tiefseeview.loadBigimgscale(
+                        arUrl,
+                        width, height,
+                        _zoomType, _zoomVal
+                    );
+                }
             }
 
             initTiefseeview(fileInfo2);

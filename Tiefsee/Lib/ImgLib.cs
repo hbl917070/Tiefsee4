@@ -400,7 +400,7 @@ public class ImgLib {
             argOut = "-out tiff";
         }
         else if (type == "png") {
-            argOut = "-clevel 0 -out png"; //輸出成不壓縮的png
+            argOut = "-clevel 0 -out png"; //輸出成不壓縮的 png
         }
         else {
             argOut = "-out bmp";
@@ -416,7 +416,7 @@ public class ImgLib {
 
 
     /// <summary>
-    /// Nconvert 取得檔案資訊(exif
+    /// Nconvert 取得檔案資訊 (exif
     /// </summary>
     public static string Nconvert_PathToInfo(string path) {
         string arg = $"-quiet -fullinfo \"{path}\"";
@@ -457,17 +457,17 @@ public class ImgLib {
 
     private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
 
-    /// <summary> vips的暫存 </summary>
+    /// <summary> vips 的暫存 </summary>
     private class DataVips {
         public string key;
         public NetVips.Image vips;
     }
 
-    /// <summary> vips的暫存 </summary>
+    /// <summary> vips 的暫存 </summary>
     private static List<DataVips> tempArNewVips = new List<DataVips>();
 
     /// <summary>
-    /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要using
+    /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要 using
     /// </summary>
     public static NetVips.Image GetNetVips(string path, string type) {
 
@@ -507,7 +507,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 使用wpf來取得圖片size
+    /// 使用 wpf 來取得圖片 size
     /// </summary>
     /// <param name="path"></param>
     /// <param name="autoOrientation"> 如果圖片有旋轉90°或270°，就長寬對調 </param>
@@ -548,14 +548,14 @@ public class ImgLib {
 
         int[] ret = new int[] { w, h };
         lock (temp_GetImgSize) {
-            temp_GetImgSize.Add(hash, ret); //存入暫存
+            temp_GetImgSize.Add(hash, ret); // 存入暫存
         }
 
         return ret;
     }
 
     /// <summary>
-    /// 取得圖片的size，然後把檔案處理成vips可以載入的格式，寫入到暫存資料夾
+    /// 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
     /// </summary>
     public static ImgInitInfo GetImgInitInfo(string path, string type) {
 
@@ -586,6 +586,15 @@ public class ImgLib {
             VipsSave(vImg, path100, "auto");
 
             return GetImgInitInfo(path100, "vips");
+        }
+
+        if (type == "avif") {
+            NetVips.Image vImg = GetNetVips(path, "avif");
+            VipsSave(vImg, path100, "auto");
+            imgInfo.width = vImg.Width;
+            imgInfo.height = vImg.Height;
+            imgInfo.code = "1";
+            imgInfo.path = path100;
         }
 
         if (type == "jpg") {
@@ -690,7 +699,27 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 縮放圖片，並且存入暫存資料夾 (只支援jpg、png、tif、webp)
+    /// 將圖片的 base64 存入暫存資料夾
+    /// </summary>
+    public static string Base64ToTempImg(string path, string base64) {
+        string path100 = PathToImg100(path);
+        try {
+            // 把 Base64 儲存成檔案
+            int x = base64.IndexOf("base64,"); // 去掉開頭的 data:image/png;base64,
+            if (x != -1) { base64 = base64.Substring(x + 7); }
+            byte[] buffer = Convert.FromBase64String(base64);
+            File.WriteAllBytes(path100, buffer);
+
+            return path;
+        }
+        catch (Exception e) {
+            Console.WriteLine(e.Message);
+            return "false";
+        }
+    }
+
+    /// <summary>
+    /// 縮放圖片，並且存入暫存資料夾 (只支援 jpg、png、tif、webp)
     /// </summary>
     public static string VipsResize(string path, double scale, string type) {
 
@@ -724,7 +753,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// vips儲存檔案
+    /// vips 儲存檔案
     /// </summary>
     /// <param name="vImg"></param>
     /// <param name="path"></param>
@@ -755,11 +784,11 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 檢查vips是否包含透明色
+    /// 檢查 vips 是否包含透明色
     /// </summary>
     public static bool VipsHasTransparent(NetVips.Image im) {
 
-        int bands = im.Bands; // 取得色板的數量，例如rgb=4、rgba=4
+        int bands = im.Bands; // 取得色板的數量，例如 rgb=4、rgba=4
         bool hasAlpha =
            bands == 2 ||
            bands > 4 ||
@@ -768,7 +797,7 @@ public class ImgLib {
         if (hasAlpha == false) { return false; } // 如果不含透明色板就直接回傳
 
         var d = im[im.Bands - 1].Min(); // 取得最後一個色板的最小值
-        return d != 255; // 如果不是255，表示有不透明的顏色
+        return d != 255; // 如果不是 255，表示有不透明的顏色
     }
 
     /// <summary>

@@ -518,6 +518,13 @@ interface WV_Image {
      * @returns base64
      */
     GetFileIcon(path: string, size: (16 | 32 | 64 | 128 | 256)): string;
+
+    /**
+     * 將圖片的 base64 存入暫存資料夾
+     * @param path 檔案路徑
+     * @param base64 
+     */
+    Base64ToTempImg(path: string, base64: string): string;
 }
 
 interface AppInfo {
