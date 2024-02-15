@@ -11,7 +11,7 @@ const newer = require("gulp-newer");
 const fc2json = require("gulp-file-contents-to-json"); // 處理 svg
 const jsonTransform = require("gulp-json-transform"); // 處理 svg
 
-const output2 = "./../Tiefsee/bin/x64/Debug/net7.0-windows10.0.17763.0/Www"; // 把打包後的檔案也複製到開發資料夾 (用於方便測試)
+const output2 = "./../Tiefsee/bin/x64/Debug/net8.0-windows10.0.17763.0/Www"; // 把打包後的檔案也複製到開發資料夾 (用於方便測試)
 
 // 資料夾內的所有svg 封裝成一個 js
 gulp.task("svg", async () => {

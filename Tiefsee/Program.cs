@@ -83,6 +83,7 @@ static class Program {
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
+        Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // 高 DPI 模式
 
         //--disable-web-security  允許跨域請求
         //--disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單

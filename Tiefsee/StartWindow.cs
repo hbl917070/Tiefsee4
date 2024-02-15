@@ -1,4 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Core;
 using System.IO;
 using System.Windows.Input;
 
@@ -235,7 +235,7 @@ public class StartWindow : Form {
     }
     private bool IsWebView2Runtime() {
         try {
-            var str = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
+            var str = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString(null);
             if (!string.IsNullOrWhiteSpace(str)) {
                 return true;
             }

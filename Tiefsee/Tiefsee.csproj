@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.17763.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -24,6 +24,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DebugType>full</DebugType>
+		<Optimize>False</Optimize>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -37,7 +38,7 @@
 	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.5.0" />
 		<PackageReference Include="MetadataExtractor" Version="2.8.1" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2151.40" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2277.86" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
