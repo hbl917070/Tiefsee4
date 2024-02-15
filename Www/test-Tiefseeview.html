@@ -76,8 +76,7 @@
         <option value="video">影片</option>
     </select>
 
-    <input type="text" id="imgurl"
-        value="https://wall.bahamut.com.tw/B/07/7d41a3dde7ab7ad8489d8c116d07ef56_0779698.JPG">
+    <input type="text" id="imgurl" value="https://wall.bahamut.com.tw/B/07/7d41a3dde7ab7ad8489d8c116d07ef56_0779698.JPG">
 
     <hr>
     <button onclick="tv.zoomFull(TiefseeviewZoomType['fitWindowOrImageOriginal'])">全滿</button>
@@ -128,15 +127,20 @@
 
 
     <script>
-
         var tv;
 
         async function loadurl() {
             let _url = $("#imgurl").val();
             let type = $("#select-type").val()
-            if (type == "img") { await tv.loadImg(_url); }
-            if (type == "bigimg") { await tv.loadBigimg(_url); }
-            if (type == "video") { await tv.loadVideo(_url); }
+            if (type == "img") {
+                await tv.loadImg(_url);
+            }
+            if (type == "bigimg") {
+                await tv.loadBigimg(_url);
+            }
+            if (type == "video") {
+                await tv.loadVideo(_url);
+            }
 
             tv.transformRefresh(false)
             tv.zoomFull(TiefseeviewZoomType["fitWindowOrImageOriginal"]);
@@ -147,9 +151,10 @@
         document.addEventListener("DOMContentLoaded", async () => {
 
             tv = new Tiefseeview(document.querySelector("#tiefseeview"));
+            tv.showClip(true);
             //tv.setOverflowDistance(0);
             loadurl()
-
+            tv.setMargin(30, 30, 30, 30);
             tv.setEventChangeZoom((ratio) => {
                 $("#output-zoom").html((ratio * 100).toFixed(2) + "%");
                 $("#output-overflow").html(`水平:${tv.getIsOverflowX()}、垂直:${tv.getIsOverflowY()}`);
@@ -164,6 +169,7 @@
             tv.setEventChangeXY((x, y) => {
                 $("#output-xy").html(`${x.toFixed(2)} , ${y.toFixed(2)}`);
             })
+            tv. getClipInfo()
         });
 
 
@@ -172,7 +178,6 @@
             //console.log(range_dge.value)
             tv.setDeg(range_dge.value, undefined, undefined, false, true)
         })
-
     </script>
 
 </body>
