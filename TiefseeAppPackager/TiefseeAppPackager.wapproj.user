@@ -19,4 +19,7 @@
     <DebuggerFlavor>AppHostLocalDebugger</DebuggerFlavor>
     <RemoteDebugEnabled>False</RemoteDebugEnabled>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebuggerFlavor>AppHostLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

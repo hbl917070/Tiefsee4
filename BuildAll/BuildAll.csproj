@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+
+		<!-- 不產生 .deps.json 檔案 -->
+		<GenerateDependencyFile>false</GenerateDependencyFile>
+		<!-- 不產生 .pdb 檔案 -->
+		<DebugType>none</DebugType>
+
+		<Platforms>x64</Platforms>
+		<Configurations>Debug</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<DebugType>full</DebugType>
+		<Optimize>False</Optimize>
+		<OutputPath>../Output/</OutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<DebugType>full</DebugType>
+		<OutputPath>../Output/</OutputPath>
+	</PropertyGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="del $(TargetDir)$(TargetName).dll" />
+
+		<!-- 編譯這些專案 -->
+		<MSBuild Projects="..\TiefseeLauncher\TiefseeLauncher.csproj" />
+		<MSBuild Projects="..\Tiefsee\Tiefsee.csproj" />
+
+		<!-- 刪除無用檔案 -->
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\Tiefsee.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\TiefseeCore.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.pdb" />
+	</Target>
+
+	<!-- 打包成 zip -->
+	<Target Name="ZipOutputPath" AfterTargets="Build">
+		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)\..\Output" DestinationFile="$(MSBuildProjectDirectory)\..\Tiefsee.zip" />
+	</Target>
+
+</Project>

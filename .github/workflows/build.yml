@@ -42,11 +42,11 @@ jobs:
       run: nuget restore Tiefsee4.sln
  
     - name: Build Solution and archive artifacts
-      run: msbuild Tiefsee4.sln /t:Tiefsee /p:Configuration=Release /p:Platform="x64" /p:DeleteExistingFiles=True
+      run: msbuild Tiefsee4.sln /t:BuildAll /p:Configuration=Release /p:Platform="x64" /p:DeleteExistingFiles=True
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Tiefsee
-        path: Tiefsee/Tiefsee.zip
+        path: Tiefsee.zip
         if-no-files-found: error

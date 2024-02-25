@@ -9,9 +9,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/Tiefsee/bin/Debug/net7.0-windows10.0.17763.0/Tiefsee.dll",
+      "program": "${workspaceFolder}/Output/TiefseeCore.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/Tiefsee",
+      "cwd": "${workspaceFolder}/Output",
       "console": "internalConsole",
       "stopAtEntry": false
     },
@@ -20,9 +20,20 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "watch",
-      "program": "${workspaceFolder}/Tiefsee/bin/Debug/net7.0-windows10.0.17763.0/Tiefsee.dll",
+      "program": "${workspaceFolder}/Output/TiefseeCore.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/Tiefsee",
+      "cwd": "${workspaceFolder}/Output",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": ".NET Core Launch (build all)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "buildAll",
+      "program": "${workspaceFolder}/Output/Tiefsee.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Output",
       "console": "internalConsole",
       "stopAtEntry": false
     }

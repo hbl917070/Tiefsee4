@@ -503,7 +503,7 @@ class SettingWindow {
                         + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         msgbox.close(dom);
-                        let appPath = await WV_Window.GetAppPath();
+                        let appPath = await WV_Window.GetTiefseePath();
                         await WV_System.AssociationExtension(ar, appPath);
                         msgbox.show({ txt: i18n.t("msg.done"), }); // 處理完成
                     }
@@ -526,7 +526,7 @@ class SettingWindow {
                         + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         msgbox.close(dom);
-                        let appPath = await WV_Window.GetAppPath();
+                        let appPath = await WV_Window.GetTiefseePath();
                         await WV_System.RemoveAssociationExtension(ar, appPath);
                         msgbox.show({ txt: i18n.t("msg.done"), }); // 處理完成
                     }
@@ -1224,7 +1224,7 @@ class SettingWindow {
                 switch_autoStart.addEventListener("change", async () => {
                     let val = switch_autoStart.checked;
                     if (val) { // 產生捷徑
-                        let exePath = await WV_Window.GetAppPath();
+                        let exePath = await WV_Window.GetTiefseePath();
                         WV_System.NewLnk(exePath, linkPath, "none");
                     } else { // 刪除捷徑
                         WV_File.Delete(linkPath);

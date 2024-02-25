@@ -1146,7 +1146,7 @@ class ScriptOpen {
         if (path === undefined) {
             path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
-        let exePath = await WV_Window.GetAppPath();
+        let exePath = await WV_Window.GetTiefseePath();
         await this.M.saveSetting();
         WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
     }
@@ -1156,7 +1156,7 @@ class ScriptOpen {
         if (path === undefined) {
             path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
-        let exePath = await WV_Window.GetAppPath();
+        let exePath = await WV_Window.GetTiefseePath();
         await this.M.saveSetting();
         WV_RunApp.ProcessStart(exePath, `showFrames "${path}"`, true, false);
     }

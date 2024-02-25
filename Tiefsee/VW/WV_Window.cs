@@ -213,11 +213,26 @@ public class WV_Window {
     }
 
     /// <summary>
-    /// 取得執行檔路徑
+    /// 取得執行檔路徑 (TiefseeCore.exe 的路徑)
     /// </summary>
     public string GetAppPath() {
         string exePath = Process.GetCurrentProcess().MainModule.FileName;
         return exePath;
+    }
+
+    /// <summary>
+    /// 取得 Tiefsee.exe 的路徑
+    /// </summary>    
+    public string GetTiefseePath() {
+        var dir = GetAppDirPath();
+
+        var path = Path.Combine(dir, "Tiefsee.exe");
+        if (File.Exists(path)) { return path; }
+
+        path = Path.Combine(dir, "../TiefseeLauncher/Tiefsee.exe");
+        if (File.Exists(path)) { return Path.GetFullPath(path); }
+
+        return GetAppPath();
     }
 
     /// <summary>

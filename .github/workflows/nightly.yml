@@ -47,4 +47,4 @@ jobs:
           prerelease: true
           body: "This is the Nightly version, compiled from the latest code committed to GitHub, and may be unstable.<br>此為 Nightly 版，以 GitHub 最新提交的程式碼編譯而成，可能存在不穩定。"
           files: |
-            ./Tiefsee/Tiefsee.zip
+            ./Tiefsee.zip

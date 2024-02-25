@@ -386,7 +386,7 @@ class MainExif {
 							if (name === "Description") {
 								let prompt = ar.find(x => x.name === "Textual Data" && x.value.startsWith("Comment: {\"prompt\": "));
 								if (prompt !== undefined) {
-									if (prompt.value.indexOf(val) === 21) { // 開頭為「Comment: {"prompt": "」
+									if (prompt.value.indexOf(val) >= 21) { // 開頭為「Comment: {"prompt": "」
 										continue;
 									}
 								}

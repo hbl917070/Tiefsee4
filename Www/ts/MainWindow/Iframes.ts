@@ -47,7 +47,7 @@ class Iframes {
                 WV_RunApp.OpenUrl(data);
             }
             if (type === "openFile") {
-                let exePath = await WV_Window.GetAppPath();
+                let exePath = await WV_Window.GetTiefseePath();
 
                 let path = Lib.URLToPath(data);
                 let arMsg: string[] = [];

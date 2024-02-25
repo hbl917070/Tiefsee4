@@ -20,8 +20,9 @@
 /TiefseeAppPackager/TiefseeAppPackager.assets.cache
 /TiefseeAppPackager/BundleArtifacts
 
+/Output
 
+/TiefseeLauncher/obj
 
-
-
-
+/BuildAll/obj
+/BuildAll/bin

@@ -30,7 +30,7 @@
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-    <EntryPointProjectUniqueName>..\Tiefsee\Tiefsee.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\TiefseeLauncher\TiefseeLauncher.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>497EA22FF6A242826D50999677B106348B025A5C</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
   </PropertyGroup>
@@ -109,6 +109,9 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tiefsee\Tiefsee.csproj" />
+    <ProjectReference Include="..\TiefseeLauncher\TiefseeLauncher.csproj" />
+    <ProjectReference Include="..\Tiefsee\Tiefsee.csproj">
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,41 +1,62 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/Tiefsee/Tiefsee.csproj", // 指定要編譯的專案檔案
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
-            ],
-            "problemMatcher": "$msCompile"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Tiefsee/Tiefsee.csproj", // 指定要編譯的專案檔案
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign",
+        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign",
+        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "--project",
+        "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
+        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+      ],
+      "problemMatcher": "$msCompile"
+    },
+
+    // ---
+
+    // 編譯全部專案
+    {
+      "label": "buildAll",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/BuildAll/BuildAll.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign",
+        "/p:OutputPath=${workspaceFolder}/Output/"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+
+  ]
 }
