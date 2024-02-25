@@ -435,14 +435,13 @@ class Config {
 
                 { ext: "tif", type: "vips", vipsType: "tif" },
                 { ext: "tiff", type: "vips", vipsType: "tif" },
-                { ext: "dds", type: "vips", vipsType: "wpf" },
+                { ext: "dds", type: "vips", vipsType: "wpf,magick" },
 
                 { ext: "psd", type: "vips", vipsType: "magick" },
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },
                 { ext: "heic", type: "vips", vipsType: "magick" },
                 { ext: "heif", type: "vips", vipsType: "magick" },
-                // { ext: "avif", type: "vips", vipsType: "wpf,magick" }, // 如果有安裝「AV1 Video Extension」，就可以使用wpf以更快的速度開啟
                 { ext: "fits", type: "vips", vipsType: "magick" },
                 { ext: "dcm", type: "vips", vipsType: "magick" }, // 多幀
                 { ext: "hdr", type: "vips", vipsType: "magick" }, // 必須輸出成png顏色才不會跑掉
