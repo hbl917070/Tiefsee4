@@ -8,14 +8,12 @@
 
 		<!-- 不產生 .deps.json 檔案 -->
 		<GenerateDependencyFile>false</GenerateDependencyFile>
-		<!-- 不產生 .pdb 檔案 -->
-		<DebugType>none</DebugType>
 
 		<Platforms>x64</Platforms>
-		<Configurations>Debug</Configurations>
+		<Configurations>Release</Configurations>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DebugType>full</DebugType>
 		<Optimize>False</Optimize>
 		<OutputPath>../Output/</OutputPath>
