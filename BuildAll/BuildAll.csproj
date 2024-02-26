@@ -26,7 +26,6 @@
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="del $(TargetDir)$(TargetName).dll" />
 
 		<!-- 編譯這些專案 -->
 		<MSBuild Projects="..\TiefseeLauncher\TiefseeLauncher.csproj" />
@@ -36,6 +35,7 @@
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\Tiefsee.pdb" />
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\TiefseeCore.pdb" />
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.dll" />
 	</Target>
 
 	<!-- 打包成 zip -->
