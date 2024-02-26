@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0-windows</TargetFramework>
-
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-
-		<!-- 不產生 .deps.json 檔案 -->
-		<GenerateDependencyFile>false</GenerateDependencyFile>
-
+		<OutputType>Exe</OutputType>
+		
 		<Platforms>x64</Platforms>
 		<Configurations>Release</Configurations>
 	</PropertyGroup>
@@ -32,8 +32,12 @@
 		<!-- 刪除無用檔案 -->
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\Tiefsee.pdb" />
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\TiefseeCore.pdb" />
+		
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.pdb" />
 		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.dll" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.exe" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.runtimeconfig.json" />
+		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.deps.json" />
 	</Target>
 
 	<!-- 打包成 zip -->

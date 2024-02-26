@@ -14,7 +14,7 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Www", "Www\Www.esproj", "{9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiefseeLauncher", "TiefseeLauncher\TiefseeLauncher.csproj", "{DB9F5F64-024A-48B0-9F35-E7D689B3883B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildAll", "BuildAll\BuildAll.csproj", "{E65FD650-271E-4531-B049-D33BAD867840}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildAll", "BuildAll\BuildAll.csproj", "{4BECA59E-706E-492E-A26D-A8B362A5F496}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,9 +37,9 @@ Global
 		{DB9F5F64-024A-48B0-9F35-E7D689B3883B}.Debug|x64.ActiveCfg = Debug|x64
 		{DB9F5F64-024A-48B0-9F35-E7D689B3883B}.Debug|x64.Build.0 = Debug|x64
 		{DB9F5F64-024A-48B0-9F35-E7D689B3883B}.Release|x64.ActiveCfg = Release|x64
-		{E65FD650-271E-4531-B049-D33BAD867840}.Debug|x64.ActiveCfg = Release|x64
-		{E65FD650-271E-4531-B049-D33BAD867840}.Debug|x64.Build.0 = Release|x64
-		{E65FD650-271E-4531-B049-D33BAD867840}.Release|x64.ActiveCfg = Release|x64
+		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Debug|x64.ActiveCfg = Debug|x64
+		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Release|x64.ActiveCfg = Release|x64
+		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
