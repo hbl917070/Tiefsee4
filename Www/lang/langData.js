@@ -347,12 +347,18 @@ var langData = {
                 "en": "Other",
                 "ja": "その他",
             },
+            rawImageThumbnail:{
+                "zh-TW": "開啟 RAW 圖片時，顯示內嵌的預覽圖",
+                "en": "Show embedded preview when opening RAW image",
+                "ja": "RAW 画像を開くときに埋め込みプレビューを表示する",
+            },
+
+            
             displayDeleteConfirmationDialog: {
                 "zh-TW": "檔案刪除前顯示確認視窗",
                 "en": "Display Delete confirmation dialog",
                 "ja": "削除の確認メッセージを表示する",
             },
-
             whenInsertingFile: {
                 "zh-TW": "偵測到檔案新增時，插入於",
                 "en": "When a new file is detected, insert it at",
@@ -2035,6 +2041,11 @@ var langData = {
                 "zh-TW": "相機型號",
                 "en": "Model",
                 "ja": "カメラのモデル",
+            },
+            "Lens Model": {
+                "zh-TW": "鏡頭型號",
+                "en": "Lens Model",
+                "ja": "レンズモデル",
             },
             "Windows XP Subject": {
                 "zh-TW": "主旨",

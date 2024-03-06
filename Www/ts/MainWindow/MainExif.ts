@@ -475,12 +475,12 @@ class MainExif {
 
 					// 處理 value 的值
 					if (name === "Metering Mode") {
-						value = M.i18n.t(`exif.value.${name}.${value}`);
 						valueI18n = `exif.value.${name}.${value}`;
+						value = M.i18n.t(`exif.value.${name}.${value}`);
 					}
 					else if (name === "Flash") {
+						valueI18n = `exif.value.${name}.${value}`;
 						value = M.i18n.t(`exif.value.${name}.${value}`);
-						valueI18n = `exif.value.${name}.${value}`
 					}
 					else if (name === "Length") {
 						value = Lib.getFileLength(Number(value));

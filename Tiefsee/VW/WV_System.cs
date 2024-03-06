@@ -168,7 +168,7 @@ public class WV_System {
         if (Directory.Exists(path) == false) { return; }
         FileSystemInfo[] ar = new DirectoryInfo(path).GetFileSystemInfos(); // 取得資料夾內的所有檔案與資料夾
         if (ar.Length <= max) { return; } // 如果檔案數量未達上限，就不做任何事情
-        List<FileSystemInfo> sortedFiles = ar.OrderBy(f => f.LastWriteTime).ToList();
+        var sortedFiles = ar.OrderBy(f => f.LastAccessTime).ToList(); // 依照最後存取時間排序
         for (int i = 0; i < sortedFiles.Count - max; i++) {
             try {
                 File.Delete(sortedFiles[i].FullName);

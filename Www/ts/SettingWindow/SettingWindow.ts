@@ -1321,6 +1321,16 @@ class SettingWindow {
 
         // 其他
         addLoadEvent(() => {
+
+            // 開啟 RAW 圖片時，顯示內嵌的預覽圖
+            var switch_rawImageThumbnail = getDom("#switch-rawImageThumbnail") as HTMLInputElement;
+            switch_rawImageThumbnail.checked = config.settings["other"]["rawImageThumbnail"];
+            switch_rawImageThumbnail.addEventListener("change", () => {
+                let val = switch_rawImageThumbnail.checked;
+                config.settings["other"]["rawImageThumbnail"] = val;
+                appleSettingOfMain();
+            });
+
             // 檔案刪除前顯示確認視窗
             var switch_fileDeletingShowCheckMsg = getDom("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
             switch_fileDeletingShowCheckMsg.checked = config.settings["other"]["fileDeletingShowCheckMsg"];

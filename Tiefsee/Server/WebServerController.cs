@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
@@ -46,7 +46,7 @@ public class WebServerController {
 
         //webServer.RouteAddGet("/api/getImg/file/{*}", getImg);
         webServer.RouteAdd("/api/img/magick", ImgMagick);
-        webServer.RouteAdd("/api/img/dcraw", ImgDcraw);
+        webServer.RouteAdd("/api/img/rawThumbnail", ImgRawThumbnail);
         webServer.RouteAdd("/api/img/wpf", ImgWpf);
         webServer.RouteAdd("/api/img/webIcc", ImgWebIcc);
         webServer.RouteAdd("/api/img/nconvert", ImgNconvert);
@@ -92,12 +92,11 @@ public class WebServerController {
     /// </summary>
     void ImgVipsInit(RequestData d) {
 
-        string json = "";
-        ImgInitInfo imgInfo = new ImgInitInfo();
+        string json;
+        ImgInitInfo imgInfo = new();
 
         string path = d.args["path"];
         string[] arType = d.args["type"].Split(','); // 使用什麼方式處理圖片
-                                                     //string outputOriginalFile = d.args["outputOriginalFile"]; // 是否直接回傳原檔
 
         path = Uri.UnescapeDataString(path);
 
@@ -114,7 +113,7 @@ public class WebServerController {
             string type = arType[i];
 
             try {
-                imgInfo = ImgLib.GetImgInitInfo(path, type);
+                imgInfo = ImgLib.GetImgInitInfo(path, type, type);
             }
             catch { }
 
@@ -133,14 +132,15 @@ public class WebServerController {
     void ImgVipsResize(RequestData d) {
         string path = d.args["path"];
         double scale = Double.Parse(d.args["scale"]);
-        string type = d.args["type"];
+        string fileType = d.args["fileType"];
+        string vipsType = d.args["vipsType"];
 
         path = Uri.UnescapeDataString(path);
 
         bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的Headers
         if (is304) { return; }
 
-        string imgPath = ImgLib.VipsResize(path, scale, type);
+        string imgPath = ImgLib.VipsResize(path, scale, fileType, vipsType);
         WriteFile(d, imgPath); // 回傳檔案
     }
 
@@ -230,7 +230,7 @@ public class WebServerController {
     /// <summary>
     /// 
     /// </summary>
-    void ImgDcraw(RequestData d) {
+    void ImgRawThumbnail(RequestData d) {
         string path = d.args["path"];
         path = Uri.UnescapeDataString(path);
         if (File.Exists(path) == false) { return; }
@@ -238,7 +238,7 @@ public class WebServerController {
         bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的Headers
         if (is304 == true) { return; }
 
-        using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
+        using (Stream stream = ImgLib.RawThumbnail_PathToStream(path, 800, out int width, out int height)) {
             WriteStream(d, stream); // 回傳檔案
         }
     }

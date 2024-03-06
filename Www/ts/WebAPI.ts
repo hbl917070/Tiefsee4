@@ -106,8 +106,8 @@ class WebAPI {
             if (type === "magickPng") {
                 return APIURL + `/api/img/magick?type=png&path=${encodePath}&${fileTime}`;
             }
-            if (type === "dcraw") {
-                return APIURL + `/api/img/dcraw?path=${encodePath}&${fileTime}`;
+            if (type === "rawThumbnail") {
+                return APIURL + `/api/img/rawThumbnail?path=${encodePath}&${fileTime}`;
             }
             if (type === "nconvert" || type === "nconvertBmp") {
                 let url = APIURL + `/api/img/nconvert?type=bmp&path=${encodePath}&${fileTime}`;
@@ -136,17 +136,18 @@ class WebAPI {
                 path: string,
                 width: number,
                 height: number,
+                vipsType: string,
             };
         }
 
         /**
          * 取得圖片網址 (以 vips 縮放過的圖片)
          */
-        static vipsResize(scale: number, fileInfo2: FileInfo2, type: string) {
+        static vipsResize(scale: number, fileInfo2: FileInfo2, fileType: string, vipsType: string) {
             let _path = fileInfo2.Path;
             let encodePath = encodeURIComponent(_path);
             let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&type=${type}&${fileTime}`;
+            let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`;
             return imgU;
         }
 

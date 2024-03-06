@@ -43,12 +43,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.5.0" />
+		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.6.0" />
 		<PackageReference Include="MetadataExtractor" Version="2.8.1" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2277.86" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2365.46" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.6" />
+		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -83,11 +85,6 @@
 
 	<!-- 編譯時複製這些資料夾 -->
 	<ItemGroup>
-		<Content Include="Data\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-	<ItemGroup>
 		<Content Include="..\Www\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -107,8 +104,8 @@
 		<Content Remove="..\Www\tsconfig.json" />
 		<Content Remove="..\Www\nuget.config" />
 	</ItemGroup>
-	
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">		
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<!-- 編譯後刪除這些資料夾 -->
 		<RemoveDir Directories="$(OutputPath)\runtimes\linux-musl-x64" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\linux-x64" />
@@ -116,6 +113,9 @@
 		<RemoveDir Directories="$(OutputPath)\runtimes\unix" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-arm64" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-x86" />
+		
+		<!-- 把 /Data/sqlite3.dll 複製到 輸出根目錄 裡面 -->
+		<Exec Command="copy $(ProjectDir)\Data\sqlite3.dll $(TargetDir)\" />
 	</Target>
 	
 </Project>

@@ -370,8 +370,22 @@ class ScriptImg {
         }
         else if (configType === "vips") {
 
+            // 如果啟用了「開啟 RAW 圖片時，顯示內嵌的預覽圖」，則把 vipsType 內的 raw 替換成 rawThumbnail
+            let arVipsType = vipsType.split(",");
+            for (let i = 0; i < arVipsType.length; i++) {
+                if (arVipsType[i] === "raw") {
+                    if (this.M.config.settings.other.rawImageThumbnail) {
+                        arVipsType[i] = "rawThumbnail";
+                    }
+                    else {
+                        arVipsType[i] = "rawFull";
+                    }
+                }
+            }
+            vipsType = arVipsType.join(",");
+
             let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
-            
+
             // 如果處理失敗，且 vipsType2 = base64，則先用 canvas 處理成 base64 再上傳到暫存資料夾
             if (imgInitInfo.code != "1" && configItem.vipsType2 === "base64") {
                 // console.log("處理失敗，改用 canvas 來處理");
@@ -386,13 +400,13 @@ class ScriptImg {
                     let base64 = await this.blobToBase64(blob);
                     if (base64 !== null) {
                         await WV_Image.Base64ToTempImg(path, base64 as string);
-                        imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+                        imgInitInfo = await WebAPI.Img.vipsInit("base64", fileInfo2);
                     } else {
                         isFail = true;
                     }
                 }
 
-                imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+                //imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
             }
 
             if (imgInitInfo.code == "1") {
@@ -411,7 +425,7 @@ class ScriptImg {
                     if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { // 如果圖片太小就不處理
                         break;
                     }
-                    let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType);
+                    let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType, imgInitInfo.vipsType);
                     arUrl.push({ scale: scale, url: imgU })
                 }
             }

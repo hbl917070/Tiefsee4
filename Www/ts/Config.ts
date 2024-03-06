@@ -111,6 +111,7 @@ class Config {
             "Comment", // 註解
             "Make", // 相機型號
             "Model", // 相機製造商
+            "Lens Model", // 鏡頭型號
             "Windows XP Subject", // 主旨
             "F-Number", // 光圈孔徑
             "Exposure Time", // 曝光時間
@@ -366,6 +367,8 @@ class Config {
 
         /** 其他 */
         other: {
+            /** 開啟 RAW 圖片時，顯示內嵌的預覽圖 */
+            rawImageThumbnail : true,
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
             /** 偵測到檔案新增時，插入於。 [auto, start, end] */
@@ -422,7 +425,7 @@ class Config {
                 { ext: "jfif", type: "vips", vipsType: "jpg" },
                 { ext: "jpe", type: "vips", vipsType: "jpg" },
                 { ext: "png", type: "vips", vipsType: "vips" },
-                { ext: "webp", type: "vips", vipsType: "vips" },
+                { ext: "webp", type: "vips", vipsType: "vips,magick" },
                 { ext: "bmp", type: "vips", vipsType: "bitmap" },
                 { ext: "apng", type: "web" },
                 { ext: "gif", type: "web" },
@@ -465,20 +468,20 @@ class Config {
                 { ext: "mpo", type: "vips", vipsType: "magick" }, // 相機
                 { ext: "jxl", type: "vips", vipsType: "magick" }, // JPEG XL，開啟速度很慢
 
-                { ext: "crw", type: "vips", vipsType: "dcraw" },
-                { ext: "raf", type: "vips", vipsType: "dcraw" },
-                { ext: "cr2", type: "vips", vipsType: "dcraw" },
-                { ext: "mrw", type: "vips", vipsType: "dcraw" },
-                { ext: "nef", type: "vips", vipsType: "dcraw" },
-                { ext: "x3f", type: "vips", vipsType: "dcraw" },
-                { ext: "pef", type: "vips", vipsType: "dcraw" },
-                { ext: "orf", type: "vips", vipsType: "dcraw" },
-                { ext: "rw2", type: "vips", vipsType: "dcraw" },
-                { ext: "arw", type: "vips", vipsType: "dcraw" },
-                { ext: "erf", type: "vips", vipsType: "dcraw" },
-                { ext: "sr2", type: "vips", vipsType: "dcraw" },
-                { ext: "srw", type: "vips", vipsType: "dcraw" },
-                { ext: "dng", type: "vips", vipsType: "dcraw" },
+                { ext: "crw", type: "vips", vipsType: "raw" },
+                { ext: "raf", type: "vips", vipsType: "raw" },
+                { ext: "cr2", type: "vips", vipsType: "raw" },
+                { ext: "mrw", type: "vips", vipsType: "raw" },
+                { ext: "nef", type: "vips", vipsType: "raw" },
+                { ext: "x3f", type: "vips", vipsType: "raw" },
+                { ext: "pef", type: "vips", vipsType: "raw" },
+                { ext: "orf", type: "vips", vipsType: "raw" },
+                { ext: "rw2", type: "vips", vipsType: "raw" },
+                { ext: "arw", type: "vips", vipsType: "raw" },
+                { ext: "erf", type: "vips", vipsType: "raw" },
+                { ext: "sr2", type: "vips", vipsType: "raw" },
+                { ext: "srw", type: "vips", vipsType: "raw" },
+                { ext: "dng", type: "vips", vipsType: "raw" },
 
                 { ext: "afphoto", type: "vips", vipsType: "extractPng" },
                 { ext: "afdesign", type: "vips", vipsType: "extractPng" },

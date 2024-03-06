@@ -2,10 +2,13 @@ using ImageMagick;
 using ImageMagick.Formats;
 using NetVips;
 using NetVips.Extensions;
+using Sdcb.LibRaw;
+using Sdcb.LibRaw.Natives;
 using SQLite;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 
 namespace Tiefsee;
@@ -137,96 +140,10 @@ public class ImgLib {
     /// </summary>
     public static Stream Wpf_PathToStream(string path) {
         Stream stream = null;
-        ImgLib.PathToBitmapSource(path, (BitmapSource bs) => {
-            stream = ImgLib.BitmapSourceToStream(bs);
+        PathToBitmapSource(path, (BitmapSource bs) => {
+            stream = BitmapSourceToStream(bs);
         });
         return stream;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="path"></param>
-    /// <param name="thumbnail"></param>
-    /// <param name="minSize"> 預覽圖的寬或高小於這個數值，就讀取原始檔案 </param>
-    /// <returns></returns>
-    public static Stream Dcraw_PathToStream(string path, bool thumbnail = true, int minSize = 800) {
-
-        string dcRawExe = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "data", "dcraw.exe");
-        string argThumbnail = "";
-        if (thumbnail) { argThumbnail = "-e "; }
-        var startInfo = new ProcessStartInfo(dcRawExe) {
-            Arguments = $"-c -w {argThumbnail}\"{path}\"", // -e=縮圖  -w=套用相機設定  -c=回傳串流
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardError = true,
-        };
-
-        try {
-
-            var memoryStream = new MemoryStream();
-            using (var process = Process.Start(startInfo)) {
-                using (Stream st = process.StandardOutput.BaseStream) {
-                    st.CopyTo(memoryStream);
-                    memoryStream.Position = 0;
-                }
-            }
-
-            // 如果縮圖小於800，就不使用縮圖       
-            if (thumbnail) {
-                try {
-                    var bs = StreamToBitmapSource(memoryStream);
-                    if (bs.PixelWidth < minSize || bs.PixelHeight < minSize) {
-                        Console.WriteLine("縮圖太小: " + path);
-                        return Dcraw_PathToStream(path, false);
-                    }
-                    else {
-                        Console.WriteLine("縮圖ok: " + path);
-                        memoryStream.Position = 0;
-                        return memoryStream;
-                    }
-                }
-                catch {
-                    Console.WriteLine("縮圖失敗: " + path);
-                }
-            }
-
-            try {
-                memoryStream.Position = 0;
-                using (MagickImage image = new(memoryStream)) {
-                    MemoryStream imgMs = new(image.ToByteArray(MagickFormat.Jpeg));
-                    memoryStream.Close();
-                    memoryStream.Dispose();
-                    if (thumbnail) {
-                        if (image.Width < minSize || image.Height < minSize) {
-                            Console.WriteLine("Magick縮圖太小: " + path);
-                            imgMs.Close();
-                            imgMs.Dispose();
-                            return Dcraw_PathToStream(path, false);
-                        }
-                    }
-                    return imgMs;
-                }
-            }
-            catch {
-                Console.WriteLine("Magick RAW 失敗: " + path);
-            }
-
-            memoryStream.Close();
-            memoryStream.Dispose();
-
-            //如果無法使用 dcraw ，就改用MagickImage直接讀取
-            using (MagickImage image = new MagickImage(path)) {
-                var imgMs = new MemoryStream(image.ToByteArray(MagickFormat.Jpeg));
-                Console.WriteLine("Magick ok: " + path);
-                return imgMs;
-            }
-
-        }
-        catch {
-            throw;
-        }
     }
 
     /// <summary>
@@ -453,6 +370,150 @@ public class ImgLib {
 
     #endregion
 
+    #region Raw
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="thumbnail"></param>
+    /// <param name="minSize"> 預覽圖的寬或高小於這個數值，就讀取原始檔案 </param>
+    /// <returns></returns>
+    public static Stream Raw_PathToFile(string path, bool thumbnail = true, int minSize = 800) {
+
+        if (thumbnail) {
+            try {
+                var stream = RawThumbnail_PathToStream(path, minSize, out int width, out int height);
+                if (stream == null || width == 0 || height == 0) {
+                    Debug.WriteLine("無法讀取 Raw 縮圖: " + path);
+                }
+                else {
+                    Debug.WriteLine("縮圖ok: " + path);
+                    return stream;
+                }
+            }
+            catch {
+                Debug.WriteLine("無法讀取 Raw 縮圖2: " + path);
+            }
+        }
+
+        try {
+            Debug.WriteLine("讀取Raw完整 開始: " + path);
+            return RawFull_PathToTif(path);
+        }
+        catch { }
+
+        throw new Exception("無法讀取 Raw 檔案: " + path);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static Stream RawThumbnail_PathToStream(string path, int minSize, out int width, out int height) {
+        RawContext r;
+        width = 0;
+        height = 0;
+
+        try {
+            r = RawContext.OpenFile(path);
+        }
+        catch {
+            Debug.WriteLine("讀取Raw縮圖 失敗: " + path);
+            return null;
+        }
+
+        // 取得縮圖數量
+        LibRawData libRawData = Marshal.PtrToStructure<LibRawData>(r.UnsafeGetHandle());
+        var thumbCount = libRawData.ThumbnailList.ThumbCount;
+
+        // 找出最大的縮圖
+        int maxWidth = -1;
+        ProcessedImage processedImage = null;
+        for (int i = 0; i < thumbCount; i++) {
+            try {
+                r.UnpackThumbnail(i);
+                var thumbnail = r.MakeDcrawMemoryThumbnail();
+                var w = thumbnail.Width;
+                var h = thumbnail.Height;
+                if (w < minSize || h < minSize) {
+                    thumbnail.Dispose();
+                    continue;
+                }
+                if (w > maxWidth) {
+                    maxWidth = w;
+                    processedImage = thumbnail;
+                }
+                else {
+                    thumbnail.Dispose();
+                }
+            }
+            catch { }
+        }
+
+        // 如果沒有縮圖，就回傳 null
+        if (processedImage == null) {
+            Debug.WriteLine("讀取Raw縮圖 無符合的縮圖: " + path);
+            r.Dispose();
+            return null;
+        }
+
+        width = processedImage.Width;
+        height = processedImage.Height;
+        Stream ms;
+        Debug.WriteLine("讀取Raw縮圖: " + $"w:{width} h:{height} type:{processedImage.ImageType}");
+
+        if (processedImage.ImageType == ProcessedImageType.Jpeg) {
+            ms = new MemoryStream(processedImage.AsSpan<byte>().ToArray());
+        }
+        else {
+            var vips = ProcessedImageToVipsImage(processedImage);
+            ms = new MemoryStream();
+            vips.JpegsaveStream(ms);
+        }
+        Debug.WriteLine("讀取Raw縮圖 完成: " + path);
+
+        processedImage.Dispose();
+        r.Dispose();
+        return ms;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static Stream RawFull_PathToTif(string path) {
+        using var r = RawContext.OpenFile(path);
+        r.Unpack();
+        r.DcrawProcess(c => {
+            c.UseCameraWb = true; // 使用機內白平衡
+        });
+        using var image = r.MakeDcrawMemoryImage();
+
+        var vips = ProcessedImageToVipsImage(image);
+        var stream = new MemoryStream();
+        vips.JpegsaveStream(stream, q: 89);
+
+        //GetNetVips(PathToImgProcessed(path, "rawFull"), vips); // 存入暫存
+
+        return stream;
+    }
+
+    public static NetVips.Image ProcessedImageToVipsImage(ProcessedImage rgbImage) {
+        int width = rgbImage.Width;
+        int height = rgbImage.Height;
+        int bands = rgbImage.Channels; // RGB image has 3 bands.
+
+        // Assuming the data is stored in a byte array format.
+        byte[] data = new byte[width * height * bands];
+        Marshal.Copy(rgbImage.DataPointer, data, 0, data.Length);
+
+        // Create a new NetVips Image from the byte array.
+        NetVips.Image vipsImage = NetVips.Image.NewFromMemory(data, width, height, bands, Enums.BandFormat.Uchar);
+
+        return vipsImage;
+    }
+
+    #endregion
+
     #region vips
 
     private static Dictionary<string, int[]> temp_GetImgSize = new Dictionary<string, int[]>();
@@ -464,7 +525,7 @@ public class ImgLib {
     }
 
     /// <summary> vips 的暫存 </summary>
-    private static List<DataVips> tempArNewVips = new List<DataVips>();
+    private static List<DataVips> tempArNewVips = new();
 
     /// <summary>
     /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要 using
@@ -481,20 +542,21 @@ public class ImgLib {
             }
 
             NetVips.Cache.MaxFiles = 0; // 避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
-            NetVips.Image im;
 
+            NetVips.Image img;
             if (type == "webp") { // 如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
                 using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                    im = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
+                    img = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
                 }
             }
             else {
-                im = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
+                img = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
             }
+
 
             tempArNewVips.Add(new DataVips {
                 key = key,
-                vips = im
+                vips = img
             });
 
             if (tempArNewVips.Count > 5) { // 最多保留5個檔案
@@ -502,7 +564,7 @@ public class ImgLib {
                 tempArNewVips[0].vips = null;
                 tempArNewVips.RemoveAt(0);
             }
-            return im;
+            return img;
         }
     }
 
@@ -522,7 +584,7 @@ public class ImgLib {
 
         int w = 0;
         int h = 0;
-        ImgLib.PathToBitmapSource(path, (BitmapSource img) => {
+        PathToBitmapSource(path, (BitmapSource img) => {
             w = img.PixelWidth;
             h = img.PixelHeight;
 
@@ -557,15 +619,16 @@ public class ImgLib {
     /// <summary>
     /// 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
     /// </summary>
-    public static ImgInitInfo GetImgInitInfo(string path, string type) {
+    public static ImgInitInfo GetImgInitInfo(string path, string type, string vipsType) {
 
         ImgInitInfo imgInfo = new();
-        string path100 = PathToImg100(path);
+
+        string path100 = PathToImgProcessed(path, vipsType); // 暫存檔案名稱
 
         // 如果已經處理過了，就改成回傳處理過的檔案
         if (File.Exists(path100)) {
-            File.SetLastWriteTime(path100, DateTime.Now); // 調整最後修改時間，延後暫存被清理
-            return GetImgInitInfo(path100, "vips");
+            File.SetLastAccessTime(path100, DateTime.Now); // 調整最後存取時間，延後暫存被清理
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "vips") {
@@ -574,6 +637,8 @@ public class ImgLib {
             imgInfo.height = wh[1];
             imgInfo.code = "1";
             imgInfo.path = path;
+            imgInfo.vipsType = vipsType;
+            return imgInfo;
         }
         else {
             StartWindow.isRunGC = true; // 定時執行GC
@@ -585,7 +650,7 @@ public class ImgLib {
             //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual); //套用顏色
             VipsSave(vImg, path100, "auto");
 
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "avif") {
@@ -595,20 +660,20 @@ public class ImgLib {
             imgInfo.height = vImg.Height;
             imgInfo.code = "1";
             imgInfo.path = path100;
+            imgInfo.vipsType = vipsType;
+            return imgInfo;
         }
 
         if (type == "jpg") {
-
-            if (IsCMYK(path)) { // 如果是CMYK，就先套用顏色
-
+            if (IsCMYK(path)) { // 如果是 CMYK，就先套用顏色
                 NetVips.Image Vimg = GetNetVips(path, "jpg");
                 using (var Vimg2 = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { //套用顏色
                     Vimg2.Jpegsave(path100);
                 }
-                return GetImgInitInfo(path100, "vips");
+                return GetImgInitInfo(path100, "vips", vipsType);
             }
             else { // 直接回傳
-                return GetImgInitInfo(path, "vips");
+                return GetImgInitInfo(path, "vips", vipsType);
             }
         }
 
@@ -618,7 +683,7 @@ public class ImgLib {
                     VipsSave(vImg, path100, "auto");
                 }
             }
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "wpf") {
@@ -629,21 +694,20 @@ public class ImgLib {
                     }
                 }
             });
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "magick") {
             using (MagickImage image = GetMagickImage(path)) {
                 if (image.IsOpaque) { // 如果不透明
                     image.Write(path100, MagickFormat.Jpeg);
-
                 }
                 else {
                     using (var ms = new MemoryStream()) {
                         // image.Quality = 1;
                         image.Write(ms, MagickFormat.Tiff);
                         ms.Position = 0;
-                        using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, "", NetVips.Enums.Access.Random)) {
+                        using (NetVips.Image vImg = NetVips.Image.NewFromStream(ms, access: NetVips.Enums.Access.Random)) {
                             VipsSave(vImg, path100, "png");
                         }
                     }
@@ -651,58 +715,105 @@ public class ImgLib {
                 image.Dispose();
             }
 
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
-        if (type == "dcraw") {
-            using (Stream stream = ImgLib.Dcraw_PathToStream(path, true, 800)) {
-                using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
+        if (type == "rawFull" || type == "rawThumbnail") {
+
+            try {
+                bool isThumbnail = type == "rawThumbnail";
+                using (var stream = Raw_PathToFile(path, isThumbnail, 800)) {
+                    using (var fileStream = File.Create(path100)) { // 儲存檔案
+                        stream.Seek(0, SeekOrigin.Begin);
+                        stream.CopyTo(fileStream);
+                    }
+                    Debug.WriteLine("Raw to vips: " + path100);
+                    return GetImgInitInfo(path100, "vips", vipsType);
                 }
             }
-            return GetImgInitInfo(path100, "vips");
+            catch {
+                // 如果無法取得 raw ，就改用 MagickImage
+                using (var image = new MagickImage(path)) {
+                    image.Write(path100, MagickFormat.Jpeg); // 儲存檔案
+                    Debug.WriteLine("Magick ok: " + path);
+                    return GetImgInitInfo(path100, "vips", vipsType);
+                }
+            }
         }
 
         if (type == "clip") {
-            using (Stream stream = ImgLib.ClipToStream(path)) {
+            using (Stream stream = ClipToStream(path)) {
                 using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
                     stream.Seek(0, SeekOrigin.Begin);
                     stream.CopyTo(fileStream);
                 }
             }
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "extractPng") {
-            using (Stream stream = ImgLib.ExtractPngToStream(path)) {
+            using (Stream stream = ExtractPngToStream(path)) {
                 using (FileStream fileStream = File.Create(path100)) { // 儲存檔案
                     stream.Seek(0, SeekOrigin.Begin);
                     stream.CopyTo(fileStream);
                 }
             }
-            return GetImgInitInfo(path100, "vips");
+            return GetImgInitInfo(path100, "vips", vipsType);
         }
 
         if (type == "nconvert" || type == "nconvertPng" || type == "nconvertJpg") {
             string nconvertPath;
             if (type == "nconvertPng") {
-                nconvertPath = ImgLib.Nconvert_PathToPath(path, false, "png");
+                nconvertPath = Nconvert_PathToPath(path, false, "png");
             }
             else {
-                nconvertPath = ImgLib.Nconvert_PathToPath(path, false, "jpg");
+                nconvertPath = Nconvert_PathToPath(path, false, "jpg");
             }
-            return GetImgInitInfo(nconvertPath, "vips");
+            return GetImgInitInfo(nconvertPath, "vips", vipsType);
         }
 
         return imgInfo;
     }
 
     /// <summary>
+    /// 縮放圖片，並且存入暫存資料夾 (只支援 jpg、png、tif、webp)
+    /// </summary>
+    public static string VipsResize(string path, double scale, string fileType, string vipsType) {
+
+        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
+        string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); // 暫存檔案的路徑
+
+        if (File.Exists(filePath)) { // 如果檔案已經存在，就直接回傳
+            File.SetLastAccessTime(filePath, DateTime.Now); // 調整最後存取時間，延後暫存被清理
+            return filePath;
+        }
+
+        if (Directory.Exists(AppPath.tempDirImgZoom) == false) { // 如果暫存資料夾不存在就建立
+            Directory.CreateDirectory(AppPath.tempDirImgZoom);
+        }
+
+        string img100 = PathToImgProcessed(path, vipsType);
+        if (File.Exists(img100)) {
+            File.SetLastAccessTime(img100, DateTime.Now); // 調整最後存取時間，延後暫存被清理
+        }
+        else { // 如果沒有處理過的暫存檔
+            img100 = path; // 直接只用原檔
+        }
+
+        NetVips.Image im = GetNetVips(img100, fileType);
+        using (NetVips.Image imR = im.Resize(scale: scale, kernel: Enums.Kernel.Lanczos3, gap: 4)) {
+            VipsSave(imR, filePath, "auto");
+        }
+        StartWindow.isRunGC = true; // 定時執行GC
+
+        return filePath;
+    }
+
+    /// <summary>
     /// 將圖片的 base64 存入暫存資料夾
     /// </summary>
     public static string Base64ToTempImg(string path, string base64) {
-        string path100 = PathToImg100(path);
+        string path100 = PathToImgProcessed(path, "base64");
         try {
             // 把 Base64 儲存成檔案
             int x = base64.IndexOf("base64,"); // 去掉開頭的 data:image/png;base64,
@@ -716,40 +827,6 @@ public class ImgLib {
             Console.WriteLine(e.Message);
             return "false";
         }
-    }
-
-    /// <summary>
-    /// 縮放圖片，並且存入暫存資料夾 (只支援 jpg、png、tif、webp)
-    /// </summary>
-    public static string VipsResize(string path, double scale, string type) {
-
-        string hashName = $"{FileLib.FileToHash(path)}_{scale}.jpg"; // 暫存檔案名稱
-        string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); // 暫存檔案的路徑
-
-        if (File.Exists(filePath)) { // 如果檔案已經存在，就直接回傳
-            File.SetLastWriteTime(filePath, DateTime.Now); // 調整最後修改時間，延後暫存被清理
-            return filePath;
-        }
-
-        if (Directory.Exists(AppPath.tempDirImgZoom) == false) { // 如果暫存資料夾不存在就建立
-            Directory.CreateDirectory(AppPath.tempDirImgZoom);
-        }
-
-        string img100 = PathToImg100(path);
-        if (File.Exists(img100)) {
-            File.SetLastWriteTime(img100, DateTime.Now); // 調整最後修改時間，延後暫存被清理
-        }
-        else { // 如果沒有處理過的暫存檔
-            img100 = path; // 直接只用原檔
-        }
-
-        NetVips.Image im = GetNetVips(img100, type);
-        using (NetVips.Image imR = im.Resize(scale: scale, kernel: Enums.Kernel.Lanczos3, gap: 4)) {
-            VipsSave(imR, filePath, "auto");
-        }
-        StartWindow.isRunGC = true; // 定時執行GC
-
-        return filePath;
     }
 
     /// <summary>
@@ -801,12 +878,15 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 取得「img100」暫存資料夾裡面的檔案名稱
+    /// 取得「ImgProcessed」暫存資料夾裡面的檔案名稱
     /// </summary>
     /// <param name="path"></param>
+    /// <param name="addStr"> 串在檔名後面的字串 </param>
+    /// <param name="ext"> 副檔名 </param>
     /// <returns></returns>
-    public static string PathToImg100(string path) {
-        string hashName = $"{FileLib.FileToHash(path)}.jpg"; // 暫存檔案名稱
+    public static string PathToImgProcessed(string path, string vipsType) {
+        string ext = ".jpg";
+        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}{ext}"; // 暫存檔案名稱
         string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
         if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
             Directory.CreateDirectory(AppPath.tempDirImgProcessed);
@@ -823,5 +903,6 @@ public class ImgInitInfo {
     public string path = "";
     public int width = 0;
     public int height = 0;
+    public string vipsType = "";
     // public string msg = "";
 }

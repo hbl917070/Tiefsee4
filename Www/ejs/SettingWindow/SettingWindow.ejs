@@ -284,7 +284,19 @@
                     <div class="box">
                         <div class="box-title" i18n="sw.other.title"> 其他 </div>
 
-                        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog"> 檔案刪除前顯示確認視窗 </div>
+                        <div class="text-title" i18n="sw.other.rawImageThumbnail">
+                            開啟 RAW 圖片時，顯示內嵌的預覽圖
+                        </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-rawImageThumbnail">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog"> 
+                            檔案刪除前顯示確認視窗 
+                        </div>
                         <div class="text-content">
                             <label class="switch">
                                 <input type="checkbox" id="switch-fileDeletingShowCheckMsg">
@@ -292,7 +304,9 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.other.whenInsertingFile"> 偵測到檔案新增時，插入於 </div>
+                        <div class="text-title" i18n="sw.other.whenInsertingFile"> 
+                            偵測到檔案新增時，插入於 
+                        </div>
                         <div class="text-content">
                             <select class="text-input" id="select-whenInsertingFile">
                                 <option value="auto" i18n="sw.other.auto"> 自動 </option>
@@ -316,7 +330,6 @@
                     </div>
 
                 </div>
-
 
                 <!-- 外觀 -->
                 <div class="page-tabsPage" id="tabsPage-appearance">
@@ -624,7 +637,6 @@
                     </div>
                 </div>
 
-
                 <!-- 滑鼠 -->
                 <div class="page-tabsPage" id="tabsPage-mouse">
                     <div class="page-title" i18n="sw.tabs.mouse"> 滑鼠 </div>
@@ -724,7 +736,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <!-- 圖片 -->
                 <div class="page-tabsPage" id="tabsPage-image">
@@ -913,10 +924,6 @@
                     <div class="page-title" i18n="sw.tabs.about"> 關於 </div>
 
                     <div class="box">
-                        <!-- <div class="box-title">
-                            <span i18n="sw.about.version">版本:</span>
-                            <span> Tiefsee 4.0.0</span>
-                        </div> -->
 
                         <div class="logobox">
                             <img class="logobox-img" src="./img/logo.svg">
