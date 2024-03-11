@@ -11,8 +11,8 @@ public class IniManager {
     private StringBuilder lpReturnedString;
     private int bufferSize;
 
-    [DllImport("kernel32")]
-    private static extern long WritePrivateProfileString(string section, string key, string lpString, string lpFileName);
+    // [DllImport("kernel32")]
+    // private static extern long WritePrivateProfileString(string section, string key, string lpString, string lpFileName);
 
     [DllImport("kernel32")]
     private static extern int GetPrivateProfileString(string section, string key, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
@@ -31,7 +31,7 @@ public class IniManager {
     }
 
     // write ini data depend on section and key
-    public void WriteIniFile(string section, string key, Object value) {
-        WritePrivateProfileString(section, key, value.ToString(), filePath);
-    }
+    // public void WriteIniFile(string section, string key, Object value) {
+    //     WritePrivateProfileString(section, key, value.ToString(), filePath);
+    // }
 }

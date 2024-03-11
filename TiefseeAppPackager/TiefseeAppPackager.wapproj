@@ -106,12 +106,10 @@
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TiefseeLauncher\TiefseeLauncher.csproj" />
-    <ProjectReference Include="..\Tiefsee\Tiefsee.csproj">
-      <Private>False</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\Tiefsee\Tiefsee.csproj" />
   </ItemGroup>
 </Project>

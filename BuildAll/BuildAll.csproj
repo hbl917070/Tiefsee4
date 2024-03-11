@@ -2,24 +2,21 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		<OutputType>Exe</OutputType>
 		
 		<Platforms>x64</Platforms>
-		<Configurations>Release</Configurations>
+		<Configurations>Release;Debug</Configurations>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DebugType>full</DebugType>
 		<Optimize>False</Optimize>
 		<OutputPath>../Output/</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<DebugType>full</DebugType>
 		<OutputPath>../Output/</OutputPath>
 	</PropertyGroup>
 

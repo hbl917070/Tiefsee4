@@ -1,7 +1,7 @@
-﻿namespace BuildAll {
+namespace BuildAll {
     internal class Program {
         static void Main(string[] args) {
-            Console.WriteLine("Hello, World!");
+            // 此專案用於打包 Zip
         }
     }
 }
