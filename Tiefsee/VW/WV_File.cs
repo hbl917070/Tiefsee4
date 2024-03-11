@@ -1,9 +1,9 @@
 using Microsoft.VisualBasic.FileIO;
-using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 
 namespace Tiefsee;
 
@@ -77,7 +77,7 @@ public class WV_File {
     /// </summary>
     public string GetFileInfo2(string path) {
         FileInfo2 info = FileLib.GetFileInfo2(path);
-        return JsonConvert.SerializeObject(info);
+        return JsonSerializer.Serialize(info);
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public class WV_File {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public FileInfo GetFileInfo(string path) {
         return new FileInfo(path);
@@ -302,7 +302,7 @@ public class WV_File {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     long ToUnix(DateTime time) {
         return FileLib.ToUnix(time);

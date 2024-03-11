@@ -1,8 +1,8 @@
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Windows.Input;
 using Windows.ApplicationModel;
 
@@ -26,7 +26,7 @@ public class WV_System {
     /// <param name="path"> 要偵測的資料夾 </param>
     public void NewFileWatcher(string key, string path) {
         fileWatcher.NewFileWatcher(key, path, (List<FileWatcherData> arData) => {
-            string data = JsonConvert.SerializeObject(arData);
+            string data = JsonSerializer.Serialize(arData);
             Adapter.UIThread(() => {
                 M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
             });
@@ -86,8 +86,7 @@ public class WV_System {
             isMouseMiddle = isMouseMiddle
         };
 
-        string json = JsonConvert.SerializeObject(obj);
-        return json;
+        return JsonSerializer.Serialize(obj);
     }
 
     /// <summary>
@@ -152,7 +151,7 @@ public class WV_System {
                 return;
             }
 
-            //非「常駐背景」的模式，則從Port資料夾判斷當前還有幾個執行個體
+            // 非「常駐背景」的模式，則從Port資料夾判斷當前還有幾個執行個體
             if (Directory.Exists(AppPath.appDataPort) == false) { return; }
             int postCount = Directory.GetFiles(AppPath.appDataPort).Length;
             if (postCount == 1) {

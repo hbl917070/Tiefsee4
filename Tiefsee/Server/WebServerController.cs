@@ -1,8 +1,7 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 
 namespace Tiefsee;
 
@@ -74,7 +73,7 @@ public class WebServerController {
         // 如果檔案不存在就返回 404 錯誤
         if (File.Exists(path) == false) {
             d.context.Response.StatusCode = 404;
-            WriteString(d, JsonConvert.SerializeObject(new ImgExif()));
+            WriteString(d, JsonSerializer.Serialize(new ImgExif()));
             return;
         }
 
@@ -82,7 +81,7 @@ public class WebServerController {
         //if (is304) { return; }
 
         var exif = Exif.GetExif(path, maxLength);
-        string json = JsonConvert.SerializeObject(exif);
+        string json = JsonSerializer.Serialize(exif);
         WriteString(d, json);
     }
 
@@ -101,7 +100,7 @@ public class WebServerController {
         path = Uri.UnescapeDataString(path);
 
         if (File.Exists(path) == false) { // 檔案不存在
-            json = JsonConvert.SerializeObject(new ImgInitInfo());
+            json = JsonSerializer.Serialize(new ImgInitInfo());
             WriteString(d, json);
             return;
         }
@@ -122,7 +121,7 @@ public class WebServerController {
             }
         }
 
-        json = JsonConvert.SerializeObject(imgInfo);
+        json = JsonSerializer.Serialize(imgInfo);
         WriteString(d, json); // 回傳輸出的檔案路徑
     }
 
@@ -145,7 +144,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgNconvert(RequestData d) {
 
@@ -168,7 +167,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgMagick(RequestData d) {
 
@@ -187,7 +186,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgWpf(RequestData d) {
 
@@ -228,7 +227,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgRawThumbnail(RequestData d) {
         string path = d.args["path"];
@@ -244,7 +243,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgClip(RequestData d) {
 
@@ -260,7 +259,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     void ImgExtractPng(RequestData d) {
         string path = d.args["path"];
@@ -296,7 +295,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetImg(RequestData d) {
         string path = d.value;
@@ -309,7 +308,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetPdf(RequestData d) {
         string path = d.args["path"];
@@ -333,7 +332,7 @@ public class WebServerController {
         //如果檔案不存在就返回404錯誤
         if (File.Exists(path) == false) {
             d.context.Response.StatusCode = 404;
-            WriteString(d, JsonConvert.SerializeObject(new ImgExif()));
+            WriteString(d, JsonSerializer.Serialize(new ImgExif()));
             return;
         }
 
@@ -346,7 +345,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetFileIcon(RequestData d) {
 
@@ -394,27 +393,26 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetFileInfo2(RequestData d) {
         string path = d.args["path"];
         path = Uri.UnescapeDataString(path);
 
         var fileInfo2 = FileLib.GetFileInfo2(path);
-        string srtStrJson = JsonConvert.SerializeObject(fileInfo2);
+        string srtStrJson = JsonSerializer.Serialize(fileInfo2);
         WriteString(d, srtStrJson);
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetFileInfo2List(RequestData d) {
         string postData = d.postData;
-        var json = JObject.Parse(postData);
-        string[] ar = json["ar"].ToObject<string[]>();
-
+        var json = JsonDocument.Parse(postData);
+        string[] ar = json.GetStringArray("ar");
         var arFileInfo2 = FileLib.GetFileInfo2List(ar);
-        string srtStrJson = JsonConvert.SerializeObject(arFileInfo2);
+        string srtStrJson = JsonSerializer.Serialize(arFileInfo2);
         WriteString(d, srtStrJson);
     }
 
@@ -462,7 +460,7 @@ public class WebServerController {
             });
         }
 
-        string retJson = JsonConvert.SerializeObject(result);
+        string retJson = JsonSerializer.Serialize(result);
 
         WriteString(d, retJson);
     }
@@ -489,7 +487,7 @@ public class WebServerController {
             json = clipboardLib.GetClipboardContent(maxTextLength);
         });
 
-        string retJson = JsonConvert.SerializeObject(json);
+        string retJson = JsonSerializer.Serialize(json);
         WriteString(d, retJson);
     }
 
@@ -498,43 +496,43 @@ public class WebServerController {
     /// </summary>
     private void ExtractFrames(RequestData d) {
         string postData = d.postData;
-        var json = JObject.Parse(postData);
-        string imgPath = json["imgPath"].ToObject<string>();
-        string outputDir = json["outputDir"].ToObject<string>();
+        var json = JsonDocument.Parse(postData);
+        string imgPath = json.GetString("imgPath");
+        string outputDir = json.GetString("outputDir");
 
         var ret = ImgFrames.ExtractFrames(imgPath, outputDir);
-        string srtStrJson = JsonConvert.SerializeObject(ret);
+        string srtStrJson = JsonSerializer.Serialize(ret);
         WriteString(d, srtStrJson);
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetSort(RequestData d) {
         string postData = d.postData;
-        var json = JObject.Parse(postData);
-        string[] ar = json["ar"].ToObject<string[]>();
-        string type = json["type"].ToString();
+        var json = JsonDocument.Parse(postData);
+        string[] ar = json.GetStringArray("ar");
+        string type = json.GetString("type");
 
         var filesort = new FileSort();
         string[] retAr = filesort.Sort(ar, type);
-        string srtStrJson = JsonConvert.SerializeObject(retAr);
+        string srtStrJson = JsonSerializer.Serialize(retAr);
         WriteString(d, srtStrJson);
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void GetSort2(RequestData d) {
         string postData = d.postData;
-        var json = JObject.Parse(postData);
-        string dir = json["dir"].ToString();
-        string[] ar = json["ar"].ToObject<string[]>();
-        string type = json["type"].ToString();
+        var json = JsonDocument.Parse(postData);
+        string dir = json.GetString("dir");
+        string[] ar = json.GetStringArray("ar");
+        string type = json.GetString("type");
 
         var filesort = new FileSort();
         string[] retAr = filesort.Sort2(dir, ar, type);
-        string srtStrJson = JsonConvert.SerializeObject(retAr);
+        string srtStrJson = JsonSerializer.Serialize(retAr);
         WriteString(d, srtStrJson);
     }
 
@@ -544,10 +542,10 @@ public class WebServerController {
     /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
     /// </summary>
     private void GetSiblingDir(RequestData d) {
-        var json = JObject.Parse(d.postData);
-        string path = json["path"].ToString();
-        string[] arExt = json["arExt"].ToObject<string[]>();
-        int maxCount = json["maxCount"].ToObject<int>();
+        var json = JsonDocument.Parse(d.postData);
+        string path = json.GetString("path");
+        string[] arExt = json.GetStringArray("arExt");
+        int maxCount = json.GetInt32("maxCount");
 
         var wvdir = new WV_Directory();
         string srtStrJson = wvdir.GetSiblingDir(path, arExt, maxCount);
@@ -561,9 +559,9 @@ public class WebServerController {
     /// </summary>
     private void GetFiles2(RequestData d) {
 
-        var json = JObject.Parse(d.postData);
-        string dirPath = json["dirPath"].ToString();
-        string[] arName = json["arName"].ToObject<string[]>();
+        var json = JsonDocument.Parse(d.postData);
+        string dirPath = json.GetString("dirPath");
+        string[] arName = json.GetStringArray("arName");
 
         var wvdir = new WV_Directory();
         string[] retAr = wvdir.GetFiles2(dirPath, arName);
@@ -572,7 +570,7 @@ public class WebServerController {
             retAr[i] = retAr[i].Substring(pathLen);
         }
 
-        string srtStrJson = JsonConvert.SerializeObject(retAr);
+        string srtStrJson = JsonSerializer.Serialize(retAr);
         WriteString(d, srtStrJson);
     }
 
@@ -581,9 +579,9 @@ public class WebServerController {
     /// 回傳資料夾裡面的檔案
     /// </summary>
     private void GetFiles(RequestData d) {
-        var json = JObject.Parse(d.postData);
-        string path = json["path"].ToString();
-        string searchPattern = json["searchPattern"].ToString();
+        var json = JsonDocument.Parse(d.postData);
+        string path = json.GetString("path");
+        string searchPattern = json.GetString("searchPattern");
 
         // 只回傳檔名，減少傳輸成本
         int pathLen = path.Length;
@@ -591,7 +589,7 @@ public class WebServerController {
             .Select(filePath => filePath.Substring(pathLen))
             .ToArray();
 
-        string srtStrJson = JsonConvert.SerializeObject(retAr);
+        string srtStrJson = JsonSerializer.Serialize(retAr);
         WriteString(d, srtStrJson);
     }
 
@@ -599,10 +597,9 @@ public class WebServerController {
     /// 回傳資料夾裡面的子資料夾
     /// </summary>
     private void GetDirectories(RequestData d) {
-
-        var json = JObject.Parse(d.postData);
-        string path = (json["path"]).ToString();
-        string searchPattern = json["searchPattern"].ToString();
+        var json = JsonDocument.Parse(d.postData);
+        string path = json.GetString("path");
+        string searchPattern = json.GetString("searchPattern");
 
         string[] retAr = Directory.GetDirectories(path, searchPattern);
         int pathLen = path.Length; //只回傳檔名，減少傳輸成本
@@ -610,7 +607,7 @@ public class WebServerController {
             retAr[i] = retAr[i].Substring(pathLen);
         }
 
-        string srtStrJson = JsonConvert.SerializeObject(retAr);
+        string srtStrJson = JsonSerializer.Serialize(retAr);
         WriteString(d, srtStrJson); //回傳
     }
 

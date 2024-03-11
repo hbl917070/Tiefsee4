@@ -74,7 +74,7 @@ public class Exif {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static ImgExif GetExif(string path, int maxLength) {
 
@@ -359,12 +359,12 @@ public class Exif {
 }
 
 public class ImgExif {
-    public string code = "0";
-    public List<ImgExifItem> data = new();
+    public string code { get; set; } = "0";
+    public List<ImgExifItem> data { get; set; } = new();
 }
 
 public class ImgExifItem {
-    public string group = "";
-    public string name = "";
-    public string value = "";
+    public string group { get; set; } = "";
+    public string name { get; set; } = "";
+    public string value { get; set; } = "";
 }

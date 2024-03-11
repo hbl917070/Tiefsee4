@@ -1,10 +1,9 @@
-﻿using ImageMagick;
+using ImageMagick;
 using LibAPNG;
 using NetVips;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text.Json;
 
 namespace Tiefsee;
 
@@ -41,14 +40,21 @@ public class ImgFrames {
                 if (File.Exists(infoPath)) {
                     using var stream = new FileStream(infoPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     using var reader = new StreamReader(stream);
-                    var json = JObject.Parse(reader.ReadToEnd());
 
-                    if ((json["hase"] ?? "").ToString() == hase) {
+                    JsonDocument json = null;
+                    try {
+                        json = JsonDocument.Parse(reader.ReadToEnd());
+                    }
+                    catch {
+                        continue; // 如果解析失敗，則使用下一個資料夾
+                    }
+
+                    if (json.TryGetString("hase") == hase) {
 
                         string[] arFile = Directory.GetFiles(outputDir, "*.*"); // 取得資料夾內所有檔案
 
                         // 產生集合，應該存在的圖片
-                        var frameCount = int.Parse((json["frameCount"] ?? "0").ToString());
+                        var frameCount = json.TryGetInt32("frameCount") ?? 0;
                         if (frameCount == 0) { break; }
                         var arPng = Enumerable.Range(1, frameCount)
                             .Select(i => Path.Combine(outputDir, i.ToString() + ".png"))
@@ -320,7 +326,7 @@ public class ImgFrames {
             };
         }
 
-        string json = JsonConvert.SerializeObject(data, Formatting.Indented);
+        string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
         string jsonPath = Path.Combine(outputDir, "info.json");
 
         var utf8WithoutBom = new System.Text.UTF8Encoding(false);

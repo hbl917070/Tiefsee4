@@ -40,7 +40,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static void PathToBitmapSource(string path, Action<BitmapSource> func) {
         using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
@@ -50,7 +50,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static BitmapSource StreamToBitmapSource(MemoryStream ms) {
         BitmapDecoder bd = BitmapDecoder.Create(ms, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
@@ -58,7 +58,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static Stream BitmapSourceToStream(BitmapSource bs) {
         BitmapEncoder encoder = new BmpBitmapEncoder();
@@ -70,7 +70,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static MagickImage GetMagickImage(string path) {
 
@@ -98,7 +98,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
@@ -136,7 +136,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static Stream Wpf_PathToStream(string path) {
         Stream stream = null;
@@ -263,7 +263,7 @@ public class ImgLib {
     public static Stream ExtractPngToStream(string filePath) {
         try {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
-                byte[] startHex = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // png 檔的開頭       
+                byte[] startHex = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // png 檔的開頭
                 int startIndex = FindStrIndexOf(fs, startHex);
                 if (startIndex == -1) { return null; }
                 byte[] endHex = new byte[] { 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 }; //png檔的結尾
@@ -373,7 +373,7 @@ public class ImgLib {
     #region Raw
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="path"></param>
     /// <param name="thumbnail"></param>
@@ -407,7 +407,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static Stream RawThumbnail_PathToStream(string path, int minSize, out int width, out int height) {
         RawContext r;
@@ -478,7 +478,7 @@ public class ImgLib {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static Stream RawFull_PathToTif(string path) {
         using var r = RawContext.OpenFile(path);
@@ -899,10 +899,10 @@ public class ImgLib {
 }
 
 public class ImgInitInfo {
-    public string code = "-1";
-    public string path = "";
-    public int width = 0;
-    public int height = 0;
-    public string vipsType = "";
-    // public string msg = "";
+    public string code { get; set; } = "-1";
+    public string path { get; set; } = "";
+    public int width { get; set; } = 0;
+    public int height { get; set; } = 0;
+    public string vipsType { get; set; } = "";
+    // public string msg { get; set; } = "";
 }

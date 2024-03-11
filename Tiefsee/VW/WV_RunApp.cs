@@ -1,9 +1,8 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using Windows.Management.Deployment;
 
 namespace Tiefsee;
@@ -104,14 +103,14 @@ public class WV_RunApp {
     }
 
     class UwpItem {
-        public string Logo;
-        public string Name;
-        public string Id;
+        public string Logo { get; set; }
+        public string Name { get; set; }
+        public string Id { get; set; }
     }
 
 
     /// <summary>
-    /// 取得UWP列表
+    /// 取得 UWP 列表
     /// </summary>
     public string GetUwpList() {
 
@@ -126,8 +125,7 @@ public class WV_RunApp {
                         jsonString = sr.ReadToEnd();
                     }
                 }
-                JObject jsonObj = JObject.Parse(jsonString);
-                _tempUwpItem = jsonObj.ToObject<Dictionary<string, UwpItem>>();
+                _tempUwpItem = JsonSerializer.Deserialize<Dictionary<string, UwpItem>>(jsonString);
             }
             catch (Exception) {
                 _tempUwpItem = new Dictionary<string, UwpItem>();
@@ -164,14 +162,14 @@ public class WV_RunApp {
 
         // 如果是首次執行，就產生暫存檔，減少下次讀取的時間
         if (isFirstRun) {
-            using (FileStream fs = new FileStream(AppPath.appDataUwpList, FileMode.Create)) {
-                using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8)) {
-                    sw.Write(JsonConvert.SerializeObject(temp_appDataUwpList));
+            using (var fs = new FileStream(AppPath.appDataUwpList, FileMode.Create)) {
+                using (var sw = new StreamWriter(fs, Encoding.UTF8)) {
+                    sw.Write(JsonSerializer.Serialize(temp_appDataUwpList));
                 }
             }
         }
 
-        return JsonConvert.SerializeObject(ar);
+        return JsonSerializer.Serialize(ar);
     }
     private static Dictionary<string, UwpItem> _tempUwpItem = null;
 
@@ -188,7 +186,7 @@ public class WV_RunApp {
             WorkingDirectory = Path.GetDirectoryName(FileName), // 設定執行檔所在的目錄
             Arguments = Arguments, // 命令參數
             CreateNoWindow = CreateNoWindow, // 是否使用新視窗
-            UseShellExecute = UseShellExecute // false=新視窗個體 
+            UseShellExecute = UseShellExecute // false=新視窗個體
         };
         System.Diagnostics.Process.Start(psi);
     }

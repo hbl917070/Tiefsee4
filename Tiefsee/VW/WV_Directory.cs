@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Tiefsee;
@@ -112,7 +111,7 @@ public class WV_Directory {
             catch { }
         }
 
-        return JsonConvert.SerializeObject(output);
+        return System.Text.Json.JsonSerializer.Serialize(output);
     }
 
     /// <summary>

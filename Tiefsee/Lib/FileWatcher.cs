@@ -144,9 +144,9 @@ public class FileWatcher {
 }
 
 public class FileWatcherData {
-    public string Key;
-    public string FullPath;
-    public string OldFullPath;
-    public string ChangeType;
-    public string FileType;
+    public string Key { get; set; }
+    public string FullPath { get; set; }
+    public string OldFullPath { get; set; }
+    public string ChangeType { get; set; }
+    public string FileType { get; set; }
 }

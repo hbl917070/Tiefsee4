@@ -1,9 +1,9 @@
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
-using Newtonsoft.Json;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 
 namespace Tiefsee;
 
@@ -12,7 +12,7 @@ public class WebWindow : FormNone {
 
     public WebView2 wv2;
     public WebWindow parentWindow; // 父視窗
-    public string[] args; // 命令列參數 
+    public string[] args; // 命令列參數
     public static WebWindow tempWindow; // 用於快速啟動的暫存視窗
     private bool isShow = false; // 是否已經顯式過視窗(用於單一啟動
     public bool isDelayInit = false; // 是否延遲初始化(暫存視窗必須設定成true
@@ -30,7 +30,7 @@ public class WebWindow : FormNone {
     public WV_Image WV_Image;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public WebWindow() {
     }
@@ -201,7 +201,7 @@ public class WebWindow : FormNone {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="args"></param>
     /// <returns> json </returns>
@@ -221,7 +221,7 @@ public class WebWindow : FormNone {
         };
 
         if (File.Exists(appInfo.settingPath)) {
-            using (StreamReader sr = new StreamReader(appInfo.settingPath, Encoding.UTF8)) {
+            using (var sr = new StreamReader(appInfo.settingPath, Encoding.UTF8)) {
                 appInfo.settingTxt = sr.ReadToEnd();
             }
         }
@@ -229,38 +229,38 @@ public class WebWindow : FormNone {
             appInfo.settingTxt = "";
         }
 
-        return JsonConvert.SerializeObject(appInfo);
+        return JsonSerializer.Serialize(appInfo);
     }
 
     public class AppInfo {
         /// <summary> 命令列參數 </summary>
-        public string[] args;
+        public string[] args { get; set; }
         /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
-        public int startType;
+        public int startType { get; set; }
         /// <summary> 程式開始的port </summary>
-        public int startPort;
+        public int startPort { get; set; }
         /// <summary> 伺服器對靜態資源使用快取 0=不使用 1=使用  </summary>
-        public int serverCache;
+        public int serverCache { get; set; }
         /// <summary> 程式所在的資料夾 </summary>
-        public string appDirPath;
+        public string appDirPath { get; set; }
         /// <summary> 程式的暫存資料夾 </summary>
-        public string appDataPath;
+        public string appDataPath { get; set; }
         /// <summary> 目前使用的 port </summary>
-        public int mainPort;
+        public int mainPort { get; set; }
         /// <summary> setting.js 的路徑 </summary>
-        public string settingPath;
+        public string settingPath { get; set; }
         /// <summary> setting.js 的文字 </summary>
-        public string settingTxt;
+        public string settingTxt { get; set; }
         /// <summary> 是否為快速預覽的視窗。 0=不是快速預覽 1=長按空白鍵 2=長按滑鼠中鍵 </summary>
-        public int quickLookRunType;
+        public int quickLookRunType { get; set; }
         /// <summary> 是否為商店版 APP </summary>
-        public bool isStoreApp;
+        public bool isStoreApp { get; set; }
         /// <summary> 哪些擴充是有啟用的 </summary>
-        public DataPlugin plugin = Plugin.dataPlugin;
+        public DataPlugin plugin { get; set; } = Plugin.dataPlugin;
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public async void Init() {
 
@@ -449,7 +449,7 @@ public class WebWindow : FormNone {
         // 如果視窗已經顯示了，則只取得焦點，不做其他事情
         if (isShow) {
             if (this.WindowState == FormWindowState.Minimized) { // 如果是最小化
-                ShowWindow(this.Handle, SW_NORMAL); // 視窗狀態    
+                ShowWindow(this.Handle, SW_NORMAL); // 視窗狀態
                                                     //this.WindowState = FormWindowState.Normal; // 視窗化
             }
             SetFocus(); // 讓視窗在最上面並且取得焦點
@@ -500,7 +500,7 @@ public class WebWindow : FormNone {
         // 如果視窗已經顯示了，則只取得焦點，不做其他事情
         if (isShow) {
             if (this.WindowState == FormWindowState.Minimized) { // 如果是最小化
-                ShowWindow(this.Handle, SW_NORMAL); // 視窗狀態    
+                ShowWindow(this.Handle, SW_NORMAL); // 視窗狀態
                                                     //this.WindowState = FormWindowState.Normal; // 視窗化
             }
             SetFocus(); // 讓視窗在最上面並且取得焦點
@@ -547,7 +547,7 @@ public class WebWindow : FormNone {
         if (isShow) {
             if (this.WindowState == FormWindowState.Minimized) { // 如果是最小化
 
-                ShowWindow(this.Handle, SW_RESTORE); // 視窗狀態    
+                ShowWindow(this.Handle, SW_RESTORE); // 視窗狀態
                                                      // this.WindowState = FormWindowState.Normal; // 視窗化
             }
             SetFocus(); // 讓視窗在最上面並且取得焦點
@@ -594,7 +594,7 @@ public class WebWindow : FormNone {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void RunJs(string js) {
         if (wv2 != null && wv2.CoreWebView2 != null) {
@@ -799,7 +799,7 @@ public class FormNone : Form {
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     protected override void WndProc(ref Message m) {
 

@@ -74,10 +74,10 @@ public static class PluginQuickLook {
 }
 
 public class DataPlugin {
-    public bool NConvert = false;
-    public bool QuickLook = false;
-    public bool MonacoEditor = false;
-    public bool PDFTronWebviewer = false;
-    public string PDFTronWebviewer_js = "";
-    public string PDFTronWebviewer_lib = "";
+    public bool NConvert { get; set; } = false;
+    public bool QuickLook { get; set; } = false;
+    public bool MonacoEditor { get; set; } = false;
+    public bool PDFTronWebviewer { get; set; } = false;
+    public string PDFTronWebviewer_js { get; set; } = "";
+    public string PDFTronWebviewer_lib { get; set; } = "";
 }
