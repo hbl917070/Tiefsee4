@@ -710,7 +710,8 @@ class MainWindow {
 
             } else {
 
-                await fileLoad.loadFiles(args); // 載入多張圖片
+                let arPath = await WebAPI.Directory.getFiles2(args);
+                await fileLoad.loadFiles(arPath); // 載入多張圖片
 
             }
 

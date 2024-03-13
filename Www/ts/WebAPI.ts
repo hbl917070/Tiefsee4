@@ -30,11 +30,16 @@ class WebAPI {
         }
 
         /**
-         * 檔名陣列 轉 路徑陣列 (用於載入複數檔案
-         * @param dirPath 資料夾路徑
-         * @param arName 檔名陣列
+         * 傳入路徑集合，回傳每個資料夾内的檔案
+         * @param arPath 路徑集合
          */
-        static async getFiles2(dirPath: string, arName: string[]) {
+        static async getFiles2(arPath: string[]) {
+            // 取得共同的開頭(通常是資料夾路徑)
+            let dirPath = Lib.GetDirectoryName(arPath[0]);
+            if (dirPath === null) { return []; }
+            // 處理成檔名
+            let arName = arPath.map(arg => Lib.GetFileName(arg));
+
             let url = APIURL + "/api/directory/getFiles2";
             let postData = { dirPath: dirPath, arName: arName };
             let retAr: string[] = await WebAPI.sendPost(url, postData);
