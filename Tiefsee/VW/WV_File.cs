@@ -133,11 +133,14 @@ public class WV_File {
     /// </summary>
     public void DragDropFile(string path) {
 
-        if (File.Exists(path) == false && Directory.Exists(path) == false) { return; }
+        bool isDir = Directory.Exists(path);
+        bool isFile = File.Exists(path);
+
+        if (isDir == false && isFile == false) { return; }
 
         try {
 
-            if (path == Path.GetFullPath(path)) { // 一般路徑
+            if (isFile && path == Path.GetFullPath(path)) { // 是檔案 且 不是長路徑
 
                 // 有縮圖(不支援長路經)
                 var dataObject = DataObjectUtilities.GetFileDataObject(path);
