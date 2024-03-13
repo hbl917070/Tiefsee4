@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>TiefseeLauncher</ActiveDebugProfile>
+    <ActiveDebugProfile>TiefseeLauncherDll</ActiveDebugProfile>
   </PropertyGroup>
 </Project>

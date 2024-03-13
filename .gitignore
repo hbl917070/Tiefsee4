@@ -22,8 +22,11 @@
 
 /Output
 
-/TiefseeLauncher/obj
-/TiefseeLauncher/bin
+/TiefseeLauncherDll/obj
+/TiefseeLauncherDll/bin
 
 /BuildAll/obj
 /BuildAll/bin
+
+TiefseeLauncher/x64
+TiefseeLauncher/Resource.aps

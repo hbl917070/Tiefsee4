@@ -1,23 +1,45 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace TiefseeLauncher;
 
-public static class Program {
-    [STAThread]
+public class Program {
+
+    /*[STAThread]
     public static void Main(string[] args) {
         new Launcher().Init(args);
+    }*/
+
+    // 導出到 C++
+    [UnmanagedCallersOnly(EntryPoint = "run")]
+    public static IntPtr Run(int argc, IntPtr argvPtr) {
+        // 將 argvPtr 轉換為 string[]
+        string[] argv = new string[argc];
+        for (int i = 0; i < argc; i++) {
+            IntPtr ptr = Marshal.ReadIntPtr(argvPtr, i * IntPtr.Size);
+            argv[i] = Marshal.PtrToStringAnsi(ptr);
+        }
+
+        new Launcher().Init(argv);
+
+        // 回傳
+        // string result = string.Join(" ", argv);
+        // IntPtr resultPtr = Marshal.StringToHGlobalAnsi(result);
+        IntPtr resultPtr = Marshal.StringToHGlobalAnsi("ok");
+        return resultPtr;
     }
 }
 
 class Launcher {
     /// <summary> Tiefsee.exe 路徑 </summary>
-    private string? exePath;
+    private string exePath;
     /// <summary> AppData(使用者資料) </summary>
-    private string? appData;
+    private string appData;
     /// <summary> Start.ini </summary>
-    private string? appDataStartIni;
+    private string appDataStartIni;
     /// <summary> Port Dir </summary>
-    private string? appDataPort;
+    private string appDataPort;
     /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
     private int startType;
     /// <summary> 透過 UserAgent 來驗證是否有權限請求 localhost server API </summary>
@@ -66,7 +88,7 @@ class Launcher {
         var startInfo = new ProcessStartInfo();
         startInfo.FileName = exePath;
         startInfo.Arguments = string.Join(" ", args.Select(x => "\"" + x + "\""));
-        Process.Start(startInfo);
+        Process.Start(startInfo).Dispose();
     }
 
     /// <summary>
@@ -96,7 +118,7 @@ class Launcher {
                 using (HttpClient client = new HttpClient()) {
                     client.Timeout = TimeSpan.FromSeconds(5); // 逾時
                     client.DefaultRequestHeaders.Add("User-Agent", webvviewUserAgent);
-                    HttpResponseMessage response = client.GetAsync(uri).Result;
+                    using HttpResponseMessage response = client.GetAsync(uri).Result;
                 }
 
                 NewWindow(args, port);
@@ -118,9 +140,42 @@ class Launcher {
         using (HttpClient client = new HttpClient()) {
             client.Timeout = TimeSpan.FromSeconds(5); // 逾時
             client.DefaultRequestHeaders.Add("User-Agent", webvviewUserAgent);
-            HttpResponseMessage response = client.GetAsync(uri).Result;
+            using HttpResponseMessage response = client.GetAsync(uri).Result;
             // string responseContent = response.Content.ReadAsStringAsync().Result; 
         }
     }
 
+}
+
+/// <summary>
+/// 存取 ini 檔
+/// </summary>
+class IniManager {
+    private string filePath;
+    private StringBuilder lpReturnedString;
+    private int bufferSize;
+
+    // [DllImport("kernel32")]
+    // private static extern long WritePrivateProfileString(string section, string key, string lpString, string lpFileName);
+
+    [DllImport("kernel32")]
+    private static extern int GetPrivateProfileString(string section, string key, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
+
+    public IniManager(string iniPath) {
+        filePath = iniPath;
+        bufferSize = 512;
+        lpReturnedString = new StringBuilder(bufferSize);
+    }
+
+    // read ini date depend on section and key
+    public string ReadIniFile(string section, string key, string defaultValue) {
+        lpReturnedString.Clear();
+        GetPrivateProfileString(section, key, defaultValue, lpReturnedString, bufferSize, filePath);
+        return lpReturnedString.ToString();
+    }
+
+    // write ini data depend on section and key
+    // public void WriteIniFile(string section, string key, Object value) {
+    //     WritePrivateProfileString(section, key, value.ToString(), filePath);
+    // }
 }

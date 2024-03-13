@@ -23,23 +23,31 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 
 		<!-- 編譯這些專案 -->
-		<MSBuild Projects="..\TiefseeLauncher\TiefseeLauncher.csproj" />
-		<MSBuild Projects="..\Tiefsee\Tiefsee.csproj" />
-
-		<!-- 刪除無用檔案 -->
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\Tiefsee.pdb" />
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\TiefseeCore.pdb" />
+		<Exec Command="dotnet publish ../TiefseeLauncherDll/TiefseeLauncherDll.csproj -r win-x64 -c Release -o ../Output" />
+		<MSBuild Projects="../TiefseeLauncher/TiefseeLauncher.vcxproj" />
+		<MSBuild Projects="../Tiefsee/Tiefsee.csproj" />
 		
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.pdb" />
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.dll" />
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.exe" />
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.runtimeconfig.json" />
-		<Delete Files="$(MSBuildProjectDirectory)\..\Output\BuildAll.deps.json" />
+		<!-- 刪除無用檔案 -->
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/Tiefsee.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/TiefseeCore.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/Tiefsee.exe.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/TiefseeLauncherDll.pdb" />
+
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.dll" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.exe" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.runtimeconfig.json" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.deps.json" />
+	</Target>
+	
+	
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		
 	</Target>
 
 	<!-- 打包成 zip -->
 	<Target Name="ZipOutputPath" AfterTargets="Build">
-		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)\..\Output" DestinationFile="$(MSBuildProjectDirectory)\..\Tiefsee.zip" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/../Output" DestinationFile="$(MSBuildProjectDirectory)/../Tiefsee.zip" />
 	</Target>
 
 </Project>
