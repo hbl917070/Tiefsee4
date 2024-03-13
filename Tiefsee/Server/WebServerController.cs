@@ -8,7 +8,6 @@ namespace Tiefsee;
 public class WebServerController {
 
     private WebServer webServer;
-    private int cacheTime = 0; // 靜態資源快取的時間
 
     public WebServerController(WebServer ws) {
 
@@ -657,7 +656,6 @@ public class WebServerController {
 
         d.context.Response.Headers.Add("Last-Modified", lastModified); // 檔案建立的時間
         d.context.Response.Headers.Add("ETag", etag); // 瀏覽器用來判斷資源是否有更新的key
-        d.context.Response.Headers.Add("Cache-Control", "public, max-age=" + cacheTime); // 讓瀏覽器快取檔案
 
         if (d.context.Request.Headers["If-None-Match"] == etag) { // 表示瀏覽器還留有暫存，狀態304後，不用回傳任何資料
             d.context.Response.StatusCode = 304;
@@ -665,16 +663,6 @@ public class WebServerController {
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// 設定是否對靜態資源使用快取
-    /// </summary>
-    /// <param name="time"> 秒數 </param>
-    public void SetCacheTime(int time) {
-        if (time <= 0) { time = 0; }
-        if (time >= 31536000) { time = 31536000; } // 一年
-        cacheTime = time;
     }
 
     /// <summary>

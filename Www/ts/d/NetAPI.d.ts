@@ -45,7 +45,7 @@ interface WV_Window {
     ClearBrowserCache(): void;
 
     /** 儲存到 start.ini */
-    SetStartIni(startPort: number, startType: number, serverCache: number)
+    SetStartIni(startPort: number, startType: number)
 
     /** 取得 AppInfo*/
     GetAppInfo(): string;
@@ -540,9 +540,6 @@ interface AppInfo {
 
     /** 程式開始的port */
     startPort: number;
-
-    /** 伺服器對靜態資源快取的時間(秒) */
-    serverCache: number;
 
     /** 程式所在的資料夾 */
     appDirPath: string;

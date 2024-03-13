@@ -211,7 +211,6 @@ public class WebWindow : FormNone {
             args = args,
             startType = Program.startType,
             startPort = Program.startPort,
-            serverCache = Program.serverCache,
             appDirPath = System.AppDomain.CurrentDomain.BaseDirectory,
             appDataPath = AppPath.appData,
             mainPort = Program.webServer.port,
@@ -239,8 +238,6 @@ public class WebWindow : FormNone {
         public int startType { get; set; }
         /// <summary> 程式開始的port </summary>
         public int startPort { get; set; }
-        /// <summary> 伺服器對靜態資源使用快取 0=不使用 1=使用  </summary>
-        public int serverCache { get; set; }
         /// <summary> 程式所在的資料夾 </summary>
         public string appDirPath { get; set; }
         /// <summary> 程式的暫存資料夾 </summary>

@@ -1088,12 +1088,10 @@ class SettingWindow {
         addLoadEvent(() => {
 
             var text_startPort = getDom("#text-startPort") as HTMLInputElement;
-            var text_serverCache = getDom("#text-serverCache") as HTMLInputElement;
             var btn_restart = getDom("#btn-startupMode-restart") as HTMLButtonElement;
 
             Lib.setRadio("[name='radio-startType']", appInfo.startType.toString())
             text_startPort.value = appInfo.startPort.toString();
-            text_serverCache.value = appInfo.serverCache.toString();
 
             // 調整選項後，顯示「重新啟動」的按鈕
             btn_restart.style.display = "none";
@@ -1114,7 +1112,6 @@ class SettingWindow {
                 // 儲存 start.ini
                 let startPort = parseInt(text_startPort.value);
                 let startType: any = Lib.getRadio("[name='radio-startType']");
-                let serverCache = parseInt(text_serverCache.value);
 
                 if (isNaN(startPort)) { startPort = 4876; }
                 if (startPort > 65535) { startPort = 65535; }
@@ -1123,11 +1120,7 @@ class SettingWindow {
                 if (startType.search(/^[1|2|3|4|5]$/) !== 0) { startType = 2; }
                 startType = parseInt(startType);
 
-                if (isNaN(serverCache)) { serverCache = 0; }
-                if (serverCache > 31536000) { serverCache = 31536000; }
-                if (serverCache < 0) { serverCache = 0; }
-
-                await WV_Window.SetStartIni(startPort, startType, serverCache);
+                await WV_Window.SetStartIni(startPort, startType);
             });
 
             // 重新啟動Tiefsee

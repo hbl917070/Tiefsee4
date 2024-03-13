@@ -10,8 +10,6 @@ static class Program {
     public static int startPort;
     /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
     public static int startType;
-    /// <summary> 伺服器對靜態資源快取的時間(秒) </summary>
-    public static int serverCache;
     /// <summary> 本地伺服器 </summary>
     public static WebServer webServer;
     /// <summary> 起始視窗，關閉此視窗就會結束程式 </summary>
@@ -47,7 +45,6 @@ static class Program {
         IniManager iniManager = new IniManager(AppPath.appDataStartIni);
         startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
-        serverCache = Int32.Parse(iniManager.ReadIniFile("setting", "serverCache", "0"));
 
         bool argsIsNone = (args.Length == 1 && args[0] == "none"); // 啟動參數是 none
 
@@ -79,7 +76,6 @@ static class Program {
             System.Windows.Forms.MessageBox.Show("Tiefsee localhost server error");
             return;
         }
-        webServer.controller.SetCacheTime(serverCache);
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
