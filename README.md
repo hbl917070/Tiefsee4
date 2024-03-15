@@ -70,7 +70,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
  - There is no functional difference between the Store and Portable versions
  - The Store version can be updated through the store and will not leave any data after Tiefsee is deleted
  - The Portable version requires the installation of [.NET Desktop Runtime 7 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) to run
- - The Portable version can use 'portable mode' by creating a `portableMode` folder next to Tiefsee.exe, and all data will be stored inside
+ - The Portable version can use 'portable mode' by creating a `PortableMode` folder next to Tiefsee.exe, and all data will be stored inside
 
 > If there are no special requirements, it is recommended to use the Store version
 

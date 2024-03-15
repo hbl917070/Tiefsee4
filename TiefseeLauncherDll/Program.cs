@@ -5,11 +5,11 @@ using System.Text;
 namespace TiefseeLauncher;
 
 public class Program {
-
-    /*[STAThread]
+    /*
+    [STAThread]
     public static void Main(string[] args) {
         new Launcher().Init(args);
-    }*/
+    } */
 
     // 導出到 C++
     [UnmanagedCallersOnly(EntryPoint = "run")]
@@ -56,7 +56,7 @@ class Launcher {
             exePath = Path.Combine(baseDirectory, "../Tiefsee/TiefseeCore.exe");
         }
 
-        string portableMode = Path.Combine(baseDirectory, "portableMode");
+        string portableMode = Path.Combine(baseDirectory, "PortableMode");
         if (Directory.Exists(portableMode)) { // 便攜模式 (如果存在此資料夾，就把資料儲存在這裡
             appData = portableMode;
         }
@@ -66,7 +66,6 @@ class Launcher {
 
         appDataStartIni = Path.Combine(appData, "Start.ini");
         appDataPort = Path.Combine(appData, "Port");
-
         var iniManager = new IniManager(appDataStartIni);
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
 
@@ -174,8 +173,9 @@ class IniManager {
         return lpReturnedString.ToString();
     }
 
+    /*
     // write ini data depend on section and key
-    // public void WriteIniFile(string section, string key, Object value) {
-    //     WritePrivateProfileString(section, key, value.ToString(), filePath);
-    // }
+    public void WriteIniFile(string section, string key, Object value) {
+        WritePrivateProfileString(section, key, value.ToString(), filePath);
+    }*/
 }

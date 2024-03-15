@@ -26,8 +26,16 @@ static class Program {
     static void Main(string[] args) {
 
         // 修改 工作目錄 為程式資料夾 (如果有傳入 args 的話，工作目錄會被修改，所以需要改回來
-        Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
-        AppPath.Init();
+        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+        AppPath.InitAppData();
+
+        var iniManager = new IniManager(AppPath.appDataStartIni);
+        startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
+        startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
+        var appData = iniManager.ReadIniFile("temporary", "appData", "");
+        var isStoreApp = iniManager.ReadIniFile("temporary", "isStoreApp", "") == "True";
+
+        AppPath.Init(appData, isStoreApp);
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
         if (StartWindow.isStoreApp) {
@@ -41,10 +49,6 @@ static class Program {
             }
             catch { }
         }
-
-        IniManager iniManager = new IniManager(AppPath.appDataStartIni);
-        startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-        startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
 
         bool argsIsNone = (args.Length == 1 && args[0] == "none"); // 啟動參數是 none
 
