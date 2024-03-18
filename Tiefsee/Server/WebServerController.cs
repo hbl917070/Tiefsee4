@@ -21,6 +21,7 @@ public class WebServerController {
 
         webServer.RouteAdd("/api/check", Ckeck);
         webServer.RouteAdd("/api/newWindow", NewWindow);
+        webServer.RouteAdd("/api/closeAllWindow", CloseAllWindow);
 
         webServer.RouteAdd("/api/getExif", GetExif);
         webServer.RouteAdd("/api/getPdf", GetPdf);
@@ -290,6 +291,16 @@ public class WebServerController {
             WebWindow.Create("MainWindow.html", args, null);
         });
 
+        WriteString(d, "ok");
+    }
+
+    /// <summary>
+    /// 關閉全部的視窗
+    /// </summary>
+    private void CloseAllWindow(RequestData d) {
+        Adapter.UIThread(() => {
+            WebWindow.CloseAllWindow();
+        });
         WriteString(d, "ok");
     }
 

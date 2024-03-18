@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -66,10 +66,10 @@ public class WV_Window {
     }
 
     /// <summary>
-    /// 關閉全部的視窗 (結束程式)
+    /// 關閉全部的視窗
     /// </summary>
-    public void CloseAllWindow() {
-        QuickRun.CloseAllWindow();
+    public void Exit() {
+        QuickRun.Exit();
     }
 
     /// <summary>

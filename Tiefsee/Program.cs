@@ -43,11 +43,17 @@ static class Program {
                 var args2 = AppInstance.GetActivatedEventArgs();
                 if (args2 != null) {
                     if (args2.Kind == ActivationKind.StartupTask) {
-                        args = new string[] { "none" };
+                        args = ["none"];
                     }
                 }
             }
             catch { }
+        }
+
+        // 啟動參數是 closeAll
+        if (args.Length == 1 && args[0] == "closeAll") {
+            QuickRun.CloseAllWindow();
+            return;
         }
 
         bool argsIsNone = (args.Length == 1 && args[0] == "none"); // 啟動參數是 none

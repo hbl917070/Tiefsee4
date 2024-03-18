@@ -17,6 +17,8 @@ public class WebWindow : FormNone {
     private bool isShow = false; // 是否已經顯式過視窗(用於單一啟動
     public bool isDelayInit = false; // 是否延遲初始化(暫存視窗必須設定成true
 
+    public static List<WebWindow> webWindowList = new(); // 用於記錄所有視窗
+
     // 用於記錄全螢幕前的狀態
     private FormWindowState tempFormWindowState = FormWindowState.Normal;
     private bool tempFullScreen = false;
@@ -33,6 +35,11 @@ public class WebWindow : FormNone {
     ///
     /// </summary>
     public WebWindow() {
+        webWindowList.Add(this);
+
+        this.FormClosed += (sender, e) => {
+            webWindowList.Remove(this);
+        };
     }
 
     /// <summary>
@@ -191,6 +198,19 @@ public class WebWindow : FormNone {
             System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName
         ) + "#" + Program.webServer.port; // post 用於讓 js 識別 webAPI 的網址
         return p;
+    }
+
+    /// <summary>
+    /// 關閉所有視窗
+    /// </summary>
+    public static void CloseAllWindow() {
+        int count = webWindowList.Count;
+        // 從後往前關閉，避免關閉後，webWindowList 的數量減少
+        for (int i = count - 1; i >= 0; i--) {
+            var item = webWindowList[i];
+            if (item == null || item.IsDisposed || item == tempWindow) { continue; }
+            webWindowList[i].Close();
+        }
     }
 
     /// <summary>

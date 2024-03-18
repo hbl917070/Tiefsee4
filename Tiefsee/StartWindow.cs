@@ -1,6 +1,7 @@
 using Microsoft.Web.WebView2.Core;
 using System.IO;
 using System.Windows.Input;
+using Windows.UI.StartScreen;
 
 namespace Tiefsee;
 
@@ -27,8 +28,9 @@ public class StartWindow : Form {
         Adapter.Initialize();
         Plugin.Init();
 
-        PortLock(); // 寫入檔案，表示此port已經被佔用
-        CheckWebView2(); // 檢查是否有webview2執行環境
+        PortLock(); // 寫入檔案，表示此 port 已經被佔用
+        CheckWebView2(); // 檢查是否有 webview2 執行環境
+        InitJumpTask(); // 初始化 JumpTask
 
         //--------------
 
@@ -207,6 +209,28 @@ public class StartWindow : Form {
         cm.Items.Add(item3);
 
         nIcon.ContextMenuStrip = cm;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public async void InitJumpTask() {
+
+        // 獲取默認的 JumpList
+        var jumpList = await Windows.UI.StartScreen.JumpList.LoadCurrentAsync();
+
+        // 清除默認的 JumpList
+        jumpList.Items.Clear();
+
+        if (Program.startType != 4 && Program.startType != 5) {
+            var item = JumpListItem.CreateWithArguments("closeAll", "Close all Tiefsee");
+            // item.Description = "Close all Tiefsee";
+            // item.Logo = new Uri("ms-appx:///t1.ico");
+            jumpList.Items.Add(item);
+        }
+
+        // 保存 JumpList
+        await jumpList.SaveAsync();
     }
 
     /// <summary>

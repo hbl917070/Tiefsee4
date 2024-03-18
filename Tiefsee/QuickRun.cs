@@ -1,6 +1,6 @@
-﻿using System.IO;
+using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
-using System.Text;
 
 namespace Tiefsee;
 
@@ -33,13 +33,72 @@ public class QuickRun {
     /// </summary>
     public static bool Check(string[] args) {
 
-        if (Program.startType == 1) { // 直接啟動
+        // 直接啟動
+        if (Program.startType == 1) {
             return false;
         }
 
+        // 找不到記錄 port 的資料夾
         if (Directory.Exists(AppPath.appDataPort) == false) {
             return false;
         }
+
+        int port = GetPort();
+
+        // 沒有可以正常請求的 port
+        if (port == -1) {
+            return false;
+        }
+
+        NewWindow(args, port);
+        return true;
+    }
+
+    /// <summary>
+    /// 結束程式
+    /// </summary>
+    public static void Exit() {
+        runNumber = 0;
+        WindowFreed();
+    }
+
+    /// <summary>
+    /// 關閉全部的視窗
+    /// </summary>
+    public static void CloseAllWindow() {
+
+        // 如果是 直接啟動，直接強制結束所有 process
+        if (Program.startType == 1) {
+            Process[] proc = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
+            for (int i = proc.Length - 1; i >= 0; i--) {
+                try {
+                    if (proc[i].Id == Process.GetCurrentProcess().Id)
+                        continue;
+                    proc[i].Kill(); // 關閉執行中的程式
+                }
+                catch { }
+            }
+
+            // 刪除所有的 port 檔案
+            foreach (string filePort in Directory.GetFiles(AppPath.appDataPort, "*")) {
+                try {
+                    File.Delete(filePort);
+                    continue;
+                }
+                catch { }
+            }
+            return;
+        }
+
+        int port = GetPort();
+        string uri = $"http://127.0.0.1:{port}/api/closeAllWindow";
+        SendRequest(uri);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private static int GetPort() {
 
         foreach (string filePort in Directory.GetFiles(AppPath.appDataPort, "*")) { // 判斷目前已經開啟的視窗
 
@@ -56,77 +115,35 @@ public class QuickRun {
                 string port = Path.GetFileName(filePort);
                 // 偵測是否可用
                 string uri = $"http://127.0.0.1:{port}/api/check";
-                using (HttpClient client = new HttpClient()) {
-                    client.Timeout = TimeSpan.FromSeconds(5); // 逾時
-                    client.DefaultRequestHeaders.Add("User-Agent", Program.webvviewUserAgent);
+                SendRequest(uri);
 
-                    HttpResponseMessage response = client.GetAsync(uri).Result;
-                }
-
-                if (Program.startType == 2) { // 快速啟動
-                    NewWindow(args, port);
-                    return true;
-                }
-
-                if (Program.startType == 3) { // 快速啟動且常駐
-                    NewWindow(args, port);
-                    return true;
-                }
-
-                if (Program.startType == 4) { // 單一執行個體
-                    NewWindow(args, port);
-                    return true;
-                }
-
-                if (Program.startType == 5) { // 單一執行個體且常駐
-                    NewWindow(args, port);
-                    return true;
-                }
+                return Int32.Parse(port);
             }
             catch { }
 
             File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
-
         }
-
-        return false;
-    }
-
-    /// <summary>
-    /// 關閉全部的視窗 (結束程式)
-    /// </summary>
-    public static void CloseAllWindow() {
-        runNumber = 0;
-        WindowFreed();
+        return -1;
     }
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="args"></param>
-    /// <param name="port"></param>
-    private static void NewWindow(string[] args, string port) {
-
-        // 啟動參數
-        StringBuilder sb = new();
-        for (int i = 0; i < args.Length; i++) {
-            if (i != args.Length - 1) {
-                sb.Append(args[i] + "\n");
-            }
-            else {
-                sb.Append(args[i]);
-            }
-        }
-
-        // 開啟新視窗
-        string base64 = Uri.EscapeDataString(sb.ToString());
+    private static void NewWindow(string[] args, int port) {
+        string base64 = Uri.EscapeDataString(string.Join("\n", args));
         string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
+        SendRequest(uri);
+    }
 
-        using (HttpClient client = new HttpClient()) {
+    /// <summary>
+    /// 發送 http 請求
+    /// </summary>
+    private static Task<string> SendRequest(string uri) {
+        using (HttpClient client = new()) {
             client.Timeout = TimeSpan.FromSeconds(5); // 逾時
             client.DefaultRequestHeaders.Add("User-Agent", Program.webvviewUserAgent);
             HttpResponseMessage response = client.GetAsync(uri).Result;
-            // string responseContent = response.Content.ReadAsStringAsync().Result; 
+            return response.Content.ReadAsStringAsync();
         }
     }
 

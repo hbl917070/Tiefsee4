@@ -73,8 +73,8 @@ interface WV_Window {
      */
     NewSubWindow(url: string, args: string[]): WebWindow;
 
-    /** 關閉全部的視窗(結束程式) */
-    CloseAllWindow();
+    /** 結束程式 */
+    Exit();
 
     /** 傳入 webWindow，將其設為目前視窗的子視窗*/
     SetOwner(webwindow: WebWindow);

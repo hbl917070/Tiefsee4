@@ -1440,7 +1440,7 @@ class SettingWindow {
             imgPath = `"${imgPath}"`;
             let exePath = await WV_Window.GetAppPath();
             WV_RunApp.ProcessStart(exePath, imgPath, true, false);
-            WV_Window.CloseAllWindow();
+            WV_Window.Exit();
         }
 
     }

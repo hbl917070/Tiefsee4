@@ -64,19 +64,25 @@ class Launcher {
             appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
         }
 
+        // 啟動參數是 closeAll
+        if (args.Length == 1 && args[0] == "closeAll") {
+            RunTiefseeCore(args);
+            return;
+        }
+
         appDataStartIni = Path.Combine(appData, "Start.ini");
         appDataPort = Path.Combine(appData, "Port");
         var iniManager = new IniManager(appDataStartIni);
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
 
         if (startType == 1) {
-            RunTiefseeCore(args); // 啟動 TiefseeCore.exe
+            RunTiefseeCore(args);
         }
         else {
             // 如果允許快速啟動，就不開啟新個體
             if (Check(args)) { return; }
 
-            RunTiefseeCore(args); // 啟動 TiefseeCore.exe
+            RunTiefseeCore(args);
         }
     }
 
@@ -95,9 +101,26 @@ class Launcher {
     /// </summary>
     private bool Check(string[] args) {
 
+        // 找不到記錄 port 的資料夾
         if (Directory.Exists(appDataPort) == false) {
             return false;
         }
+
+        int port = GetPort();
+
+        // 沒有可以正常請求的 port
+        if (port == -1) {
+            return false;
+        }
+
+        NewWindow(args, port);
+        return true;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private int GetPort() {
 
         foreach (string filePort in Directory.GetFiles(appDataPort, "*")) { // 判斷目前已經開啟的視窗
 
@@ -114,33 +137,35 @@ class Launcher {
                 string port = Path.GetFileName(filePort);
                 // 偵測是否可用
                 string uri = $"http://127.0.0.1:{port}/api/check";
-                using (HttpClient client = new HttpClient()) {
-                    client.Timeout = TimeSpan.FromSeconds(5); // 逾時
-                    client.DefaultRequestHeaders.Add("User-Agent", webvviewUserAgent);
-                    using HttpResponseMessage response = client.GetAsync(uri).Result;
-                }
+                SendRequest(uri);
 
-                NewWindow(args, port);
-                return true;
+                return Int32.Parse(port);
             }
             catch { }
 
             File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
         }
-        return false;
+        return -1;
     }
 
     /// <summary>
     /// 開啟新視窗
     /// </summary>
-    private void NewWindow(string[] args, string port) {
+    private void NewWindow(string[] args, int port) {
         string base64 = Uri.EscapeDataString(string.Join("\n", args));
         string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
-        using (HttpClient client = new HttpClient()) {
+        SendRequest(uri);
+    }
+
+    /// <summary>
+    /// 發送 http 請求
+    /// </summary>
+    private Task<string> SendRequest(string uri) {
+        using (HttpClient client = new()) {
             client.Timeout = TimeSpan.FromSeconds(5); // 逾時
             client.DefaultRequestHeaders.Add("User-Agent", webvviewUserAgent);
-            using HttpResponseMessage response = client.GetAsync(uri).Result;
-            // string responseContent = response.Content.ReadAsStringAsync().Result; 
+            HttpResponseMessage response = client.GetAsync(uri).Result;
+            return response.Content.ReadAsStringAsync();
         }
     }
 
