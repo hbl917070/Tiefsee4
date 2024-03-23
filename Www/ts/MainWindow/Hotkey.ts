@@ -64,11 +64,11 @@ class Hotkey {
 
             // 如果有開啟msg視窗
             if (M.msgbox.isShow()) {
-                if (e.code == "Escape") {
+                if (e.key == "Escape") {
                     M.msgbox.closeNow();
                     e.preventDefault();
                 }
-                if (e.code == "Enter" || e.code == "NumpadEnter") {
+                if (e.key == "Enter") {
                     M.msgbox.clickYes();
                     e.preventDefault();
                 }
