@@ -386,9 +386,12 @@ class MainExif {
 							if (name === "Description") {
 								let prompt = ar.find(x => x.name === "Textual Data" && x.value.startsWith("Comment: {\"prompt\": "));
 								if (prompt !== undefined) {
-									if (prompt.value.indexOf(val) >= 21) { // 開頭為「Comment: {"prompt": "」
-										continue;
-									}
+									try {
+										let json = JSON.parse(prompt.value.substring(9));
+										if (json.prompt.trim() == val) { // 開頭為「Comment: {"prompt": "」
+											continue;
+										}
+									} catch (e) {	}
 								}
 							}
 
@@ -418,7 +421,13 @@ class MainExif {
 							}
 
 							else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
-								if (val.includes("Steps: ")) {
+								if (val.includes(`"sui_image_params":`)) { // StableSwarmUI
+									let json = JSON.parse(val)["sui_image_params"];
+									AiDrawingPrompt.getNormalJson(json).forEach(item => {
+										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+									})
+								}
+								else if (val.includes("Steps: ")) { // A1111
 									AiDrawingPrompt.getSdwebui(val).forEach(item => {
 										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
