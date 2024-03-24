@@ -158,8 +158,9 @@ class AiDrawingPrompt {
 			"UltimateSDUpscale",
 			"KSampler (Efficient)",
 			"KSampler Adv. (Efficient)",
+			"KSampler SDXL (Eff.)",
 		];
-		var MODEL_TYPES = ["ckpt_name", "lora_name"]; // 模型名稱
+		var MODEL_TYPES = ["ckpt_name", "model", "base_ckpt_name"]; // 模型名稱
 		var SEED_TYPES = ["seed", "noise_seed"];
 
 		let json: any;
@@ -217,7 +218,7 @@ class AiDrawingPrompt {
 			return obj.toString();
 		}
 
-		// 用於遞迴找出目標節點的id
+		// 用於遞迴找出目標節點的 id
 		function getUnknownKey(obj: any, key: string[]) {
 			if (obj === undefined) { return undefined; }
 			let keys = Object.keys(obj);
@@ -256,15 +257,15 @@ class AiDrawingPrompt {
 
 			for (let i = 0; i < MODEL_TYPES.length; i++) {
 				let text = inputs[MODEL_TYPES[i]];
+
 				if (text !== undefined) {
-					if (typeof text === 'object') {
-						return JSON.stringify(text);
-					} else {
+					if (typeof text === "string") {
 						return text.toString();
 					}
 				}
 			}
 
+			// 如果沒有找到 text，則取得新的 key 來遞迴
 			let newKey = getUnknownKey(inputs, key2);
 			if (newKey !== undefined) {
 				return getModel(newKey, key2)
@@ -313,10 +314,25 @@ class AiDrawingPrompt {
 			let inputs = obj.inputs;
 			if (inputs === undefined) { return undefined; }
 
-			let width = inputs.width;
-			let height = inputs.height;
+			if (typeof inputs.size_selected === "string") {
+				return inputs.size_selected;
+			}
+
+			let width = inputs.width || inputs.empty_latent_width;
+			let height = inputs.height || inputs.empty_latent_height;
 			if (width === undefined || height === undefined) { return undefined; }
-			return `${width} x ${height}`;
+
+			if (typeof width === "string" || typeof width === "number") {
+				return `${width} x ${height}`;
+			}
+
+			// 如果沒有找到，則取得新的 key 來遞迴
+			let newKey = getUnknownKey(inputs, []);
+			if (newKey !== undefined) {
+				return getSize(newKey)
+			}
+
+			return undefined;
 		}
 
 		let mianInputs;
@@ -328,6 +344,10 @@ class AiDrawingPrompt {
 				mianInputs = item.inputs;
 
 				if (mianInputs !== undefined) {
+
+					mianInputs.positive = mianInputs.positive || mianInputs.sdxl_tuple;
+					mianInputs.negative = mianInputs.negative || mianInputs.sdxl_tuple;
+					mianInputs.model = mianInputs.model || mianInputs.sdxl_tuple;
 
 					// 如果是已知模型節點
 					let isModelNode = KSAMPLER_TYPES.includes(classType);
@@ -347,7 +367,7 @@ class AiDrawingPrompt {
 
 					let model = getModel(getKey(mianInputs.model), ["model"]);
 					let size = getSize(getKey(mianInputs.latent_image));
-
+					//sdxl_tuple
 					let prompt = getPrompt(getKey(mianInputs.positive), ["positive", "text", "conditioning"]);
 					if (prompt == _prompt) { // 如果已經加入過相同的提示詞，則略過
 						prompt = undefined;
@@ -501,6 +521,12 @@ class AiDrawingPrompt {
 					continue;
 				}
 
+				// 如果是 LoraLoader|pysssss 節點，會多一層
+				loraName = loraName.content || loraName;
+				if (typeof loraName === "object") {
+					loraName = JSON.stringify(loraName);
+				}
+
 				let arStrength: any = {};
 				let keys = Object.keys(intputs);
 				keys.forEach(key => {
@@ -635,7 +661,7 @@ class AiDrawingPrompt {
 		for (let key in json) {
 			retPush(key, json[key]);
 		}
-		
+
 		return retData;
 	}
 
