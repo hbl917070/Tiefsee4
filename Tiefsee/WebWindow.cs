@@ -17,7 +17,8 @@ public class WebWindow : FormNone {
     private bool isShow = false; // 是否已經顯式過視窗(用於單一啟動
     public bool isDelayInit = false; // 是否延遲初始化(暫存視窗必須設定成true
 
-    public static List<WebWindow> webWindowList = new(); // 用於記錄所有視窗
+    /// <summary> 當前開啟的視窗 </summary>
+    public static List<WebWindow> webWindowList = new();
 
     // 用於記錄全螢幕前的狀態
     private FormWindowState tempFormWindowState = FormWindowState.Normal;
@@ -209,7 +210,10 @@ public class WebWindow : FormNone {
         for (int i = count - 1; i >= 0; i--) {
             var item = webWindowList[i];
             if (item == null || item.IsDisposed || item == tempWindow) { continue; }
-            webWindowList[i].Close();
+            try {
+                webWindowList[i].Close();
+            }
+            catch { }
         }
     }
 
@@ -661,12 +665,12 @@ public class WebWindow : FormNone {
 
         this.TopMost = true;
         this.TopMost = false;
-
-        GlobalActivate(this.Handle);
+        SwitchToThisWindow(this.wv2.Handle, true);
+        GlobalActivate(this.wv2.Handle);
         this.Activate();
         this.wv2.Focus();
 
-        /*DelayRun(30, () => {
+        /*Adapter.DelayRun(30, () => {
             //this.wv2.Focus();
             //SwitchToThisWindow(this.wv2.Handle, true);
         });*/

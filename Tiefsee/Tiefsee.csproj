@@ -44,7 +44,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.6.0" />
-		<PackageReference Include="MetadataExtractor" Version="2.8.1" />
+		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2365.46" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />

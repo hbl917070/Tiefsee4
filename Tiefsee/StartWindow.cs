@@ -223,7 +223,7 @@ public class StartWindow : Form {
         jumpList.Items.Clear();
 
         if (Program.startType != 4 && Program.startType != 5) {
-            var item = JumpListItem.CreateWithArguments("closeAll", "Close all Tiefsee");
+            var item = JumpListItem.CreateWithArguments("closeAll", "Close All Tiefsee Windows");
             // item.Description = "Close all Tiefsee";
             // item.Logo = new Uri("ms-appx:///t1.ico");
             jumpList.Items.Add(item);

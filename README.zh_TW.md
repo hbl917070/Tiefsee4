@@ -29,7 +29,7 @@ Tiefsee
 
 > 運行需求：64位元的 Windows 10 或 Windows 11
 
-### 當前版本 Tiefsee 4.1.6
+### 當前版本 Tiefsee 4.2.1
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
@@ -70,7 +70,7 @@ Tiefsee
 
  - 商店版與免安裝版功能上沒有差異
  - 商店版可以透過商店來進行更新，且刪除 Tiefsee 後不會留下任何資料
- - 免安裝版需要安裝 [.NET Desktop Runtime 7 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) 才能運行
+ - 免安裝版需要安裝 [.NET Desktop Runtime 8 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) 才能運行
  - 免安裝版可以使用「便攜模式」 ，在 Tiefsee.exe 旁邊新建一個`PortableMode`資料夾，資料就都會儲存在裡面
 
 > 沒有特別需求的話，我推薦使用商店版
@@ -78,7 +78,7 @@ Tiefsee
 <br>
 
 ### 2、為什麼商店版比免安裝版還要大
-商店版在編譯的時候會把 NET 的執行環境整個打包進程式裡面，微軟目前尚未提出有效的解決方案。
+商店版在編譯的時候會把 .NET 的執行環境整個打包進程式裡面，微軟目前尚未提出有效的解決方案。
 
 <br>
 
@@ -98,7 +98,7 @@ Tiefsee
 <br>
 
 ## 專案說明
-- 專案類型：C# WinForm (net 7)
+- 專案類型：C# WinForm (.NET 8)
 - 開發語言：C#、TypeScript
 - [專案建立步驟](/Building.zh_TW.md)
 

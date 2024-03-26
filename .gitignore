@@ -28,6 +28,7 @@
 /BuildAll/obj
 /BuildAll/bin
 
-TiefseeLauncher/x64
-TiefseeLauncher/Resource.aps
-TiefseeLauncher/Release
+TiefseeLauncher/obj
+TiefseeLauncher/bin
+
+Tiefsee.zip

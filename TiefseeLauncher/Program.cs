@@ -5,12 +5,13 @@ using System.Text;
 namespace TiefseeLauncher;
 
 public class Program {
-    /*
+
     [STAThread]
     public static void Main(string[] args) {
         new Launcher().Init(args);
-    } */
+    }
 
+    /*
     // 導出到 C++
     [UnmanagedCallersOnly(EntryPoint = "run")]
     public static IntPtr Run(int argc, IntPtr argvPtr) {
@@ -28,7 +29,7 @@ public class Program {
         // IntPtr resultPtr = Marshal.StringToHGlobalAnsi(result);
         IntPtr resultPtr = Marshal.StringToHGlobalAnsi("ok");
         return resultPtr;
-    }
+    }*/
 }
 
 class Launcher {

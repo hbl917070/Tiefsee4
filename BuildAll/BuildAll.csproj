@@ -23,8 +23,7 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 
 		<!-- 編譯這些專案 -->
-		<Exec Command="dotnet publish ../TiefseeLauncherDll/TiefseeLauncherDll.csproj -r win-x64 -c Release -o ../Output" />
-		<MSBuild Projects="../TiefseeLauncher/TiefseeLauncher.vcxproj" Properties="Configuration=Release" />
+		<Exec Command="dotnet publish ../TiefseeLauncher/TiefseeLauncher.csproj -r win-x64 -c Release -o ../Output" />
 		<MSBuild Projects="../Tiefsee/Tiefsee.csproj" Properties="Configuration=Release"/>
 		
 		<!-- 刪除無用檔案 -->

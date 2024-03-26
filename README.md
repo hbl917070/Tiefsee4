@@ -29,7 +29,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
 
 > System requirements: 64-bit Windows 10 or Windows 11
 
-### Current version：Tiefsee 4.1.6
+### Current version：Tiefsee 4.2.1
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
@@ -69,7 +69,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
 
  - There is no functional difference between the Store and Portable versions
  - The Store version can be updated through the store and will not leave any data after Tiefsee is deleted
- - The Portable version requires the installation of [.NET Desktop Runtime 7 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) to run
+ - The Portable version requires the installation of [.NET Desktop Runtime 8 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) to run
  - The Portable version can use 'portable mode' by creating a `PortableMode` folder next to Tiefsee.exe, and all data will be stored inside
 
 > If there are no special requirements, it is recommended to use the Store version
@@ -97,7 +97,7 @@ The frosted glass window effect is not an officially released API of Windows. Th
 <br>
 
 ## Project Description
-- Project Type: C# WinForm (net 7)
+- Project Type: C# WinForm (.NET 8)
 - Development Language：C#、TypeScript
 - [Project Build Steps](Building.md)
 

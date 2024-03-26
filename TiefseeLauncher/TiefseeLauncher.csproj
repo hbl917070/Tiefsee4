@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>Library</OutputType>
+		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<PublishAot>true</PublishAot>
 		<Platforms>x64</Platforms>
 
-		<AssemblyName>TiefseeLauncherDll</AssemblyName>
+		<AssemblyName>Tiefsee</AssemblyName>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
 		<!-- 移除全球化專用的程式碼-->
 		<InvariantGlobalization>true</InvariantGlobalization>
+		<ApplicationIcon>logo.ico</ApplicationIcon>
 
 	</PropertyGroup>
 
@@ -28,5 +29,8 @@
 		<OutputPath>../Output/</OutputPath>
 		<IsAotCompatible>True</IsAotCompatible>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Include="logo.ico" />
+	</ItemGroup>
 
 </Project>
