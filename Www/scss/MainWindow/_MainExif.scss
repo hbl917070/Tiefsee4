@@ -224,6 +224,9 @@
         -webkit-line-clamp: var(--mainExifMaxLine);
         -webkit-box-orient: vertical;
         display: -webkit-box;
+
+        // 允許顯示空白跟換行
+        white-space: pre-wrap;
       }
     }
 
@@ -329,6 +332,9 @@
     -webkit-line-clamp: var(--mainExifMaxLine);
     -webkit-box-orient: vertical;
     display: -webkit-box;
+
+    // 允許顯示空白跟換行
+    white-space: pre-wrap;
   }
 
   //google map

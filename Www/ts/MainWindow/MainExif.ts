@@ -686,10 +686,7 @@ class MainExif {
 				if (ext === ".json" || ext === ".info") {
 					text = Lib.jsonStrFormat(text).jsonFormat;
 				}
-				text = Lib.escape(text);
-				text = text.replace(/[ ]/g, "&nbsp;");
-				text = text.replace(/\n/g, "<br>");
-				return text;
+				return Lib.escape(text);
 			}
 
 			// 外框物件
@@ -922,8 +919,6 @@ class MainExif {
 			value = value.toString();
 			let oVal = value; // 原始資料
 			value = Lib.escape(value);
-			value = value.replace(/\n/g, "<br>"); // 處理換行
-			value = value.replace(/[ ]/g, "&nbsp;"); // 處理空白
 
 			let html = `
 				<div class="mainExifItem">
