@@ -245,7 +245,13 @@ class MainExif {
 			let comfyuiWorkflow: string | undefined;
 			let comfyuiGenerationData: any | undefined;
 			let comfyScript: any | undefined;
-
+			let civitai = {
+				civitaiResources: undefined as string | undefined,
+				lorahashes: undefined as string | undefined,
+				hashes: undefined as string | undefined,
+				tiHashes: undefined as string | undefined,
+				modelHash: undefined as string | undefined,
+			};
 
 			// 待影片載入完畢，更新「影片長度」的資訊
 			async function updateVideoDuration(domVideo: HTMLElement) {
@@ -320,12 +326,7 @@ class MainExif {
 					let nameI18n = `exif.name.${name}`;
 					name = M.i18n.t(`exif.name.${name}`);
 
-					let domValue = Lib.newDom(`
-						<span>
-							${value}
-							<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div>
-						<span>
-					`);
+					let domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div><span>`);
 					let domBtn = domValue.querySelector(".btnExport") as HTMLElement;
 					domBtn.addEventListener("click", () => {
 						console.log(path)
@@ -391,7 +392,7 @@ class MainExif {
 										if (json.prompt.trim() == val) { // 開頭為「Comment: {"prompt": "」
 											continue;
 										}
-									} catch (e) {	}
+									} catch (e) { }
 								}
 							}
 
@@ -429,6 +430,21 @@ class MainExif {
 								}
 								else if (val.includes("Steps: ")) { // A1111
 									AiDrawingPrompt.getSdwebui(val).forEach(item => {
+										if (item.title == "Civitai resources") {
+											civitai.civitaiResources = item.text;
+										}
+										if (item.title == "Lora hashes") {
+											civitai.lorahashes = item.text;
+										}
+										if (item.title == "Model hash") {
+											civitai.modelHash = item.text;
+										}
+										if (item.title == "Hashes") {
+											civitai.hashes = item.text;
+										}
+										if (item.title == "TI hashes") {
+											civitai.tiHashes = item.text;
+										}
 										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
@@ -504,6 +520,9 @@ class MainExif {
 			deferredFunc.forEach(func => {
 				func();
 			});
+
+			// 初始化 Civitai Resources 區塊
+			initCivitaiResources(civitai);
 
 			// 解析 ComfyUI 
 			if (comfyuiPrompt !== undefined) {
@@ -613,6 +632,243 @@ class MainExif {
 				let btnNew = await getRelatedBtnAdd()
 				domTabContentRelated.appendChild(btnNew);
 			}
+		}
+
+		/**
+		 * 初始化 Civitai Resources 區塊
+		 */
+		async function initCivitaiResources(civitai: {
+			civitaiResources: string | undefined,
+			lorahashes: string | undefined,
+			hashes: string | undefined,
+			tiHashes: string | undefined,
+			modelHash: string | undefined,
+		}) {
+
+			// 記錄當前的 path，如果在載入期間已經切換到其他檔案，則離開
+			let path = fileInfo2.FullPath;
+
+			// 如果全部都沒有資料，就離開
+			if (civitai.civitaiResources === undefined &&
+				civitai.lorahashes === undefined &&
+				civitai.hashes === undefined &&
+				civitai.tiHashes === undefined &&
+				civitai.modelHash === undefined
+			) {
+				return;
+			}
+
+			let data: any = civitai.civitaiResources;
+			if (typeof data === "string") {
+				try {
+					data = JSON.parse(data);
+				} catch (e) {
+					console.warn("Civitai resources 解析失敗");
+					console.warn(data);
+					return;
+				}
+			}
+			// 如果不是集合
+			if (data instanceof Array === false) {
+				data = [];
+			}
+
+			if (civitai.modelHash !== undefined) {
+				data.push({ type: "", hash: civitai.modelHash });
+			}
+
+			/** 	
+				Lora hashes 範例
+				aaa: 69d6c487ff4c, 
+				bbb: 7a1336916118
+			 */
+			function addHash(hashList: string | undefined) {
+				if (typeof hashList !== "string") { return; }
+				let hashes = hashList.split(",");
+				hashes.forEach((item: string) => {
+					let x = item.split(": ");
+					if (x.length !== 2) { return; }
+
+					// 取最後一個
+					let value = x[x.length - 1].trim();
+					// 移除非英數字元
+					value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+					// 如果已經存在，就不再加入
+					let isExist = data.some((item: any) => {
+						return item.hash === value;
+					})
+					if (isExist === false) {
+						data.push({ type: "", hash: value });
+					}
+				})
+			}
+			addHash(civitai.lorahashes);
+			addHash(civitai.hashes);
+			addHash(civitai.tiHashes);
+
+			// 判斷是否有重複的項目
+			let tempId: any[] = [];
+
+			// 折疊面板
+			let collapseDom = getCollapseDom("Civitai Resources", true, "civitaiResources");
+
+			for (let i = 0; i < data.length; i++) {
+				const item = data[i];
+				let hash = item.hash;
+				let modelVersionId = item.modelVersionId;
+				let dbKey = modelVersionId || hash;
+				if (hash === undefined && modelVersionId === undefined) {
+					console.warn("Civitai 未預期的格式");
+					console.warn(item);
+					continue;
+				}
+
+				let modelId: any;
+				let modelType: any = item.type;
+				let modelName: any;
+				let name: any;
+				let error: any;
+
+				// 先嘗試從 indexedDB 取得資料
+				let dbData = await M.db?.getData(DbStoreName.civitaiResources, dbKey);
+				if (dbData !== undefined) {
+					modelId = dbData.modelId;
+					modelType = dbData.modelType;
+					modelName = dbData.modelName;
+					name = dbData.name;
+					modelVersionId = dbData.modelVersionId;
+					error = dbData.error;
+					// console.log("indexedDB 取得資料", modelId, modelName, error);
+
+					// 重複的項目
+					if (tempId.includes(modelVersionId)) { continue; }
+					tempId.push(modelVersionId);
+				}
+
+				// 避免在載入期間已經切換到其他檔案
+				if (path !== fileInfo2.FullPath) { return; }
+
+				// 曾經下載過，且資料是 error，就不再載入
+				if (error) { continue; }
+
+				// 先產生一個空的 dom 項目，待資料載入完畢後，再替換
+				let oldDom = getItemDom(dbKey, "Loading" + "\n" + "-");
+				collapseDom.domContent.appendChild(oldDom);
+
+				setTimeout(async () => {
+
+					// 如果 indexedDB 沒有資料，則從 Civitai 取得資料
+					if (error === undefined &&
+						(modelId === undefined || modelName === undefined)) {
+						let url: string;
+						let result
+						if (hash) {
+
+							url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
+							result = await Lib.sendGet("json", url);
+
+							// 如果 hash 超過 10 個字，且找不到資源，則只取前 10 個字再試一次
+							if (result.error && hash.length > 10) {
+								hash = hash.substring(0, 10);
+								url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
+								result = await Lib.sendGet("json", url);
+								console.log("Civitai 重新請求資料", url);
+							}
+						} else {
+							url = `https://civitai.com/api/v1/model-versions/` + modelVersionId;
+							result = await Lib.sendGet("json", url);
+						}
+						// console.log("Civitai 請求資料", url);
+
+						modelId = result.modelId;
+						modelName = result.model?.name;
+						modelType = result.model?.type;
+						name = result.name;
+						modelVersionId = result.id;
+						error = result.error;
+
+						if (result.error) {
+							console.warn("Civitai 返回 error", url, result);
+							// 如果找不到資源，則一樣存到 indexedDB
+							M.db?.saveData(DbStoreName.civitaiResources, {
+								id: dbKey,
+								time: new Date().format("yyyy-MM-dd hh:mm:ss"),
+								error: result.error
+							});
+						} else {
+							if (modelId === undefined || modelName === undefined) {
+								console.warn("Civitai 返回資料解析失敗", url, result);
+							}
+							// 存到 indexedDB
+							M.db?.saveData(DbStoreName.civitaiResources, {
+								id: dbKey,
+								time: new Date().format("yyyy-MM-dd hh:mm:ss"),
+								modelId: modelId,
+								modelVersionId: modelVersionId,
+								modelName: modelName,
+								modelType: modelType,
+								name: name,
+							});
+						}
+
+						// 重複的項目
+						if (tempId.includes(modelVersionId)) {
+							oldDom.parentNode?.removeChild(oldDom);
+							// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
+							if (collapseDom.domContent.children.length === 0) {
+								collapseDom.domBox.parentNode?.removeChild(collapseDom.domBox);
+							}
+							return;
+						}
+						tempId.push(modelVersionId);
+					}
+
+					if (error) {
+						oldDom.parentNode?.removeChild(oldDom);
+						// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
+						if (collapseDom.domContent.children.length === 0) {
+							collapseDom.domBox.parentNode?.removeChild(collapseDom.domBox);
+						}
+						return;
+					}
+
+					if (modelId === undefined || modelName === undefined) {
+						return;
+					}
+
+					// 檢查 oldDom 是否還存在
+					if (oldDom.parentNode !== null) {
+
+						// 產生新的 dom
+						let newItem = Lib.newDom(`
+						<div class="mainExifItem">
+							<div class="mainExifName">${modelType}</div>
+							<div class="mainExifValue">${modelName}<br>${name}</div>
+							<div class="mainExifBtns">
+								<div class="btn mainExifBtnCivitai" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
+							</div>
+						</div>`);
+						let btnCivitai = newItem.querySelector(".mainExifBtnCivitai") as HTMLElement;
+						btnCivitai.addEventListener("click", async () => {
+							let url = "https://civitai.com/models/" + modelId + "?modelVersionId=" + modelVersionId;
+							WV_RunApp.OpenUrl(url);
+						});
+						domTabContentInfo.appendChild(newItem);
+
+						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
+						oldDom.insertAdjacentElement("afterend", newItem);
+						oldDom.parentNode?.removeChild(oldDom);
+					}
+
+				}, 1);
+
+			}
+
+			if (collapseDom.domContent.children.length > 0) {
+				domTabContentInfo.appendChild(collapseDom.domBox);
+			}
+
 		}
 
 		/**
@@ -846,8 +1102,9 @@ class MainExif {
 		 * 折疊面板的 dom
 		 * @param title 標題
 		 * @param type 初始狀態
+		 * @param key 儲存設定值的key
 		 */
-		function getCollapseDom(title: string, type: boolean) {
+		function getCollapseDom(title: string, type: boolean, key?: string) {
 
 			// 外框物件
 			let domBox = Lib.newDom(`
@@ -874,15 +1131,28 @@ class MainExif {
 			let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
 			domBox.appendChild(domContent);
 
+			// 從設定讀取折疊狀態
+			let open;
+			if (key !== undefined) {
+				open = M.config.settings.layout.mainExifCollapse[key];
+			}
+			if (open === undefined) { open = type; }
+
 			// 初始化 折疊面板
-			Lib.collapse(domBox, "init-" + type); // 不使用動畫直接初始化狀態
+			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
 			domTitle.addEventListener("click", (e) => {
 				// 如果是右上角的按鈕，則不處理
 				let target = e.target as HTMLElement;
 				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
 					return;
 				}
-				Lib.collapse(domBox, "toggle", (type) => { }); // 切換折疊狀態
+				Lib.collapse(domBox, "toggle", (type) => {
+					if (key !== undefined) {
+						let t = (type === "true");
+						M.config.settings.layout.mainExifCollapse[key] = t; // 更改狀態後，儲存折疊狀態
+					}
+
+				}); // 切換折疊狀態
 			});
 
 			return {

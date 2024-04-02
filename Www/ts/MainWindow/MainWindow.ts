@@ -13,6 +13,7 @@ class MainWindow {
     public dom_mainL: HTMLElement;
     public dom_mainR: HTMLElement;
 
+    public db: IndexedDBManager | null = null;
     public i18n;
     public config;
     public mainToolbar;
@@ -61,6 +62,7 @@ class MainWindow {
         this.dom_mainL = dom_mainL;
         this.dom_mainR = dom_mainR;
 
+        var db: IndexedDBManager;
         var config = this.config = new Config(baseWindow);
         var i18n = this.i18n = new I18n();
         i18n.pushData(langData);
@@ -90,12 +92,11 @@ class MainWindow {
         this.downloadFileFromUrl = downloadFileFromUrl;
 
         new Hotkey(this);
-        init();
 
-        /**
-         * 
-         */
-        async function init() {
+        (async () => {
+
+            db = await new IndexedDBManager("tiefseeDB", 1);
+            this.db = db;
 
             fileShow.openNone(); // 不顯示任何東西
 
@@ -486,8 +487,7 @@ class MainWindow {
                 }
             }
 
-        }
-
+        })();
 
         /**
          * 下載檔案

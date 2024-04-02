@@ -67,7 +67,12 @@ class AiDrawingPrompt {
 				}
 				let jsonF = Lib.jsonStrFormat(text);
 				if (jsonF.ok) { // 如果是json (例如 Hashes
-					text = jsonF.jsonFormat; // 格式化json再顯示
+					if ("Civitai resources") {
+						text = text.replace(/[,]/g, `, \n`);
+					} else {
+						text = jsonF.jsonFormat; // 格式化json再顯示
+					}
+
 				} else {
 					if (title === "Tiled Diffusion" && text.startsWith('{') && text.endsWith('}')) { //格式例如 {'Method': 'MultiDiffusion', 'Tile tile width': 96}
 						text = text.replace(/[,][ ]/g, `, \n`);
@@ -241,7 +246,9 @@ class AiDrawingPrompt {
 			for (let i = 0; i < SEED_TYPES.length; i++) {
 				let text = inputs[SEED_TYPES[i]];
 				if (text !== undefined) {
-					return text.toString();
+					if (typeof text === "string" || typeof text === "number") {
+						return text.toString();
+					}
 				}
 			}
 			return undefined;
