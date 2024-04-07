@@ -2627,6 +2627,7 @@ class Tiefseeview {
 
             let _w = toNumber(dom_data.style.width); // 原始圖片大小(旋轉前的大小)
             let _h = toNumber(dom_data.style.height);
+            if (_w === 0 || _h === 0) { return; }
             let _margin = 35; // 多繪製的區域
             let _scale = _w / getOriginalWidth(); // 目前的 圖片縮放比例
             let radio_can = 1;
@@ -2724,6 +2725,18 @@ class Tiefseeview {
                     sWidth: sWidth, sHeight: sHeight,
                     dx: dx, dy: dy,
                     dWidth: dWidth, dHeight: dHeight
+                }
+
+                // 如果圖片大於 canvas 的最大限制，就改用 <img> 來渲染
+                let nowWidth = can.width;
+                let nowHeight = can.height;
+                if (nowWidth > 65535 || nowHeight > 65535 || nowWidth * nowHeight > 265690000) {
+                    console.log("圖片過大，無法渲染", url);
+                    setDataType("img");
+                    await loadImg(url);
+                    // 載入圖片後必須重新設定大小
+                    setDataSize(dom_data.offsetWidth);
+                    return;
                 }
 
                 // if (sx < 0) { sx = 0 }

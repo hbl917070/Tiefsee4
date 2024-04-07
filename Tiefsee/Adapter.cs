@@ -1,4 +1,4 @@
-﻿namespace Tiefsee;
+namespace Tiefsee;
 
 public static class Adapter {
 
@@ -100,6 +100,20 @@ public static class Adapter {
             }
             x -= 100;
         }
+    }
+
+    /// <summary>
+    /// 超時就強制結束
+    /// </summary>
+    /// <param name="timeoutSeconds"> 最長秒數 </param>
+    /// <param name="func"></param>
+    public static void RunWithTimeout(double timeoutSeconds, Action func) {
+        CancellationTokenSource cts = new();
+        cts.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds)); // 設定超時時間
+
+        Task task = Task.Run(func, cts.Token); // 將 CancellationToken 傳遞給 Task.Run
+
+        task.Wait(cts.Token); // 等待任務完成或超時
     }
 
 }

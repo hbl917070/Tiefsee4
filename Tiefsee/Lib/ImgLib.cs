@@ -26,15 +26,10 @@ public class ImgLib {
 
         Bitmap icon = null;
 
-        CancellationTokenSource cts = new();
-        cts.CancelAfter(TimeSpan.FromSeconds(1)); // 設定超時時間為一秒
-
-        Task task = Task.Run(() => {
+        Adapter.RunWithTimeout(1, () => {
             // 取得圖片在Windows系統的縮圖
             icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
-        }, cts.Token); // 將 CancellationToken 傳遞給 Task.Run
-
-        task.Wait(cts.Token); // 等待任務完成或超時
+        });
 
         return icon;
     }
@@ -801,9 +796,17 @@ public class ImgLib {
         }
 
         NetVips.Image im = GetNetVips(img100, fileType);
-        using (NetVips.Image imR = im.Resize(scale: scale, kernel: Enums.Kernel.Lanczos3, gap: 4)) {
-            VipsSave(imR, filePath, "auto");
+
+        Enums.Kernel? kernel = Enums.Kernel.Lanczos3;
+        double? gap = 4;
+        // 如果圖片太大，就使用計算成本較低的 最近鄰法
+        if (im.Width > 30000 || im.Height > 30000) {
+            kernel = Enums.Kernel.Nearest;
+            gap = null;
         }
+        using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
+        VipsSave(imR, filePath, "auto");
+
         StartWindow.isRunGC = true; // 定時執行GC
 
         return filePath;

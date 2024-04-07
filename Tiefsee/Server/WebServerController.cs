@@ -108,18 +108,20 @@ public class WebServerController {
         //bool is304 = HeadersAdd304(d, path); //回傳檔案時加入快取的Headers
         //if (is304 == true) { return; }
 
-        for (int i = 0; i < arType.Length; i++) {
-            string type = arType[i];
+        Adapter.RunWithTimeout(60, () => {
+            for (int i = 0; i < arType.Length; i++) {
+                string type = arType[i];
 
-            try {
-                imgInfo = ImgLib.GetImgInitInfo(path, type, type);
-            }
-            catch { }
+                try {
+                    imgInfo = ImgLib.GetImgInitInfo(path, type, type);
+                }
+                catch { }
 
-            if (imgInfo.width != 0) {
-                break;
+                if (imgInfo.width != 0) {
+                    break;
+                }
             }
-        }
+        });
 
         json = JsonSerializer.Serialize(imgInfo);
         WriteString(d, json); // 回傳輸出的檔案路徑
@@ -139,8 +141,11 @@ public class WebServerController {
         bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的Headers
         if (is304) { return; }
 
-        string imgPath = ImgLib.VipsResize(path, scale, fileType, vipsType);
-        WriteFile(d, imgPath); // 回傳檔案
+        Adapter.RunWithTimeout(60, () => {
+            string imgPath = ImgLib.VipsResize(path, scale, fileType, vipsType);
+            WriteFile(d, imgPath); // 回傳檔案
+        });
+
     }
 
     /// <summary>
@@ -374,27 +379,46 @@ public class WebServerController {
         bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的 Headers
         if (is304) { return; }
 
+        Bitmap icon = null;
+
         try {
-            using Bitmap icon = ImgLib.GetFileIcon(path, size);
-            if (icon == null) { return; }
+            icon = ImgLib.GetFileIcon(path, size);
+        }
+        catch { }
 
-            using (Stream input = new MemoryStream()) {
+        // 如果取得失敗，就等待 1 秒後再試一次
+        if (icon == null) {
+            Thread.Sleep(1000);
+            try {
+                icon = ImgLib.GetFileIcon(path, size);
+            }
+            catch { }
+        }
 
-                icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
-                input.Position = 0;
+        // 如果 2 次都取得失敗，就返回 500 錯誤
+        if (icon == null) {
+            d.context.Response.StatusCode = 500;
+            WriteString(d, "500");
+            return;
+        }
 
-                d.context.Response.ContentLength64 = input.Length;
+        try {
+            using Stream input = new MemoryStream();
 
-                if (d.context.Request.HttpMethod != "HEAD") {
-                    byte[] buffer = new byte[1024 * 16];
-                    int nbytes;
-                    while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
-                        // context.Response.SendChunked = input.Length > 1024 * 16;
-                        d.context.Response.OutputStream.Write(buffer, 0, nbytes);
-                    }
+            icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+            input.Position = 0;
+
+            d.context.Response.ContentLength64 = input.Length;
+
+            if (d.context.Request.HttpMethod != "HEAD") {
+                byte[] buffer = new byte[1024 * 16];
+                int nbytes;
+                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
+                    // context.Response.SendChunked = input.Length > 1024 * 16;
+                    d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                 }
             }
-
+            icon.Dispose();
         }
         catch {
             d.context.Response.StatusCode = 500;
