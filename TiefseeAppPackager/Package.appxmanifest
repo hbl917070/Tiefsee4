@@ -82,6 +82,7 @@
 							<uap:FileType ContentType="image/tiff">.tif</uap:FileType>
 							<uap:FileType ContentType="image/tiff">.tiff</uap:FileType>
 							<uap:FileType>.dds</uap:FileType>
+							<uap:FileType>.jxr</uap:FileType>
 							<uap:FileType>.psd</uap:FileType>
 							<uap:FileType>.psb</uap:FileType>
 							<uap:FileType>.pcx</uap:FileType>

@@ -439,7 +439,8 @@ class Config {
                 { ext: "tif", type: "vips", vipsType: "tif" },
                 { ext: "tiff", type: "vips", vipsType: "tif" },
                 { ext: "dds", type: "vips", vipsType: "wpf,magick" },
-
+                { ext: "jxr", type: "vips", vipsType: "wpf" },
+                
                 { ext: "psd", type: "vips", vipsType: "magick" },
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },
