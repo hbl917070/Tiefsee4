@@ -1770,6 +1770,11 @@ var langData = {
             "en": "File size exceeded limit",
             "ja": "ファイルサイズが制限を超えた",
         },
+        downloadImages: {
+            "zh-TW": "此操作將下載 {n} 張圖片，是否繼續？",
+            "en": "This operation will download {n} images, do you want to continue?",
+            "ja": "{n} 枚の画像をダウンロードしますか？",
+        },
         //#endregion
 
         //#region 文字編輯器

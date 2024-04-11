@@ -1124,8 +1124,83 @@ class ScriptOpen {
         // if (M.fileLoad.getIsBulkView()) { return; }
 
         let clipboardContent = await WebAPI.getClipboardContent();
+        console.log(clipboardContent);
 
-        if (clipboardContent.Type == "url") {
+        let showErr = () => {
+            Toast.show(this.M.i18n.t("msg.cannotOpenClipboard"), 1000 * 3); // 無法開啟剪貼簿的內容
+        }
+
+        if (clipboardContent.Type == "html") {
+
+            // 解析 <img src="url">
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(clipboardContent.Data, "text/html");
+            let arImg = doc.querySelectorAll("img");
+
+            // 如果是來自 word 的資料，圖片標籤為 <v:imagedata src="file:///C:/Users/u1/AppData/Local/Temp/msohtmlclip1/01/clip_image001.png"/>
+            if (arImg.length === 0) {
+                arImg = doc.querySelectorAll("v\\:imagedata");
+            }
+
+            // 取得所有圖片的 src，並去除重複
+            let arSrc = [];
+            for (let i = 0; i < arImg.length; i++) {
+                let src = arImg[i].getAttribute("src");
+                if (src === null) { continue; }
+                if (arSrc.indexOf(src) === -1) {
+                    arSrc.push(src);
+                }
+            }
+
+            // console.log(arSrc);
+
+            let downloadAll = async () => {
+                let path;
+                for (let i = 0; i < arSrc.length; i++) {
+                    let src = arSrc[i];
+                    let base64;
+                    if (src.startsWith("http") || src.startsWith("file://")) {
+                        let file = await this.M.downloadFileFromUrl(src);
+                        if (file != null) {
+                            base64 = await Lib.readFileAsDataURL(file);
+                        }
+                    }
+                    else if (src.startsWith("data:image/")) {
+                        base64 = src;
+                    }
+
+                    if (base64 !== undefined) {
+                        let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+                        if (extension !== "") {
+                            path = await WV_File.Base64ToTempFile(base64, extension);
+                        }
+                    }
+                }
+
+                if (path !== undefined) {
+                    await this.M.fileLoad.loadFile(path); // 重新載入圖片
+                    return;
+                }
+                showErr();
+            }
+
+            // 如果圖片數量大於 10，則跳出詢問視窗
+            if (arSrc.length >= 10) {
+                this.M.msgbox.show({
+                    type: "txt",
+                    txt: this.M.i18n.t("msg.downloadImages", { n: arSrc.length }), // 此操作將下載 n 張圖片，是否繼續？
+                    funcYes: async (dom: HTMLElement, value: string) => {
+                        this.M.msgbox.close(dom);
+                        await downloadAll();
+                    }
+                });
+            } else {
+                await downloadAll();
+            }
+            return;
+        }
+
+        else if (clipboardContent.Type == "url") {
             let file = await this.M.downloadFileFromUrl(clipboardContent.Data);
             if (file != null) {
                 let base64 = await Lib.readFileAsDataURL(file);
@@ -1133,12 +1208,14 @@ class ScriptOpen {
                 if (extension !== "") {
                     let path = await WV_File.Base64ToTempFile(base64, extension);
                     await this.M.fileLoad.loadFile(path); // 下載檔案後，重新載入圖片
+                    return;
                 }
             }
         }
 
         else if (clipboardContent.Type == "file" || clipboardContent.Type == "dir") {
             await this.M.fileLoad.loadFile(clipboardContent.Data); // 重新載入圖片
+            return;
         }
 
         else if (clipboardContent.Type == "img") {
@@ -1147,12 +1224,11 @@ class ScriptOpen {
             if (extension !== "") {
                 let path = await WV_File.Base64ToTempFile(base64, extension);
                 await this.M.fileLoad.loadFile(path); // 重新載入圖片
+                return;
             }
         }
 
-        else {
-            Toast.show(this.M.i18n.t("msg.cannotOpenClipboard"), 1000 * 3); // 無法開啟剪貼簿的內容
-        }
+        showErr();
     }
 
     /** 另開視窗 */

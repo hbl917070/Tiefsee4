@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 
 namespace Tiefsee;
@@ -12,6 +12,17 @@ public class ClipboardLib {
     /// <returns></returns>
     public ClipboardContent GetClipboardContent(int maxTextLength = 5000) {
         try {
+
+            // html
+            if (Clipboard.ContainsText(TextDataFormat.Html)) {
+                string html = Clipboard.GetText(TextDataFormat.Html);
+                return new() {
+                    Type = "html",
+                    Data = html
+                };
+            }
+
+            // 圖片
             if (Clipboard.ContainsImage()) {
                 using (var ms = new MemoryStream()) {
                     Clipboard.GetImage().Save(ms, System.Drawing.Imaging.ImageFormat.Png);
@@ -21,6 +32,8 @@ public class ClipboardLib {
                     };
                 }
             }
+
+            // 檔案
             if (Clipboard.ContainsFileDropList()) {
                 var files = Clipboard.GetFileDropList();
                 if (files.Count > 0) {
@@ -33,6 +46,8 @@ public class ClipboardLib {
                     }
                 }
             }
+
+            // 文字
             if (Clipboard.ContainsText()) {
 
                 string oldText = Clipboard.GetText();
