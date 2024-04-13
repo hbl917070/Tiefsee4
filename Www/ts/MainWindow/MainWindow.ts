@@ -375,13 +375,13 @@ class MainWindow {
                     path = Lib.URLToPath(path);
                     await fileLoad.loadFile(path);
 
-                } else if (text.search(/^http:\/\/127\.0\.0\.1:7860\/.*\?filename=([^&]+).*$/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
 
                     // ex: http://127.0.0.1:7860/sd_extra_networks/thumb?filename=D%3A/ai/stable-diffusion-webui/models/Lora/aaa.png&mtime=1676408109.8893292
 
                     e.preventDefault();
 
-                    const regex = /^http:\/\/127\.0\.0\.1:7860\/.*\?filename=([^&]+).*$/;
+                    const regex = /^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/;
                     const match = text.match(regex);
                     if (match) {
                         path = decodeURIComponent(match[1]);
