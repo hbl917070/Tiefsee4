@@ -1,5 +1,7 @@
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Tiefsee;
 
@@ -51,6 +53,33 @@ public static class PluginQuickLook {
     private static MethodInfo meth = null;
     private static Object obj = null;
 
+
+    #region 
+
+    [DllImport("user32.dll")]
+    static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    static extern bool GetGUIThreadInfo(uint idThread, ref GUITHREADINFO lpgui);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct GUITHREADINFO {
+        public uint cbSize;
+        public uint flags;
+        public IntPtr hwndActive;
+        public IntPtr hwndFocus;
+        public IntPtr hwndCapture;
+        public IntPtr hwndMenuOwner;
+        public IntPtr hwndMoveSize;
+        public IntPtr hwndCaret;
+        public System.Drawing.Rectangle rcCaret;
+    };
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+    #endregion
+
     /// <summary>
     /// 取得當前資料夾或桌面選取的單一檔案，如果取得失敗則返回 ""
     /// </summary>
@@ -69,7 +98,43 @@ public static class PluginQuickLook {
         }
 
         string ret = (string)meth.Invoke(obj, new Object[] { }); // Invoke 調用方法
+
+        // 如果是 win11 且焦點在輸入框上面，則忽略
+        if (ret != "" && IsFocusOnExplorerInput()) {
+            return "";
+        }
+
         return ret;
+    }
+
+    /// <summary>
+    /// 判斷當前的焦點是否在 win11 的檔案總管輸入框
+    /// </summary>
+    private static bool IsFocusOnExplorerInput() {
+
+        // 如果不是 win11 則直接離開
+        if (StartWindow.isWin11 == false) { return false; }
+
+        const int maxChars = 256;
+        StringBuilder className = new StringBuilder(maxChars);
+
+        GUITHREADINFO guiInfo = new GUITHREADINFO();
+        guiInfo.cbSize = (uint)Marshal.SizeOf(guiInfo);
+
+        // Get the GUI thread information of the foreground window
+        GetGUIThreadInfo(0, ref guiInfo);
+
+        if (guiInfo.hwndFocus == IntPtr.Zero) {
+            return false;
+        }
+
+        GetClassName(guiInfo.hwndFocus, className, maxChars);
+
+        if (className.ToString() == "Microsoft.UI.Content.DesktopChildSiteBridge") {
+            return true;
+        }
+
+        return false;
     }
 }
 

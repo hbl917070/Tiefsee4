@@ -16,7 +16,7 @@ public class StartWindow : Form {
     /// <summary> 用於鎖定 port 檔案 </summary>
     private FileStream fsPort;
     /// <summary> 是否為 win11 </summary>
-    private bool isWin11 = false;
+    public static bool isWin11 = false;
     /// <summary> 桌面的路徑 </summary>
     private string desktopDir;
 
