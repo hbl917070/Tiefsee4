@@ -160,7 +160,7 @@ class Config {
     public settings = {
         theme: {
             /** 是否啟用毛玻璃 */
-            "aeroType": "none", //none / win7 / win10
+            "aeroType": "none", // none / win7 / win10
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
             /** 文字粗細 */
@@ -204,6 +204,12 @@ class Config {
 
         /** 佈局 */
         layout: {
+
+            /** 啟用 工具列 */
+            mainToolbarEnabled: true,
+            /** 工具列對齊。 [lef, center] */
+            mainToolbarAlign: "left",
+
             /** 啟用 檔案預覽視窗 */
             fileListEnabled: true,
             /** 顯示編號 */
@@ -225,7 +231,7 @@ class Config {
             dirListImgNumber: 3,
 
             /** 啟用 詳細資料視窗 */
-            mainExifEnabled: false,
+            mainExifEnabled: true,
             /** 寬度 */
             mainExifShowWidth: 150,
             /** 顯示的最大行數 */
@@ -239,10 +245,14 @@ class Config {
             /** 啟用 相關檔案 */
             relatedFilesEnabled: true,
 
-            /** 啟用 工具列 */
-            mainToolbarEnabled: true,
-            /** 工具列對齊。 [lef, center] */
-            mainToolbarAlign: "left",
+            /** 啓用 Civitai Resources */
+            civitaiResourcesEnabled: true,
+            /** 圖片預設狀態 true=展開、false=折疊 */
+            civitaiResourcesDefault: true,
+            /** 圖片數量 */
+            civitaiResourcesImgNumber: 2,
+            /** 允許 NSFW 圖片 */
+            civitaiResourcesNsfwLevel: 3,
 
             /** 大型切換按鈕。 [leftRight, bottom, none]  */
             largeBtn: "bottom",
@@ -368,7 +378,7 @@ class Config {
         /** 其他 */
         other: {
             /** 開啟 RAW 圖片時，顯示內嵌的預覽圖 */
-            rawImageThumbnail : true,
+            rawImageThumbnail: true,
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
             /** 偵測到檔案新增時，插入於。 [auto, start, end] */
@@ -440,7 +450,7 @@ class Config {
                 { ext: "tiff", type: "vips", vipsType: "tif" },
                 { ext: "dds", type: "vips", vipsType: "wpf,magick" },
                 { ext: "jxr", type: "vips", vipsType: "wpf" },
-                
+
                 { ext: "psd", type: "vips", vipsType: "magick" },
                 { ext: "psb", type: "vips", vipsType: "magick" },
                 { ext: "pcx", type: "vips", vipsType: "magick" },

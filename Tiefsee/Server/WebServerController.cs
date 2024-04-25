@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -27,6 +29,7 @@ public class WebServerController {
         webServer.RouteAdd("/api/getPdf", GetPdf);
         webServer.RouteAdd("/api/getText", GetText);
         webServer.RouteAdd("/api/getFileIcon", GetFileIcon);
+        webServer.RouteAdd("/api/getWebIcon", GetWebIcon);
         webServer.RouteAdd("/api/getFileInfo2", GetFileInfo2);
         webServer.RouteAdd("/api/getFileInfo2List", GetFileInfo2List);
         webServer.RouteAdd("/api/getUwpList", GetUwpList);
@@ -337,14 +340,14 @@ public class WebServerController {
     }
 
     /// <summary>
-    /// 取得檔案的Exif資訊
+    /// 取得檔案的 Exif 資訊
     /// </summary>
     void GetText(RequestData d) {
 
         string path = d.args["path"];
         path = Uri.UnescapeDataString(path);
 
-        //如果檔案不存在就返回404錯誤
+        //如果檔案不存在就返回 404 錯誤
         if (File.Exists(path) == false) {
             d.context.Response.StatusCode = 404;
             WriteString(d, JsonSerializer.Serialize(new ImgExif()));
@@ -360,7 +363,7 @@ public class WebServerController {
     }
 
     /// <summary>
-    ///
+    /// 取得檔案的 Icon
     /// </summary>
     private void GetFileIcon(RequestData d) {
 
@@ -370,8 +373,7 @@ public class WebServerController {
 
         // 如果檔案不存在就返回 404 錯誤
         if (File.Exists(path) == false) {
-            d.context.Response.StatusCode = 404;
-            WriteString(d, "404");
+            WriteError(d, 404, "找不到檔案");
             return;
         }
 
@@ -379,50 +381,90 @@ public class WebServerController {
         bool is304 = HeadersAdd304(d, path); // 回傳檔案時加入快取的 Headers
         if (is304) { return; }
 
-        Bitmap icon = null;
+        using Bitmap icon = ImgLib.GetFileIcon(path, size, 3);
 
-        try {
-            icon = ImgLib.GetFileIcon(path, size);
-        }
-        catch { }
-
-        // 如果取得失敗，就等待 1 秒後再試一次
+        // 如果取得失敗，就返回 500 錯誤
         if (icon == null) {
-            Thread.Sleep(1000);
-            try {
-                icon = ImgLib.GetFileIcon(path, size);
-            }
-            catch { }
-        }
-
-        // 如果 2 次都取得失敗，就返回 500 錯誤
-        if (icon == null) {
-            d.context.Response.StatusCode = 500;
-            WriteString(d, "500");
+            WriteError(d, 500, "圖示取得失敗");
             return;
         }
 
         try {
             using Stream input = new MemoryStream();
-
             icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
             input.Position = 0;
 
-            d.context.Response.ContentLength64 = input.Length;
+            WriteStream(d, input); // 回傳檔案
 
-            if (d.context.Request.HttpMethod != "HEAD") {
-                byte[] buffer = new byte[1024 * 16];
-                int nbytes;
-                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0) {
-                    // context.Response.SendChunked = input.Length > 1024 * 16;
-                    d.context.Response.OutputStream.Write(buffer, 0, nbytes);
-                }
-            }
             icon.Dispose();
         }
         catch {
-            d.context.Response.StatusCode = 500;
-            WriteString(d, "500");
+            WriteError(d, 500, "圖示解析失敗");
+        }
+    }
+
+    /// <summary>
+    /// 從網路下載圖片後，返回圖片的 icon
+    /// </summary>
+    /// <param name="d"></param>
+    private async void GetWebIcon(RequestData d) {
+
+        var args = d.args;
+        int size = Int32.Parse(args["size"]);
+        string path = Uri.UnescapeDataString(args["path"]); // 檔案儲存的相對路徑
+        string url = Uri.UnescapeDataString(args["url"]);
+
+        string tempPath = Path.Combine(AppPath.tempDirWebFile, path);
+
+        // 如果資料夾不存在就建立
+        if (Directory.Exists(Path.GetDirectoryName(tempPath)) == false) {
+            Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
+        }
+
+        if (File.Exists(tempPath) == false) {
+            try {
+                // 下載圖片
+                using HttpClient webClient = new();
+                webClient.Timeout = TimeSpan.FromSeconds(10); // 設定超時時間為 10 秒
+                byte[] data = webClient.GetByteArrayAsync(url).Result;
+                File.WriteAllBytes(tempPath, data);
+            }
+            catch (Exception ex) {
+                Debug.WriteLine("GetWebIcon fail " + ex.Message);
+                WriteError(d, 500, "圖片下載失敗: " + ex);
+                return;
+            }
+        }
+
+        // 如果檔案不存在就返回 404 錯誤
+        if (File.Exists(tempPath) == false) {
+            WriteError(d, 404, "找不到檔案");
+            return;
+        }
+
+        d.context.Response.ContentType = "image/png";
+        bool is304 = HeadersAdd304(d, tempPath); // 回傳檔案時加入快取的 Headers
+        if (is304) { return; }
+
+        using Bitmap icon = ImgLib.GetFileIcon(tempPath, size, 3);
+
+        // 如果取得失敗，就返回 500 錯誤
+        if (icon == null) {
+            WriteError(d, 500, "圖示取得失敗");
+            return;
+        }
+
+        try {
+            using Stream input = new MemoryStream();
+            icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+            input.Position = 0;
+
+            WriteStream(d, input); // 回傳檔案
+
+            icon.Dispose();
+        }
+        catch {
+            WriteError(d, 500, "圖示解析失敗");
         }
     }
 
@@ -701,10 +743,16 @@ public class WebServerController {
     }
 
     /// <summary>
+    /// 回傳錯誤
+    /// </summary>
+    private void WriteError(RequestData d, int code, string msg) {
+        d.context.Response.StatusCode = code;
+        WriteString(d, msg);
+    }
+
+    /// <summary>
     /// 回傳字串
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="str"></param>
     private void WriteString(RequestData d, string str) {
         d.context.Response.AddHeader("Content-Encoding", "br"); // 告訴瀏覽器使用了Brotli壓縮
         d.context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); //設定編碼
@@ -738,15 +786,7 @@ public class WebServerController {
                     d.context.Response.OutputStream.Write(buffer, 0, nbytes);
                 }
             }
-            // context.Response.StatusCode = (int)HttpStatusCode.OK;
-            // context.Response.OutputStream.Flush();
         }
-        /*using (FileStream fs = new FileStream(_path, FileMode.Open, FileAccess.Read, FileAccess.Read, FileShare.ReadWrite)) {
-            byte[] _responseArray = new byte[fs.Length];
-            fs.Read(_responseArray, 0, _responseArray.Length);
-            fs.Close();
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-        }*/
     }
 
     /// <summary>
@@ -763,7 +803,6 @@ public class WebServerController {
             }
         }
     }
-
 
     private IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
         #region extension to MIME type list

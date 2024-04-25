@@ -237,6 +237,7 @@ public class WebWindow : FormNone {
             startPort = Program.startPort,
             appDirPath = System.AppDomain.CurrentDomain.BaseDirectory,
             appDataPath = AppPath.appData,
+            tempDirWebFile = AppPath.tempDirWebFile,
             mainPort = Program.webServer.port,
             settingPath = AppPath.appDataSetting,
             quickLookRunType = quickLookRunType,
@@ -266,6 +267,8 @@ public class WebWindow : FormNone {
         public string appDirPath { get; set; }
         /// <summary> 程式的暫存資料夾 </summary>
         public string appDataPath { get; set; }
+        /// <summary> 暫存資料夾 - 從網路下載的檔案 </summary>
+        public string tempDirWebFile { get; set; }
         /// <summary> 目前使用的 port </summary>
         public int mainPort { get; set; }
         /// <summary> setting.js 的路徑 </summary>

@@ -1,6 +1,6 @@
 interface WebWindow {
 
-    /** 運行js */
+    /** 運行 js */
     RunJs(js: string): string;
 
     /** 視窗取得焦點 */
@@ -41,13 +41,13 @@ interface WebWindow {
 
 interface WV_Window {
 
-    /** 清理webview2的暫存 */
+    /** 清理 webview2 的暫存 */
     ClearBrowserCache(): void;
 
     /** 儲存到 start.ini */
     SetStartIni(startPort: number, startType: number)
 
-    /** 取得 AppInfo*/
+    /** 取得 AppInfo */
     GetAppInfo(): string;
 
     /** 網頁載入完成後，呼叫此函數才會顯示視窗 */
@@ -79,10 +79,10 @@ interface WV_Window {
     /** 傳入 webWindow，將其設為目前視窗的子視窗*/
     SetOwner(webwindow: WebWindow);
 
-    /** 在父親視窗運行js */
+    /** 在父視窗執行 js */
     RunJsOfParent(js: string): string;
 
-    /** 啟用AERO毛玻璃效果 */
+    /** 啟用 AERO 毛玻璃效果 */
     SetAERO(type: ("win7" | "win10")): void;
 
     /** 設定縮放倍率，預設 1.0 */
@@ -546,6 +546,9 @@ interface AppInfo {
 
     /** AppData(使用者資料) */
     appDataPath: string;
+
+    /** 暫存資料夾 - 從網路下載的檔案 */
+    tempDirWebFile: string;
 
     /** 目前使用的port */
     mainPort: number;

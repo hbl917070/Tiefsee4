@@ -187,6 +187,18 @@ input::-webkit-inner-spin-button {
     max-width: 250px;
     display: flex;
   }
+
+  .collapseBox {
+    border-left: 1px solid var(--color-white40);
+    padding-left: 15px;
+    padding-bottom: 5px;
+    margin-left: 15px;
+
+    display: none;
+    &[active="true"] {
+      display: block;
+    }
+  }
 }
 
 .text-input {
@@ -201,7 +213,8 @@ input::-webkit-inner-spin-button {
   flex: 1;
 }
 /******************/
-//擴充套件清單
+
+// 擴充套件清單
 .pluginLiet {
   margin-top: 5px;
   max-width: 800px;
@@ -350,7 +363,7 @@ input::-webkit-inner-spin-button {
 
 //#region tippy (提示方塊)
 
-//問號
+// 問號
 .img-help {
   display: inline-block;
   cursor: pointer;
@@ -367,7 +380,7 @@ input::-webkit-inner-spin-button {
 }
 
 .tippy-box[data-theme~="tippyMyTheme"] {
-  //自訂主題
+  // 自訂主題
   box-sizing: content-box;
   transition: all 0.15s cubic-bezier(0.49, 0.37, 0.45, 1.4) !important;
   background-color: var(--color-black);
@@ -386,7 +399,7 @@ input::-webkit-inner-spin-button {
 }
 //#endregion
 
-//自訂工具列
+// 自訂工具列
 .toolbarList {
   margin-left: 30px;
 
@@ -494,7 +507,7 @@ input::-webkit-inner-spin-button {
 
 //---------------------
 
-//如果是商店APP版，就隱藏區塊
+// 如果是商店APP版，就隱藏區塊
 body[showType="storeApp"] [show-not="storeApp"] {
   display: none;
 }

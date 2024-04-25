@@ -374,18 +374,24 @@ class Lib {
     /**
      * 送出 GET 的 http 請求
      */
-    public static async sendGet(type: ("text" | "json" | "base64"), url: string) {
+    public static async sendGet(type: ("text" | "json" | "base64"), url: string, timeout = 30000) {
+
+        const controller = new AbortController();
+
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         if (type === "text") {
             let txt = "";
             await fetch(url, {
                 "method": "get",
+                signal: controller.signal,
             }).then((response) => {
                 return response.text();
             }).then((html) => {
                 txt = html;
             }).catch((err) => {
                 console.log("error: ", err);
+                throw err;
             });
             return txt;
         }
@@ -394,12 +400,14 @@ class Lib {
             let json: any = {};
             await fetch(url, {
                 "method": "get",
+                signal: controller.signal,
             }).then((response) => {
                 return response.json();
             }).then((html) => {
                 json = html;
             }).catch((err) => {
                 console.log("error: ", err);
+                throw err;
             });
             return json;
         }
@@ -472,7 +480,7 @@ class Lib {
      * @param domTitle 標題區塊
      * @param type  "init-true" | "init-false" | "toggle" 
      */
-    public static async collapse(domBox: HTMLElement, type: string, funcChange?: (type: string) => void) {
+    public static async collapse(domBox: HTMLElement, type: string, funcChange?: (type: boolean) => void) {
 
         let domContent = domBox.querySelector(".collapse-content") as HTMLElement;
         if (domContent === null) { return; }
@@ -481,7 +489,7 @@ class Lib {
         if (div === null) { return; }
 
         if (funcChange === undefined) {
-            funcChange = (type: string) => { };
+            funcChange = (type: boolean) => { };
         }
 
         // 自動
@@ -500,7 +508,7 @@ class Lib {
             }
             domContent.style.maxHeight = 0 + "px";
             domBox.setAttribute("open", "false");
-            funcChange(type);
+            funcChange(false);
         }
 
         if (type === "true") {
@@ -513,19 +521,19 @@ class Lib {
                     domContent.style.maxHeight = "";
                 }
             }, 300);
-            funcChange(type);
+            funcChange(true);
         }
 
         // 無動畫，用於初始化
         if (type === "init-false") {
             domContent.style.maxHeight = 0 + "px";
             domBox.setAttribute("open", "false");
-            funcChange("false");
+            funcChange(false);
         }
         if (type === "init-true") {
             domContent.style.maxHeight = "";
             domBox.setAttribute("open", "true");
-            funcChange("true");
+            funcChange(true);
         }
     }
 
@@ -773,5 +781,67 @@ class Throttle {
             });
 
         }, timeout);
+    }
+}
+
+/**
+ * 限制最大同時連線數。Chrome最大連線數為6
+ */
+class RequestLimiter {
+    private queue: [HTMLImageElement, string][];
+    private inProgress: number;
+    private maxRequests: number;
+
+    constructor(maxRequests: number) {
+        this.queue = [];
+        this.inProgress = 0;
+        this.maxRequests = maxRequests;
+    }
+
+    public addRequest(img: HTMLImageElement, url: string) {
+
+        // 檢查 img 元素是否仍然存在於文檔中
+        if (!document.body.contains(img)) {
+            return;
+        }
+
+        // 檢查佇列中是否已經存在相同的 img 元素和網址
+        const index = this.queue.findIndex(([i, u]) => i === img && u === url);
+        if (index !== -1) { // 如果存在，則忽略這個請求       
+            return;
+        }
+
+        // 檢查佇列中是否存在相同的 img 元素但不同的網址
+        const index2 = this.queue.findIndex(([i, u]) => i === img && u !== url);
+        if (index2 !== -1) { // 如果存在，則將舊的請求從佇列中移除   
+            this.queue.splice(index2, 1);
+        }
+
+        // 添加新的請求
+        this.queue.push([img, url]);
+        this.processQueue();
+    }
+
+    private processQueue() {
+        while (this.inProgress < this.maxRequests && this.queue.length > 0) {
+            this.inProgress++;
+            const [img, url] = this.queue.shift()!;
+            this.loadImage(img, url).then(() => {
+                this.inProgress--;
+                this.processQueue();
+            });
+        }
+    }
+
+    private loadImage(img: HTMLImageElement, url: string) {
+        return new Promise<void>((resolve) => {
+            if (!document.body.contains(img)) { // 檢查 img 元素是否仍然存在於文檔中
+                resolve();
+                return;
+            }
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+            img.src = url;
+        });
     }
 }

@@ -86,6 +86,16 @@ class WebAPI {
         }
 
         /**
+         *  從網路下載圖片後，返回圖片的 icon
+         */
+        static webIcon(url: string, path: string) {
+            let encodePath = encodeURIComponent(path);
+            let encodeUrl = encodeURIComponent(url);
+            let r = 0; // Math.random(); // 避免快取
+            return APIURL + `/api/getWebIcon?size=256&url=${encodeUrl}&path=${encodePath}&r=${r}`;
+        }
+
+        /**
          * 取得圖片網址
          */
         static async getUrl(type: string, fileInfo2: FileInfo2) {

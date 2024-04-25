@@ -2,12 +2,17 @@
  * 資料表名稱
  */
 var DbStoreName = {
+    /** Civitai Resources 的暫存資料 */
     civitaiResources: "civitaiResources",
+    /** 詳細資訊面板內的項目折疊狀態 */
+    infoPanelCollapse: "infoPanelCollapse",
 }
 
 class IndexedDBManager {
 
-    private storeNames: string[] = [DbStoreName.civitaiResources]; // 資料表名稱
+    // 資料表名稱
+    private storeNames: string[] = Object.values(DbStoreName);
+
     private dbPromise: Promise<IDBDatabase>;
     constructor(private dbName: string, private version: number) {
         this.dbPromise = this.init();
@@ -41,7 +46,7 @@ class IndexedDBManager {
     public async getData(storeName: string, id: string): Promise<any> {
         const db = await this.dbPromise;
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction([storeName]);
+            const transaction = db.transaction(storeName);
             const objectStore = transaction.objectStore(storeName);
             const request = objectStore.get(id);
 
@@ -62,8 +67,15 @@ class IndexedDBManager {
      */
     public async saveData(storeName: string, data: any): Promise<void> {
         const db = await this.dbPromise;
+        const transaction = db.transaction(storeName, "readwrite");
+        const objectStore = transaction.objectStore(storeName);
+        objectStore.put(data);
+    }
+
+    public async deleteData(storeName: string, id: string): Promise<void> {
+        const db = await this.dbPromise;
         const transaction = db.transaction([storeName], "readwrite");
         const objectStore = transaction.objectStore(storeName);
-        objectStore.add(data);
+        objectStore.delete(id);
     }
 }

@@ -19,17 +19,21 @@ public class ImgLib {
     /// 取得任何檔案的圖示
     /// </summary>
     /// <param name="path"></param>
-    /// <param name="size">16 32 64 128 256</param>
+    /// <param name="size"> 16 32 64 128 256 </param>
+    /// <param name="waitSec"> 等待秒數 </param>
     /// <returns></returns>
-    public static Bitmap GetFileIcon(string path, int size) {
+    public static Bitmap GetFileIcon(string path, int size, double waitSec = 1.5) {
         if (File.Exists(path) == false) { return null; }
 
         Bitmap icon = null;
 
-        Adapter.RunWithTimeout(1, () => {
-            // 取得圖片在Windows系統的縮圖
-            icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
-        });
+        try {
+            Adapter.RunWithTimeout(waitSec, () => {
+                // 取得圖片在Windows系統的縮圖
+                icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
+            });
+        }
+        catch { }
 
         return icon;
     }

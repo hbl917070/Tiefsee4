@@ -263,7 +263,7 @@
 
   //資訊
   .mainExifList {
-    padding: 0 5px;
+    padding-left: 5px;
     padding-bottom: 20px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -273,16 +273,27 @@
     flex-wrap: wrap;
     flex-direction: row;
     align-items: center;
-    border-top: 1px solid var(--color-blue20);
     padding: 3px 0;
+
+    // 水平線
+    &::before {
+      content: "";
+      height: 1px;
+      background-color: var(--color-blue20);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 5px;
+    }
+    // 第一個項目不顯示水平線
+    &:first-child::before {
+      display: none;
+    }
 
     word-wrap: break-word;
     //word-break: break-all;
     font-size: 14px;
     position: relative;
-  }
-  .mainExifItem:first-child {
-    border-top: none;
   }
 
   // 匯出
@@ -336,8 +347,52 @@
     // 允許顯示空白跟換行
     white-space: pre-wrap;
   }
+  // 不顯示空白跟換行
+  .mainExifValue__nowrap {
+    white-space: normal;
+  }
 
-  //google map
+  // Civitai resources 的圖片
+  .mainExifImgList {
+    display: none;
+
+    &[active="true"] {
+      display: flex;
+    }
+
+    .mainExifImgItem {
+      height: 150px;
+      max-width: 150px;
+      width: 100%;
+      margin-right: 4px;
+      //text-align: center;
+      border-radius: 4px;
+
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover {
+        cursor: pointer;
+        outline: 1px solid var(--color-blue40);
+        outline-offset: -1px; // outline 內縮
+      }
+    }
+  }
+
+  // google map
   .mainExifMap {
     position: relative;
     width: 100%;
@@ -375,7 +430,7 @@
   .mainExifBtns {
     position: absolute;
     top: 0;
-    right: -5px;
+    right: 0;
     display: flex;
     flex-direction: row;
 

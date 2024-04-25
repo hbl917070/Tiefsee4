@@ -624,8 +624,28 @@ var langData = {
                 "zh-TW": `自動找出相同檔名的檔案。<br> 例如 "dog.jpg", "dog.txt", "dog.preview.png"`,
                 "en": `Automatically find files with the same file name. <br> For example, "dog.jpg", "dog.txt", "dog.preview.png"`,
                 "ja": `同じファイル名のファイルを自動的に見つけます。<br> 例えば、"dog.jpg", "dog.txt", "dog.preview.png"`
-            }
+            },
 
+            civitaiResourcesEnabled: {
+                "zh-TW": `顯示 Civitai Resources`,
+                "en": `Display Civitai Resources`,
+                "ja": `Civitai Resources を表示する`    
+            },
+            civitaiResourcesDefault : {
+                "zh-TW": `圖片預設狀態`,
+                "en": `Default image state`,
+                "ja": `画像のデフォルト状態`,
+            },
+            civitaiResourcesImgNumber : {
+                "zh-TW": `圖片數量`,
+                "en": `Number of images`,
+                "ja": `画像の数`,   
+            },
+            civitaiResourcesNsfwLevel  : {
+                "zh-TW": `允許 NSFW 圖片`,
+                "en": `Allow NSFW images`,
+                "ja": `NSFW 画像を許可する`,
+            },
         },
 
         // 工具列

@@ -294,8 +294,8 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog"> 
-                            檔案刪除前顯示確認視窗 
+                        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog">
+                            檔案刪除前顯示確認視窗
                         </div>
                         <div class="text-content">
                             <label class="switch">
@@ -304,8 +304,8 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.other.whenInsertingFile"> 
-                            偵測到檔案新增時，插入於 
+                        <div class="text-title" i18n="sw.other.whenInsertingFile">
+                            偵測到檔案新增時，插入於
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-whenInsertingFile">
@@ -574,6 +574,42 @@
                         <div class="text-title" i18n="sw.informationPanel.maxLine"> 顯示的最大行數 (1~1000) </div>
                         <div class="text-content">
                             <input class="text-input" type="number" id="text-mainExifMaxLine">
+                        </div>
+
+                        <!-- Civitai Resources -->
+                        <div class="text-title" i18n="sw.informationPanel.civitaiResourcesEnabled"> 顯示 Civitai Resources </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-civitaiResourcesEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id="civitaiBox" class="collapseBox">
+                            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesDefault"> 圖片預設狀態 </div>
+                            <div class="text-content">
+                                <select class="text-input" id="select-civitaiResourcesDefault">
+                                    <option value="true" i18n="menu.expand"> 展開 </option>
+                                    <option value="false" i18n="menu.collapse"> 折疊 </option>
+                                </select>
+                            </div>
+
+                            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesImgNumber"> 圖片數量 </div>
+                            <div class="text-content">
+                                <select class="text-input" id="select-civitaiResourcesImgNumber">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+
+                            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesNsfwLevel"> 允許 NSFW 圖片 </div>
+                            <div class="text-content">
+                                <label class="switch">
+                                    <input type="checkbox" id="switch-civitaiResourcesNsfwLevel">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
                         </div>
 
                     </div>

@@ -33,6 +33,9 @@ class MainExif {
 		var isHide = false; // 暫時隱藏
 		var isEnabled = true; // 啟用 檔案預覽視窗
 
+		/** 請求限制器 */
+		const limiter = new RequestLimiter(3);
+
 		/** 頁籤的類型 */
 		var TabType = {
 			/** 資訊 */
@@ -534,7 +537,7 @@ class MainExif {
 						const data = cdata[i].data;
 
 						// 折疊面板
-						let collapseDom = getCollapseDom(node, true);
+						let collapseDom = await getCollapseDom(node, true);
 						data.forEach(item => {
 							collapseDom.domContent.appendChild(getItemDom(item.title, item.text));
 						});
@@ -546,14 +549,14 @@ class MainExif {
 			// 把 ComfyScript 放在最下面，並預設展開
 			if (comfyScript !== undefined) {
 				// 折疊面板
-				let collapseDom = getCollapseDom("ComfyScript", true);
+				let collapseDom = await getCollapseDom("ComfyScript", true);
 				collapseDom.domContent.appendChild(getItemDom("ComfyScript", comfyScript));
 				domTabContentInfo.appendChild(collapseDom.domBox);
 			}
 			// 把 ComfyUI 的原始資料放在最下面，並預設折疊
 			if (comfyuiPrompt !== undefined || comfyuiWorkflow !== undefined) {
 				// 折疊面板
-				let collapseDom = getCollapseDom("ComfyUI Data", false);
+				let collapseDom = await getCollapseDom("ComfyUI Data", false);
 
 				if (comfyuiGenerationData !== undefined) {
 					let jsonF = Lib.jsonStrFormat(comfyuiGenerationData);
@@ -711,14 +714,14 @@ class MainExif {
 			let tempId: any[] = [];
 
 			// 折疊面板
-			let collapseDom = getCollapseDom("Civitai Resources", true, "civitaiResources");
+			let collapseDom = await getCollapseDom("Civitai Resources", true, "civitaiResources", (type) => { });
 
 			for (let i = 0; i < data.length; i++) {
 				const item = data[i];
 				let hash = item.hash;
 				let modelVersionId = item.modelVersionId;
 				let dbKey = modelVersionId || hash;
-				if (hash === undefined && modelVersionId === undefined) {
+				if (dbKey === undefined || dbKey === null) {
 					console.warn("Civitai 未預期的格式");
 					console.warn(item);
 					continue;
@@ -728,15 +731,31 @@ class MainExif {
 				let modelType: any = item.type;
 				let modelName: any;
 				let name: any;
+				let images: any[];
 				let error: any;
 
 				// 先嘗試從 indexedDB 取得資料
 				let dbData = await M.db?.getData(DbStoreName.civitaiResources, dbKey);
+
 				if (dbData !== undefined) {
+					// 如果發生過錯誤，且時間超過 1 天，就重新下載
+					if (dbData.error !== undefined) {
+						let time = new Date(dbData.time).getTime();
+						let timeNow = new Date().getTime();
+						//if (isNaN(time) || timeNow - time > 20 * 1000) {
+						if (isNaN(time) || timeNow - time > 24 * 60 * 60 * 1000) {
+							dbData = undefined;
+						}
+					}
+				}
+
+				if (dbData !== undefined) {
+
 					modelId = dbData.modelId;
 					modelType = dbData.modelType;
 					modelName = dbData.modelName;
 					name = dbData.name;
+					images = dbData.images;
 					modelVersionId = dbData.modelVersionId;
 					error = dbData.error;
 					// console.log("indexedDB 取得資料", modelId, modelName, error);
@@ -750,46 +769,75 @@ class MainExif {
 				if (path !== fileInfo2.FullPath) { return; }
 
 				// 曾經下載過，且資料是 error，就不再載入
-				if (error) { continue; }
+				if (error === "Model not found") { continue; }
 
 				// 先產生一個空的 dom 項目，待資料載入完畢後，再替換
 				let oldDom = getItemDom(dbKey, "Loading" + "\n" + "-");
 				collapseDom.domContent.appendChild(oldDom);
 
+				let ompleteCount = 0;
+				// 項目完成時呼叫的函數，用與判斷是否全部都已經完成
+				let completeFunc = () => {
+					ompleteCount++;
+					if (ompleteCount === data.length) {
+						// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
+						if (collapseDom.domContent.children.length === 0) {
+							collapseDom.domBox.parentNode?.removeChild(collapseDom.domBox);
+						}
+					}
+				}
+
 				setTimeout(async () => {
 
 					// 如果 indexedDB 沒有資料，則從 Civitai 取得資料
 					if (error === undefined &&
-						(modelId === undefined || modelName === undefined)) {
-						let url: string;
-						let result
-						if (hash) {
+						(modelId === undefined || modelName === undefined || images === undefined)) {
+						let url: string = "";
+						let result;
+						let timeout = 10 * 1000;
 
-							url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
-							result = await Lib.sendGet("json", url);
+						try {
+							if (hash) {
 
-							// 如果 hash 超過 10 個字，且找不到資源，則只取前 10 個字再試一次
-							if (result.error && hash.length > 10) {
-								hash = hash.substring(0, 10);
 								url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
-								result = await Lib.sendGet("json", url);
-								console.log("Civitai 重新請求資料", url);
+								result = await Lib.sendGet("json", url, timeout);
+
+								// 如果 hash 超過 10 個字，且找不到資源，則只取前 10 個字再試一次
+								if (result.error && hash.length > 10) {
+									hash = hash.substring(0, 10);
+									url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
+									result = await Lib.sendGet("json", url, timeout);
+									// console.log("Civitai 重新請求資料", url);
+								}
+							} else {
+								url = `https://civitai.com/api/v1/model-versions/` + modelVersionId;
+								result = await Lib.sendGet("json", url, timeout);
 							}
-						} else {
-							url = `https://civitai.com/api/v1/model-versions/` + modelVersionId;
-							result = await Lib.sendGet("json", url);
+						} catch (e) {
+
+							console.error("Civitai 請求失敗", e);
+							let exifValue = oldDom.querySelector(".mainExifValue") as HTMLElement
+							exifValue.innerHTML = "Error";
+							result = {
+								error: "Request error"
+							}
 						}
+
 						// console.log("Civitai 請求資料", url);
 
 						modelId = result.modelId;
 						modelName = result.model?.name;
 						modelType = result.model?.type;
 						name = result.name;
+						images = result.images;
 						modelVersionId = result.id;
 						error = result.error;
 
 						if (result.error) {
-							console.warn("Civitai 返回 error", url, result);
+							console.log("Civitai 返回 error", url, result);
+							let exifValue = oldDom.querySelector(".mainExifValue") as HTMLElement
+							exifValue.innerHTML = "Error";
+
 							// 如果找不到資源，則一樣存到 indexedDB
 							M.db?.saveData(DbStoreName.civitaiResources, {
 								id: dbKey,
@@ -798,10 +846,18 @@ class MainExif {
 							});
 						} else {
 							if (modelId === undefined || modelName === undefined) {
-								console.warn("Civitai 返回資料解析失敗", url, result);
+								console.log("Civitai 返回資料解析失敗", url, result);
 							}
+
 							// 存到 indexedDB
-							M.db?.saveData(DbStoreName.civitaiResources, {
+							let images2 = result.images.map((item: any) => {
+								return {
+									url: item.url,
+									nsfwLevel: item.nsfwLevel,
+									type: item.type
+								};
+							});
+							await M.db?.saveData(DbStoreName.civitaiResources, {
 								id: dbKey,
 								time: new Date().format("yyyy-MM-dd hh:mm:ss"),
 								modelId: modelId,
@@ -809,16 +865,16 @@ class MainExif {
 								modelName: modelName,
 								modelType: modelType,
 								name: name,
+								images: images2
 							});
+							console.log("Civitai 成功", url);
+
 						}
 
 						// 重複的項目
-						if (tempId.includes(modelVersionId)) {
+						if (modelVersionId !== undefined && tempId.includes(modelVersionId)) {
 							oldDom.parentNode?.removeChild(oldDom);
-							// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
-							if (collapseDom.domContent.children.length === 0) {
-								collapseDom.domBox.parentNode?.removeChild(collapseDom.domBox);
-							}
+							completeFunc();
 							return;
 						}
 						tempId.push(modelVersionId);
@@ -826,43 +882,158 @@ class MainExif {
 
 					if (error) {
 						oldDom.parentNode?.removeChild(oldDom);
-						// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
-						if (collapseDom.domContent.children.length === 0) {
-							collapseDom.domBox.parentNode?.removeChild(collapseDom.domBox);
-						}
+						completeFunc();
 						return;
 					}
 
 					if (modelId === undefined || modelName === undefined) {
+						completeFunc();
 						return;
 					}
 
 					// 檢查 oldDom 是否還存在
 					if (oldDom.parentNode !== null) {
 
+						if (baseWindow.appInfo === undefined) { return; }
+
 						// 產生新的 dom
 						let newItem = Lib.newDom(`
-						<div class="mainExifItem">
-							<div class="mainExifName">${modelType}</div>
-							<div class="mainExifValue">${modelName}<br>${name}</div>
-							<div class="mainExifBtns">
-								<div class="btn mainExifBtnCivitai" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
-							</div>
-						</div>`);
+							<div class="mainExifItem">
+								<div class="mainExifName">${Lib.escape(modelType)}</div>
+								<div class="mainExifValue mainExifValue__nowrap">
+									${Lib.escape(modelName)}<br>
+									${Lib.escape(name)}
+									<div class="mainExifImgList">
+									</div>
+								</div>
+								<div class="mainExifBtns">
+									<div class="btn mainExifBtnExpand" title="${M.i18n.t("menu.expand")}">${SvgList["expand.svg"]}</div>
+									<div class="btn mainExifBtnCollapse" title="${M.i18n.t("menu.collapse")}">${SvgList["collapse.svg"]}</div>
+									<div class="btn mainExifBtnCivitai" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
+								</div>
+							</div>`);
+						domTabContentInfo.appendChild(newItem);
+
+						let btnExpand = newItem.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
+						let btnCollapse = newItem.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊			
 						let btnCivitai = newItem.querySelector(".mainExifBtnCivitai") as HTMLElement;
+						let divImgList = newItem.querySelector(".mainExifImgList") as HTMLElement;
+
+						// 產生預覽圖
+						let imgCount = M.config.settings.layout.civitaiResourcesImgNumber;
+						let nsfwLevel = M.config.settings.layout.civitaiResourcesNsfwLevel;
+
+						// 判斷是否有圖片
+						let isHaveImg = false;
+						// 載入圖片
+						let funcLoadImg: (() => void)[] = [];
+
+						for (let i = 0; i < images.length; i++) {
+							const item = images[i];
+							if (item.type === "image" && item.nsfwLevel <= nsfwLevel) {
+
+								isHaveImg = true;
+
+								// 開啟網址時下載圖片，並回傳其 icon
+								let name = `Civitai\\${dbKey}-${i + 1}.jpg`;
+								let imgPath = Lib.Combine([baseWindow.appInfo.tempDirWebFile, name]);
+								let imgUrl = WebAPI.Img.webIcon(item.url, name);
+
+								let imgItem = Lib.newDom(`
+									<div class="mainExifImgItem">
+										<img>
+									</div>
+								`);
+								divImgList.appendChild(imgItem);
+								imgItem.setAttribute("data-path", imgPath);
+
+								const domImg = imgItem.querySelector("img") as HTMLImageElement;
+
+								// 展開時，載入圖片，已經載入過的就不再載入
+								let isLoad = false;
+								funcLoadImg.push(() => {
+									if (isLoad) { return; }
+									isLoad = true;
+									limiter.addRequest(domImg, imgUrl); // 發出請求
+								})
+
+								// 圖片載入失敗時，顯示錯誤圖示
+								domImg.onerror = () => {
+									domImg.src = "./img/error.svg";
+									domImg.style.objectFit = "contain";
+								}
+
+								// 雙擊左鍵
+								Lib.addEventDblclick(imgItem, async (e: MouseEvent) => { // 圖片物件
+									let imgPath = imgItem.getAttribute("data-path");
+									if (imgPath === null) { return; }
+									M.script.open.openNewWindow(imgPath);
+								});
+
+								imgCount--;
+								if (imgCount <= 0) { break; }
+							}
+						}
+
 						btnCivitai.addEventListener("click", async () => {
 							let url = "https://civitai.com/models/" + modelId + "?modelVersionId=" + modelVersionId;
 							WV_RunApp.OpenUrl(url);
 						});
-						domTabContentInfo.appendChild(newItem);
+
+						// 套用狀態。 true=展開 、 false=折疊、 null=不顯示
+						function setCollapse(t: boolean | null) {
+							if (t) { // 狀態是展開，顯示折疊按鈕	
+								btnExpand.style.display = "none";
+								btnCollapse.style.display = "";
+								divImgList.setAttribute("active", "true");
+
+								// 展開時，載入圖片
+								funcLoadImg.forEach(func => {
+									func();
+								})
+
+							} else if (t === false) {
+								btnExpand.style.display = "";
+								btnCollapse.style.display = "none";
+								divImgList.setAttribute("active", "");
+							} else {
+								// 什麼都不顯示
+								btnExpand.style.display = "none";
+								btnCollapse.style.display = "none";
+								divImgList.removeAttribute("active");
+							}
+						}
+						btnExpand.addEventListener("click", async () => { // 展開
+							setCollapse(true);
+							// 儲存折疊狀態
+							M.db?.saveData(DbStoreName.infoPanelCollapse, { id: "civitaiImg-" + dbKey, collapse: true });
+						});
+						btnCollapse.addEventListener("click", async () => { // 折疊
+							setCollapse(false);
+							// 儲存折疊狀態
+							M.db?.saveData(DbStoreName.infoPanelCollapse, { id: "civitaiImg-" + dbKey, collapse: false });
+						});
+
+						// 從 db 讀取折疊狀態
+						let dbCollapse = await M.db?.getData(DbStoreName.infoPanelCollapse, "civitaiImg-" + dbKey);
+						if (dbCollapse !== undefined) {
+							setCollapse(dbCollapse.collapse);
+						} else {
+							setCollapse(M.config.settings.layout.civitaiResourcesDefault);
+						}
+						// 如果沒有圖片，就不顯示展開按鈕
+						if (isHaveImg === false) {
+							setCollapse(null);
+						}
 
 						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
 						oldDom.insertAdjacentElement("afterend", newItem);
 						oldDom.parentNode?.removeChild(oldDom);
+
+						completeFunc();
 					}
 
 				}, 1);
-
 			}
 
 			if (collapseDom.domContent.children.length > 0) {
@@ -1090,8 +1261,8 @@ class MainExif {
 				}
 
 				Lib.collapse(domBox, "toggle", (type) => { //切換折疊狀態
-					let t = (type === "true");
-					M.config.settings.layout.mainExifCollapse[title] = t; //更改狀態後，儲存折疊狀態
+
+					M.config.settings.layout.mainExifCollapse[title] = type; //更改狀態後，儲存折疊狀態
 				});
 			})
 
@@ -1104,11 +1275,11 @@ class MainExif {
 		 * @param type 初始狀態
 		 * @param key 儲存設定值的key
 		 */
-		function getCollapseDom(title: string, type: boolean, key?: string) {
+		async function getCollapseDom(title: string, type: boolean, key?: string, funcChange?: (type: boolean) => void) {
 
 			// 外框物件
 			let domBox = Lib.newDom(`
-				<div class="mainExifRelatedBox" data-menu="file">	
+				<div class="mainExifRelatedBox">	
 				</div>
 			`);
 
@@ -1133,10 +1304,14 @@ class MainExif {
 
 			// 從設定讀取折疊狀態
 			let open;
+			// 從 db 讀取折疊狀態
 			if (key !== undefined) {
-				open = M.config.settings.layout.mainExifCollapse[key];
+				let dbCollapse = await M.db?.getData(DbStoreName.infoPanelCollapse, key);
+				if (dbCollapse !== undefined) { open = dbCollapse.collapse; }
 			}
-			if (open === undefined) { open = type; }
+			if (open === undefined) {
+				open = type;
+			}
 
 			// 初始化 折疊面板
 			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
@@ -1146,12 +1321,12 @@ class MainExif {
 				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
 					return;
 				}
-				Lib.collapse(domBox, "toggle", (type) => {
+				Lib.collapse(domBox, "toggle", async (type) => {
 					if (key !== undefined) {
-						let t = (type === "true");
-						M.config.settings.layout.mainExifCollapse[key] = t; // 更改狀態後，儲存折疊狀態
+						funcChange?.(type);
+						// 更改狀態後，儲存折疊狀態
+						await M.db?.saveData(DbStoreName.infoPanelCollapse, { id: key, collapse: type });
 					}
-
 				}); // 切換折疊狀態
 			});
 

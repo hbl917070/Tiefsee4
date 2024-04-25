@@ -464,12 +464,14 @@ class AiDrawingPrompt {
 					let loraName = intputs["lora_name_" + i];
 					if (loraName === undefined) { break; }
 
+					if (modelStr === 0 && clipStr === 0) { continue; } // 如果都是 0，則略過
 					if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
 					let jsonFormat = Lib.stringifyWithNewlines({
 						"Model Strength": modelStr,
 						"Clip Strength": clipStr
 					}, true, true);
 					arLora.push({ title: loraName, text: jsonFormat });
+
 				}
 			}
 
@@ -510,6 +512,7 @@ class AiDrawingPrompt {
 					let clipWeight = intputs["clip_weight_" + i];
 					if (clipWeight === undefined) { break; }
 
+					if (modelWeight === 0 && clipWeight === 0) { continue; } // 如果都是 0，則略過		
 					if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
 					let jsonFormat = Lib.stringifyWithNewlines({
 						"Model Strength": modelWeight,
@@ -540,6 +543,9 @@ class AiDrawingPrompt {
 					let value = intputs[key];
 					let type = typeof value;
 					if (type === "number" || type === "string") {
+
+						if (value === 0) { return; } // 如果是 0，則略過
+
 						if (key === "strength_model" || key === "lora_model_strength") {
 							arStrength["Model Strength"] = value;
 						}

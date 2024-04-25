@@ -898,7 +898,7 @@ class SettingWindow {
         addLoadEvent(() => {
             // 顯示 詳細資料面板
             var switch_mainExifEnabled = getDom("#switch-mainExifEnabled") as HTMLInputElement;
-            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"]; // 
+            switch_mainExifEnabled.checked = config.settings["layout"]["mainExifEnabled"];
             switch_mainExifEnabled.addEventListener("change", () => {
                 let val = switch_mainExifEnabled.checked;
                 config.settings["layout"]["mainExifEnabled"] = val;
@@ -932,6 +932,52 @@ class SettingWindow {
                 if (val <= 0) { val = 1; }
                 text_mainExifMaxLine.value = val + "";
                 config.settings["layout"]["mainExifMaxLine"] = val;
+                appleSettingOfMain();
+            });
+
+            // 顯示 Civitai Resources 
+            var divCivitaiBox = getDom("#civitaiBox") as HTMLElement;
+            function updateCivitaiBox() {
+                if (switch_civitaiResourcesEnabled.checked) {
+                    divCivitaiBox.setAttribute("active", "true");
+                } else {
+                    divCivitaiBox.removeAttribute("active");
+                }
+            }
+            var switch_civitaiResourcesEnabled = getDom("#switch-civitaiResourcesEnabled") as HTMLInputElement;
+            switch_civitaiResourcesEnabled.checked = config.settings["layout"]["civitaiResourcesEnabled"];
+            updateCivitaiBox();
+            switch_civitaiResourcesEnabled.addEventListener("change", () => {
+                let val = switch_civitaiResourcesEnabled.checked;
+                config.settings["layout"]["civitaiResourcesEnabled"] = val;
+                appleSettingOfMain();
+                updateCivitaiBox();
+            });
+
+            // 圖片預設狀態
+            var select_civitaiResourcesDefault = getDom("#select-civitaiResourcesDefault") as HTMLSelectElement;
+            select_civitaiResourcesDefault.value = config.settings.layout.civitaiResourcesDefault.toString();
+            select_civitaiResourcesDefault.addEventListener("change", () => {
+                let val = select_civitaiResourcesDefault.value;
+                config.settings.layout.civitaiResourcesDefault = val === "true";
+                appleSettingOfMain();
+            });
+
+            // 圖片數量
+            var select_civitaiResourcesImgNumber = getDom("#select-civitaiResourcesImgNumber") as HTMLSelectElement;
+            select_civitaiResourcesImgNumber.value = config.settings.layout.civitaiResourcesImgNumber.toString();
+            select_civitaiResourcesImgNumber.addEventListener("change", () => {
+                let val = Number(select_civitaiResourcesImgNumber.value);
+                config.settings.layout.civitaiResourcesImgNumber = val;
+                appleSettingOfMain();
+            });
+
+            // 允許 NSFW 圖片
+            var switch_civitaiResourcesNsfwLevel = getDom("#switch-civitaiResourcesNsfwLevel") as HTMLInputElement;
+            switch_civitaiResourcesNsfwLevel.checked = config.settings.layout.civitaiResourcesNsfwLevel == 99;
+            switch_civitaiResourcesNsfwLevel.addEventListener("change", () => {
+                let val = switch_civitaiResourcesNsfwLevel.checked;
+                config.settings.layout.civitaiResourcesNsfwLevel = val ? 99 : 3;
                 appleSettingOfMain();
             });
 

@@ -1,4 +1,3 @@
-﻿using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -195,12 +194,13 @@ public class FileLib {
         using var sha256 = System.Security.Cryptography.SHA256.Create();
         string s;
         if (File.Exists(path)) {
-            long fileSize = new FileInfo(path).Length; // File size
-            long ticks = new FileInfo(path).LastWriteTime.Ticks; // File last modified time
+            var fileinfo = new FileInfo(path);
+            long fileSize = fileinfo.Length; // File size
+            long ticks = fileinfo.LastWriteTime.Ticks; // File last modified time
             s = Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(fileSize + path + ticks)));
         }
         else {
-            s = path;
+            s = Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(path)));
         }
         return s.ToLower().Replace("\\", "").Replace("/", "").Replace("+", "").Replace("=", "");
     }

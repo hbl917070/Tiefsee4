@@ -95,7 +95,7 @@ class MainWindow {
 
         (async () => {
 
-            db = await new IndexedDBManager("tiefseeDB", 1);
+            db = await new IndexedDBManager("tiefseeDB", 2);
             this.db = db;
 
             fileShow.openNone(); // 不顯示任何東西
