@@ -6,6 +6,11 @@ namespace Tiefsee;
 
 [ComVisible(true)]
 public class WV_Window {
+    // 子視窗快取,用來判斷是否已經開啟過,並取得已開啟的視窗
+    private readonly Dictionary<string, WebWindow> _subWindowCache = new();
+
+    // 反向查詢創建子視窗時的字串
+    private readonly Dictionary<WebWindow, string> _subWindowCacheReverse = new();
 
     public WebWindow M;
 
@@ -60,8 +65,24 @@ public class WV_Window {
     /// <param name="args"></param>
     /// <returns></returns>
     public WebWindow NewSubWindow(string url, object[] args) {
+        // 子視窗已建立過，不再建立
+        if (_subWindowCache.ContainsKey(url)) {
+            return null;
+        };
         var w = NewWindow(url, args);
         SetOwner(w);
+        // 記錄子視窗快取
+        _subWindowCache[url] = w;
+        _subWindowCacheReverse[w] = url;
+        w.Closed += (sender, eventArgs) => {
+            if (sender == null)
+                return;
+            // 移除子視窗快取
+            var window = (WebWindow)sender;
+            var urlKey = _subWindowCacheReverse[window];
+            _subWindowCacheReverse.Remove(window);
+            _subWindowCache.Remove(urlKey);
+        };
         return null;
     }
 
