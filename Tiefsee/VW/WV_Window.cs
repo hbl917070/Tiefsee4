@@ -6,11 +6,9 @@ namespace Tiefsee;
 
 [ComVisible(true)]
 public class WV_Window {
-    // 子視窗快取,用來判斷是否已經開啟過,並取得已開啟的視窗
-    private readonly Dictionary<string, WebWindow> _subWindowCache = new();
 
-    // 反向查詢創建子視窗時的字串
-    private readonly Dictionary<WebWindow, string> _subWindowCacheReverse = new();
+    // 子視窗快取，用來判斷是否已經開啟過，並取得已開啟的視窗
+    private readonly Dictionary<string, WebWindow> _subWindowCache = new();
 
     public WebWindow M;
 
@@ -23,14 +21,14 @@ public class WV_Window {
     /// </summary>
     public void ClearBrowserCache() {
         // M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync(); // 會清除使用者資料
-        M.wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
+        M.Wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
     }
 
     /// <summary>
     /// 儲存到 start.ini
     /// </summary>
-    /// <param name="startPort">程式開始的port</param>
-    /// <param name="startType">1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐</param>
+    /// <param name="startPort"> 程式開始的 port </param>
+    /// <param name="startType"> 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐 </param>
     public void SetStartIni(int startPort, int startType) {
         IniManager iniManager = new IniManager(AppPath.appDataStartIni);
         iniManager.WriteIniFile("setting", "startPort", startPort);
@@ -44,7 +42,7 @@ public class WV_Window {
     /// </summary>
     /// <returns></returns>
     public string GetAppInfo() {
-        return WebWindow.GetAppInfo(M.args, 0);
+        return WebWindow.GetAppInfo(M.Args, 0);
     }
 
     /// <summary>
@@ -61,29 +59,27 @@ public class WV_Window {
     /// <summary>
     /// 新開子視窗
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public WebWindow NewSubWindow(string url, object[] args) {
+    /// <param name="url"> html 檔的路徑 </param>
+    /// <param name="args"> 命令列參數 </param>
+    /// <param name="windowKey"> 用於判斷是否已經啟動過視窗的 key </param>
+    /// <returns> true=啟動成功 false=已經啟動過 </returns>
+    public bool NewSubWindow(string url, object[] args, string windowKey) {
         // 子視窗已建立過，不再建立
-        if (_subWindowCache.ContainsKey(url)) {
-            return null;
+        if (_subWindowCache.ContainsKey(windowKey)) {
+            _subWindowCache[windowKey]?.ShowWindow();
+            return false;
         };
+
         var w = NewWindow(url, args);
         SetOwner(w);
+
         // 記錄子視窗快取
-        _subWindowCache[url] = w;
-        _subWindowCacheReverse[w] = url;
+        _subWindowCache.Add(windowKey, w);
         w.Closed += (sender, eventArgs) => {
-            if (sender == null)
-                return;
-            // 移除子視窗快取
-            var window = (WebWindow)sender;
-            var urlKey = _subWindowCacheReverse[window];
-            _subWindowCacheReverse.Remove(window);
-            _subWindowCache.Remove(urlKey);
+            _subWindowCache.Remove(windowKey);
         };
-        return null;
+
+        return true;
     }
 
     /// <summary>
@@ -157,11 +153,11 @@ public class WV_Window {
     }
 
     /// <summary>
-    /// 設定縮放倍率，預設1.0
+    /// 設定縮放倍率，預設 1.0
     /// </summary>
     /// <param name="d"></param>
     public void SetZoomFactor(double d) {
-        M.wv2.ZoomFactor = d;
+        M.Wv2.ZoomFactor = d;
     }
 
     /// <summary>
@@ -169,7 +165,7 @@ public class WV_Window {
     /// </summary>
     /// <returns></returns>
     public double GetZoomFactor() {
-        return M.wv2.ZoomFactor;
+        return M.Wv2.ZoomFactor;
     }
 
     /// <summary>
@@ -191,14 +187,12 @@ public class WV_Window {
     }
 
     /// <summary>
-    /// 在父親視窗運行js
+    /// 在父親視窗運行 js
     /// </summary>
-    /// <param name="js"></param>
-    /// <returns></returns>
     public async Task<string> RunJsOfParent(string js) {
-        if (M.parentWindow == null) { return ""; }
-        if (M.parentWindow.wv2.CoreWebView2 == null) { return ""; }
-        return await M.parentWindow.wv2.CoreWebView2.ExecuteScriptAsync(js);
+        if (M.ParentWindow == null) { return ""; }
+        if (M.ParentWindow.Wv2.CoreWebView2 == null) { return ""; }
+        return await M.ParentWindow.Wv2.CoreWebView2.ExecuteScriptAsync(js);
     }
 
     /// <summary>
@@ -255,7 +249,7 @@ public class WV_Window {
     /// 取得命令列參數
     /// </summary>
     public string[] GetArguments() {
-        return M.args;
+        return M.Args;
     }
 
     /// <summary>

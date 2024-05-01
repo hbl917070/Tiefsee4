@@ -12,27 +12,25 @@ interface WebWindow {
     /** 設定視窗坐標 */
     SetPosition(left: number, top: number): void;
 
-    //StartPosition: number;
-
     /** 標題 */
     Text: string;
 
-    /**視窗 x坐標 */
+    /** 視窗 x坐標 */
     Left: number;
 
-    /**視窗 y坐標 */
+    /** 視窗 y坐標 */
     Top: number;
 
-    /**視窗寬度 */
+    /** 視窗寬度 */
     Width: number;
 
-    /**視窗高度 */
+    /** 視窗高度 */
     Height: number;
 
-    /**顯示或隱藏視窗 */
+    /** 顯示或隱藏視窗 */
     Visible: boolean;
 
-    /**關閉視窗 */
+    /** 關閉視窗 */
     Close(): void;
 
     /** 視窗狀態。 0=視窗化 1=最小化 2=最大化 */
@@ -68,10 +66,11 @@ interface WV_Window {
 
     /**
      * 新開子視窗
-     * @param url 完整網址
+     * @param url html 檔的路徑
      * @param args 命令列參數
+     * @param windowKey 用於判斷是否已經啟動過視窗的 key
      */
-    NewSubWindow(url: string, args: string[]): WebWindow;
+    NewSubWindow(url: string, args: string[], windowKey: string): boolean;
 
     /** 結束程式 */
     Exit();
@@ -91,10 +90,10 @@ interface WV_Window {
     /** 取得縮放倍率，預設 1.0 */
     GetZoomFactor(): number;
 
-    /** 設定視窗最小size */
+    /** 設定視窗最小 size */
     SetMinimumSize(width: number, height: number): void;
 
-    /** 設定視窗size */
+    /** 設定視窗 size */
     SetSize(width: number, height: number): void;
 
     /** 設定視窗坐標 */
@@ -115,7 +114,7 @@ interface WV_Window {
     /** 取得命令列參數 */
     GetArguments(): string[];
 
-    /**關閉視窗 */
+    /** 關閉視窗 */
     Close(): void;
 
     /** 隱藏視窗 */
@@ -129,22 +128,22 @@ interface WV_Window {
     /** 標題 */
     Text: string;
 
-    /**視窗 x坐標 */
+    /** 視窗 x坐標 */
     Left: number;
 
-    /**視窗 y坐標 */
+    /** 視窗 y坐標 */
     Top: number;
 
-    /**視窗寬度 */
+    /** 視窗寬度 */
     Width: number;
 
-    /**視窗高度 */
+    /** 視窗高度 */
     Height: number;
 
-    /**顯示或隱藏視窗 */
+    /** 顯示或隱藏視窗 */
     Visible: boolean;
 
-    /**視窗狀態 */
+    /** 視窗狀態 */
     WindowState: ("Maximized" | "Minimized" | "Normal");
 
     /** 啟用或關閉 全螢幕 */
@@ -152,17 +151,14 @@ interface WV_Window {
     /** 取得當前是否為 全螢幕 */
     GetFullScreen(): boolean;
 
-    /**視窗置頂 */
+    /** 視窗置頂 */
     TopMost: boolean;
 
-    /**拖曳視窗 */
+    /** 拖曳視窗 */
     WindowDrag(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move')): void;
-
-
 }
 
 interface WV_Directory {
-
 
     /**
      * 取得跟自己同層的資料夾內的檔案資料(自然排序的前5筆)
@@ -212,7 +208,7 @@ interface WV_Directory {
 
 interface WV_File {
 
-    /** 將base64儲存至暫存資料夾 tempDirWebFile，並回傳路徑 */
+    /** 將 base64 儲存至暫存資料夾 tempDirWebFile，並回傳路徑 */
     Base64ToTempFile(base64: string, extension: string): string;
 
     /** 在檔案總管顯示檔案 */
@@ -494,10 +490,10 @@ interface WV_RunApp {
     /** 以其他程式開啟(系統原生選單) */
     ShowMenu(path: string): void;
 
-    /**取得開始選單裡面的所有lnk */
+    /**取得開始選單裡面的所有 lnk */
     GetStartMenuList(): string[]
 
-    /** 以UWP開啟檔案 */
+    /** 以 UWP 開啟檔案 */
     RunUwp(uwpId: string, filePath: string): void;
 
     /**
@@ -538,7 +534,7 @@ interface AppInfo {
     /** 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐 */
     startType: number;
 
-    /** 程式開始的port */
+    /** 程式開始的 port */
     startPort: number;
 
     /** 程式所在的資料夾 */
@@ -550,7 +546,7 @@ interface AppInfo {
     /** 暫存資料夾 - 從網路下載的檔案 */
     tempDirWebFile: string;
 
-    /** 目前使用的port */
+    /** 目前使用的 port */
     mainPort: number;
 
     /** setting.js 的路徑 */
@@ -562,7 +558,7 @@ interface AppInfo {
     /** 是否為快速預覽的視窗。 0=不是快速預覽 1=長按空白鍵 2=長按滑鼠中鍵 */
     quickLookRunType: number;
 
-    /** 是否為商店版APP */
+    /** 是否為商店版 APP */
     isStoreApp: boolean;
 
     /** 判斷哪些擴充有啟用 */

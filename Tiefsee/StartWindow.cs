@@ -90,7 +90,7 @@ public class StartWindow : Form {
 
                     // 再次檢查是否按著空白鍵或滑鼠中鍵
                     isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
-                    isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
+                    isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; // 按著滑鼠滾輪
                     if (isMouseMiddle == false && isKeyboardSpace == false) { return; }
 
                     // win11 對資料夾按下滑鼠滾輪會觸發新開檔案總管的分頁，停止使用此功能避免衝突
@@ -102,12 +102,12 @@ public class StartWindow : Form {
                     }
 
                     if (Program.startType == 2 || Program.startType == 3) {
-                        if (WebWindow.tempWindow == null) { return; }
-                        WebWindow.TriggerCreate(WebWindow.tempWindow, new String[] { selectedItem }, quickLookRunType);
+                        if (WebWindow.TempWindow == null) { return; }
+                        WebWindow.TriggerCreate(WebWindow.TempWindow, [selectedItem], quickLookRunType);
 
                     }
                     else if (Program.startType == 4 || Program.startType == 5) { // 單一執行個體，用原來的視窗開啟
-                        WebWindow.Create("MainWindow.html", new String[] { selectedItem }, null);
+                        WebWindow.Create("MainWindow.html", [selectedItem], null);
                     }
                 }
 
@@ -115,12 +115,12 @@ public class StartWindow : Form {
             else { //放開空白鍵
 
                 if (isDown) {
-                    if (WebWindow.tempWindow != null) {
-                        WebWindow.tempWindow.RunJs($@"
-                                if (window.mainWindow !== undefined)
-                                    if (window.mainWindow.quickLookUp !== undefined)
-                                        mainWindow.quickLookUp();
-                            ");
+                    if (WebWindow.TempWindow != null) {
+                        WebWindow.TempWindow.RunJs($@"
+                            if (window.mainWindow !== undefined)
+                                if (window.mainWindow.quickLookUp !== undefined)
+                                    mainWindow.quickLookUp();
+                        ");
                     }
                 }
                 isDown = false;
@@ -174,12 +174,12 @@ public class StartWindow : Form {
 
         QuickRun.WindowCreate();
 
-        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
+        System.Windows.Forms.NotifyIcon nIcon = new();
         nIcon.Icon = new System.Drawing.Icon(AppPath.logoIcon);
         nIcon.Text = "TiefSee";
         nIcon.Visible = true;
         nIcon.DoubleClick += (sender, e) => {
-            WebWindow.Create("MainWindow.html", new string[0], null);
+            WebWindow.Create("MainWindow.html", [], null);
         };
 
         var cm = new RJDropdownMenu(); // 右鍵選單
@@ -190,7 +190,7 @@ public class StartWindow : Form {
 
         ToolStripMenuItem item1 = new ToolStripMenuItem("New");
         item1.Click += (sender2, e2) => {
-            WebWindow.Create("MainWindow.html", new string[0], null);
+            WebWindow.Create("MainWindow.html", [], null);
         };
         cm.Items.Add(item1);
 

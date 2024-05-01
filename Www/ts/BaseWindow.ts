@@ -166,20 +166,6 @@ class BaseWindow {
     }
 
     /**
-     * 開啟新的子視窗
-     * @param _name 
-     * @returns 
-     */
-    public async newWindow(_name: string) {
-        // let url = location.protocol + '//' + location.host + "/Www/" + _name
-        let url = _name
-        // var w = await WV_Window.NewWindow(url, []);
-        // WV_Window.SetOwner(w); // 設為子視窗
-        var w = await WV_Window.NewSubWindow(url, []);
-        return w;
-    }
-
-    /**
      * 關閉視窗
      */
     public async close() {

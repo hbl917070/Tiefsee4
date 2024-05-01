@@ -1532,8 +1532,6 @@ class ScriptSetting {
         this.M = _M;
     }
 
-    temp_setting: WebWindow | null = null; // 用於判斷視窗是否已經開啟
-
     /**
      * 開啟 設定 視窗
      * @param toPage 開啟指定的頁簽
@@ -1541,29 +1539,27 @@ class ScriptSetting {
      */
     public async showSetting(toPage = "", toDom = "") {
 
-        // 如果視窗已經存在，就不再新開
-        if (this.temp_setting != null) {
-            if (await this.temp_setting.Visible === true) {
-                this.temp_setting.WindowState = 0; // 視窗化
-                return;
-            }
-        }
-
-        // 顯示loading畫面，避免短時間內重複開啟setting
-        let domLoading = document.querySelector("#loadingSetting") as HTMLElement;
-        if (domLoading.getAttribute("active") == "true") {
-            return;
-        } else {
-            domLoading.setAttribute("active", "true");
-            setTimeout(() => {
-                domLoading.setAttribute("active", "");
-            }, 1000);
-        }
-
-        await this.M.saveSetting(); // 先儲存目前的設定值
+        // 儲存目前的設定值
+        await this.M.saveSetting();
 
         // 新開視窗
-        this.temp_setting = await baseWindow.newWindow(`SettingWindow.html?toPage=${toPage}&toDom=${toDom}`);
+        let isRun = await WV_Window.NewSubWindow(
+            `SettingWindow.html?toPage=${toPage}&toDom=${toDom}`,
+            [],
+            "settingWindow");
+
+        // 如果有正常開啟視窗
+        if (isRun) {
+            // 顯示 loading 畫面
+            let domLoading = document.querySelector("#loadingSetting") as HTMLElement;
+            if (domLoading.getAttribute("active") != "true") {
+                domLoading.setAttribute("active", "true");
+                // 1秒後隱藏 loading 畫面
+                setTimeout(() => {
+                    domLoading.setAttribute("active", "");
+                }, 1000);
+            }
+        }
     }
 }
 
