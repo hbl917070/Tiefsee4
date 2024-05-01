@@ -68,7 +68,7 @@ class AiDrawingPrompt {
 				let jsonF = Lib.jsonStrFormat(text);
 				if (jsonF.ok) { // 如果是json (例如 Hashes
 					if ("Civitai resources") {
-						text = text.replace(/[,]/g, `, \n`);
+						text = CivitaiStringify(jsonF.json);
 					} else {
 						text = jsonF.jsonFormat; // 格式化json再顯示
 					}
@@ -89,6 +89,26 @@ class AiDrawingPrompt {
 				result.push({ title: title, text: text });
 			}
 			return result;
+		}
+
+		/**
+		 * 格式化 Civitai resources 的 json
+		 */
+		function CivitaiStringify(obj: any) {
+			try {
+				console.log(obj);
+				var jsonFormat = JSON.stringify(obj, null, "\uFDD9");
+				jsonFormat = jsonFormat.replace(/\uFDD9/g, "");
+				jsonFormat = jsonFormat
+					.replace(/\[\n/g, "[")
+					.replace(/\n\]/g, "]")
+					.replace(/\{\n/g, "{")
+					.replace(/\n\}/g, "}");
+				return jsonFormat;
+
+			} catch (e) {
+				return obj.toString();
+			}
 		}
 
 		/**
