@@ -1,5 +1,6 @@
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Windows.Storage;
@@ -7,6 +8,9 @@ using Windows.Storage;
 namespace Tiefsee;
 
 public class Exif {
+
+    // 快取
+    private static LRUCache<string, ImgExif> _lruGetExif = new(500);
 
     /// <summary>
     /// 旋轉資訊
@@ -148,6 +152,50 @@ public class Exif {
                         Console.WriteLine("Textual Data 解析錯誤:\n" + ee);
                     }
                 }*/
+
+                if (group == "Exif SubIFD" && name == "User Comment" && value != "") {
+                    try {
+                        byte[] unicodeBytes = directory.GetByteArray(tag.Type);
+                        var idCode = Encoding.UTF8.GetString(unicodeBytes, 0, 8).TrimEnd('\0', ' ');
+                        if (idCode == "UNICODE") { // 如果是 Unicode 編碼
+
+                            string getText(byte[] data) {
+                                var ar = new[] { Encoding.Unicode, Encoding.BigEndianUnicode };
+                                foreach (var encoding in ar) {
+                                    string t = encoding.GetString(data);
+                                    if (t.Contains(":") && t.Contains(",")) { // 如果是 ai 繪圖的 Prompt，就一定會有這些符號
+                                        // Debug.WriteLine(encoding.HeaderName);
+                                        return t;
+                                    }
+                                }
+
+                                // 如果判斷失敗，則用 UWP 的方式取得
+                                string comment = null;
+                                Task.Run(async () => {
+                                    try {
+                                        var f = await StorageFile.GetFileFromPathAsync(path);
+                                        var v = await f.Properties.GetDocumentPropertiesAsync();
+                                        comment = v.Comment;
+                                    }
+                                    catch { }
+                                }).Wait(); // 等待非同步操作完成
+
+                                if (string.IsNullOrWhiteSpace(comment) == false) {
+                                    return comment;
+                                }
+
+                                // 如果還是無法取得，則回傳原始資料
+                                return value;
+                            }
+
+                            var byteArray = unicodeBytes.Skip(8).ToArray(); // 去除前 8 個 byte
+                            value = getText(byteArray).Replace("\0", "");
+                        }
+                    }
+                    catch (Exception ee) {
+                        Debug.WriteLine("User Comment 解析錯誤:\n" + ee);
+                    }
+                }
 
                 // sum += ($"{directory.Name} - {tag.Name} = {tag.Description}")+"\n";
                 if (tagType == ExifDirectoryBase.TagOrientation) { // 旋轉方向
@@ -353,8 +401,6 @@ public class Exif {
         _lruGetExif.Add(hash, exif);
         return exif;
     }
-    // 快取
-    private static LRUCache<string, ImgExif> _lruGetExif = new(500);
 
 }
 
