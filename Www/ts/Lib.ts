@@ -288,12 +288,18 @@ class Lib {
     }
 
     /**
-     * 移除可能破壞html的跳脫符號
+     * 移除可能破壞 html 的跳脫符號
      */
     public static escape(htmlStr: string) {
+
         if (htmlStr === undefined || htmlStr === null) {
             return "";
         }
+        // 如果不是 字串
+        if (typeof htmlStr !== "string") {
+            return htmlStr + "";
+        }
+        
         return htmlStr.replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")

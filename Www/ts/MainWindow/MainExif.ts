@@ -737,13 +737,17 @@ class MainExif {
 				// 先嘗試從 indexedDB 取得資料
 				let dbData = await M.db?.getData(DbStoreName.civitaiResources, dbKey);
 
-				if (dbData !== undefined) {
-					// 如果發生過錯誤，且時間超過 1 天，就重新下載
-					if (dbData.error !== undefined) {
-						let time = new Date(dbData.time).getTime();
-						let timeNow = new Date().getTime();
-						//if (isNaN(time) || timeNow - time > 20 * 1000) {
+				// 如果發生過錯誤
+				if (dbData !== undefined && dbData.error !== undefined) {
+					let time = new Date(dbData.time).getTime();
+					let timeNow = new Date().getTime();
+
+					if (dbData.error === "Model not found") { // 如果找不到資源，則 1 天後再重試			
 						if (isNaN(time) || timeNow - time > 24 * 60 * 60 * 1000) {
+							dbData = undefined;
+						}
+					} else { // 其他錯誤，1 小時後再重試
+						if (isNaN(time) || timeNow - time > 60 * 60 * 1000) {
 							dbData = undefined;
 						}
 					}
@@ -768,8 +772,8 @@ class MainExif {
 				// 避免在載入期間已經切換到其他檔案
 				if (path !== fileInfo2.FullPath) { return; }
 
-				// 曾經下載過，且資料是 error，就不再載入
-				if (error === "Model not found") { continue; }
+				// 曾經下載過，且發生過錯誤
+				if (error !== undefined ) { continue; }
 
 				// 先產生一個空的 dom 項目，待資料載入完畢後，再替換
 				let oldDom = getItemDom(dbKey, "Loading" + "\n" + "-");
@@ -898,7 +902,7 @@ class MainExif {
 
 						// 產生新的 dom
 						let newItem = Lib.newDom(`
-							<div class="mainExifItem">
+							<div class="mainExifItem" data-hash="${Lib.escape(dbKey)}">
 								<div class="mainExifName">${Lib.escape(modelType)}</div>
 								<div class="mainExifValue mainExifValue__nowrap">
 									${Lib.escape(modelName)}<br>
@@ -957,10 +961,15 @@ class MainExif {
 									limiter.addRequest(domImg, imgUrl); // 發出請求
 								})
 
-								// 圖片載入失敗時，顯示錯誤圖示
+								// 圖片載入失敗時
 								domImg.onerror = () => {
-									domImg.src = "./img/error.svg";
-									domImg.style.objectFit = "contain";
+									// 顯示錯誤圖示
+									/*domImg.src = "./img/error.svg";
+									domImg.style.objectFit = "contain";*/
+
+									// 移除 dom
+									imgItem.parentNode?.removeChild(imgItem);
+									console.warn("Civitai 圖片載入失敗", imgUrl);
 								}
 
 								// 雙擊左鍵
