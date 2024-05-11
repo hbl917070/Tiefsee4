@@ -648,6 +648,8 @@ class MainExif {
 			modelHash: string | undefined,
 		}) {
 
+			if (M.config.settings.layout.civitaiResourcesEnabled === false) { return; }
+
 			// 記錄當前的 path，如果在載入期間已經切換到其他檔案，則離開
 			let path = fileInfo2.FullPath;
 
@@ -773,7 +775,7 @@ class MainExif {
 				if (path !== fileInfo2.FullPath) { return; }
 
 				// 曾經下載過，且發生過錯誤
-				if (error !== undefined ) { continue; }
+				if (error !== undefined) { continue; }
 
 				// 先產生一個空的 dom 項目，待資料載入完畢後，再替換
 				let oldDom = getItemDom(dbKey, "Loading" + "\n" + "-");

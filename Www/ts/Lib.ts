@@ -299,7 +299,7 @@ class Lib {
         if (typeof htmlStr !== "string") {
             return htmlStr + "";
         }
-        
+
         return htmlStr.replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -801,7 +801,7 @@ class RequestLimiter {
     constructor(maxRequests: number) {
         this.queue = [];
         this.inProgress = 0;
-        this.maxRequests = maxRequests;
+        this.maxRequests = Math.min(maxRequests, 6); // 設置上限
     }
 
     public addRequest(img: HTMLImageElement, url: string) {
@@ -813,13 +813,13 @@ class RequestLimiter {
 
         // 檢查佇列中是否已經存在相同的 img 元素和網址
         const index = this.queue.findIndex(([i, u]) => i === img && u === url);
-        if (index !== -1) { // 如果存在，則忽略這個請求       
+        if (index !== -1) { // 如果存在，則忽略這個請求
             return;
         }
 
         // 檢查佇列中是否存在相同的 img 元素但不同的網址
         const index2 = this.queue.findIndex(([i, u]) => i === img && u !== url);
-        if (index2 !== -1) { // 如果存在，則將舊的請求從佇列中移除   
+        if (index2 !== -1) { // 如果存在，則將舊的請求從佇列中移除
             this.queue.splice(index2, 1);
         }
 
@@ -830,23 +830,29 @@ class RequestLimiter {
 
     private processQueue() {
         while (this.inProgress < this.maxRequests && this.queue.length > 0) {
-            this.inProgress++;
             const [img, url] = this.queue.shift()!;
             this.loadImage(img, url).then(() => {
                 this.inProgress--;
                 this.processQueue();
+            }).catch((error) => {
+                // console.error(error);
+                this.inProgress--; // 當錯誤發生時，減少 inProgress 的值
+                this.processQueue(); // 繼續處理隊列中的下一個請求
             });
         }
     }
 
     private loadImage(img: HTMLImageElement, url: string) {
-        return new Promise<void>((resolve) => {
+        return new Promise<void>((resolve, reject) => {
             if (!document.body.contains(img)) { // 檢查 img 元素是否仍然存在於文檔中
-                resolve();
+                reject(new Error("Image element is not in the document."));
                 return;
             }
-            img.addEventListener("load", () => resolve(), { once: true });
-            img.addEventListener("error", () => resolve(), { once: true });
+            this.inProgress++; // 圖片開始加載時增加 inProgress
+            img.onload = img.onerror = () => {
+                this.inProgress--; // 圖片加載完成或加載錯誤時減少 inProgress
+                resolve();
+            };
             img.src = url;
         });
     }
