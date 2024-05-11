@@ -93,6 +93,14 @@ class MainWindow {
 
         new Hotkey(this);
 
+        // 指定允許被選取的元素
+        const selectionManager = new SelectionManager("whitelist");
+        selectionManager.add(".mainExifName"); // 詳細資料面板的標題
+        selectionManager.add(".mainExifValue"); // 詳細資料面板的內容
+        selectionManager.add(".mainExifRelatedText *"); // 相關檔案的文字
+        selectionManager.add(".msgbox-txt *"); // 訊息視窗的標題
+        selectionManager.add("[allowSelection]");
+
         (async () => {
 
             db = await new IndexedDBManager("tiefseeDB", 2);

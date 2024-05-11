@@ -41,7 +41,10 @@ class SettingWindow {
             return document.querySelector(selectors);
         }
 
-        // initDomImport(); // 初始化圖示
+        // 指定不能被選取的元素
+        const selectionManager = new SelectionManager("blacklist");
+        selectionManager.add(".btn");
+        selectionManager.add(".switch");
 
         /**
           * 覆寫 onCreate

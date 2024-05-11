@@ -857,3 +857,34 @@ class RequestLimiter {
         });
     }
 }
+
+/**
+ * 指定哪些元素允許被選取
+ */
+class SelectionManager {
+    private mode: "whitelist" | "blacklist";
+    private filter: string[] = [];
+
+    constructor(mode: "whitelist" | "blacklist") {
+        this.mode = mode;
+        this.init();
+    }
+
+    private init() {
+        document.addEventListener("mousedown", (event: MouseEvent) => {
+            const target = event.target as Element;
+            // 如果點擊的是文字輸入框，則不阻止選取
+            if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+                return;
+            }
+            const isMatch = this.filter.some(selector => target.matches(selector));
+            if ((this.mode === "blacklist" && isMatch) || (this.mode === "whitelist" && !isMatch)) {
+                event.preventDefault();
+            }
+        });
+    }
+
+    public add(selector: string) {
+        this.filter.push(selector);
+    }
+}

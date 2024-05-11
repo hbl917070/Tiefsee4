@@ -20,7 +20,7 @@ class Toast {
 
         let domItem: HTMLElement | undefined = Lib.newDom(`
                 <div class="toastItem">
-                    <div class="toastTxt">${txt}</div>
+                    <div class="toastTxt" allowSelection>${txt}</div>
                     <div class="toastClose"></div>
                 </div>
             `);

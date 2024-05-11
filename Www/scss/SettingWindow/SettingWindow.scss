@@ -289,6 +289,7 @@ input::-webkit-inner-spin-button {
   display: inline-block;
   width: 50px;
   height: 24px;
+  cursor: pointer;
 
   input {
     opacity: 0;
@@ -298,7 +299,6 @@ input::-webkit-inner-spin-button {
 
   .slider {
     position: absolute;
-    cursor: pointer;
     top: 0;
     left: 0;
     right: 0;
@@ -307,6 +307,7 @@ input::-webkit-inner-spin-button {
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border: 1px solid var(--color-white40);
+    user-select: none; // 禁止選取
   }
 
   .slider:before {

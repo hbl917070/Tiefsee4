@@ -72,9 +72,9 @@ class Msgbox {
             const item = arRadio[i];
             let checked = (item.value == radioValue) ? "checked" : ""; //是否選取
             htmlRadio += `
-            <label class="msgbox-radio">
+            <label class="msgbox-radio" allowSelection>
                 <input class="base-radio" type="radio" name="msgbox-radio" value="${item.value}" ${checked}>
-                <span>${item.name}</span>
+                <span allowSelection>${item.name}</span>
             </label>`;
         }
         if (arRadio.length > 0) {
