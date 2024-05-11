@@ -108,6 +108,7 @@
   &:hover .scroll-bg,
   &[action="true"] .scroll-bg {
     opacity: 1;
+    backdrop-filter: saturate(180%) blur(20px);
   }
 
   // 移入與拖曳時-拖曳區域
@@ -165,6 +166,7 @@
   &:hover .scroll-bg,
   &[action="true"] .scroll-bg {
     opacity: 1;
+    backdrop-filter: saturate(180%) blur(20px);
   }
 
   // 移入與拖曳時-拖曳區域

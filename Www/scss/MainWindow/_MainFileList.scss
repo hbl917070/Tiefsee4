@@ -104,12 +104,11 @@
 
 /* #endregion */
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 
-//滾動條樣式  (小型、用於檔案預覽視窗
+// 滾動條樣式  (小型、用於檔案預覽視窗
 
 .base-scrollbar-mini {
-
   position: relative;
 
   &::-webkit-scrollbar {
@@ -118,7 +117,7 @@
 
   /*垂直滾動條*/
   .scroll-y {
-    width: 16px;
+    width: 10px;
     position: absolute;
     right: 0px;
     z-index: 1;
@@ -127,7 +126,7 @@
   /*背景*/
   .scroll-y .scroll-bg {
     height: 100%;
-    width: 6px;
+    width: 10px;
     background-color: var(--color-black60);
     position: absolute;
     right: 0;
@@ -155,10 +154,12 @@
   .scroll-y:hover .scroll-bg,
   .scroll-y[action="true"] .scroll-bg {
     opacity: 1;
+    backdrop-filter: saturate(180%) blur(20px);
   }
 
   /*移入與拖曳時-拖曳區域*/
   .scroll-y:hover .scroll-box,
   .scroll-y[action="true"] .scroll-box {
+    width: 7px !important;
   }
 }
