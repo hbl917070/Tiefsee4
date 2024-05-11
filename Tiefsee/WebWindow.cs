@@ -319,9 +319,16 @@ public class WebWindow : FormNone {
         Adapter.LoopRun(20, () => {
             var w = panel.Width;
             var h = panel.Height;
+            // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
+            // 所以網頁在視窗化時會內縮 1px
+            // 因此這裡必須把 webview2 外推 1px，避免 Acrylic 效果溢出到視窗外
+            if (this.WindowState == FormWindowState.Normal) {
+                w += 1;
+                h += 1;
+            }
             if (_wv2.Width != w || _wv2.Height != h) {
-                _wv2.Width = panel.Width;
-                _wv2.Height = panel.Height;
+                _wv2.Width = w;
+                _wv2.Height = h;
             }
         });
 
@@ -459,21 +466,25 @@ public class WebWindow : FormNone {
     /// 以js呼叫此函數後才會顯示視窗(從父視窗的中間開啟
     /// </summary>
     public void ShowWindowAtCenter(int width, int height) {
-        ShowWindow(() => {
-            if (_parentWindow != null) {
-                this.WindowState = FormWindowState.Normal;
-                SetSize(width, height);
 
-                int w = this.Width - _parentWindow.Width;
-                int h = this.Height - _parentWindow.Height;
-                int l = _parentWindow.Left - (w / 2);
-                int t = _parentWindow.Top - (h / 2);
-                this.SetPosition(l, t);
-            }
-            else {
-                this.WindowState = FormWindowState.Normal;
-            }
+        // 在視窗顯示前沒辦法修改視窗的 size 跟坐標，所以先隱藏
+        _wv2.Visible = false;
+
+        ShowWindow(() => {
+            this.WindowState = FormWindowState.Normal;
         });
+
+        // 取得螢幕縮放比例
+        float scale = _parentWindow.DeviceDpi / 96f;
+
+        int w = (int)((width * scale) - _parentWindow.Width);
+        int h = (int)((height * scale) - _parentWindow.Height);
+        int l = _parentWindow.Left - (w / 2);
+        int t = _parentWindow.Top - (h / 2);
+        SetSize(width, height);
+        SetPosition(l, t);
+
+        _wv2.Visible = true;
     }
 
     /// <summary>
@@ -686,7 +697,6 @@ public class FormNone : Form {
             style.Style &= ~0x80000; // WS_SYSMENU 移除標題列的右鍵選單
             return style;
         }
-
     }
 
     /// <summary>

@@ -55,8 +55,18 @@ class SettingWindow {
             baseWindow.appInfo = json;
             appInfo = json;
 
-            await WV_Window.ShowWindowAtCenter(600 * window.devicePixelRatio, 450 * window.devicePixelRatio); // 顯示視窗 
-            WV_Window.SetMinimumSize(400 * window.devicePixelRatio, 300 * window.devicePixelRatio); // 設定視窗最小size
+            let width = 600;
+            let height = 450;
+            await WV_Window.ShowWindowAtCenter(width, height); // 顯示視窗
+
+            // win11 指定視窗的大小是未乘以縮放比例的，所以網頁寬度與指定的寬度不同，就重新設定視窗大小
+            if (Math.abs(document.body.clientWidth - width) > 10) {
+                let ratio = window.devicePixelRatio; // 獲取瀏覽器的縮放比例，必須在視窗顯示後才能獲取
+                await WV_Window.SetSize(width * ratio, height * ratio);
+            }
+            let ratio = window.devicePixelRatio;
+            WV_Window.SetMinimumSize(400 * ratio, 300 * ratio); // 設定視窗最小 size
+
             WV_Window.Text = "Setting";
             let iconPath = Lib.Combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
             WV_Window.SetIcon(iconPath);
