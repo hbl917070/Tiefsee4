@@ -614,26 +614,60 @@ class SettingWindow {
             });
         })
 
-        // 視窗效果 (aero毛玻璃)
+        // 視窗效果
         addLoadEvent(() => {
 
-            var switch_areo = getDom("#select-aeroType") as HTMLSelectElement;
-            switch_areo.value = config.settings["theme"]["aeroType"];
+            var switchWindowStyle = getDom("#select-windowStyle") as HTMLSelectElement;
+            switchWindowStyle.value = config.settings["theme"]["windowStyle"];
 
-            switch_areo.addEventListener("change", () => {
-                let val = switch_areo.value;
-                config.settings["theme"]["aeroType"] = val;
+            switchWindowStyle.addEventListener("change", () => {
+                let val = switchWindowStyle.value;
+                config.settings["theme"]["windowStyle"] = val;
             });
 
-            // 調整選項後，顯示「重新啟動」的按鈕
-            var btn_restart = getDom("#btn-windowAero-restart") as HTMLButtonElement;
-            btn_restart.style.display = "none";
-            switch_areo.addEventListener("change", () => {
-                btn_restart.style.display = "";
+            // 顯示名單
+            let options: string[] = [];
+            if (baseWindow.appInfo.isWin11) {
+                options = [
+                    "none",
+                    "acrylicDark", "acrylicLight",
+                    "micaDark", "micaLight",
+                    "micaAltDark", "micaAltLight"
+                ];
+            } else {
+                options = ["none", "aero", "acrylic"];
+            }
+
+            // 隱藏不支援的選項
+            for (let i = 0; i < switchWindowStyle.options.length; i++) {
+                const item = switchWindowStyle.options[i];
+                if (options.indexOf(item.value) === -1) {
+                    item.style.display = "none";
+                }
+            }
+
+            // 如果選擇的選項不在支援的名單中，就指定為 None
+            if (options.indexOf(switchWindowStyle.value) === -1) {
+                switchWindowStyle.value = "none";
+            }
+
+            let btnRestart = getDom("#btn-windowAero-restart") as HTMLButtonElement;
+            btnRestart.style.display = "none";
+            switchWindowStyle.addEventListener("change", () => {
+
+                if (baseWindow.appInfo.isWin11) { // win11
+                    // 調整選項後，直接套用
+                    appleSettingOfMain();
+                } else { // win10
+                    // 調整選項後，顯示「重新啟動」的按鈕
+                    btnRestart.style.display = "";
+                }
+
             });
-            btn_restart.addEventListener("click", () => {
+            btnRestart.addEventListener("click", () => {
                 restartTiefsee();
             });
+
         })
 
         // 工具列

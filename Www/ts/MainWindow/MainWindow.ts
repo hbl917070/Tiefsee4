@@ -125,12 +125,12 @@ class MainWindow {
             baseWindow.closingEvents.push(async () => {
 
                 if (getIsQuickLook() === false) { // 正常視窗(不是快速預覽)
-                    if (script.setting.temp_setting != null) { // 如果有開啟 設定視窗
+                    /*if (script.setting.temp_setting != null) { // 如果有開啟 設定視窗
                         if (await script.setting.temp_setting.Visible === true) {
                             await script.setting.temp_setting.RunJs("setting.saveData();"); // 關閉前先儲存設定
                             await Lib.sleep(30); // js無法呼叫C#的非同步函數，所以必須加上延遲，避免執行js前程式就被關閉
                         }
-                    }
+                    }*/
                     WV_System.DeleteTemp(100, 300); // 刪除圖片暫存
                     await saveSetting(); // 儲存 setting.json
                     return true;
@@ -563,8 +563,8 @@ class MainWindow {
 
                     initSetting(json.settingTxt); // 初始讀取設定
                     await initLastPosition(); // 初始 套用上次的視窗狀態與坐標
-                    initLoad(json.args); // 初始 載入檔案
-                    initAERO(); // 初始 套用aero毛玻璃效果
+                    initLoad(json.args); // 初始 載入檔案           
+                    // await baseWindow.setWindowAttribute(config.settings.theme.aeroType); // 視窗樣式
 
                 } else { // 單純開啟圖片(用於 單一執行個體)
 
@@ -592,7 +592,7 @@ class MainWindow {
                         fileShow.openNone(); // 避免卡在上一張圖片
                         await initQuickLookPosition(); // 初始 快速啟動的坐標   
                         initLoad(json.args); // 初始 載入檔案
-                        initAERO(); // 初始 套用aero毛玻璃效果
+                        // await baseWindow.setWindowAttribute(config.settings.theme.aeroType); // 視窗樣式
                     }
                     checkDownKey();
                 }
@@ -741,23 +741,6 @@ class MainWindow {
             applySetting(config.settings, true);
         }
 
-        var isInitAERO = false; // 避免重複套用AERO
-        /** 
-         * 初始 套用aero毛玻璃效果
-         */
-        function initAERO() {
-            if (isInitAERO) { return; }
-
-            let aeroType = config.settings["theme"]["aeroType"];
-            if (aeroType == "win10") {
-                WV_Window.SetAERO("win10");
-                isInitAERO = true;
-            } else if (aeroType == "win7") {
-                WV_Window.SetAERO("win7");
-                isInitAERO = true;
-            }
-        }
-
         /**
          * 再次檢查目前是否按著空白鍵或滑鼠中鍵
          */
@@ -836,6 +819,11 @@ class MainWindow {
             let cssRoot = document.body;
 
             config.settings = _settings;
+
+            // -----------
+
+            // 視窗樣式
+            baseWindow.setWindowAttribute(config.settings.theme.windowStyle);
 
             // -----------
 

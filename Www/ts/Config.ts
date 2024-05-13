@@ -159,8 +159,8 @@ class Config {
 
     public settings = {
         theme: {
-            /** 是否啟用毛玻璃 */
-            "aeroType": "none", // none / win7 / win10
+            /** 視窗樣式 ( none, aero, acrylic, acrylicDark, acrylicLight, micaDark, micaLight, micaAltDark, micaAltLight */
+            "windowStyle": "none",
             /** 視窗縮放比例 */
             "zoomFactor": 1.0,
             /** 文字粗細 */
@@ -424,8 +424,7 @@ class Config {
      */
     private initAllowFileType() {
 
-        let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
-        if (plugin == null) { return; }
+        let plugin: AppInfoPlugin = this.baseWindow.appInfo.plugin;
 
         // img
         (() => {
@@ -578,8 +577,7 @@ class Config {
      */
     public allowFileType(type: string) {
 
-        let plugin: AppInfoPlugin | undefined = this.baseWindow.appInfo?.plugin;
-        if (plugin == null) { return []; }
+        let plugin: AppInfoPlugin = this.baseWindow.appInfo.plugin;
 
         // 首次執行進行初始化
         if (this._allowFile_img.length === 0) {

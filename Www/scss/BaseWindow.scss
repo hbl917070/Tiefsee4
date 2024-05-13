@@ -84,7 +84,7 @@ body {
   flex-direction: column;
 }
 
-/*視窗最大化時*/
+// 視窗最大化時
 .window.maximized {
   right: 0px;
   bottom: 0px;
@@ -95,7 +95,12 @@ body {
 .window.maximized .window-border {
   display: none;
 }
-
+// win11 圓角
+.window.windowRoundedCorners {
+  box-shadow: none;
+  border: none;
+  border-radius: 0px;
+}
 /*---------------------------*/
 
 /* #region window-titlebar 標題列*/

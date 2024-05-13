@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using static Tiefsee.WindowAPI;
+
 
 namespace Tiefsee;
 
@@ -146,10 +148,53 @@ public class WV_Window {
     }
 
     /// <summary>
-    /// 視窗使用毛玻璃效果(只有win10、win11有效
+    /// 視窗效果
     /// </summary>
-    public void SetAERO(string type) {
-        EnableBlur(M.Handle, type);
+    public void WindowStyle(string type) {
+
+        type = type.ToLower();
+
+        // 此效果只能用於 win11
+        if (StartWindow.isWin11) {
+            if (type == "none") {
+                M.WindowStyleForWin11(SystemBackdropType.None);
+            }
+            else if (type == "AcrylicDark".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+            }
+            else if (type == "AcrylicLight".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+            }
+            else if (type == "MicaDark".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.Mica);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+            }
+            else if (type == "MicaLight".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.Mica);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+            }
+            else if (type == "MicaAltDark".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+            }
+            else if (type == "MicaAltLight".ToLower()) {
+                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
+                M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+            }
+        }
+        else {
+            M.WindowStyleForWin10(type);
+        }
+    }
+
+
+    /// <summary>
+    /// win11 視窗圓角
+    /// </summary>
+    public void EnableWindowRoundedCorners(bool enable) {
+        M.WindowRoundedCorners(enable);
     }
 
     /// <summary>
@@ -336,7 +381,6 @@ public class WV_Window {
     /// 關閉視窗
     /// </summary>
     public void Close() {
-        //M.wv2.Visible = false;
         M.CloseWindow();
     }
 
@@ -360,127 +404,22 @@ public class WV_Window {
     /// </summary>
     public void WindowDrag(string type) {
 
-        //避免滑鼠在沒有按下的情況下執行
-        if (System.Windows.Forms.Control.MouseButtons != System.Windows.Forms.MouseButtons.Left) {
+        // 避免滑鼠在沒有按下的情況下執行
+        if (Control.MouseButtons != MouseButtons.Left) {
             return;
         }
 
-        var run = ResizeDirection.Move;
+        var resizeDirection = ResizeDirection.Move;
+        if (type == "CT") { resizeDirection = ResizeDirection.CT; }
+        if (type == "RC") { resizeDirection = ResizeDirection.RC; }
+        if (type == "CB") { resizeDirection = ResizeDirection.CB; }
+        if (type == "LC") { resizeDirection = ResizeDirection.LC; }
+        if (type == "LT") { resizeDirection = ResizeDirection.LT; }
+        if (type == "RT") { resizeDirection = ResizeDirection.RT; }
+        if (type == "LB") { resizeDirection = ResizeDirection.LB; }
+        if (type == "RB") { resizeDirection = ResizeDirection.RB; }
 
-        if (type == "CT") { run = ResizeDirection.CT; }
-        if (type == "RC") { run = ResizeDirection.RC; }
-        if (type == "CB") { run = ResizeDirection.CB; }
-        if (type == "LC") { run = ResizeDirection.LC; }
-        if (type == "LT") { run = ResizeDirection.LT; }
-        if (type == "RT") { run = ResizeDirection.RT; }
-        if (type == "LB") { run = ResizeDirection.LB; }
-        if (type == "RB") { run = ResizeDirection.RB; }
-
-        /*if (_run== ResizeDirection.Move) { //拖曳視窗
-            int WM_NCLBUTTONDOWN = 161; //  0xA1
-            int HTCAPTION = 2;
-            ReleaseCapture();
-            SendMessage(M.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
-            return;
-        }*/
-
-        ReleaseCapture();
-        SendMessage(M.Handle, WM_SYSCOMMAND, (int)(run), 0);
+        M.WindowDrag(resizeDirection);
     }
-
-    #region 視窗拖曳
-    public enum ResizeDirection {
-        LC = 0xF001, // 左
-        RC = 0xF002, // 右
-        CT = 0xF003, // 上
-        LT = 0xF004, // 左上
-        RT = 0xF005, // 右上
-        CB = 0xF006, // 下
-        LB = 0xF007, // 左下
-        RB = 0xF008, // 右下
-        Move = 0xF009 // 移動
-    }
-
-    // 指定滑鼠到特定視窗
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern IntPtr SetCapture(IntPtr hWnd);
-
-    // 釋放滑鼠
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern bool ReleaseCapture();
-
-    // 拖曳視窗
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern bool SendMessage(IntPtr hwnd, int wMsg, int wParam, int lParam);
-    public const int WM_SYSCOMMAND = 0x0112;
-    public const int WM_LBUTTONUP = 0x202;
-
-    #endregion
-
-    #region 毛玻璃
-
-    [DllImport("user32.dll")]
-    internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct WindowCompositionAttributeData {
-        public WindowCompositionAttribute Attribute;
-        public IntPtr Data;
-        public int SizeOfData;
-    }
-
-    internal enum WindowCompositionAttribute {
-        WCA_ACCENT_POLICY = 19
-    }
-
-    internal enum AccentState {
-        ACCENT_DISABLED = 0,
-        ACCENT_ENABLE_GRADIENT = 1,
-        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
-        ACCENT_ENABLE_BLURBEHIND = 3,
-        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
-        ACCENT_INVALID_STATE = 5
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct AccentPolicy {
-        public AccentState AccentState;
-        public uint AccentFlags;
-        public uint GradientColor;
-        public uint AnimationId;
-    }
-
-    private uint _blurOpacity = 0;
-    private uint _blurBackgroundColor = 0x010101; /* BGR color format */
-
-    internal void EnableBlur(IntPtr hwnd, string type) {
-        var accent = new AccentPolicy();
-
-        if (type.ToLower() == "win10") {
-            // win10
-            accent.AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
-            accent.GradientColor = (_blurOpacity << 24) | (_blurBackgroundColor & 0xFFFFFF);
-        }
-        else {
-            // win7
-            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
-        }
-
-        var accentStructSize = Marshal.SizeOf(accent);
-
-        var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-        Marshal.StructureToPtr(accent, accentPtr, false);
-
-        var data = new WindowCompositionAttributeData();
-        data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-        data.SizeOfData = accentStructSize;
-        data.Data = accentPtr;
-
-        SetWindowCompositionAttribute(hwnd, ref data);
-
-        Marshal.FreeHGlobal(accentPtr);
-    }
-
-    #endregion
 
 }

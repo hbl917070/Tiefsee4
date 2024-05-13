@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using static Tiefsee.WindowAPI;
 
 namespace Tiefsee;
 
@@ -26,6 +27,8 @@ public class WebWindow : FormNone {
     /// <summary> 記錄全螢幕前的狀態 </summary>
     private FormWindowState _tempFormWindowState = FormWindowState.Normal;
     private bool _tempFullScreen = false;
+    /// <summary> 視窗是否有圓角 </summary>
+    private bool _windowRoundedCorners = false;
 
     public WebView2 Wv2 { get { return _wv2; } }
     public WebWindow ParentWindow { get { return _parentWindow; } }
@@ -226,7 +229,7 @@ public class WebWindow : FormNone {
     /// </summary>
     public static string GetAppInfo(string[] args, int quickLookRunType) {
 
-        AppInfo appInfo = new AppInfo {
+        AppInfo appInfo = new() {
             args = args,
             startType = Program.startType,
             startPort = Program.startPort,
@@ -236,6 +239,7 @@ public class WebWindow : FormNone {
             mainPort = Program.webServer.port,
             settingPath = AppPath.appDataSetting,
             quickLookRunType = quickLookRunType,
+            isWin11 = StartWindow.isWin11,
             isStoreApp = StartWindow.isStoreApp
         };
 
@@ -273,6 +277,8 @@ public class WebWindow : FormNone {
         public int quickLookRunType { get; set; }
         /// <summary> 是否為商店版 APP </summary>
         public bool isStoreApp { get; set; }
+        /// <summary> 是否為 win11 </summary>
+        public bool isWin11 { get; set; }
         /// <summary> 哪些擴充是有啟用的 </summary>
         public DataPlugin plugin { get; set; } = Plugin.dataPlugin;
     }
@@ -322,7 +328,7 @@ public class WebWindow : FormNone {
             // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
             // 所以網頁在視窗化時會內縮 1px
             // 因此這裡必須把 webview2 外推 1px，避免 Acrylic 效果溢出到視窗外
-            if (this.WindowState == FormWindowState.Normal) {
+            if (_windowRoundedCorners == false && this.WindowState == FormWindowState.Normal) {
                 w += 1;
                 h += 1;
             }
@@ -624,50 +630,54 @@ public class WebWindow : FormNone {
 
         this.TopMost = true;
         this.TopMost = false;
-        SwitchToThisWindow(this._wv2.Handle, true);
-        GlobalActivate(this._wv2.Handle);
+        WindowAPI.SwitchToThisWindow(this._wv2.Handle, true);
+        WindowAPI.GlobalActivate(this._wv2.Handle);
         this.Activate();
         this._wv2.Focus();
 
-        /*Adapter.DelayRun(30, () => {
-            //this.wv2.Focus();
-            //SwitchToThisWindow(this.wv2.Handle, true);
-        });*/
+        /* Adapter.DelayRun(30, () => {
+            this.wv2.Focus();
+            SwitchToThisWindow(this.wv2.Handle, true);
+        }); */
     }
-
-    [DllImport("User32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern bool SwitchToThisWindow(IntPtr hWnd, Boolean fAltTab);
-
-    #region 視窗取得焦點
-
-    //https://stackoverflow.com/questions/257587/bring-a-window-to-the-front-in-wpf
 
     /// <summary>
-    /// Activate a window from anywhere by attaching to the foreground window
+    /// 拖曳視窗
     /// </summary>
-    public static void GlobalActivate(IntPtr interopHelper) {
-        //Get the process ID for this window's thread
-        //var interopHelper = new WindowInteropHelper(w);
-        UInt32 thisWindowThreadId = GetWindowThreadProcessId(interopHelper, IntPtr.Zero);
-
-        //Get the process ID for the foreground window's thread
-        var currentForegroundWindow = GetForegroundWindow();
-        var currentForegroundWindowThreadId = GetWindowThreadProcessId(currentForegroundWindow, IntPtr.Zero);
-
-        //Attach this window's thread to the current window's thread
-        AttachThreadInput(currentForegroundWindowThreadId, thisWindowThreadId, true);
+    public void WindowDrag(ResizeDirection type) {
+        WindowAPI.WindowDrag(Handle, type);
     }
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
+    /// <summary>
+    /// win10 視窗效果
+    /// </summary>
+    /// <param name="type"> acrylic | aero </param>
+    public void WindowStyleForWin10(string type) {
+        WindowAPI.WindowStyleForWin10(this.Handle, type);
+        this.Show(); // 沒有這行會無法立即套用效果
+    }
 
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+    /// <summary>
+    /// win11 視窗效果
+    /// </summary>
+    public void WindowStyleForWin11(SystemBackdropType type) {
+        WindowAPI.WindowStyleForWin11(this.Handle, type);
+    }
 
-    [DllImport("user32.dll")]
-    private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+    /// <summary>
+    /// win11 暗黑模式
+    /// </summary>
+    public void WindowThemeForWin11(ImmersiveDarkMode type) {
+        WindowAPI.WindowThemeForWin11(this.Handle, type);
+    }
 
-    #endregion
+    /// <summary>
+    /// win11 視窗圓角
+    /// </summary>
+    public void WindowRoundedCorners(bool enable) {
+        _windowRoundedCorners = enable;
+        WindowAPI.WindowRoundedCorners(this.Handle, enable);
+    }
 
 }
 

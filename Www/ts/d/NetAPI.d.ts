@@ -81,8 +81,11 @@ interface WV_Window {
     /** 在父視窗執行 js */
     RunJsOfParent(js: string): string;
 
-    /** 啟用 AERO 毛玻璃效果 */
-    SetAERO(type: ("win7" | "win10")): void;
+    /** 啟用 視窗效果 */
+    WindowStyle(type: string): void;
+
+    /** 啟用 win11 視窗圓角  */
+    EnableWindowRoundedCorners(enable: boolean): string;
 
     /** 設定縮放倍率，預設 1.0 */
     SetZoomFactor(d: number): void;
@@ -560,6 +563,9 @@ interface AppInfo {
 
     /** 是否為商店版 APP */
     isStoreApp: boolean;
+
+    /** 是否為 win11 */
+    isWin11: boolean;
 
     /** 判斷哪些擴充有啟用 */
     plugin: AppInfoPlugin;

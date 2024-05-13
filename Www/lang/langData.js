@@ -507,16 +507,6 @@ var langData = {
                 "en": "Default",
                 "ja": "プリセット",
             },
-            aeroWin7: {
-                "zh-TW": "AERO",
-                "en": "AERO",
-                "ja": "AERO",
-            },
-            aeroWin10: {
-                "zh-TW": "Acrylic",
-                "en": "Acrylic",
-                "ja": "Acrylic",
-            },
             tooltip: {
                 "zh-TW": `  
                     1. 使用「AERO」或「Acrylic」後，還必須調整「視窗背景色」的透明度，才能達到最佳視覺效果。<br>

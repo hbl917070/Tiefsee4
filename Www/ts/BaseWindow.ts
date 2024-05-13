@@ -20,7 +20,7 @@ class BaseWindow {
     public btn_close: HTMLDivElement;
     public dom_titlebarTxt: HTMLDivElement;
 
-    public appInfo: AppInfo | undefined;
+    public appInfo: AppInfo = undefined as any;
 
     public topMost: boolean = false;
     public left: number = 0;
@@ -202,6 +202,30 @@ class BaseWindow {
     public normal() {
         WV_Window.WindowState = "Normal";
         this.updateWindowState();
+    }
+
+    private _isInitWindowAttribute = false; // 避免重複套用視窗效果
+    /**  套用 套用視窗效果  */
+    public async setWindowAttribute(type: string) {
+        if (this._isInitWindowAttribute) { return; }
+
+        if (baseWindow.appInfo.isWin11) {
+
+            if (type === "none") {
+                await WV_Window.EnableWindowRoundedCorners(false);
+                this.dom_window.classList.remove("windowRoundedCorners");
+            } else {
+                await WV_Window.EnableWindowRoundedCorners(true);
+                this.dom_window.classList.add("windowRoundedCorners");
+            }
+
+            await WV_Window.WindowStyle(type);
+
+        } else {
+            await WV_Window.WindowStyle(type);
+            this._isInitWindowAttribute = true;
+        }
+
     }
 
     /** 視窗化或最大化時，標題列右邊的按鈕 */

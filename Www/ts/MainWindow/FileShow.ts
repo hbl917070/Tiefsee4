@@ -369,8 +369,6 @@ class FileShow {
             }
             let configType = configItem.type;
 
-            if (baseWindow.appInfo === undefined) { return; }
-
             let txt = await WebAPI.getText(_path);
 
             if (configType === "md") {

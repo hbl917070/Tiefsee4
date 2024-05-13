@@ -234,7 +234,7 @@ class BulkView {
             dom_lastWriteTime.checked = M.config.settings.bulkView.show.lastWriteTime;
             apply();
 
-            if (svgIndentation === "" && baseWindow.appInfo !== undefined) {
+            if (svgIndentation === "") {
                 svgIndentation = Lib.Combine([baseWindow.appInfo.appDirPath, "\\Www\\img\\indentation.svg"]);
             }
         }
