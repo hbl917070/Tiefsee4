@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -135,7 +136,7 @@ public class WebServerController {
     /// </summary>
     void ImgVipsResize(RequestData d) {
         string path = d.args["path"];
-        double scale = Double.Parse(d.args["scale"]);
+        double scale = Double.Parse(d.args["scale"], CultureInfo.InvariantCulture);
         string fileType = d.args["fileType"];
         string vipsType = d.args["vipsType"];
 

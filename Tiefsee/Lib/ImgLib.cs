@@ -808,16 +808,8 @@ public class ImgLib {
             kernel = Enums.Kernel.Nearest;
             gap = null;
         }
-        try {
-            using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
-            VipsSave(imR, filePath, "auto");
-        }
-        catch {
-            kernel = Enums.Kernel.Nearest;
-            gap = null;
-            using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
-            VipsSave(imR, filePath, "auto");
-        }
+        using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
+        VipsSave(imR, filePath, "auto");
 
         StartWindow.isRunGC = true; // 定時執行GC
 
