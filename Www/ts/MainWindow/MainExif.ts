@@ -353,7 +353,9 @@ class MainExif {
 				else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
 
 					// Stable Diffusion webui 輸出的 jpg 或 webp
-					if (value.includes("Steps: ") && value.includes("Seed: ")) {
+					if (value.includes("Steps: ") && 
+						(value.includes("Size: ") || value.includes("Samplers: ") || value.includes("Model: "))
+					) {
 						ar.push({
 							group: "PNG-tEXt",
 							name: "Textual Data",
