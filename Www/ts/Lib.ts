@@ -874,7 +874,10 @@ class SelectionManager {
         document.addEventListener("mousedown", (event: MouseEvent) => {
             const target = event.target as Element;
             // 如果點擊的是文字輸入框，則不阻止選取
-            if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+            if (target instanceof HTMLInputElement ||
+                target instanceof HTMLTextAreaElement ||
+                target instanceof HTMLSelectElement
+            ) {
                 return;
             }
             const isMatch = this.filter.some(selector => target.matches(selector));

@@ -61,16 +61,16 @@ public class WebWindow : FormNone {
     /// <param name="args"> 命令列參數 </param>
     /// <param name="parentWindow"></param>
     /// <returns></returns>
-    public static WebWindow Create(string url, string[] args, WebWindow parentWindow) {
+    public static async Task<WebWindow> Create(string url, string[] args, WebWindow parentWindow) {
 
         // 如果開啟非 mainwindow 的 window
         if (url.IndexOf("MainWindow.html") == -1) {
             var ww = new WebWindow();
             ww._isDelayInit = false;
-            ww.Init();
+            await ww.Init();
             ww._parentWindow = parentWindow;
             ww._args = args;
-            ww._wv2.Source = new Uri(GetHtmlFilePath(url));
+            ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
             ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
                 TriggerCreate(ww, args);
             };
@@ -81,10 +81,10 @@ public class WebWindow : FormNone {
         if (Program.startType == 1) {
             var ww = new WebWindow();
             ww._isDelayInit = false;
-            ww.Init();
+            await ww.Init();
             ww._parentWindow = parentWindow;
             ww._args = args;
-            ww._wv2.Source = new Uri(GetHtmlFilePath(url));
+            ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
             ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
                 TriggerCreate(ww, args);
             };
@@ -98,10 +98,10 @@ public class WebWindow : FormNone {
                 // 新建
                 _tempWindow = new WebWindow();
                 _tempWindow._isDelayInit = false;
-                _tempWindow.Init();
+                await _tempWindow.Init();
                 _tempWindow._parentWindow = parentWindow;
                 _tempWindow._args = args;
-                _tempWindow._wv2.Source = new Uri(GetHtmlFilePath(url));
+                _tempWindow._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
                 _tempWindow._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
                     TriggerCreate(_tempWindow, args);
                 };
@@ -127,10 +127,10 @@ public class WebWindow : FormNone {
         if (_tempWindow == null) {
             var ww = new WebWindow();
             ww._isDelayInit = false;
-            ww.Init();
+            await ww.Init();
             ww._parentWindow = parentWindow;
             ww._args = args;
-            ww._wv2.Source = new Uri(GetHtmlFilePath(url));
+            ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
             ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
                 TriggerCreate(ww, args);
             };
@@ -145,6 +145,8 @@ public class WebWindow : FormNone {
         // 呼叫先前已經建立的 window 來顯示
         temp2._parentWindow = parentWindow;
         temp2._args = args;
+        //temp2._wv2.Width = 1600;
+        //temp2._wv2.Height = 900;
         temp2._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
             TriggerCreate(temp2, args);
         };
@@ -164,13 +166,13 @@ public class WebWindow : FormNone {
 
         url = GetHtmlFilePath(url);
 
-        Adapter.DelayRun(10, () => {
+        Adapter.DelayRun(10, async () => {
             if (_tempWindow != null) { return; }
             WebWindow temp3 = new();
             temp3._isDelayInit = true;
-            temp3.Init();
-            temp3._args = new string[0] { };
-            temp3._wv2.Source = new(url);
+            await temp3.Init();
+            temp3._args = [];
+            temp3._wv2.CoreWebView2.Navigate(url);
             // 如果視窗載入完成時，tempWindow 已經被暫用，則釋放這個 window
             void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
                 Adapter.DelayRun(100, () => {
@@ -286,43 +288,23 @@ public class WebWindow : FormNone {
     /// <summary>
     ///
     /// </summary>
-    public async void Init() {
-
-        var panel = new Panel();
-        panel.Dock = DockStyle.Fill;
-        this.Controls.Add(panel);
+    public async Task Init() {
 
         _wv2 = new WebView2();
-        panel.Controls.Add(_wv2);
-
-        if (_isDelayInit) {
-
-            bool firstRunNavigationCompleted = true;
-            // 初次載入頁面完成時
-            _wv2.NavigationCompleted += (object sender, CoreWebView2NavigationCompletedEventArgs e) => {
-
-                // 避免重複執行
-                if (firstRunNavigationCompleted == true) {
-                    firstRunNavigationCompleted = false;
-                }
-                else { return; }
-
-                Adapter.DelayRun(100, () => {
-                    this.Show();
-                    this.Hide(); // 等待網頁載入完成後才隱藏視窗，避免焦點被webview2搶走
-                });
-            };
-        }
-        else {
-            this.Show();
-            this.Hide();
-        }
-
         _wv2.ZoomFactor = 1;
         _wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 
+        var panel = new Panel();
+        panel.Dock = DockStyle.Fill;
+        panel.Controls.Add(_wv2);
+        this.Controls.Add(panel);
+        this.Hide();
+
         // 降低調整 webview 縮放頻率，可提升縮放視窗的流暢度
         Adapter.LoopRun(20, () => {
+
+            if (_isShow == false) { return; }
+
             var w = panel.Width;
             var h = panel.Height;
             // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
@@ -469,46 +451,53 @@ public class WebWindow : FormNone {
     }
 
     /// <summary>
-    /// 以js呼叫此函數後才會顯示視窗(從父視窗的中間開啟
+    /// 以 js 呼叫此函數後才會顯示視窗 (從父視窗的中間開啟
     /// </summary>
-    public void ShowWindowAtCenter(int width, int height) {
+    public async void ShowWindowAtCenter(int width, int height) {
 
-        // 在視窗顯示前沒辦法修改視窗的 size 跟坐標，所以先隱藏
-        _wv2.Visible = false;
+        if (_isShow) { return; }
 
-        ShowWindow(() => {
-            this.WindowState = FormWindowState.Normal;
-        });
+        // 先隱藏視窗再顯示，避免視窗顯示時的閃爍
+        this.Show();
+        this.Hide();
+
+        await ShowWindow(() => { });
 
         // 取得螢幕縮放比例
         float scale = _parentWindow.DeviceDpi / 96f;
-
         int w = (int)((width * scale) - _parentWindow.Width);
         int h = (int)((height * scale) - _parentWindow.Height);
         int l = _parentWindow.Left - (w / 2);
         int t = _parentWindow.Top - (h / 2);
-        SetSize(width, height);
         SetPosition(l, t);
-
-        _wv2.Visible = true;
+        SetSize(width, height);
     }
 
     /// <summary>
-    /// 以 js 呼叫此函數後才會顯示視窗(初始化坐標與size
+    /// 以 js 呼叫此函數後才會顯示視窗 (初始化 坐標 與 size
     /// </summary>
-    public void ShowWindowAtPosition(int x, int y, int width, int height, string windowState) {
-        ShowWindow(() => {
+    public async void ShowWindowAtPosition(int x, int y, int width, int height, string windowState) {
+        await ShowWindow(() => {
+
             this.SetPosition(x, y);
             this.SetSize(width, height);
 
             if (windowState == "Maximized") {
                 this.WindowState = FormWindowState.Maximized;
+
+                // 設定成目標坐標所在螢幕的大小
+                var screen = Screen.FromPoint(new Point(x, y));
+                _wv2.Width = screen.WorkingArea.Width;
+                _wv2.Height = screen.WorkingArea.Height;
             }
             else if (windowState == "Minimized") {
                 this.WindowState = FormWindowState.Minimized;
             }
             else if (windowState == "Normal") {
                 this.WindowState = FormWindowState.Normal;
+
+                _wv2.Width = width;
+                _wv2.Height = height;
             }
         });
     }
@@ -516,13 +505,13 @@ public class WebWindow : FormNone {
     /// <summary>
     /// 以js呼叫此函數後才會顯示視窗(系統預設指派的視窗坐標
     /// </summary>
-    public void ShowWindow() {
-        ShowWindow(() => {
+    public async void ShowWindow() {
+        await ShowWindow(() => {
             this.WindowState = FormWindowState.Normal;
         });
     }
 
-    private void ShowWindow(Action func) {
+    private async Task ShowWindow(Action func) {
 
         // 如果視窗已經顯示了，則只取得焦點，不做其他事情
         if (_isShow) {
@@ -532,7 +521,6 @@ public class WebWindow : FormNone {
             SetFocus(); // 讓視窗在最上面並且取得焦點
             return;
         }
-        _isShow = true;
 
         QuickRun.WindowCreate();
 
@@ -542,17 +530,18 @@ public class WebWindow : FormNone {
 
         // --------
 
-        this.Show();
-        this.Opacity = 1;
+        await Task.Delay(50);
 
+        _isShow = true;
+        this.Show();
         RunJs($"baseWindow.SizeChanged({this.Left},{this.Top},{this.Width},{this.Height},'{this.WindowState}')");
         SetFocus(); // 讓視窗在最上面並且取得焦點
-
-        if (_parentWindow != null) { // 避免開子視窗後導致父親視窗失去 置頂
+        if (_parentWindow != null) { // 避免開子視窗後導致父視窗失去置頂
             if (_parentWindow.TopMost == true) {
                 _parentWindow.TopMost = true;
             }
         }
+
     }
 
     /// <summary>
@@ -630,9 +619,9 @@ public class WebWindow : FormNone {
 
         this.TopMost = true;
         this.TopMost = false;
-        WindowAPI.SwitchToThisWindow(this._wv2.Handle, true);
-        WindowAPI.GlobalActivate(this._wv2.Handle);
-        this.Activate();
+        WindowAPI.SwitchToThisWindow(this.Handle, true);
+        WindowAPI.GlobalActivate(this.Handle);
+        // this.Activate();
         this._wv2.Focus();
 
         /* Adapter.DelayRun(30, () => {
@@ -654,7 +643,6 @@ public class WebWindow : FormNone {
     /// <param name="type"> acrylic | aero </param>
     public void WindowStyleForWin10(string type) {
         WindowAPI.WindowStyleForWin10(this.Handle, type);
-        this.Show(); // 沒有這行會無法立即套用效果
     }
 
     /// <summary>
@@ -691,7 +679,6 @@ public class FormNone : Form {
 
     // 視窗初始化
     protected override void OnHandleCreated(EventArgs e) {
-        this.Opacity = 0;
     }
 
     // 讓視窗看不到

@@ -53,8 +53,8 @@ public class WV_Window {
     /// <param name="url"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    public WebWindow NewWindow(string url, object[] args) {
-        var w = WebWindow.Create(url, args.Select(x => x.ToString()).ToArray(), M);
+    public async Task<WebWindow> NewWindow(string url, object[] args) {
+        var w = await WebWindow.Create(url, args.Select(x => x.ToString()).ToArray(), M);
         return w;
     }
 
@@ -65,14 +65,14 @@ public class WV_Window {
     /// <param name="args"> 命令列參數 </param>
     /// <param name="windowKey"> 用於判斷是否已經啟動過視窗的 key </param>
     /// <returns> true=啟動成功 false=已經啟動過 </returns>
-    public bool NewSubWindow(string url, object[] args, string windowKey) {
+    public async Task<bool> NewSubWindow(string url, object[] args, string windowKey) {
         // 子視窗已建立過，不再建立
         if (_subWindowCache.ContainsKey(windowKey)) {
             _subWindowCache[windowKey]?.ShowWindow();
             return false;
         };
 
-        var w = NewWindow(url, args);
+        var w = await NewWindow(url, args);
         SetOwner(w);
 
         // 記錄子視窗快取
@@ -156,32 +156,32 @@ public class WV_Window {
 
         // 此效果只能用於 win11
         if (StartWindow.isWin11) {
-            if (type == "none") {
+            if (type == "none" || type == "default") {
                 M.WindowStyleForWin11(SystemBackdropType.None);
             }
             else if (type == "AcrylicDark".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
             }
             else if (type == "AcrylicLight".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+                M.WindowStyleForWin11(SystemBackdropType.Acrylic);
             }
             else if (type == "MicaDark".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.Mica);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+                M.WindowStyleForWin11(SystemBackdropType.Mica);
             }
             else if (type == "MicaLight".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.Mica);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+                M.WindowStyleForWin11(SystemBackdropType.Mica);
             }
             else if (type == "MicaAltDark".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
+                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
             }
             else if (type == "MicaAltLight".ToLower()) {
-                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
+                M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
             }
         }
         else {
@@ -193,7 +193,7 @@ public class WV_Window {
     /// <summary>
     /// win11 視窗圓角
     /// </summary>
-    public void EnableWindowRoundedCorners(bool enable) {
+    public void WindowRoundedCorners(bool enable) {
         M.WindowRoundedCorners(enable);
     }
 
@@ -397,6 +397,11 @@ public class WV_Window {
     public Boolean TopMost {
         get { return M.TopMost; }
         set { M.TopMost = value; }
+    }
+
+    public double Opacity {
+        get { return M.Opacity; }
+        set { M.Opacity = value; }
     }
 
     /// <summary>

@@ -421,16 +421,19 @@
                         </div>
 
                         <div class="text-title">
-                            <span i18n="sw.windowSetting.windowAero"> 視窗效果 </span>
+                            <span i18n="sw.windowSetting.windowStyle"> 視窗效果 </span>
                             <div class="img-help" data-i18n="sw.windowSetting.tooltip">
                                 <%- await readFile("./img/default/tool-help.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
                             <select class="text-input" id="select-windowStyle">
-                                <option value="none" i18n="sw.windowSetting.aeroNone"> 預設 </option>
+                                <option value="none" i18n="sw.none"> None </option>
+
                                 <option value="aero"> AERO </option>
                                 <option value="acrylic"> Acrylic </option>
+
+                                <option value="default" i18n="sw.default"> 預設 </option>
 
                                 <option value="acrylicDark"> Acrylic Dark </option>
                                 <option value="micaDark"> Mica Dark </option>
@@ -442,9 +445,11 @@
                             </select>
                         </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-windowAero-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                            <div class="btn" id="btn-windowStyle-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
                         </div>
-
+                        <div class="text-content">
+                            <div class="btn" id="btn-applySuggestedColor" i18n="sw.windowSetting.applySuggestedColor"> 套用建議配色 </div>
+                        </div>
                     </div>
 
                 </div>

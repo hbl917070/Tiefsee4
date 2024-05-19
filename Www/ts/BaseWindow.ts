@@ -212,10 +212,11 @@ class BaseWindow {
         if (baseWindow.appInfo.isWin11) {
 
             if (type === "none") {
-                await WV_Window.EnableWindowRoundedCorners(false);
+                await WV_Window.WindowRoundedCorners(false);
                 this.dom_window.classList.remove("windowRoundedCorners");
-            } else {
-                await WV_Window.EnableWindowRoundedCorners(true);
+            }
+            else {
+                await WV_Window.WindowRoundedCorners(true);
                 this.dom_window.classList.add("windowRoundedCorners");
             }
 

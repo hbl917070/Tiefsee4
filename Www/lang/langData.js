@@ -1,12 +1,22 @@
 var langData = {
 
-    //setting window
+    // setting window
     sw: {
-
+        
         reloadRequired: {
             "zh-TW": "需要重新載入",
             "en": "Reload Required",
             "ja": "再読み込みが必要です",
+        },
+        none: {
+            "zh-TW": "無",
+            "en": "None",
+            "ja": "なし",
+        },
+        default: {
+            "zh-TW": "預設",
+            "en": "Default",
+            "ja": "プリセット",
         },
 
         //#region tabs
@@ -480,7 +490,7 @@ var langData = {
             },
         },
 
-        //視窗設定
+        // 視窗設定
         windowSetting: {
             title: {
                 "zh-TW": "視窗設定",
@@ -497,33 +507,28 @@ var langData = {
                 "en": "Window rounded corners (0 ~ 15)",
                 "ja": "ウィンドウの円角 (0 ~ 15)",
             },
-            windowAero: {
+            windowStyle: {
                 "zh-TW": "視窗效果",
                 "en": " Window effect",
                 "ja": "ウィンドウ効果",
             },
-            aeroNone: {
-                "zh-TW": "預設",
-                "en": "Default",
-                "ja": "プリセット",
-            },
+
             tooltip: {
                 "zh-TW": `  
-                    1. 使用「AERO」或「Acrylic」後，還必須調整「視窗背景色」的透明度，才能達到最佳視覺效果。<br>
-                    2. 使用「AERO」或「Acrylic」後，可能導致 Tiefsee 在移動視窗時卡頓。<br>
-                    3. Windows 11 可能無法使用「AERO」。
+                    修改此選項後，還必須調整「視窗背景色」的透明度，才能達到最佳視覺效果
                 `,
                 "en": `
-                    1. After using "AERO" or "Acrylic", you must also adjust the opacity of "Window background color" to get the best look.<br>
-                    2. Using AERO or Acrylic may cause Tiefsee to stutter when moving the window.<br>
-                    3. Windows 11 may not be able to use "AERO".
+                    After changing this option, you must also adjust the transparency of the "Window background color" to achieve the best visual effect
                 `,
                 "ja": `
-                    1. 「AERO」または「Acrylic」を使用した後、「ウィンドウの背景色」の不透明度も調整すると、最適な見た目になります。<br>
-                    2. 「AERO」または「Acrylic」を使用すると、Tiefseeがウィンドウを移動するときにカクつく可能性があります。<br>
-                    3. Windows 11 では、「AERO」が使用できない場合があります。
-                    `,
-            }
+                    このオプションを変更した後、最適な視覚効果を得るために「ウィンドウの背景色」の透明度も調整する必要があります
+                `,
+            },
+            applySuggestedColor: {
+                "zh-TW": "套用建議配色",
+                "en": "Apply Suggested Color",
+                "ja": "提案された色を適用",
+            },
         },
 
         //#endregion
@@ -1620,7 +1625,6 @@ var langData = {
 
     },
 
-    //大量瀏覽模式
     bulkView: {
         columns: {
             "zh-TW": "每行圖片數",
@@ -1717,9 +1721,7 @@ var langData = {
             "en": "Last Write Time",
             "ja": "更新時間",
         },
-
     },
-
 
     msg: {
 
@@ -1982,7 +1984,6 @@ var langData = {
         },
         //#endregion
     },
-
 
     exif: {
 
@@ -2320,8 +2321,6 @@ var langData = {
 
     },
 
-
-
     script: {
 
         none: {
@@ -2414,8 +2413,6 @@ var langData = {
             "en": "Move Image Left or Next File",
             "ja": "画像を左に移動 or 次のファイル"
         },
-
-
         //#endregion
 
         //#region 檔案
@@ -2552,4 +2549,3 @@ var langData = {
 
     },
 }
-

@@ -38,7 +38,7 @@ class SettingWindow {
         }
 
         function getDom(selectors: string) {
-            return document.querySelector(selectors);
+            return document.querySelector(selectors) as HTMLElement;
         }
 
         // 指定不能被選取的元素
@@ -167,7 +167,6 @@ class SettingWindow {
             });
 
         })
-
 
         // 自訂工具列
         addLoadEvent(() => {
@@ -311,13 +310,14 @@ class SettingWindow {
         // 主題
         addLoadEvent(() => {
 
-            // var cssRoot = document.documentElement;
             var jq_colorWindowBackground = $("#text-colorWindowBackground"); // 視窗顏色
             var jq_colorWindowBorder = $("#text-colorWindowBorder"); // 邊框顏色
             var jq_colorWhite = $("#text-colorWhite"); // 文字顏色
             var jq_colorBlack = $("#text-colorBlack"); // 區塊底色
             var jq_colorBlue = $("#text-colorBlue"); // 主顏色
             var dom_applyThemeBtns = getDom("#applyTheme-btns") as HTMLElement;
+            var select_windowStyle = getDom("#select-windowStyle") as HTMLSelectElement;
+            let btnApplyColor = getDom("#btn-applySuggestedColor") as HTMLButtonElement; // 套用建議配色
 
             // 初始化顏色選擇器物件
             addEvent(jq_colorWindowBackground, "--color-window-background", true);
@@ -327,7 +327,7 @@ class SettingWindow {
             addEvent(jq_colorBlue, "--color-blue", false);
             // add(jQdom_theme_colorGrey, "--color-grey", false);
 
-            applyTheme()
+            applyTheme();
 
             // 初始化顏色選擇器物件
             function addEvent(jQdim: JQuery, name: string, opacity: boolean = false) {
@@ -379,15 +379,15 @@ class SettingWindow {
 
             // 初始化主題按鈕
             applyThemeAddBtn( // 深色主題
-                `<div class="btn" i18n="sw.theme.darkTheme">${i18n.t("sw.theme.darkTheme")}</div>`,
+                `<div class="btn js-btn-darkTheme" i18n="sw.theme.darkTheme">${i18n.t("sw.theme.darkTheme")}</div>`,
                 { r: 31, g: 39, b: 43, a: 0.97 },
                 { r: 255, g: 255, b: 255, a: 0.25 },
                 { r: 255, g: 255, b: 255, },
                 { r: 0, g: 0, b: 0, },
                 { r: 0, g: 200, b: 255, },
             )
-            applyThemeAddBtn( // 深色主題
-                `<div class="btn" i18n="sw.theme.lightTheme">${i18n.t("sw.theme.lightTheme")}</div>`,
+            applyThemeAddBtn( // 淺色主題
+                `<div class="btn js-btn-lightTheme" i18n="sw.theme.lightTheme">${i18n.t("sw.theme.lightTheme")}</div>`,
                 { r: 255, g: 255, b: 255, a: 0.97 },
                 { r: 112, g: 112, b: 112, a: 0.25 },
                 { r: 0, g: 0, b: 0, },
@@ -404,13 +404,62 @@ class SettingWindow {
                 blue: { r: number, g: number, b: number }) {
 
                 let btn = Lib.newDom(html);
+                let btnRestart = getDom("#btn-windowStyle-restart") as HTMLButtonElement;
+
+                btn.addEventListener("mouseup", () => {
+                    // 根據選擇的主題來調整 視窗效果
+                    let windowStyle = select_windowStyle.value;
+                    if (baseWindow.appInfo.isWin11) {
+                        let isDark = isDarkMode(windowBackground);
+                        if (isDark) {
+                            if (windowStyle == "acrylicLight") { select_windowStyle.value = "acrylicDark"; }
+                            if (windowStyle == "micaLight") { select_windowStyle.value = "micaDark"; }
+                            if (windowStyle == "micaAltLight") { select_windowStyle.value = "micaAltDark"; }
+                            if (windowStyle.includes("Light")) {
+                                // 主動觸發 switchWindowStyle 的 change 事件
+                                select_windowStyle.dispatchEvent(new Event("change"));
+                                btnApplyColor.style.display = "none";
+                            }
+                        } else {
+                            if (windowStyle == "acrylicDark") { select_windowStyle.value = "acrylicLight"; }
+                            if (windowStyle == "micaDark") { select_windowStyle.value = "micaLight"; }
+                            if (windowStyle == "micaAltDark") { select_windowStyle.value = "micaAltLight"; }
+                            if (windowStyle.includes("Dark")) {
+                                select_windowStyle.dispatchEvent(new Event("change"));
+                                btnApplyColor.style.display = "none";
+                            }
+                        }
+                    }
+                });
+
                 btn.onclick = () => {
+
+                    // 根據選擇的主題來調整 背景透明度
+                    let windowStyle = select_windowStyle.value;
+                    if (windowStyle === "none" || windowStyle === "default") {
+                        windowBackground.a = 0.97;
+                    }
+                    else if (windowStyle === "aero") {
+                        windowBackground.a = 0.8;
+                    }
+                    else if (windowStyle === "acrylic") {
+                        windowBackground.a = 0.7;
+                    }
+                    else if (windowStyle === "acrylicDark" || windowStyle === "acrylicLight") {
+                        windowBackground.a = 0.7;
+                    }
+                    else if (windowStyle === "micaDark" || windowStyle === "micaLight" ||
+                        windowStyle === "micaAltDark" || windowStyle === "micaAltLight"
+                    ) {
+                        windowBackground.a = 0;
+                    }
+
                     config.settings.theme["--color-window-background"] = windowBackground;
                     config.settings.theme["--color-window-border"] = windowBorder;
                     config.settings.theme["--color-white"] = white;
                     config.settings.theme["--color-black"] = black;
                     config.settings.theme["--color-blue"] = blue;
-                    applyTheme()
+                    applyTheme();
                 };
                 dom_applyThemeBtns.append(btn);
             }
@@ -630,6 +679,7 @@ class SettingWindow {
             if (baseWindow.appInfo.isWin11) {
                 options = [
                     "none",
+                    "default",
                     "acrylicDark", "acrylicLight",
                     "micaDark", "micaLight",
                     "micaAltDark", "micaAltLight"
@@ -651,8 +701,11 @@ class SettingWindow {
                 switchWindowStyle.value = "none";
             }
 
-            let btnRestart = getDom("#btn-windowAero-restart") as HTMLButtonElement;
+            let btnRestart = getDom("#btn-windowStyle-restart") as HTMLButtonElement;
+            let btnApplyColor = getDom("#btn-applySuggestedColor") as HTMLButtonElement;
+            var jqWindowBg = $("#text-colorWindowBackground"); // 視窗顏色
             btnRestart.style.display = "none";
+            btnApplyColor.style.display = "none";
             switchWindowStyle.addEventListener("change", () => {
 
                 if (baseWindow.appInfo.isWin11) { // win11
@@ -663,11 +716,68 @@ class SettingWindow {
                     btnRestart.style.display = "";
                 }
 
+                if (baseWindow.appInfo.isWin11) {
+                    // @ts-ignore
+                    let windowBg = jqWindowBg.minicolors("rgbObject"); // 取得顏色 
+                    let isDark = isDarkMode(windowBg);
+                    let val = switchWindowStyle.value;
+
+                    // 如果背景透明度不符
+                    if (val === "none" || val === "default") {
+                        if (windowBg.a < 0.9) {
+                            btnApplyColor.style.display = "";
+                        }
+                    }
+                    else if (val === "acrylicDark" || val === "acrylicLight") {
+                        if (windowBg.a < 0.5 || windowBg.a > 0.8) {
+                            btnApplyColor.style.display = "";
+                        }
+                    }
+                    else if (val === "micaDark" || val === "micaLight" ||
+                        val === "micaAltDark" || val === "micaAltLight") {
+                        if (windowBg.a > 0.1) {
+                            btnApplyColor.style.display = "";
+                        }
+                    }
+
+                    // 如果主題不符
+                    if (isDark) {
+                        if (val === "acrylicLight" || val === "micaLight" || val === "micaAltLight") {
+                            btnApplyColor.style.display = "";
+                        }
+                    } else {
+                        if (val === "acrylicDark" || val === "micaDark" || val === "micaAltDark") {
+                            btnApplyColor.style.display = "";
+                        }
+                    }
+                }
             });
             btnRestart.addEventListener("click", () => {
                 restartTiefsee();
             });
+            btnApplyColor.addEventListener("click", () => {
 
+                let val = switchWindowStyle.value;
+
+                if (val === "acrylicLight" || val === "micaLight" || val === "micaAltLight") {
+                    getDom(".js-btn-lightTheme")?.click();
+                }
+                else if (val === "acrylicDark" || val === "micaDark" || val === "micaAltDark") {
+                    getDom(".js-btn-darkTheme")?.click();
+                }
+                else {
+                    //@ts-ignore
+                    let windowBg = jqWindowBg.minicolors("rgbObject"); // 取得顏色 
+                    let isDark = isDarkMode(windowBg);
+                    if (isDark) {
+                        getDom(".js-btn-darkTheme")?.click();
+                    } else {
+                        getDom(".js-btn-lightTheme")?.click();
+                    }
+                }
+
+                btnApplyColor.style.display = "none";
+            });
         })
 
         // 工具列
@@ -881,7 +991,6 @@ class SettingWindow {
 
         })
 
-
         // 檔案預覽視窗
         addLoadEvent(() => {
             var switch_fileListEnabled = getDom("#switch-fileListEnabled") as HTMLInputElement;
@@ -1085,18 +1194,8 @@ class SettingWindow {
             });
         })
 
-
         // 圖片 縮放模式
         addLoadEvent(() => {
-
-            /*var select_tiefseeviewImageRendering = getDom("#select-tiefseeviewImageRendering") as HTMLInputElement;
-            select_tiefseeviewImageRendering.value = config.settings["image"]["tiefseeviewImageRendering"];
-
-            select_tiefseeviewImageRendering.addEventListener("change", () => {
-                let val = select_tiefseeviewImageRendering.value;
-                config.settings["image"]["tiefseeviewImageRendering"] = val;
-                appleSettingOfMain();
-            });*/
 
             var switch_imageShowPixels = getDom("#switch-imageShowPixels") as HTMLInputElement;
             switch_imageShowPixels.checked = config.settings["image"]["tiefseeviewImageRendering"] == "2"
@@ -1221,7 +1320,6 @@ class SettingWindow {
                 restartTiefsee();
             })
         })
-
 
         // 重設設定 
         addLoadEvent(() => {
@@ -1495,6 +1593,18 @@ class SettingWindow {
             bParent.replaceChild(bHolder, b);
             aParent.replaceChild(b, aHolder);
             bParent.replaceChild(a, bHolder);
+        }
+
+        /**
+         * 判斷是否為深色模式
+         * @param bg { r:number, g:number, b:number } 
+         * @returns true=深色模式 false=淺色模式
+         */
+        function isDarkMode(bg: any) {
+            // 判斷顏色接近黑色還是白色
+            let n = ((bg.r > 127) ? 1 : 0) + ((bg.g > 127) ? 1 : 0) + ((bg.b > 127) ? 1 : 0);
+            if (n >= 2) { return false; }
+            return true;
         }
 
         /**

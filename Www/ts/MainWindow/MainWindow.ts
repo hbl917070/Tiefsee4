@@ -564,11 +564,10 @@ class MainWindow {
                     initSetting(json.settingTxt); // 初始讀取設定
                     await initLastPosition(); // 初始 套用上次的視窗狀態與坐標
                     initLoad(json.args); // 初始 載入檔案           
-                    // await baseWindow.setWindowAttribute(config.settings.theme.aeroType); // 視窗樣式
 
                 } else { // 單純開啟圖片(用於 單一執行個體)
 
-                    WV_Window.ShowWindow(); // 顯示視窗 
+                    WV_Window.ShowWindow(); // 顯示視窗
                     initLoad(json.args); // 初始載入檔案
                 }
             }
@@ -592,7 +591,6 @@ class MainWindow {
                         fileShow.openNone(); // 避免卡在上一張圖片
                         await initQuickLookPosition(); // 初始 快速啟動的坐標   
                         initLoad(json.args); // 初始 載入檔案
-                        // await baseWindow.setWindowAttribute(config.settings.theme.aeroType); // 視窗樣式
                     }
                     checkDownKey();
                 }

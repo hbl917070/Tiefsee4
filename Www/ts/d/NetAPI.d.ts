@@ -85,7 +85,7 @@ interface WV_Window {
     WindowStyle(type: string): void;
 
     /** 啟用 win11 視窗圓角  */
-    EnableWindowRoundedCorners(enable: boolean): string;
+    WindowRoundedCorners(enable: boolean): string;
 
     /** 設定縮放倍率，預設 1.0 */
     SetZoomFactor(d: number): void;
@@ -156,6 +156,9 @@ interface WV_Window {
 
     /** 視窗置頂 */
     TopMost: boolean;
+
+    /** 視窗透明度 */
+    Opacity: number;
 
     /** 拖曳視窗 */
     WindowDrag(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move')): void;
