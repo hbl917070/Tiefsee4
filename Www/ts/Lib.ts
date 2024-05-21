@@ -795,7 +795,7 @@ class Throttle {
  */
 class RequestLimiter {
     private queue: [HTMLImageElement, string][];
-    private inProgress: number;
+    private inProgress: number; // 目前正在進行的請求數
     private maxRequests: number;
 
     constructor(maxRequests: number) {
@@ -831,6 +831,7 @@ class RequestLimiter {
     private processQueue() {
         while (this.inProgress < this.maxRequests && this.queue.length > 0) {
             const [img, url] = this.queue.shift()!;
+            this.inProgress++; // 圖片開始加載時增加 inProgress
             this.loadImage(img, url).then(() => {
                 this.inProgress--;
                 this.processQueue();
@@ -844,16 +845,29 @@ class RequestLimiter {
 
     private loadImage(img: HTMLImageElement, url: string) {
         return new Promise<void>((resolve, reject) => {
-            if (!document.body.contains(img)) { // 檢查 img 元素是否仍然存在於文檔中
-                reject(new Error("Image element is not in the document."));
-                return;
-            }
-            this.inProgress++; // 圖片開始加載時增加 inProgress
+
+            // 如果圖片已經不存在
+            let intervalTimer = setInterval(() => {
+                if (!document.body.contains(img)) {
+                    // console.log("Image element has been removed from the document.");
+                    clearInterval(intervalTimer);
+                    clearTimeout(timeoutTimer);
+                    reject("Image element has been removed from the document.");
+                }
+            }, 50);
+
+            // 載入超時
+            let timeoutTimer = setTimeout(() => {
+                clearInterval(intervalTimer);
+                reject("Loading image timed out.");
+            }, 30 * 1000);
+
+            img.src = url;
             img.onload = img.onerror = () => {
-                this.inProgress--; // 圖片加載完成或加載錯誤時減少 inProgress
+                clearInterval(intervalTimer);
+                clearTimeout(timeoutTimer);
                 resolve();
             };
-            img.src = url;
         });
     }
 }

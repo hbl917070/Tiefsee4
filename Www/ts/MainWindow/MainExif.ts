@@ -34,7 +34,7 @@ class MainExif {
 		var isEnabled = true; // 啟用 檔案預覽視窗
 
 		/** 請求限制器 */
-		const limiter = new RequestLimiter(3);
+		const limiter = new RequestLimiter(1);
 
 		/** 頁籤的類型 */
 		var TabType = {
@@ -332,7 +332,6 @@ class MainExif {
 					let domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div><span>`);
 					let domBtn = domValue.querySelector(".btnExport") as HTMLElement;
 					domBtn.addEventListener("click", () => {
-						console.log(path)
 						M.script.open.showFrames(path);
 					})
 					let itemDom = getItemDom(name, domValue, nameI18n, "");
@@ -353,7 +352,7 @@ class MainExif {
 				else if (name === "Comment" || name === "User Comment" || name === "Windows XP Comment" || name === "Image Description") {
 
 					// Stable Diffusion webui 輸出的 jpg 或 webp
-					if (value.includes("Steps: ") && 
+					if (value.includes("Steps: ") &&
 						(value.includes("Size: ") || value.includes("Samplers: ") || value.includes("Model: "))
 					) {
 						ar.push({
@@ -670,8 +669,7 @@ class MainExif {
 				try {
 					data = JSON.parse(data);
 				} catch (e) {
-					console.warn("Civitai resources 解析失敗");
-					console.warn(data);
+					console.warn("Civitai resources 解析失敗", data);
 					return;
 				}
 			}
@@ -726,8 +724,7 @@ class MainExif {
 				let modelVersionId = item.modelVersionId;
 				let dbKey = modelVersionId || hash;
 				if (dbKey === undefined || dbKey === null) {
-					console.warn("Civitai 未預期的格式");
-					console.warn(item);
+					console.warn("Civitai 未預期的格式", item);
 					continue;
 				}
 
@@ -822,16 +819,13 @@ class MainExif {
 								result = await Lib.sendGet("json", url, timeout);
 							}
 						} catch (e) {
-
-							console.error("Civitai 請求失敗", e);
+							console.error("Civitai request error", url, e);
 							let exifValue = oldDom.querySelector(".mainExifValue") as HTMLElement
 							exifValue.innerHTML = "Error";
 							result = {
 								error: "Request error"
 							}
 						}
-
-						// console.log("Civitai 請求資料", url);
 
 						modelId = result.modelId;
 						modelName = result.model?.name;
@@ -842,7 +836,7 @@ class MainExif {
 						error = result.error;
 
 						if (result.error) {
-							console.log("Civitai 返回 error", url, result);
+							console.log("Civitai error", url, result);
 							let exifValue = oldDom.querySelector(".mainExifValue") as HTMLElement
 							exifValue.innerHTML = "Error";
 
@@ -875,7 +869,7 @@ class MainExif {
 								name: name,
 								images: images2
 							});
-							console.log("Civitai 成功", url);
+							console.log("Civitai success", url);
 
 						}
 
@@ -933,8 +927,6 @@ class MainExif {
 
 						// 判斷是否有圖片
 						let isHaveImg = false;
-						// 載入圖片
-						let funcLoadImg: (() => void)[] = [];
 
 						for (let i = 0; i < images.length; i++) {
 							const item = images[i];
@@ -952,29 +944,34 @@ class MainExif {
 										<img>
 									</div>
 								`);
-								divImgList.appendChild(imgItem);
+
 								imgItem.setAttribute("data-path", imgPath);
 
 								const domImg = imgItem.querySelector("img") as HTMLImageElement;
 
-								// 展開時，載入圖片，已經載入過的就不再載入
-								let isLoad = false;
-								funcLoadImg.push(() => {
-									if (isLoad) { return; }
-									isLoad = true;
+								// 圖片出現在畫面時，載入圖片
+								const observer = new IntersectionObserver(entries => {
+									if (entries[0].intersectionRatio <= 0) { return; }
 									limiter.addRequest(domImg, imgUrl); // 發出請求
-								})
+									observer.unobserve(imgItem); // 在第一次觸發後，停止觀察該元素
+								}, {
+									threshold: 0.1,
+								});
+								observer.observe(imgItem);
+
+								divImgList.appendChild(imgItem);
 
 								// 圖片載入失敗時
-								domImg.onerror = () => {
+								domImg.addEventListener("error", () => {
+									console.warn("Civitai image load error", imgPath);
 									// 顯示錯誤圖示
 									/*domImg.src = "./img/error.svg";
 									domImg.style.objectFit = "contain";*/
 
 									// 移除 dom
 									imgItem.parentNode?.removeChild(imgItem);
-									console.warn("Civitai 圖片載入失敗", imgUrl);
-								}
+									console.warn("Civitai image load error", imgPath);
+								});
 
 								// 雙擊左鍵
 								Lib.addEventDblclick(imgItem, async (e: MouseEvent) => { // 圖片物件
@@ -999,12 +996,6 @@ class MainExif {
 								btnExpand.style.display = "none";
 								btnCollapse.style.display = "";
 								divImgList.setAttribute("active", "true");
-
-								// 展開時，載入圖片
-								funcLoadImg.forEach(func => {
-									func();
-								})
-
 							} else if (t === false) {
 								btnExpand.style.display = "";
 								btnCollapse.style.display = "none";

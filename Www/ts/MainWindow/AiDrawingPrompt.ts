@@ -96,7 +96,6 @@ class AiDrawingPrompt {
 		 */
 		function CivitaiStringify(obj: any) {
 			try {
-				console.log(obj);
 				var jsonFormat = JSON.stringify(obj, null, "\uFDD9");
 				jsonFormat = jsonFormat.replace(/\uFDD9/g, "");
 				jsonFormat = jsonFormat

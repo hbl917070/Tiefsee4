@@ -68,7 +68,7 @@
           //background-color: var(--color-white10);          color: var(--color-blue);
           //border-bottom: 3px solid var(--color-blue);
           color: var(--color-blue);
-          svg *{
+          svg * {
             stroke: var(--color-blue) !important;
           }
         }
@@ -370,20 +370,20 @@
       width: 100%;
       margin-top: 3px;
       margin-right: 4px;
-      //text-align: center;
       border-radius: 6px;
-
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-
+      background-color: var(--color-white10);
       overflow: hidden;
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         pointer-events: none;
         user-select: none;
+      }
+      // 沒有圖片時，隱藏
+      img:not([src]) {
+        opacity: 0;
       }
 
       &:last-child {
