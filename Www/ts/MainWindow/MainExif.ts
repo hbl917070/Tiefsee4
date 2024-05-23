@@ -941,7 +941,7 @@ class MainExif {
 
 								let imgItem = Lib.newDom(`
 									<div class="mainExifImgItem">
-										<img>
+										<img fetchpriority="low"/>
 									</div>
 								`);
 
@@ -1228,7 +1228,7 @@ class MainExif {
 				domContent = Lib.newDom(`
 					<div class="mainExifRelatedContent collapse-content">
 						<div class="mainExifRelatedImg">
-							<img src="${imgUrl}" />
+							<img src="${imgUrl}" fetchpriority="low"/>
 						</div>
 					</div>
 				`);

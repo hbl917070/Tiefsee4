@@ -263,18 +263,18 @@ class MainDirList {
 			let len = arPath.length;
 			if (len > imgNumber) { len = imgNumber; }
 
-			let imgHtml = "";
+			let htmlImgBox = "";
 			for (let i = 0; i < len; i++) {
 				const path = Lib.Combine([_dirPath, arPath[i]]);
-				let style = "";
+				let htmlImg = "";
 				if (temp_loaded.indexOf(n + "-" + i) !== -1) { // 圖片已經載入過了，直接顯示
 					let imgUrl = getImgUrl(path);
-					style = `background-image:url('${imgUrl}')`;
+					htmlImg = `<img src="${imgUrl}" fetchpriority="low"/>`;
 				}
-				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}" style="${style}"></div>`;
+				htmlImgBox += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="${i}">${htmlImg}</div>`;
 			}
 			if (len === 0) {
-				imgHtml += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid="" style=""></div>`;
+				htmlImgBox += `<div class="dirList-img dirList-img__${imgNumber}" data-imgid=""></div>`;
 			}
 
 			let name = Lib.GetFileName(_dirPath); // 檔名
@@ -293,7 +293,7 @@ class MainDirList {
                         ${htmlNo} ${htmlName}
                     </div>
                     <div class="dirList-imgbox">
-                        ${imgHtml}   
+                        ${htmlImgBox}   
                     </div>
                 </div>
             `);
@@ -320,7 +320,7 @@ class MainDirList {
 								temp_loaded.push(n + "-" + i); // 加到全域變數，表示已經載入過
 								let _url = getImgUrl(path);
 								let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
-								domImg.style.backgroundImage = `url("${_url}")`;
+								domImg.innerHTML = `<img src="${_url}" fetchpriority="low"/>`;
 							}
 						}
 					}, 30);
@@ -331,7 +331,7 @@ class MainDirList {
 						temp_loaded.push(n + "-" + i); // 加到全域變數，表示已經載入過
 						let _url = getImgUrl(path);
 						let domImg = div.getElementsByClassName("dirList-img")[i] as HTMLImageElement;
-						domImg.style.backgroundImage = `url("${_url}")`;
+						domImg.innerHTML = `<img src="${_url}" fetchpriority="low"/>`;
 						//}
 					}
 				}
@@ -347,7 +347,7 @@ class MainDirList {
 			if (Lib.GetExtension(path) === ".svg") {
 				return Lib.pathToURL(path);
 			}
-			return WebAPI.Img.fileIcon(path).replace(/[']/g, "\\'");
+			return WebAPI.Img.fileIcon(path);
 		}
 
 		/**

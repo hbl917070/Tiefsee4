@@ -1135,6 +1135,7 @@ class Tiefseeview {
         async function preloadImg(_url: string, isInitSize: undefined | boolean = true): Promise<boolean> {
 
             let img = document.createElement("img");
+            img.fetchPriority = "high"; // 設定圖片優先權
             let p = await new Promise((resolve, reject) => {
                 img.addEventListener("load", (e) => {
                     if (isInitSize) {

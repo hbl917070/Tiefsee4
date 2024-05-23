@@ -5,9 +5,9 @@ self.addEventListener("message", async (e) => {
     let scale = e.data.scale;
     let tempUrl = e.data.tempUrl;
 
-    const imgBlob = await fetch(url).then(
-        (r) => r.blob()
-    );
+    const imgBlob = await fetch(url, {
+        priority: "high", // 高優先權
+    }).then((r) => r.blob());
 
     const img = await createImageBitmap(imgBlob);
 

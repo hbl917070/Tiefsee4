@@ -231,7 +231,7 @@ class MainFileList {
 
             let name = Lib.GetFileName(path); // 檔名
 
-            let style = "";
+            let htmlImg = "";
 
             if (temp_loaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (path !== "") {
@@ -241,14 +241,14 @@ class MainFileList {
                         temp_loaded.push(i); // 加到全域變數，表示已經載入過
                         let _url = getImgUrl(path);
                         let domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
-                        domImg.style.backgroundImage = `url("${_url}")`;
+                        domImg.innerHTML = `<img src="${_url}" fetchpriority="low"/>`;
                     }, 30);
                 }
             } else {
 
                 // 圖片已經載入過了，直接顯示
                 let imgUrl = getImgUrl(path);
-                style = `background-image:url('${imgUrl}')`;
+                htmlImg = `<img src="${imgUrl}" fetchpriority="low">`;
             }
 
             let htmlNo = ``;
@@ -265,7 +265,7 @@ class MainFileList {
                     <div class="fileList-title">
                         ${htmlNo} ${htmlName}
                     </div>
-                    <div class="fileList-img" style="${style}"> </div>                                                            
+                    <div class="fileList-img"> ${htmlImg} </div>                                                            
                 </div>`);
             dom_fileListData.append(div);
             div.setAttribute("data-path", path);
@@ -290,7 +290,7 @@ class MainFileList {
             if (Lib.GetExtension(path) === ".svg") {
                 return Lib.pathToURL(path);
             }
-            return WebAPI.Img.fileIcon(path).replace(/[']/g, "\\'");
+            return WebAPI.Img.fileIcon(path);
         }
 
         /**

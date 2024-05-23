@@ -217,8 +217,9 @@ class WebAPI {
     static async sendPost(url: string, postData: any) {
         let json: any;
         await fetch(url, {
-            "body": JSON.stringify(postData),
-            "method": "POST",
+            body: JSON.stringify(postData),
+            method: "POST",
+            priority: "high", // 高優先權
         }).then((response) => {
             return response.json();
         }).then((t) => {

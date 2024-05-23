@@ -389,8 +389,9 @@ class Lib {
         if (type === "text") {
             let txt = "";
             await fetch(url, {
-                "method": "get",
-                signal: controller.signal,
+                method: "get",
+                signal: controller.signal, // 用於取消請求
+                priority: "high", // 高優先權
             }).then((response) => {
                 return response.text();
             }).then((html) => {
@@ -405,8 +406,9 @@ class Lib {
         if (type === "json") {
             let json: any = {};
             await fetch(url, {
-                "method": "get",
-                signal: controller.signal,
+                method: "get",
+                signal: controller.signal, // 用於取消請求
+                priority: "high", // 高優先權
             }).then((response) => {
                 return response.json();
             }).then((html) => {
