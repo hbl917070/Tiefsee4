@@ -145,8 +145,6 @@ public class WebWindow : FormNone {
         // 呼叫先前已經建立的 window 來顯示
         temp2._parentWindow = parentWindow;
         temp2._args = args;
-        //temp2._wv2.Width = 1600;
-        //temp2._wv2.Height = 900;
         temp2._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
             TriggerCreate(temp2, args);
         };
@@ -305,6 +303,8 @@ public class WebWindow : FormNone {
 
             if (_isShow == false) { return; }
 
+
+
             var w = panel.Width;
             var h = panel.Height;
             // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
@@ -313,6 +313,11 @@ public class WebWindow : FormNone {
             if (_windowRoundedCorners == false && this.WindowState == FormWindowState.Normal) {
                 w += 1;
                 h += 1;
+            }
+            // win11 的圓角效果，邊框會往內吃掉 1px，所以要主動把 webview2 往外內 1px，避免右邊的捲動條被遮住
+            if (_windowRoundedCorners && this.WindowState == FormWindowState.Normal) {
+                w -= 1;
+                h -= 1;
             }
             if (_wv2.Width != w || _wv2.Height != h) {
                 _wv2.Width = w;
@@ -457,10 +462,6 @@ public class WebWindow : FormNone {
 
         if (_isShow) { return; }
 
-        // 先隱藏視窗再顯示，避免視窗顯示時的閃爍
-        this.Show();
-        this.Hide();
-
         await ShowWindow(() => { });
 
         // 取得螢幕縮放比例
@@ -530,7 +531,7 @@ public class WebWindow : FormNone {
 
         // --------
 
-        await Task.Delay(50);
+        // await Task.Delay(50);
 
         _isShow = true;
         this.Show();

@@ -97,6 +97,8 @@ body {
 }
 // win11 圓角
 .window.windowRoundedCorners {
+  right: 0.5px;
+  bottom: 0.5px;
   box-shadow: none;
   border: none;
   border-radius: 0px;
