@@ -1,6 +1,7 @@
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Windows.Storage;
@@ -39,8 +40,8 @@ public class Exif {
         }
 
         try {
-            double n1 = Double.Parse(ar[0].Trim());
-            double n2 = Double.Parse(ar[1].Trim());
+            double n1 = Double.Parse(ar[0].Trim(), CultureInfo.InvariantCulture);
+            double n2 = Double.Parse(ar[1].Trim(), CultureInfo.InvariantCulture);
             double n3 = 1 / (n1 / n2);
             float n4 = (float)decimal.Round((decimal)n3, 1); // 小數兩位
             return "1/" + n4 + " sec";
@@ -62,8 +63,8 @@ public class Exif {
         }
 
         try {
-            double n1 = Double.Parse(ar[0].Trim());
-            double n2 = Double.Parse(ar[1].Trim());
+            double n1 = Double.Parse(ar[0].Trim(), CultureInfo.InvariantCulture);
+            double n2 = Double.Parse(ar[1].Trim(), CultureInfo.InvariantCulture);
             double n3 = n1 / n2;
             float n4 = (float)decimal.Round((decimal)n3, 2); // 小數兩位
             if (n4 > 0) {
