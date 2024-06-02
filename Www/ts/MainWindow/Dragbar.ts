@@ -81,6 +81,10 @@ class Dragbar {
 
             // 拖曳開始
             dom_dragbar.addEventListener("pointerdown", (ev) => { // mousedown + touchstart
+                // 點擊的不是左鍵
+                if (ev.button !== 0) {
+                    return;
+                }
                 ev.preventDefault();
                 dom_windowBody.style.pointerEvents = "none"; // 避免畫面上的iframe造成無法識別滑鼠事件
                 temp_val = Lib.toNumber(dom_dragbar.style.left);
