@@ -837,6 +837,11 @@ class MainWindow {
             let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
             fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
+            fileShow.tiefseeview.enableTouchpadGestures(
+                config.settings.other.enableTouchpadGestures); // 啟用觸控板手勢
+           
+            // -----------
+
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); // 視窗縮放
             cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); // 圖示粗細
 

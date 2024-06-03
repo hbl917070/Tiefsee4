@@ -60,6 +60,7 @@ class Tiefseeview {
     public showClip; // 顯示或隱藏剪裁框
     public getClipInfo; // 取得剪裁框的資訊
     public clipFull; // 剪裁框全滿
+    public enableTouchpadGestures; // 啟用觸控板手勢
 
     public getEventMouseWheel; // 滑鼠滾輪捲動時
     public setEventMouseWheel;
@@ -166,6 +167,8 @@ class Tiefseeview {
 
         var temp_videoDuration: number = -1; // 影片長度
 
+        var touchpadGestures = false; // 啟用觸控板手勢
+
         // 滑鼠滾輪的行為
         var eventMouseWheel = (_type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number): void => {
             if (_type === "up") { zoomIn(offsetX, offsetY); }
@@ -256,6 +259,7 @@ class Tiefseeview {
         this.showClip = showClip;
         this.getClipInfo = getClipInfo;
         this.clipFull = clipFull;
+        this.enableTouchpadGestures = (enable: boolean) => { touchpadGestures = enable; }
 
         setLoadingUrl(loadingUrl); // 初始化 loading 圖片
         setLoading(false); // 預設為隱藏
@@ -729,6 +733,8 @@ class Tiefseeview {
             setRendering(rendering); // 縮放結束後，把渲染模式改回原本的縮放模式
         });
 
+
+
         // 滑鼠滾輪上下滾動時
         dom_dpizoom.addEventListener("wheel", (e: WheelEvent) => {
 
@@ -740,7 +746,47 @@ class Tiefseeview {
             temp_zoomWithWindow = false;
             $(dom_con).stop(true, false);
 
-            let isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100; // 捲動值小於100表示為觸控板，觸控板快速滑動時會大於100
+            // @ts-ignore
+            // wheelDeltaY 已被標記為過時
+            let wheelDeltaY = e.wheelDeltaY;
+
+            let isTouchPad: boolean;
+            if (touchpadGestures === false) {
+                // 如果沒有啟用觸控板手勢，則一律視為滑鼠滾輪
+                isTouchPad = false;
+            }
+            else if (e.deltaX !== 0) {
+                // 如果有水平捲動，則視為觸控板
+                isTouchPad = true;
+            }
+            else if (window.zoomFactor && wheelDeltaY) {
+                // 當 wheelDeltaY 為 120 的倍數時，表示為滑鼠滾輪
+                let dy = Math.abs(wheelDeltaY * window.zoomFactor);
+                dy = dy > 120 ? dy % 120 : dy;
+                if (Math.abs(120 - dy) < 2) {
+                    isTouchPad = false;
+                } else {
+                    isTouchPad = true;
+                }
+            }
+            else if (window.zoomFactor) {
+                // Windows 將滑鼠設定成一次捲動 3 行時，deltaY 為 100
+                // 如果 deltaY / 33.333 得到的結果是整數，表示為滑鼠滾輪
+                let dy = Math.abs(e.deltaY * window.zoomFactor) / 33.33333333;
+                if (findDifference(dy) < 0.00001) {
+                    isTouchPad = false;
+                } else {
+                    isTouchPad = true;
+                }
+            }
+            else {
+                // 透過捲動距離來判斷是否為觸控板，如果系統設定滑鼠滾輪速度過低，這個方法就會失效
+                // 且觸控板快速滑動時可能會大於100
+                // isTouchPad = Math.abs(e.deltaX) < 100 && Math.abs(e.deltaY) < 100;
+
+                // 因為有誤判的可能，所以在無法取得 zoomFactor 與 wheelDeltaY 的情況，一律視為滑鼠滾輪
+                isTouchPad = false;
+            }
 
             // 觸控板雙指移動
             if (isTouchPad || temp_touchPadTime + 200 > new Date().getTime()) {
@@ -750,13 +796,25 @@ class Tiefseeview {
                 requestAnimationFrame(() => {
 
                     if (e.ctrlKey === true) {
-                        let scale = 1 - e.deltaY * 0.01; // 無法使用
-                        zoomIn(e.offsetX, e.offsetY, (scale), TiefseeviewImageRendering["pixelated"]);
+
+                        if (e.deltaY > 0) {
+                            zoomOut(e.offsetX, e.offsetY);
+                        }
+                        else if (e.deltaY < 0) {
+                            zoomIn(e.offsetX, e.offsetY);
+                        }
 
                     } else {
 
                         let posX = e.deltaX;
                         let posY = e.deltaY;
+
+                        // 如果一次捲動一頁，delta將會得到 1，所以直接乘上 100
+                        if (e.deltaMode === 2) {
+                            posX = Math.sign(posX) * 100;
+                            posY = Math.sign(posY) * 100;
+                        }
+
                         setXY(
                             toNumber(dom_con.style.left) - posX,
                             toNumber(dom_con.style.top) - posY,
@@ -2215,7 +2273,16 @@ class Tiefseeview {
                 deltaX: event.deltaX,
                 deltaY: event.deltaY,
                 deltaZ: event.deltaZ,
-                deltaMode: event.deltaMode
+                deltaMode: event.deltaMode,
+                ctrlKey: event.ctrlKey,
+                altKey: event.altKey,
+                shiftKey: event.shiftKey,
+                // @ts-ignore
+                wheelDelta: event.wheelDelta,
+                // @ts-ignore
+                wheelDeltaY: event.wheelDeltaY,
+                // @ts-ignore
+                wheelDeltaX: event.wheelDeltaX,
             });
 
             // 主動觸發 wheel 事件
@@ -3034,6 +3101,13 @@ class Tiefseeview {
                 func();
             }
             updatePixelRatio();
+        }
+
+        /**
+         * 返回與整數的差值，例如 6.03 => 0.03
+         */
+        function findDifference(num: number) {
+            return Math.abs(num - Math.round(num));
         }
 
         /**

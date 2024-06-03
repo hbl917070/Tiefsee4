@@ -315,6 +315,19 @@
                             </select>
                         </div>
 
+                        <div class="text-title">
+                            <span i18n="sw.other.enableTouchpadGestures"> 啟用觸控板手勢 </span>
+                            <div class="img-help" data-i18n="sw.other.enableTouchpadGesturesTooltip">
+                                <%- await readFile("./img/default/tool-help.svg"); %>
+                            </div>
+                        </div>
+                        <div class="text-content">
+                            <label class="switch">
+                                <input type="checkbox" id="switch-enableTouchpadGestures">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
                     </div>
 
                     <div class="box">
@@ -709,7 +722,6 @@
                         <div class="text-content">
                             <select class="text-input" id="select-mouseButton5"></select>
                         </div>
-
                     </div>
 
 

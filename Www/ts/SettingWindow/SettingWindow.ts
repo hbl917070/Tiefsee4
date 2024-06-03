@@ -1524,7 +1524,7 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
-            // 檔案刪除前顯示確認視窗
+            // 偵測到檔案新增時，插入於
             var select_whenInsertingFile = getDom("#select-whenInsertingFile") as HTMLSelectElement;
             select_whenInsertingFile.value = config.settings["other"]["whenInsertingFile"];
 
@@ -1533,6 +1533,16 @@ class SettingWindow {
                 config.settings["other"]["whenInsertingFile"] = val;
                 appleSettingOfMain();
             });
+
+            // 啟用觸控板手勢
+            var switch_touchpadGesture = getDom("#switch-enableTouchpadGestures") as HTMLInputElement;
+            switch_touchpadGesture.checked = config.settings.other.enableTouchpadGestures;
+            switch_touchpadGesture.addEventListener("change", () => {
+                let val = switch_touchpadGesture.checked;
+                config.settings.other.enableTouchpadGestures = val;
+                appleSettingOfMain();
+            });
+       
         })
 
         addLoadEvent(() => {

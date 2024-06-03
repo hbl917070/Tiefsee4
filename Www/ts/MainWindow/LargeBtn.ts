@@ -30,20 +30,9 @@ class LargeBtn {
         // 把滑鼠的滾動事件傳遞給 tiefseeview
         ([domLargeBtnLeft, domLargeBtnRight]).forEach(btn => {
             btn.addEventListener("wheel", (event) => {
-
                 event.preventDefault();
-
                 if (M.script.img.isImg() === false) { return; }
-
-                let newEvent = new WheelEvent("wheel", {
-                    clientX: event.x,
-                    clientY: event.y,
-                    deltaX: event.deltaX,
-                    deltaY: event.deltaY,
-                    deltaZ: event.deltaZ,
-                    deltaMode: event.deltaMode
-                });
-                M.fileShow.tiefseeview.sendWheelEvent(newEvent);
+                M.fileShow.tiefseeview.sendWheelEvent(event);
             });
         });
 

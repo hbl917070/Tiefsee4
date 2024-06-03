@@ -383,6 +383,8 @@ class Config {
             fileDeletingShowCheckMsg: true,
             /** 偵測到檔案新增時，插入於。 [auto, start, end] */
             whenInsertingFile: "auto",
+            /** 啟用觸控板手勢 */
+            enableTouchpadGestures: false,
             /** 語言 */
             lang: "",
         },

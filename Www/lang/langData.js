@@ -2,7 +2,7 @@ var langData = {
 
     // setting window
     sw: {
-        
+
         reloadRequired: {
             "zh-TW": "需要重新載入",
             "en": "Reload Required",
@@ -357,13 +357,13 @@ var langData = {
                 "en": "Other",
                 "ja": "その他",
             },
-            rawImageThumbnail:{
+            rawImageThumbnail: {
                 "zh-TW": "開啟 RAW 圖片時，顯示內嵌的預覽圖",
                 "en": "Show embedded preview when opening RAW image",
                 "ja": "RAW 画像を開くときに埋め込みプレビューを表示する",
             },
 
-            
+
             displayDeleteConfirmationDialog: {
                 "zh-TW": "檔案刪除前顯示確認視窗",
                 "en": "Display Delete confirmation dialog",
@@ -389,6 +389,31 @@ var langData = {
                 "en": "Insert to the end",
                 "ja": "最後に挿入",
             },
+
+
+            enableTouchpadGestures: {
+                "zh-TW": "啟用觸控板手勢",
+                "en": "Enable touchpad gestures",
+                "ja": "タッチパッドジェスチャを有効にする",
+            },
+            enableTouchpadGesturesTooltip: {
+                "zh-TW": `
+                    1. 雙指滑動：移動圖片<br>
+                    2. 雙指捏合：縮放圖片<br>
+                    (啟用後可能與滑鼠滾輪衝突)
+                `,
+                "en": `
+                    1. Two-finger swipe: Move the image<br>
+                    2. Two-finger pinch: Zoom the image<br>
+                    (May conflict with mouse wheel after enabling)
+                `,
+                "ja": `
+                    1. 2本指スワイプ：画像を移動する<br>
+                    2. 2本指ピンチ：画像をズームする<br>
+                    (有効にした後、マウスホイールと競合する可能性があります)
+                `,      
+            },
+
         },
 
         //#endregion
@@ -624,19 +649,19 @@ var langData = {
             civitaiResourcesEnabled: {
                 "zh-TW": `顯示 Civitai Resources`,
                 "en": `Display Civitai Resources`,
-                "ja": `Civitai Resources を表示する`    
+                "ja": `Civitai Resources を表示する`
             },
-            civitaiResourcesDefault : {
+            civitaiResourcesDefault: {
                 "zh-TW": `圖片預設狀態`,
                 "en": `Default image state`,
                 "ja": `画像のデフォルト状態`,
             },
-            civitaiResourcesImgNumber : {
+            civitaiResourcesImgNumber: {
                 "zh-TW": `圖片數量`,
                 "en": `Number of images`,
-                "ja": `画像の数`,   
+                "ja": `画像の数`,
             },
-            civitaiResourcesNsfwLevel  : {
+            civitaiResourcesNsfwLevel: {
                 "zh-TW": `允許 NSFW 圖片`,
                 "en": `Allow NSFW images`,
                 "ja": `NSFW 画像を許可する`,

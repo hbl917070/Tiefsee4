@@ -51,9 +51,9 @@ class TiefseeScroll {
                 e.preventDefault(); // 禁止頁面滾動
                 let v = getTop();
                 if (e.deltaX > 0 || e.deltaY > 0) { // 下
-                    setTop(v + 10, "wheel");
+                    setTop(v + 100, "wheel");
                 } else { // 上
-                    setTop(v - 10, "wheel");
+                    setTop(v - 100, "wheel");
                 }
             }
         }

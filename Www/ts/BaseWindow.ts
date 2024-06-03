@@ -11,6 +11,11 @@ const WV_Image: WV_Image = WV2.WV_Image;
 const APIURL = "http://127.0.0.1:" + location.hash.replace("#", ""); // api 網址
 var temp_dropPath: string[] | undefined = undefined; // 暫存。取得拖曳進視窗的檔案路徑
 
+interface Window {
+    /** 網頁的縮放比例，預設值 1.0 */
+    zoomFactor: number;
+}
+
 class BaseWindow {
 
     public dom_window: HTMLDivElement;
@@ -185,6 +190,7 @@ class BaseWindow {
     public setZoomFactor(d: number) {
         this.zoomFactor = d;
         WV_Window.SetZoomFactor(d);
+        window.zoomFactor = d;
     }
 
     /** 最大化 */
