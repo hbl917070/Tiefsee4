@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -71,20 +72,30 @@ class Launcher {
             return;
         }
 
+        // 送出 closeAll 後，會異常再次送出第二個啟動APP的指令，所以這裡要過濾掉 (編譯成商店版才有的BUG)
+        if (args.Length == 1 && args[0].EndsWith("!App")) {
+            if (File.Exists(args[0]) == false) {
+                return;
+            }
+        }
+
         appDataStartIni = Path.Combine(appData, "Start.ini");
         appDataPort = Path.Combine(appData, "Port");
         var iniManager = new IniManager(appDataStartIni);
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
 
+        // 如果是直接啟動
         if (startType == 1) {
             RunTiefseeCore(args);
+            return;
         }
-        else {
-            // 如果允許快速啟動，就不開啟新個體
-            if (Check(args)) { return; }
 
-            RunTiefseeCore(args);
+        // 如果允許快速啟動，就不開啟新個體
+        if (IsQuickStartAllowed(args)) {
+            return;
         }
+
+        RunTiefseeCore(args);
     }
 
     /// <summary>
@@ -98,30 +109,14 @@ class Launcher {
     }
 
     /// <summary>
-    /// 快速開啟。回傳 true 表示結束程式
+    /// 判斷是否允許快速啟動。 true=允許快速啟動，直接結束程式 false=快速啟動失敗，繼續執行程式
     /// </summary>
-    private bool Check(string[] args) {
+    private bool IsQuickStartAllowed(string[] args) {
 
         // 找不到記錄 port 的資料夾
         if (Directory.Exists(appDataPort) == false) {
             return false;
         }
-
-        int port = GetPort();
-
-        // 沒有可以正常請求的 port
-        if (port == -1) {
-            return false;
-        }
-
-        NewWindow(args, port);
-        return true;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private int GetPort() {
 
         foreach (string filePort in Directory.GetFiles(appDataPort, "*")) { // 判斷目前已經開啟的視窗
 
@@ -136,38 +131,43 @@ class Launcher {
 
             try {
                 string port = Path.GetFileName(filePort);
-                // 偵測是否可用
-                string uri = $"http://127.0.0.1:{port}/api/check";
-                SendRequest(uri);
 
-                return Int32.Parse(port);
+                using var client = new NamedPipeClientStream($"tiefsee-{port}");
+                client.Connect(3 * 1000);
+
+                // 連接超時
+                if (client.IsConnected == false) {
+                    continue;
+                }
+
+                string data = string.Join("\n", args);
+                //  if (data == "") { data = "\n"; } // 避免傳送空字串
+                var message = Encoding.UTF8.GetBytes(data);
+
+                // 連接到伺服器
+                client.Write(message, 0, message.Length);
+
+                return true;
+
+                // 取得伺服器回應
+                /*var buffer = new byte[256];
+                client.Read(buffer, 0, buffer.Length);
+                var response = Encoding.UTF8.GetString(buffer);
+
+                //if (response == "ok") {
+                return true;
+                //}*/
             }
             catch { }
 
-            File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
-        }
-        return -1;
-    }
+            // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
+            try {
+                File.Delete(filePort);
+            }
+            catch { }
 
-    /// <summary>
-    /// 開啟新視窗
-    /// </summary>
-    private void NewWindow(string[] args, int port) {
-        string base64 = Uri.EscapeDataString(string.Join("\n", args));
-        string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
-        SendRequest(uri);
-    }
-
-    /// <summary>
-    /// 發送 http 請求
-    /// </summary>
-    private Task<string> SendRequest(string uri) {
-        using (HttpClient client = new()) {
-            client.Timeout = TimeSpan.FromSeconds(5); // 逾時
-            client.DefaultRequestHeaders.Add("User-Agent", webvviewUserAgent);
-            HttpResponseMessage response = client.GetAsync(uri).Result;
-            return response.Content.ReadAsStringAsync();
         }
+        return false;
     }
 
 }

@@ -120,8 +120,10 @@ public class QuickRun {
                 return Int32.Parse(port);
             }
             catch { }
-
-            File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
+            try {
+                File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
+            }
+            catch { }
         }
         return -1;
     }

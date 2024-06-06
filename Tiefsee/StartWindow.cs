@@ -1,5 +1,7 @@
 using Microsoft.Web.WebView2.Core;
 using System.IO;
+using System.IO.Pipes;
+using System.Text;
 using System.Windows.Input;
 using Windows.UI.StartScreen;
 
@@ -31,6 +33,7 @@ public class StartWindow : Form {
         PortLock(); // 寫入檔案，表示此 port 已經被佔用
         CheckWebView2(); // 檢查是否有 webview2 執行環境
         InitJumpTask(); // 初始化 JumpTask
+        InitNamedPipeServer();
 
         //--------------
 
@@ -270,6 +273,63 @@ public class StartWindow : Form {
             return false;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 初始化 NamedPipeServerStream
+    /// </summary>
+    private async void InitNamedPipeServer() {
+
+        if (Program.startType == 1) { return; }
+
+        await Task.Factory.StartNew(async () => {
+
+            using var server = new NamedPipeServerStream(
+                $"tiefsee-{Program.startPort}",
+                PipeDirection.InOut,
+                NamedPipeServerStream.MaxAllowedServerInstances,
+                PipeTransmissionMode.Message);
+
+            // 等待客戶端連接
+            while (Adapter.isRuning) {
+                server.WaitForConnection();
+
+                // 客戶端已連接
+                while (Adapter.isRuning) {
+
+                    var buffer = new byte[1024];
+                    var ms = new MemoryStream();
+                    int readBytes;
+                    do {
+                        readBytes = server.Read(buffer, 0, buffer.Length);
+                        ms.Write(buffer, 0, readBytes);
+                    } while (!server.IsMessageComplete);
+                    var allData = ms.ToArray();
+                    var message = Encoding.UTF8.GetString(allData, 0, allData.Length);
+
+                    // 客戶端已經斷開連接
+                    /*if (readBytes == 0)
+                        break;*/
+
+                    // 將字串剖析回命令列參數
+                    string[] args = message.Split('\n');
+                    Adapter.UIThread(() => {
+                        WebWindow.Create("MainWindow.html", args, null);
+                    });
+
+                    break;
+
+                    // 回應客戶端
+                    /*var response = Encoding.UTF8.GetBytes("ok");
+                    server.Write(response, 0, response.Length);
+                    server.WaitForPipeDrain();*/
+                }
+
+                // 客戶端已斷開連接
+                server.Disconnect();
+
+            }
+        });
     }
 
 }
