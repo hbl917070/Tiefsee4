@@ -89,13 +89,6 @@ Possible reasons are:
 
 <br>
 
-### 4、Abnormalities occur after using frosted glass (AERO, Acrylic) window effects
-The frosted glass window effect is not an officially released API of Windows. This feature may have bugs or be unusable on some devices. Common problems include:
- - The blurred area overflows outside the window
- - Tiefsee's window is severely delayed when moving
-
-<br>
-
 ## Project Description
 - Project Type: C# WinForm (.NET 8)
 - Development Language：C#、TypeScript

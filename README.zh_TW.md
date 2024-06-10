@@ -90,13 +90,6 @@ Tiefsee
  
 <br>
 
-### 4、使用毛玻璃(AERO、Acrylic)視窗效果後產生異常
- 毛玻璃視窗效果並非 Windows 正式公開的 API，這項功能在某些裝置上可能存在 BUG，或是無法使用。常見的問題為：
- - 模糊區域溢出到視窗外
- - Tiefsee 的視窗在移動時嚴重延遲
-
-<br>
-
 ## 專案說明
 - 專案類型：C# WinForm (.NET 8)
 - 開發語言：C#、TypeScript
