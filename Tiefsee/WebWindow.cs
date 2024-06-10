@@ -26,6 +26,9 @@ public class WebWindow : FormNone {
     public static List<WebWindow> WebWindowList { get; set; } = new();
     /// <summary> 記錄全螢幕前的狀態 </summary>
     private FormWindowState _tempFormWindowState = FormWindowState.Normal;
+    /// <summary> 記錄全螢幕前是否有視窗圓角 </summary>
+    private bool _tempWindowRoundedCorners = false;
+    /// <summary> 當前是否為 全螢幕 </summary>
     private bool _tempFullScreen = false;
     /// <summary> 視窗是否有圓角 </summary>
     private bool _windowRoundedCorners = false;
@@ -303,10 +306,10 @@ public class WebWindow : FormNone {
 
             if (_isShow == false) { return; }
 
-
-
             var w = panel.Width;
             var h = panel.Height;
+            var l = 0;
+            var t = 0;
             // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
             // 所以網頁在視窗化時會內縮 1px
             // 因此這裡必須把 webview2 外推 1px，避免 Acrylic 效果溢出到視窗外
@@ -316,12 +319,16 @@ public class WebWindow : FormNone {
             }
             // win11 的圓角效果，邊框會往內吃掉 1px，所以要主動把 webview2 往外內 1px，避免右邊的捲動條被遮住
             if (_windowRoundedCorners && this.WindowState == FormWindowState.Normal) {
-                w -= 1;
-                h -= 1;
+                w -= 2;
+                h -= 2;
+                l = 1;
+                t = 1;
             }
             if (_wv2.Width != w || _wv2.Height != h) {
                 _wv2.Width = w;
                 _wv2.Height = h;
+                _wv2.Left = l;
+                _wv2.Top = t;
             }
         });
 
@@ -590,6 +597,7 @@ public class WebWindow : FormNone {
 
         if (val) {
             _tempFormWindowState = WindowState;
+            _tempWindowRoundedCorners = _windowRoundedCorners;
 
             SuspendLayout();
             FormBorderStyle = FormBorderStyle.None;
@@ -599,11 +607,20 @@ public class WebWindow : FormNone {
             }
             WindowState = FormWindowState.Maximized;
 
+            // 如果進入全螢幕前有視窗圓角，則先取消
+            if (_windowRoundedCorners) {
+                WindowRoundedCorners(false);
+            }
+
             ResumeLayout();
         }
         else {
             FormBorderStyle = FormBorderStyle.Sizable;
             WindowState = _tempFormWindowState;
+
+            if (_tempWindowRoundedCorners) {
+                WindowRoundedCorners(true);
+            }
         }
     }
     /// <summary>

@@ -86,9 +86,8 @@ body {
 
 // 視窗最大化時
 .window.maximized {
-  right: 0px;
-  bottom: 0px;
-  box-shadow: none;
+  right: 0px !important;
+  bottom: 0px !important;
   border: none;
   border-radius: 0px;
 }
@@ -99,7 +98,6 @@ body {
 .window.windowRoundedCorners {
   right: 0.5px;
   bottom: 0.5px;
-  box-shadow: none;
   border: none;
   border-radius: 0px;
 }
