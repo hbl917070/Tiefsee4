@@ -29,7 +29,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
 
 > System requirements: 64-bit Windows 10 or Windows 11
 
-### Current version：Tiefsee 4.2.2
+### Current version：Tiefsee 4.2.3
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>

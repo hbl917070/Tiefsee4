@@ -297,6 +297,7 @@ public class StartWindow : Form {
                 // 客戶端已連接
                 while (Adapter.isRuning) {
 
+                    // 讀取客戶端發送的訊息
                     var buffer = new byte[1024];
                     var ms = new MemoryStream();
                     int readBytes;
@@ -307,10 +308,6 @@ public class StartWindow : Form {
                     var allData = ms.ToArray();
                     var message = Encoding.UTF8.GetString(allData, 0, allData.Length);
 
-                    // 客戶端已經斷開連接
-                    /*if (readBytes == 0)
-                        break;*/
-
                     // 將字串剖析回命令列參數
                     string[] args = message.Split('\n');
                     Adapter.UIThread(() => {
@@ -318,16 +315,10 @@ public class StartWindow : Form {
                     });
 
                     break;
-
-                    // 回應客戶端
-                    /*var response = Encoding.UTF8.GetBytes("ok");
-                    server.Write(response, 0, response.Length);
-                    server.WaitForPipeDrain();*/
                 }
 
                 // 客戶端已斷開連接
                 server.Disconnect();
-
             }
         });
     }

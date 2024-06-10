@@ -148,15 +148,6 @@ class Launcher {
                 client.Write(message, 0, message.Length);
 
                 return true;
-
-                // 取得伺服器回應
-                /*var buffer = new byte[256];
-                client.Read(buffer, 0, buffer.Length);
-                var response = Encoding.UTF8.GetString(buffer);
-
-                //if (response == "ok") {
-                return true;
-                //}*/
             }
             catch { }
 
