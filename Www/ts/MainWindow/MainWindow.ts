@@ -936,6 +936,16 @@ class MainWindow {
             }
 
             fileShow.iframes.setTheme();
+
+            // 設定顯示面板的順序
+            let folderPanel = document.querySelector(".main-L") as HTMLElement;
+            let filePanel = document.querySelector(".main-L2") as HTMLElement;
+            let imagePanel = document.querySelector(".main-V") as HTMLElement;
+            let infoPanel = document.querySelector(".main-R") as HTMLElement;
+            folderPanel.style.order = config.settings.layout.folderPanelOrder.toString();
+            filePanel.style.order = config.settings.layout.filePanelOrder.toString();
+            imagePanel.style.order = config.settings.layout.imagePanelOrder.toString();
+            infoPanel.style.order = config.settings.layout.infoPanelOrder.toString();
         }
 
         /**

@@ -1153,6 +1153,58 @@ class SettingWindow {
             });
         })
 
+        // 佈局順序
+        addLoadEvent(() => {
+            let domLayoutOrderItem = document.querySelectorAll('.layout-order-item');
+            let folderPanelOrder = config.settings["layout"]["folderPanelOrder"];
+            let filePanelOrder = config.settings["layout"]["filePanelOrder"];
+            let imagePanelOrder = config.settings["layout"]["imagePanelOrder"];
+            let informationPanelOrder = config.settings["layout"]["infoPanelOrder"];
+            const folderPanelString = "Folder Panel";
+            const filePanelString = "File Panel";
+            const imagePanelString = "Image Panel";
+            const informationPanelString = "Info Panel";
+            domLayoutOrderItem[folderPanelOrder].innerHTML = folderPanelString;
+            domLayoutOrderItem[filePanelOrder].innerHTML = filePanelString;
+            domLayoutOrderItem[imagePanelOrder].innerHTML = imagePanelString;
+            domLayoutOrderItem[informationPanelOrder].innerHTML = informationPanelString;
+            let sourceElement: any;
+            let dragStart = (ev: any) => {
+                sourceElement = ev.target;
+            }
+            let dragOver = (ev: any) => {
+                ev.preventDefault();
+            };
+            let dragDrop = (ev: any) => {
+                let targetElement = ev.target;
+
+                if (targetElement == sourceElement) return;
+                [sourceElement.innerHTML, ev.target.innerHTML] = [ev.target.innerHTML, sourceElement.innerHTML];
+                for (let i = 0; i < domLayoutOrderItem.length; i++) {
+                    switch (domLayoutOrderItem[i].innerHTML) {
+                        case folderPanelString:
+                            config.settings["layout"]["folderPanelOrder"] = i;
+                            break;
+                        case filePanelString:
+                            config.settings["layout"]["filePanelOrder"] = i;
+                            break;
+                        case imagePanelString:
+                            config.settings["layout"]["imagePanelOrder"] = i;
+                            break;
+                        case informationPanelString:
+                            config.settings["layout"]["infoPanelOrder"] = i;
+                            break;
+                    }
+                }
+            };
+            for (let i = 0; i < domLayoutOrderItem.length; i++) {
+                const dom = domLayoutOrderItem[i] as HTMLElement;
+                dom.addEventListener("dragstart", dragStart);
+                dom.addEventListener("dragover", dragOver);
+                dom.addEventListener("drop", dragDrop);
+            }
+        })
+
         // 圖片 dpi
         addLoadEvent(() => {
             var select_imageDpizoom = getDom("#select-imageDpizoom") as HTMLInputElement;

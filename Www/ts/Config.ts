@@ -256,6 +256,12 @@ class Config {
 
             /** 大型切換按鈕。 [leftRight, bottom, none]  */
             largeBtn: "bottom",
+
+            /** 顯示面版順序 */
+            filePanelOrder : 0,
+            folderPanelOrder : 1,
+            imagePanelOrder : 2,
+            infoPanelOrder : 3,
         },
 
         /** 記錄程式上次關閉時的位置 */

@@ -65,11 +65,9 @@
 }
 
 //容器 - 左
-.main-L {
+.main-L , .main-L2 {
   height: 100%;
   position: relative;
-  display: flex;
-  flex-direction: row;
 }
 
 //容器 - 右
