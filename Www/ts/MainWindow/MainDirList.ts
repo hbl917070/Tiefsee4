@@ -13,6 +13,7 @@ class MainDirList {
 	public setShowName;
 	public setItemWidth;
 	public setImgNumber;
+	public dragbar;
 
 	constructor(M: MainWindow) {
 
@@ -49,7 +50,7 @@ class MainDirList {
 		sc.initGeneral(dom_dirList, "y");
 
 		// 拖曳改變 size
-		var dragbar = new Dragbar();
+		var dragbar = this.dragbar = new Dragbar();
 		dragbar.init("right", dom_dirList, dom_dragbar_mainDirList, M.dom_mainL);
 		// 拖曳開始
 		dragbar.setEventStart(() => { })
@@ -57,7 +58,7 @@ class MainDirList {
 		dragbar.setEventMove((val: number) => {
 			if (val < 10) { // 小於10的話就暫時隱藏
 				dom_dirList.style.opacity = "0";
-				dragbar.setPosition(0);
+				dragbar.setDragbarPosition(0);
 			} else {
 				dom_dirList.style.opacity = "1";
 				setItemWidth(val);
@@ -185,7 +186,7 @@ class MainDirList {
 
 			var cssRoot = document.body;
 			cssRoot.style.setProperty("--dirList-width", val + "px");
-			dragbar.setPosition(val);
+			dragbar.setDragbarPosition(val);
 
 			temp_start = -1; // 強制必須重新繪製
 			updateItem();

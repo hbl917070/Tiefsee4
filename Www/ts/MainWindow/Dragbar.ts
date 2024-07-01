@@ -1,5 +1,5 @@
 /**
- * 改變物件size的拖曳條
+ * 改變物件 size 的拖曳條
  */
 class Dragbar {
 
@@ -11,119 +11,143 @@ class Dragbar {
     public getEventEnd;
     public setEventEnd;
     public setEnabled;
-    public setPosition;
+    public setDragbarPosition;
+    public setType;
 
     constructor() {
-        let dom_windowBody = document.getElementById("window-body") as HTMLElement;
-        let dom_box: HTMLElement; // 螢幕看得到的區域
-        let dom_dragbar: HTMLElement;
-        let dom_observe: HTMLElement;
-        let temp_val = 0;
-        let temp_width = 0;
-        let hammer_dragbar: HammerManager;
-        let type: ("left" | "right") = "right";
+        let _domWindowBody = document.getElementById("window-body") as HTMLElement;
+        let _domBox: HTMLElement; // 螢幕看得到的區域
+        let _domDragbar: HTMLElement;
+        let _domObserve: HTMLElement;
+        let _tempVal = 0;
+        let _tempWidth = 0;
+        let _hammerDragbar: HammerManager;
+        let _type: ("left" | "right") = "right";
+        let _enable = true;
 
         let _eventStart = () => { };
         let _eventMove = (val: number) => { };
         let _eventEnd = (val: number) => { };
-        this.getEventStart = function () { return _eventStart }
-        this.setEventStart = function (func: () => void) { _eventStart = func }
-        this.getEventMove = function () { return _eventMove }
-        this.setEventMove = function (func: (val: number) => void) { _eventMove = func }
-        this.getEventEnd = function () { return _eventEnd }
-        this.setEventEnd = function (func: (val: number) => void) { _eventEnd = func }
-        this.setEnabled = function (val: boolean) {
+
+        this.getEventStart = () => { return _eventStart }
+        this.setEventStart = (func: () => void) => { _eventStart = func }
+        this.getEventMove = () => { return _eventMove }
+        this.setEventMove = (func: (val: number) => void) => { _eventMove = func }
+        this.getEventEnd = () => { return _eventEnd }
+        this.setEventEnd = (func: (val: number) => void) => { _eventEnd = func }
+
+        /**
+         * 設定 拖曳條是否啟用
+         */
+        this.setEnabled = (val: boolean) => {
+            _enable = val;
             if (val) {
-                dom_dragbar.style.display = "block";
+                _domDragbar.style.display = "block";
             } else {
-                dom_dragbar.style.display = "none";
+                _domDragbar.style.display = "none";
             }
         }
-        /** 設定 拉條的位置 */
-        this.setPosition = function (val: number) {
-            if (type === "left") {
-                dom_dragbar.style.left = (dom_box.getBoundingClientRect().left) + "px";
+
+        /** 
+         * 設定 拉條的位置
+         */
+        this.setDragbarPosition = (val: number) => {
+            if (_enable === false) { return; }
+            if (_type === "left") {
+                _domDragbar.style.left = (_domBox.getBoundingClientRect().left) + "px";
             }
-            if (type === "right") {
-                dom_dragbar.style.left = (dom_box.getBoundingClientRect().left + val) + "px";
+            if (_type === "right") {
+                _domDragbar.style.left = (_domBox.getBoundingClientRect().left + val) + "px";
             }
         }
 
         /**
-         * 初始化
-         * @param _dom_box 要被修改size的物件
-         * @param _dom_dragbar 拖曳條
+         * 設定 拖曳條的類型
          */
-        this.init = function init(_type: ("left" | "right"), _dom_box: HTMLElement, _dom_dragbar: HTMLElement, _dom_observe: HTMLElement) {
-            type = _type;
-            dom_box = _dom_box;
-            dom_dragbar = _dom_dragbar;
-            dom_observe = _dom_observe;
-            hammer_dragbar = new Hammer(dom_dragbar);
+        this.setType = (type: ("left" | "right")) => {
+            _type = type;
+            updatePosition();
+        }
 
-            // 區塊或body改變大小時，更新拖曳條的坐標
-            function updatePosition() {
-                requestAnimationFrame(() => {
-                    if (type === "left") {
-                        dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
-                        dom_dragbar.style.left = dom_box.getBoundingClientRect().left + "px"
-                        dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
-                    }
-                    if (type === "right") {
-                        dom_dragbar.style.top = dom_box.getBoundingClientRect().top + "px"
-                        dom_dragbar.style.left = dom_box.getBoundingClientRect().left + dom_box.getBoundingClientRect().width + "px"
-                        dom_dragbar.style.height = dom_box.getBoundingClientRect().height + "px";
-                    }
-                })
-            }
-            new ResizeObserver(updatePosition).observe(dom_observe);
+        /**
+         * 初始化
+         * @param domBox 要被修改 size 的物件
+         * @param domDragbar 拖曳條
+         */
+        this.init = (type: ("left" | "right"), domBox: HTMLElement, domDragbar: HTMLElement, domObserve: HTMLElement) => {
+            _type = type;
+            _domBox = domBox;
+            _domDragbar = domDragbar;
+            _domObserve = domObserve;
+            _hammerDragbar = new Hammer(_domDragbar);
+
+            // 區塊 或 body 改變大小時，更新拖曳條的坐標
+            new ResizeObserver(updatePosition).observe(_domObserve);
             new ResizeObserver(updatePosition).observe(document.body);
 
             // 拖曳開始
-            dom_dragbar.addEventListener("pointerdown", (ev) => { // mousedown + touchstart
+            _domDragbar.addEventListener("pointerdown", (ev) => { // mousedown + touchstart
                 // 點擊的不是左鍵
                 if (ev.button !== 0) {
                     return;
                 }
                 ev.preventDefault();
-                dom_windowBody.style.pointerEvents = "none"; // 避免畫面上的iframe造成無法識別滑鼠事件
-                temp_val = Lib.toNumber(dom_dragbar.style.left);
-                temp_width = dom_box.getBoundingClientRect().width;
+                _domWindowBody.style.pointerEvents = "none"; // 避免畫面上的 iframe 造成無法識別滑鼠事件
+                _tempVal = Lib.toNumber(_domDragbar.style.left);
+                _tempWidth = _domBox.getBoundingClientRect().width;
                 _eventStart();
             });
             // 拖曳 結束
-            dom_dragbar.addEventListener("pointerup", () => {
-                dom_windowBody.style.pointerEvents = ""; // 解除鎖定
+            _domDragbar.addEventListener("pointerup", () => {
+                _domWindowBody.style.pointerEvents = ""; // 解除鎖定
             })
 
             // 拖曳
-            hammer_dragbar.get("pan").set({ pointers: 0, threshold: 0, direction: Hammer.DIRECTION_ALL });
-            hammer_dragbar.on("pan", (ev: HammerInput) => {
-                dom_dragbar.setAttribute("active", "true");
+            _hammerDragbar.get("pan").set({ pointers: 0, threshold: 0, direction: Hammer.DIRECTION_ALL });
+            _hammerDragbar.on("pan", (ev: HammerInput) => {
+                _domDragbar.setAttribute("active", "true");
                 let val = update(ev);
                 _eventMove(val);
-
             });
 
             // 拖曳 結束
-            hammer_dragbar.on("panend", (ev: HammerInput) => {
-                dom_windowBody.style.pointerEvents = ""; //解除鎖定
-                dom_dragbar.setAttribute("active", "");
+            _hammerDragbar.on("panend", (ev: HammerInput) => {
+                _domWindowBody.style.pointerEvents = ""; // 解除鎖定
+                _domDragbar.setAttribute("active", "");
                 let val = update(ev);
                 _eventEnd(val);
             });
 
             function update(ev: HammerInput) {
                 let val = 0;
-                if (type === "left") {
-                    val = temp_val * 0 - ev.deltaX - dom_box.getBoundingClientRect().left * 0 + temp_width;
+                if (_type === "left") {
+                    val = _tempVal * 0 - ev.deltaX - _domBox.getBoundingClientRect().left * 0 + _tempWidth;
                 }
-                if (type === "right") {
-                    val = temp_val + ev.deltaX - dom_box.getBoundingClientRect().left;
+                if (_type === "right") {
+                    val = _tempVal + ev.deltaX - _domBox.getBoundingClientRect().left;
                 }
                 return val;
             }
-
         }
+
+        /**
+         * 更新拖曳條的坐標
+         */
+        function updatePosition() {
+            if (_enable === false) { return; }
+            requestAnimationFrame(() => {
+                if (_type === "left") {
+                    _domDragbar.style.top = _domBox.getBoundingClientRect().top + "px"
+                    _domDragbar.style.left = _domBox.getBoundingClientRect().left + "px"
+                    _domDragbar.style.height = _domBox.getBoundingClientRect().height + "px";
+                }
+                if (_type === "right") {
+                    _domDragbar.style.top = _domBox.getBoundingClientRect().top + "px"
+                    _domDragbar.style.left = _domBox.getBoundingClientRect().left + _domBox.getBoundingClientRect().width + "px"
+                    _domDragbar.style.height = _domBox.getBoundingClientRect().height + "px";
+                }
+            })
+        }
+
     }
 }

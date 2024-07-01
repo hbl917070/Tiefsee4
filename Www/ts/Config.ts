@@ -257,11 +257,11 @@ class Config {
             /** 大型切換按鈕。 [leftRight, bottom, none]  */
             largeBtn: "bottom",
 
-            /** 顯示面版順序 */
-            filePanelOrder : 0,
-            folderPanelOrder : 1,
-            imagePanelOrder : 2,
-            infoPanelOrder : 3,
+            /** 面版順序 */
+            filePanelOrder: 0,
+            dirPanelOrder: 1,
+            imagePanelOrder: 2,
+            infoPanelOrder: 3,
         },
 
         /** 記錄程式上次關閉時的位置 */
@@ -584,8 +584,6 @@ class Config {
      * @param type 例如 GroupType.img
      */
     public allowFileType(type: string) {
-
-        let plugin: AppInfoPlugin = this.baseWindow.appInfo.plugin;
 
         // 首次執行進行初始化
         if (this._allowFile_img.length === 0) {

@@ -839,7 +839,7 @@ class MainWindow {
 
             fileShow.tiefseeview.enableTouchpadGestures(
                 config.settings.other.enableTouchpadGestures); // 啟用觸控板手勢
-           
+
             // -----------
 
             baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); // 視窗縮放
@@ -937,15 +937,35 @@ class MainWindow {
 
             fileShow.iframes.setTheme();
 
+            // ---------------
+
             // 設定顯示面板的順序
-            let folderPanel = document.querySelector(".main-L") as HTMLElement;
+            let dirPanel = document.querySelector(".main-L") as HTMLElement;
             let filePanel = document.querySelector(".main-L2") as HTMLElement;
             let imagePanel = document.querySelector(".main-V") as HTMLElement;
             let infoPanel = document.querySelector(".main-R") as HTMLElement;
-            folderPanel.style.order = config.settings.layout.folderPanelOrder.toString();
-            filePanel.style.order = config.settings.layout.filePanelOrder.toString();
-            imagePanel.style.order = config.settings.layout.imagePanelOrder.toString();
-            infoPanel.style.order = config.settings.layout.infoPanelOrder.toString();
+            let dirPanelOrder = config.settings.layout.dirPanelOrder;
+            let filePanelOrder = config.settings.layout.filePanelOrder;
+            let imagePanelOrder = config.settings.layout.imagePanelOrder;
+            let infoPanelOrder = config.settings.layout.infoPanelOrder;
+            // 如果有重複或缺漏，就初始化設定值
+            let arOrder = [dirPanelOrder, filePanelOrder, imagePanelOrder, infoPanelOrder];
+            if ((arOrder.includes(0) && arOrder.includes(1) &&
+                arOrder.includes(2) && arOrder.includes(3)) === false) {
+                dirPanelOrder = 0;
+                filePanelOrder = 1;
+                imagePanelOrder = 2;
+                infoPanelOrder = 3;
+            }
+            dirPanel.style.order = dirPanelOrder.toString();
+            filePanel.style.order = filePanelOrder.toString();
+            imagePanel.style.order = imagePanelOrder.toString();
+            infoPanel.style.order = infoPanelOrder.toString();
+            // 更新拖曳條的位置
+            mainFileList.dragbar.setType((filePanelOrder > imagePanelOrder) ? "left" : "right");
+            mainDirList.dragbar.setType((dirPanelOrder > imagePanelOrder) ? "left" : "right");
+            mainExif.dragbar.setType((infoPanelOrder > imagePanelOrder) ? "left" : "right");
+
         }
 
         /**

@@ -12,6 +12,7 @@ class MainFileList {
     public setShowNo;
     public setShowName;
     public setItemWidth;
+    public dragbar;
 
     constructor(M: MainWindow) {
 
@@ -46,7 +47,7 @@ class MainFileList {
         sc.initGeneral(dom_fileList, "y");
 
         // 拖曳改變size
-        var dragbar = new Dragbar();
+        var dragbar = this.dragbar = new Dragbar();
         dragbar.init("right", dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
         // 拖曳開始
         dragbar.setEventStart(() => { })
@@ -54,7 +55,7 @@ class MainFileList {
         dragbar.setEventMove((val: number) => {
             if (val < 10) { // 小於10的話就暫時隱藏
                 dom_fileList.style.opacity = "0";
-                dragbar.setPosition(0);
+                dragbar.setDragbarPosition(0);
             } else {
                 dom_fileList.style.opacity = "1";
                 setItemWidth(val);
@@ -158,7 +159,7 @@ class MainFileList {
 
             var cssRoot = document.body;
             cssRoot.style.setProperty("--fileList-width", val + "px");
-            dragbar.setPosition(val);
+            dragbar.setDragbarPosition(val);
 
             temp_start = -1; // 強制必須重新繪製
             updateItem();

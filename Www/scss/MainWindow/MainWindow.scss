@@ -65,7 +65,8 @@
 }
 
 //容器 - 左
-.main-L , .main-L2 {
+.main-L,
+.main-L2 {
   height: 100%;
   position: relative;
 }
@@ -83,9 +84,9 @@
 }
 
 //同時顯示檔案面板跟資料夾面板時，減少兩個項目之間的距離
-.main-item:nth-child(n + 2 of .main-item[active="true"]:not([hide="true"])) {
+/*.main-item:nth-child(n + 2 of .main-item[active="true"]:not([hide="true"])) {
   margin-left: -3px;
-}
+}*/
 
 //-------------------------------
 

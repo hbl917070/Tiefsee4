@@ -411,7 +411,7 @@ var langData = {
                     1. 2本指スワイプ：画像を移動する<br>
                     2. 2本指ピンチ：画像をズームする<br>
                     (有効にした後、マウスホイールと競合する可能性があります)
-                `,      
+                `,
             },
 
         },
@@ -723,6 +723,23 @@ var langData = {
                 "zh-TW": "左右兩側(內縮)",
                 "en": "Both sides (contraction)",
                 "ja": "左右両側(収縮)",
+            },
+        },
+
+        // 面板順序
+        layoutOrder: {
+            title: {
+                "zh-TW": "面板順序",
+                "en": "Panel Order",
+                "ja": "パネルの順序",
+            },
+            filePanel: "menu.showFilePanel",
+            dirPanel: "menu.showDirectoryPanel",
+            infoPanel: "menu.showInformationPanel",
+            imagePanel: {
+                "zh-TW": "圖片面板",
+                "en": "Image Panel",
+                "ja": "画像パネル",
             },
         },
 

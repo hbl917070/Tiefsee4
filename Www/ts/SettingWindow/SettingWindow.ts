@@ -1155,54 +1155,55 @@ class SettingWindow {
 
         // 佈局順序
         addLoadEvent(() => {
-            let domLayoutOrderItem = document.querySelectorAll('.layout-order-item');
-            let folderPanelOrder = config.settings["layout"]["folderPanelOrder"];
-            let filePanelOrder = config.settings["layout"]["filePanelOrder"];
-            let imagePanelOrder = config.settings["layout"]["imagePanelOrder"];
-            let informationPanelOrder = config.settings["layout"]["infoPanelOrder"];
-            const folderPanelString = "Folder Panel";
-            const filePanelString = "File Panel";
-            const imagePanelString = "Image Panel";
-            const informationPanelString = "Info Panel";
-            domLayoutOrderItem[folderPanelOrder].innerHTML = folderPanelString;
-            domLayoutOrderItem[filePanelOrder].innerHTML = filePanelString;
-            domLayoutOrderItem[imagePanelOrder].innerHTML = imagePanelString;
-            domLayoutOrderItem[informationPanelOrder].innerHTML = informationPanelString;
-            let sourceElement: any;
-            let dragStart = (ev: any) => {
-                sourceElement = ev.target;
-            }
-            let dragOver = (ev: any) => {
-                ev.preventDefault();
-            };
-            let dragDrop = (ev: any) => {
-                let targetElement = ev.target;
+            let dom_toolbarList = document.querySelector("#layoutOrder-list") as HTMLElement;
+            let domLayoutOrderItem = dom_toolbarList.querySelectorAll(".layoutOrder-item");
+            let dirPanelOrder = config.settings.layout.dirPanelOrder;
+            let filePanelOrder = config.settings.layout.filePanelOrder;
+            let imagePanelOrder = config.settings.layout.imagePanelOrder;
+            let infoPanelOrder = config.settings.layout.infoPanelOrder;
 
-                if (targetElement == sourceElement) return;
-                [sourceElement.innerHTML, ev.target.innerHTML] = [ev.target.innerHTML, sourceElement.innerHTML];
-                for (let i = 0; i < domLayoutOrderItem.length; i++) {
-                    switch (domLayoutOrderItem[i].innerHTML) {
-                        case folderPanelString:
-                            config.settings["layout"]["folderPanelOrder"] = i;
-                            break;
-                        case filePanelString:
-                            config.settings["layout"]["filePanelOrder"] = i;
-                            break;
-                        case imagePanelString:
-                            config.settings["layout"]["imagePanelOrder"] = i;
-                            break;
-                        case informationPanelString:
-                            config.settings["layout"]["infoPanelOrder"] = i;
-                            break;
+            const dirPanelString = "sw.layoutOrder.dirPanel";
+            const filePanelString = "sw.layoutOrder.filePanel";
+            const imagePanelString = "sw.layoutOrder.imagePanel";
+            const infoPanelString = "sw.layoutOrder.infoPanel";
+            domLayoutOrderItem[dirPanelOrder].setAttribute("i18n", dirPanelString);
+            domLayoutOrderItem[filePanelOrder].setAttribute("i18n", filePanelString);
+            domLayoutOrderItem[imagePanelOrder].setAttribute("i18n", imagePanelString);
+            domLayoutOrderItem[infoPanelOrder].setAttribute("i18n", infoPanelString);
+
+            // 初始化拖曳功能
+            new Sortable(dom_toolbarList, {
+                animation: 150,
+                onEnd: (evt) => {
+
+                    // 取得目前 dom 的順序
+                    let doms = dom_toolbarList.querySelectorAll(".layoutOrder-item");
+                    let ar = [];
+                    for (let i = 0; i < doms.length; i++) {
+                        ar.push(doms[i].getAttribute("i18n"));
                     }
+
+                    // 設定 config
+                    for (let i = 0; i < ar.length; i++) {
+                        switch (ar[i]) {
+                            case dirPanelString:
+                                config.settings.layout.dirPanelOrder = i;
+                                break;
+                            case filePanelString:
+                                config.settings.layout.filePanelOrder = i;
+                                break;
+                            case imagePanelString:
+                                config.settings.layout.imagePanelOrder = i;
+                                break;
+                            case infoPanelString:
+                                config.settings.layout.infoPanelOrder = i;
+                                break;
+                        }
+                    }
+
+                    appleSettingOfMain();
                 }
-            };
-            for (let i = 0; i < domLayoutOrderItem.length; i++) {
-                const dom = domLayoutOrderItem[i] as HTMLElement;
-                dom.addEventListener("dragstart", dragStart);
-                dom.addEventListener("dragover", dragOver);
-                dom.addEventListener("drop", dragDrop);
-            }
+            });
         })
 
         // 圖片 dpi
@@ -1594,7 +1595,7 @@ class SettingWindow {
                 config.settings.other.enableTouchpadGestures = val;
                 appleSettingOfMain();
             });
-       
+
         })
 
         addLoadEvent(() => {

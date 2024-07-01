@@ -7,6 +7,7 @@ class MainExif {
 	public setItemWidth;
 	public setHorizontal;
 	public updateFileWatcher;
+	public dragbar;
 
 	constructor(M: MainWindow) {
 
@@ -96,7 +97,7 @@ class MainExif {
 		}
 
 		// 拖曳改變 size
-		var dragbar = new Dragbar();
+		var dragbar = this.dragbar = new Dragbar();
 		dragbar.init("left", domMainExif, domDragbar_mainFileList, M.dom_mainR);
 		// 拖曳開始
 		dragbar.setEventStart(() => { })
@@ -104,7 +105,7 @@ class MainExif {
 		dragbar.setEventMove((val: number) => {
 			if (val < 10) { // 小於10的話就暫時隱藏
 				domMainExif.style.opacity = "0";
-				dragbar.setPosition(0);
+				dragbar.setDragbarPosition(0);
 			} else {
 				domMainExif.style.opacity = "1";
 				setItemWidth(val);
@@ -189,7 +190,7 @@ class MainExif {
 			// var cssRoot = document.body;
 			// cssRoot.style.setProperty("--mainExif-width", val + "px");
 			domMainExif.style.width = val + "px";
-			dragbar.setPosition(val);
+			dragbar.setDragbarPosition(val);
 		}
 
 		/**

@@ -415,19 +415,35 @@ input::-webkit-inner-spin-button {
     margin-bottom: 5px;
     user-select: none;
     cursor: ns-resize;
+
+    input {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -25px;
+      margin: auto;
+    }
+    svg {
+      height: 25px;
+      margin-right: 5px;
+    }
   }
-  .toolbarList-item input {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -25px;
-    margin: auto;
-  }
-  .toolbarList-item svg {
-    height: 25px;
-    margin-right: 5px;
-  }
-  .toolbarList-item span {
+}
+
+// 佈局順序
+.layoutOrder-list {
+  .layoutOrder-item {
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    background-color: var(--color-white10);
+    padding-left: 10px;
+    border-radius: 5px;
+    color: var(--color-white);
+    position: relative;
+    margin-bottom: 5px;
+    user-select: none;
+    cursor: ns-resize;
   }
 }
 
@@ -511,20 +527,4 @@ input::-webkit-inner-spin-button {
 // 如果是商店APP版，就隱藏區塊
 body[showType="storeApp"] [show-not="storeApp"] {
   display: none;
-}
-
-.layout-order-box{
-  display: flex;
-  flex-direction: row;
-}
-
-.layout-order-item {
-  width: 50px;
-  height: 50px;
-  border-color: white;
-  border-width: 2px;
-  color: white;
-  border-style: solid;
-  align-content: center;
-  text-align: center;
 }
