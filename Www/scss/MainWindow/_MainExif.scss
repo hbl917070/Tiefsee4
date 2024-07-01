@@ -113,6 +113,13 @@
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1;
+
+    // 用於 contenteditable 的調整
+    outline: none;
+    caret-color: transparent;
+    img::selection {
+      background: transparent;
+    }
   }
 
   /* #region 拖曳條 */
@@ -272,6 +279,13 @@
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1;
+
+    // 用於 contenteditable 的調整
+    outline: none;
+    caret-color: transparent;
+    img::selection {
+      background: transparent;
+    }
   }
   .mainExifItem {
     flex-wrap: wrap;
