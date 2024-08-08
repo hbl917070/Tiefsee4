@@ -10,7 +10,7 @@
 		<Platforms>x64</Platforms>
 		<UseWPF>True</UseWPF>
 		<StartupObject>Tiefsee.Program</StartupObject>
-		<Copyright>Copyright © 2021-2023 hbl917070</Copyright>
+		<Copyright>Copyright © 2024 hbl917070</Copyright>
 		<PackageProjectUrl>https://github.com/hbl917070/Tiefsee4</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/hbl917070/Tiefsee4</RepositoryUrl>
 		<ApplicationIcon>logo.ico</ApplicationIcon>
@@ -45,7 +45,7 @@
 	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="13.9.1" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
 		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.6" />
