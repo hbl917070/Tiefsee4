@@ -74,6 +74,10 @@ class BulkView {
         /** 切換欄時，記錄上一次的值。用於辨識是否使用首圖縮排 */
         let temp_columns = -1;
 
+        /** 記錄改變寬度前的高度及捲動位置 */
+        let originBulkViewHeight = 0;
+        let originBulkViewScrollTop = 0;
+
         /** 請求限制器 */
         const limiter = new RequestLimiter(3);
 
@@ -243,6 +247,8 @@ class BulkView {
          * 套用設定
          */
         function apply() {
+            originBulkViewHeight = dom_bulkViewContent.offsetHeight;
+            originBulkViewScrollTop = dom_bulkView.scrollTop;
 
             let columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(dom_columns));
             let gaplessMode = M.config.settings.bulkView.gaplessMode = dom_gaplessMode.value;
@@ -254,13 +260,9 @@ class BulkView {
             dom_bulkViewContent.setAttribute("waterfall", waterfall);
             dom_bulkViewContent.setAttribute("columns", columns.toString());
             dom_bulkViewContent.setAttribute("align", align);
-            if (columns === 1 || columns === 2) {
-                dom_bulkViewContent.setAttribute("fixedWidth", fixedWidth);
-            } else {
-                dom_bulkViewContent.setAttribute("fixedWidth", "");
-            }
 
             dom_bulkViewContent.setAttribute("gaplessMode", gaplessMode);
+            updateFixedWidth(fixedWidth , columns);
             updateColumns(columns);
 
             let number = M.config.settings.bulkView.show.number = dom_number.checked;
@@ -362,6 +364,20 @@ class BulkView {
             setGroupRadioVal(dom_columns, n.toString());
             dom_bulkView.setAttribute("columns", n.toString());
             updateSize();
+        }
+
+        function updateFixedWidth(w: string , columns: number) {
+            if (columns === 1 || columns === 2) {
+                dom_bulkViewContent.setAttribute("fixedWidth", w);
+            } else {
+                dom_bulkViewContent.setAttribute("fixedWidth", "");
+            }
+            // 設定捲動條位置
+            let currentBulkViewHeight = dom_bulkViewContent.offsetHeight;
+            let ratio = originBulkViewHeight == 0 ? 1 : originBulkViewScrollTop / originBulkViewHeight;
+            if (originBulkViewHeight !== currentBulkViewHeight) {
+                dom_bulkView.scrollTop = currentBulkViewHeight * ratio;
+            }
         }
 
         var updateSizeThrottle = new Throttle(50); // 節流
