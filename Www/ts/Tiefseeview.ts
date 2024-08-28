@@ -1532,9 +1532,10 @@ class Tiefseeview {
                 if (isOnlyRun === false) { isDpizoomAUto = false; }
             }
 
+            // TODO 暫時不啟用這裡的功能，因為會 chrome 128 版的 zoom 機制與原本的不一樣
             // @ts-ignore
-            dom_dpizoom.style.zoom = (1 / val);
-            dpizoom = val;
+            // dom_dpizoom.style.zoom = (1 / val);
+            // dpizoom = val;
         }
 
         /**
