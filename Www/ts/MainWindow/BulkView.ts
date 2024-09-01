@@ -262,7 +262,7 @@ class BulkView {
             dom_bulkViewContent.setAttribute("align", align);
 
             dom_bulkViewContent.setAttribute("gaplessMode", gaplessMode);
-            updateFixedWidth(fixedWidth , columns);
+            updateFixedWidth(fixedWidth, columns);
             updateColumns(columns);
 
             let number = M.config.settings.bulkView.show.number = dom_number.checked;
@@ -366,7 +366,7 @@ class BulkView {
             updateSize();
         }
 
-        function updateFixedWidth(w: string , columns: number) {
+        function updateFixedWidth(w: string, columns: number) {
             if (columns === 1 || columns === 2) {
                 dom_bulkViewContent.setAttribute("fixedWidth", w);
             } else {
