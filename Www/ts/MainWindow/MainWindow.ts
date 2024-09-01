@@ -830,9 +830,6 @@ class MainWindow {
             i18n.setLang(lang);
 
             // -----------
-            let dpizoom = Number(config.settings["image"]["dpizoom"]); // 圖片DPI縮放
-            if (dpizoom == -1 || isNaN(dpizoom)) { dpizoom = -1; }
-            fileShow.tiefseeview.setDpizoom(dpizoom);
 
             let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
             fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);

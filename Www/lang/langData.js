@@ -987,12 +987,6 @@ var langData = {
                 "en": "Experimental Features",
                 "ja": "実験的な機能",
             },
-            imageDPI: {
-                "zh-TW": "圖片DPI",
-                "en": "Image DPI",
-                "ja": "画像のDPI",
-            },
-
         },
 
         // 重設設定

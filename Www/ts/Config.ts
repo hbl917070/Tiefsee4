@@ -179,8 +179,6 @@ class Config {
 
         /** 圖片 */
         image: {
-            /** 圖片dpi縮放 */
-            "dpizoom": "-1",
             /** 圖片渲染模式 */
             "tiefseeviewImageRendering": "0",
             /** 圖片預設縮放模式 */

@@ -1206,18 +1206,6 @@ class SettingWindow {
             });
         })
 
-        // 圖片 dpi
-        addLoadEvent(() => {
-            var select_imageDpizoom = getDom("#select-imageDpizoom") as HTMLInputElement;
-            select_imageDpizoom.value = config.settings["image"]["dpizoom"];
-
-            select_imageDpizoom.addEventListener("change", () => {
-                let val = select_imageDpizoom.value;
-                config.settings["image"]["dpizoom"] = val;
-                appleSettingOfMain();
-            });
-        })
-
         // 縮小至特定比例以下，就使用libvips重新處理圖片
         addLoadEvent(() => {
             var select_tiefseeviewBigimgscaleRatio = getDom("#select-tiefseeviewBigimgscaleRatio") as HTMLInputElement;
