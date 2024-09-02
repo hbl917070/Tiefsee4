@@ -2849,7 +2849,7 @@ class Tiefseeview {
                     );
 
                 }
-                else if (_scale / dpizoom3 > bigimgTemp.scale && bigimgTemp.scale < 1) {
+                else if (_scale > bigimgTemp.scale && bigimgTemp.scale < 1) {
 
                     // console.log("drawImage直接渲染 原圖尚未載入完成");
                     sx = sx * bigimgTemp.scale
@@ -2863,7 +2863,7 @@ class Tiefseeview {
                     );
 
                 }
-                else if (_scale / dpizoom3 >= 1) {
+                else if (_scale >= 1) {
 
                     // console.log("drawImage直接渲染");
                     sx = sx * bigimgTemp.scale
