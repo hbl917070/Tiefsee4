@@ -286,6 +286,39 @@ namespace Tiefsee {
         private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 
         #endregion
+
+        #region 任務欄
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct APPBARDATA
+        {
+            public int cbSize;
+            public IntPtr hWnd;
+            public uint uCallbackMessage;
+            public uint uEdge;
+            public RECT rc;
+            public int lParam;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        [DllImport("shell32.dll", SetLastError = true)]
+        public static extern uint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+
+        // ABM_GETSTATE 用來檢查任務欄狀態的訊息
+        public const uint ABM_GETSTATE = 0x00000004;
+
+        // 設定任務欄的狀態，當值為 ABS_AUTOHIDE 時，表示啟用了自動隱藏
+        public const int ABS_AUTOHIDE = 0x1;
+
+        #endregion
     }
 
 }
