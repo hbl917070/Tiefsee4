@@ -694,8 +694,26 @@ public class WebWindow : FormNone {
 
         // 檢查是否啟用了自動隱藏
         if ((state & ABS_AUTOHIDE) == ABS_AUTOHIDE) {
+            state = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
             var bounds = Screen.FromHandle(Handle).WorkingArea;
-            bounds.Height -= 1;
+            if (state == 1) {
+                switch (abd.uEdge) {
+                    case ABE_TOP:
+                        bounds.Y += 1;
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_BOTTOM:
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_LEFT:
+                        bounds.X += 1;
+                        bounds.Width -= 1;
+                        break;
+                    case ABE_RIGHT:
+                        bounds.Width -= 1;
+                        break;
+                }
+            }
             MaximizedBounds = bounds;
         }
         else {

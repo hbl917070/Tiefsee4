@@ -315,8 +315,17 @@ namespace Tiefsee {
         // ABM_GETSTATE 用來檢查任務欄狀態的訊息
         public const uint ABM_GETSTATE = 0x00000004;
 
+
+        public const uint ABM_GETTASKBARPOS = 0x00000005;
+
         // 設定任務欄的狀態，當值為 ABS_AUTOHIDE 時，表示啟用了自動隱藏
         public const int ABS_AUTOHIDE = 0x1;
+
+        // APPBARDATA edge 可能的值
+        public const uint ABE_LEFT = 0;
+        public const uint ABE_TOP = 1;
+        public const uint ABE_RIGHT = 2;
+        public const uint ABE_BOTTOM = 3;
 
         #endregion
     }
