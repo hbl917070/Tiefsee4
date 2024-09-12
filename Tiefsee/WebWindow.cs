@@ -696,6 +696,8 @@ public class WebWindow : FormNone {
         if ((state & ABS_AUTOHIDE) == ABS_AUTOHIDE) {
             state = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
             var bounds = Screen.FromHandle(Handle).WorkingArea;
+            bounds.X = 0;
+            bounds.Y = 0;
             if (state == 1) {
                 switch (abd.uEdge) {
                     case ABE_TOP:
@@ -717,7 +719,10 @@ public class WebWindow : FormNone {
             MaximizedBounds = bounds;
         }
         else {
-            MaximizedBounds = Screen.FromHandle(Handle).WorkingArea;
+            var bounds = Screen.FromHandle(Handle).WorkingArea;
+            bounds.X = 0;
+            bounds.Y = 0;
+            MaximizedBounds = bounds;
         }
     }
 }
