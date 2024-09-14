@@ -50,6 +50,7 @@ public class WebWindow : FormNone {
     ///
     /// </summary>
     public WebWindow() {
+        ResetMaximumBound();
         WebWindowList.Add(this);
 
         this.FormClosed += (sender, e) => {
@@ -685,6 +686,45 @@ public class WebWindow : FormNone {
         WindowAPI.WindowRoundedCorners(this.Handle, enable);
     }
 
+    public void ResetMaximumBound() {
+        APPBARDATA abd = new APPBARDATA();
+        abd.cbSize = Marshal.SizeOf(abd);
+        // 獲取任務欄狀態
+        uint state = SHAppBarMessage(ABM_GETSTATE, ref abd);
+
+        // 檢查是否啟用了自動隱藏
+        if ((state & ABS_AUTOHIDE) == ABS_AUTOHIDE) {
+            state = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
+            var bounds = Screen.FromHandle(Handle).WorkingArea;
+            bounds.X = 0;
+            bounds.Y = 0;
+            if (state == 1) {
+                switch (abd.uEdge) {
+                    case ABE_TOP:
+                        bounds.Y += 1;
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_BOTTOM:
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_LEFT:
+                        bounds.X += 1;
+                        bounds.Width -= 1;
+                        break;
+                    case ABE_RIGHT:
+                        bounds.Width -= 1;
+                        break;
+                }
+            }
+            MaximizedBounds = bounds;
+        }
+        else {
+            var bounds = Screen.FromHandle(Handle).WorkingArea;
+            bounds.X = 0;
+            bounds.Y = 0;
+            MaximizedBounds = bounds;
+        }
+    }
 }
 
 /// <summary>
