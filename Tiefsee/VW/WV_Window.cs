@@ -350,7 +350,6 @@ public class WV_Window {
         set {
             if (value == "Maximized") {
                 // WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
-                M.ResetMaximumBound();
                 M.WindowState = FormWindowState.Maximized;
             }
             if (value == "Minimized") {

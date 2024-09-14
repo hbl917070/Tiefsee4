@@ -290,8 +290,7 @@ namespace Tiefsee {
         #region 任務欄
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct APPBARDATA
-        {
+        public struct APPBARDATA {
             public int cbSize;
             public IntPtr hWnd;
             public uint uCallbackMessage;
@@ -301,8 +300,7 @@ namespace Tiefsee {
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
+        public struct RECT {
             public int left;
             public int top;
             public int right;
@@ -328,6 +326,20 @@ namespace Tiefsee {
         public const uint ABE_BOTTOM = 3;
 
         #endregion
+
+        /// <summary>
+        /// 描述視窗的位置和大小的結構體
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPOS {
+            public IntPtr hwnd;
+            public IntPtr hwndInsertAfter;
+            public int x;
+            public int y;
+            public int cx;
+            public int cy;
+            public uint flags;
+        }
     }
 
 }

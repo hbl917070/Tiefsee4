@@ -50,7 +50,6 @@ public class WebWindow : FormNone {
     ///
     /// </summary>
     public WebWindow() {
-        ResetMaximumBound();
         WebWindowList.Add(this);
 
         this.FormClosed += (sender, e) => {
@@ -686,45 +685,6 @@ public class WebWindow : FormNone {
         WindowAPI.WindowRoundedCorners(this.Handle, enable);
     }
 
-    public void ResetMaximumBound() {
-        APPBARDATA abd = new APPBARDATA();
-        abd.cbSize = Marshal.SizeOf(abd);
-        // 獲取任務欄狀態
-        uint state = SHAppBarMessage(ABM_GETSTATE, ref abd);
-
-        // 檢查是否啟用了自動隱藏
-        if ((state & ABS_AUTOHIDE) == ABS_AUTOHIDE) {
-            state = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
-            var bounds = Screen.FromHandle(Handle).WorkingArea;
-            bounds.X = 0;
-            bounds.Y = 0;
-            if (state == 1) {
-                switch (abd.uEdge) {
-                    case ABE_TOP:
-                        bounds.Y += 1;
-                        bounds.Height -= 1;
-                        break;
-                    case ABE_BOTTOM:
-                        bounds.Height -= 1;
-                        break;
-                    case ABE_LEFT:
-                        bounds.X += 1;
-                        bounds.Width -= 1;
-                        break;
-                    case ABE_RIGHT:
-                        bounds.Width -= 1;
-                        break;
-                }
-            }
-            MaximizedBounds = bounds;
-        }
-        else {
-            var bounds = Screen.FromHandle(Handle).WorkingArea;
-            bounds.X = 0;
-            bounds.Y = 0;
-            MaximizedBounds = bounds;
-        }
-    }
 }
 
 /// <summary>
@@ -737,6 +697,7 @@ public class FormNone : Form {
 
     // 視窗初始化
     protected override void OnHandleCreated(EventArgs e) {
+        ResetMaximumBound();
     }
 
     // 讓視窗看不到
@@ -783,6 +744,47 @@ public class FormNone : Form {
     };
 
     /// <summary>
+    /// 重設視窗的最大邊界
+    /// 覆寫視窗標題列的程式最大化後，如果將工作列設為自動隱藏，視窗會完全遮蔽工作列，導致叫不出工具列，所以要重設視窗的最大化邊界
+    /// </summary>
+    private void ResetMaximumBound() {
+        APPBARDATA abd = new APPBARDATA();
+        abd.cbSize = Marshal.SizeOf(abd);
+        // 獲取任務欄狀態
+        uint state = SHAppBarMessage(ABM_GETSTATE, ref abd);
+
+        // 檢查是否啟用了自動隱藏
+        if ((state & ABS_AUTOHIDE) == ABS_AUTOHIDE) {
+            state = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
+            var bounds = Screen.FromHandle(Handle).WorkingArea;
+            bounds.X = 0;
+            bounds.Y = 0;
+            if (state == 1) {
+                switch (abd.uEdge) {
+                    case ABE_TOP:
+                        bounds.Y += 1;
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_BOTTOM:
+                        bounds.Height -= 1;
+                        break;
+                    case ABE_LEFT:
+                        bounds.X += 1;
+                        bounds.Width -= 1;
+                        break;
+                    case ABE_RIGHT:
+                        bounds.Width -= 1;
+                        break;
+                }
+            }
+            MaximizedBounds = bounds;
+        }
+        else {
+            MaximizedBounds = default;
+        }
+    }
+
+    /// <summary>
     /// 避免最大化跟視窗化時，視窗大小錯誤
     /// </summary>
     protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) {
@@ -814,6 +816,21 @@ public class FormNone : Form {
                 OnRightClick(pos);
             }
         }
+
+        #region 視窗最大化時，重設視窗的最大邊界
+
+        const int WM_WINDOWPOSCHANGING = 0x0046;
+
+        if (m.Msg == WM_WINDOWPOSCHANGING) {
+            var windowPos = (WINDOWPOS)Marshal.PtrToStructure(m.LParam, typeof(WINDOWPOS));
+            if ((windowPos.flags & 0x0001) == 0) { // SWP_NOSIZE flag is not set
+                if (this.WindowState == FormWindowState.Maximized) {
+                    ResetMaximumBound();
+                }
+            }
+        }
+
+        #endregion
 
         // System.Diagnostics.Debug.WriteLine(m.Msg);
 
