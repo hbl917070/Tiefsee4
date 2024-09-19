@@ -37,8 +37,8 @@ jobs:
         run: wasm-pack --version
       - name: Build with wasm-pack
         run: wasm-pack build --target web --out-dir ../wasm
-        working-directory: ./rust
-        
+        working-directory: ${{ github.workspace }}\rust
+       
       - name: Gulp build Tiefsee
         run: |
           cd Www
