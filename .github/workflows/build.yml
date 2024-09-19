@@ -26,7 +26,11 @@ jobs:
         run: |
           cd Www
           npm ci
-          
+
+      - name: Install Rust
+        run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source $HOME/.cargo/env
       - name: Install wasm-pack
         run: cargo install wasm-pack
       - name: Build with wasm-pack
