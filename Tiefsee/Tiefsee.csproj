@@ -68,6 +68,7 @@
 		<Content Remove="..\Www\ejs\**" />
 		<Content Remove="..\Www\ts\**" />
 		<Content Remove="..\Www\scss\**" />
+		<Content Remove="..\Www\rust\**" />
 		<Content Remove="..\Www\.vscode\**" />
 
 		<Content Remove="..\Www\package-lock.json" />
