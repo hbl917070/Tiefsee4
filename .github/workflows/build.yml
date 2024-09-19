@@ -26,7 +26,12 @@ jobs:
         run: |
           cd Www
           npm ci
-
+          
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+      - name: Build with wasm-pack
+        run: wasm-pack build --target web --out-dir ../wasm
+        
       - name: Gulp build Tiefsee
         run: |
           cd Www
