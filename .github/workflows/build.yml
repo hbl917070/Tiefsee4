@@ -30,11 +30,14 @@ jobs:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
+          $env:Path += ";$env:USERPROFILE\.cargo\bin"
       - name: Install wasm-pack
         run: cargo install wasm-pack
+      - name: Check wasm-pack version
+        run: wasm-pack --version
       - name: Build with wasm-pack
         run: wasm-pack build --target web --out-dir ../wasm
+        working-directory: ./rust
         
       - name: Gulp build Tiefsee
         run: |
