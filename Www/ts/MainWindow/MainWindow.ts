@@ -908,6 +908,9 @@ class MainWindow {
             imageArea = imageArea * imageArea;
             fileShow.tiefseeview.setEventHighQualityLimit(() => { return imageArea; })
 
+            // 銳化圖片
+            fileShow.tiefseeview.setSharpenValue(config.settings.image.sharpenValue);
+
             // -----------
 
             // 套用顏色

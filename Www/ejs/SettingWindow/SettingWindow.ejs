@@ -118,13 +118,34 @@
                     <div class="box">
                         <div class="box-title" i18n="sw.imageSettings.title"> 圖片設定 </div>
 
-                        <div class="text-title" i18n="sw.imageSettings.imageShowPixels"> 如果圖片縮放比例大於100%，則呈現像素 </div>
+                        <div class="text-title" i18n="sw.imageSettings.imageShowPixels"> 圖片縮放比例大於 100% 時，呈現像素 </div>
                         <div class="text-content">
-
                             <label class="switch">
                                 <input type="checkbox" id="switch-imageShowPixels">
                                 <span class="slider round"></span>
                             </label>
+                        </div>
+
+                        <div class="text-title">
+                            <span i18n="sw.imageSettings.imageSharpen"> 銳化圖片</span>
+                            <div class="img-help" data-i18n="sw.imageSettings.imageSharpenTooltip">
+                                <%- await readFile("./img/default/tool-help.svg"); %>
+                            </div>
+                        </div>
+                        <div class="text-content">
+                            <select class="text-input" id="select-sharpen">
+                                <option value="0" i18n="sw.disable"> 停用 </option>
+                                <option value="0.05">5</option>
+                                <option value="0.1">10</option>
+                                <option value="0.15">15</option>
+                                <option value="0.2">20</option>
+                                <option value="0.25">25</option>
+                                <option value="0.3">30</option>
+                                <option value="0.35">35</option>
+                                <option value="0.4">40</option>
+                                <option value="0.45">45</option>
+                                <option value="0.5">50</option>
+                            </select>
                         </div>
 
                         <div class="text-title" i18n="sw.zoomMode.title"> 圖片預設縮放模式 </div>

@@ -55,6 +55,8 @@ class Tiefseeview {
     public getIsZoomWithWindow; // 取得 是否圖片隨視窗縮放
     public getVideoDuration; // 取得影片長度
     public setIsZoomWithWindow;
+    public getSharpenValue; // 取得銳化值
+    public setSharpenValue; // 設定銳化值
     public showClip; // 顯示或隱藏剪裁框
     public getClipInfo; // 取得剪裁框的資訊
     public clipFull; // 剪裁框全滿
@@ -115,6 +117,7 @@ class Tiefseeview {
         scrollX.initTiefseeScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-x"), "x")
         scrollY.initTiefseeScroll(<HTMLImageElement>dom_tiefseeview.querySelector(".scroll-y"), "y")
 
+        var worker: Worker;
         var url: string; // 目前的圖片網址
         var dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img"; // 資料類型
         var dpizoom: number = 1; // 已棄用
@@ -253,6 +256,8 @@ class Tiefseeview {
         this.getIsZoomWithWindow = getIsZoomWithWindow;
         this.getVideoDuration = getVideoDuration;
         this.setIsZoomWithWindow = setIsZoomWithWindow;
+        this.getSharpenValue = getSharpenValue;
+        this.setSharpenValue = setSharpenValue;
         this.showClip = showClip;
         this.getClipInfo = getClipInfo;
         this.clipFull = clipFull;
@@ -1343,7 +1348,9 @@ class Tiefseeview {
                 sx: 0, sy: 0,
                 sWidth: 1, sHeight: 1,
                 dx: 0, dy: 0,
-                dWidth: 1, dHeight: 1
+                dWidth: 1, dHeight: 1,
+                isSharpen: false,
+                url: ""
             }
 
             dom_img.src = _url;
@@ -1394,7 +1401,9 @@ class Tiefseeview {
                 sx: 0, sy: 0,
                 sWidth: 1, sHeight: 1,
                 dx: 0, dy: 0,
-                dWidth: 1, dHeight: 1
+                dWidth: 1, dHeight: 1,
+                isSharpen: false,
+                url: ""
             }
 
             // dom_img.src = url;
@@ -1918,8 +1927,8 @@ class Tiefseeview {
 
             if (_sp <= 0) {
 
-                dom_con.style.top = _top + "px";
-                dom_con.style.left = _left + "px";
+                dom_con.style.top = Math.round(_top) + "px";
+                dom_con.style.left = Math.round(_left) + "px";
                 init_scroll(); // 初始化滾動條的位置(跟隨圖片位置同步)
 
             } else {
@@ -1943,8 +1952,8 @@ class Tiefseeview {
                             duration: _sp, // 動畫時間
                             start: () => { },
                             complete: () => { // 動畫結束時
-                                dom_con.style.top = _top + "px";
-                                dom_con.style.left = _left + "px";
+                                dom_con.style.top = Math.round(_top) + "px";
+                                dom_con.style.left = Math.round(_left) + "px";
                                 resolve(0);
                             },
                             easing: "easeOutExpo"
@@ -2543,8 +2552,8 @@ class Tiefseeview {
         /** [private] 取得縮放後的Canvas */
         function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: ("high" | "low" | "medium")) {
 
-            let width = Math.floor(img.width * zoom);
-            let height = Math.floor(img.height * zoom);
+            let width = Math.round(img.width * zoom);
+            let height = Math.round(img.height * zoom);
 
             let cs = document.createElement("canvas");
             cs.width = width;
@@ -2590,6 +2599,7 @@ class Tiefseeview {
 
                 // 使用 worker 在背景載入圖片
                 worker.postMessage({
+                    type: "loadImage",
                     url: nowItem.url,
                     tempUrl: getUrl(),
                     scale: nowItem.scale,
@@ -2613,35 +2623,59 @@ class Tiefseeview {
                 scale: sc
             }
         }
-
-        // 使用 Worker 在背景載入圖片
+    
+        // 使用 Worker 
         try {
+            worker = new Worker("./js/TiefseeviewWorker.js");
+            worker.addEventListener("message", (e) => {
 
-            // var worker_url = URL.createObjectURL(new Blob([`${worker_js}`]));
-            // var worker = new Worker(worker_url);
-            var worker = new Worker("./js/TiefseeviewWorker.js");
-            worker.addEventListener('message', function (e) {
+                const type = e.data.type;
 
-                let tempUrl = e.data.tempUrl;
-                let url = e.data.url;
-                let scale = e.data.scale;
+                // 在背景載入圖片
+                if (type === "loadImage") {
 
-                let domImg = e.data.img;
+                    const tempUrl = e.data.tempUrl;
+                    const scale = e.data.scale;
+                    const domImg = e.data.img;
 
-                if (tempUrl != getUrl()) { // 避免已經切換圖片了
-                    // console.log("old:" + tempUrl + "   new:" + getUrl())
-                    return;
+                    if (tempUrl !== getUrl()) { // 避免已經切換圖片了
+                        // console.log("old:" + tempUrl + "   new:" + getUrl())
+                        return;
+                    }
+
+                    const domCan = document.createElement("canvas");
+                    domCan.width = domImg.width;
+                    domCan.height = domImg.height;
+                    const context0 = domCan.getContext("2d");
+                    context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+
+                    temp_bigimgscale[scale] = domCan;
+
+                    bigimgDraw(true);
                 }
 
-                let domCan = document.createElement("canvas");
-                domCan.width = domImg.width;
-                domCan.height = domImg.height;
-                let context0 = domCan.getContext("2d");
-                context0?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+                // 銳化圖片
+                if (type === "sharpen") {
 
-                temp_bigimgscale[scale] = domCan;
+                    const sharpenedImageData = e.data.sharpenedImageData;
+                    const drawImage = e.data.temp_drawImage;
 
-                bigimgDraw(true)
+                    if (drawImage.scale === temp_drawImage.scale &&
+                        drawImage.sx === temp_drawImage.sx &&
+                        drawImage.sy === temp_drawImage.sy &&
+                        drawImage.sWidth === temp_drawImage.sWidth &&
+                        drawImage.sHeight === temp_drawImage.sHeight &&
+                        drawImage.dx === temp_drawImage.dx &&
+                        drawImage.dy === temp_drawImage.dy &&
+                        drawImage.dWidth === temp_drawImage.dWidth &&
+                        drawImage.dHeight === temp_drawImage.dHeight &&
+                        drawImage.url === temp_drawImage.url) {
+
+                        const context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
+                        context.putImageData(sharpenedImageData, 0, 0);
+                    }
+
+                }
 
             }, false);
 
@@ -2651,16 +2685,21 @@ class Tiefseeview {
 
         // #endregion
 
+        /** 用於判斷繪製位置 */
         var temp_drawImage = {
             scale: -1,
             sx: 0, sy: 0,
             sWidth: 1, sHeight: 1,
             dx: 0, dy: 0,
-            dWidth: 1, dHeight: 1
+            dWidth: 1, dHeight: 1,
+            /** 是否已經執行銳化 */
+            isSharpen: false,
+            url: ""
         }
 
         /**
          * [private] bigimg 或 bigimgscale 渲染圖片
+         * @param IsImmediatelyRun 是否立即執行
          */
         async function bigimgDraw(IsImmediatelyRun?: boolean) {
 
@@ -2676,7 +2715,9 @@ class Tiefseeview {
                     sx: 0, sy: 0,
                     sWidth: 1, sHeight: 1,
                     dx: 0, dy: 0,
-                    dWidth: 1, dHeight: 1
+                    dWidth: 1, dHeight: 1,
+                    isSharpen: false,
+                    url: ""
                 }
             }
             let dpizoom3 = dpizoom2;
@@ -2716,10 +2757,10 @@ class Tiefseeview {
             // 轉換鏡像前的坐標
             function calc(_p: { x: number, y: number }) {
                 if (mirrorVertical) {
-                    _p.y = toNumber(dom_data.style.height) - _p.y
+                    _p.y = toNumber(dom_data.style.height) - _p.y;
                 }
                 if (mirrorHorizontal) {
-                    _p.x = toNumber(dom_data.style.width) - _p.x
+                    _p.x = toNumber(dom_data.style.width) - _p.x;
                 }
                 return _p;
             }
@@ -2731,14 +2772,14 @@ class Tiefseeview {
             // 取得圖片旋轉前的left、top
             img_left = origPoint1.x;
             img_top = origPoint1.y;
-            if (img_left > (origPoint1.x)) { img_left = (origPoint1.x) }
-            if (img_left > (origPoint2.x)) { img_left = (origPoint2.x) }
-            if (img_left > (origPoint3.x)) { img_left = (origPoint3.x) }
-            if (img_left > (origPoint4.x)) { img_left = (origPoint4.x) }
-            if (img_top > (origPoint1.y)) { img_top = (origPoint1.y) }
-            if (img_top > (origPoint2.y)) { img_top = (origPoint2.y) }
-            if (img_top > (origPoint3.y)) { img_top = (origPoint3.y) }
-            if (img_top > (origPoint4.y)) { img_top = (origPoint4.y) }
+            if (img_left > (origPoint1.x)) { img_left = (origPoint1.x); }
+            if (img_left > (origPoint2.x)) { img_left = (origPoint2.x); }
+            if (img_left > (origPoint3.x)) { img_left = (origPoint3.x); }
+            if (img_left > (origPoint4.x)) { img_left = (origPoint4.x); }
+            if (img_top > (origPoint1.y)) { img_top = (origPoint1.y); }
+            if (img_top > (origPoint2.y)) { img_top = (origPoint2.y); }
+            if (img_top > (origPoint3.y)) { img_top = (origPoint3.y); }
+            if (img_top > (origPoint4.y)) { img_top = (origPoint4.y); }
 
             // 取得圖片旋轉後的width、height
             let viewWidth = 1;
@@ -2774,14 +2815,14 @@ class Tiefseeview {
 
             // 避免以浮點數進行運算
             function toFloor() {
-                sx = Math.floor(sx);
-                sy = Math.floor(sy);
-                sWidth = Math.floor(sWidth);
-                sHeight = Math.floor(sHeight);
-                dx = Math.floor(dx);
-                dy = Math.floor(dy);
-                dWidth = Math.floor(dWidth);
-                dHeight = Math.floor(dHeight);
+                sx = Math.round(sx);
+                sy = Math.round(sy);
+                sWidth = Math.round(sWidth);
+                sHeight = Math.round(sHeight);
+                dx = Math.round(dx);
+                dy = Math.round(dy);
+                dWidth = Math.round(dWidth);
+                dHeight = Math.round(dHeight);
             }
             toFloor();
 
@@ -2798,7 +2839,9 @@ class Tiefseeview {
                     sx: sx, sy: sy,
                     sWidth: sWidth, sHeight: sHeight,
                     dx: dx, dy: dy,
-                    dWidth: dWidth, dHeight: dHeight
+                    dWidth: dWidth, dHeight: dHeight,
+                    isSharpen: false,
+                    url: url
                 }
 
                 // 如果圖片大於 canvas 的最大限制，就改用 <img> 來渲染
@@ -2813,16 +2856,12 @@ class Tiefseeview {
                     return;
                 }
 
-                // if (sx < 0) { sx = 0 }
-                // if (sy < 0) { sy = 0 }
-                // if (sWidth > getOriginalWidth()) { sWidth = getOriginalWidth() }
-                // if (sHeight > getOriginalHeight()) { sWidth = getOriginalHeight() }
-                dom_bigimg_canvas.width = Math.floor((viewWidth + _margin * 2) / radio_can * dpizoom3);
-                dom_bigimg_canvas.height = Math.floor((viewHeight + _margin * 2) / radio_can * dpizoom3);
-                dom_bigimg_canvas.style.width = Math.floor(viewWidth + _margin * 2) + "px";
-                dom_bigimg_canvas.style.height = Math.floor(viewHeight + _margin * 2) + "px";
-                dom_bigimg_canvas.style.left = dx / dpizoom3 + "px";
-                dom_bigimg_canvas.style.top = dy / dpizoom3 + "px";
+                dom_bigimg_canvas.width = Math.round((viewWidth + _margin * 2) / radio_can * dpizoom3);
+                dom_bigimg_canvas.height = Math.round((viewHeight + _margin * 2) / radio_can * dpizoom3);
+                dom_bigimg_canvas.style.width = Math.round(viewWidth + _margin * 2) + "px";
+                dom_bigimg_canvas.style.height = Math.round(viewHeight + _margin * 2) + "px";
+                dom_bigimg_canvas.style.left = Math.round(dx / dpizoom3) + "px";
+                dom_bigimg_canvas.style.top = Math.round(dy / dpizoom3) + "px";
                 let context = <CanvasRenderingContext2D>dom_bigimg_canvas.getContext("2d");
                 // context.imageSmoothingEnabled = false;
 
@@ -2962,9 +3001,57 @@ class Tiefseeview {
                         });
                 }
 
+                // 銳化圖片
+                debouncedSharpening();
+
             }
 
         }
+
+        /** 銳化值 */
+        let sharpenValue = 0;
+        /** 設定銳化值 */
+        function setSharpenValue(value: number) {
+            if (value !== sharpenValue) {
+                sharpenValue = value;
+                // 強制重新渲染
+                bigimgDraw(true);
+            }
+        }
+        /** 取得銳化值 */
+        function getSharpenValue() { return sharpenValue; }
+
+        // 銳化圖片。不會立即執行，必須一段時間沒有更新，才會執行
+        const debouncedSharpening = Lib.debounce(() => {
+
+            if (sharpenValue === 0) { return; }
+
+            const width = dom_bigimg_canvas.width;
+            const height = dom_bigimg_canvas.height;
+            const offscreenCanvas = new OffscreenCanvas(width, height);
+            const offscreenContext = offscreenCanvas.getContext("2d");
+            if (offscreenContext === null) { return; }
+
+            // 將原始圖像繪製到離屏 canvas 上
+            offscreenContext.drawImage(dom_bigimg_canvas, 0, 0);
+
+            // 獲取圖像數據
+            const imageBitmap = offscreenCanvas.transferToImageBitmap();
+
+
+            if (temp_drawImage.isSharpen === false) {
+
+                worker.postMessage({
+                    type: "sharpen",
+                    blur: 0.5,
+                    sharpen: sharpenValue,
+                    imageBitmap: imageBitmap,
+                    temp_drawImage
+                }, [imageBitmap]);
+
+                temp_drawImage.isSharpen = true;
+            }
+        }, 100);
 
         /**
          * [private] 改變內容大小
@@ -2972,24 +3059,24 @@ class Tiefseeview {
         function setDataSize(_width: number) {
             if (dataType === "img") {
                 let ratio = getOriginalHeight() / getOriginalWidth();
-                dom_data.style.width = _width + "px";
-                dom_data.style.height = (_width * ratio) + "px";
-                dom_img.style.width = _width + "px";
-                dom_img.style.height = (_width * ratio) + "px";
+                dom_data.style.width = Math.round(_width) + "px";
+                dom_data.style.height = Math.round(_width * ratio) + "px";
+                dom_img.style.width = Math.round(_width) + "px";
+                dom_img.style.height = Math.round(_width * ratio) + "px";
             }
             if (dataType === "bigimg" || dataType === "bigimgscale") {
                 let ratio = getOriginalHeight() / getOriginalWidth();
                 let _w = _width;
                 let _h = _width * ratio;
-                dom_data.style.width = _w + "px";
-                dom_data.style.height = _h + "px";
+                dom_data.style.width = Math.round(_w) + "px";
+                dom_data.style.height = Math.round(_h) + "px";
             }
             if (dataType === "video") {
                 let ratio = getOriginalHeight() / getOriginalWidth();
-                dom_data.style.width = _width + "px";
-                dom_data.style.height = (_width * ratio) + "px";
-                dom_video.style.width = _width + "px";
-                dom_video.style.height = (_width * ratio) + "px";
+                dom_data.style.width = Math.round(_width) + "px";
+                dom_data.style.height = Math.round(_width * ratio) + "px";
+                dom_video.style.width = Math.round(_width) + "px";
+                dom_video.style.height = Math.round(_width * ratio) + "px";
             }
         }
 

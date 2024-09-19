@@ -18,6 +18,11 @@ var langData = {
             "en": "Default",
             "ja": "プリセット",
         },
+        disable: {
+            "zh-TW": "停用",
+            "en": "Disable",
+            "ja": "無効",
+        },
 
         //#region tabs
         tabs: {
@@ -88,6 +93,17 @@ var langData = {
                 "zh-TW": "圖片縮放比例大於 100% 時，呈現像素",
                 "en": "Show pixels if the image zoom ratio is above 100%",
                 "ja": "画像の拡大率が 100% 以上の場合、画素を表示します",
+            },
+
+            imageSharpen: {
+                "zh-TW": "圖片銳化",
+                "en": "Image Sharpen",
+                "ja": "画像のシャープ化",
+            },
+            imageSharpenTooltip: {
+                "zh-TW": "增強邊緣，適合用於插圖或是含有文字的圖片",
+                "en": "Enhance the edges, suitable for illustrations or images containing text",
+                "ja": "エッジを強調し、イラストやテキストを含む画像に適しています",
             },
         },
 

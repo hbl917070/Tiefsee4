@@ -12,6 +12,7 @@
 /Www/obj
 /Www/MainWindow.html
 /Www/SettingWindow.html
+/Www/rust/target
 
 /TiefseeAppPackager/Package.StoreAssociation.xml
 /TiefseeAppPackager/obj

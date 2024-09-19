@@ -189,7 +189,10 @@ class Config {
             tiefseeviewAlignType: "C",
 
             /** 縮小至特定比例以下，就使用libvips重新處理圖片 */
-            tiefseeviewBigimgscaleRatio: 0.8
+            tiefseeviewBigimgscaleRatio: 0.8,
+
+            /** 圖片銳化 */
+            sharpenValue: 0,
         },
 
         /** 預設排序 */

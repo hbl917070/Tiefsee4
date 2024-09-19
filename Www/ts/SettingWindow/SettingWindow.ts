@@ -518,6 +518,19 @@ class SettingWindow {
             });
         })
 
+        // 銳化圖片
+        addLoadEvent(() => {
+            const selectSharpen = getDom("#select-sharpen") as HTMLSelectElement;
+
+            selectSharpen.value = config.settings.image.sharpenValue.toString();
+
+            selectSharpen.addEventListener("change", () => {
+                let val = selectSharpen.value;
+                config.settings.image.sharpenValue = Number(val);
+                appleSettingOfMain();
+            });
+        })
+
         // 預設排序
         addLoadEvent(() => {
             var select_fileSort = getDom("#select-fileSort") as HTMLSelectElement;
