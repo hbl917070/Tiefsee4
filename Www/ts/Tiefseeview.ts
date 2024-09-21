@@ -2623,7 +2623,7 @@ class Tiefseeview {
                 scale: sc
             }
         }
-    
+
         // 使用 Worker 
         try {
             worker = new Worker("./js/TiefseeviewWorker.js");
@@ -3002,7 +3002,9 @@ class Tiefseeview {
                 }
 
                 // 銳化圖片
-                debouncedSharpening();
+                if (_w > 10 && _h > 10) {
+                    debouncedSharpening();
+                }
 
             }
 
@@ -3037,7 +3039,6 @@ class Tiefseeview {
 
             // 獲取圖像數據
             const imageBitmap = offscreenCanvas.transferToImageBitmap();
-
 
             if (temp_drawImage.isSharpen === false) {
 

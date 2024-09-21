@@ -3,14 +3,13 @@ use wasm_bindgen::Clamped;
 use wasm_bindgen::JsValue;
 use web_sys::ImageData;
 
+// 對圖像數據進行卷積操作
 #[wasm_bindgen]
-pub fn sharpen_image(image_data: ImageData, v: f32) -> Result<ImageData, JsValue> {
+pub fn image_filter(image_data: ImageData, kernel: &[f32]) -> Result<ImageData, JsValue> {
     let width = image_data.width();
     let height = image_data.height();
     let data = image_data.data();
     let mut output_data = data.clone();
-
-    let kernel: [f32; 9] = [0.0, -v, 0.0, -v, 1.0 + v * 4.0, -v, 0.0, -v, 0.0];
 
     let side = 3;
     let half_side = side / 2;

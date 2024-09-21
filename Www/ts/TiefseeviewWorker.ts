@@ -60,7 +60,13 @@ self.addEventListener("message", async (e) => {
         const imageData = ctx.getImageData(0, 0, width, height);
 
         // 銳化處理
-        const sharpenedImageData = await wasm.sharpen_image(imageData, sharpen);
+        const v = sharpen;
+        const kernel = new Float32Array([
+            0, -v, 0,
+            -v, 1 + v * 4, -v,
+            0, -v, 0
+        ]);
+        const sharpenedImageData = await wasm.image_filter(imageData, kernel);
 
         console.timeEnd("銳化處理");
 
