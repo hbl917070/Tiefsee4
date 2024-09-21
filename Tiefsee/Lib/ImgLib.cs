@@ -77,7 +77,7 @@ public class ImgLib {
             // BackgroundColor = MagickColors.None,
             Defines = new DngReadDefines {
                 OutputColor = DngOutputColor.SRGB,
-                UseCameraWhitebalance = true,
+                UseCameraWhiteBalance = true,
                 DisableAutoBrightness = false
             }
         };

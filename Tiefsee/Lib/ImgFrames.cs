@@ -267,9 +267,9 @@ public class ImgFrames {
                 if (type == "webps") {
                     lock (itemInfo) {
                         if (n == 0) {
-                            loopCount = image.AnimationIterations;
+                            loopCount = (int)image.AnimationIterations;
                         }
-                        int delay = image.AnimationDelay * 10; // webp 的延遲是 1/100秒
+                        int delay = (int)image.AnimationDelay * 10; // webp 的延遲是 1/100秒
                         itemInfo.Add(n + 1, new() { Delay = delay });
                     }
                 }
