@@ -44,14 +44,14 @@
             }
 
             // 接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
+            const type = e.data.type;
+            const data = e.data.data;
 
             if (type === "loadFile") {
-                loadFile(data.txt, data.path);
+                loadFile(data.text, data.path);
             }
-            if (type === "loadTxt") {
-                loadTxt(data.txt, data.fileType);
+            if (type === "loadText") {
+                loadText(data.text, data.fileType);
             }
             if (type === "loadNone") {
                 loadNone();
@@ -60,12 +60,11 @@
                 setReadonly(data.val)
             }
             if (type === "getText") {
-                let t = getText();
-                let json = {
+                const t = getText();
+                libIframe.postMsg({
                     type: "getText",
                     data: t,
-                };
-                libIframe.postMsg(json);
+                });
             }
             if (type === "setTheme") {
                 setTheme();
@@ -77,7 +76,7 @@
          * 告知父物件 已經初始化完成
          */
         function initFinish() {
-            let json = {
+            const json = {
                 type: "MonacoEditor.initFinish",
                 data: "",
             };
@@ -106,9 +105,9 @@
          */
         async function initFinishMonacoEditor() {
 
-            let pluginPath = libIframe.getPluginPath();
-            let pathLib = pluginPath + "/monaco-editor/min/vs";
-            let pathJs = pathLib + "/loader.js";
+            const pluginPath = libIframe.getPluginPath();
+            const pathLib = pluginPath + "/monaco-editor/min/vs";
+            const pathJs = pathLib + "/loader.js";
             await libIframe.addScript(pathJs);
 
             //-------------
@@ -169,24 +168,24 @@
          * 清空文件
          */
         function loadNone() {
-            loadTxt("", "txt");
+            loadText("", "txt");
         }
 
         /**
          * 載入檔案
          */
-        async function loadFile(txt, path) {
+        async function loadFile(text, path) {
             monaco.editor.getModels().forEach(model => model.dispose()); // 清除所有已存在的 Model
-            var model = monaco.editor.createModel(txt, undefined, monaco.Uri.file(path));
-            editor.setModel(model);
+            const model = monaco.editor.createModel(text, undefined, monaco.Uri.file(path));
+            editor.setModel(model);       
         }
 
         /**
          * 載入文字
          */
-        function loadTxt(txt, fileType) {
+        function loadText(text, fileType) {
             monaco.editor.getModels().forEach(model => model.dispose()); // 清除所有已存在的 Model
-            var model = monaco.editor.createModel(txt, fileType);
+            const model = monaco.editor.createModel(text, fileType);
             editor.setModel(model);
         }
 
@@ -203,13 +202,13 @@
         function setTheme() {
 
             // 判斷是深色還是淺色主題
-            let theme = libIframe.initTheme();
+            const theme = libIframe.initTheme();
             let themeName = "vs";
             if (theme["theme"] === "dark") {
                 themeName = "vs-dark";
             }
 
-            let bgColor = libIframe.colorToHex(theme["windowBackground"]);
+            const bgColor = libIframe.colorToHex(theme["windowBackground"]);
 
             monaco.editor.defineTheme("myTheme", {
                 base: themeName,

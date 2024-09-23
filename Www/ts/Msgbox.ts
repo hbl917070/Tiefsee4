@@ -4,13 +4,13 @@
 class Msgbox {
 
     private _isShow = false;
-    private i18n: I18n;
+    private _i18n: I18n;
 
-    constructor(_i18n: I18n | undefined) {
+    constructor(i18n: I18n | undefined) {
 
-        if (_i18n === undefined) {
-            this.i18n = new I18n();
-            this.i18n.pushData({
+        if (i18n === undefined) {
+            this._i18n = new I18n();
+            this._i18n.pushData({
                 msg: {
                     yes: { "en": "Yes", },
                     no: { "en": "No", },
@@ -18,7 +18,7 @@ class Msgbox {
             });
         } else {
 
-            this.i18n = _i18n
+            this._i18n = i18n
         }
     }
 
@@ -70,7 +70,7 @@ class Msgbox {
         let htmlRadio = "";
         for (let i = 0; i < arRadio.length; i++) {
             const item = arRadio[i];
-            let checked = (item.value == radioValue) ? "checked" : ""; //是否選取
+            const checked = (item.value == radioValue) ? "checked" : ""; //是否選取
             htmlRadio += `
             <label class="msgbox-radio" allowSelection>
                 <input class="base-radio" type="radio" name="msgbox-radio" value="${item.value}" ${checked}>
@@ -84,7 +84,7 @@ class Msgbox {
             </div>`
         }
 
-        let dom = Lib.newDom(
+        const dom = Lib.newDom(
             `<div class="msgbox">
                 <div class="msgbox-box" active="false">
                     <div class="msgbox-close"></div>
@@ -94,18 +94,18 @@ class Msgbox {
                     ${htmlRadio}
                 
                     <div class="msgbox-bottom">
-                        <div class="msgbox-btn msgbox-btn__yes" i18n="msg.yes">${this.i18n.t("msg.yes")}</div>
-                        <div class="msgbox-btn msgbox-btn__no" i18n="msg.no">${this.i18n.t("msg.no")}</div>
+                        <div class="msgbox-btn msgbox-btn__yes" i18n="msg.yes">${this._i18n.t("msg.yes")}</div>
+                        <div class="msgbox-btn msgbox-btn__no" i18n="msg.no">${this._i18n.t("msg.no")}</div>
                     </div>
                 </div>
             </div>`)
 
-        let donBox = dom.querySelector(".msgbox-box") as HTMLElement;
-        let donInput = dom.querySelector(".msgbox-input") as HTMLInputElement;
-        let donBtnClose = dom.querySelector(".msgbox-close") as HTMLElement;
-        let donBottom = dom.querySelector(".msgbox-bottom") as HTMLElement;
-        let donBtnNo = dom.querySelector(".msgbox-btn__no") as HTMLElement;
-        let donBtnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;
+        const donBox = dom.querySelector(".msgbox-box") as HTMLElement;
+        const donInput = dom.querySelector(".msgbox-input") as HTMLInputElement;
+        const donBtnClose = dom.querySelector(".msgbox-close") as HTMLElement;
+        const donBottom = dom.querySelector(".msgbox-bottom") as HTMLElement;
+        const donBtnNo = dom.querySelector(".msgbox-btn__no") as HTMLElement;
+        const donBtnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;
 
         setTimeout(() => {
             donBox.setAttribute("active", "true");
@@ -164,7 +164,7 @@ class Msgbox {
         dom.parentNode?.removeChild(dom); // 移除dom
 
         // 判斷是否還有其他的 訊息方塊
-        let arMsgbox = document.querySelectorAll(".msgbox-box");
+        const arMsgbox = document.querySelectorAll(".msgbox-box");
         for (let i = 0; i < arMsgbox.length; i++) {
             const item = arMsgbox[i];
             if (item.getAttribute("active") == "true") {
@@ -179,7 +179,7 @@ class Msgbox {
      * 關閉全部
      */
     public closeAll() {
-        let arMsgbox = document.querySelectorAll(".msgbox");
+        const arMsgbox = document.querySelectorAll(".msgbox");
         for (let i = 0; i < arMsgbox.length; i++) {
             const dom = arMsgbox[i];
             dom.parentNode?.removeChild(dom);
@@ -192,9 +192,9 @@ class Msgbox {
     */
     public closeNow() {
 
-        let arMsgbox = document.querySelectorAll(".msgbox");
+        const arMsgbox = document.querySelectorAll(".msgbox");
 
-        if (arMsgbox.length === 0) { return }
+        if (arMsgbox.length === 0) { return; }
         if (arMsgbox.length === 1) { this._isShow = false; }
 
         const dom = arMsgbox[arMsgbox.length - 1];
@@ -206,9 +206,9 @@ class Msgbox {
      */
     public clickYes() {
 
-        let arMsgbox = document.querySelectorAll(".msgbox");
+        const arMsgbox = document.querySelectorAll(".msgbox");
 
-        if (arMsgbox.length === 0) { return }
+        if (arMsgbox.length === 0) { return; }
 
         const dom = arMsgbox[arMsgbox.length - 1];
         const btnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;

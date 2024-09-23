@@ -1,7 +1,7 @@
 /**
  * 資料表名稱
  */
-var DbStoreName = {
+const DbStoreName = {
     /** Civitai Resources 的暫存資料 */
     civitaiResources: "civitaiResources",
     /** 詳細資訊面板內的項目折疊狀態 */

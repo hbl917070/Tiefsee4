@@ -7,88 +7,86 @@ class FileSort {
     public getOrderbyType;
 
     constructor(M: MainWindow) {
-        var dom_fileSort_name = document.getElementById("menuitem-fileSort-name") as HTMLInputElement;
-        var dom_fileSort_lastWriteTime = document.getElementById("menuitem-fileSort-lastWriteTime") as HTMLInputElement;
-        var dom_fileSort_length = document.getElementById("menuitem-fileSort-length") as HTMLInputElement;
-        var dom_fileSort_lastAccessTime = document.getElementById("menuitem-fileSort-lastAccessTime") as HTMLInputElement;
-        var dom_fileSort_creationTime = document.getElementById("menuitem-fileSort-creationTime") as HTMLInputElement;
-        var dom_fileSort_random = document.getElementById("menuitem-fileSort-random") as HTMLInputElement;
+        const _domFileSortName = document.getElementById("menuitem-fileSort-name") as HTMLInputElement;
+        const _domFileSortLastWriteTime = document.getElementById("menuitem-fileSort-lastWriteTime") as HTMLInputElement;
+        const _domFileSortLength = document.getElementById("menuitem-fileSort-length") as HTMLInputElement;
+        const _domFileSortLastAccessTime = document.getElementById("menuitem-fileSort-lastAccessTime") as HTMLInputElement;
+        const _domFileSortCreationTime = document.getElementById("menuitem-fileSort-creationTime") as HTMLInputElement;
+        const _domFileSortRandom = document.getElementById("menuitem-fileSort-random") as HTMLInputElement;
 
-        var dom_fileSort_asc = document.getElementById("menuitem-fileSort-asc") as HTMLInputElement;
-        var dom_fileSort_desc = document.getElementById("menuitem-fileSort-desc") as HTMLInputElement;
+        const _domFileSortAsc = document.getElementById("menuitem-fileSort-asc") as HTMLInputElement;
+        const _domFileSortDesc = document.getElementById("menuitem-fileSort-desc") as HTMLInputElement;
 
-        var yesSvgTxt = SvgList["yes.svg"];
-        var sortType = FileSortType.name; //排序方式
-        var orderbyType = FileOrderbyType.asc;
+        const _yesSvgTxt = SvgList["yes.svg"];
+        var _sortType = FileSortType.name; //排序方式
+        var _orderbyType = FileOrderbyType.asc;
 
         this.readSortType = readSortType;
         this.updateMenu = updateMenu;
         this.sort = sort;
-        this.getSortType = () => { return sortType; }
-        this.getOrderbyType = () => { return orderbyType; }
+        this.getSortType = () => { return _sortType; }
+        this.getOrderbyType = () => { return _orderbyType; }
 
-        dom_fileSort_name.addEventListener("click", () => {
-            sortType = FileSortType.name;
+        _domFileSortName.addEventListener("click", () => {
+            _sortType = FileSortType.name;
             updateSort();
         });
-        dom_fileSort_lastWriteTime.addEventListener("click", () => {
-            sortType = FileSortType.lastWriteTime;
+        _domFileSortLastWriteTime.addEventListener("click", () => {
+            _sortType = FileSortType.lastWriteTime;
             updateSort();
         });
-        dom_fileSort_length.addEventListener("click", () => {
-            sortType = FileSortType.length;
+        _domFileSortLength.addEventListener("click", () => {
+            _sortType = FileSortType.length;
             updateSort();
         });
-        dom_fileSort_lastAccessTime.addEventListener("click", () => {
-            sortType = FileSortType.lastAccessTime;
+        _domFileSortLastAccessTime.addEventListener("click", () => {
+            _sortType = FileSortType.lastAccessTime;
             updateSort();
         });
-        dom_fileSort_creationTime.addEventListener("click", () => {
-            sortType = FileSortType.creationTime;
+        _domFileSortCreationTime.addEventListener("click", () => {
+            _sortType = FileSortType.creationTime;
             updateSort();
         });
-        dom_fileSort_random.addEventListener("click", () => {
-            sortType = FileSortType.random;
+        _domFileSortRandom.addEventListener("click", () => {
+            _sortType = FileSortType.random;
             updateSort();
         });
 
-        dom_fileSort_asc.addEventListener("click", () => {
-            orderbyType = FileOrderbyType.asc;
+        _domFileSortAsc.addEventListener("click", () => {
+            _orderbyType = FileOrderbyType.asc;
             updateSort();
         });
-        dom_fileSort_desc.addEventListener("click", () => {
-            orderbyType = FileOrderbyType.desc;
+        _domFileSortDesc.addEventListener("click", () => {
+            _orderbyType = FileOrderbyType.desc;
             updateSort();
         });
 
         /**
          * 不重新載入圖片，只更新排序(用於排序選單的按鈕
-         * @param _sortType 
          */
         async function updateSort() {
 
-            //sortType = _sortType;
-            if (orderbyType === FileOrderbyType.desc) {
-                if (sortType === FileSortType.name) { sortType = FileSortType.nameDesc; }
-                if (sortType === FileSortType.lastWriteTime) { sortType = FileSortType.lastWriteTimeDesc; }
-                if (sortType === FileSortType.length) { sortType = FileSortType.lengthDesc; }
-                if (sortType === FileSortType.lastAccessTime) { sortType = FileSortType.lastAccessTimeDesc; }
-                if (sortType === FileSortType.creationTime) { sortType = FileSortType.creationTimeDesc; }
+            if (_orderbyType === FileOrderbyType.desc) {
+                if (_sortType === FileSortType.name) { _sortType = FileSortType.nameDesc; }
+                if (_sortType === FileSortType.lastWriteTime) { _sortType = FileSortType.lastWriteTimeDesc; }
+                if (_sortType === FileSortType.length) { _sortType = FileSortType.lengthDesc; }
+                if (_sortType === FileSortType.lastAccessTime) { _sortType = FileSortType.lastAccessTimeDesc; }
+                if (_sortType === FileSortType.creationTime) { _sortType = FileSortType.creationTimeDesc; }
             }
-            if (orderbyType === FileOrderbyType.asc) {
-                if (sortType === FileSortType.nameDesc) { sortType = FileSortType.name; }
-                if (sortType === FileSortType.lastWriteTimeDesc) { sortType = FileSortType.lastWriteTime; }
-                if (sortType === FileSortType.lengthDesc) { sortType = FileSortType.length; }
-                if (sortType === FileSortType.lastAccessTimeDesc) { sortType = FileSortType.lastAccessTime; }
-                if (sortType === FileSortType.creationTimeDesc) { sortType = FileSortType.creationTime; }
+            if (_orderbyType === FileOrderbyType.asc) {
+                if (_sortType === FileSortType.nameDesc) { _sortType = FileSortType.name; }
+                if (_sortType === FileSortType.lastWriteTimeDesc) { _sortType = FileSortType.lastWriteTime; }
+                if (_sortType === FileSortType.lengthDesc) { _sortType = FileSortType.length; }
+                if (_sortType === FileSortType.lastAccessTimeDesc) { _sortType = FileSortType.lastAccessTime; }
+                if (_sortType === FileSortType.creationTimeDesc) { _sortType = FileSortType.creationTime; }
             }
 
-            let path = M.fileLoad.getFilePath();
-            let dirPath = Lib.GetDirectoryName(path);
+            const path = M.fileLoad.getFilePath();
+            const dirPath = Lib.getDirectoryName(path);
             if (dirPath === null) { return; }
             setFileSortType(dirPath);
 
-            let ar = await sort(M.fileLoad.getWaitingFile())
+            const ar = await sort(M.fileLoad.getWaitingFile())
             // 目前檔案位置
             M.fileLoad.setFlagFile(0);
             for (let i = 0; i < ar.length; i++) {
@@ -112,62 +110,60 @@ class FileSort {
         }
 
         /**
-         * 更新menu選單
-         * @param _sortType 
+         * 更新 menu 選單
          */
         function updateMenu() {
 
-            dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_length.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortName.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortLastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortLength.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortLastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortCreationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortRandom.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
-            dom_fileSort_asc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_fileSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortAsc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domFileSortDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
-            if (sortType === FileSortType.name || sortType === FileSortType.nameDesc) {
-                dom_fileSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.name || _sortType === FileSortType.nameDesc) {
+                _domFileSortName.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === FileSortType.lastWriteTime || sortType === FileSortType.lastWriteTimeDesc) {
-                dom_fileSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.lastWriteTime || _sortType === FileSortType.lastWriteTimeDesc) {
+                _domFileSortLastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === FileSortType.length || sortType === FileSortType.lengthDesc) {
-                dom_fileSort_length.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.length || _sortType === FileSortType.lengthDesc) {
+                _domFileSortLength.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === FileSortType.lastAccessTime || sortType === FileSortType.lastAccessTimeDesc) {
-                dom_fileSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.lastAccessTime || _sortType === FileSortType.lastAccessTimeDesc) {
+                _domFileSortLastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === FileSortType.creationTime || sortType === FileSortType.creationTimeDesc) {
-                dom_fileSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.creationTime || _sortType === FileSortType.creationTimeDesc) {
+                _domFileSortCreationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === FileSortType.random) {
-                dom_fileSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === FileSortType.random) {
+                _domFileSortRandom.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
 
-            if (orderbyType === FileOrderbyType.asc) {
-                dom_fileSort_asc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_orderbyType === FileOrderbyType.asc) {
+                _domFileSortAsc.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (orderbyType === FileOrderbyType.desc) {
-                dom_fileSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_orderbyType === FileOrderbyType.desc) {
+                _domFileSortDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
         }
 
         /**
          * 排序檔案
-         * @param _type 排序類型
+         * @param arWaitingFile 等待排序的檔案 
          * @returns 排序後的陣列
          */
-        async function sort(arWaitingFile: string[]): Promise<string[]> {
-            arWaitingFile = await WebAPI.sort2(arWaitingFile, sortType);
+        async function sort(arWaitingFile: string[]) {
+            arWaitingFile = await WebAPI.sort2(arWaitingFile, _sortType);
             return arWaitingFile;
         }
 
         /**
          * 設定該資料夾設定的檔案排序方式
          * @param dirPath 
-         * @param _sortType 
          */
         function setFileSortType(dirPath: string) {
 
@@ -179,7 +175,7 @@ class FileSort {
             }
 
             // 儲存排序
-            json[dirPath] = sortType;
+            json[dirPath] = _sortType;
             window.localStorage.setItem("sortFile", JSON.stringify(json));
         }
 
@@ -194,22 +190,22 @@ class FileSort {
 
             if (t === null) { t = "{}" } // 避免從來沒有儲存過
             let json = JSON.parse(t);
-            let _sortType = json[dirPath];
+            let sortType = json[dirPath];
 
-            if (_sortType !== undefined) {
-                sortType = _sortType;
+            if (sortType !== undefined) {
+                _sortType = sortType;
             } else {
                 let defaultSort = M.config.settings.sort["fileSort"];
                 if (Object.keys(FileSortType).indexOf(defaultSort) === -1) { // 如果找不到
                     defaultSort = FileSortType.name;
                 }
-                sortType = defaultSort;
+                _sortType = defaultSort;
             }
 
-            if (sortType.indexOf("Desc") !== -1) {
-                orderbyType = FileOrderbyType.desc;
+            if (_sortType.indexOf("Desc") !== -1) {
+                _orderbyType = FileOrderbyType.desc;
             } else {
-                orderbyType = FileOrderbyType.asc;
+                _orderbyType = FileOrderbyType.asc;
             }
         }
 
@@ -220,7 +216,7 @@ class FileSort {
 /**
  * 排序類型
  */
-var FileSortType = {
+const FileSortType = {
     /** 檔名自然排序 */
     name: "name",
 
@@ -258,7 +254,7 @@ var FileSortType = {
 /**
  * 遞增或遞減
  */
-var FileOrderbyType = {
+const FileOrderbyType = {
     desc: "desc",
     asc: "asc",
 }

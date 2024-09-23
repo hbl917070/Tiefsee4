@@ -112,7 +112,7 @@ body {
   display: flex;
   justify-content: space-between;
 
-  .titlebar-txt {
+  .titlebar-text {
     height: 100%;
     color: var(--color-white);
     display: flex;
@@ -124,7 +124,7 @@ body {
 
     app-region: drag; //讓視窗允許拖曳
   }
-  .titlebar-txt span {
+  .titlebar-text span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

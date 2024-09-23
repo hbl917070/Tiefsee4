@@ -3,39 +3,39 @@ class Lib {
     /**
      * 取得資料夾路徑
      */
-    public static GetDirectoryName = (path: string) => {
+    public static getDirectoryName = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
 
-        let count = path.split("\\").length - 1; //計算斜線數量
+        let count = path.split("\\").length - 1; // 計算斜線數量
 
         /*if (path.lastIndexOf("\\") === path.length - 1) {
             path = path.substring(0, path.length - 1);
         }*/
 
-        if (count === 0) { return null; } //沒有斜線表示沒有父親目錄
+        if (count === 0) { return null; } // 沒有斜線表示沒有父親目錄
         if (path.length <= 2) { return null; }
 
         if (path.substring(0, 2) === "\\\\") { //網路路徑，例如 \\Desktop-abc\AA
-            if (count <= 3) { //網路路徑至少要2層
+            if (count <= 3) { // 網路路徑至少要2層
                 return null;
             }
             if (count === 4) {
-                if (path.lastIndexOf("\\") === path.length - 1) { //斜線在最後 例如 \\Desktop-abc\AA\
+                if (path.lastIndexOf("\\") === path.length - 1) { // 斜線在最後 例如 \\Desktop-abc\AA\
                     return null;
                 }
             }
         } else {
             if (count === 1) {
-                if (path.lastIndexOf("\\") === path.length - 1) { //斜線在最後 例如 D:/
+                if (path.lastIndexOf("\\") === path.length - 1) { // 斜線在最後 例如 D:/
                     return null;
                 }
             }
         }
 
-        let name = path.substring(0, path.lastIndexOf("\\")); //取得資料夾路徑
+        let name = path.substring(0, path.lastIndexOf("\\")); // 取得資料夾路徑
 
-        //避免 D:\ 變成 D:
-        count = name.split("\\").length - 1; //計算斜線數量  
+        // 避免 D:\ 變成 D:
+        count = name.split("\\").length - 1; // 計算斜線數量  
         if (count === 0) {
             name = name + "\\";
         }
@@ -48,10 +48,9 @@ class Lib {
      * @param path 
      * @returns 
      */
-    public static GetFileName = (path: string) => {
+    public static getFileName = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
-        let name = path.substring(path.lastIndexOf("\\") + 1); //取得檔名
-        return name;
+        return path.substring(path.lastIndexOf("\\") + 1); // 取得檔名
     }
 
     /**
@@ -59,10 +58,10 @@ class Lib {
      * @param path 
      * @returns 
      */
-    public static GetExtension = (path: string) => {
+    public static getExtension = (path: string) => {
         path = path.replace(/[/]/ig, "\\");
-        let name = path.substring(path.lastIndexOf("\\") + 1); // 取得檔名
-        let index = name.lastIndexOf(".");
+        const name = path.substring(path.lastIndexOf("\\") + 1); // 取得檔名
+        const index = name.lastIndexOf(".");
         if (index === -1) { return ""; }
         return "." + name.substring(index + 1).toLocaleLowerCase();
     }
@@ -72,7 +71,7 @@ class Lib {
      * @param arPath 
      * @returns 
      */
-    public static Combine = (arPath: string[]): string => {
+    public static combine = (arPath: string[]): string => {
         if (arPath.length === 0) { return ""; }
         if (arPath.length === 1) { return arPath[0]; }
 
@@ -96,13 +95,13 @@ class Lib {
      * 註冊 double click 事件
      * @param dom 
      * @param func 
-     * @param dealy 雙擊的時間(毫秒)
+     * @param dealy 雙擊的時間 (毫秒)
      */
     public static addEventDblclick(dom: HTMLElement, func: (e: MouseEvent) => void, dealy: number = 400) {
 
-        var clickTimeout = -1;
-        var _x = 0;
-        var _y = 0;
+        let clickTimeout = -1;
+        let x = 0;
+        let y = 0;
 
         dom.addEventListener("mousedown", async (e: MouseEvent) => {
 
@@ -113,12 +112,12 @@ class Lib {
             if (clickTimeout !== -1) { // double click      
                 clearTimeout(clickTimeout);
                 clickTimeout = -1;
-                if (Math.abs(_x - e.offsetX) < 4 && Math.abs(_y - e.offsetY) < 4) { // 如果點擊位置一樣
+                if (Math.abs(x - e.offsetX) < 4 && Math.abs(y - e.offsetY) < 4) { // 如果點擊位置一樣
                     func(e)
                 }
             } else {
-                _x = e.offsetX;
-                _y = e.offsetY;
+                x = e.offsetX;
+                y = e.offsetY;
                 clickTimeout = setTimeout(() => { // click
                     clickTimeout = -1;
                 }, dealy);
@@ -128,13 +127,13 @@ class Lib {
     }
 
     /**
-     * 判斷是否為動圖(gif、apng、webp動圖、svg)
+     * 判斷是否為動圖 (gif、apng、webp動圖、svg)
      * @param fileInfo2 
      * @returns 
      */
-    public static IsAnimation(fileInfo2: FileInfo2) {
-        let hex = fileInfo2.HexValue;
-        if (Lib.GetExtension(fileInfo2.Path) === ".svg") {
+    public static isAnimation(fileInfo2: FileInfo2) {
+        const hex = fileInfo2.HexValue;
+        if (Lib.getExtension(fileInfo2.Path) === ".svg") {
             return true;
         }
         if (hex.startsWith("47 49 46 38")) { // gif
@@ -159,11 +158,11 @@ class Lib {
     /**
      * 取得真實檔案類型
      * @param fileInfo2 
-     * @returns 小寫附檔名，例如「jpg」
+     * @returns 小寫附檔名，例如 jpg
      */
-    public static GetFileType(fileInfo2: FileInfo2) {
+    public static getFileType(fileInfo2: FileInfo2) {
 
-        let fileExt = Lib.GetExtension(fileInfo2.FullPath); // 取得附檔名
+        let fileExt = Lib.getExtension(fileInfo2.FullPath); // 取得附檔名
         fileExt = fileExt.replace(".", "").toLocaleLowerCase();
         let hex = fileInfo2.HexValue;
 
@@ -246,16 +245,18 @@ class Lib {
     }
 
     /**
-      * 取得檔案的大小的文字
+      * 取得檔案 size，例如 1.2 MB
       * @param path 
       * @returns 
       */
     public static getFileLength(len: number) {
         if (len / 1024 < 1) {
             return len.toFixed(1) + " B";
-        } else if (len / (1024 * 1024) < 1) {
+        }
+        else if (len / (1024 * 1024) < 1) {
             return (len / (1024)).toFixed(1) + " KB";
-        } else if (len / (1024 * 1024 * 1024) < 1) {
+        }
+        else if (len / (1024 * 1024 * 1024) < 1) {
             return (len / (1024 * 1024)).toFixed(1) + " MB";
         }
         return (len / (1024 * 1024 * 1024)).toFixed(1) + " GB";
@@ -264,13 +265,14 @@ class Lib {
     /**
      * URL 轉 路徑
      */
-    public static URLToPath(path: string): string {
+    public static urlToPath(path: string): string {
 
         path = path.split("?")[0]; // 刪除 URL 中的查詢參數
 
         if (path.indexOf("file:///") === 0) { // 一般檔案
             path = path.substring(8);
-        } else if (path.indexOf("file://") === 0) { // 網路路徑，例如 \\Desktop-abc\AA
+        }
+        else if (path.indexOf("file://") === 0) { // 網路路徑，例如 \\Desktop-abc\AA
             path = path.substring(5);
         }
         path = decodeURIComponent(path).replace(/[/]/g, "\\");
@@ -280,7 +282,7 @@ class Lib {
     /**
      * 路徑 轉 URL
      */
-    public static pathToURL(path: string): string {
+    public static pathToUrl(path: string): string {
         return "file:///" + encodeURIComponent(path)
             .replace(/[%]3A/g, ":")
             .replace(/[%]2F/g, "/")
@@ -322,9 +324,9 @@ class Lib {
      * 取得目前的焦點是否在文字輸入框上
      */
     public static isTextFocused() {
-        let dom = document.activeElement;
+        const dom = document.activeElement;
         if (dom === null) { return false; }
-        let tag = dom.tagName;
+        const tag = dom.tagName;
         if (tag === "TEXTAREA") {
             return true;
         }
@@ -351,7 +353,7 @@ class Lib {
      */
     public static getBrowserLang() {
         let browserLang = navigator.language.toLowerCase();
-        if (browserLang == "zh" || browserLang.indexOf("zh-") === 0) {
+        if (browserLang == "zh" || browserLang.startsWith("zh-")) {
             return "zh-TW";
         }
         if (browserLang.indexOf("ja") === 0) { // 日本
@@ -371,10 +373,10 @@ class Lib {
      * @param html 
      * @returns 
      */
-    public static newDom(html: string): HTMLElement {
-        var template = document.createElement("template");
+    public static newDom(html: string) {
+        const template = document.createElement("template");
         template.innerHTML = html.trim();
-        return <HTMLElement>template.content.firstChild;
+        return template.content.firstChild as HTMLElement;
     }
 
     /**
@@ -421,10 +423,10 @@ class Lib {
         }
 
         if (type === "base64") {
-            let base64: string = await new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
+            const base64: string = await new Promise((resolve, _) => {
+                const xhr = new XMLHttpRequest();
                 xhr.onload = function () {
-                    var reader = new FileReader();
+                    const reader = new FileReader();
                     reader.onloadend = function () {
                         let d = reader.result;
                         if (typeof d === "string") {
@@ -441,7 +443,6 @@ class Lib {
             });
             return base64;
         }
-
     }
 
     /**
@@ -449,7 +450,7 @@ class Lib {
      * @param ms 毫秒
      */
     public static async sleep(ms: number) {
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, _) => {
             setTimeout(function () {
                 resolve(0);
             }, ms);
@@ -490,10 +491,10 @@ class Lib {
      */
     public static async collapse(domBox: HTMLElement, type: string, funcChange?: (type: boolean) => void) {
 
-        let domContent = domBox.querySelector(".collapse-content") as HTMLElement;
+        const domContent = domBox.querySelector(".collapse-content") as HTMLElement;
         if (domContent === null) { return; }
 
-        let div = domContent.querySelector("div");
+        const div = domContent.querySelector("div");
         if (div === null) { return; }
 
         if (funcChange === undefined) {

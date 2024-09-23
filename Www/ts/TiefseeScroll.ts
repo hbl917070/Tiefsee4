@@ -14,16 +14,16 @@ class TiefseeScroll {
 
     constructor() {
 
-        var domScroll: HTMLElement;
-        var domBg: HTMLElement;
-        var domBox: HTMLElement;
-        var type: ("x" | "y");
-        var contentHeight: number = 0; // 內容高度(全部的值)
-        var panelHeight: number = 0; // 容器的高度
-        var _eventChange = (v: number, mode: "set" | "wheel" | "pan") => { };
-        var hammerScroll;
-        var startLeft: number = 0;
-        var startTop: number = 0;
+        var _domScroll: HTMLElement;
+        var _domBg: HTMLElement;
+        var _domBox: HTMLElement;
+        var _type: ("x" | "y");
+        var _contentHeight = 0; // 內容高度(全部的值)
+        var _panelHeight = 0; // 容器的高度
+        var _eventChange = (val: number, mode: "set" | "wheel" | "pan") => { };
+        var _hammerScroll;
+        var _startLeft = 0;
+        var __startTop = 0;
 
         this.getEventChange = getEventChange;
         this.setEventChange = setEventChange;
@@ -36,18 +36,17 @@ class TiefseeScroll {
 
         /**
          * 初始化 - Tiefseeview 的滾動條
-         * @param _domScroll 
-         * @param _type 
+         * @param domScroll 
+         * @param type 
          */
-        function initTiefseeScroll(_domScroll: HTMLElement, _type: ("x" | "y")) {
-            domScroll = _domScroll;
-            type = _type;
+        function initTiefseeScroll(domScroll: HTMLElement, type: ("x" | "y")) {
+            _domScroll = domScroll;
+            _type = type;
 
             init();
 
             // 在滾動條上面滾動時
-            domScroll.addEventListener("wheel", (ev) => { MouseWheel(ev); }, true);
-            const MouseWheel = (e: WheelEvent) => {
+            const mouseWheel = (e: WheelEvent) => {
                 e.preventDefault(); // 禁止頁面滾動
                 let v = getTop();
                 if (e.deltaX > 0 || e.deltaY > 0) { // 下
@@ -56,44 +55,45 @@ class TiefseeScroll {
                     setTop(v - 100, "wheel");
                 }
             }
+            _domScroll.addEventListener("wheel", (e) => { mouseWheel(e); }, true);
         }
 
         /**
          * 初始化 - 一般的滾動條
          * @param domPanel 外層的容器
-         * @param _type 
+         * @param type 
          */
-        function initGeneral(domPanel: HTMLElement, _type: ("x" | "y")) {
+        function initGeneral(domPanel: HTMLElement, type: ("x" | "y")) {
 
             let domContent = domPanel.firstElementChild as HTMLElement;
             if (domContent === null) {
                 return;
             }
 
-            type = _type;
+            _type = type;
 
-            if (type === "y") {
-                domScroll = Lib.newDom(`
+            if (_type === "y") {
+                _domScroll = Lib.newDom(`
                     <div class="scroll-y js-noDrag">
                         <div class="scroll-bg js-noDrag"></div>
                         <div class="scroll-box js-noDrag"></div>
                     </div>`
                 );
             } else {
-                domScroll = Lib.newDom(`
+                _domScroll = Lib.newDom(`
                     <div class="scroll-x js-noDrag">
                         <div class="scroll-bg js-noDrag"></div>
                         <div class="scroll-box js-noDrag"></div>
                     </div>`
                 );
             }
-            domPanel.appendChild(domScroll);
+            domPanel.appendChild(_domScroll);
             init();
 
             // 滾動條變化時(主動拖拉滾動條)，同步至容器
             setEventChange((v: number, mode: "set" | "wheel" | "pan") => {
                 if (mode === "set") { return; }
-                if (type === "y") {
+                if (_type === "y") {
                     domPanel.scrollTop = v;
                 } else {
                     domPanel.scrollLeft = v;
@@ -102,30 +102,30 @@ class TiefseeScroll {
 
             // 容器發生捲動時，更新滾動條
             domPanel.addEventListener("scroll", () => {
-                let v;
-                if (type === "y") {
-                    v = domPanel.scrollTop;
-                    domScroll.style.top = v + "px"; // 坐標定位
+                let val;
+                if (_type === "y") {
+                    val = domPanel.scrollTop;
+                    _domScroll.style.top = val + "px"; // 坐標定位
                 } else {
-                    v = domPanel.scrollLeft;
-                    domScroll.style.left = v + "px"; // 坐標定位
+                    val = domPanel.scrollLeft;
+                    _domScroll.style.left = val + "px"; // 坐標定位
                 }
-                setValue(v);
+                setValue(val);
             })
 
             // 區塊或body改變大小時，更新拖曳條的坐標
             function updatePosition() {
                 requestAnimationFrame(() => {
 
-                    if (type === "y") {
-                        domScroll.style.height = domPanel.offsetHeight + "px";
-                        
-                        let v = domPanel.scrollTop;
-                        if (v + domPanel.offsetHeight > domContent.offsetHeight) { // 避免滾動條影響高度的計算
-                            domScroll.style.top =  "0px";
-                            v = domPanel.scrollTop;
-                        } 
-                        domScroll.style.top = v + "px";          
+                    if (_type === "y") {
+                        _domScroll.style.height = domPanel.offsetHeight + "px";
+
+                        let val = domPanel.scrollTop;
+                        if (val + domPanel.offsetHeight > domContent.offsetHeight) { // 避免滾動條影響高度的計算
+                            _domScroll.style.top = "0px";
+                            val = domPanel.scrollTop;
+                        }
+                        _domScroll.style.top = val + "px";
 
                         update(
                             domContent.offsetHeight,
@@ -133,25 +133,25 @@ class TiefseeScroll {
                             getTop()
                         );
 
-                        setValue(v);
+                        setValue(val);
 
                     } else {
-                        domScroll.style.width = domPanel.offsetWidth + "px";
-                   
-                        let v = domPanel.scrollLeft;
-                        if (v + domPanel.offsetWidth > domContent.offsetWidth) { // 避免滾動條影響高度的計算
-                            domScroll.style.left =  "0px";
-                            v = domPanel.scrollLeft;
-                        } 
-                        domScroll.style.left = v + "px";
+                        _domScroll.style.width = domPanel.offsetWidth + "px";
+
+                        let val = domPanel.scrollLeft;
+                        if (val + domPanel.offsetWidth > domContent.offsetWidth) { // 避免滾動條影響高度的計算
+                            _domScroll.style.left = "0px";
+                            val = domPanel.scrollLeft;
+                        }
+                        _domScroll.style.left = val + "px";
 
                         update(
                             domContent.offsetWidth,
                             domPanel.offsetWidth,
                             getTop()
                         );
-                        
-                        setValue(v);
+
+                        setValue(val);
                     }
 
                 })
@@ -165,140 +165,140 @@ class TiefseeScroll {
          * 初始化事件
          */
         function init() {
-            domBg = <HTMLElement>domScroll.querySelector(".scroll-bg");
-            domBox = <HTMLElement>domScroll.querySelector(".scroll-box");
-            hammerScroll = new Hammer(domScroll, {});
+            _domBg = _domScroll.querySelector(".scroll-bg") as HTMLElement;
+            _domBox = _domScroll.querySelector(".scroll-box") as HTMLElement;
+            _hammerScroll = new Hammer(_domScroll, {});
 
             // 拖曳開始
-            domScroll.addEventListener("mousedown", (ev) => { touchStart(ev); });
-            domScroll.addEventListener("touchstart", (ev) => { touchStart(ev); });
-            const touchStart = (ev: any) => {
-                ev.preventDefault();
-                startLeft = toNumber(domBox.style.left);
-                startTop = toNumber(domBox.style.top);
+            _domScroll.addEventListener("mousedown", (e) => { touchStart(e); });
+            _domScroll.addEventListener("touchstart", (e) => { touchStart(e); });
+            const touchStart = (e: any) => {
+                e.preventDefault();
+                _startLeft = toNumber(_domBox.style.left);
+                __startTop = toNumber(_domBox.style.top);
             }
 
             // 拖曳中
-            hammerScroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
-            hammerScroll.on("pan", (ev) => {
-                ev.preventDefault();
-                let deltaX = ev["deltaX"];
-                let deltaY = ev["deltaY"];
-                if (type === "y") {
-                    let top = startTop + deltaY;
+            _hammerScroll.get("pan").set({ threshold: 0, direction: Hammer.DIRECTION_ALL });
+            _hammerScroll.on("pan", (e) => {
+                e.preventDefault();
+                let deltaX = e["deltaX"];
+                let deltaY = e["deltaY"];
+                if (_type === "y") {
+                    let top = __startTop + deltaY;
                     setTop(top, "pan");
                 }
-                if (type === "x") {
-                    let left = startLeft + deltaX;
+                if (_type === "x") {
+                    let left = _startLeft + deltaX;
                     setTop(left, "pan");
                 }
-                domScroll.setAttribute("action", "true"); // 表示「拖曳中」，用於CSS樣式
+                _domScroll.setAttribute("action", "true"); // 表示「拖曳中」，用於CSS樣式
             });
 
-            hammerScroll.on("panend", (ev) => {
-                domScroll.setAttribute("action", ""); // 表示「結束拖曳」，用於CSS樣式
+            _hammerScroll.on("panend", (e) => {
+                _domScroll.setAttribute("action", ""); // 表示「結束拖曳」，用於CSS樣式
             });
         }
 
         /**
          * 
-         * @param _contentHeight 內容高度(全部的值)
-         * @param _panelHeight 容器高度
-         * @param _top 目前的值
+         * @param contentHeight 內容高度(全部的值)
+         * @param panelHeight 容器高度
+         * @param top 目前的值
          */
-        function update(_contentHeight: number, _panelHeight: number, _top: number): void {
+        function update(contentHeight: number, panelHeight: number, top: number) {
 
-            if (_top === undefined) {
-                _top = 0;
+            if (top === undefined) {
+                top = 0;
             }
 
-            contentHeight = _contentHeight;
-            panelHeight = _panelHeight;
+            _contentHeight = contentHeight;
+            _panelHeight = panelHeight;
 
-            if (type === "y") {
-                let h = _panelHeight / _contentHeight * domScroll.offsetHeight;
+            if (_type === "y") {
+                let h = panelHeight / contentHeight * _domScroll.offsetHeight;
                 if (h < 50) { h = 50; }
-                domBox.style.height = h + "px";
+                _domBox.style.height = h + "px";
             }
 
-            if (type === "x") {
-                let l = _panelHeight / _contentHeight * domScroll.offsetWidth;
+            if (_type === "x") {
+                let l = panelHeight / contentHeight * _domScroll.offsetWidth;
                 if (l < 50) { l = 50; }
-                domBox.style.width = l + "px";
+                _domBox.style.width = l + "px";
             }
 
             // 不需要時，自動隱藏
-            if (_contentHeight - 3 >= _panelHeight) {
-                domScroll.style.opacity = "1";
-                domScroll.style.pointerEvents = "";
+            if (contentHeight - 3 >= panelHeight) {
+                _domScroll.style.opacity = "1";
+                _domScroll.style.pointerEvents = "";
             } else {
-                domScroll.style.opacity = "0";
-                domScroll.style.pointerEvents = "none";
+                _domScroll.style.opacity = "0";
+                _domScroll.style.pointerEvents = "none";
             }
 
-            setValue(_top);
+            setValue(top);
         }
 
         /**
          * 捲動到指定的 值
-         * @param v 
+         * @param val 
          */
-        function setValue(v: number): void {
+        function setValue(val: number) {
 
-            v = v / (contentHeight - panelHeight); // 換算成百分比
+            val = val / (_contentHeight - _panelHeight); // 換算成百分比
 
-            if (type === "y") {
-                v = v * (domScroll.offsetHeight - domBox.offsetHeight);
+            if (_type === "y") {
+                val = val * (_domScroll.offsetHeight - _domBox.offsetHeight);
             }
 
-            if (type === "x") {
-                v = v * (domScroll.offsetWidth - domBox.offsetWidth);
+            if (_type === "x") {
+                val = val * (_domScroll.offsetWidth - _domBox.offsetWidth);
             }
 
-            setTop(v, "set");
+            setTop(val, "set");
         }
 
         /**
          * 取得目前的位置(px)
          * @returns 
          */
-        function getTop(): number {
-            if (type === "y") {
-                return toNumber(domBox.style.top);
+        function getTop() {
+            if (_type === "y") {
+                return toNumber(_domBox.style.top);
             }
-            if (type === "x") {
-                return toNumber(domBox.style.left);
+            if (_type === "x") {
+                return toNumber(_domBox.style.left);
             }
             return 0;
         }
 
         /**
          * 捲動到指定的位置(px)
-         * @param v 
+         * @param val 
          * @param mode set/pan/wheel
          */
-        function setTop(v: number, mode: ("set" | "pan" | "wheel")): void {
+        function setTop(val: number, mode: ("set" | "pan" | "wheel")) {
 
-            v = toNumber(v);
+            val = toNumber(val);
 
-            if (type === "y") {
-                if (v < 0) {
-                    v = 0;
+            if (_type === "y") {
+                if (val < 0) {
+                    val = 0;
                 }
-                if (v > domScroll.offsetHeight - domBox.offsetHeight) {
-                    v = domScroll.offsetHeight - domBox.offsetHeight;
+                if (val > _domScroll.offsetHeight - _domBox.offsetHeight) {
+                    val = _domScroll.offsetHeight - _domBox.offsetHeight;
                 }
-                domBox.style.top = v + "px";
+                _domBox.style.top = val + "px";
             }
 
-            if (type === "x") {
-                if (v < 0) {
-                    v = 0;
+            if (_type === "x") {
+                if (val < 0) {
+                    val = 0;
                 }
-                if (v > domScroll.offsetWidth - domBox.offsetWidth) {
-                    v = domScroll.offsetWidth - domBox.offsetWidth;
+                if (val > _domScroll.offsetWidth - _domBox.offsetWidth) {
+                    val = _domScroll.offsetWidth - _domBox.offsetWidth;
                 }
-                domBox.style.left = v + "px";
+                _domBox.style.left = val + "px";
             }
             eventChange(mode);
         }
@@ -307,7 +307,7 @@ class TiefseeScroll {
          * 取得 捲動時的事件
          * @returns 
          */
-        function getEventChange(): (v: number, mode: "set" | "wheel" | "pan") => void {
+        function getEventChange() {
             return _eventChange;
         }
 
@@ -315,7 +315,7 @@ class TiefseeScroll {
          * 設定 捲動時的事件
          * @param func 
          */
-        function setEventChange(func = (v: number, mode: "set" | "wheel" | "pan") => { }) {
+        function setEventChange(func = (val: number, mode: "set" | "wheel" | "pan") => { }) {
             _eventChange = func;
         }
 
@@ -323,32 +323,29 @@ class TiefseeScroll {
          * 捲動時呼叫此函數
          * @param mode 
          */
-        function eventChange(mode: ("set" | "pan" | "wheel")): void {
+        function eventChange(mode: ("set" | "pan" | "wheel")) {
             let x = 0;
-            if (type === "y") {
-                x = domScroll.offsetHeight - domBox.offsetHeight; // 計算剩餘空間
-                x = toNumber(domBox.style.top) / x; // 計算比例
-                x = x * (contentHeight - panelHeight)
+            if (_type === "y") {
+                x = _domScroll.offsetHeight - _domBox.offsetHeight; // 計算剩餘空間
+                x = toNumber(_domBox.style.top) / x; // 計算比例
+                x = x * (_contentHeight - _panelHeight)
             }
 
-            if (type === "x") {
-                x = domScroll.offsetWidth - domBox.offsetWidth; // 計算剩餘空間
-                x = toNumber(domBox.style.left) / x; // 計算比例
-                x = x * (contentHeight - panelHeight)
+            if (_type === "x") {
+                x = _domScroll.offsetWidth - _domBox.offsetWidth; // 計算剩餘空間
+                x = toNumber(_domBox.style.left) / x; // 計算比例
+                x = x * (_contentHeight - _panelHeight)
             }
 
             _eventChange(x, mode);
         }
 
-
         /**
          * 轉 number
-         * @param t 
-         * @returns 
          */
-        function toNumber(t: string | number): number {
+        function toNumber(t: string | number) {
             if (typeof (t) === "number") { return t } // 如果本來就是數字，直接回傳
-            if (typeof t === "string") { return Number(t.replace("px", "")); } // 如果是string，去掉px後轉型成數字
+            if (typeof t === "string") { return Number(t.replace("px", "")); } // 如果是 string，去掉 "px" 再轉數字
             return 0;
         }
 

@@ -1,4 +1,3 @@
-
 class MainMenu {
 
     public updateRightMenuImageZoomRatioTxt;
@@ -10,14 +9,14 @@ class MainMenu {
 
     constructor(M: MainWindow) {
 
-        var dom_rightMenuImage_zoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement; //右鍵選單的圖片縮放比例
+        const _domRightMenuImageZoomRatioTxt = document.querySelector("#menu-rightMenuImage .js-zoomRatioTxt") as HTMLElement; //右鍵選單的圖片縮放比例
 
-        var btnTopmost = document.querySelector("#menu-layout .js-topmost") as HTMLElement;
-        var btnMainToolbar = document.querySelector("#menu-layout .js-mainToolbar") as HTMLElement;
-        var btnMainDirList = document.querySelector("#menu-layout .js-mainDirList") as HTMLElement;
-        var btnMainFileList = document.querySelector("#menu-layout .js-mainFileList") as HTMLElement;
-        var btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
-        var btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
+        const _btnTopmost = document.querySelector("#menu-layout .js-topmost") as HTMLElement;
+        const _btnMainToolbar = document.querySelector("#menu-layout .js-mainToolbar") as HTMLElement;
+        const _btnMainDirList = document.querySelector("#menu-layout .js-mainDirList") as HTMLElement;
+        const _btnMainFileList = document.querySelector("#menu-layout .js-mainFileList") as HTMLElement;
+        const _btnMainExif = document.querySelector("#menu-layout .js-mainExif") as HTMLElement;
+        const _btnFullScreen = document.querySelector("#menu-layout .js-fullScreen") as HTMLDivElement;
 
         this.updateRightMenuImageZoomRatioTxt = updateRightMenuImageZoomRatioTxt;
         this.updateMenuLayoutCheckState = updateMenuLayoutCheckState;
@@ -41,7 +40,7 @@ class MainMenu {
         initText();
         initLayout();
 
-        var dataMenu = "";
+        var _dataMenu = "";
 
         document.body.addEventListener("mousedown", (e) => {
 
@@ -54,8 +53,8 @@ class MainMenu {
                     return;
                 }
                 //避免CSS設定過user-select:none的元素，無法透過點擊來讓文字取消選取狀態
-                let targetElement = e.target as Element;
-                let userSelect = window.getComputedStyle(targetElement).getPropertyValue("user-select");
+                const targetElement = e.target as Element;
+                const userSelect = window.getComputedStyle(targetElement).getPropertyValue("user-select");
                 if (userSelect === "none") {
                     window.getSelection()?.removeAllRanges(); //取消文字的選取狀態
                 }
@@ -63,17 +62,17 @@ class MainMenu {
 
             //點擊右鍵時
             if (e.button === 2) {
-                let target = e.target as HTMLElement;
+                const target = e.target as HTMLElement;
                 let dom = target as HTMLElement;
                 //取得 data-menu ，如果當前的dom沒有設定，則往往上層找
                 while (true) {
-                    let _dataMenu = dom.getAttribute("data-menu");
+                    let dataMenu = dom.getAttribute("data-menu");
                     if (dom === document.body) {
-                        dataMenu = "auto"
+                        _dataMenu = "auto"
                         break;
                     }
-                    if (_dataMenu != null) {
-                        dataMenu = _dataMenu;
+                    if (dataMenu != null) {
+                        _dataMenu = dataMenu;
                         break;
                     }
                     dom = dom.parentNode as HTMLElement;
@@ -88,7 +87,7 @@ class MainMenu {
 
                 showMenu(e);
 
-                dataMenu = "";
+                _dataMenu = "";
             }
         });
 
@@ -99,9 +98,9 @@ class MainMenu {
 
             if (M.menu.getIsShow()) { return; }
 
-            if (dataMenu === "") {
+            if (_dataMenu === "") {
 
-            } if (dataMenu === "none") {
+            } if (_dataMenu === "none") {
 
             } else if (Lib.isTextFocused()) { //焦點在輸入框上
                 M.script.menu.showRightMenuTextbox(x, y);
@@ -109,18 +108,18 @@ class MainMenu {
             } else if (Lib.isTxtSelect()) { //有選取文字的話
                 M.script.menu.showRightMenuTxt(x, y);
 
-            } else if (dataMenu === "filePanel") { //檔案預覽面板
+            } else if (_dataMenu === "filePanel") { //檔案預覽面板
                 M.script.menu.showRightMenuFilePanel(e);
 
-            } else if (dataMenu === "dirPanel") { //資料夾預覽面板
+            } else if (_dataMenu === "dirPanel") { //資料夾預覽面板
                 M.script.menu.showRightMenuDirPanel(e);
 
-            } else if (dataMenu === "file") { //純檔案
+            } else if (_dataMenu === "file") { //純檔案
                 M.script.menu.showRightMenuFile(e);
 
             } else {
                 //根據當前的顯示類型來決定右鍵選單
-                let showType = document.body.getAttribute("showType") ?? "";
+                const showType = document.body.getAttribute("showType") ?? "";
                 if (showType === "img" || showType === "imgs" || showType === "video") {
                     M.script.menu.showRightMenuImage(x, y);
                 } else if (showType === "bulkView") {
@@ -136,20 +135,20 @@ class MainMenu {
 
         /**
          * 更新 右鍵選單的圖片縮放比例
-         * @param txt 
+         * @param text 
          */
-        function updateRightMenuImageZoomRatioTxt(txt?: string) {
+        function updateRightMenuImageZoomRatioTxt(text?: string) {
 
-            if (dom_rightMenuImage_zoomRatioTxt === null) { return; }
+            if (_domRightMenuImageZoomRatioTxt === null) { return; }
 
-            if (txt !== undefined) { // 如果有傳入文字，就更新文字內容
-                dom_rightMenuImage_zoomRatioTxt.innerHTML = txt;
+            if (text !== undefined) { // 如果有傳入文字，就更新文字內容
+                _domRightMenuImageZoomRatioTxt.innerHTML = text;
             }
 
-            if (dom_rightMenuImage_zoomRatioTxt.clientWidth !== 0) {
-                let r = 35 / dom_rightMenuImage_zoomRatioTxt.clientWidth;
+            if (_domRightMenuImageZoomRatioTxt.clientWidth !== 0) {
+                let r = 35 / _domRightMenuImageZoomRatioTxt.clientWidth;
                 if (r > 1) { r = 1; }
-                dom_rightMenuImage_zoomRatioTxt.style.transform = `scaleX(${r})`
+                _domRightMenuImageZoomRatioTxt.style.transform = `scaleX(${r})`
             }
         }
 
@@ -160,10 +159,10 @@ class MainMenu {
          */
         async function initFile() {
 
-            let dom = document.getElementById("menu-file") as HTMLElement;
+            const dom = document.getElementById("menu-file") as HTMLElement;
 
             function getPath() {
-                let path = dom.getAttribute("data-path");
+                const path = dom.getAttribute("data-path");
                 if (path !== null && path !== "") {
                     return path;
                 } else {
@@ -233,7 +232,7 @@ class MainMenu {
         }
 
         var _isInitOtherAppList = false;
-        var _otherAppList: {
+        const _otherAppList: {
             dom: HTMLElement,
             isInit?: boolean,
             imgUrl: string,
@@ -259,7 +258,7 @@ class MainMenu {
             }
 
             // 以第三方程式開啟
-            var dom_menuOtherAppOpen = document.getElementById("menu-otherAppOpen");
+            const domMenuOtherAppOpen = document.getElementById("menu-otherAppOpen");
             // 讀取開始選單裡面的捷徑
             async function funcExe() {
 
@@ -306,7 +305,7 @@ class MainMenu {
 
                     if (imgBase64 === "") { continue; } // 如果沒有圖示，表示檔案不存在
 
-                    let dom = Lib.newDom(`
+                    const dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
                                 <img>
@@ -321,7 +320,7 @@ class MainMenu {
                         M.menu.close();
                         WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); // 開啟檔案
                     };
-                    dom_menuOtherAppOpen?.append(dom);
+                    domMenuOtherAppOpen?.append(dom);
                     _otherAppList.push({ dom: dom, menuConfig: exe.menuConfig, imgUrl: imgBase64 });
                 }
 
@@ -336,7 +335,7 @@ class MainMenu {
                 }[] = [];
 
                 // 加入uwp
-                let arLnk = await WebAPI.getUwpList();
+                const arLnk = await WebAPI.getUwpList();
                 for (let i = 0; i < arLnk.length; i++) {
                     const uwpItem = arLnk[i];
 
@@ -354,9 +353,9 @@ class MainMenu {
                 for (let i = 0; i < arUwp.length; i++) {
 
                     const uwpItem = arUwp[i];
-                    let name = uwpItem.name; // 顯示的名稱
-                    let logo = uwpItem.path;
-                    let dom = Lib.newDom(`
+                    const name = uwpItem.name; // 顯示的名稱
+                    const logo = uwpItem.path;
+                    const dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">
                                 <img>
@@ -371,7 +370,7 @@ class MainMenu {
                         M.menu.close();
                         WV_RunApp.RunUwp(uwpItem.id, filePath); // 開啟檔案
                     };
-                    dom_menuOtherAppOpen?.append(dom);
+                    domMenuOtherAppOpen?.append(dom);
                     _otherAppList.push({ dom: dom, menuConfig: uwpItem.menuConfig, imgUrl: logo });
                 }
             }
@@ -390,13 +389,13 @@ class MainMenu {
             if (path === undefined) { return; }
 
             _otherAppList.forEach(item => {
-                let fileExt = Lib.GetExtension(path).replace(".", ""); // 取得副檔名
-                let configFileExt = item.menuConfig.fileExt ?? [];
-                let isExtOK = configFileExt.includes(fileExt);
+                const fileExt = Lib.getExtension(path).replace(".", ""); // 取得副檔名
+                const configFileExt = item.menuConfig.fileExt ?? [];
+                const isExtOK = configFileExt.includes(fileExt);
 
-                let groupType = M.fileLoad.fileExtToGroupType(fileExt);
-                let configGroupType = item.menuConfig.groupType ?? [];
-                let isGroupTypeOK = configGroupType.includes(groupType);
+                const groupType = M.fileLoad.fileExtToGroupType(fileExt);
+                const configGroupType = item.menuConfig.groupType ?? [];
+                const isGroupTypeOK = configGroupType.includes(groupType);
 
                 if (isExtOK || isGroupTypeOK) {
 
@@ -427,7 +426,7 @@ class MainMenu {
           */
         function initOpenFile() {
 
-            let dom = document.getElementById("menu-openfile") as HTMLElement;
+            const dom = document.getElementById("menu-openfile") as HTMLElement;
 
             // 載入檔案
             dom.querySelector(".js-openFile")?.addEventListener("click", () => {
@@ -447,10 +446,10 @@ class MainMenu {
          */
         async function initCopy() {
 
-            let dom = document.getElementById("menu-copy") as HTMLElement;
+            const dom = document.getElementById("menu-copy") as HTMLElement;
 
             function getPath() {
-                let path = dom.getAttribute("data-path");
+                const path = dom.getAttribute("data-path");
                 if (path !== null && path !== "") {
                     return path;
                 } else {
@@ -518,7 +517,7 @@ class MainMenu {
         function initRotate() {
 
             // 順時針90°
-            var dom_rotateCw = document.getElementById("menuitem-img-rotateCw");
+            const dom_rotateCw = document.getElementById("menuitem-img-rotateCw");
             if (dom_rotateCw !== null) {
                 dom_rotateCw.onclick = async () => {
                     M.menu.close();
@@ -527,7 +526,7 @@ class MainMenu {
             }
 
             // 逆時針90°
-            var dom_rotateCcw = document.getElementById("menuitem-img-rotateCcw");
+            const dom_rotateCcw = document.getElementById("menuitem-img-rotateCcw");
             if (dom_rotateCcw !== null) {
                 dom_rotateCcw.onclick = async () => {
                     M.menu.close();
@@ -536,7 +535,7 @@ class MainMenu {
             }
 
             // 水平鏡像
-            var dom_mirroringH = document.getElementById("menuitem-img-mirroringH");
+            const dom_mirroringH = document.getElementById("menuitem-img-mirroringH");
             if (dom_mirroringH !== null) {
                 dom_mirroringH.onclick = async () => {
                     M.menu.close();
@@ -545,7 +544,7 @@ class MainMenu {
             }
 
             // 垂直鏡像
-            var dom_mirroringV = document.getElementById("menuitem-img-mirroringV");
+            const dom_mirroringV = document.getElementById("menuitem-img-mirroringV");
             if (dom_mirroringV !== null) {
                 dom_mirroringV.onclick = async () => {
                     M.menu.close();
@@ -554,7 +553,7 @@ class MainMenu {
             }
 
             // 初始化旋轉
-            var dom_initRotate = document.getElementById("menuitem-img-initRotate");
+            const dom_initRotate = document.getElementById("menuitem-img-initRotate");
             if (dom_initRotate !== null) {
                 dom_initRotate.onclick = async () => {
                     M.menu.close();
@@ -568,7 +567,7 @@ class MainMenu {
          */
         function initRightMenuImage() {
 
-            let dom = document.getElementById("menu-rightMenuImage")
+            const dom = document.getElementById("menu-rightMenuImage")
             if (dom === null) { return; }
 
             dom.querySelector(".js-bulkView")?.addEventListener("click", () => { // 大量瀏覽模式
@@ -588,7 +587,7 @@ class MainMenu {
                 M.script.fileLoad.nextDir();
             });
 
-            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
+            const dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
             if (dragDropFile !== null) {
                 Lib.addDragThresholdListener(dragDropFile, 3, () => {
                     M.script.file.dragDropFile();
@@ -687,7 +686,7 @@ class MainMenu {
          */
         function initRightMenuWelcome() {
 
-            let dom = document.getElementById("menu-rightMenuWelcome")
+            const dom = document.getElementById("menu-rightMenuWelcome")
             if (dom === null) { return; }
 
             dom.querySelector(".js-open")?.addEventListener("click", () => { // 設定
@@ -713,7 +712,7 @@ class MainMenu {
          */
         function initRightMenuDefault() {
 
-            let dom = document.getElementById("menu-rightMenuDefault")
+            const dom = document.getElementById("menu-rightMenuDefault")
             if (dom === null) { return; }
 
             dom.querySelector(".js-prev")?.addEventListener("click", () => {
@@ -764,7 +763,7 @@ class MainMenu {
          */
         function initRightMenuBulkView() {
 
-            let dom = document.getElementById("menu-rightMenuBulkView");
+            const dom = document.getElementById("menu-rightMenuBulkView");
             if (dom === null) { return; }
 
             dom.querySelector(".js-back")?.addEventListener("click", () => { // 返回
@@ -772,7 +771,7 @@ class MainMenu {
                 M.toolbarBack.runEvent();
             });
 
-            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
+            const dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
             if (dragDropFile !== null) {
                 Lib.addDragThresholdListener(dragDropFile, 3, () => {
                     M.script.file.dragDropFile();
@@ -849,17 +848,17 @@ class MainMenu {
          */
         function initRightMenuFileBox() {
 
-            let dom = document.querySelector("#menu-fileBox");
+            const dom = document.querySelector("#menu-fileBox");
             if (dom === null) { return; }
 
             function getPath() {
                 if (dom === null) { return ""; }
-                let path = dom.getAttribute("data-path");
+                const path = dom.getAttribute("data-path");
                 if (path === null) { return ""; }
                 return path;
             }
 
-            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
+            const dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
             if (dragDropFile !== null) {
                 Lib.addDragThresholdListener(dragDropFile, 3, () => {
                     M.script.file.dragDropFile(getPath());
@@ -923,17 +922,17 @@ class MainMenu {
          *  初始化 右鍵選單 - dirbox
          */
         function initRightMenuDirBox() {
-            let dom = document.querySelector("#menu-dirBox");
+            const dom = document.querySelector("#menu-dirBox");
             if (dom === null) { return; }
 
             function getPath() {
                 if (dom === null) { return ""; }
-                let path = dom.getAttribute("data-path");
+                const path = dom.getAttribute("data-path");
                 if (path === null) { return ""; }
                 return path;
             }
 
-            let dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
+            const dragDropFile = dom.querySelector(".js-dragDropFile") as HTMLElement; // 快速拖曳
             if (dragDropFile !== null) {
                 Lib.addDragThresholdListener(dragDropFile, 3, () => {
                     M?.script.file.dragDropFile(getPath());
@@ -984,7 +983,7 @@ class MainMenu {
          * 初始化 右鍵選單 - 檔案預覽面板
          */
         function initRightMenuFilePanel() {
-            let dom = document.querySelector("#menu-rightMenuFilePanel");
+            const dom = document.querySelector("#menu-rightMenuFilePanel");
             if (dom === null) { return; }
 
             dom.querySelector(".js-reload")?.addEventListener("click", () => { // 重新載入
@@ -1005,7 +1004,7 @@ class MainMenu {
          * 初始化 右鍵選單 - 資料夾預覽面板
          */
         function initRightMenuDirPanel() {
-            let dom = document.querySelector("#menu-rightMenuDirPanel");
+            const dom = document.querySelector("#menu-rightMenuDirPanel");
             if (dom === null) { return; }
 
             dom.querySelector(".js-reload")?.addEventListener("click", () => { // 重新載入
@@ -1027,24 +1026,24 @@ class MainMenu {
          */
         async function initTextbox() {
 
-            var dom_menu = document.getElementById("menu-text");
-            if (dom_menu !== null) {
-                dom_menu.addEventListener("mousedown", (e) => {
+            const domMenu = document.getElementById("menu-text");
+            if (domMenu !== null) {
+                domMenu.addEventListener("mousedown", (e) => {
                     e.preventDefault(); // 避免搶走輸入框的焦點
                 });
             }
 
-            var dom_cut = document.getElementById("menuitem-text-cut"); // 剪下
-            if (dom_cut !== null) {
-                dom_cut.onclick = async () => {
+            const domCut = document.getElementById("menuitem-text-cut"); // 剪下
+            if (domCut !== null) {
+                domCut.onclick = async () => {
                     await WV_System.SendKeys_CtrlAnd("x");
                     M.menu.close();
                 }
             }
 
-            var dom_copy = document.getElementById("menuitem-text-copy"); // 複製
-            if (dom_copy !== null) {
-                dom_copy.onclick = async () => {
+            const domCopy = document.getElementById("menuitem-text-copy"); // 複製
+            if (domCopy !== null) {
+                domCopy.onclick = async () => {
                     let selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Text(selection.toString()); // 存入剪貼簿
@@ -1052,21 +1051,21 @@ class MainMenu {
                 }
             }
 
-            var dom_paste = document.getElementById("menuitem-text-paste"); //貼上
-            if (dom_paste !== null) {
-                dom_paste.onclick = async () => {
+            const domPaste = document.getElementById("menuitem-text-paste"); //貼上
+            if (domPaste !== null) {
+                domPaste.onclick = async () => {
                     await Lib.sleep(10);
                     await WV_System.SendKeys_CtrlAnd("v");
                     M.menu.close();
                 }
 
-                var dom_selectAll = document.getElementById("menuitem-text-selectAll"); // 全選
-                if (dom_selectAll !== null) {
-                    dom_selectAll.onclick = async () => {
+                const domSelectAll = document.getElementById("menuitem-text-selectAll"); // 全選
+                if (domSelectAll !== null) {
+                    domSelectAll.onclick = async () => {
                         M.menu.close();
-                        let dom_input = document.activeElement as HTMLInputElement;
-                        if (dom_input === null) { return; }
-                        dom_input.setSelectionRange(0, dom_input.value.length)
+                        const domInput = document.activeElement as HTMLInputElement;
+                        if (domInput === null) { return; }
+                        domInput.setSelectionRange(0, domInput.value.length)
                     }
                 }
             }
@@ -1077,18 +1076,18 @@ class MainMenu {
          */
         async function initText() {
 
-            var dom_menu = document.getElementById("menu-txt");
-            if (dom_menu !== null) {
-                dom_menu.addEventListener("mousedown", (e) => {
+            const domMenu = document.getElementById("menu-txt");
+            if (domMenu !== null) {
+                domMenu.addEventListener("mousedown", (e) => {
                     e.preventDefault(); // 避免搶走輸入框的焦點
                 });
             }
 
-            var dom_copy = document.getElementById("menuitem-txt-copy"); // 複製
-            if (dom_copy !== null) {
-                dom_copy.onclick = async () => {
+            const domCopy = document.getElementById("menuitem-txt-copy"); // 複製
+            if (domCopy !== null) {
+                domCopy.onclick = async () => {
                     M.menu.close();
-                    let selection = document.getSelection();
+                    const selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Text(selection.toString()); // 存入剪貼簿
                 }
@@ -1099,22 +1098,22 @@ class MainMenu {
          * 初始化 menu-版面
          */
         async function initLayout() {
-            btnTopmost.addEventListener("click", async () => {
+            _btnTopmost.addEventListener("click", async () => {
                 M.script.window.enabledTopmost();
             });
-            btnFullScreen.addEventListener("click", () => {
+            _btnFullScreen.addEventListener("click", () => {
                 M.script.window.enabledFullScreen();
             });
-            btnMainToolbar.addEventListener("click", () => {
+            _btnMainToolbar.addEventListener("click", () => {
                 M.script.window.enabledMainToolbar();
             });
-            btnMainDirList.addEventListener("click", () => {
+            _btnMainDirList.addEventListener("click", () => {
                 M.script.window.enabledMainDirList();
             });
-            btnMainFileList.addEventListener("click", () => {
+            _btnMainFileList.addEventListener("click", () => {
                 M.script.window.enabledMainFileList();
             });
-            btnMainExif.addEventListener("click", () => {
+            _btnMainExif.addEventListener("click", () => {
                 M.script.window.enabledMainExif();
             });
         }
@@ -1123,11 +1122,11 @@ class MainMenu {
          * 判斷哪些選項要被勾選，於開啟選單時呼叫
          */
         function updateMenuLayoutCheckState() {
-            setMenuLayoutCheckState(btnMainToolbar, M.config.settings.layout.mainToolbarEnabled);
-            setMenuLayoutCheckState(btnMainDirList, M.config.settings.layout.dirListEnabled);
-            setMenuLayoutCheckState(btnMainFileList, M.config.settings.layout.fileListEnabled);
-            setMenuLayoutCheckState(btnMainExif, M.config.settings.layout.mainExifEnabled);
-            setMenuLayoutCheckState(btnFullScreen, M.fullScreen.getEnabled());
+            setMenuLayoutCheckState(_btnMainToolbar, M.config.settings.layout.mainToolbarEnabled);
+            setMenuLayoutCheckState(_btnMainDirList, M.config.settings.layout.dirListEnabled);
+            setMenuLayoutCheckState(_btnMainFileList, M.config.settings.layout.fileListEnabled);
+            setMenuLayoutCheckState(_btnMainExif, M.config.settings.layout.mainExifEnabled);
+            setMenuLayoutCheckState(_btnFullScreen, M.fullScreen.getEnabled());
         }
 
         /**

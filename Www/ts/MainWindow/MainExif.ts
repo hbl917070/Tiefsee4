@@ -19,60 +19,60 @@ class MainExif {
 		this.setHorizontal = setHorizontal;
 		this.updateFileWatcher = updateFileWatcher;
 
-		var domMainExif = document.getElementById("mainExif") as HTMLElement;
-		var domDragbar_mainFileList = document.getElementById("dragbar-mainExif") as HTMLElement; // 拖曳條
+		const _domMainExif = document.getElementById("mainExif") as HTMLElement;
+		const _domDragbarMainFileList = document.getElementById("dragbar-mainExif") as HTMLElement; // 拖曳條
 
-		var domTabBtns = domMainExif.querySelector(".js-tabBtns") as HTMLElement;
-		var domTabBtnInfo = domMainExif.querySelector(".js-tabBtn-info") as HTMLElement;
-		var domTabBtnRelated = domMainExif.querySelector(".js-tabBtn-related") as HTMLElement;
-		var domTabContentInfo = domMainExif.querySelector(".js-tabContent-info") as HTMLElement;
-		var domTabContentRelated = domMainExif.querySelector(".js-tabContent-related") as HTMLElement;
+		const _domTabBtns = _domMainExif.querySelector(".js-tabBtns") as HTMLElement;
+		const _domTabBtnInfo = _domMainExif.querySelector(".js-tabBtn-info") as HTMLElement;
+		const _domTabBtnRelated = _domMainExif.querySelector(".js-tabBtn-related") as HTMLElement;
+		const _domTabContentInfo = _domMainExif.querySelector(".js-tabContent-info") as HTMLElement;
+		const _domTabContentRelated = _domMainExif.querySelector(".js-tabContent-related") as HTMLElement;
 
-		var relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
-		var fileInfo2: FileInfo2;
+		const _relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
+		var _fileInfo2: FileInfo2;
 
-		var isHide = false; // 暫時隱藏
-		var isEnabled = true; // 啟用 檔案預覽視窗
+		var _isHide = false; // 暫時隱藏
+		var _isEnabled = true; // 啟用 檔案預覽視窗
 
 		/** 請求限制器 */
-		const limiter = new RequestLimiter(1);
+		const _limiter = new RequestLimiter(1);
 
 		/** 頁籤的類型 */
-		var TabType = {
+		const TabType = {
 			/** 資訊 */
 			info: "info",
 			/** 相關檔案 */
 			related: "related"
 		}
 		/** 當前頁籤的類型 */
-		var tabType = TabType.info;
+		var _tabType = TabType.info;
 
 		// 在工具列滾動時，進行水平移動
-		domTabBtns.addEventListener("wheel", (e: WheelEvent) => {
+		_domTabBtns.addEventListener("wheel", (e: WheelEvent) => {
 
-			let scrollLeft = domTabBtns.scrollLeft;
+			let scrollLeft = _domTabBtns.scrollLeft;
 			let deltaY = e.deltaY; // 上下滾動的量
 
 			if (deltaY > 0) { // 往右
-				domTabBtns.scroll(scrollLeft + 20, 0);
+				_domTabBtns.scroll(scrollLeft + 20, 0);
 			}
 			if (deltaY < 0) { // 往左
-				domTabBtns.scroll(scrollLeft - 20, 0);
+				_domTabBtns.scroll(scrollLeft - 20, 0);
 			}
 		}, false);
 
-		new TiefseeScroll().initGeneral(domTabBtns, "x"); // 滾動條元件
+		new TiefseeScroll().initGeneral(_domTabBtns, "x"); // 滾動條元件
 
-		domTabBtnInfo.addEventListener("click", () => {
+		_domTabBtnInfo.addEventListener("click", () => {
 			setTab(TabType.info);
-			if (fileInfo2 !== undefined) {
+			if (_fileInfo2 !== undefined) {
 				loadInfo();
 				loadRelated();
 			}
 		})
-		domTabBtnRelated.addEventListener("click", () => {
+		_domTabBtnRelated.addEventListener("click", () => {
 			setTab(TabType.related);
-			if (fileInfo2 !== undefined) {
+			if (_fileInfo2 !== undefined) {
 				loadInfo();
 				loadRelated();
 			}
@@ -80,39 +80,39 @@ class MainExif {
 		function setTab(type: string) {
 
 			if (type === TabType.related) {
-				tabType = TabType.related;
-				domTabBtnInfo.setAttribute("active", "");
-				domTabBtnRelated.setAttribute("active", "true");
-				domTabContentInfo.style.display = "none";
-				domTabContentRelated.style.display = "";
+				_tabType = TabType.related;
+				_domTabBtnInfo.setAttribute("active", "");
+				_domTabBtnRelated.setAttribute("active", "true");
+				_domTabContentInfo.style.display = "none";
+				_domTabContentRelated.style.display = "";
 			} else {
-				tabType = TabType.info;
-				domTabBtnInfo.setAttribute("active", "true");
-				domTabBtnRelated.setAttribute("active", "");
-				domTabContentInfo.style.display = "";
-				domTabContentRelated.style.display = "none";
+				_tabType = TabType.info;
+				_domTabBtnInfo.setAttribute("active", "true");
+				_domTabBtnRelated.setAttribute("active", "");
+				_domTabContentInfo.style.display = "";
+				_domTabContentRelated.style.display = "none";
 			}
 
-			M.config.settings.layout.mainExifTabs = tabType;
+			M.config.settings.layout.mainExifTabs = _tabType;
 		}
 
 		// 拖曳改變 size
-		var dragbar = this.dragbar = new Dragbar();
-		dragbar.init("left", domMainExif, domDragbar_mainFileList, M.dom_mainR);
+		const _dragbar = this.dragbar = new Dragbar();
+		_dragbar.init("left", _domMainExif, _domDragbarMainFileList, M.domMainR);
 		// 拖曳開始
-		dragbar.setEventStart(() => { })
+		_dragbar.setEventStart(() => { })
 		// 拖曳
-		dragbar.setEventMove((val: number) => {
+		_dragbar.setEventMove((val: number) => {
 			if (val < 10) { // 小於10的話就暫時隱藏
-				domMainExif.style.opacity = "0";
-				dragbar.setDragbarPosition(0);
+				_domMainExif.style.opacity = "0";
+				_dragbar.setDragbarPosition(0);
 			} else {
-				domMainExif.style.opacity = "1";
+				_domMainExif.style.opacity = "1";
 				setItemWidth(val);
 			}
 		})
 		// 拖曳 結束
-		dragbar.setEventEnd((val: number) => {
+		_dragbar.setEventEnd((val: number) => {
 			if (val < 10) { // 小於10的話，關閉檔案預覽視窗
 				setEnabled(false);
 			}
@@ -122,13 +122,13 @@ class MainExif {
 		 * 暫時隱藏(不影響設定值，強制隱藏
 		 */
 		function setHide(val: boolean) {
-			isHide = val;
+			_isHide = val;
 			if (val) {
-				domMainExif.setAttribute("hide", "true");
-				dragbar.setEnabled(false);
+				_domMainExif.setAttribute("hide", "true");
+				_dragbar.setEnabled(false);
 			} else {
-				domMainExif.setAttribute("hide", "");
-				dragbar.setEnabled(M.config.settings.layout.mainExifEnabled);
+				_domMainExif.setAttribute("hide", "");
+				_dragbar.setEnabled(M.config.settings.layout.mainExifEnabled);
 			}
 		}
 
@@ -138,22 +138,22 @@ class MainExif {
 		function setEnabled(val: boolean) {
 
 			if (val) {
-				domMainExif.setAttribute("active", "true");
+				_domMainExif.setAttribute("active", "true");
 
 				// 讀取上次的設定
-				tabType = M.config.settings.layout.mainExifTabs;
-				setTab(tabType);
+				_tabType = M.config.settings.layout.mainExifTabs;
+				setTab(_tabType);
 
 			} else {
-				domMainExif.setAttribute("active", "");
+				_domMainExif.setAttribute("active", "");
 			}
 
 			M.config.settings.layout.mainExifEnabled = val;
-			dragbar.setEnabled(val);
-			domMainExif.style.opacity = "1";
+			_dragbar.setEnabled(val);
+			_domMainExif.style.opacity = "1";
 
-			if (isEnabled === val) { return; }
-			isEnabled = val;
+			if (_isEnabled === val) { return; }
+			_isEnabled = val;
 
 			loadInfo();
 			loadRelated();
@@ -164,10 +164,10 @@ class MainExif {
 		 */
 		function setRelatedFilesEnabled(val: boolean) {
 			if (val) {
-				domTabBtns.setAttribute("active", "true");
+				_domTabBtns.setAttribute("active", "true");
 			} else {
-				domTabBtns.setAttribute("active", "false");
-				if (tabType === TabType.related) {
+				_domTabBtns.setAttribute("active", "false");
+				if (_tabType === TabType.related) {
 					setTab(TabType.info);
 					loadInfo();
 				}
@@ -175,7 +175,7 @@ class MainExif {
 		}
 
 		/**
-		 * 設定size
+		 * 設定 size
 		 * @param val 
 		 */
 		function setItemWidth(val: number) {
@@ -189,8 +189,8 @@ class MainExif {
 
 			// var cssRoot = document.body;
 			// cssRoot.style.setProperty("--mainExif-width", val + "px");
-			domMainExif.style.width = val + "px";
-			dragbar.setDragbarPosition(val);
+			_domMainExif.style.width = val + "px";
+			_dragbar.setDragbarPosition(val);
 		}
 
 		/**
@@ -198,8 +198,8 @@ class MainExif {
 		 * @param _fileInfo2 
 		 * @param noCheckPath true=不在載入完成後檢查是否已經切換到其他檔案
 		 */
-		function init(_fileInfo2: FileInfo2, noCheckPath = false) {
-			fileInfo2 = _fileInfo2;
+		function init(fileInfo2: FileInfo2, noCheckPath = false) {
+			_fileInfo2 = fileInfo2;
 			loadInfo(noCheckPath);
 			loadRelated(noCheckPath);
 		}
@@ -209,18 +209,18 @@ class MainExif {
 		 */
 		async function loadInfo(noCheckPath = false) {
 
-			if (isEnabled === false) { return; }
-			if (tabType !== TabType.info) { return; }
+			if (_isEnabled === false) { return; }
+			if (_tabType !== TabType.info) { return; }
 
-			domTabContentInfo.innerHTML = "";
+			_domTabContentInfo.innerHTML = "";
 
-			if (fileInfo2.Type === "none") { // 如果檔案不存在
+			if (_fileInfo2.Type === "none") { // 如果檔案不存在
 				return;
 			}
 
-			let path = fileInfo2.FullPath;
-			let maxLength = M.config.settings.advanced.exifReadMaxLength;
-			let json = await WebAPI.getExif(fileInfo2, maxLength);
+			const path = _fileInfo2.FullPath;
+			const maxLength = M.config.settings.advanced.exifReadMaxLength;
+			const json = await WebAPI.getExif(_fileInfo2, maxLength);
 
 			if (json.code != "1") {
 				return;
@@ -230,7 +230,7 @@ class MainExif {
 					return;
 				}
 			}
-			let groupType = M.fileShow.getGroupType();
+			const groupType = M.fileShow.getGroupType();
 
 			// 取得經緯度
 			let gpsLat = getItem(json.data, "GPS Latitude")?.value; // 緯度
@@ -271,7 +271,7 @@ class MainExif {
 						// 產生新的 dom
 						let name = M.i18n.t(`exif.name.Video Duration`);
 						let domVideoNew = getItemDom(name, value);
-						domTabContentInfo.appendChild(domVideoNew);
+						_domTabContentInfo.appendChild(domVideoNew);
 
 						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
 						domVideo.insertAdjacentElement("afterend", domVideoNew);
@@ -285,9 +285,9 @@ class MainExif {
 
 			// 不重要的資訊，排到最後面才顯示
 			function lastItem(name: string, val: string) {
-				let itemDom = getItemDom(name, val);
+				const itemDom = getItemDom(name, val);
 				deferredFunc.push(() => {
-					domTabContentInfo.appendChild(itemDom);
+					_domTabContentInfo.appendChild(itemDom);
 				})
 			}
 
@@ -301,7 +301,7 @@ class MainExif {
 				if (groupType === GroupType.video && name === "Video Duration") {
 					// 先產生一個沒有資料的項目
 					let domVideo = getItemDom(M.i18n.t(`exif.name.${name}`), " ");
-					domTabContentInfo.appendChild(domVideo);
+					_domTabContentInfo.appendChild(domVideo);
 					// 待影片載入完畢，更新「影片長度」的資訊
 					updateVideoDuration(domVideo);
 					continue;
@@ -317,27 +317,27 @@ class MainExif {
 
 					value = encodeURIComponent(value); // 移除可能破壞html的跳脫符號
 
-					let mapHtml = `
+					const mapHtml = `
 						<div class="mainExifItem">
 							<div class="mainExifMap">
 								<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
 							</div>
 						</div>`;
-					domTabContentInfo.appendChild(Lib.newDom(mapHtml));
+					_domTabContentInfo.appendChild(Lib.newDom(mapHtml));
 
 				}
 				else if (name === "Frame Count") { // 總幀數
-					let nameI18n = `exif.name.${name}`;
+					const nameI18n = `exif.name.${name}`;
 					name = M.i18n.t(`exif.name.${name}`);
 
-					let domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div><span>`);
-					let domBtn = domValue.querySelector(".btnExport") as HTMLElement;
+					const domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div><span>`);
+					const domBtn = domValue.querySelector(".btnExport") as HTMLElement;
 					domBtn.addEventListener("click", () => {
 						M.script.open.showFrames(path);
 					})
-					let itemDom = getItemDom(name, domValue, nameI18n, "");
+					const itemDom = getItemDom(name, domValue, nameI18n, "");
 
-					domTabContentInfo.appendChild(itemDom);
+					_domTabContentInfo.appendChild(itemDom);
 
 				}
 				else if (name === "Make" && value.startsWith("Prompt:{")) { // ComfyUI 的 webp
@@ -369,7 +369,7 @@ class MainExif {
 								comfyuiPrompt = JSON.parse(value)["prompt"];
 							}
 						} else {
-							domTabContentInfo.appendChild(getItemDom(name, value));
+							_domTabContentInfo.appendChild(getItemDom(name, value));
 						}
 					}
 
@@ -381,7 +381,7 @@ class MainExif {
 						let val = vals[i];
 						let x = val.indexOf(": "); // 資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
-							domTabContentInfo.appendChild(getItemDom(name, val));
+							_domTabContentInfo.appendChild(getItemDom(name, val));
 
 						} else {
 
@@ -404,10 +404,10 @@ class MainExif {
 							if (name === "Comment") { // NovelAI 才有的欄位
 								if (val.includes(`"steps": `)) {
 									AiDrawingPrompt.getNovelai(val).forEach(item => {
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
-									domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
 							else if (name === "Generation time") { // ComfyUI
@@ -419,10 +419,10 @@ class MainExif {
 							else if (name === "metadata") { // 不明，資料為一般的 json
 								if (val.includes(`"seed": `)) {
 									AiDrawingPrompt.getNormalJson(val).forEach(item => {
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
-									domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
 
@@ -430,7 +430,7 @@ class MainExif {
 								if (val.includes(`"sui_image_params":`)) { // StableSwarmUI
 									let json = JSON.parse(val)["sui_image_params"];
 									AiDrawingPrompt.getNormalJson(json).forEach(item => {
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								}
 								else if (val.includes("Steps: ")) { // A1111
@@ -450,10 +450,10 @@ class MainExif {
 										if (item.title == "TI hashes") {
 											civitai.tiHashes = item.text;
 										}
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
-									domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
 
@@ -484,15 +484,15 @@ class MainExif {
 								let items = AiDrawingPrompt.getInvokeai(val);
 								if (items.length > 0) {
 									items.forEach(item => {
-										domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
-									domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom(name, val));
 								}
 							}
 
 							else {
-								domTabContentInfo.appendChild(getItemDom(name, val));
+								_domTabContentInfo.appendChild(getItemDom(name, val));
 							}
 						}
 					}
@@ -517,7 +517,7 @@ class MainExif {
 					}
 
 					name = M.i18n.t(`exif.name.${name}`);
-					domTabContentInfo.appendChild(getItemDom(name, value, nameI18n, valueI18n));
+					_domTabContentInfo.appendChild(getItemDom(name, value, nameI18n, valueI18n));
 				}
 			}
 
@@ -543,7 +543,7 @@ class MainExif {
 						data.forEach(item => {
 							collapseDom.domContent.appendChild(getItemDom(item.title, item.text));
 						});
-						domTabContentInfo.appendChild(collapseDom.domBox);
+						_domTabContentInfo.appendChild(collapseDom.domBox);
 					}
 				}
 			}
@@ -553,7 +553,7 @@ class MainExif {
 				// 折疊面板
 				let collapseDom = await getCollapseDom("ComfyScript", true);
 				collapseDom.domContent.appendChild(getItemDom("ComfyScript", comfyScript));
-				domTabContentInfo.appendChild(collapseDom.domBox);
+				_domTabContentInfo.appendChild(collapseDom.domBox);
 			}
 			// 把 ComfyUI 的原始資料放在最下面，並預設折疊
 			if (comfyuiPrompt !== undefined || comfyuiWorkflow !== undefined) {
@@ -579,17 +579,17 @@ class MainExif {
 				if (comfyuiWorkflow !== undefined) {
 					collapseDom.domContent.appendChild(getItemDom("Workflow", comfyuiWorkflow));
 				}
-				domTabContentInfo.appendChild(collapseDom.domBox);
+				_domTabContentInfo.appendChild(collapseDom.domBox);
 			}
 			// 不存在 ComfyUI 的資料，但是有 GenerationData，則直接顯示
 			else if (comfyuiGenerationData !== undefined) {
 
 				if (comfyuiGenerationData.includes(`"seed":`)) {
 					AiDrawingPrompt.getNormalJson(comfyuiGenerationData).forEach(item => {
-						domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+						_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 					})
 				} else {
-					domTabContentInfo.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
+					_domTabContentInfo.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
 				}
 
 			}
@@ -602,17 +602,17 @@ class MainExif {
 		 */
 		async function loadRelated(noCheckPath = false) {
 
-			if (isEnabled === false) { return; }
-			if (tabType !== TabType.related) { return; }
+			if (_isEnabled === false) { return; }
+			if (_tabType !== TabType.related) { return; }
 
-			domTabContentRelated.innerHTML = "";
+			_domTabContentRelated.innerHTML = "";
 
-			if (fileInfo2.Type === "none") { // 如果檔案不存在
+			if (_fileInfo2.Type === "none") { // 如果檔案不存在
 				return;
 			}
 
-			let path = fileInfo2.FullPath;
-			let json = await WebAPI.getRelatedFileList(path, relatedFileExtList);
+			const path = _fileInfo2.FullPath;
+			const json = await WebAPI.getRelatedFileList(path, _relatedFileExtList);
 
 			if (noCheckPath === false) {
 				if (M.fileLoad.getFilePath() !== path) { // 如果已經在載入期間已經切換到其他檔案
@@ -622,20 +622,20 @@ class MainExif {
 
 			for (let i = 0; i < json.length; i++) {
 				const item = json[i];
-				let itemPath = item.path;
-				let itemText = item.text;
-				let domBox = await getRelatedDom(itemPath, itemText);
+				const itemPath = item.path;
+				const itemText = item.text;
+				const domBox = await getRelatedDom(itemPath, itemText);
 				if (noCheckPath === false) {
 					if (M.fileLoad.getFilePath() !== path) { // 如果已經在載入期間已經切換到其他檔案
 						return;
 					}
 				}
-				domTabContentRelated.appendChild(domBox);
+				_domTabContentRelated.appendChild(domBox);
 			}
 
 			if (json.length === 0) {
-				let btnNew = await getRelatedBtnAdd()
-				domTabContentRelated.appendChild(btnNew);
+				const btnNew = await getRelatedBtnAdd()
+				_domTabContentRelated.appendChild(btnNew);
 			}
 		}
 
@@ -653,7 +653,7 @@ class MainExif {
 			if (M.config.settings.layout.civitaiResourcesEnabled === false) { return; }
 
 			// 記錄當前的 path，如果在載入期間已經切換到其他檔案，則離開
-			let path = fileInfo2.FullPath;
+			const path = _fileInfo2.FullPath;
 
 			// 如果全部都沒有資料，就離開
 			if (civitai.civitaiResources === undefined &&
@@ -717,7 +717,7 @@ class MainExif {
 			let tempId: any[] = [];
 
 			// 折疊面板
-			let collapseDom = await getCollapseDom("Civitai Resources", true, "civitaiResources", (type) => { });
+			const collapseDom = await getCollapseDom("Civitai Resources", true, "civitaiResources", (type) => { });
 
 			for (let i = 0; i < data.length; i++) {
 				const item = data[i];
@@ -772,7 +772,7 @@ class MainExif {
 				}
 
 				// 避免在載入期間已經切換到其他檔案
-				if (path !== fileInfo2.FullPath) { return; }
+				if (path !== _fileInfo2.FullPath) { return; }
 
 				// 曾經下載過，且發生過錯誤
 				if (error !== undefined) { continue; }
@@ -783,7 +783,7 @@ class MainExif {
 
 				let ompleteCount = 0;
 				// 項目完成時呼叫的函數，用與判斷是否全部都已經完成
-				let completeFunc = () => {
+				const completeFunc = () => {
 					ompleteCount++;
 					if (ompleteCount === data.length) {
 						// 如果移除項目後，折疊面板沒有任何項目，則移除折疊面板
@@ -900,7 +900,7 @@ class MainExif {
 						if (baseWindow.appInfo === undefined) { return; }
 
 						// 產生新的 dom
-						let newItem = Lib.newDom(`
+						const newItem = Lib.newDom(`
 							<div class="mainExifItem" data-hash="${Lib.escape(dbKey)}">
 								<div class="mainExifName">${Lib.escape(modelType)}</div>
 								<div class="mainExifValue mainExifValue__nowrap">
@@ -915,12 +915,12 @@ class MainExif {
 									<div class="btn mainExifBtnCivitai" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
 								</div>
 							</div>`);
-						domTabContentInfo.appendChild(newItem);
+						_domTabContentInfo.appendChild(newItem);
 
-						let btnExpand = newItem.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
-						let btnCollapse = newItem.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊			
-						let btnCivitai = newItem.querySelector(".mainExifBtnCivitai") as HTMLElement;
-						let divImgList = newItem.querySelector(".mainExifImgList") as HTMLElement;
+						const btnExpand = newItem.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
+						const btnCollapse = newItem.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊			
+						const btnCivitai = newItem.querySelector(".mainExifBtnCivitai") as HTMLElement;
+						const divImgList = newItem.querySelector(".mainExifImgList") as HTMLElement;
 
 						// 產生預覽圖
 						let imgCount = M.config.settings.layout.civitaiResourcesImgNumber;
@@ -936,11 +936,11 @@ class MainExif {
 								isHaveImg = true;
 
 								// 開啟網址時下載圖片，並回傳其 icon
-								let name = `Civitai\\${dbKey}-${i + 1}.jpg`;
-								let imgPath = Lib.Combine([baseWindow.appInfo.tempDirWebFile, name]);
-								let imgUrl = WebAPI.Img.webIcon(item.url, name);
+								const name = `Civitai\\${dbKey}-${i + 1}.jpg`;
+								const imgPath = Lib.combine([baseWindow.appInfo.tempDirWebFile, name]);
+								const imgUrl = WebAPI.Img.webIcon(item.url, name);
 
-								let imgItem = Lib.newDom(`
+								const imgItem = Lib.newDom(`
 									<div class="mainExifImgItem">
 										<img fetchpriority="low"/>
 									</div>
@@ -953,7 +953,7 @@ class MainExif {
 								// 圖片出現在畫面時，載入圖片
 								const observer = new IntersectionObserver(entries => {
 									if (entries[0].intersectionRatio <= 0) { return; }
-									limiter.addRequest(domImg, imgUrl); // 發出請求
+									_limiter.addRequest(domImg, imgUrl); // 發出請求
 									observer.unobserve(imgItem); // 在第一次觸發後，停止觀察該元素
 								}, {
 									threshold: 0.1,
@@ -1042,7 +1042,7 @@ class MainExif {
 			}
 
 			if (collapseDom.domContent.children.length > 0) {
-				domTabContentInfo.appendChild(collapseDom.domBox);
+				_domTabContentInfo.appendChild(collapseDom.domBox);
 			}
 
 		}
@@ -1052,22 +1052,22 @@ class MainExif {
 		 * @returns dom
 		 */
 		async function getRelatedBtnAdd() {
-			let path = fileInfo2.FullPath;
-			let btnNew = Lib.newDom(`
+			const path = _fileInfo2.FullPath;
+			const btnNew = Lib.newDom(`
 				<div class="mainExifRelatedBtnAdd" i18n="menu.new">
 					${M.i18n.t("menu.new")}
 				</div>
 			`);
 
 			btnNew.addEventListener("click", async () => {
-				let dirPath = Lib.GetDirectoryName(path);
+				const dirPath = Lib.getDirectoryName(path);
 				if (dirPath === null) { return; }
 				// let pathF = Lib.GetExtension(path).split(".")[0];
-				let txtName = Lib.GetFileName(path).split(".")[0] + ".txt";
-				let txtPath = Lib.Combine([dirPath, txtName]);
+				let txtName = Lib.getFileName(path).split(".")[0] + ".txt";
+				let txtPath = Lib.combine([dirPath, txtName]);
 				if (await WV_File.Exists(txtPath) === true) { // 如果檔案已經存在
-					txtName = Lib.GetFileName(path).split(".")[0] + ".1.txt";
-					txtPath = Lib.Combine([dirPath, txtName]);
+					txtName = Lib.getFileName(path).split(".")[0] + ".1.txt";
+					txtPath = Lib.combine([dirPath, txtName]);
 				}
 				M.textEditor.show(txtPath);
 				M.textEditor.setOnSave(async (text: string) => {
@@ -1084,14 +1084,13 @@ class MainExif {
 		function formatVideoLength(input: any): string {
 			if (input === undefined || input === null || input === "") { return ""; }
 
-			let milliseconds = Number(input);
+			const milliseconds = Number(input);
 			if (isNaN(milliseconds)) { return input; }
 
-			//let totalSeconds = Math.floor(milliseconds / 1000);
-			let totalSeconds = Math.floor(milliseconds);
-			let hours = Math.floor(totalSeconds / 3600);
-			let minutes = Math.floor((totalSeconds % 3600) / 60);
-			let seconds = totalSeconds % 60;
+			const totalSeconds = Math.floor(milliseconds);
+			const hours = Math.floor(totalSeconds / 3600);
+			const minutes = Math.floor((totalSeconds % 3600) / 60);
+			const seconds = totalSeconds % 60;
 
 			// 如果小時數小於1，則只返回分鐘和秒數
 			if (hours < 1) {
@@ -1110,11 +1109,11 @@ class MainExif {
 		 */
 		async function getRelatedDom(itemPath: string, itemText: string | null) {
 
-			let name = Lib.GetFileName(fileInfo2.FullPath);
-			let itemName = Lib.GetFileName(itemPath);
+			const name = Lib.getFileName(_fileInfo2.FullPath);
+			const itemName = Lib.getFileName(itemPath);
 
 			function getText(text: string) {
-				let ext = Lib.GetExtension(itemPath);
+				let ext = Lib.getExtension(itemPath);
 				if (ext === ".json" || ext === ".info") {
 					text = Lib.jsonStrFormat(text).jsonFormat;
 				}
@@ -1122,7 +1121,7 @@ class MainExif {
 			}
 
 			// 外框物件
-			let domBox = Lib.newDom(`
+			const domBox = Lib.newDom(`
 				<div class="mainExifRelatedBox" data-menu="file">	
 				</div>
 			`);
@@ -1139,7 +1138,7 @@ class MainExif {
 			`);
 			domBox.appendChild(domTitle);
 
-			let btnList = domTitle.querySelector(".mainExifRelatedTitleBtnList") as HTMLElement;
+			const btnList = domTitle.querySelector(".mainExifRelatedTitleBtnList") as HTMLElement;
 
 			// 內容物件
 			let domContent: HTMLElement;
@@ -1215,9 +1214,9 @@ class MainExif {
 			} else {
 
 				// 取得圖片網址
-				let imgData = await M.script.img.getImgData(await WebAPI.getFileInfo2(itemPath));
-				let arUrl = imgData.arUrl;
-				let imageWidth = imgData.width;
+				const imgData = await M.script.img.getImgData(await WebAPI.getFileInfo2(itemPath));
+				const arUrl = imgData.arUrl;
+				const imageWidth = imgData.width;
 				let imgUrl = arUrl[0].url;
 				for (let i = arUrl.length - 1; i >= 0; i--) {
 					if (imageWidth * arUrl[i].scale >= 400) {
@@ -1260,7 +1259,7 @@ class MainExif {
 			domTitle.addEventListener("click", (e) => {
 
 				// 如果是右上角的按鈕，則不處理
-				let target = e.target as HTMLElement;
+				const target = e.target as HTMLElement;
 				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
 					return;
 				}
@@ -1283,13 +1282,13 @@ class MainExif {
 		async function getCollapseDom(title: string, type: boolean, key?: string, funcChange?: (type: boolean) => void) {
 
 			// 外框物件
-			let domBox = Lib.newDom(`
+			const domBox = Lib.newDom(`
 				<div class="mainExifRelatedBox">	
 				</div>
 			`);
 
 			// 標題物件
-			let domTitle = Lib.newDom(`
+			const domTitle = Lib.newDom(`
 				<div class="mainExifRelatedTitle collapse-title">
 					<span>${Lib.escape(title)}</span>
 					<div class="mainExifRelatedTitleBtnList"></div>
@@ -1298,13 +1297,13 @@ class MainExif {
 			domBox.appendChild(domTitle);
 
 			// 內容物件
-			let domContent: HTMLElement = Lib.newDom(`
+			const domContent: HTMLElement = Lib.newDom(`
 				<div class="mainExifRelatedContent collapse-content">
 					<div class="mainExifList">
 					</div>
 				</div>
 			`);
-			let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
+			const domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
 			domBox.appendChild(domContent);
 
 			// 從設定讀取折疊狀態
@@ -1322,7 +1321,7 @@ class MainExif {
 			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
 			domTitle.addEventListener("click", (e) => {
 				// 如果是右上角的按鈕，則不處理
-				let target = e.target as HTMLElement;
+				const target = e.target as HTMLElement;
 				if (target !== null && target.classList.contains("mainExifRelatedTitleBtn")) {
 					return;
 				}
@@ -1370,7 +1369,7 @@ class MainExif {
 			let oVal = value; // 原始資料
 			value = Lib.escape(value);
 
-			let html = `
+			const div = Lib.newDom(`
 				<div class="mainExifItem">
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
@@ -1379,13 +1378,12 @@ class MainExif {
 						<div class="btn mainExifBtnCollapse" title="${M.i18n.t("menu.collapse")}">${SvgList["collapse.svg"]}</div>
 						<div class="btn mainExifBtnCopy" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
 					</div>
-				</div>`;
-
-			let div = Lib.newDom(html);
-			let divValue = div.querySelector(".mainExifValue") as HTMLElement;
-			let btnCopy = div.querySelector(".mainExifBtnCopy") as HTMLElement; // 複製
-			let btnExpand = div.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
-			let btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
+				</div>`
+			);
+			const divValue = div.querySelector(".mainExifValue") as HTMLElement;
+			const btnCopy = div.querySelector(".mainExifBtnCopy") as HTMLElement; // 複製
+			const btnExpand = div.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
+			const btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
 
 			btnCopy.addEventListener("click", async () => { // 複製到剪貼簿
 				await WV_System.SetClipboard_Text(oVal);
@@ -1465,9 +1463,9 @@ class MainExif {
 		 */
 		function setHorizontal(val: boolean) {
 			if (val) {
-				domMainExif.classList.add("mainExif--horizontal");
+				_domMainExif.classList.add("mainExif--horizontal");
 			} else {
-				domMainExif.classList.remove("mainExif--horizontal");
+				_domMainExif.classList.remove("mainExif--horizontal");
 			}
 		}
 
@@ -1475,13 +1473,13 @@ class MainExif {
 		 * 檔案被修改時呼叫
 		 */
 		async function updateFileWatcher(fileWatcherData: FileWatcherData) {
-			if (isEnabled === false) { return; }
-			if (tabType !== TabType.related) { return; }
+			if (_isEnabled === false) { return; }
+			if (_tabType !== TabType.related) { return; }
 
 			// 取得要操作的dom，null 表示不存在此
 			function getRelatedBox(path: string) {
 				path = path.toLowerCase();
-				let arContentRelated = domTabContentRelated.querySelectorAll(".mainExifRelatedBox");
+				let arContentRelated = _domTabContentRelated.querySelectorAll(".mainExifRelatedBox");
 				for (let i = 0; i < arContentRelated.length; i++) {
 					const item = arContentRelated[i];
 					let dataPath = item.getAttribute("data-path");
@@ -1496,8 +1494,8 @@ class MainExif {
 
 			// 取得標題，null 表示不是相關檔案，例如 .min.js
 			function getTitle() {
-				let name = Lib.GetFileName(fileInfo2.FullPath); // 目前檔案的檔名
-				let itemName = Lib.GetFileName(fileWatcherData.FullPath);
+				let name = Lib.getFileName(_fileInfo2.FullPath); // 目前檔案的檔名
+				let itemName = Lib.getFileName(fileWatcherData.FullPath);
 				let nameF = name.split(".")[0]; // 取得檔名第一個.之前的部分
 				let itemNameF = itemName.split(".")[0];
 
@@ -1516,9 +1514,9 @@ class MainExif {
 				relatedBox.remove();
 
 				// 如果沒有其他檔案，就顯示 新增按鈕
-				if (domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
+				if (_domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
 					let btnNew = await getRelatedBtnAdd()
-					domTabContentRelated.appendChild(btnNew);
+					_domTabContentRelated.appendChild(btnNew);
 				}
 			}
 
@@ -1537,9 +1535,9 @@ class MainExif {
 							relatedBox.remove();
 
 							// 如果沒有其他檔案，就顯示 新增按鈕
-							if (domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
+							if (_domTabContentRelated.querySelectorAll(".mainExifRelatedBox").length === 0) {
 								let btnNew = await getRelatedBtnAdd()
-								domTabContentRelated.appendChild(btnNew);
+								_domTabContentRelated.appendChild(btnNew);
 							}
 						}
 					}
@@ -1559,16 +1557,16 @@ class MainExif {
 				let title = getTitle();
 				if (title !== null) {
 					let path = fileWatcherData.FullPath;
-					let ext = Lib.GetExtension(path).replace(".", "");
+					let ext = Lib.getExtension(path).replace(".", "");
 					let text = null;
-					if (relatedFileExtList.includes(ext)) {
+					if (_relatedFileExtList.includes(ext)) {
 						text = await WV_File.GetText(path);
 					}
 					let domBox = await getRelatedDom(path, text);
-					domTabContentRelated.appendChild(domBox);
+					_domTabContentRelated.appendChild(domBox);
 
 					// 新增檔案後就隱藏 新增按鈕
-					let btnNew = domTabContentRelated.querySelector(".mainExifRelatedBtnAdd");
+					let btnNew = _domTabContentRelated.querySelector(".mainExifRelatedBtnAdd");
 					if (btnNew !== null) {
 						btnNew.remove();
 					}
@@ -1593,14 +1591,14 @@ class TextEditor {
 	public setOnSave;
 
 	constructor(M: MainWindow) {
-		let dom = document.querySelector("#textEditor") as HTMLElement;
-		let domTextarea = dom?.querySelector(".textEditor-textarea") as HTMLTextAreaElement;
-		let domBtnSave = dom?.querySelector(".js-save") as HTMLElement;
-		let domBtnPretty = dom?.querySelector(".js-pretty") as HTMLElement;
-		let domBtnClose = dom?.querySelector(".js-close") as HTMLElement;
-		let filePath = "";
-		let isShow = false;
-		let onSave = (text: string) => { };
+		const _dom = document.querySelector("#textEditor") as HTMLElement;
+		const _domTextarea = _dom?.querySelector(".textEditor-textarea") as HTMLTextAreaElement;
+		const _domBtnSave = _dom?.querySelector(".js-save") as HTMLElement;
+		const _domBtnPretty = _dom?.querySelector(".js-pretty") as HTMLElement;
+		const _domBtnClose = _dom?.querySelector(".js-close") as HTMLElement;
+		let _filePath = "";
+		let _isShow = false;
+		let _onSave = (text: string) => { };
 
 		this.show = show;
 		this.close = close;
@@ -1611,7 +1609,7 @@ class TextEditor {
 		this.setOnSave = setOnSave;
 
 		// 讓 Textarea 支援 tab
-		domTextarea.addEventListener("keydown", function (e) {
+		_domTextarea.addEventListener("keydown", function (e) {
 
 			if (e.code === "Tab") {
 				// selection
@@ -1630,19 +1628,19 @@ class TextEditor {
 				else {
 					// Block indent/unindent trashes undo stack.
 					// Select whole lines
-					var selStart = this.selectionStart;
-					var selEnd = this.selectionEnd;
-					var text = domTextarea.value;
+					let selStart = this.selectionStart;
+					let selEnd = this.selectionEnd;
+					let text = _domTextarea.value;
 					while (selStart > 0 && text[selStart - 1] != "\n")
 						selStart--;
 					while (selEnd > 0 && text[selEnd - 1] != "\n" && selEnd < text.length)
 						selEnd++;
 
 					// Get selected text
-					var lines = text.substring(selStart, selEnd).split("\n");
+					let lines = text.substring(selStart, selEnd).split("\n");
 
 					// Insert tabs
-					for (var i = 0; i < lines.length; i++) {
+					for (let i = 0; i < lines.length; i++) {
 						// Don't indent last line if cursor at start of line
 						if (i == lines.length - 1 && lines[i].length == 0)
 							continue;
@@ -1671,20 +1669,20 @@ class TextEditor {
 			return true;
 		});
 
-		domBtnSave.addEventListener("click", async () => {
+		_domBtnSave.addEventListener("click", async () => {
 			await save();
 		})
-		domBtnPretty.addEventListener("click", () => {
+		_domBtnPretty.addEventListener("click", () => {
 			let t = getText();
 			try {
-				let j = JSON.parse(t);
+				const j = JSON.parse(t);
 				t = JSON.stringify(j, null, "\t");
 				setText(t);
 			} catch (e) {
 				Toast.show(M.i18n.t("msg.formattingFailed"), 1000 * 3); // 儲存完成
 			}
 		})
-		domBtnClose.addEventListener("click", () => {
+		_domBtnClose.addEventListener("click", () => {
 			close();
 		})
 
@@ -1692,7 +1690,7 @@ class TextEditor {
 		 * 取得目前是否顯示
 		 */
 		function getIsShow() {
-			return isShow;
+			return _isShow;
 		}
 
 		/**
@@ -1701,33 +1699,33 @@ class TextEditor {
 		 */
 		async function show(path: string | null) {
 
-			isShow = true;
-			dom.style.display = "";
+			_isShow = true;
+			_dom.style.display = "";
 			await Lib.sleep(1);
-			dom.setAttribute("active", "true");
+			_dom.setAttribute("active", "true");
 
 			if (path === null) { path = "" }
-			filePath = path;
+			_filePath = path;
 			let t = "";
-			if (await WV_File.Exists(filePath)) {
-				t = await WV_File.GetText(filePath);
+			if (await WV_File.Exists(_filePath)) {
+				t = await WV_File.GetText(_filePath);
 			}
 			setText(t);
 
 			// 設定焦點
-			domTextarea.focus();
-			domTextarea.setSelectionRange(0, 0);
+			_domTextarea.focus();
+			_domTextarea.setSelectionRange(0, 0);
 
-			domTextarea.scrollTop = 0;
+			_domTextarea.scrollTop = 0;
 
 			// 如果是json，就顯示 格式化 的按鈕
 			if (
-				Lib.GetExtension(filePath) === ".json"
+				Lib.getExtension(_filePath) === ".json"
 				|| t.startsWith("{")
 			) {
-				domBtnPretty.style.display = "";
+				_domBtnPretty.style.display = "";
 			} else {
-				domBtnPretty.style.display = "none";
+				_domBtnPretty.style.display = "none";
 			}
 		}
 
@@ -1735,13 +1733,13 @@ class TextEditor {
 		 * 關閉視窗
 		 */
 		function close() {
-			isShow = false;
-			dom.setAttribute("active", "false");
+			_isShow = false;
+			_dom.setAttribute("active", "false");
 
 			setTimeout(() => {
-				if (dom.getAttribute("active") == "false") {
-					domTextarea.value = "";
-					dom.style.display = "none";
+				if (_dom.getAttribute("active") == "false") {
+					_domTextarea.value = "";
+					_dom.style.display = "none";
 				}
 			}, 300);
 		}
@@ -1750,7 +1748,7 @@ class TextEditor {
 		 * 設定 儲存後執行的回調
 		 */
 		function setOnSave(funcSave: (text: string) => void) {
-			onSave = funcSave;
+			_onSave = funcSave;
 		}
 
 		/**
@@ -1759,8 +1757,8 @@ class TextEditor {
 		async function save() {
 			let t = getText();
 			try {
-				await WV_File.SetText(filePath, t);
-				onSave(t);
+				await WV_File.SetText(_filePath, t);
+				_onSave(t);
 				Toast.show(M.i18n.t("msg.saveComplete"), 1000 * 3); // 儲存完成
 			} catch (e) {
 				Toast.show(M.i18n.t("msg.saveFailed") + ":\n" + e, 1000 * 3); // 儲存失敗
@@ -1771,14 +1769,14 @@ class TextEditor {
 		 * 取得 文字
 		 */
 		function getText() {
-			return domTextarea.value;
+			return _domTextarea.value;
 		}
 
 		/**
 		 * 設定 文字
 		 */
 		function setText(t: string) {
-			domTextarea.value = t;
+			_domTextarea.value = t;
 		}
 
 	}

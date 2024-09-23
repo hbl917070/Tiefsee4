@@ -13,13 +13,13 @@ class WebAPI {
             let postData = { path: path, arExt: arExt, maxCount: maxCount };
             let retJson = await WebAPI.sendPost(url, postData);
 
-            let parentPath = Lib.GetDirectoryName(path) ?? path;
+            let parentPath = Lib.getDirectoryName(path) ?? path;
 
             // 為了減少資料傳輸量，所以返回的資料只有資料夾名跟檔名，要把他們處理回絕對路徑
             let json: any = {};
             for (const key in retJson) {
                 if (retJson.hasOwnProperty(key) == false) { continue; }
-                var newKey = Lib.Combine([parentPath, key]);
+                var newKey = Lib.combine([parentPath, key]);
                 json[newKey] = retJson[key].map((value: string) => {
                     // return newKey + "\\" + value;
                     return value;
@@ -35,10 +35,10 @@ class WebAPI {
          */
         static async getFiles2(arPath: string[]) {
             // 取得共同的開頭(通常是資料夾路徑)
-            let dirPath = Lib.GetDirectoryName(arPath[0]);
+            let dirPath = Lib.getDirectoryName(arPath[0]);
             if (dirPath === null) { return []; }
             // 處理成檔名
-            let arName = arPath.map(arg => Lib.GetFileName(arg));
+            let arName = arPath.map(arg => Lib.getFileName(arg));
 
             let url = APIURL + "/api/directory/getFiles2";
             let postData = { dirPath: dirPath, arName: arName };
@@ -89,9 +89,9 @@ class WebAPI {
          *  從網路下載圖片後，返回圖片的 icon
          */
         static webIcon(url: string, path: string) {
-            let encodePath = encodeURIComponent(path);
-            let encodeUrl = encodeURIComponent(url);
-            let r = 0; // Math.random(); // 避免快取
+            const encodePath = encodeURIComponent(path);
+            const encodeUrl = encodeURIComponent(url);
+            const r = 0; // Math.random(); // 避免快取
             return APIURL + `/api/getWebIcon?size=256&url=${encodeUrl}&path=${encodePath}&r=${r}`;
         }
 
@@ -99,18 +99,18 @@ class WebAPI {
          * 取得圖片網址
          */
         static async getUrl(type: string, fileInfo2: FileInfo2) {
-            let _path = fileInfo2.Path;
-            let encodePath = encodeURIComponent(_path);
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            const path = fileInfo2.Path;
+            const encodePath = encodeURIComponent(path);
+            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
             if (type === "web") {
-                return Lib.pathToURL(_path) + `?${fileTime}`;
+                return Lib.pathToUrl(path) + `?${fileTime}`;
             }
             if (type === "webIcc") {
                 return APIURL + `/api/img/webIcc?path=${encodePath}&${fileTime}`;
             }
             if (type === "icon") {
-                return this.fileIcon(_path);
+                return this.fileIcon(path);
             }
             if (type === "wpf") {
                 return APIURL + `/api/img/wpf?path=${encodePath}&${fileTime}`;
@@ -126,12 +126,12 @@ class WebAPI {
             }
             if (type === "nconvert" || type === "nconvertBmp") {
                 let url = APIURL + `/api/img/nconvert?type=bmp&path=${encodePath}&${fileTime}`;
-                url = Lib.pathToURL(await Lib.sendGet("text", url));
+                url = Lib.pathToUrl(await Lib.sendGet("text", url));
                 return url;
             }
             if (type === "nconvertPng") {
                 let url = APIURL + `/api/img/nconvert?type=png&path=${encodePath}&${fileTime}`;
-                url = Lib.pathToURL(await Lib.sendGet("text", url));
+                url = Lib.pathToUrl(await Lib.sendGet("text", url));
                 return url;
             }
             return APIURL + `/api/img/magick?path=${encodePath}&${fileTime}`;
@@ -141,11 +141,11 @@ class WebAPI {
          * 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
          */
         static async vipsInit(vipsType: string, fileInfo2: FileInfo2) {
-            let _path = fileInfo2.Path;
-            let encodePath = encodeURIComponent(_path);
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let u = APIURL + `/api/img/vipsInit?path=${encodePath}&type=${vipsType}&${fileTime}`;
-            let imgInitInfo = await Lib.sendGet("json", u);
+            const path = fileInfo2.Path;
+            const encodePath = encodeURIComponent(path);
+            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            const u = APIURL + `/api/img/vipsInit?path=${encodePath}&type=${vipsType}&${fileTime}`;
+            const imgInitInfo = await Lib.sendGet("json", u);
             return imgInitInfo as {
                 code: string, // 1=成功 -1=失敗
                 path: string,
@@ -159,10 +159,10 @@ class WebAPI {
          * 取得圖片網址 (以 vips 縮放過的圖片)
          */
         static vipsResize(scale: number, fileInfo2: FileInfo2, fileType: string, vipsType: string) {
-            let _path = fileInfo2.Path;
-            let encodePath = encodeURIComponent(_path);
-            let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            let imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`;
+            const path = fileInfo2.Path;
+            const encodePath = encodeURIComponent(path);
+            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            const imgU = APIURL + `/api/img/vipsResize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`;
             return imgU;
         }
 
@@ -178,7 +178,7 @@ class WebAPI {
                 let fileInfo2 = data;
                 let path = fileInfo2.Path;
                 let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                url = Lib.pathToURL(path) + `?${fileTime}`;
+                url = Lib.pathToUrl(path) + `?${fileTime}`;
             }
 
             let code: string = "-1"; // 1=成功 -1=失敗
@@ -234,8 +234,8 @@ class WebAPI {
      * 排序
      */
     static async sort(ar: string[], type: string) {
-        let url = APIURL + "/api/sort";
-        let postData = { ar: ar, type: type };
+        const url = APIURL + "/api/sort";
+        const postData = { ar: ar, type: type };
         return WebAPI.sendPost(url, postData);
     }
 
@@ -247,13 +247,13 @@ class WebAPI {
         if (ar.length === 0) { return [] }
 
         // 取得共同的開頭(通常是資料夾路徑)
-        let dirPath = Lib.GetDirectoryName(ar[0]) as string;
+        let dirPath = Lib.getDirectoryName(ar[0]) as string;
         if (dirPath === null) { return [] }
 
         for (let i = 0; i < ar.length; i++) {
             const path = ar[i];
             if (path.indexOf(dirPath) !== 0) {
-                dirPath = Lib.GetDirectoryName(dirPath) as string;
+                dirPath = Lib.getDirectoryName(dirPath) as string;
             }
         }
 
@@ -284,9 +284,9 @@ class WebAPI {
      * 取得 文字檔內容
      */
     static async getText(path: string) {
-        let encodePath = encodeURIComponent(path);
-        let url = APIURL + `/api/getText?path=${encodePath}&r=${Math.random()}`;
-        let ret = await Lib.sendGet("text", url);
+        const encodePath = encodeURIComponent(path);
+        const url = APIURL + `/api/getText?path=${encodePath}&r=${Math.random()}`;
+        const ret = await Lib.sendGet("text", url);
         return ret;
     }
 
@@ -294,10 +294,10 @@ class WebAPI {
      * 取得 pdf的網址
      */
     static getPdf(fileInfo2: FileInfo2) {
-        let path = fileInfo2.Path;
-        let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        let encodePath = encodeURIComponent(path);
-        let url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
+        const path = fileInfo2.Path;
+        const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        const encodePath = encodeURIComponent(path);
+        const url = `${APIURL}/api/getPdf?path=${encodePath}&${fileTime}`
         return url;
     }
 
@@ -305,11 +305,11 @@ class WebAPI {
      * 取得 檔案exif
      */
     static async getExif(fileInfo2: FileInfo2, maxLength: number) {
-        let path = fileInfo2.Path;
-        let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        let encodePath = encodeURIComponent(path);
-        let url = APIURL + `/api/getExif?maxLength=${maxLength}&path=${encodePath}&${fileTime}`;
-        let json = await Lib.sendGet("json", url);
+        const path = fileInfo2.Path;
+        const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        const encodePath = encodeURIComponent(path);
+        const url = APIURL + `/api/getExif?maxLength=${maxLength}&path=${encodePath}&${fileTime}`;
+        const json = await Lib.sendGet("json", url);
         return json as {
             code: string,
             data: {
@@ -324,8 +324,8 @@ class WebAPI {
      * 取得 檔案基本資料
      */
     static async getFileInfo2(path: string) {
-        let s = await WV_File.GetFileInfo2(path);
-        let json: FileInfo2 = JSON.parse(s);
+        const s = await WV_File.GetFileInfo2(path);
+        const json: FileInfo2 = JSON.parse(s);
         json.FullPath = json.Path;
         return json;
         /*let encodePath = encodeURIComponent(path);
@@ -338,9 +338,9 @@ class WebAPI {
     * 取得 多筆檔案基本資料
     */
     static async getFileInfo2List(arPath: string[]) {
-        let url = APIURL + "/api/getFileInfo2List";
-        let postData = { ar: arPath };
-        let retAr = await WebAPI.sendPost(url, postData);
+        const url = APIURL + "/api/getFileInfo2List";
+        const postData = { ar: arPath };
+        const retAr = await WebAPI.sendPost(url, postData);
         for (let i = 0; i < retAr.length; i++) {
             retAr[i].FullPath = retAr[i].Path;
         }
@@ -348,12 +348,12 @@ class WebAPI {
     }
 
     /**
-     * 取得 UWP列表
+     * 取得 UWP 列表
      */
     static async getUwpList() {
-        let url = APIURL + "/api/getUwpList";
-        let postData = {};
-        let ret = await WebAPI.sendPost(url, postData);
+        const url = APIURL + "/api/getUwpList";
+        const postData = {};
+        const ret = await WebAPI.sendPost(url, postData);
         return ret as { Logo: string, Name: string, Id: string }[];
     }
 
@@ -362,10 +362,10 @@ class WebAPI {
       */
     static async getRelatedFileList(path: string, arTextExt: string[]) {
         //let arTextExt = ["txt", "json", "xml", "info", "ini", "config"];
-        let textExt = arTextExt.join(",")
-        let encodePath = encodeURIComponent(path);
-        let url = APIURL + `/api/getRelatedFileList?path=${encodePath}&textExt=${textExt}&r=${Math.random()}`;
-        let json = await Lib.sendGet("json", url);
+        const textExt = arTextExt.join(",")
+        const encodePath = encodeURIComponent(path);
+        const url = APIURL + `/api/getRelatedFileList?path=${encodePath}&textExt=${textExt}&r=${Math.random()}`;
+        const json = await Lib.sendGet("json", url);
         return json as { path: string, text: string | null }[];
     }
 
@@ -378,11 +378,11 @@ class WebAPI {
         if (fileInfo2.Lenght > 1024 * 1024 * 10) {
             return true;
         }
-        let path = fileInfo2.Path;
-        let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        let encodePath = encodeURIComponent(path);
-        let url = APIURL + `/api/isBinary?path=${encodePath}&${fileTime}`;
-        let ret = await Lib.sendGet("text", url);
+        const path = fileInfo2.Path;
+        const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        const encodePath = encodeURIComponent(path);
+        const url = APIURL + `/api/isBinary?path=${encodePath}&${fileTime}`;
+        const ret = await Lib.sendGet("text", url);
         return ret === "True";
     }
 
@@ -390,9 +390,9 @@ class WebAPI {
      * 取得剪貼簿內容
      */
     static async getClipboardContent() {
-        let maxTextLength = 1000;
-        let url = APIURL + `/api/getClipboardContent?maxTextLength=${maxTextLength}`;
-        let ret = await Lib.sendGet("json", url);
+        const maxTextLength = 1000;
+        const url = APIURL + `/api/getClipboardContent?maxTextLength=${maxTextLength}`;
+        const ret = await Lib.sendGet("json", url);
         return ret as { Type: string, Data: string };
     }
 
@@ -400,9 +400,9 @@ class WebAPI {
     * 解析多幀圖片
     */
     static async extractFrames(path: string) {
-        let url = APIURL + "/api/extractFrames";
-        let postData = { imgPath: path, outputDir: "" };
-        let retAr = await WebAPI.sendPost(url, postData);
+        const url = APIURL + "/api/extractFrames";
+        const postData = { imgPath: path, outputDir: "" };
+        const retAr = await WebAPI.sendPost(url, postData);
         return retAr as string;
     }
 }

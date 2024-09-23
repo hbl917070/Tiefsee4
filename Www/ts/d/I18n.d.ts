@@ -1,1 +1,1 @@
-declare var langData: any;
+declare const langData: any;

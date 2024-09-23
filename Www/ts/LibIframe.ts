@@ -23,9 +23,9 @@ class LibIframe {
      */
     public async closeIME() {
 
-        var domFocus = document.activeElement as HTMLElement | null; // 當前擁有焦點的dom
+        const domFocus = document.activeElement as HTMLElement | null; // 當前擁有焦點的dom
 
-        var text = document.createElement("input");
+        const text = document.createElement("input");
         text.setAttribute("type", "url");
         text.style.position = "relative";
         text.style.opacity = "0";
@@ -79,10 +79,9 @@ class LibIframe {
     public initTextHotkey() {
         window.addEventListener("keydown", async (e) => {
             if (e.code === "KeyS" && e.ctrlKey) {
-                let json = {
+                this.postMsg({
                     type: "saveText",
-                };
-                this.postMsg(json);
+                });
             }
         }, true);
     }
@@ -98,12 +97,11 @@ class LibIframe {
      * 取得 AppInfo
      */
     public getAppInfo() {
-        let getUrlString = location.href;
-        let url = new URL(getUrlString);
-        let appInfo = url.searchParams.get("appInfo");
+        const getUrlString = location.href;
+        const url = new URL(getUrlString);
+        const appInfo = url.searchParams.get("appInfo");
         if (appInfo == null) { return {}; }
-        let json = JSON.parse(appInfo);
-        return json;
+        return JSON.parse(appInfo);
     }
 
     /**
@@ -113,8 +111,8 @@ class LibIframe {
         if (appInfo === undefined) {
             appInfo = this.getAppInfo();
         }
-        let appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
-        let pathLib = "file:///" + appDataPath + "/Plugin";
+        const appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
+        const pathLib = "file:///" + appDataPath + "/Plugin";
         return pathLib;
     }
 
@@ -122,9 +120,9 @@ class LibIframe {
      * 取得使用者選擇的語言
      */
     public getLang() {
-        let getUrlString = location.href;
-        let url = new URL(getUrlString);
-        let lang = url.searchParams.get("lang");
+        const getUrlString = location.href;
+        const url = new URL(getUrlString);
+        const lang = url.searchParams.get("lang");
         return lang;
     }
 
@@ -133,10 +131,10 @@ class LibIframe {
      * 初始化 Theme
      */
     public initTheme() {
-        let strTheme = window.localStorage.getItem("settings.theme");
+        const strTheme = window.localStorage.getItem("settings.theme");
         if (strTheme === null) { return null; }
 
-        let theme = JSON.parse(strTheme);
+        const theme = JSON.parse(strTheme);
 
         // 用背景色判斷是淺色還是深色主題
         function getTheme(): "light" | "dark" {
@@ -163,17 +161,16 @@ class LibIframe {
      * {r, g, b} to 16進制
      */
     public colorToHex(color: any) {
-        let c = this.decimalToHex(color.r, 2)
+        return this.decimalToHex(color.r, 2)
             + this.decimalToHex(color.g, 2)
             + this.decimalToHex(color.b, 2);
-        return c;
     }
 
     /**
      * 10進制 to 16進制
      */
     public decimalToHex(d: string, padding: number) {
-        var hex = Number(d).toString(16);
+        let hex = Number(d).toString(16);
         padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
         while (hex.length < padding) {
             hex = "0" + hex;
@@ -194,11 +191,11 @@ class LibIframe {
      * 載入新的 JS
      */
     public async addScript(src: string) {
-        var script = document.createElement("script");
+        const script = document.createElement("script");
         script.src = src;
         document.head.appendChild(script);
 
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, _) => {
             script.onload = function () {
                 resolve(1);
             };
@@ -210,17 +207,15 @@ class LibIframe {
      */
     public openUrl(url: string) {
         if (url.startsWith("http:") || url.startsWith("https:")) { // 開啟網址    
-            let json = {
+            this.postMsg({
                 type: "openUrl",
                 data: url,
-            };
-            this.postMsg(json);
+            });
         } else { // 開啟檔案  
-            let json = {
+            this.postMsg({
                 type: "openFile",
                 data: url,
-            };
-            this.postMsg(json);
+            });
         }
     }
 

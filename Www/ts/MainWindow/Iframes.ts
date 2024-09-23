@@ -1,7 +1,7 @@
 class Iframes {
 
     public monacoEditor;
-    public pDFTronWebviewer;
+    public pdfTronWebviewer;
     public cherryMarkdown;
     public textView;
     public pdfview;
@@ -11,19 +11,19 @@ class Iframes {
 
     constructor(M: MainWindow) {
 
-        var monacoEditor = new MonacoEditor(M);
-        var pDFTronWebviewer = new PDFTronWebviewer(M);
-        var cherryMarkdown = new CherryMarkdown(M);
-        var textview = new Textview(M);
-        var pdfview = new Pdfview(M);
-        var welcomeview = new Welcomeview(M);
+        const _monacoEditor = new MonacoEditor(M);
+        const _pdfTronWebviewer = new PdfTronWebviewer(M);
+        const _cherryMarkdown = new CherryMarkdown(M);
+        const _textview = new Textview(M);
+        const _pdfview = new Pdfview(M);
+        const _welcomeview = new Welcomeview(M);
 
-        this.monacoEditor = monacoEditor;
-        this.pDFTronWebviewer = pDFTronWebviewer;
-        this.cherryMarkdown = cherryMarkdown;
-        this.textView = textview;
-        this.pdfview = pdfview;
-        this.welcomeview = welcomeview;
+        this.monacoEditor = _monacoEditor;
+        this.pdfTronWebviewer = _pdfTronWebviewer;
+        this.cherryMarkdown = _cherryMarkdown;
+        this.textView = _textview;
+        this.pdfview = _pdfview;
+        this.welcomeview = _welcomeview;
         this.getText = getText;
         this.setTheme = setTheme;
 
@@ -36,25 +36,25 @@ class Iframes {
             }
 
             // 接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
+            const type = e.data.type;
+            const data = e.data.data;
 
             if (type === "getText") {
-                _txt = data;
+                _text = data;
             }
 
             if (type === "openUrl") {
                 WV_RunApp.OpenUrl(data);
             }
             if (type === "openFile") {
-                let exePath = await WV_Window.GetTiefseePath();
+                const exePath = await WV_Window.GetTiefseePath();
 
-                let path = Lib.URLToPath(data);
-                let arMsg: string[] = [];
+                const path = Lib.urlToPath(data);
+                const arMsg: string[] = [];
 
                 // 如果不是絕對路徑，則從目前檔案的資料夾尋找
                 if (path.startsWith("\\\\") === false && path.startsWith(":", 1) === false) { // \\Desktop-abc\AA  C:\123.jppg                   
-                    let filePath = Lib.Combine([M.fileLoad.getDirPath(), path]);
+                    const filePath = Lib.combine([M.fileLoad.getDirPath(), path]);
                     arMsg.push(filePath);
                     if (await WV_File.Exists(filePath)) {
                         WV_RunApp.ProcessStart(exePath, `"${filePath}"`, true, false);
@@ -62,16 +62,14 @@ class Iframes {
                     }
                 }
 
-                let filePath2 = path;
-                arMsg.push(filePath2);
-                if (await WV_File.Exists(filePath2)) {
-                    WV_RunApp.ProcessStart(exePath, `"${filePath2}"`, true, false);
+                arMsg.push(path);
+                if (await WV_File.Exists(path)) {
+                    WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
                     return;
                 }
 
                 M.msgbox.show({
-                    txt: M.i18n.t("msg.notFound") + "<br>"
-                        + arMsg.join("<br>")
+                    txt: M.i18n.t("msg.notFound") + "<br>" + arMsg.join("<br>")
                 });
             }
             if (type === "loadDropFile") {
@@ -82,30 +80,30 @@ class Iframes {
             }
         });
 
-        var _txt: null | string = null;
+        var _text: null | string = null;
         async function getText() {
 
             let groupType = M.fileShow.getGroupType()
 
             if (groupType === GroupType.txt) {
-                _txt = textview.getText();
+                _text = _textview.getText();
             } else if (groupType === GroupType.monacoEditor) {
-                monacoEditor.getText();
+                _monacoEditor.getText();
             } else if (groupType === GroupType.md) {
-                cherryMarkdown.getText();
+                _cherryMarkdown.getText();
             } else {
                 return "";
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化
-                if (_txt !== null) {
+                if (_text !== null) {
                     break;
                 }
                 await Lib.sleep(10);
             }
-            let txt = _txt
-            _txt = null;
-            return txt;
+            const text = _text
+            _text = null;
+            return text;
         }
 
         function setTheme() {
@@ -116,20 +114,20 @@ class Iframes {
             if (groupType === GroupType.txt) {
             }
             if (groupType === GroupType.monacoEditor) {
-                monacoEditor.setTheme();
+                _monacoEditor.setTheme();
             }
             if (groupType === GroupType.md) {
-                cherryMarkdown.setTheme();
+                _cherryMarkdown.setTheme();
             }
             if (groupType === GroupType.office) {
-                pDFTronWebviewer.setTheme();
+                _pdfTronWebviewer.setTheme();
             }
         }
 
     }
 }
 
-class PDFTronWebviewer {
+class PdfTronWebviewer {
     public visible;
     public loadFile;
     public loadNone;
@@ -137,10 +135,10 @@ class PDFTronWebviewer {
 
     constructor(M: MainWindow) {
 
-        var dom_pdftronWebviewer = document.querySelector("#mView-pdftronWebviewer") as HTMLIFrameElement;
+        const _domPdftronWebviewer = document.querySelector("#mView-pdftronWebviewer") as HTMLIFrameElement;
 
         /** PDFTronWebviewer 是否初始化完成 */
-        var isInitPDFTronWebviewer = false;
+        var _isInitPdfTronWebviewer = false;
 
         this.visible = visible;
         this.loadFile = loadFile;
@@ -156,11 +154,11 @@ class PDFTronWebviewer {
             }
 
             // 接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
+            const type = e.data.type;
+            const data = e.data.data;
 
             if (type === "PDFTronWebviewer.initFinish") {
-                isInitPDFTronWebviewer = true;
+                _isInitPdfTronWebviewer = true;
             }
         });
 
@@ -169,9 +167,9 @@ class PDFTronWebviewer {
          */
         function visible(val: boolean) {
             if (val === true) {
-                dom_pdftronWebviewer.style.display = "block";
+                _domPdftronWebviewer.style.display = "block";
             } else {
-                dom_pdftronWebviewer.style.display = "none";
+                _domPdftronWebviewer.style.display = "none";
             }
         }
 
@@ -180,51 +178,49 @@ class PDFTronWebviewer {
          */
         async function loadFile(path: string) {
 
-            if (dom_pdftronWebviewer.src == "") {
-                let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_pdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+            if (_domPdftronWebviewer.src == "") {
+                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
+                _domPdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
             }
 
             for (let i = 0; i < 2000; i++) { //等待套件初始化
-                if (isInitPDFTronWebviewer === true) {
+                if (_isInitPdfTronWebviewer === true) {
                     break;
                 }
                 await Lib.sleep(10);
             }
 
-            let json = {
+            const json = {
                 type: "loadFile",
                 data: path,
             };
-            dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+            _domPdftronWebviewer.contentWindow?.postMessage(json, "*");
         }
 
         /**
          * 清空內容
          */
         function loadNone() {
-            if (isInitPDFTronWebviewer === false) { return; }
-            let json = {
+            if (_isInitPdfTronWebviewer === false) { return; }
+            postMsg({
                 type: "loadNone",
                 data: "",
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 套用主題
          */
         function setTheme() {
-            let json = {
+            postMsg({
                 type: "setTheme",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         function postMsg(json: any) {
-            if (isInitPDFTronWebviewer) {
-                dom_pdftronWebviewer.contentWindow?.postMessage(json, "*");
+            if (_isInitPdfTronWebviewer) {
+                _domPdftronWebviewer.contentWindow?.postMessage(json, "*");
             }
         }
 
@@ -235,7 +231,7 @@ class MonacoEditor {
 
     public visible;
     public loadFile;
-    public loadTxt;
+    public loadText;
     public loadNone;
     public setReadonly;
     public getText;
@@ -243,14 +239,14 @@ class MonacoEditor {
 
     constructor(M: MainWindow) {
 
-        var dom_monacoEditor = document.querySelector("#mView-monacoEditor") as HTMLIFrameElement;
+        const _domMonacoEditor = document.querySelector("#mView-monacoEditor") as HTMLIFrameElement;
 
         /** MonacoEditor 是否初始化完成 */
-        var isInitMonacoEditor = false;
+        var _isInitMonacoEditor = false;
 
         this.visible = visible;
         this.loadFile = loadFile;
-        this.loadTxt = loadTxt;
+        this.loadText = loadText;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
         this.getText = getText;
@@ -265,33 +261,33 @@ class MonacoEditor {
             }
 
             // 接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
+            const type = e.data.type;
+            const data = e.data.data;
 
             if (type === "MonacoEditor.initFinish") {
-                isInitMonacoEditor = true;
+                _isInitMonacoEditor = true;
             }
         });
 
         /** 
-         * 顯示或隱藏dom
+         * 顯示或隱藏 dom
          */
         function visible(val: boolean) {
             if (val === true) {
-                dom_monacoEditor.style.display = "block";
+                _domMonacoEditor.style.display = "block";
             } else {
-                dom_monacoEditor.style.display = "none";
+                _domMonacoEditor.style.display = "none";
             }
         }
 
         async function awaitInit() {
-            if (dom_monacoEditor.src == "") {
-                let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_monacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+            if (_domMonacoEditor.src == "") {
+                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
+                _domMonacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化
-                if (isInitMonacoEditor === true) {
+                if (_isInitMonacoEditor === true) {
                     break;
                 }
                 await Lib.sleep(10);
@@ -300,21 +296,20 @@ class MonacoEditor {
 
         /**
          * 載入檔案
-         * @param txt 
+         * @param text 
          * @param path 檔案路徑
          */
-        async function loadFile(txt: string, path: string) {
+        async function loadFile(text: string, path: string) {
 
             await awaitInit();
 
-            let json = {
+            postMsg({
                 type: "loadFile",
                 data: {
-                    txt: txt,
+                    text: text,
                     path: path,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
@@ -322,16 +317,15 @@ class MonacoEditor {
          * @param text 
          * @param fileType 檔案類型，例如 javascript / html
          */
-        async function loadTxt(text: string, fileType: string) {
+        async function loadText(text: string, fileType: string) {
             await awaitInit();
-            let json = {
-                type: "loadTxt",
+            postMsg({
+                type: "loadText",
                 data: {
-                    txt: text,
+                    text: text,
                     fileType: fileType,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
@@ -339,51 +333,47 @@ class MonacoEditor {
          */
         async function setReadonly(val: boolean) {
             await awaitInit();
-            let json = {
+            postMsg({
                 type: "setReadonly",
                 data: {
                     val: val,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 清空內容
          */
         function loadNone() {
-            let json = {
+            postMsg({
                 type: "loadNone",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 送出 getText 的請求
          */
         function getText() {
-            let json = {
+            postMsg({
                 type: "getText",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 套用主題
          */
         function setTheme() {
-            let json = {
+            postMsg({
                 type: "setTheme",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         function postMsg(json: any) {
-            if (isInitMonacoEditor) {
-                dom_monacoEditor.contentWindow?.postMessage(json, "*");
+            if (_isInitMonacoEditor) {
+                _domMonacoEditor.contentWindow?.postMessage(json, "*");
             }
         }
 
@@ -394,7 +384,7 @@ class MonacoEditor {
 class CherryMarkdown {
     public visible;
     public loadFile;
-    public loadTxt;
+    public loadText;
     public loadNone;
     public setReadonly;
     public getText;
@@ -402,14 +392,14 @@ class CherryMarkdown {
 
     constructor(M: MainWindow) {
 
-        var dom_iframe = document.querySelector("#mView-cherryMarkdown") as HTMLIFrameElement;
+        const _domIframe = document.querySelector("#mView-cherryMarkdown") as HTMLIFrameElement;
 
         /** MonacoEditor 是否初始化完成 */
-        var isInitCherryMarkdown = false;
+        var _isInitCherryMarkdown = false;
 
         this.visible = visible;
         this.loadFile = loadFile;
-        this.loadTxt = loadTxt;
+        this.loadText = loadText;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
         this.getText = getText;
@@ -424,11 +414,11 @@ class CherryMarkdown {
             }
 
             // 接收到的資料
-            let type = e.data.type;
-            let data = e.data.data;
+            const type = e.data.type;
+            const data = e.data.data;
 
             if (type === "CherryMarkdown.initFinish") {
-                isInitCherryMarkdown = true;
+                _isInitCherryMarkdown = true;
             }
 
         });
@@ -438,20 +428,20 @@ class CherryMarkdown {
          */
         function visible(val: boolean) {
             if (val === true) {
-                dom_iframe.style.display = "block";
+                _domIframe.style.display = "block";
             } else {
-                dom_iframe.style.display = "none";
+                _domIframe.style.display = "none";
             }
         }
 
         async function awaitInit() {
-            if (dom_iframe.src == "") {
-                let appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                dom_iframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+            if (_domIframe.src == "") {
+                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
+                _domIframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化
-                if (isInitCherryMarkdown === true) {
+                if (_isInitCherryMarkdown === true) {
                     break;
                 }
                 await Lib.sleep(10);
@@ -461,30 +451,28 @@ class CherryMarkdown {
         /**
          * 載入檔案並且設定目錄
          */
-        async function loadFile(txt: string, dir: string) {
+        async function loadFile(text: string, dir: string) {
             await awaitInit();
-            let json = {
+            postMsg({
                 type: "loadFile",
                 data: {
-                    txt: txt,
+                    text: text,
                     dir: dir,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 載入文字
          */
-        async function loadTxt(txt: string) {
+        async function loadText(text: string) {
             await awaitInit();
-            let json = {
-                type: "loadTxt",
+            postMsg({
+                type: "loadText",
                 data: {
-                    txt: txt,
+                    text: text,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
@@ -492,51 +480,47 @@ class CherryMarkdown {
          */
         async function setReadonly(val: boolean) {
             await awaitInit();
-            let json = {
+            postMsg({
                 type: "setReadonly",
                 data: {
                     val: val,
                 },
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 清空內容
          */
         function loadNone() {
-            let json = {
+            postMsg({
                 type: "loadNone",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 送出 getText 的請求
          */
         function getText() {
-            let json = {
+            postMsg({
                 type: "getText",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         /**
          * 套用主題
          */
         function setTheme() {
-            let json = {
+            postMsg({
                 type: "setTheme",
                 data: null,
-            };
-            postMsg(json);
+            });
         }
 
         function postMsg(json: any) {
-            if (isInitCherryMarkdown) {
-                dom_iframe.contentWindow?.postMessage(json, "*");
+            if (_isInitCherryMarkdown) {
+                _domIframe.contentWindow?.postMessage(json, "*");
             }
         }
 
@@ -546,7 +530,7 @@ class CherryMarkdown {
 class Textview {
     public visible;
     // public loadFile;
-    public loadTxt;
+    public loadText;
     public loadNone;
     public setReadonly;
     public getText;
@@ -554,19 +538,19 @@ class Textview {
 
     constructor(M: MainWindow) {
 
-        var dom_text = document.querySelector("#mView-txt") as HTMLTextAreaElement;
+        const _domText = document.querySelector("#mView-text") as HTMLTextAreaElement;
 
         this.visible = visible;
         // this.loadFile = loadFile;
-        this.loadTxt = loadText;
+        this.loadText = loadText;
         this.loadNone = loadNone;
         this.setReadonly = setReadonly;
         this.getText = getText;
         // this.setTheme = setTheme;
 
         // 處理唯讀
-        dom_text.addEventListener("keydown", (e) => {
-            if (isReadonly === false) { return; }
+        _domText.addEventListener("keydown", (e) => {
+            if (_isReadonly === false) { return; }
 
             // 只允許 Ctrl+C 跟 Ctrl+A ，其餘的按鍵都攔截
             if (e.code == "KeyC" && e.ctrlKey === true) {
@@ -581,9 +565,9 @@ class Textview {
           */
         function visible(val: boolean) {
             if (val === true) {
-                dom_text.style.display = "block";
+                _domText.style.display = "block";
             } else {
-                dom_text.style.display = "none";
+                _domText.style.display = "none";
             }
         }
 
@@ -591,20 +575,20 @@ class Textview {
          * 載入文字
          */
         async function loadText(text: string) {
-            dom_text.scrollTo(0, 0); // 捲到最上面
-            dom_text.value = text;
+            _domText.scrollTo(0, 0); // 捲到最上面
+            _domText.value = text;
         }
 
-        var isReadonly = false; // 是否為唯讀
+        var _isReadonly = false; // 是否為唯讀
         /**
           * 設定是否唯讀
           */
         async function setReadonly(val: boolean) {
-            isReadonly = val;
+            _isReadonly = val;
             if (val) {
-                dom_text.setAttribute("readonly", "readonly");
+                _domText.setAttribute("readonly", "readonly");
             } else {
-                dom_text.removeAttribute("readonly");
+                _domText.removeAttribute("readonly");
             }
         }
 
@@ -616,7 +600,7 @@ class Textview {
         }
 
         function getText() {
-            return dom_text.value;
+            return _domText.value;
         }
 
     }
@@ -629,7 +613,7 @@ class Pdfview {
 
     constructor(M: MainWindow) {
 
-        var dom_iframe = document.querySelector("#mView-pdf") as HTMLTextAreaElement;
+        const _domIframe = document.querySelector("#mView-pdf") as HTMLTextAreaElement;
 
         this.visible = visible;
         this.loadFile = loadFile;
@@ -640,9 +624,9 @@ class Pdfview {
           */
         function visible(val: boolean) {
             if (val === true) {
-                dom_iframe.style.display = "block";
+                _domIframe.style.display = "block";
             } else {
-                dom_iframe.style.display = "none";
+                _domIframe.style.display = "none";
             }
         }
 
@@ -650,15 +634,15 @@ class Pdfview {
          * 載入檔案
          */
         async function loadFile(fileInfo2: FileInfo2) {
-            let _url = WebAPI.getPdf(fileInfo2);
-            dom_iframe.setAttribute("src", _url);
+            const url = WebAPI.getPdf(fileInfo2);
+            _domIframe.setAttribute("src", url);
         }
 
         /**
          * 清空內容
          */
         function loadNone() {
-            dom_iframe.setAttribute("src", "");
+            _domIframe.setAttribute("src", "");
         }
     }
 }
@@ -671,18 +655,18 @@ class Welcomeview {
 
     constructor(M: MainWindow) {
 
-        var dom_welcomeview = document.querySelector("#mView-welcome") as HTMLDivElement;
+        const _domWelcomeview = document.querySelector("#mView-welcome") as HTMLDivElement;
         this.visible = visible;
-        this.dom = dom_welcomeview;
+        this.dom = _domWelcomeview;
 
         /** 
         * 顯示或隱藏dom
         */
         function visible(val: boolean) {
             if (val === true) {
-                dom_welcomeview.style.display = "flex";
+                _domWelcomeview.style.display = "flex";
             } else {
-                dom_welcomeview.style.display = "none";
+                _domWelcomeview.style.display = "none";
             }
         }
 

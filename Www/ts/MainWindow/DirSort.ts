@@ -7,18 +7,18 @@ class DirSort {
 
     constructor(M: MainWindow) {
 
-        var dom_dirSort_name = document.getElementById("menuitem-dirSort-name") as HTMLInputElement;
-        var dom_dirSort_lastWriteTime = document.getElementById("menuitem-dirSort-lastWriteTime") as HTMLInputElement;
-        var dom_dirSort_lastAccessTime = document.getElementById("menuitem-dirSort-lastAccessTime") as HTMLInputElement;
-        var dom_dirSort_creationTime = document.getElementById("menuitem-dirSort-creationTime") as HTMLInputElement;
-        var dom_dirSort_random = document.getElementById("menuitem-dirSort-random") as HTMLInputElement;
+        const _domDirSort_name = document.getElementById("menuitem-dirSort-name") as HTMLInputElement;
+        const _domDirSortLastWriteTime = document.getElementById("menuitem-dirSort-lastWriteTime") as HTMLInputElement;
+        const _domDirSortLastAccessTime = document.getElementById("menuitem-dirSort-lastAccessTime") as HTMLInputElement;
+        const _domDirSortCreationTime = document.getElementById("menuitem-dirSort-creationTime") as HTMLInputElement;
+        const _domDirSortRandom = document.getElementById("menuitem-dirSort-random") as HTMLInputElement;
 
-        var dom_dirSort_asc = document.getElementById("menuitem-dirSort-asc") as HTMLInputElement;
-        var dom_dirSort_desc = document.getElementById("menuitem-dirSort-desc") as HTMLInputElement;
+        const _domDirSortAsc = document.getElementById("menuitem-dirSort-asc") as HTMLInputElement;
+        const _domDirSortDesc = document.getElementById("menuitem-dirSort-desc") as HTMLInputElement;
 
-        var yesSvgTxt = SvgList["yes.svg"];
-        var sortType = DirSortType.name; // 排序方式
-        var orderbyType = DirOrderbyType.asc;
+        const _yesSvgTxt = SvgList["yes.svg"];
+        var _sortType = DirSortType.name; // 排序方式
+        var _orderbyType = DirOrderbyType.asc;
 
         // this.getSortType = () => { return sortType }
         // this.setSortType = (val: string) => { sortType = val; }
@@ -27,33 +27,33 @@ class DirSort {
         this.updateMenu = updateMenu;
         this.sort = sort;
 
-        dom_dirSort_name.addEventListener("click", () => {
-            sortType = DirSortType.name;
+        _domDirSort_name.addEventListener("click", () => {
+            _sortType = DirSortType.name;
             updateSort();
         });
-        dom_dirSort_lastWriteTime.addEventListener("click", () => {
-            sortType = DirSortType.lastWriteTime;
+        _domDirSortLastWriteTime.addEventListener("click", () => {
+            _sortType = DirSortType.lastWriteTime;
             updateSort();
         });
-        dom_dirSort_lastAccessTime.addEventListener("click", () => {
-            sortType = DirSortType.lastAccessTime;
+        _domDirSortLastAccessTime.addEventListener("click", () => {
+            _sortType = DirSortType.lastAccessTime;
             updateSort();
         });
-        dom_dirSort_creationTime.addEventListener("click", () => {
-            sortType = DirSortType.creationTime;
+        _domDirSortCreationTime.addEventListener("click", () => {
+            _sortType = DirSortType.creationTime;
             updateSort();
         });
-        dom_dirSort_random.addEventListener("click", () => {
-            sortType = DirSortType.random;
+        _domDirSortRandom.addEventListener("click", () => {
+            _sortType = DirSortType.random;
             updateSort();
         });
 
-        dom_dirSort_asc.addEventListener("click", () => {
-            orderbyType = DirOrderbyType.asc
+        _domDirSortAsc.addEventListener("click", () => {
+            _orderbyType = DirOrderbyType.asc
             updateSort();
         });
-        dom_dirSort_desc.addEventListener("click", () => {
-            orderbyType = DirOrderbyType.desc
+        _domDirSortDesc.addEventListener("click", () => {
+            _orderbyType = DirOrderbyType.desc
             updateSort();
         });
 
@@ -64,28 +64,28 @@ class DirSort {
         async function updateSort() {
 
             // sortType = _sortType;
-            if (orderbyType === DirOrderbyType.desc) {
-                if (sortType === DirSortType.name) { sortType = DirSortType.nameDesc; }
-                if (sortType === DirSortType.lastWriteTime) { sortType = DirSortType.lastWriteTimeDesc; }
-                if (sortType === DirSortType.lastAccessTime) { sortType = DirSortType.lastAccessTimeDesc; }
-                if (sortType === DirSortType.creationTime) { sortType = DirSortType.creationTimeDesc; }
+            if (_orderbyType === DirOrderbyType.desc) {
+                if (_sortType === DirSortType.name) { _sortType = DirSortType.nameDesc; }
+                if (_sortType === DirSortType.lastWriteTime) { _sortType = DirSortType.lastWriteTimeDesc; }
+                if (_sortType === DirSortType.lastAccessTime) { _sortType = DirSortType.lastAccessTimeDesc; }
+                if (_sortType === DirSortType.creationTime) { _sortType = DirSortType.creationTimeDesc; }
             }
-            if (orderbyType === DirOrderbyType.asc) {
-                if (sortType === DirSortType.nameDesc) { sortType = DirSortType.name; }
-                if (sortType === DirSortType.lastWriteTimeDesc) { sortType = DirSortType.lastWriteTime; }
-                if (sortType === DirSortType.lastAccessTimeDesc) { sortType = DirSortType.lastAccessTime; }
-                if (sortType === DirSortType.creationTimeDesc) { sortType = DirSortType.creationTime; }
+            if (_orderbyType === DirOrderbyType.asc) {
+                if (_sortType === DirSortType.nameDesc) { _sortType = DirSortType.name; }
+                if (_sortType === DirSortType.lastWriteTimeDesc) { _sortType = DirSortType.lastWriteTime; }
+                if (_sortType === DirSortType.lastAccessTimeDesc) { _sortType = DirSortType.lastAccessTime; }
+                if (_sortType === DirSortType.creationTimeDesc) { _sortType = DirSortType.creationTime; }
             }
 
             await sort()
 
             // 使用 父親資料夾 當做key來記錄排序
             let dirPath = M.fileLoad.getDirPath()
-            let dirParentPath = Lib.GetDirectoryName(dirPath)
+            let dirParentPath = Lib.getDirectoryName(dirPath)
             if (dirParentPath === null) {
                 dirParentPath = dirPath;
             }
-            setDirSortType(dirParentPath, sortType);
+            setDirSortType(dirParentPath, _sortType);
 
             M.fileLoad.updateTitle(); // 更新視窗標題
             M.mainDirList.init(); // 設定 檔案預覽視窗 目前選中的項目
@@ -101,36 +101,36 @@ class DirSort {
          */
         function updateMenu() {
 
-            dom_dirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_dirSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_dirSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_dirSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_dirSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortLastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortLastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortCreationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortRandom.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
-            dom_dirSort_asc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
-            dom_dirSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortAsc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
+            _domDirSortDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
 
-            if (sortType === DirSortType.name || sortType === DirSortType.nameDesc) {
-                dom_dirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === DirSortType.name || _sortType === DirSortType.nameDesc) {
+                _domDirSort_name.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === DirSortType.lastWriteTime || sortType === DirSortType.lastWriteTimeDesc) {
-                dom_dirSort_lastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === DirSortType.lastWriteTime || _sortType === DirSortType.lastWriteTimeDesc) {
+                _domDirSortLastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === DirSortType.lastAccessTime || sortType === DirSortType.lastAccessTimeDesc) {
-                dom_dirSort_lastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === DirSortType.lastAccessTime || _sortType === DirSortType.lastAccessTimeDesc) {
+                _domDirSortLastAccessTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === DirSortType.creationTime || sortType === DirSortType.creationTimeDesc) {
-                dom_dirSort_creationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === DirSortType.creationTime || _sortType === DirSortType.creationTimeDesc) {
+                _domDirSortCreationTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (sortType === DirSortType.random) {
-                dom_dirSort_random.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_sortType === DirSortType.random) {
+                _domDirSortRandom.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
 
-            if (orderbyType === DirOrderbyType.asc) {
-                dom_dirSort_asc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_orderbyType === DirOrderbyType.asc) {
+                _domDirSortAsc.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
-            if (orderbyType === DirOrderbyType.desc) {
-                dom_dirSort_desc.getElementsByClassName("menu-hor-icon")[0].innerHTML = yesSvgTxt;
+            if (_orderbyType === DirOrderbyType.desc) {
+                _domDirSortDesc.getElementsByClassName("menu-hor-icon")[0].innerHTML = _yesSvgTxt;
             }
             // M.menu.close(); // 關閉menu
         }
@@ -150,7 +150,7 @@ class DirSort {
 
             if (arKey.length <= 1) { return; } // 只有1筆資料就不需要排序
 
-            arKey = await WebAPI.sort2(arKey, sortType);
+            arKey = await WebAPI.sort2(arKey, _sortType);
 
             // 排序後把資料放回 WaitingDir
             let ar: { [key: string]: string[] } = {}
@@ -167,9 +167,9 @@ class DirSort {
         /**
          * 設定該資料夾設定的檔案排序方式
          * @param dirPath 
-         * @param _sortType 
+         * @param sortType 
          */
-        function setDirSortType(dirPath: string, _sortType: string) {
+        function setDirSortType(dirPath: string, sortType: string) {
 
             // 取得原來的排序
             let t = window.localStorage.getItem("sortDir");
@@ -193,22 +193,22 @@ class DirSort {
             let t = window.localStorage.getItem("sortDir");
 
             if (t === null) { t = "{}" } // 避免從來沒有儲存過
-            let json = JSON.parse(t);
-            let _sortType = json[dirPath];
-            if (_sortType !== undefined) {
-                sortType = _sortType;
+            const json = JSON.parse(t);
+            let sortType = json[dirPath];
+            if (sortType !== undefined) {
+                _sortType = sortType;
             } else {
                 let defaultSort = M.config.settings.sort["dirSort"];
                 if (Object.keys(DirSortType).indexOf(defaultSort) === -1) { //如果找不到
                     defaultSort = DirSortType.name;
                 }
-                sortType = defaultSort;
+                _sortType = defaultSort;
             }
 
-            if (sortType.indexOf("Desc") !== -1) {
-                orderbyType = DirOrderbyType.desc;
+            if (_sortType.indexOf("Desc") !== -1) {
+                _orderbyType = DirOrderbyType.desc;
             } else {
-                orderbyType = DirOrderbyType.asc;
+                _orderbyType = DirOrderbyType.asc;
             }
         }
 
@@ -219,7 +219,7 @@ class DirSort {
 /**
  * 排序類型
  */
-var DirSortType = {
+const DirSortType = {
     /** 檔名自然排序 */
     name: "name",
     /** 檔名自然排序(逆) */
@@ -243,7 +243,7 @@ var DirSortType = {
 /**
  * 遞增或遞減
  */
-var DirOrderbyType = {
+const DirOrderbyType = {
     desc: "desc",
     asc: "asc",
 }

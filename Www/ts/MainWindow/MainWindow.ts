@@ -9,9 +9,9 @@ class MainWindow {
 
     public quickLookUp;
 
-    public dom_toolbar: HTMLElement;
-    public dom_mainL: HTMLElement;
-    public dom_mainR: HTMLElement;
+    public domToolbar: HTMLElement;
+    public domMainL: HTMLElement;
+    public domMainR: HTMLElement;
 
     public db: IndexedDBManager | null = null;
     public i18n;
@@ -47,43 +47,43 @@ class MainWindow {
 
         this.quickLookUp = quickLookUp;
 
-        var dom_toolbar = <HTMLElement>document.getElementById("main-toolbar"); // 工具列
-        var dom_mainL = <HTMLElement>document.getElementById("main-L"); // 左邊區域
-        var dom_mainR = <HTMLElement>document.getElementById("main-R"); // 左邊區域
-        var btn_layout = <HTMLDivElement>document.querySelector(".titlebar-toolbar-layout"); // 開啟layout選單
+        const _domToolbar = document.getElementById("main-toolbar") as HTMLElement; // 工具列
+        const _domMainL = document.getElementById("main-L") as HTMLElement; // 左邊區域
+        const _domMainR = document.getElementById("main-R") as HTMLElement; // 左邊區域
+        const _btnLayout = document.querySelector(".titlebar-toolbar-layout") as HTMLDivElement; // 開啟layout選單
 
-        let firstRun = true; // 用於判斷是否為第一次執行
-        let startType = 0; // 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
+        let _firstRun = true; // 用於判斷是否為第一次執行
+        let _startType = 0; // 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
 
         /** 是否為快速預覽 */
-        var isQuickLook = false;
+        var _isQuickLook = false;
 
-        this.dom_toolbar = dom_toolbar;
-        this.dom_mainL = dom_mainL;
-        this.dom_mainR = dom_mainR;
+        this.domToolbar = _domToolbar;
+        this.domMainL = _domMainL;
+        this.domMainR = _domMainR;
 
-        var db: IndexedDBManager;
-        var config = this.config = new Config(baseWindow);
-        var i18n = this.i18n = new I18n();
-        i18n.pushData(langData);
-        var msgbox = this.msgbox = new Msgbox(i18n);
-        var fileLoad = this.fileLoad = new FileLoad(this);
-        var fileShow = this.fileShow = new FileShow(this);
-        var fileSort = this.fileSort = new FileSort(this);
-        var dirSort = this.dirSort = new DirSort(this);
-        var mainFileList = this.mainFileList = new MainFileList(this);
-        var mainDirList = this.mainDirList = new MainDirList(this);
-        var imgSearch = this.imgSearch = new ImgSearch(this);
-        var mainExif = this.mainExif = new MainExif(this);
-        var mainToolbar = this.mainToolbar = new MainToolbar(this);
-        var menu = this.menu = new Menu(this);
-        var mainMenu = this.mainMenu = new MainMenu(this);
-        var largeBtn = this.largeBtn = new LargeBtn(this);
-        var script = this.script = new Script(this);
-        var bulkView = this.bulkView = new BulkView(this);
-        var toolbarBack = this.toolbarBack = new ToolbarBack();
-        var fullScreen = this.fullScreen = new FullScreen(this);
-        var textEditor = this.textEditor = new TextEditor(this);
+        var _db: IndexedDBManager;
+        const _config = this.config = new Config(baseWindow);
+        const _i18n = this.i18n = new I18n();
+        _i18n.pushData(langData);
+        const _msgbox = this.msgbox = new Msgbox(_i18n);
+        const _fileLoad = this.fileLoad = new FileLoad(this);
+        const _fileShow = this.fileShow = new FileShow(this);
+        const _fileSort = this.fileSort = new FileSort(this);
+        const _dirSort = this.dirSort = new DirSort(this);
+        const _mainFileList = this.mainFileList = new MainFileList(this);
+        const _mainDirList = this.mainDirList = new MainDirList(this);
+        const _imgSearch = this.imgSearch = new ImgSearch(this);
+        const _mainExif = this.mainExif = new MainExif(this);
+        const _mainToolbar = this.mainToolbar = new MainToolbar(this);
+        const _menu = this.menu = new Menu(this);
+        const _mainMenu = this.mainMenu = new MainMenu(this);
+        const _largeBtn = this.largeBtn = new LargeBtn(this);
+        const _script = this.script = new Script(this);
+        const _bulkView = this.bulkView = new BulkView(this);
+        const _toolbarBack = this.toolbarBack = new ToolbarBack();
+        const _fullScreen = this.fullScreen = new FullScreen(this);
+        const _textEditor = this.textEditor = new TextEditor(this);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
@@ -103,21 +103,21 @@ class MainWindow {
 
         (async () => {
 
-            db = await new IndexedDBManager("tiefseeDB", 2);
-            this.db = db;
+            _db = await new IndexedDBManager("tiefseeDB", 2);
+            this.db = _db;
 
-            fileShow.openNone(); // 不顯示任何東西
+            _fileShow.openNone(); // 不顯示任何東西
 
             WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio); // 設定視窗最小size
 
-            fileShow.tiefseeview.setMargin(0, 10, 10, 0);
+            _fileShow.tiefseeview.setMargin(0, 10, 10, 0);
 
             // 視窗改變大小時觸發
             baseWindow.sizeChangeEvents.push(async () => {
                 // 必須在視窗化的狀態下記錄size，不可以在最大化的時候記錄size
                 if (baseWindow.windowState === "Normal") {
-                    config.settings.position.width = baseWindow.width;
-                    config.settings.position.height = baseWindow.height;
+                    _config.settings.position.width = baseWindow.width;
+                    _config.settings.position.height = baseWindow.height;
                 }
             });
 
@@ -143,27 +143,27 @@ class MainWindow {
 
             // 設定icon
             async function initIcon() {
-                let path = Lib.Combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
+                const path = Lib.combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
                 WV_Window.SetIcon(path);
             }
             initIcon();
 
             // 開啟layout選單
-            btn_layout.addEventListener("click", function (e) {
-                script.menu.showLayout(btn_layout);
+            _btnLayout.addEventListener("click", (e) => {
+                _script.menu.showLayout(_btnLayout);
             })
 
             // 封鎖原生右鍵選單
-            document.addEventListener("contextmenu", function (e) {
+            document.addEventListener("contextmenu", (e) => {
                 // if (Lib.isTextFocused() === false) { // 焦點不在輸入框上          
                 // }
                 e.preventDefault();
             })
 
             // 圖片區域也允許拖曳視窗
-            fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
+            _fileShow.dom_imgview.addEventListener("mousedown", async (e) => {
                 // 圖片沒有出現滾動條
-                if (fileShow.tiefseeview.getIsOverflowX() === false && fileShow.tiefseeview.getIsOverflowY() === false) {
+                if (_fileShow.tiefseeview.getIsOverflowX() === false && _fileShow.tiefseeview.getIsOverflowY() === false) {
                     if (e.button === 0) { // 滑鼠左鍵
                         let WindowState = baseWindow.windowState;
                         if (WindowState === "Normal") {
@@ -184,14 +184,14 @@ class MainWindow {
             });*/
 
             // double click 最大化或視窗化
-            Lib.addEventDblclick(dom_toolbar, async (e) => { // 工具列
+            Lib.addEventDblclick(_domToolbar, async (e) => { // 工具列
                 // 如果是按鈕就不雙擊全螢幕
-                let _dom = e.target as HTMLDivElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+                const dom = e.target as HTMLDivElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
-                let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
+                const windowState = baseWindow.windowState
+                if (windowState === "Maximized" && _fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
                     setTimeout(() => {
@@ -199,9 +199,9 @@ class MainWindow {
                     }, 50);
                 }
             });
-            Lib.addEventDblclick(fileShow.iframes.welcomeview.dom, async () => { // 歡迎頁面
-                let WindowState = baseWindow.windowState
-                if (WindowState === "Maximized" && fullScreen.getEnabled() === false) {
+            Lib.addEventDblclick(_fileShow.iframes.welcomeview.dom, async () => { // 歡迎頁面
+                const windowState = baseWindow.windowState
+                if (windowState === "Maximized" && _fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
                     setTimeout(() => {
@@ -211,52 +211,52 @@ class MainWindow {
             });
 
             // 讓工具列允許拖曳視窗
-            dom_toolbar.addEventListener("mousedown", async (e) => {
-                if (fullScreen.getEnabled() === true) { return; }
-                let _dom = e.target as HTMLDivElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+            _domToolbar.addEventListener("mousedown", async (e) => {
+                if (_fullScreen.getEnabled() === true) { return; }
+                const dom = e.target as HTMLDivElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
                 if (e.button === 0) { // 滑鼠左鍵
                     await WV_Window.WindowDrag("move");
                 }
             });
-            dom_toolbar.addEventListener("touchstart", async (e) => {
-                if (fullScreen.getEnabled() === true) { return; }
-                let _dom = e.target as HTMLDivElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+            _domToolbar.addEventListener("touchstart", async (e) => {
+                if (_fullScreen.getEnabled() === true) { return; }
+                const dom = e.target as HTMLDivElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
-                let isShowScroll = dom_toolbar.scrollWidth > dom_toolbar.clientWidth; // 判斷當前是否有滾動條
+                const isShowScroll = _domToolbar.scrollWidth > _domToolbar.clientWidth; // 判斷當前是否有滾動條
                 if (isShowScroll === false) {
-                    baseWindow.touchDrop.start(dom_toolbar, e, "move");
+                    baseWindow.touchDrop.start(_domToolbar, e, "move");
                 }
             });
 
             // 在工具列滾動時，進行水平移動
-            dom_toolbar.addEventListener("wheel", (e: WheelEvent) => {
+            _domToolbar.addEventListener("wheel", (e: WheelEvent) => {
 
-                let scrollLeft = dom_toolbar.scrollLeft;
-                let deltaY = e.deltaY; // 上下滾動的量
+                const scrollLeft = _domToolbar.scrollLeft;
+                const deltaY = e.deltaY; // 上下滾動的量
 
                 if (deltaY > 0) { // 往右
-                    dom_toolbar.scroll(scrollLeft + 20, 0);
+                    _domToolbar.scroll(scrollLeft + 20, 0);
                 }
                 if (deltaY < 0) { // 往左
-                    dom_toolbar.scroll(scrollLeft - 20, 0);
+                    _domToolbar.scroll(scrollLeft - 20, 0);
                 }
             }, false);
 
-            new TiefseeScroll().initGeneral(dom_toolbar, "x"); // 滾動條元件
+            new TiefseeScroll().initGeneral(_domToolbar, "x"); // 滾動條元件
 
 
             // 讓歡迎畫面允許拖曳視窗
-            fileShow.iframes.welcomeview.dom.addEventListener("mousedown", async (e) => {
+            _fileShow.iframes.welcomeview.dom.addEventListener("mousedown", async (e) => {
 
                 // 排除不允許拖拉的物件
-                let _dom = e.target as HTMLDivElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+                const dom = e.target as HTMLDivElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
                 e.preventDefault();
 
@@ -271,61 +271,59 @@ class MainWindow {
             // #region 自定義滑鼠
 
             // 按下
-            fileShow.dom_imgview.addEventListener("mousedown", (e) => {
+            _fileShow.dom_imgview.addEventListener("mousedown", (e) => {
                 let sc = "";
                 let type = e.button;
                 if (type === 1) { // 滾輪鍵
-                    sc = config.settings.mouse.scrollWheelButton;
+                    sc = _config.settings.mouse.scrollWheelButton;
                 }
                 if (type === 3) { // 按鍵4
-                    sc = config.settings.mouse.mouseButton4;
+                    sc = _config.settings.mouse.mouseButton4;
                 }
                 if (type === 4) { // 按鍵5
-                    sc = config.settings.mouse.mouseButton5;
+                    sc = _config.settings.mouse.mouseButton5;
                 }
 
-                // let offsetX = e.offsetX;
-                // let offsetY = e.offsetY;
-                let offsetX = e.x - fileShow.dom_imgview.getBoundingClientRect().left;
-                let offsetY = e.y - fileShow.dom_imgview.getBoundingClientRect().top;
-                script.run(sc, { x: offsetX, y: offsetY });
+                let offsetX = e.x - _fileShow.dom_imgview.getBoundingClientRect().left;
+                let offsetY = e.y - _fileShow.dom_imgview.getBoundingClientRect().top;
+                _script.run(sc, { x: offsetX, y: offsetY });
             })
 
             // 雙擊左鍵
-            Lib.addEventDblclick(fileShow.dom_imgview, async (e: MouseEvent) => { // 圖片物件
-                let sc = config.settings.mouse.leftDoubleClick;
-                let offsetX = e.x - fileShow.dom_imgview.getBoundingClientRect().left;
-                let offsetY = e.y - fileShow.dom_imgview.getBoundingClientRect().top;
-                script.run(sc, { x: offsetX, y: offsetY });
+            Lib.addEventDblclick(_fileShow.dom_imgview, async (e: MouseEvent) => { // 圖片物件
+                const sc = _config.settings.mouse.leftDoubleClick;
+                const offsetX = e.x - _fileShow.dom_imgview.getBoundingClientRect().left;
+                const offsetY = e.y - _fileShow.dom_imgview.getBoundingClientRect().top;
+                _script.run(sc, { x: offsetX, y: offsetY });
             });
 
             // 覆寫滾動事件
-            fileShow.tiefseeview.setEventMouseWheel((type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => {
+            _fileShow.tiefseeview.setEventMouseWheel((type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => {
 
                 let sc = "";
                 if (type === "up") {
                     if (e.ctrlKey) {
-                        sc = config.settings.mouse.scrollUpCtrl;
+                        sc = _config.settings.mouse.scrollUpCtrl;
                     } else if (e.shiftKey) {
-                        sc = config.settings.mouse.scrollUpShift;
+                        sc = _config.settings.mouse.scrollUpShift;
                     } else if (e.altKey) {
-                        sc = config.settings.mouse.scrollUpAlt;
+                        sc = _config.settings.mouse.scrollUpAlt;
                     } else {
-                        sc = config.settings.mouse.scrollUp;
+                        sc = _config.settings.mouse.scrollUp;
                     }
                 } else {
                     if (e.ctrlKey) {
-                        sc = config.settings.mouse.scrollDownCtrl;
+                        sc = _config.settings.mouse.scrollDownCtrl;
                     } else if (e.shiftKey) {
-                        sc = config.settings.mouse.scrollDownShift;
+                        sc = _config.settings.mouse.scrollDownShift;
                     } else if (e.altKey) {
-                        sc = config.settings.mouse.scrollDownAlt;
+                        sc = _config.settings.mouse.scrollDownAlt;
                     } else {
-                        sc = config.settings.mouse.scrollDown;
+                        sc = _config.settings.mouse.scrollDown;
                     }
                 }
 
-                script.run(sc, { x: offsetX, y: offsetY });
+                _script.run(sc, { x: offsetX, y: offsetY });
             });
 
             // #endregion
@@ -353,9 +351,9 @@ class MainWindow {
 
                 if (e.dataTransfer === null) { return; }
 
-                let files = e.dataTransfer.files;
-                let text = e.dataTransfer.getData("text/plain"); // 取得拖曳進來的文字，或圖片的網址
-                let textUrl = e.dataTransfer.getData("text/uri-list");
+                const files = e.dataTransfer.files;
+                const text = e.dataTransfer.getData("text/plain"); // 取得拖曳進來的文字，或圖片的網址
+                const textUrl = e.dataTransfer.getData("text/uri-list");
                 /*console.log(e.dataTransfer.types)
                 console.log(text)
                 console.log(textUrl)
@@ -364,11 +362,11 @@ class MainWindow {
 
                 // 下載檔案後，判斷是否需要重新載入圖片 
                 async function reloadImageAfterDownload(path: string) {
-                    if (fileLoad.getIsBulkView() === false) { // 一般圖片模式，直接重新載入
-                        await fileLoad.loadFile(path);
+                    if (_fileLoad.getIsBulkView() === false) { // 一般圖片模式，直接重新載入
+                        await _fileLoad.loadFile(path);
                     } else { // 大量瀏覽模式，與目前所在目錄不同才重新載入
-                        if (Lib.GetDirectoryName(path) !== fileLoad.getDirPath()) {
-                            await fileLoad.loadFile(path);
+                        if (Lib.getDirectoryName(path) !== _fileLoad.getDirPath()) {
+                            await _fileLoad.loadFile(path);
                         }
                     }
                 }
@@ -379,9 +377,9 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    var path = text.match(/file=(.+)/)?.[1] || "";
-                    path = Lib.URLToPath(path);
-                    await fileLoad.loadFile(path);
+                    let path = text.match(/file=(.+)/)?.[1] || "";
+                    path = Lib.urlToPath(path);
+                    await _fileLoad.loadFile(path);
 
                 } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
 
@@ -392,19 +390,19 @@ class MainWindow {
                     const regex = /^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/;
                     const match = text.match(regex);
                     if (match) {
-                        path = decodeURIComponent(match[1]);
-                        path = Lib.URLToPath(path);
-                        await fileLoad.loadFile(path);
+                        let path = decodeURIComponent(match[1]);
+                        path = Lib.urlToPath(path);
+                        await _fileLoad.loadFile(path);
                     }
 
                 } else if (text.indexOf("https://cdn.discordapp.com/attachments/") === 0) { // 如果是 discord 的圖片
 
                     e.preventDefault();
 
-                    let file = await downloadFileFromUrl(text);
+                    const file = await downloadFileFromUrl(text);
                     if (file != null) {
-                        let base64 = await Lib.readFileAsDataURL(file);
-                        let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+                        const base64 = await Lib.readFileAsDataURL(file);
+                        const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
                         if (extension !== "") {
                             let path = await WV_File.Base64ToTempFile(base64, extension);
                             await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
@@ -414,14 +412,14 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    let base64 = await Lib.readFileAsDataURL(files[0]);
-                    let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+                    const base64 = await Lib.readFileAsDataURL(files[0]);
+                    const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
 
                     if (extension !== "") {
-                        let path = await WV_File.Base64ToTempFile(base64, extension);
+                        const path = await WV_File.Base64ToTempFile(base64, extension);
                         await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
                     } else { // 檔案解析失敗的話，嘗試從網址下載
-                        let file = await downloadFileFromUrl(text);
+                        const file = await downloadFileFromUrl(text);
                         if (file != null) {
                             let base64 = await Lib.readFileAsDataURL(file);
                             let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
@@ -437,8 +435,8 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    let base64 = text;
-                    let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
+                    const base64 = text;
+                    const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
                         await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
@@ -448,7 +446,7 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    let file = await downloadFileFromUrl(text);
+                    const file = await downloadFileFromUrl(text);
                     if (file != null) {
                         let base64 = await Lib.readFileAsDataURL(file);
                         let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
@@ -460,17 +458,17 @@ class MainWindow {
                 } else if (textUrl.search(/^file:[/][/]/) === 0) { // 某些應用程式的檔案連結，例如vscode
 
                     e.preventDefault();
-                    let path = Lib.URLToPath(textUrl);
-                    await fileLoad.loadFile(path);
+                    const path = Lib.urlToPath(textUrl);
+                    await _fileLoad.loadFile(path);
 
                 } else if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) { // 本機的檔案
 
                     // 取得拖曳進來的檔案路徑
                     chrome.webview.postMessageWithAdditionalObjects("FilesDropped", files);
-                    let arFile = await baseWindow.getDropPath();
+                    const arFile = await baseWindow.getDropPath();
 
                     if (arFile === undefined) { return; }
-                    await fileLoad.loadDropFile(arFile);
+                    await _fileLoad.loadDropFile(arFile);
                     e.preventDefault();
 
                 }
@@ -491,7 +489,7 @@ class MainWindow {
                 x = x / window.devicePixelRatio;
                 y = y / window.devicePixelRatio;
                 if (y <= 30) {
-                    mainMenu.showMenu(new MouseEvent("mouseup"), x, y);
+                    _mainMenu.showMenu(new MouseEvent("mouseup"), x, y);
                 }
             }
 
@@ -505,21 +503,21 @@ class MainWindow {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-            script.window.enabledLoading(true);
+            _script.window.enabledLoading(true);
 
             try {
                 const response = await fetch(imageUrl, { signal: controller.signal });
 
                 // 判斷請求是否成功
                 if (response.status !== 200) {
-                    Toast.show(i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); // 檔案下載失敗
+                    Toast.show(_i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); // 檔案下載失敗
                     return null;
                 }
 
                 // 判斷檔案大小
                 const contentLength = response.headers.get("content-length");
                 if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { // 50m
-                    Toast.show(i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); // 檔案大小超過限制
+                    Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); // 檔案大小超過限制
                     return null;
                 }
 
@@ -527,7 +525,7 @@ class MainWindow {
                 const contentType = response.headers.get("content-type");
                 // console.log(contentType)
                 if (!contentType || !contentType.startsWith("image/")) {
-                    Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); // 不支援的檔案類型
+                    Toast.show(_i18n.t("msg.unsupportedFileTypes"), 1000 * 3); // 不支援的檔案類型
                     return null;
                 }
 
@@ -535,12 +533,12 @@ class MainWindow {
                 const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
                 return new File([blob], fileName, { type: response.headers.get("content-type") ?? "application/octet-stream" });
             } catch (error) {
-                Toast.show(i18n.t("msg.fileDownloadFailed"), 1000 * 3); // 檔案下載失敗
+                Toast.show(_i18n.t("msg.fileDownloadFailed"), 1000 * 3); // 檔案下載失敗
                 console.error(error);
                 return null;
             } finally {
                 clearTimeout(timeoutId);
-                script.window.enabledLoading(false);
+                _script.window.enabledLoading(false);
             }
         }
 
@@ -551,15 +549,15 @@ class MainWindow {
         baseWindow.onCreate = async (json: AppInfo) => {
 
             baseWindow.appInfo = json;
-            startType = json.startType;
+            _startType = json.startType;
 
-            isQuickLook = false;
+            _isQuickLook = false;
 
             if (json.quickLookRunType === 0) { // 一般啟動
 
-                if (firstRun === true) { // 首次開啟視窗
+                if (_firstRun === true) { // 首次開啟視窗
 
-                    firstRun = false;
+                    _firstRun = false;
 
                     initSetting(json.settingTxt); // 初始讀取設定
                     await initLastPosition(); // 初始 套用上次的視窗狀態與坐標
@@ -574,21 +572,21 @@ class MainWindow {
 
             if (json.quickLookRunType !== 0) { // 快速預覽
 
-                msgbox.closeAll();
+                _msgbox.closeAll();
                 initSetting(json.settingTxt); // 初始讀取設定
 
                 let isKeyboardSpace = json.quickLookRunType === 1; // 按著空白鍵
                 let isMouseMiddle = json.quickLookRunType === 2; // 按著滑鼠中鍵(滾輪)
 
-                if ((isKeyboardSpace && config.settings.quickLook.keyboardSpaceRun) ||
-                    (isMouseMiddle && config.settings.quickLook.mouseMiddleRun)) {
+                if ((isKeyboardSpace && _config.settings.quickLook.keyboardSpaceRun) ||
+                    (isMouseMiddle && _config.settings.quickLook.mouseMiddleRun)) {
 
-                    if (startType == 4 || startType == 5) { // 單純開啟圖片(用於 單一執行個體)
+                    if (_startType == 4 || _startType == 5) { // 單純開啟圖片(用於 單一執行個體)
                         WV_Window.ShowWindow(); // 顯示視窗 
                         initLoad(json.args); // 初始載入檔案
                     } else {
-                        isQuickLook = true;
-                        fileShow.openNone(); // 避免卡在上一張圖片
+                        _isQuickLook = true;
+                        _fileShow.openNone(); // 避免卡在上一張圖片
                         await initQuickLookPosition(); // 初始 快速啟動的坐標   
                         initLoad(json.args); // 初始 載入檔案
                     }
@@ -600,7 +598,7 @@ class MainWindow {
 
             setTimeout(() => { // 延遲執行，避免剛啟動視窗時，因被搶走焦點導致右鍵選單被關閉
                 window.onblur = function () { // 視窗失去焦點
-                    menu.close(); // 關閉menu
+                    _menu.close(); // 關閉menu
                 };
             }, 1000);
         }
@@ -610,8 +608,8 @@ class MainWindow {
          */
         async function quickLookUp() {
             // 如果是單一執行個體，就不關閉視窗
-            if (startType === 2 || startType === 3) {
-                fileShow.openNone();
+            if (_startType === 2 || _startType === 3) {
+                _fileShow.openNone();
                 await WV_Window.Hide();
             }
             // console.log("關閉 快速預覽")
@@ -623,20 +621,20 @@ class MainWindow {
         async function initQuickLookPosition() {
 
             // 取得滑鼠所在的螢幕資訊
-            let mousePosition = await WV_System.GetMousePosition();
-            let screen = await WV_System.GetScreenFromPoint(mousePosition[0], mousePosition[1]);
-            let screenX = screen[0];
-            let screenY = screen[1];
-            let screenW = screen[2];
-            let screenH = screen[3];
+            const mousePosition = await WV_System.GetMousePosition();
+            const screen = await WV_System.GetScreenFromPoint(mousePosition[0], mousePosition[1]);
+            const screenX = screen[0];
+            const screenY = screen[1];
+            const screenW = screen[2];
+            const screenH = screen[3];
 
-            let rate = 0.8; // 全螢幕的80%
+            const rate = 0.8; // 全螢幕的 80%
 
             // 置中的坐標與size
-            let width = screenW * rate;
-            let height = screenH * rate;
-            let left = screenX + ((screenW - width) / 2);
-            let top = screenY + ((screenH - height) / 2);
+            const width = screenW * rate;
+            const height = screenH * rate;
+            const left = screenX + ((screenW - width) / 2);
+            const top = screenY + ((screenH - height) / 2);
 
             await WV_Window.ShowWindowAtPosition(left, top, width, height, "Normal"); // 顯示視窗 
         }
@@ -645,7 +643,7 @@ class MainWindow {
          * 初始 套用上次的視窗狀態與坐標
          */
         async function initLastPosition() {
-            let txtPosition = config.settings.position;
+            let txtPosition = _config.settings.position;
             if (txtPosition.left !== -9999) {
                 if (txtPosition.windowState == "Maximized") {
                     await WV_Window.ShowWindowAtPosition(
@@ -677,8 +675,8 @@ class MainWindow {
          * 初始 載入檔案
          */
         async function initLoad(args: string[]) {
-            msgbox.closeAll(); // 關閉所有訊息視窗
-            menu.close();
+            _msgbox.closeAll(); // 關閉所有訊息視窗
+            _menu.close();
 
             // 如果是長路經，路徑開頭會是「\\?\」，將其去除
             args = args.map(arg => arg.startsWith("\\\\?\\") ? arg.slice(4) : arg);
@@ -689,41 +687,41 @@ class MainWindow {
 
             // 解析多幀圖片
             if (args.length >= 2 && args[0] === "showFrames") {
-                script.window.enabledLoading(true);
+                _script.window.enabledLoading(true);
                 args.shift(); // 把陣列的第一個元素從其中刪除
                 try {
-                    let dirPath = await WebAPI.extractFrames(args[0]);
-                    script.bulkView.show();
-                    await fileLoad.loadFile(dirPath); // 載入單張圖片
+                    const dirPath = await WebAPI.extractFrames(args[0]);
+                    _script.bulkView.show();
+                    await _fileLoad.loadFile(dirPath); // 載入單張圖片
                 } catch {
-                    fileShow.openWelcome();
-                    Toast.show(i18n.t("msg.imageAnalysisFailed"), 1000 * 3); // 圖片解析失敗
+                    _fileShow.openWelcome();
+                    Toast.show(_i18n.t("msg.imageAnalysisFailed"), 1000 * 3); // 圖片解析失敗
                 }
 
-                script.window.enabledLoading(false);
+                _script.window.enabledLoading(false);
                 return;
             }
 
             if (args.length === 0) {
-                fileShow.openWelcome();
+                _fileShow.openWelcome();
 
             } else if (args.length === 1) {
                 if (args[0] === "") {
-                    fileShow.openWelcome();
+                    _fileShow.openWelcome();
                 } else {
-                    await fileLoad.loadFile(args[0]); // 載入單張圖片
+                    await _fileLoad.loadFile(args[0]); // 載入單張圖片
                 }
 
             } else {
 
-                let arPath = await WebAPI.Directory.getFiles2(args);
-                await fileLoad.loadFiles(arPath); // 載入多張圖片
+                const arPath = await WebAPI.Directory.getFiles2(args);
+                await _fileLoad.loadFiles(arPath); // 載入多張圖片
 
             }
 
             // 在圖片載入完成後，更新「用其他APP開啟檔案」的列表
             setTimeout(() => {
-                mainMenu.updateOtherAppList(undefined);
+                _mainMenu.updateOtherAppList(undefined);
             }, 1000 * 2);
         }
 
@@ -731,22 +729,21 @@ class MainWindow {
          * 初始 讀取設定
          */
         function initSetting(settingTxt: string) {
-            var userSetting = {};
+            let userSetting = {};
             try {
                 userSetting = JSON.parse(settingTxt);
             } catch (e) { }
-            $.extend(true, config.settings, userSetting);
-            applySetting(config.settings, true);
+            $.extend(true, _config.settings, userSetting);
+            applySetting(_config.settings, true);
         }
 
         /**
          * 再次檢查目前是否按著空白鍵或滑鼠中鍵
          */
         async function checkDownKey() {
-
-            let json = JSON.parse(await WV_System.GetDownKey());
-            let keyboardSpaceRun = config.settings.quickLook.keyboardSpaceRun;
-            let mouseMiddleRun = config.settings.quickLook.mouseMiddleRun;
+            const json = JSON.parse(await WV_System.GetDownKey());
+            const keyboardSpaceRun = _config.settings.quickLook.keyboardSpaceRun;
+            const mouseMiddleRun = _config.settings.quickLook.mouseMiddleRun;
             if ((json.isKeyboardSpace && keyboardSpaceRun) || (json.isMouseMiddle && mouseMiddleRun)) {
 
             } else {
@@ -758,7 +755,7 @@ class MainWindow {
          * 目前是否為快速預覽
          */
         function getIsQuickLook() {
-            return isQuickLook;
+            return _isQuickLook;
         }
 
         /**
@@ -769,12 +766,12 @@ class MainWindow {
          */
         function updateDomVisibility() {
 
-            let bodyShowType = document.body.getAttribute("showType");
+            const bodyShowType = document.body.getAttribute("showType");
             if (bodyShowType === null) { return; }
 
             function getShowType(dom: Element) {
                 while (true) { // 取得 bulkView-item 的 data-path
-                    let showType = dom.getAttribute("showType");
+                    const showType = dom.getAttribute("showType");
                     if (showType !== null && showType !== "") {
                         return showType;
                     }
@@ -809,79 +806,79 @@ class MainWindow {
 
         /**
          * 套用設定
-         * @param _settings 
+         * @param settings 
          * @param isStart 是否為第一次呼叫
          */
-        function applySetting(_settings: any, isStart = false) {
+        function applySetting(settings: any, isStart = false) {
 
-            let cssRoot = document.body;
+            const cssRoot = document.body;
 
-            config.settings = _settings;
+            _config.settings = settings;
 
             // -----------
 
             // 視窗樣式
-            baseWindow.setWindowAttribute(config.settings.theme.windowStyle);
+            baseWindow.setWindowAttribute(_config.settings.theme.windowStyle);
 
             // -----------
 
             // 語言
-            let lang = script.window.getLang();
-            i18n.setLang(lang);
+            const lang = _script.window.getLang();
+            _i18n.setLang(lang);
 
             // -----------
 
-            let tiefseeviewImageRendering = Number(config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
-            fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
+            const tiefseeviewImageRendering = Number(_config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
+            _fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
-            fileShow.tiefseeview.enableTouchpadGestures(
-                config.settings.other.enableTouchpadGestures); // 啟用觸控板手勢
+            _fileShow.tiefseeview.enableTouchpadGestures(
+                _config.settings.other.enableTouchpadGestures); // 啟用觸控板手勢
 
             // -----------
 
-            baseWindow.setZoomFactor(config.settings["theme"]["zoomFactor"]); // 視窗縮放
-            cssRoot.style.setProperty("--svgWeight", config.settings["theme"]["svgWeight"]); // 圖示粗細
+            baseWindow.setZoomFactor(_config.settings["theme"]["zoomFactor"]); // 視窗縮放
+            cssRoot.style.setProperty("--svgWeight", _config.settings["theme"]["svgWeight"]); // 圖示粗細
 
             // document.body.style.fontWeight = config.settings["theme"]["fontWeight"]; // 文字粗細
-            let fontWeight = Number.parseInt(config.settings["theme"]["fontWeight"]);
-            let fontWeightBole = Number.parseInt(config.settings["theme"]["fontWeight"]) + 200;
+            const fontWeight = Number.parseInt(_config.settings["theme"]["fontWeight"]);
+            const fontWeightBole = Number.parseInt(_config.settings["theme"]["fontWeight"]) + 200;
             cssRoot.style.setProperty("--fontWeight", fontWeight.toString()); // 文字粗細(一般)
             cssRoot.style.setProperty("--fontWeightBold", fontWeightBole.toString()); // 文字粗細(粗體)
 
             // -----------
 
-            mainToolbar.setEnabled(config.settings.layout.mainToolbarEnabled); // 工具列
-            dom_toolbar.setAttribute("toolbarAlign", config.settings.layout.mainToolbarAlign); // 工具列對齊
+            _mainToolbar.setEnabled(_config.settings.layout.mainToolbarEnabled); // 工具列
+            _domToolbar.setAttribute("toolbarAlign", _config.settings.layout.mainToolbarAlign); // 工具列對齊
 
-            mainFileList.setEnabled(config.settings.layout.fileListEnabled); // 檔案預覽視窗
-            mainFileList.setShowNo(config.settings.layout.fileListShowNo);
-            mainFileList.setShowName(config.settings.layout.fileListShowName);
-            if (isStart) { mainFileList.setItemWidth(config.settings.layout.fileListShowWidth); }
+            _mainFileList.setEnabled(_config.settings.layout.fileListEnabled); // 檔案預覽視窗
+            _mainFileList.setShowNo(_config.settings.layout.fileListShowNo);
+            _mainFileList.setShowName(_config.settings.layout.fileListShowName);
+            if (isStart) { _mainFileList.setItemWidth(_config.settings.layout.fileListShowWidth); }
 
-            mainDirList.setEnabled(config.settings.layout.dirListEnabled); // 資料夾預覽視窗
-            mainDirList.setShowNo(config.settings.layout.dirListShowNo);
-            mainDirList.setShowName(config.settings.layout.dirListShowName);
-            mainDirList.setImgNumber(config.settings.layout.dirListImgNumber);
-            if (isStart) { mainDirList.setItemWidth(config.settings.layout.dirListShowWidth); }
+            _mainDirList.setEnabled(_config.settings.layout.dirListEnabled); // 資料夾預覽視窗
+            _mainDirList.setShowNo(_config.settings.layout.dirListShowNo);
+            _mainDirList.setShowName(_config.settings.layout.dirListShowName);
+            _mainDirList.setImgNumber(_config.settings.layout.dirListImgNumber);
+            if (isStart) { _mainDirList.setItemWidth(_config.settings.layout.dirListShowWidth); }
 
-            mainExif.setEnabled(config.settings.layout.mainExifEnabled); // 詳細資料視窗
-            if (isStart) { mainExif.setItemWidth(config.settings.layout.mainExifShowWidth); }
-            cssRoot.style.setProperty("--mainExifMaxLine", config.settings.layout.mainExifMaxLine + ""); // 顯示的最大行數(1~1000)
-            mainExif.setHorizontal(config.settings.layout.mainExifHorizontal); // 寬度足夠時，橫向排列
-            mainExif.setRelatedFilesEnabled(config.settings.layout.relatedFilesEnabled); // 顯示相關檔案
+            _mainExif.setEnabled(_config.settings.layout.mainExifEnabled); // 詳細資料視窗
+            if (isStart) { _mainExif.setItemWidth(_config.settings.layout.mainExifShowWidth); }
+            cssRoot.style.setProperty("--mainExifMaxLine", _config.settings.layout.mainExifMaxLine + ""); // 顯示的最大行數(1~1000)
+            _mainExif.setHorizontal(_config.settings.layout.mainExifHorizontal); // 寬度足夠時，橫向排列
+            _mainExif.setRelatedFilesEnabled(_config.settings.layout.relatedFilesEnabled); // 顯示相關檔案
 
             // -----------
 
             // 工具列順序與是否顯示
             const arGroupName = ["img", "pdf", "txt", "bulkView"];
             arGroupName.map((gn) => {
-                let groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
+                const groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
 
-                let dom_group = dom_toolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
-                let arMainToolbar = config.settings.mainToolbar[groupName];
+                const dom_group = _domToolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
+                const arMainToolbar = _config.settings.mainToolbar[groupName];
                 for (let i = 0; i < arMainToolbar.length; i++) {
                     const item = arMainToolbar[i];
-                    let dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
+                    const dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
                     if (dom_btn === null) { continue; }
                     if (dom_btn.getAttribute("data-name") == "showBulkViewSetting") { continue; } // 大量瀏覽模式設定
 
@@ -893,28 +890,28 @@ class MainWindow {
             // -----------
 
             // 大型切換按鈕
-            largeBtn.setShowType(config.settings.layout.largeBtn);
+            _largeBtn.setShowType(_config.settings.layout.largeBtn);
 
             // -----------
 
             // 大量瀏覽模式一頁顯示的圖片數量
-            bulkView.setImgMaxCount(config.settings.bulkView.imgMaxCount);
+            _bulkView.setImgMaxCount(_config.settings.bulkView.imgMaxCount);
 
             // -----------
 
             // 圖片面積大於這個數值的平方，就禁用高品質縮放
-            let imageArea = Number(config.settings.advanced.highQualityLimit);
+            let imageArea = Number(_config.settings.advanced.highQualityLimit);
             if (imageArea == -1) { imageArea = 999999; }
             imageArea = imageArea * imageArea;
-            fileShow.tiefseeview.setEventHighQualityLimit(() => { return imageArea; })
+            _fileShow.tiefseeview.setEventHighQualityLimit(() => { return imageArea; })
 
             // 銳化圖片
-            fileShow.tiefseeview.setSharpenValue(config.settings.image.sharpenValue);
+            _fileShow.tiefseeview.setSharpenValue(_config.settings.image.sharpenValue);
 
             // -----------
 
             // 套用顏色
-            cssRoot.style.setProperty("--window-border-radius", config.settings.theme["--window-border-radius"] + "px");
+            cssRoot.style.setProperty("--window-border-radius", _config.settings.theme["--window-border-radius"] + "px");
             initColor("--color-window-background", true);
             initColor("--color-window-border", true);
             initColor("--color-white");
@@ -923,7 +920,7 @@ class MainWindow {
             // initColor("--color-grey");
             function initColor(name: string, opacity: boolean = false) {
                 // @ts-ignore
-                let c = config.settings.theme[name];
+                const c = _config.settings.theme[name];
 
                 if (opacity) {
                     cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a} )`);
@@ -935,21 +932,21 @@ class MainWindow {
                 }
             }
 
-            fileShow.iframes.setTheme();
+            _fileShow.iframes.setTheme();
 
             // ---------------
 
             // 設定顯示面板的順序
-            let dirPanel = document.querySelector(".main-L") as HTMLElement;
-            let filePanel = document.querySelector(".main-L2") as HTMLElement;
-            let imagePanel = document.querySelector(".main-V") as HTMLElement;
-            let infoPanel = document.querySelector(".main-R") as HTMLElement;
-            let dirPanelOrder = config.settings.layout.dirPanelOrder;
-            let filePanelOrder = config.settings.layout.filePanelOrder;
-            let imagePanelOrder = config.settings.layout.imagePanelOrder;
-            let infoPanelOrder = config.settings.layout.infoPanelOrder;
+            const dirPanel = document.querySelector(".main-L") as HTMLElement;
+            const filePanel = document.querySelector(".main-L2") as HTMLElement;
+            const imagePanel = document.querySelector(".main-V") as HTMLElement;
+            const infoPanel = document.querySelector(".main-R") as HTMLElement;
+            let dirPanelOrder = _config.settings.layout.dirPanelOrder;
+            let filePanelOrder = _config.settings.layout.filePanelOrder;
+            let imagePanelOrder = _config.settings.layout.imagePanelOrder;
+            let infoPanelOrder = _config.settings.layout.infoPanelOrder;
             // 如果有重複或缺漏，就初始化設定值
-            let arOrder = [dirPanelOrder, filePanelOrder, imagePanelOrder, infoPanelOrder];
+            const arOrder = [dirPanelOrder, filePanelOrder, imagePanelOrder, infoPanelOrder];
             if ((arOrder.includes(0) && arOrder.includes(1) &&
                 arOrder.includes(2) && arOrder.includes(3)) === false) {
                 dirPanelOrder = 0;
@@ -962,10 +959,9 @@ class MainWindow {
             imagePanel.style.order = imagePanelOrder.toString();
             infoPanel.style.order = infoPanelOrder.toString();
             // 更新拖曳條的位置
-            mainFileList.dragbar.setType((filePanelOrder > imagePanelOrder) ? "left" : "right");
-            mainDirList.dragbar.setType((dirPanelOrder > imagePanelOrder) ? "left" : "right");
-            mainExif.dragbar.setType((infoPanelOrder > imagePanelOrder) ? "left" : "right");
-
+            _mainFileList.dragbar.setType((filePanelOrder > imagePanelOrder) ? "left" : "right");
+            _mainDirList.dragbar.setType((dirPanelOrder > imagePanelOrder) ? "left" : "right");
+            _mainExif.dragbar.setType((infoPanelOrder > imagePanelOrder) ? "left" : "right");
         }
 
         /**
@@ -974,16 +970,16 @@ class MainWindow {
         async function saveSetting() {
 
             // 視窗目前的狀態
-            config.settings.position.left = baseWindow.left;
-            config.settings.position.top = baseWindow.top;
+            _config.settings.position.left = baseWindow.left;
+            _config.settings.position.top = baseWindow.top;
             // config.settings.position.width = baseWindow.width;
             // config.settings.position.height = baseWindow.height;
-            config.settings.position.windowState = baseWindow.windowState;
+            _config.settings.position.windowState = baseWindow.windowState;
 
             // 儲存 setting.json
-            let s = JSON.stringify(config.settings, null, "\t");
-            var path = await WV_Window.GetAppDataPath(); // 程式的暫存資料夾
-            path = Lib.Combine([path, "Setting.json"]);
+            let s = JSON.stringify(_config.settings, null, "\t");
+            let path = await WV_Window.GetAppDataPath(); // 程式的暫存資料夾
+            path = Lib.combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
         }
 
@@ -1002,17 +998,17 @@ class ToolbarBack {
 
     constructor() {
 
-        var btn = document.querySelector("#toolbar-back") as HTMLElement;
-        var clickEvent: () => void = () => { }
-        var active = false;
+        const _btn = document.querySelector("#toolbar-back") as HTMLElement;
+        var _clickEvent: () => void = () => { }
+        var _active = false;
 
         this.visible = visible;
         this.getVisible = getVisible;
         this.setEvent = setEvent;
         this.runEvent = runEvent;
 
-        btn.addEventListener("click", () => {
-            clickEvent();
+        _btn.addEventListener("click", () => {
+            _clickEvent();
         })
 
         /** 
@@ -1020,16 +1016,16 @@ class ToolbarBack {
          */
         function visible(val: boolean) {
             if (val === true) {
-                btn.setAttribute("active", "true");
-                active = true;
+                _btn.setAttribute("active", "true");
+                _active = true;
             } else {
-                btn.setAttribute("active", "");
-                active = false;
+                _btn.setAttribute("active", "");
+                _active = false;
             }
         }
 
         function getVisible() {
-            return active;
+            return _active;
         }
 
         /**
@@ -1037,14 +1033,14 @@ class ToolbarBack {
          * @param func 
          */
         function setEvent(func: () => void) {
-            clickEvent = func;
+            _clickEvent = func;
         }
 
         /**
          * 執行click事件
          */
         function runEvent() {
-            clickEvent();
+            _clickEvent();
         }
 
     }

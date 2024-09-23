@@ -5,7 +5,7 @@ class MainToolbar {
 
     constructor(M: MainWindow | null) {
 
-        var ar: {
+        const _ar: {
             type: ("button" | "html" | "hr"),
             group: string,
             i18n: string,
@@ -36,8 +36,8 @@ class MainToolbar {
 
             //產生UI
             if (M === null) { return }
-            for (let i = 0; i < ar.length; i++) {
-                const item = ar[i];
+            for (let i = 0; i < _ar.length; i++) {
+                const item = _ar[i];
 
                 if (item.type === "html") {
                     addToolbarHtml({
@@ -72,7 +72,7 @@ class MainToolbar {
          * @returns 
          */
         function getArrray() {
-            return ar;
+            return _ar;
         }
 
         /**
@@ -82,9 +82,9 @@ class MainToolbar {
         function setEnabled(val: boolean) {
             if (M == null) { return; }
             if (val) {
-                M.dom_toolbar.style.display = "";
+                M.domToolbar.style.display = "";
             } else {
-                M.dom_toolbar.style.display = "none";
+                M.domToolbar.style.display = "none";
             }
             M.config.settings.layout.mainToolbarEnabled = val;
         }
@@ -95,7 +95,7 @@ class MainToolbar {
         function initToolbarImg() {
 
             // 上一個檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.img,
@@ -109,7 +109,7 @@ class MainToolbar {
             })
 
             // 下一個檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.img,
@@ -123,7 +123,7 @@ class MainToolbar {
             })
 
             // 檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.img,
@@ -137,7 +137,7 @@ class MainToolbar {
             })
 
             // 上一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.img,
@@ -151,7 +151,7 @@ class MainToolbar {
             })
 
             // 下一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.img,
@@ -165,7 +165,7 @@ class MainToolbar {
             })
 
             // 排序
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.img,
@@ -179,7 +179,7 @@ class MainToolbar {
             })
 
             // 複製
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.img,
@@ -193,7 +193,7 @@ class MainToolbar {
             })
 
             // 快速拖曳
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.img,
@@ -213,7 +213,7 @@ class MainToolbar {
             })
 
             // 刪除
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.img,
@@ -227,7 +227,7 @@ class MainToolbar {
             })
 
             // 搜圖
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuImageSearch",
                 group: GroupType.img,
@@ -241,7 +241,7 @@ class MainToolbar {
             })
 
             // 進入 大量瀏覽模式
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.img,
@@ -255,7 +255,7 @@ class MainToolbar {
             })
 
             // 設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.img,
@@ -269,7 +269,7 @@ class MainToolbar {
             })
 
             // 旋轉與鏡像
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuRotation",
                 group: GroupType.img,
@@ -283,7 +283,7 @@ class MainToolbar {
             })
 
             // 縮放至適合視窗
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.zoomToFit",
                 group: GroupType.img,
@@ -299,7 +299,7 @@ class MainToolbar {
             //----------------   
 
             // 縮放比例
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-btn js-noDrag">
@@ -318,7 +318,7 @@ class MainToolbar {
             })
 
             // 圖片長寬
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoSize">
@@ -333,7 +333,7 @@ class MainToolbar {
             })
 
             // 檔案類型、檔案大小
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoType">
@@ -348,7 +348,7 @@ class MainToolbar {
             })
 
             // 檔案修改時間
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoWriteTime">
@@ -369,7 +369,7 @@ class MainToolbar {
         function initToolbarPdf() {
 
             // 上一張
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.pdf,
@@ -383,7 +383,7 @@ class MainToolbar {
             })
 
             // 下一張
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.pdf,
@@ -397,7 +397,7 @@ class MainToolbar {
             })
 
             // 開啟檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.pdf,
@@ -411,7 +411,7 @@ class MainToolbar {
             })
 
             // 上一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.pdf,
@@ -425,7 +425,7 @@ class MainToolbar {
             })
 
             // 下一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.pdf,
@@ -439,7 +439,7 @@ class MainToolbar {
             })
 
             // 排序
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.pdf,
@@ -453,7 +453,7 @@ class MainToolbar {
             })
 
             // 複製
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.pdf,
@@ -467,7 +467,7 @@ class MainToolbar {
             })
 
             // 快速拖曳
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.pdf,
@@ -487,7 +487,7 @@ class MainToolbar {
             })
 
             // 刪除
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.pdf,
@@ -501,7 +501,7 @@ class MainToolbar {
             })
 
             // 進入 大量瀏覽模式
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.pdf,
@@ -515,7 +515,7 @@ class MainToolbar {
             })
 
             // 設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.pdf,
@@ -532,7 +532,7 @@ class MainToolbar {
             //----------------------------------
 
             // 檔案類型、檔案大小
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoType">
@@ -547,7 +547,7 @@ class MainToolbar {
             })
 
             // 檔案修改時間
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoWriteTime">
@@ -568,7 +568,7 @@ class MainToolbar {
         function initToolbarTxt() {
 
             // 上一個檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.txt,
@@ -582,7 +582,7 @@ class MainToolbar {
             })
 
             // 下一個檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.txt,
@@ -596,7 +596,7 @@ class MainToolbar {
             })
 
             // 檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.txt,
@@ -610,7 +610,7 @@ class MainToolbar {
             })
 
             // 儲存檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSave",
                 group: GroupType.txt,
@@ -624,7 +624,7 @@ class MainToolbar {
             })
 
             // 上一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.txt,
@@ -638,7 +638,7 @@ class MainToolbar {
             })
 
             // 下一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.txt,
@@ -652,7 +652,7 @@ class MainToolbar {
             })
 
             // 排序
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.txt,
@@ -666,7 +666,7 @@ class MainToolbar {
             })
 
             // 複製
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.txt,
@@ -680,7 +680,7 @@ class MainToolbar {
             })
 
             // 快速拖曳
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.txt,
@@ -700,7 +700,7 @@ class MainToolbar {
             })
 
             // 刪除
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.txt,
@@ -714,7 +714,7 @@ class MainToolbar {
             })
 
             // 進入 大量瀏覽模式
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.txt,
@@ -728,7 +728,7 @@ class MainToolbar {
             })
 
             // 設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.txt,
@@ -745,7 +745,7 @@ class MainToolbar {
             //---------------------
 
             // 檔案類型、檔案大小
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoType">
@@ -760,7 +760,7 @@ class MainToolbar {
             })
 
             // 檔案修改時間
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoWriteTime">
@@ -782,7 +782,7 @@ class MainToolbar {
         function initToolbarWelcome() {
 
             // 顯示選單 開啟檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.openFile",
                 group: GroupType.welcome,
@@ -796,7 +796,7 @@ class MainToolbar {
             })
 
             // 設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.welcome,
@@ -810,14 +810,13 @@ class MainToolbar {
             })
         }
 
-
         /**
          * 初始化 工具列 BulkView
          */
         function initBulkView() {
 
             // 開啟檔案
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.bulkView,
@@ -831,7 +830,7 @@ class MainToolbar {
             })
 
             // 上一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.bulkView,
@@ -845,7 +844,7 @@ class MainToolbar {
             })
 
             // 下一個資料夾
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.bulkView,
@@ -859,7 +858,7 @@ class MainToolbar {
             })
 
             // 排序
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.bulkView,
@@ -873,7 +872,7 @@ class MainToolbar {
             })
 
             // 複製
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.bulkView,
@@ -887,7 +886,7 @@ class MainToolbar {
             })
 
             // 快速拖曳
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.bulkView,
@@ -907,7 +906,7 @@ class MainToolbar {
             })
 
             // 刪除
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showDeleteDirMsg",
                 group: GroupType.bulkView,
@@ -921,7 +920,7 @@ class MainToolbar {
             })
 
             // 設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.bulkView,
@@ -935,7 +934,7 @@ class MainToolbar {
             })
 
             // 檔案修改時間
-            ar.push({
+            _ar.push({
                 type: "html",
                 html: `
                     <div class="main-toolbar-txt" data-name="infoWriteTime">
@@ -950,7 +949,7 @@ class MainToolbar {
             })
 
             // 大量瀏覽模式設定
-            ar.push({
+            _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showBulkViewSetting",
                 group: GroupType.bulkView,
@@ -978,7 +977,7 @@ class MainToolbar {
             i18n: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = Lib.newDom(item.html);
+            const div = Lib.newDom(item.html);
             div.setAttribute("title", item.i18n);
             div.setAttribute("i18n", item.i18n);
             div.style.order = "999";
@@ -997,7 +996,7 @@ class MainToolbar {
             group: string,
             func: (domBtn: HTMLElement) => void,
         }) {
-            let div = Lib.newDom(`<div class="main-toolbar-hr"> </div>`);
+            const div = Lib.newDom(`<div class="main-toolbar-hr"> </div>`);
             div.style.order = "888";
             addToolbarDom({
                 group: item.group,
@@ -1019,7 +1018,7 @@ class MainToolbar {
         }) {
 
             // 產生按鈕
-            let div = Lib.newDom(`
+            const div = Lib.newDom(`
                 <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
                     ${SvgList[item.icon]}
                 </div>`);
@@ -1043,16 +1042,16 @@ class MainToolbar {
             if (M === null) { return }
 
             // 如果群組不存在，就先產生群組
-            let dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
-            if (dom_group === null) {
-                let div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
-                M.dom_toolbar.querySelector("#toolbar-content")?.appendChild(div);
-                dom_group = M.dom_toolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
+            let domGroup = M.domToolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
+            if (domGroup === null) {
+                const div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
+                M.domToolbar.querySelector("#toolbar-content")?.appendChild(div);
+                domGroup = M.domToolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }
 
             item.func(item.dom)
-            if (dom_group !== null) {
-                dom_group.appendChild(item.dom);
+            if (domGroup !== null) {
+                domGroup.appendChild(item.dom);
             }
         }
 

@@ -2,17 +2,17 @@ class ImgSearch {
 
     constructor(M: MainWindow) {
 
-        let arData = M.config.imgSearch.list;
+        const _arData = M.config.imgSearch.list;
 
         initMenu();
 
         function initMenu() {
 
-            let domMenu = document.getElementById("menu-imgSearch") as HTMLElement;
-            var domMenuList = document.getElementById("menu-imgSearch-list") as HTMLElement;
+            const domMenu = document.getElementById("menu-imgSearch") as HTMLElement;
+            const domMenuList = document.getElementById("menu-imgSearch-list") as HTMLElement;
 
             function getPath() {
-                let path = domMenu.getAttribute("data-path");
+                const path = domMenu.getAttribute("data-path");
                 if (path !== null && path !== "") {
                     return path;
                 } else {
@@ -20,14 +20,14 @@ class ImgSearch {
                 }
             }
 
-            for (let i = 0; i < arData.length; i++) {
+            for (let i = 0; i < _arData.length; i++) {
 
-                const item = arData[i];
-                let name = item.name; // 顯示的名稱
-                let icon = item.icon; // 圖示
-                let url = item.url;
+                const item = _arData[i];
+                const name = item.name; // 顯示的名稱
+                const icon = item.icon; // 圖示
+                const url = item.url;
 
-                let dom = Lib.newDom(`
+                const dom = Lib.newDom(`
                     <div class="menu-hor-item">
                         <div class="menu-hor-icon">
                             <img src="${icon}">
@@ -42,7 +42,7 @@ class ImgSearch {
                     M.menu.close();
 
                     if (url == "googleSearch") {
-                        let imgSearchUrl = await googleSearch(getPath());
+                        const imgSearchUrl = await googleSearch(getPath());
                         if (imgSearchUrl === "") {
                             M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); // 圖片搜尋失敗
                             return;
@@ -50,12 +50,12 @@ class ImgSearch {
                         WV_RunApp.OpenUrl(imgSearchUrl);
 
                     } else {
-                        let imgUrl = await getWebUrl(getPath());
+                        const imgUrl = await getWebUrl(getPath());
                         if (imgUrl === "") {
                             M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); // 圖片搜尋失敗
                             return;
                         }
-                        let imgSearchUrl = url.replace("{url}", imgUrl);
+                        const imgSearchUrl = url.replace("{url}", imgUrl);
                         WV_RunApp.OpenUrl(imgSearchUrl);
                     }
                 };
@@ -72,11 +72,11 @@ class ImgSearch {
         async function getBlob(path: string) {
 
             // 壓縮圖片
-            let max = 1000; // 圖片最大面積不可以超過這個值的平方
+            const max = 1000; // 圖片最大面積不可以超過這個值的平方
             let blob: Blob | null;
             if (M.fileLoad.getIsBulkView() === false && path === M.fileLoad.getFilePath()) {
-                let w = M.fileShow.tiefseeview.getOriginalWidth();
-                let h = M.fileShow.tiefseeview.getOriginalHeight();
+                const w = M.fileShow.tiefseeview.getOriginalWidth();
+                const h = M.fileShow.tiefseeview.getOriginalHeight();
                 let zoom = 1;
                 if (w * h > max * max) {
                     zoom = Math.sqrt((max * max) / (w * h));
@@ -85,21 +85,21 @@ class ImgSearch {
 
             } else {
 
-                let fileInfo2 = await WebAPI.getFileInfo2(path);
-                let imgData = await M.script.img.getImgData(fileInfo2);
-                let w = imgData.width;
-                let h = imgData.height;
+                const fileInfo2 = await WebAPI.getFileInfo2(path);
+                const imgData = await M.script.img.getImgData(fileInfo2);
+                const w = imgData.width;
+                const h = imgData.height;
                 let zoom = 1;
                 if (w * h > max * max) {
                     zoom = Math.sqrt((max * max) / (w * h));
                 }
-                let imtUrl = imgData.arUrl[0].url;
-                let p = await M.script.img.preloadImg(imtUrl);
+                const imtUrl = imgData.arUrl[0].url;
+                const p = await M.script.img.preloadImg(imtUrl);
                 if (p === false) {
                     console.log("搜圖失敗。無法載入圖片");
                     return null;
                 }
-                let canvas = await M.script.img.urlToCanvas(imtUrl);
+                const canvas = await M.script.img.urlToCanvas(imtUrl);
                 blob = await M.script.img.getCanvasBlob(canvas, zoom, "medium", "jpg", 0.8, "#FFFFFF");
             }
 
@@ -112,13 +112,13 @@ class ImgSearch {
          */
         async function googleSearch(path: string) {
 
-            let blob = await getBlob(path);
+            const blob = await getBlob(path);
             if (blob === null) { return ""; }
 
-            let formData = new FormData();
+            const formData = new FormData();
             formData.append("encoded_image", blob, "image.jpg");
             formData.append("sbisrc", "Google Chrome 110.0.5481.78 (Official) Windows");
-            let rsp = await fetch("https://www.google.com/searchbyimage/upload", {
+            const rsp = await fetch("https://www.google.com/searchbyimage/upload", {
                 "body": formData,
                 "method": "POST",
             });
@@ -126,7 +126,7 @@ class ImgSearch {
             let retUrl = "";
             if (rsp.status === 200) {
                 retUrl = rsp.url;
-                let q = retUrl.indexOf("?");
+                const q = retUrl.indexOf("?");
                 if (q !== -1) {
                     retUrl = "https://www.google.com/search" + retUrl.substring(q);
                 }
@@ -145,7 +145,7 @@ class ImgSearch {
 
             // 上傳圖片
             let retUrl = "";
-            let imgServer = M.config.imgSearch.imgServer;
+            const imgServer = M.config.imgSearch.imgServer;
             for (let i = 0; i < imgServer.length; i++) {
                 const url = imgServer[i].url;
                 const timeout = imgServer[i].timeout;

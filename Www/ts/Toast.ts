@@ -4,10 +4,10 @@ class Toast {
 
     /**
      * 顯示一個 Toast 文字訊息
-     * @param txt 文字內容
+     * @param text 文字內容
      * @param ms 多少毫秒後自動關閉
      */
-    public static show = (txt: string, ms: number) => {
+    public static show = (text: string, ms: number) => {
 
         if (Toast.domToastList === undefined) {
             Toast.domToastList = document.createElement("div") as HTMLElement;
@@ -15,15 +15,15 @@ class Toast {
             document.body.appendChild(Toast.domToastList);
         }
 
-        txt = Lib.escape(txt); // 移除可能破壞html的跳脫符號
-        txt = txt.replace(/[\n]/g, "<br>");
+        text = Lib.escape(text); // 移除可能破壞 html 的跳脫符號
+        text = text.replace(/[\n]/g, "<br>");
 
         let domItem: HTMLElement | undefined = Lib.newDom(`
-                <div class="toastItem">
-                    <div class="toastTxt" allowSelection>${txt}</div>
-                    <div class="toastClose"></div>
-                </div>
-            `);
+            <div class="toastItem">
+                <div class="toastText" allowSelection>${text}</div>
+                <div class="toastClose"></div>
+            </div>
+        `);
 
         // 一段時間後自動關閉
         setTimeout(() => {
@@ -33,7 +33,7 @@ class Toast {
         }, ms);
 
         // 右邊的關閉按鈕
-        let toastClose = domItem.querySelector(".toastClose") as HTMLElement;
+        const toastClose = domItem.querySelector(".toastClose") as HTMLElement;
         toastClose.onclick = () => {
             if (domItem === undefined) { return; }
             Toast.domToastList?.removeChild(domItem);

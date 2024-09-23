@@ -26,55 +26,55 @@ class MainFileList {
         this.setShowName = setShowName
         this.setItemWidth = setItemWidth
 
-        let dom_fileList = document.getElementById("main-fileList") as HTMLElement; // 螢幕看得到的區域
-        let dom_fileListBody = document.getElementById("main-fileListBody") as HTMLElement; // 整體的高
-        let dom_fileListData = document.getElementById("main-fileListData") as HTMLElement; // 資料
-        var dom_dragbar_mainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement; // 拖曳條
+        const _domFileList = document.getElementById("main-fileList") as HTMLElement; // 螢幕看得到的區域
+        const _domFileListBody = document.getElementById("main-fileListBody") as HTMLElement; // 整體的高
+        const _domFileListData = document.getElementById("main-fileListData") as HTMLElement; // 資料
+        const _domDragbarMainFileList = document.getElementById("dragbar-mainFileList") as HTMLElement; // 拖曳條
 
-        var isHide = false; // 暫時隱藏
-        var isEnabled = true; // 啟用 檔案預覽視窗
-        var isShowNo = true; // 顯示編號
-        var isShowName = true; // 顯示檔名
-        var itemWidth = 1; // 單個項目的寬度
-        var itemHeight = 1; // 單個項目的高度
+        var _isHide = false; // 暫時隱藏
+        var _isEnabled = true; // 啟用 檔案預覽視窗
+        var _isShowNo = true; // 顯示編號
+        var _isShowName = true; // 顯示檔名
+        var _itemWidth = 1; // 單個項目的寬度
+        var _itemHeight = 1; // 單個項目的高度
 
-        var temp_loaded: number[] = []; // 已經載入過的圖片編號
-        var temp_start = 0; // 用於判斷是否需要重新渲染UI
-        var temp_count = 0;
-        var temp_itemHeight = 0; // 用於判斷物件高度是否需要更新
+        var _tempLoaded: number[] = []; // 已經載入過的圖片編號
+        var _tempStart = 0; // 用於判斷是否需要重新渲染UI
+        var _tempCount = 0;
+        var _tempItemHeight = 0; // 用於判斷物件高度是否需要更新
 
-        var sc = new TiefseeScroll(); // 滾動條元件
-        sc.initGeneral(dom_fileList, "y");
+        const _sc = new TiefseeScroll(); // 滾動條元件
+        _sc.initGeneral(_domFileList, "y");
 
         // 拖曳改變size
-        var dragbar = this.dragbar = new Dragbar();
-        dragbar.init("right", dom_fileList, dom_dragbar_mainFileList, M.dom_mainL);
+        const _dragbar = this.dragbar = new Dragbar();
+        _dragbar.init("right", _domFileList, _domDragbarMainFileList, M.domMainL);
         // 拖曳開始
-        dragbar.setEventStart(() => { })
+        _dragbar.setEventStart(() => { })
         // 拖曳
-        dragbar.setEventMove((val: number) => {
+        _dragbar.setEventMove((val: number) => {
             if (val < 10) { // 小於10的話就暫時隱藏
-                dom_fileList.style.opacity = "0";
-                dragbar.setDragbarPosition(0);
+                _domFileList.style.opacity = "0";
+                _dragbar.setDragbarPosition(0);
             } else {
-                dom_fileList.style.opacity = "1";
+                _domFileList.style.opacity = "1";
                 setItemWidth(val);
             }
         })
         // 拖曳 結束
-        dragbar.setEventEnd((val: number) => {
+        _dragbar.setEventEnd((val: number) => {
             if (val < 10) { // 小於10的話，關閉檔案預覽視窗
                 setEnabled(false);
             }
         })
 
         // 更新畫面
-        dom_fileList.addEventListener("scroll", () => { // 捲動時
+        _domFileList.addEventListener("scroll", () => { // 捲動時
             updateItem()
         })
         new ResizeObserver(() => { // 區塊改變大小時
             updateItem()
-        }).observe(dom_fileList)
+        }).observe(_domFileList)
 
         /**
          * 暫時隱藏(不影響設定值，強制隱藏
@@ -85,13 +85,13 @@ class MainFileList {
                 val = true;
             }
 
-            isHide = val;
+            _isHide = val;
             if (val) {
-                dom_fileList.setAttribute("hide", "true");
-                dragbar.setEnabled(false);
+                _domFileList.setAttribute("hide", "true");
+                _dragbar.setEnabled(false);
             } else {
-                dom_fileList.setAttribute("hide", "");
-                dragbar.setEnabled(M.config.settings.layout.fileListEnabled);
+                _domFileList.setAttribute("hide", "");
+                _dragbar.setEnabled(M.config.settings.layout.fileListEnabled);
             }
         }
 
@@ -101,19 +101,19 @@ class MainFileList {
         function setEnabled(val: boolean) {
 
             if (val) {
-                dom_fileList.setAttribute("active", "true");
+                _domFileList.setAttribute("active", "true");
             } else {
-                dom_fileList.setAttribute("active", "");
+                _domFileList.setAttribute("active", "");
             }
 
             M.config.settings.layout.fileListEnabled = val;
-            dragbar.setEnabled(val);
-            dom_fileList.style.opacity = "1";
+            _dragbar.setEnabled(val);
+            _domFileList.style.opacity = "1";
 
-            if (isEnabled === val) { return; }
-            isEnabled = val;
-            temp_start = -1; // 強制必須重新繪製
-            dom_fileListData.innerHTML = ""; // 移除之前的所有物件
+            if (_isEnabled === val) { return; }
+            _isEnabled = val;
+            _tempStart = -1; // 強制必須重新繪製
+            _domFileListData.innerHTML = ""; // 移除之前的所有物件
             updateItem();
             setStartLocation(); // 捲到中間
         }
@@ -122,10 +122,10 @@ class MainFileList {
          * 設定是否顯示編號
          */
         function setShowNo(val: boolean) {
-            if (isShowNo === val) { return; }
-            isShowNo = val;
-            temp_start = -1; // 強制必須重新繪製
-            dom_fileListData.innerHTML = ""; // 移除之前的所有物件
+            if (_isShowNo === val) { return; }
+            _isShowNo = val;
+            _tempStart = -1; // 強制必須重新繪製
+            _domFileListData.innerHTML = ""; // 移除之前的所有物件
             updateItem();
             setStartLocation(); // 捲到中間
         }
@@ -134,10 +134,10 @@ class MainFileList {
          * 設定是否顯示檔名
          */
         function setShowName(val: boolean) {
-            if (isShowName === val) { return; }
-            isShowName = val;
-            temp_start = -1; // 強制必須重新繪製
-            dom_fileListData.innerHTML = ""; // 移除之前的所有物件
+            if (_isShowName === val) { return; }
+            _isShowName = val;
+            _tempStart = -1; // 強制必須重新繪製
+            _domFileListData.innerHTML = ""; // 移除之前的所有物件
             updateItem();
             setStartLocation(); // 捲到中間
         }
@@ -147,21 +147,21 @@ class MainFileList {
          */
         function setItemWidth(val: number) {
 
-            if (itemWidth === val) { return; }
+            if (_itemWidth === val) { return; }
 
             let valMin = 80;
             let valMax = 200;
             if (val <= valMin) { val = valMin; }
             if (val >= valMax) { val = valMax; }
 
-            itemWidth = val;
+            _itemWidth = val;
             M.config.settings.layout.fileListShowWidth = val;
 
-            var cssRoot = document.body;
+            const cssRoot = document.body;
             cssRoot.style.setProperty("--fileList-width", val + "px");
-            dragbar.setDragbarPosition(val);
+            _dragbar.setDragbarPosition(val);
 
-            temp_start = -1; // 強制必須重新繪製
+            _tempStart = -1; // 強制必須重新繪製
             updateItem();
             setStartLocation(); // 捲到中間
             // updateLocation()
@@ -172,45 +172,44 @@ class MainFileList {
          */
         function updateItem() {
 
-            if (isEnabled === false) {
-                dom_fileListData.innerHTML = ""; // 移除之前的所有物件
+            if (_isEnabled === false) {
+                _domFileListData.innerHTML = ""; // 移除之前的所有物件
                 return;
             }
 
-            let noDelay = temp_start === -999; // true=首次執行，載入圖片不需要延遲
+            let noDelay = _tempStart === -999; // true=首次執行，載入圖片不需要延遲
 
             // 取得單個項目的高度
-            let fileListItem = dom_fileListData.querySelector(".fileList-item");
+            let fileListItem = _domFileListData.querySelector(".fileList-item");
             if (fileListItem === null) {
                 newItem(-1, "");
-                fileListItem = dom_fileListData.querySelector(".fileList-item");
+                fileListItem = _domFileListData.querySelector(".fileList-item");
             }
 
             if (fileListItem !== null) {
-                itemHeight = fileListItem.getBoundingClientRect().height + 6;
+                _itemHeight = fileListItem.getBoundingClientRect().height + 6;
             }
 
             // 重新計算整體的高度
-            if (temp_itemHeight !== itemHeight) {
+            if (_tempItemHeight !== _itemHeight) {
                 let arWaitingFile = M.fileLoad.getWaitingFile();
-                dom_fileListBody.style.height = (arWaitingFile.length * itemHeight) + 4 + "px";
+                _domFileListBody.style.height = (arWaitingFile.length * _itemHeight) + 4 + "px";
             }
-            temp_itemHeight = itemHeight;
+            _tempItemHeight = _itemHeight;
 
-            let start = Math.floor(dom_fileList.scrollTop / itemHeight) - 1; // 開始位置
-            let count = Math.floor(dom_fileList.clientHeight / itemHeight) + 5; // 抓取數量
+            let start = Math.floor(_domFileList.scrollTop / _itemHeight) - 1; // 開始位置
+            let count = Math.floor(_domFileList.clientHeight / _itemHeight) + 5; // 抓取數量
 
             if (start < 0) { start = 0 }
-            if (temp_start === start && temp_count === count) { // 沒變化就離開
+            if (_tempStart === start && _tempCount === count) { // 沒變化就離開
                 return;
             }
-            temp_start = start;
-            temp_count = count;
+            _tempStart = start;
+            _tempCount = count;
 
-            dom_fileListData.innerHTML = ""; // 移除之前的所有物件
-            dom_fileListData.style.marginTop = (start * itemHeight) + "px";
-            let arWaitingFile = M.fileLoad.getWaitingFile()
-
+            _domFileListData.innerHTML = ""; // 移除之前的所有物件
+            _domFileListData.style.marginTop = (start * _itemHeight) + "px";
+            let arWaitingFile = M.fileLoad.getWaitingFile();
 
             let end = start + count;
             if (end > arWaitingFile.length) { end = arWaitingFile.length; }
@@ -230,45 +229,45 @@ class MainFileList {
          */
         function newItem(i: number, path: string, noDelay = false) {
 
-            let name = Lib.GetFileName(path); // 檔名
+            const name = Lib.getFileName(path); // 檔名
 
             let htmlImg = "";
 
-            if (temp_loaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
+            if (_tempLoaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (path !== "") {
                     setTimeout(() => {
-                        if (dom_fileListData.contains(div) === false) { return; } // 如果物件不在網頁上，就不載入圖片
+                        if (_domFileListData.contains(div) === false) { return; } // 如果物件不在網頁上，就不載入圖片
 
-                        temp_loaded.push(i); // 加到全域變數，表示已經載入過
-                        let _url = getImgUrl(path);
-                        let domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
+                        _tempLoaded.push(i); // 加到全域變數，表示已經載入過
+                        const _url = getImgUrl(path);
+                        const domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
                         domImg.innerHTML = `<img src="${_url}" fetchpriority="low"/>`;
                     }, 30);
                 }
             } else {
 
                 // 圖片已經載入過了，直接顯示
-                let imgUrl = getImgUrl(path);
+                const imgUrl = getImgUrl(path);
                 htmlImg = `<img src="${imgUrl}" fetchpriority="low">`;
             }
 
             let htmlNo = ``;
             let htmlName = ``;
-            if (isShowNo === true) {
+            if (_isShowNo === true) {
                 htmlNo = `<div class="fileList-no">${i + 1}</div>`;
             }
-            if (isShowName === true) {
+            if (_isShowName === true) {
                 htmlName = `<div class="fileList-name">${name}</div>`;
             }
 
-            let div = Lib.newDom(
+            const div = Lib.newDom(
                 `<div class="fileList-item" data-id="${i}">
                     <div class="fileList-title">
                         ${htmlNo} ${htmlName}
                     </div>
                     <div class="fileList-img"> ${htmlImg} </div>                                                            
                 </div>`);
-            dom_fileListData.append(div);
+            _domFileListData.append(div);
             div.setAttribute("data-path", path);
 
             // click 載入圖片
@@ -288,8 +287,8 @@ class MainFileList {
          * 
          */
         function getImgUrl(path: string) {
-            if (Lib.GetExtension(path) === ".svg") {
-                return Lib.pathToURL(path);
+            if (Lib.getExtension(path) === ".svg") {
+                return Lib.pathToUrl(path);
             }
             return WebAPI.Img.fileIcon(path);
         }
@@ -298,9 +297,9 @@ class MainFileList {
          * 檔案預覽視窗初始化 (重新讀取列表
          */
         function init() {
-            temp_start = -999;
-            temp_loaded = [];
-            temp_itemHeight = -1;
+            _tempStart = -999;
+            _tempLoaded = [];
+            _tempItemHeight = -1;
             updateItem();
         }
 
@@ -310,14 +309,14 @@ class MainFileList {
          */
         function select() {
 
-            if (isEnabled === false) { return; }
+            if (_isEnabled === false) { return; }
 
             // 移除上一次選擇的項目
             document.querySelector(`.fileList-item[active=true]`)?.setAttribute("active", "");
 
-            let id = M.fileLoad.getFlagFile(); // 取得id
+            const id = M.fileLoad.getFlagFile(); // 取得id
 
-            let div = document.querySelector(`.fileList-item[data-id="${id}"]`);
+            const div = document.querySelector(`.fileList-item[data-id="${id}"]`);
             if (div == null) { return; }
             div.setAttribute("active", "true");
         }
@@ -327,11 +326,11 @@ class MainFileList {
          */
         function setStartLocation() {
 
-            if (isEnabled === false) { return; }
+            if (_isEnabled === false) { return; }
 
-            let id = M.fileLoad.getFlagFile(); // 取得id
-            let f = (dom_fileList.clientHeight - itemHeight) / 2 - 0; // 計算距離中心的距離
-            dom_fileList.scrollTop = id * itemHeight - f;
+            const id = M.fileLoad.getFlagFile(); // 取得id
+            const f = (_domFileList.clientHeight - _itemHeight) / 2 - 0; // 計算距離中心的距離
+            _domFileList.scrollTop = id * _itemHeight - f;
         }
 
         /**
@@ -339,22 +338,22 @@ class MainFileList {
          */
         function updateLocation() {
 
-            if (isEnabled === false) { return; }
+            if (_isEnabled === false) { return; }
 
-            let id = M.fileLoad.getFlagFile(); // 取得id
+            const id = M.fileLoad.getFlagFile(); // 取得id
 
             // 如果選中的項目在上面
-            let start = Math.floor(dom_fileList.scrollTop / itemHeight); // 開始位置
+            const start = Math.floor(_domFileList.scrollTop / _itemHeight); // 開始位置
             if (id <= start) {
-                dom_fileList.scrollTop = id * itemHeight;
-                return
+                _domFileList.scrollTop = id * _itemHeight;
+                return;
             }
 
             // 如果選中的項目在下面
-            let count = Math.floor(dom_fileList.clientHeight / itemHeight); // 抓取數量
-            let end = (id - count + 1) * itemHeight - (dom_fileList.clientHeight % itemHeight) + 3;
-            if (dom_fileList.scrollTop < end) {
-                dom_fileList.scrollTop = end;
+            const count = Math.floor(_domFileList.clientHeight / _itemHeight); // 抓取數量
+            const end = (id - count + 1) * _itemHeight - (_domFileList.clientHeight % _itemHeight) + 3;
+            if (_domFileList.scrollTop < end) {
+                _domFileList.scrollTop = end;
             }
         }
 

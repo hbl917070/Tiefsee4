@@ -50,13 +50,13 @@
             let type = e.data.type;
             let data = e.data.data;
 
-            if (type === "loadTxt") {
+            if (type === "loadText") {
                 setRoot("");
-                setText(data.txt);
+                setText(data.text);
             }
             if (type === "loadFile") { // 載入檔案並且設定目錄
                 setRoot(data.dir);
-                setText(data.txt);
+                setText(data.text);
             }
             if (type === "loadNone") {
                 setText("");

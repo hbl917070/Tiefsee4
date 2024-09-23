@@ -15,7 +15,7 @@ class Dragbar {
     public setType;
 
     constructor() {
-        let _domWindowBody = document.getElementById("window-body") as HTMLElement;
+        const _domWindowBody = document.getElementById("window-body") as HTMLElement;
         let _domBox: HTMLElement; // 螢幕看得到的區域
         let _domDragbar: HTMLElement;
         let _domObserve: HTMLElement;

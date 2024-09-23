@@ -248,7 +248,7 @@ interface WV_File {
     GetText(path: string): string;
 
     /** 儲存文字資料 */
-    SetText(path: string, txt: string);
+    SetText(path: string, text: string);
 
     /** new FileInfo */
     GetFileInfo(path: string): WV_FileInfo;

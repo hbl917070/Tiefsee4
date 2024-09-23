@@ -12,7 +12,6 @@ initWasm();
 // 讓 Tiefseeview 在背景載入圖片
 self.addEventListener("message", async (e) => {
 
-
     const type = e.data.type;
 
     // 載入圖片

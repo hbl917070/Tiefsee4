@@ -1,4 +1,3 @@
-
 class Config {
 
     private baseWindow: BaseWindow;
@@ -433,7 +432,7 @@ class Config {
      */
     private initAllowFileType() {
 
-        let plugin: AppInfoPlugin = this.baseWindow.appInfo.plugin;
+        const plugin: AppInfoPlugin = this.baseWindow.appInfo.plugin;
 
         // img
         (() => {
@@ -625,7 +624,7 @@ class Config {
     }
 }
 
-var GroupType = {
+const GroupType = {
 
     /** 起始畫面 */
     welcome: "welcome",

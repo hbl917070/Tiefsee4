@@ -345,7 +345,7 @@ class ScriptImg {
     public async getImgData(fileInfo2: FileInfo2) {
 
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        let fileType = Lib.GetFileType(fileInfo2); // 取得檔案類型
+        let fileType = Lib.getFileType(fileInfo2); // 取得檔案類型
         let configItem = this.M.config.getAllowFileTypeItem(GroupType.img, fileType); // ex. { ext:"psd", type:"magick" }
         if (configItem === null) {
             configItem = { ext: "", type: "vips", vipsType: "magick" }
@@ -356,7 +356,7 @@ class ScriptImg {
         let arUrl: { scale: number, url: string }[] = [];
         let width = -1;
         let height = -1;
-        let isAnimation = Lib.IsAnimation(fileInfo2); // 判斷是否為動圖
+        let isAnimation = Lib.isAnimation(fileInfo2); // 判斷是否為動圖
         let isFail = false; // true表示圖片載入失敗，回傳 icon
         let path = fileInfo2.Path;
 
@@ -389,7 +389,7 @@ class ScriptImg {
             // 如果處理失敗，且 vipsType2 = base64，則先用 canvas 處理成 base64 再上傳到暫存資料夾
             if (imgInitInfo.code != "1" && configItem.vipsType2 === "base64") {
                 // console.log("處理失敗，改用 canvas 來處理");
-                let url = Lib.pathToURL(path);
+                let url = Lib.pathToUrl(path);
                 await this.preloadImg(url);
                 let can = this.urlToCanvas(url);
                 let blob = await this.getCanvasBlob(can, 1, "medium", "png", 0.9);
@@ -419,7 +419,7 @@ class ScriptImg {
                 if (ratio < 0.5) { ratio = 0.5; }
 
                 // 設定縮放的比例
-                arUrl.push({ scale: 1, url: Lib.pathToURL(imgInitInfo.path) + `?${fileTime}` });
+                arUrl.push({ scale: 1, url: Lib.pathToUrl(imgInitInfo.path) + `?${fileTime}` });
                 for (let i = 1; i <= 30; i++) {
                     let scale = Number(Math.pow(ratio, i).toFixed(3));
                     if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { // 如果圖片太小就不處理
@@ -735,8 +735,8 @@ class ScriptFile {
 
     /** 儲存文字檔 */
     public async save(btn?: HTMLElement) {
-        let t = await this.M.fileShow.iframes.getText();
-        let path = this.M.fileLoad.getFilePath();
+        const t = await this.M.fileShow.iframes.getText();
+        const path = this.M.fileLoad.getFilePath();
         this.M.msgbox.closeAll(); // 關閉所有訊息視窗
         if (t == null) {
             Toast.show(this.M.i18n.t("msg.saveFailed"), 1000 * 3); // 儲存失敗
@@ -774,7 +774,7 @@ class ScriptMenu {
             if (type === "dir") {
                 domMenu.setAttribute("showType", GroupType.bulkView);
             } else {
-                let fileExt = Lib.GetExtension(path).replace(".", "");
+                let fileExt = Lib.getExtension(path).replace(".", "");
                 let showType = this.M.fileLoad.fileExtToGroupType(fileExt);
                 domMenu.setAttribute("showType", showType);
             }
@@ -819,13 +819,13 @@ class ScriptMenu {
             if (type === "dir") {
                 domMenu.setAttribute("showType", GroupType.bulkView);
             } else {
-                fileExt = Lib.GetExtension(path).replace(".", "");
+                fileExt = Lib.getExtension(path).replace(".", "");
                 showType = this.M.fileLoad.fileExtToGroupType(fileExt);
                 domMenu.setAttribute("showType", showType);
             }
 
         } else {
-            fileExt = Lib.GetExtension(this.M.fileLoad.getFilePath()).replace(".", "");
+            fileExt = Lib.getExtension(this.M.fileLoad.getFilePath()).replace(".", "");
             showType = this.M.fileLoad.fileExtToGroupType(fileExt);
             domMenu.setAttribute("showType", "");
             domMenu.setAttribute("data-path", "");
@@ -958,7 +958,7 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); // 顯示檔名
+            domFileName.value = Lib.getFileName(path); // 顯示檔名
         } else {
             domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
@@ -992,7 +992,7 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); // 顯示檔名
+            domFileName.value = Lib.getFileName(path); // 顯示檔名
         } else {
             domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
@@ -1022,7 +1022,7 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); // 顯示檔名
+            domFileName.value = Lib.getFileName(path); // 顯示檔名
         } else {
             domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
@@ -1051,7 +1051,7 @@ class ScriptMenu {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
             domFileBox.setAttribute("data-path", path);
-            domFileName.value = Lib.GetFileName(path); // 顯示檔名
+            domFileName.value = Lib.getFileName(path); // 顯示檔名
         } else {
             domFileBox.style.display = "none"; // 隱藏檔案區塊
         }
@@ -1347,7 +1347,7 @@ class ScriptCopy {
         if (path === undefined) {
             path = this.M.fileLoad.getFilePath();
         }
-        let name = Lib.GetFileName(path);
+        let name = Lib.getFileName(path);
         await WV_System.SetClipboard_Text(name);
         Toast.show(this.M.i18n.t("msg.copyFileName"), 1000 * 3); // 已將「檔案名稱」複製至剪貼簿
     }
@@ -1356,7 +1356,7 @@ class ScriptCopy {
         if (path === undefined) {
             path = this.M.fileLoad.getDirPath();
         }
-        let name = Lib.GetFileName(path);
+        let name = Lib.getFileName(path);
         await WV_System.SetClipboard_Text(name);
         Toast.show(this.M.i18n.t("msg.copyDirName"), 1000 * 3); // 已將「資料夾名稱」複製至剪貼簿
     }
@@ -1394,7 +1394,7 @@ class ScriptCopy {
 
         let fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
-        let imgType = Lib.GetFileType(fileInfo2); // 取得檔案類型
+        let imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path
@@ -1463,7 +1463,7 @@ class ScriptCopy {
         }
         let fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
-        let imgType = Lib.GetFileType(fileInfo2); // 取得檔案類型
+        let imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path

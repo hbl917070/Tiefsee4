@@ -135,7 +135,7 @@
     display: block;
     pointer-events: none;
   }
-  .mView-welcome-txt {
+  .mView-welcome-text {
     text-align: center;
     font-size: 20px;
     pointer-events: none;
@@ -195,7 +195,7 @@ body[fullScreen="true"] {
     background-color: var(--color-black80);
     //backdrop-filter: saturate(180%) blur(20px);
   }
-  .titlebar-txt {
+  .titlebar-text {
     app-region: no-drag; //讓視窗不允許拖曳
   }
 

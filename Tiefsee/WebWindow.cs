@@ -426,7 +426,7 @@ public class WebWindow : FormNone {
             sb.Append("]");
 
             RunJs($@"
-                var temp_dropPath = {sb.ToString()};
+                var _dropPath = {sb.ToString()};
             ");
         };
 
