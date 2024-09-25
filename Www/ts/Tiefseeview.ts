@@ -1302,8 +1302,8 @@ class Tiefseeview {
             }
 
             // 清空畫布
-            const context = <CanvasRenderingContext2D>_domBigimgCanvas.getContext("2d");
-            context.clearRect(0, 0, _domBigimgCanvas.width, _domBigimgCanvas.height);
+            const ctx = _domBigimgCanvas.getContext("2d") as CanvasRenderingContext2D;
+            ctx.clearRect(0, 0, _domBigimgCanvas.width, _domBigimgCanvas.height);
 
             _domImg.src = url;
 
@@ -2331,12 +2331,12 @@ class Tiefseeview {
 
                     // 背景色改成白色
                     const canvasNew = document.createElement("canvas");
-                    const context = canvasNew.getContext("2d") as CanvasRenderingContext2D;
+                    const ctx = canvasNew.getContext("2d") as CanvasRenderingContext2D;
                     canvasNew.width = canvas.width;
                     canvasNew.height = canvas.height;
-                    context.fillStyle = "#FFFFFF"; // 填滿顏色
-                    context.fillRect(0, 0, canvas.width, canvas.height);
-                    context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "#FFFFFF"; // 填滿顏色
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
                     canvas = canvasNew;
                 }
 
@@ -2363,8 +2363,8 @@ class Tiefseeview {
                 _tempCan = document.createElement("canvas");
                 _tempCan.width = getOriginalWidth();
                 _tempCan.height = getOriginalHeight();
-                const context = _tempCan.getContext("2d");
-                context?.drawImage(_domImg, 0, 0, getOriginalWidth(), getOriginalHeight());
+                const ctx = _tempCan.getContext("2d") as CanvasRenderingContext2D;
+                ctx.drawImage(_domImg, 0, 0, getOriginalWidth(), getOriginalHeight());
                 return _tempCan;
             }
 
@@ -2372,8 +2372,8 @@ class Tiefseeview {
                 _tempCan = document.createElement("canvas");
                 _tempCan.width = getOriginalWidth();
                 _tempCan.height = getOriginalHeight();
-                const context = _tempCan.getContext("2d");
-                context?.drawImage(_domVideo, 0, 0, getOriginalWidth(), getOriginalHeight());
+                const ctx = _tempCan.getContext("2d") as CanvasRenderingContext2D;
+                ctx.drawImage(_domVideo, 0, 0, getOriginalWidth(), getOriginalHeight());
                 return _tempCan;
             }
 
@@ -2445,10 +2445,10 @@ class Tiefseeview {
             domImg.src = url;
 
             const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
             canvas.width = domImg.width;
             canvas.height = domImg.height;
-            context?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+            ctx.drawImage(domImg, 0, 0, domImg.width, domImg.height);
 
             return canvas;
         }
@@ -2527,10 +2527,10 @@ class Tiefseeview {
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
-            const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+            const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-            context.imageSmoothingQuality = quality;
-            context.drawImage(img, 0, 0, width, height);
+            ctx.imageSmoothingQuality = quality;
+            ctx.drawImage(img, 0, 0, width, height);
             return canvas;
         }
 
@@ -2613,10 +2613,10 @@ class Tiefseeview {
                     }
 
                     const canvas = document.createElement("canvas");
-                    const context = canvas.getContext("2d");
+                    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
                     canvas.width = domImg.width;
                     canvas.height = domImg.height;
-                    context?.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+                    ctx.drawImage(domImg, 0, 0, domImg.width, domImg.height);
 
                     _tempBigimgscale[scale] = canvas;
 
@@ -2626,22 +2626,22 @@ class Tiefseeview {
                 // 銳化圖片
                 if (type === "sharpen") {
 
-                    const sharpenedImageData = e.data.sharpenedImageData;
-                    const drawImage = e.data.temp_drawImage;
+                    const imageBitmap = e.data.imageBitmap;
+                    const tempDrawImage = e.data.tempDrawImage;
 
-                    if (drawImage.scale === _tempDrawImage.scale &&
-                        drawImage.sx === _tempDrawImage.sx &&
-                        drawImage.sy === _tempDrawImage.sy &&
-                        drawImage.sWidth === _tempDrawImage.sWidth &&
-                        drawImage.sHeight === _tempDrawImage.sHeight &&
-                        drawImage.dx === _tempDrawImage.dx &&
-                        drawImage.dy === _tempDrawImage.dy &&
-                        drawImage.dWidth === _tempDrawImage.dWidth &&
-                        drawImage.dHeight === _tempDrawImage.dHeight &&
-                        drawImage.url === _tempDrawImage.url) {
+                    if (tempDrawImage.scale === _tempDrawImage.scale &&
+                        tempDrawImage.sx === _tempDrawImage.sx &&
+                        tempDrawImage.sy === _tempDrawImage.sy &&
+                        tempDrawImage.sWidth === _tempDrawImage.sWidth &&
+                        tempDrawImage.sHeight === _tempDrawImage.sHeight &&
+                        tempDrawImage.dx === _tempDrawImage.dx &&
+                        tempDrawImage.dy === _tempDrawImage.dy &&
+                        tempDrawImage.dWidth === _tempDrawImage.dWidth &&
+                        tempDrawImage.dHeight === _tempDrawImage.dHeight &&
+                        tempDrawImage.url === _tempDrawImage.url) {
 
-                        const context = <CanvasRenderingContext2D>_domBigimgCanvas.getContext("2d");
-                        context.putImageData(sharpenedImageData, 0, 0);
+                        const ctx = _domBigimgCanvas.getContext("2d") as CanvasRenderingContext2D;
+                        ctx.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
                     }
 
                 }
@@ -2831,8 +2831,8 @@ class Tiefseeview {
                 _domBigimgCanvas.style.height = Math.round(viewHeight + margin * 2) + "px";
                 _domBigimgCanvas.style.left = Math.round(dx / dpiZoom) + "px";
                 _domBigimgCanvas.style.top = Math.round(dy / dpiZoom) + "px";
-                let context = <CanvasRenderingContext2D>_domBigimgCanvas.getContext("2d");
-                // context.imageSmoothingEnabled = false;
+                let ctx = _domBigimgCanvas.getContext("2d") as CanvasRenderingContext2D;
+                // ctx.imageSmoothingEnabled = false;
 
 
                 _tempCanvasSN += 1; // 用於判斷是否已經切換圖片
@@ -2850,8 +2850,8 @@ class Tiefseeview {
                     dWidth = dWidth
                     dHeight = dHeight
                     toRound();
-                    // context.imageSmoothingQuality = "high";
-                    context.drawImage(can,
+                    // ctx.imageSmoothingQuality = "high";
+                    ctx.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
                     );
@@ -2865,7 +2865,7 @@ class Tiefseeview {
                     dWidth = dWidth / bigimgTemp.scale
                     dHeight = dHeight / bigimgTemp.scale
                     toRound();
-                    context.drawImage(can,
+                    ctx.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
                     );
@@ -2891,7 +2891,7 @@ class Tiefseeview {
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc === _tempCanvasSN) {
-                                context.drawImage(sprites, 0, 0,);
+                                ctx.drawImage(sprites, 0, 0,);
                             }
                         });
 
@@ -2910,7 +2910,7 @@ class Tiefseeview {
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc === _tempCanvasSN) {
-                                context.drawImage(sprites, sx, sy,);
+                                ctx.drawImage(sprites, sx, sy,);
                             }
                         });
 
@@ -2929,7 +2929,7 @@ class Tiefseeview {
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc === _tempCanvasSN) {
-                                context.drawImage(sprites, 0, sy);
+                                ctx.drawImage(sprites, 0, sy);
                             }
                         });
 
@@ -2948,7 +2948,7 @@ class Tiefseeview {
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc === _tempCanvasSN) {
-                                context.drawImage(sprites, sx, 0);
+                                ctx.drawImage(sprites, sx, 0);
                             }
                         });
 
@@ -2965,7 +2965,7 @@ class Tiefseeview {
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
                             if (tc === _tempCanvasSN) {
-                                context.drawImage(sprites, 0, 0,);
+                                ctx.drawImage(sprites, 0, 0,);
                             }
                         });
                 }
@@ -2997,16 +2997,10 @@ class Tiefseeview {
 
             if (_sharpenValue === 0) { return; }
 
-            const width = _domBigimgCanvas.width;
-            const height = _domBigimgCanvas.height;
-            const offscreenCanvas = new OffscreenCanvas(width, height);
-            const offscreenContext = offscreenCanvas.getContext("2d");
-            if (offscreenContext === null) { return; }
-
-            // 將原始圖像繪製到離屏 canvas 上
-            offscreenContext.drawImage(_domBigimgCanvas, 0, 0);
-
-            // 獲取圖像數據
+            // 轉換成 ImageBitmap
+            const offscreenCanvas = new OffscreenCanvas(_domBigimgCanvas.width, _domBigimgCanvas.height);
+            const ctx = offscreenCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+            ctx.drawImage(_domBigimgCanvas, 0, 0);
             const imageBitmap = offscreenCanvas.transferToImageBitmap();
 
             if (_tempDrawImage.isSharpen === false) {
@@ -3016,7 +3010,7 @@ class Tiefseeview {
                     blur: 0.5,
                     sharpen: _sharpenValue,
                     imageBitmap: imageBitmap,
-                    temp_drawImage: _tempDrawImage
+                    tempDrawImage: _tempDrawImage
                 }, [imageBitmap]);
 
                 _tempDrawImage.isSharpen = true;
