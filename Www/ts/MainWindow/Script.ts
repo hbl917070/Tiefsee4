@@ -419,7 +419,8 @@ class ScriptImg {
                 if (ratio < 0.5) { ratio = 0.5; }
 
                 // 設定縮放的比例
-                arUrl.push({ scale: 1, url: Lib.pathToUrl(imgInitInfo.path) + `?${fileTime}` });
+                arUrl.push({ scale: 1, url: await WebAPI.getFile(imgInitInfo.path) });
+
                 for (let i = 1; i <= 30; i++) {
                     let scale = Number(Math.pow(ratio, i).toFixed(3));
                     if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { // 如果圖片太小就不處理
@@ -1124,7 +1125,7 @@ class ScriptOpen {
         // if (M.fileLoad.getIsBulkView()) { return; }
 
         let clipboardContent = await WebAPI.getClipboardContent();
-        console.log(clipboardContent);
+        // console.log(clipboardContent);
 
         let showErr = () => {
             Toast.show(this.M.i18n.t("msg.cannotOpenClipboard"), 1000 * 3); // 無法開啟剪貼簿的內容
@@ -1159,8 +1160,16 @@ class ScriptOpen {
                 for (let i = 0; i < arSrc.length; i++) {
                     let src = arSrc[i];
                     let base64;
-                    if (src.startsWith("http") || src.startsWith("file://")) {
-                        let file = await this.M.downloadFileFromUrl(src);
+                    if (src.startsWith("file://")) {
+                        const url = WebAPI.getFile(Lib.urlToPath(src)) 
+                        let file = await this.M.downloadFileFromUrl(url);
+                        if (file != null) {
+                            base64 = await Lib.readFileAsDataURL(file);
+                        }
+                    }
+                    else if (src.startsWith("http")) {
+                        const url = WebAPI.forwardGet(src);
+                        let file = await this.M.downloadFileFromUrl(url);
                         if (file != null) {
                             base64 = await Lib.readFileAsDataURL(file);
                         }
@@ -1201,7 +1210,8 @@ class ScriptOpen {
         }
 
         else if (clipboardContent.Type == "url") {
-            let file = await this.M.downloadFileFromUrl(clipboardContent.Data);
+            const url = WebAPI.forwardGet(clipboardContent.Data);
+            let file = await this.M.downloadFileFromUrl(url);
             if (file != null) {
                 let base64 = await Lib.readFileAsDataURL(file);
                 let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名

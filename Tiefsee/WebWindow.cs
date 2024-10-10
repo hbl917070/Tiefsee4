@@ -198,10 +198,11 @@ public class WebWindow : FormNone {
     /// 傳入 www 資料夾內的檔名，回傳實體路徑
     /// </summary>
     private static string GetHtmlFilePath(string fileName) {
-        string p = "file:///" +
+        /* return "file:///" +
             Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName) +
-            "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址
-        return p;
+            "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址 */
+        // return $"http://tiefsee.com/www/{fileName}#{Program.webServer.port}";
+        return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
     }
 
     /// <summary>
@@ -335,15 +336,31 @@ public class WebWindow : FormNone {
         var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
         CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
         await _wv2.EnsureCoreWebView2Async(webView2Environment); // 等待初始化完成
+        // 指定為深色主題
+        _wv2.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark;
+        // 是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
+        _wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false;
+        // 輸入框自動填充
+        _wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+        // 使用者是否能夠影響 Web 視圖的縮放
+        _wv2.CoreWebView2.Settings.IsZoomControlEnabled = false;
+        // 是否顯示左下角的網址狀態
+        _wv2.CoreWebView2.Settings.IsStatusBarEnabled = false;
+        // 覆寫 userAgent。用於在請求 API 時，辨識身份是否合法
+        _wv2.CoreWebView2.Settings.UserAgent = _wv2.CoreWebView2.Settings.UserAgent + " " + Program.webvviewUserAgent;
+        // 讓 webview2 支援 css「app - region:drag」
+        _wv2.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
+        // 觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
+        // _wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;
+        // 是否啟用特定於瀏覽器的快速鍵
+        // _wv2.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 
-        _wv2.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark; // 指定為深色主題
-        _wv2.CoreWebView2.Settings.IsSwipeNavigationEnabled = false; // 是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
-        _wv2.CoreWebView2.Settings.IsGeneralAutofillEnabled = false; // 自動填充啟用
-        _wv2.CoreWebView2.Settings.IsZoomControlEnabled = false; // 使用者是否能夠影響 Web 視圖的縮放
-        _wv2.CoreWebView2.Settings.IsStatusBarEnabled = false; // 是否顯示左下角的網址狀態
-        // wv2.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44";
-        // wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false; // 觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
-        // wv2.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false; // 是否啟用特定於瀏覽器的快速鍵
+        // 避免被 adguard 影響載入速度
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter("http://local.adguard.org/*", CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
+            args.Response = _wv2.CoreWebView2.Environment
+                .CreateWebResourceResponse(null, 200, "OK", "");
+        };
 
         WV_Window = new WV_Window(this);
         WV_Directory = new WV_Directory(this);

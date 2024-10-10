@@ -140,7 +140,7 @@ class ImgSearch {
          */
         async function getWebUrl(path: string) {
 
-            let blob = await getBlob(path);
+            const blob = await getBlob(path);
             if (blob === null) { return ""; }
 
             // 上傳圖片
@@ -150,8 +150,7 @@ class ImgSearch {
                 const url = imgServer[i].url;
                 const timeout = imgServer[i].timeout;
 
-                var formData = new FormData();
-                formData.append("key", url);
+                const formData = new FormData();
                 formData.append("media", blob, "image.jpg");
 
                 retUrl = await submitPost(url, formData, timeout);
@@ -169,26 +168,7 @@ class ImgSearch {
          */
         async function submitPost(imgServer: string, formData: FormData, timeout: number) {
 
-            let json: any = "";
-            const controller = new AbortController(); // 建立一個新的中止控制器    
-            const signal = controller.signal;
-            const timeoutId = setTimeout(() => controller.abort(), timeout); // 設定5秒後取消fetch()請求
-
-            try {
-                await fetch(imgServer, {
-                    "body": formData,
-                    "method": "POST",
-                    signal,
-                }).then((response) => {
-                    return response.json();
-                }).then((html) => {
-                    json = html;
-                })
-            } catch (error) {
-                json = "";
-            } finally {
-                clearTimeout(timeoutId); // 清除 timeoutId 以防止記憶體洩漏
-            }
+            const json = await WebAPI.forwardPost(imgServer, formData, timeout)
 
             if (json === "") { return ""; }
             if (json.status != 200) { return ""; }

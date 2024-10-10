@@ -399,7 +399,7 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    const file = await downloadFileFromUrl(text);
+                    const file = await downloadFileFromUrl(WebAPI.forwardGet(text));
                     if (file != null) {
                         const base64 = await Lib.readFileAsDataURL(file);
                         const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
@@ -419,7 +419,13 @@ class MainWindow {
                         const path = await WV_File.Base64ToTempFile(base64, extension);
                         await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
                     } else { // 檔案解析失敗的話，嘗試從網址下載
-                        const file = await downloadFileFromUrl(text);
+
+                        let path;
+                        if (text.search(/^http[s]:[/][/]/) === 0) path = WebAPI.forwardGet(text);
+                        else if (text.search(/^file:[/][/]/) === 0) path = WebAPI.getFile(Lib.urlToPath(text));
+                        else path = text;
+
+                        const file = await downloadFileFromUrl(path);
                         if (file != null) {
                             let base64 = await Lib.readFileAsDataURL(file);
                             let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
@@ -446,7 +452,7 @@ class MainWindow {
 
                     e.preventDefault();
 
-                    const file = await downloadFileFromUrl(text);
+                    const file = await downloadFileFromUrl(WebAPI.forwardGet(text));
                     if (file != null) {
                         let base64 = await Lib.readFileAsDataURL(file);
                         let extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名

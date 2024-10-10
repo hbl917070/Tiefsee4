@@ -2,9 +2,9 @@
 
 (async () => {
 
-    const wasm: any = await import("./../wasm/tiefsee_wasm.js");
-    await wasm.default({});
-
+    const wasm = await import("./../wasm/tiefsee_wasm.js") ;
+    await wasm.default({ module_or_path: "/wasm/tiefsee_wasm_bg.wasm" });
+ 
     self.addEventListener("message", async (e) => {
         const { chunk, sharpen } = e.data;
         const { random, imageBitmap, width, height, startY } = chunk;

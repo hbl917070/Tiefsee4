@@ -104,7 +104,7 @@ class WebAPI {
             const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
 
             if (type === "web") {
-                return Lib.pathToUrl(path) + `?${fileTime}`;
+                return WebAPI.getFile(fileInfo2);
             }
             if (type === "webIcc") {
                 return APIURL + `/api/img/webIcc?path=${encodePath}&${fileTime}`;
@@ -176,9 +176,7 @@ class WebAPI {
                 url = data;
             } else {
                 let fileInfo2 = data;
-                let path = fileInfo2.Path;
-                let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-                url = Lib.pathToUrl(path) + `?${fileTime}`;
+                url = WebAPI.getFile(fileInfo2);
             }
 
             let code: string = "-1"; // 1=成功 -1=失敗
@@ -302,6 +300,34 @@ class WebAPI {
     }
 
     /**
+     * 取得檔案
+     */
+    static getFile(file: string | FileInfo2) {
+
+        if (typeof file === "string") {
+            const encodePath = encodeURIComponent(file);
+            return APIURL + `/api/getFile?path=${encodePath}`;
+        }
+
+        const fileInfo2 = file;
+        const path = fileInfo2.Path;
+        const encodePath = encodeURIComponent(path);
+        const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+        return APIURL + `/api/getFile?path=${encodePath}&${fileTime}`;
+    }
+
+    // 用於區別影片來自哪個視窗
+    private static windowId = Math.random();
+
+    /**
+     * 取得影片
+     */
+    static getVideo(path: string) {
+        const encodePath = encodeURIComponent(path);
+        return APIURL + `/api/getVideo?path=${encodePath}&windowId=${this.windowId}`;
+    }
+
+    /**
      * 取得 檔案exif
      */
     static async getExif(fileInfo2: FileInfo2, maxLength: number) {
@@ -404,5 +430,41 @@ class WebAPI {
         const postData = { imgPath: path, outputDir: "" };
         const retAr = await WebAPI.sendPost(url, postData);
         return retAr as string;
+    }
+
+    /**
+     * 轉送 post
+     */
+    static async forwardPost(url: string, formData: FormData, timeout: number) {
+        let json: any = "";
+        const controller = new AbortController(); // 建立一個新的中止控制器    
+        const signal = controller.signal;
+        const timeoutId = setTimeout(() => controller.abort(), timeout); // 設定n秒後取消fetch()請求
+
+        try {
+            await fetch(APIURL + "/api/forwardRequest", {
+                "body": formData,
+                "method": "POST",
+                headers: { targetUrl: url, },
+                signal,
+            }).then((response) => {
+                return response.json();
+            }).then((html) => {
+                json = html;
+            })
+        } catch (error) {
+            json = "";
+        } finally {
+            clearTimeout(timeoutId); // 清除 timeoutId 以防止記憶體洩漏
+        }
+
+        return json;
+    }
+
+    /**
+     * 轉送 get
+     */
+    static forwardGet(url: string) {
+        return APIURL + "/api/forwardRequest?targetUrl=" + encodeURIComponent(url);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -12,7 +12,7 @@ public class WebServer {
     public string origin;
     public WebServerController controller;
     private HttpListener httpListener;
-    private List<Func<RequestData, bool>> arRoute = new(); // 路由
+    private List<Func<RequestData, Task<bool>>> arRoute = new(); // 路由
 
     public WebServer() { }
 
@@ -37,8 +37,8 @@ public class WebServer {
                 controller = new WebServerController(this);
 
                 break;
-
-            } catch { }
+            }
+            catch { }
 
             if (i == 99) {
                 return false;
@@ -51,27 +51,32 @@ public class WebServer {
     /// <summary>
     /// 
     /// </summary>
-    private void GetContextCallBack(IAsyncResult ar) {
+    private async void GetContextCallBack(IAsyncResult ar) {
 
         HttpListener listener = ar.AsyncState as HttpListener;
         HttpListenerContext context = listener.EndGetContext(ar);
         listener.BeginGetContext(new AsyncCallback(GetContextCallBack), listener);
         HttpListenerRequest request = context.Request;
 
-        // request.Headers.Add("Access-Control-Allow-Origin", "*");
+        string baseUrl = $"http://127.0.0.1:{port}";
 
         string url = request.Url.ToString();
-        url = url.Substring($"http://127.0.0.1:{port}".Length);
+        url = url.Substring(baseUrl.Length);
 
-        // 禁止 webview2 以外的請求
-        if (request.UserAgent != Program.webvviewUserAgent) {
-            context.Response.StatusCode = 403; // 狀態
+        var origin = request.Headers.Get("origin");
+
+        // UserAgent 裡面不包含 "Tiefsee"，就回傳 403
+        if (request?.UserAgent.Contains(Program.webvviewUserAgent) == false) {
+            context.Response.StatusCode = 403;
             context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); // 設定編碼
             byte[] _responseArray = Encoding.UTF8.GetBytes("403");
             context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
-            context.Response.Close(); // close the connection
+            context.Response.Close();
             return;
         }
+
+        // 允許任何來自任何網域的請求
+        // context.Response.AddHeader("Access-Control-Allow-Origin", "*");
 
         Dictionary<string, string> dirArgs = new Dictionary<string, string>();
         int argStart = url.IndexOf("?");
@@ -85,7 +90,8 @@ public class WebServer {
                 if (ss != -1) {
                     key = item.Substring(0, ss);
                     val = item.Substring(ss + 1);
-                } else {
+                }
+                else {
                     key = item;
                     val = "";
                 }
@@ -105,22 +111,24 @@ public class WebServer {
 
         try {
             for (int i = 0; i < arRoute.Count; i++) { // 嘗試匹配每一個有註冊的路由 
-                if (arRoute[i](requestData) == true) { // 如果匹配網址成功，就離開
+                if (await arRoute[i](requestData) == true) { // 如果匹配網址成功，就離開
                     break;
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // 狀態500、回傳錯誤訊息的文字
             context.Response.StatusCode = 500;
-            context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); // 設定編碼
-            byte[] _responseArray = Encoding.UTF8.GetBytes(e.ToString());
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
+            context.Response.AddHeader("Content-Type", "text/text; charset=utf-8");
+            byte[] responseArray = Encoding.UTF8.GetBytes(e.ToString());
+            context.Response.OutputStream.Write(responseArray, 0, responseArray.Length);
         }
 
         // context.Response.KeepAlive = true; // set the KeepAlive bool to false
         try {
             context.Response.Close(); // close the connection
-        } catch { }
+        }
+        catch { }
     }
 
     /// <summary>
@@ -128,9 +136,9 @@ public class WebServer {
     /// </summary>
     /// <param name="urlFormat"> 網址匹配規則，無視大小寫，允許在結尾使用「{*}」，表示任何字串 </param>
     /// <param name="func"></param>
-    public void RouteAdd(string urlFormat, Action<RequestData> func) {
+    public void RouteAdd(string urlFormat, Func<RequestData, Task> func) {
 
-        var func2 = new Func<RequestData, bool>((RequestData requestData) => {
+        var func2 = new Func<RequestData, Task<bool>>(async (RequestData requestData) => {
 
             // 規則字串 
             string pattern = "^" + urlFormat.Replace("{*}", ".*") + "$";
@@ -144,7 +152,7 @@ public class WebServer {
                     requestData.value = val;
                 }
 
-                func(requestData);
+                await func(requestData);
                 return true;
             }
 
@@ -154,6 +162,7 @@ public class WebServer {
 
         arRoute.Add(func2);
     }
+
 
     /// <summary>
     /// 檢查 port 是否有被佔用
@@ -205,7 +214,7 @@ public class RequestData {
     /// <summary> 取得網址結尾「{*}」實際的字串 </summary>
     public string value = "";
     /// <summary> 「?」後面的參數 </summary>
-    public Dictionary<string, string> args = new(); 
+    public Dictionary<string, string> args = new();
     public HttpListenerContext context;
     public string postData {
         get {

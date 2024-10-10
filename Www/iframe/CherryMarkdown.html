@@ -41,7 +41,7 @@
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== libIframe.APIURL) {
                 console.error("錯誤的請求來源：" + e.origin);
                 return;
             }
@@ -193,17 +193,20 @@
                          * @returns
                          */
                         urlProcessor: (url) => {
-                            //console.log(url);
-                            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("mailto:") || url.startsWith("file:")) {
+                            // console.log(url);
+                            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("mailto:")) {
                                 return url;
+                            } else if (url.startsWith("file:")) { // 網址格式的檔案路徑
+                                const path = libIframe.urlToPath(url);
+                                return libIframe.pathToUrl(path);
                             } else if (url.length > 2 && url.substring(1, 2) === ":") { // C:\123.jppg
-                                return libIframe.pathToURL(url);
+                                return libIframe.pathToUrl(url);
                             } else if (url.startsWith("\\\\")) { // \\Desktop-abc\AA
-                                return url;
-                            } else if (url.startsWith("data:image/")) { // base64，例如 data:image/
+                                return libIframe.pathToUrl(url);
+                            } else if (url.startsWith("data:image/")) { // base64
                                 return url;
                             } else {
-                                return getRoot() + url.replace(/\\/g, "/");
+                                return getRoot() + url;
                             }
                         },
                     }
@@ -289,6 +292,7 @@
          * 設定md檔所在的目錄，好讓圖片跟超連結找得到
          */
         function setRoot(path) {
+            path = libIframe.pathToUrl(path, false) + "/";
             _root = path;
             document.querySelector("#root").href = path;
         }

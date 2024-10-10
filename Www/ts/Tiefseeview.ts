@@ -11,7 +11,6 @@ class Tiefseeview {
     public scrollY; // 垂直滾動條
 
     public preloadImg; // 預載入 圖片
-    public preloadVideo; // 預載入 影片
     public loadImg; // 載入圖片
     public loadBigimg;
     public loadBigimgscale;
@@ -196,7 +195,6 @@ class Tiefseeview {
         this.scrollX = _scrollX;
         this.scrollY = _scrollY;
         this.preloadImg = preloadImg;
-        this.preloadVideo = preloadVideo;
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
         this.loadBigimgscale = loadBigimgscale;
@@ -1213,39 +1211,6 @@ class Tiefseeview {
         }
 
         /**
-         * 預載入影片資源
-         * @param _url 網址
-         * @returns true=載入完成、false=載入失敗
-         */
-        async function preloadVideo(url: string) {
-
-            const video = document.createElement("video");
-            const p = await new Promise((resolve, _) => {
-                video.addEventListener("loadedmetadata", (e) => {
-                    _tempOriginalWidth = video.videoWidth; // 初始化圖片size
-                    _tempOriginalHeight = video.videoHeight;
-                    _tempVideoDuration = isNaN(video.duration) ? -1 : video.duration;
-
-                    resolve(true);
-                });
-                video.addEventListener("error", (e) => {
-                    _tempVideoDuration = -1;
-                    _tempOriginalWidth = 1;
-                    _tempOriginalHeight = 1;
-                    resolve(false);
-                });
-                video.src = url;
-            })
-
-            // temp_img = video;
-
-            // img.src = "";
-            // @ts-ignore
-            // img = null;
-            return <boolean>p;
-        }
-
-        /**
          * 載入空白圖片
          */
         async function loadNone() {
@@ -1259,27 +1224,57 @@ class Tiefseeview {
          */
         async function loadVideo(url: string) {
 
-            // setLoading(true);
             _url = url;
-            const p = await preloadVideo(url);
-            // setLoading(false);
-            setDataType("video");
 
-            if (p === false) {
+            _domVideo.onloadedmetadata = () => { // 載入完成時自動播放
+                _domVideo.play();
+            }
+
+            const p = await new Promise((resolve, _) => {
+                // 清除事件
+                function clearEvent() {
+                    _domVideo.removeEventListener("loadedmetadata", onLoadedMetadata);
+                    _domVideo.removeEventListener("error", onError);
+                }
+
+                function onLoadedMetadata() {
+                    clearEvent();
+                    resolve(true);
+                }
+
+                function onError() {
+                    clearEvent();
+                    resolve(false);
+                }
+
+                _domVideo.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
+                _domVideo.addEventListener("error", onError, { once: true });
+
+                _domVideo.src = url;
+            });
+
+            // 如果載入期間，已經切換到其他圖片，就不要繼續執行
+            if (_url !== url) { return; }
+
+            if (p) {
+                setDataType("video");
+
+                _tempOriginalWidth = _domVideo.videoWidth; // 初始化圖片 size
+                _tempOriginalHeight = _domVideo.videoHeight;
+                _tempVideoDuration = isNaN(_domVideo.duration) ? -1 : _domVideo.duration;
+
+                clipFull();
+                return true;
+            }
+            else {
+                _tempVideoDuration = -1;
+                _tempOriginalWidth = 1;
+                _tempOriginalHeight = 1;
                 setDataType("img");
                 await preloadImg(_errerUrl);
                 _domImg.src = _errerUrl;
                 return false;
             }
-
-            _domVideo.src = url;
-            _domVideo.onloadedmetadata = () => { // 載入完成時自動播放
-                _domVideo.play();
-            }
-
-            clipFull();
-
-            return true;
         }
 
         /**

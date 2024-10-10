@@ -102,7 +102,7 @@ public class WV_RunApp {
         }
     }
 
-    class UwpItem {
+    public class UwpItem {
         public string Logo { get; set; }
         public string Name { get; set; }
         public string Id { get; set; }
@@ -112,7 +112,7 @@ public class WV_RunApp {
     /// <summary>
     /// 取得 UWP 列表
     /// </summary>
-    public string GetUwpList() {
+    public List<UwpItem> GetUwpList() {
 
         bool isFirstRun = false;
         if (_tempUwpItem == null) { // 判斷是否為首次執行
@@ -128,12 +128,12 @@ public class WV_RunApp {
                 _tempUwpItem = JsonSerializer.Deserialize<Dictionary<string, UwpItem>>(jsonString);
             }
             catch (Exception) {
-                _tempUwpItem = new Dictionary<string, UwpItem>();
+                _tempUwpItem = new();
             }
         }
 
-        Dictionary<string, UwpItem> temp_appDataUwpList = new Dictionary<string, UwpItem>();
-        List<UwpItem> ar = new List<UwpItem>();
+        var temp_appDataUwpList = new Dictionary<string, UwpItem>();
+        var ar = new List<UwpItem>();
         var packageManager = new PackageManager();
         var packages = packageManager.FindPackagesForUser("");
         foreach (var package in packages) {
@@ -145,12 +145,11 @@ public class WV_RunApp {
                 string name = package.DisplayName; // APP在地化的名稱 (取得成本高)
                 string logo = package.Logo.ToString(); // 圖示的路徑 (取得成本高)
                 string id = package.Id.Name + "_" + package.Id.PublisherId;
-                UwpItem uwpItem = new UwpItem {
+                _tempUwpItem.Add(fullName, new UwpItem {
                     Logo = logo,
                     Name = name,
                     Id = id
-                };
-                _tempUwpItem.Add(fullName, uwpItem);
+                });
             }
 
             if (isFirstRun) {
@@ -162,14 +161,12 @@ public class WV_RunApp {
 
         // 如果是首次執行，就產生暫存檔，減少下次讀取的時間
         if (isFirstRun) {
-            using (var fs = new FileStream(AppPath.appDataUwpList, FileMode.Create)) {
-                using (var sw = new StreamWriter(fs, Encoding.UTF8)) {
-                    sw.Write(JsonSerializer.Serialize(temp_appDataUwpList));
-                }
-            }
+            using var fs = new FileStream(AppPath.appDataUwpList, FileMode.Create);
+            using var sw = new StreamWriter(fs, Encoding.UTF8);
+            sw.Write(JsonSerializer.Serialize(temp_appDataUwpList));
         }
 
-        return JsonSerializer.Serialize(ar);
+        return ar;
     }
     private static Dictionary<string, UwpItem> _tempUwpItem = null;
 

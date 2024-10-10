@@ -33,7 +33,7 @@
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== libIframe.APIURL) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -77,10 +77,11 @@
          *  初始化套件
          */
         async function initPDFTronWebviewer() {
+            const pluginPath = libIframe.getPluginPath();
 
             let appInfo = libIframe.getAppInfo();
-            let pathLib = appInfo.plugin.PDFTronWebviewer_lib;
-            let pathJs = appInfo.plugin.PDFTronWebviewer_js;
+            let pathLib = pluginPath + appInfo.plugin.PDFTronWebviewer_lib;
+            let pathJs = pluginPath + appInfo.plugin.PDFTronWebviewer_js;
 
             await libIframe.addScript(pathJs);
 
@@ -107,7 +108,7 @@
                 }
                 instance.UI.setLanguage(lang);
 
-                let iframeWindow = document.body.querySelector("iframe").contentWindow;
+                const iframeWindow = document.body.querySelector("iframe").contentWindow;
                 libIframe.initEventDrop(iframeWindow); // 註冊 drop 事件，拖曳檔案進來時 開啟檔案
 
                 // 點擊超連結時
@@ -121,7 +122,7 @@
          * 套用主題
          */
         function setTheme() {
-            let theme = libIframe.initTheme();
+            const theme = libIframe.initTheme();
             if (theme["theme"] === "dark") {
                 instance.UI.setTheme("dark");
             } else {
@@ -140,6 +141,7 @@
          * 載入檔案
          */
         async function loadFile(path) {
+            path = libIframe.pathToUrl(libIframe.urlToPath(path));
             instance.UI.loadDocument(path);
             instance.UI.setFitMode("FitWidth"); // 縮放模式為寬度全滿
             instance.UI.setToolbarGroup('toolbarGroup-View'); // 工具列預設選擇為view            

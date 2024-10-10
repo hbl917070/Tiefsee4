@@ -93,15 +93,9 @@ static class Program {
 
         //--disable-web-security  允許跨域請求
         //--disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
-        //--disable-backing-store-limit  禁用對後備存儲數量的限制。可以防止具有許多視窗/選項卡和大量記憶體的用戶閃爍
         //--user-agent  覆寫userAgent
         //--enable-features=msWebView2EnableDraggableRegions 讓webview2支援css「app-region:drag」
-        webvviewArguments = $@"
---disable-web-security 
---disable-features=""msWebOOUI,msPdfOOUI"" 
---user-agent=""{Program.webvviewUserAgent}"" 
---enable-features=""msWebView2EnableDraggableRegions"" 
-";
+        webvviewArguments = null;
 
         if (startType != 1) { AppLock(false); } // 解除鎖定
         startWindow = new StartWindow();

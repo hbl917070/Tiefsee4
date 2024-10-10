@@ -354,7 +354,7 @@ class MainMenu {
 
                     const uwpItem = arUwp[i];
                     const name = uwpItem.name; // 顯示的名稱
-                    const logo = uwpItem.path;
+                    const logo = WebAPI.getFile(Lib.urlToPath(uwpItem.path));
                     const dom = Lib.newDom(`
                         <div class="menu-hor-item">
                             <div class="menu-hor-icon">

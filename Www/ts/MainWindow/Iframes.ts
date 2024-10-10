@@ -30,7 +30,7 @@ class Iframes {
         window.addEventListener("message", async (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== APIURL) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -148,7 +148,7 @@ class PdfTronWebviewer {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== APIURL) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -255,7 +255,7 @@ class MonacoEditor {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== APIURL) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -408,7 +408,7 @@ class CherryMarkdown {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== "file://") {
+            if (e.origin !== APIURL) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -437,7 +437,7 @@ class CherryMarkdown {
         async function awaitInit() {
             if (_domIframe.src == "") {
                 const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                _domIframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+                _domIframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}&allowCors=true`;
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化

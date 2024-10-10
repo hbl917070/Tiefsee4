@@ -1,6 +1,12 @@
 class LibIframe {
 
+    public appInfo: AppInfo;
+    public APIURL: string;
+
     constructor() {
+
+        this.appInfo = this.getAppInfo();
+        this.APIURL = "http://127.0.0.1:" + this.appInfo.mainPort;
 
         //處理唯讀
         window.addEventListener("keydown", (e) => {
@@ -96,24 +102,19 @@ class LibIframe {
     /**
      * 取得 AppInfo
      */
-    public getAppInfo() {
+    public getAppInfo(): AppInfo {
         const getUrlString = location.href;
         const url = new URL(getUrlString);
         const appInfo = url.searchParams.get("appInfo");
-        if (appInfo == null) { return {}; }
+        if (appInfo == null) { throw new Error("appInfo is null"); }
         return JSON.parse(appInfo);
     }
 
     /**
      * 取得 Plugin 的路徑
      */
-    public getPluginPath(appInfo?: any) {
-        if (appInfo === undefined) {
-            appInfo = this.getAppInfo();
-        }
-        const appDataPath = appInfo.appDataPath.replace(/\\/g, "/");
-        const pathLib = "file:///" + appDataPath + "/Plugin";
-        return pathLib;
+    public getPluginPath() {
+        return this.APIURL + "/Plugin";
     }
 
     /**
@@ -222,10 +223,32 @@ class LibIframe {
     /**
      * 路徑 轉 URL
      */
-    public pathToURL(path: string): string {
-        return "file:///" + encodeURIComponent(path)
+    public pathToUrl(path: string, encode = true): string {
+        if (encode) {
+            return this.APIURL + `/api/getFile?path=${encodeURIComponent(path)}`;
+        }
+        return this.APIURL + `/file/${path.replace(/\\/g, "/")}`;
+
+        /*return "file:///" + encodeURIComponent(path)
             .replace(/[%]3A/g, ":")
             .replace(/[%]2F/g, "/")
-            .replace(/[%]5C/g, "/");
+            .replace(/[%]5C/g, "/");*/
+    }
+
+    /**
+     * URL 轉 路徑
+     */
+    public urlToPath(path: string): string {
+
+        path = path.split("?")[0]; // 刪除 URL 中的查詢參數
+
+        if (path.indexOf("file:///") === 0) { // 一般檔案
+            path = path.substring(8);
+        }
+        else if (path.indexOf("file://") === 0) { // 網路路徑，例如 \\Desktop-abc\AA
+            path = path.substring(5);
+        }
+        path = decodeURIComponent(path).replace(/[/]/g, "\\");
+        return path;
     }
 }

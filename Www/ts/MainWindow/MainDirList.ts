@@ -345,7 +345,7 @@ class MainDirList {
 		 */
 		function getImgUrl(path: string) {
 			if (Lib.getExtension(path) === ".svg") {
-				return Lib.pathToUrl(path);
+				return WebAPI.getFile(path);
 			}
 			return WebAPI.Img.fileIcon(path);
 		}

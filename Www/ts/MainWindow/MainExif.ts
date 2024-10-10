@@ -320,7 +320,7 @@ class MainExif {
 					const mapHtml = `
 						<div class="mainExifItem">
 							<div class="mainExifMap">
-								<iframe class="mainExifMapIframe" src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
+								<iframe class="mainExifMapIframe" credentialless src="https://maps.google.com.tw/maps?q=${value}&z=16&output=embed"></iframe>
 							</div>
 						</div>`;
 					_domTabContentInfo.appendChild(Lib.newDom(mapHtml));

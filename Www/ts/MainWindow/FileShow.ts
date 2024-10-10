@@ -246,19 +246,18 @@ class FileShow {
         async function openVideo(fileInfo2: FileInfo2) {
 
             _isLoaded = false;
-            let path = fileInfo2.Path;
+            const path = fileInfo2.Path;
             setShowType(GroupType.video); // 改變顯示類型
-            let imgurl = path; // 圖片網址
 
+            let imgurl: string; // 圖片網址
             if (M.fileLoad.getGroupType() === GroupType.unknown) { // 如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(path, 256); // 取得檔案總管的圖示
             } else {
-                imgurl = await WebAPI.Img.getUrl("web", fileInfo2);
+                imgurl = await WebAPI.getVideo(path);
             }
 
             _tiefseeview.setLoading(true, 200);
-            await _tiefseeview.preloadImg(imgurl); // 預載入
-            await _tiefseeview.loadVideo(imgurl); // 使用video渲染
+            await _tiefseeview.loadVideo(imgurl);
 
             initTiefseeview(fileInfo2);
             _isLoaded = true;
@@ -374,7 +373,6 @@ class FileShow {
                 setShowType(GroupType.md); // 改變顯示類型
                 _iframes.setTheme();
                 let dir = Lib.getDirectoryName(path) as string;
-                dir = Lib.pathToUrl(dir) + "/";
                 await _iframes.cherryMarkdown.setReadonly(M.getIsQuickLook());
                 await _iframes.cherryMarkdown.loadFile(txt, dir);
 

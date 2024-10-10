@@ -30,15 +30,15 @@ public static class Plugin {
         pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib/webviewer.min.js"); // 從瀏覽器下載的zip
         dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
         if (dataPlugin.PDFTronWebviewer) {
-            dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
-            dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "WebViewer/lib");
+            dataPlugin.PDFTronWebviewer_js = "/WebViewer/lib/webviewer.min.js";
+            dataPlugin.PDFTronWebviewer_lib = "/WebViewer/lib";
         }
         else {
             pathPDFTronWebviewer = Path.Combine(AppPath.appDataPlugin, "webviewer/webviewer.min.js"); // 從npm下載
             dataPlugin.PDFTronWebviewer = File.Exists(pathPDFTronWebviewer);
             if (dataPlugin.PDFTronWebviewer) {
-                dataPlugin.PDFTronWebviewer_js = pathPDFTronWebviewer;
-                dataPlugin.PDFTronWebviewer_lib = Path.Combine(AppPath.appDataPlugin, "webviewer/public");
+                dataPlugin.PDFTronWebviewer_js = "/webviewer/webviewer.min.js";
+                dataPlugin.PDFTronWebviewer_lib = "/webviewer/public";
             }
         }
     }

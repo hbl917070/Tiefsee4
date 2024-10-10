@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Tiefsee;
@@ -18,44 +18,44 @@ public class WV_Directory {
     /// 取得跟自己同層的資料夾內的檔案資料(自然排序的前4筆)
     /// </summary>
     /// <param name="siblingPath"></param>
-    /// <param name="_arExt"> 副檔名 </param>
+    /// <param name="arExt"> 副檔名 </param>
     /// <param name="maxCount"> 資料夾允許處理的最大數量 </param>
     /// <returns></returns>
-    public string GetSiblingDir(string siblingPath, object[] _arExt, int maxCount) {
+    public Dictionary<string, List<string>> GetSiblingDir(string siblingPath, object[] arExt, int maxCount) {
 
         if (maxCount <= -1) { maxCount = int.MaxValue; }
 
         // 如果資料夾不存在
-        if (Directory.Exists(siblingPath) == false) { return "{}"; }
+        if (Directory.Exists(siblingPath) == false) { return new(); }
 
         // 把副檔名轉小寫。例如 JPG => .jpg
-        string[] arExt = _arExt
+        string[] fileExtensions = arExt
             .Select(x => "." + ((string)x).ToLower())
             .ToArray();
 
         string parentPath = Path.GetDirectoryName(siblingPath); // 取得父親資料夾
         Dictionary<string, List<string>> output = new();
 
-        string[] arDir = new string[0];
+        string[] arDir = [];
         try { // 如果取得所有資料夾失敗，就只處理自己目前的資料夾
             if (parentPath == null) { // 如果沒有上一層資料夾
-                arDir = new string[] { siblingPath }; // 只處理自己
+                arDir = [siblingPath]; // 只處理自己
             }
             else if (parentPath == Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)) { //如果開啟的是 user資料夾 裡面的資料(例如桌面
-                arDir = new string[] { siblingPath }; // 只處理自己
+                arDir = [siblingPath]; // 只處理自己
             }
             else if (maxCount == 0) {
-                arDir = new string[] { siblingPath }; // 只處理自己
+                arDir = [siblingPath]; // 只處理自己
             }
             else {
                 arDir = Directory.GetDirectories(parentPath); // 取得所有子資料夾
                 if (arDir.Length > maxCount) { // 如果資料夾太多
-                    arDir = new string[] { siblingPath }; // 只處理自己
+                    arDir = [siblingPath]; // 只處理自己
                 }
             }
         }
         catch {
-            arDir = new string[] { siblingPath }; // 只處理自己
+            arDir = [siblingPath]; // 只處理自己
         }
 
         foreach (var dirPath in arDir) { // 所有子資料夾
@@ -63,7 +63,7 @@ public class WV_Directory {
             string[] arFile;
             try {
                 // arFile = Directory.GetFiles(dirPath);
-                if (arExt.Length == 0) {
+                if (fileExtensions.Length == 0) {
                     // 取得資料夾內前4個檔案的檔名
                     arFile = Directory.EnumerateFiles(dirPath, "*.*")
                         .Select(filePath => Path.GetFileName(filePath)).Take(4).ToArray();
@@ -71,7 +71,7 @@ public class WV_Directory {
                 else {
                     // 以副檔名來篩選，取得資料夾內前4個檔案的檔名
                     var query = Directory.EnumerateFiles(dirPath, "*.*", SearchOption.TopDirectoryOnly)
-                        .Where(file => arExt.Contains(Path.GetExtension(file).ToLower(), StringComparer.Ordinal));
+                        .Where(file => fileExtensions.Contains(Path.GetExtension(file).ToLower(), StringComparer.Ordinal));
                     arFile = query.Take(4).Select(f => Path.GetFileName(f)).ToArray();
                 }
             }
@@ -111,7 +111,7 @@ public class WV_Directory {
             catch { }
         }
 
-        return System.Text.Json.JsonSerializer.Serialize(output);
+        return output;
     }
 
     /// <summary>
