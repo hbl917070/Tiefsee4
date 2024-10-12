@@ -256,7 +256,7 @@ public class WebServerController {
         if (await CheckFileExist(d, path) == false) { return; }
 
         // 如果前端的檔案已經有快取，則直接回傳 304
-        // if (HeadersAdd304(d, path)) { return; }
+        if (HeadersAdd304(d, path)) { return; }
 
         d.context.Response.ContentType = GetMimeTypeMapping(path);
 
@@ -916,13 +916,16 @@ public class WebServerController {
     private bool HeadersAdd304(RequestData d, string path) {
 
         DateTime dt = new FileInfo(path).LastWriteTime;
-        string lastModified = dt.ToString("ddd, dd MMM yyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
+        string lastModified = dt.ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", new System.Globalization.CultureInfo("en-US"));
         string etag = dt.ToFileTimeUtc().ToString();
 
-        d.context.Response.Headers.Add("Last-Modified", lastModified); // 檔案建立的時間
-        d.context.Response.Headers.Add("ETag", etag); // 瀏覽器用來判斷資源是否有更新的key
+        d.context.Response.Headers.Add("Last-Modified", lastModified);
+        d.context.Response.Headers.Add("ETag", etag);
+        // 檔案有變化就一律重新讀取
+        d.context.Response.Headers.Add("Cache-Control", "no-cache");
 
-        if (d.context.Request.Headers["If-None-Match"] == etag) { // 表示瀏覽器還留有暫存，狀態304後，不用回傳任何資料
+        // 如果瀏覽器還留有暫存，就直接回傳 304 狀態
+        if (d.context.Request.Headers["If-None-Match"] == etag) {
             d.context.Response.StatusCode = 304;
             return true;
         }
