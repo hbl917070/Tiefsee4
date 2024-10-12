@@ -216,12 +216,6 @@ public class WebServerController {
         // 如果前端的檔案已經有快取，則直接回傳 304
         if (HeadersAdd304(d, path)) { return; }
 
-        // 禁止跨域請求
-        if (allowCors == false) {
-            d.context.Response.Headers.Add("Cross-Origin-Opener-Policy", "same-origin");
-            d.context.Response.Headers.Add("Cross-Origin-Embedder-Policy", "require-corp");
-        }
-
         d.context.Response.ContentType = GetMimeTypeMapping(path);
 
         await WriteFile(d, path);
@@ -239,10 +233,6 @@ public class WebServerController {
 
         // 如果前端的檔案已經有快取，則直接回傳 304
         if (HeadersAdd304(d, path)) { return; }
-
-        // 禁止跨域請求
-        d.context.Response.Headers.Add("Cross-Origin-Opener-Policy", "same-origin");
-        d.context.Response.Headers.Add("Cross-Origin-Embedder-Policy", "require-corp");
 
         d.context.Response.ContentType = GetMimeTypeMapping(path);
 
@@ -919,7 +909,7 @@ public class WebServerController {
 
     #region Headers 相關
 
-    /// <summary>
+        /// <summary>
     /// 回傳檔案時加入快取的 Headers
     /// </summary>
     /// <returns> true=304 false=正常回傳檔案 </returns>
