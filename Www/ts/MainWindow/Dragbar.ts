@@ -24,6 +24,7 @@ class Dragbar {
         let _hammerDragbar: HammerManager;
         let _type: ("left" | "right") = "right";
         let _enable = true;
+        let _tempBoxRect: DOMRect = new DOMRect();
 
         let _eventStart = () => { };
         let _eventMove = (val: number) => { };
@@ -43,6 +44,7 @@ class Dragbar {
             _enable = val;
             if (val) {
                 _domDragbar.style.display = "block";
+                updatePosition();
             } else {
                 _domDragbar.style.display = "none";
             }
@@ -134,19 +136,36 @@ class Dragbar {
          * 更新拖曳條的坐標
          */
         function updatePosition() {
-            if (_enable === false) { return; }
+
+            if (_enable === false) {
+                _tempBoxRect = new DOMRect();
+                return;
+            }
+
+            const rect = _domBox.getBoundingClientRect();
+
+            // 如果位置沒有改變，就不更新
+            if (rect.left === _tempBoxRect.left &&
+                rect.top === _tempBoxRect.top &&
+                rect.width === _tempBoxRect.width &&
+                rect.height === _tempBoxRect.height
+            ) {
+                return;
+            }
+            _tempBoxRect = rect;
+
             requestAnimationFrame(() => {
                 if (_type === "left") {
-                    _domDragbar.style.top = _domBox.getBoundingClientRect().top + "px"
-                    _domDragbar.style.left = _domBox.getBoundingClientRect().left + "px"
-                    _domDragbar.style.height = _domBox.getBoundingClientRect().height + "px";
+                    _domDragbar.style.top = rect.top + "px"
+                    _domDragbar.style.left = rect.left + "px"
+                    _domDragbar.style.height = rect.height + "px";
                 }
                 if (_type === "right") {
-                    _domDragbar.style.top = _domBox.getBoundingClientRect().top + "px"
-                    _domDragbar.style.left = _domBox.getBoundingClientRect().left + _domBox.getBoundingClientRect().width + "px"
-                    _domDragbar.style.height = _domBox.getBoundingClientRect().height + "px";
+                    _domDragbar.style.top = rect.top + "px"
+                    _domDragbar.style.left = rect.left + rect.width + "px"
+                    _domDragbar.style.height = rect.height + "px";
                 }
-            })
+            });
         }
 
     }

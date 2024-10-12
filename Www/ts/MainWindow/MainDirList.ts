@@ -71,7 +71,7 @@ class MainDirList {
 			}
 		})
 
-		//更新畫面
+		// 更新畫面
 		_domDirList.addEventListener("scroll", () => { // 捲動時
 			updateItem()
 		})
