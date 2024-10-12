@@ -42,6 +42,9 @@ interface WV_Window {
     /** 清理 webview2 的暫存 */
     ClearBrowserCache(): void;
 
+    /** 取得 webview2 版本資訊 */
+    GetBrowserVersionString(): string;
+
     /** 儲存到 start.ini */
     SetStartIni(startPort: number, startType: number)
 

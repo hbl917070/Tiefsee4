@@ -12,6 +12,7 @@ namespace Tiefsee;
 public class WebWindow : FormNone {
 
     private WebView2 _wv2;
+    private CoreWebView2Environment _webView2Environment;
     /// <summary> 父視窗 </summary>
     private WebWindow _parentWindow;
     /// <summary> 命令列參數 </summary>
@@ -34,6 +35,7 @@ public class WebWindow : FormNone {
     private bool _windowRoundedCorners = false;
 
     public WebView2 Wv2 { get { return _wv2; } }
+    public CoreWebView2Environment Wv2Environment { get { return _webView2Environment; } }
     public WebWindow ParentWindow { get { return _parentWindow; } }
     public string[] Args { get { return _args; } }
     public static WebWindow TempWindow { get { return _tempWindow; } }
@@ -334,8 +336,8 @@ public class WebWindow : FormNone {
         });
 
         var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
-        CoreWebView2Environment webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
-        await _wv2.EnsureCoreWebView2Async(webView2Environment); // 等待初始化完成
+        _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
+        await _wv2.EnsureCoreWebView2Async(_webView2Environment); // 等待初始化完成
         // 指定為深色主題
         _wv2.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark;
         // 是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航

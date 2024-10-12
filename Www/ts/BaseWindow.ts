@@ -7,8 +7,8 @@ const WV_Path: WV_Path = WV2.WV_Path;
 const WV_System: WV_System = WV2.WV_System;
 const WV_RunApp: WV_RunApp = WV2.WV_RunApp;
 const WV_Image: WV_Image = WV2.WV_Image;
-
-const APIURL = "http://127.0.0.1:" + location.hash.replace("#", ""); // api 網址
+const PORT = location.hash.replace("#", "");
+const APIURL = "http://127.0.0.1:" + PORT; // api 網址
 var _dropPath: string[] | undefined = undefined; // 暫存。取得拖曳進視窗的檔案路徑
 
 interface Window {

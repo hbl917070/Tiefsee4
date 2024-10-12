@@ -1494,8 +1494,8 @@ class SettingWindow {
                 dom_MonacoEditor.innerHTML = getHtml(baseWindow.appInfo.plugin.MonacoEditor);
 
                 // 如果未安裝QuickLook擴充套件，就顯示提示文字，並且禁止編輯
-               const dom_noInstalled = getDom("#quickLook-noInstalled") as HTMLInputElement;
-               const dom_box = getDom("#quickLook-box") as HTMLInputElement;
+                const dom_noInstalled = getDom("#quickLook-noInstalled") as HTMLInputElement;
+                const dom_box = getDom("#quickLook-box") as HTMLInputElement;
                 if (baseWindow.appInfo.plugin.QuickLook) {
                     dom_noInstalled.style.display = "none";
                     dom_box.style.opacity = "1";
@@ -1592,9 +1592,19 @@ class SettingWindow {
 
         })
 
+        // 關於
+        addLoadEvent(async () => {
+            const webViewVersion = getDom("#span-webViewVersion") as HTMLInputElement;
+            webViewVersion.innerHTML = await WV_Window.GetBrowserVersionString();
+
+            const serverPort = getDom("#span-serverPort") as HTMLInputElement;
+            serverPort.innerHTML = PORT;
+        })
+
         addLoadEvent(() => {
             _i18n.setAll();
         })
+
         // 初始化頁面分頁
         addLoadEvent(() => {
 
@@ -1635,6 +1645,28 @@ class SettingWindow {
                 element?.scrollIntoView();
             }
         })
+
+        /**
+         * 取得瀏覽器版本資訊
+         */
+        function getBrowserInfo() {
+            var ua = navigator.userAgent, tem,
+                M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return { name: 'IE', version: (tem[1] || '') };
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
+                if (tem != null) return { name: tem[1].replace('OPR', 'Opera'), version: tem[2] };
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return {
+                name: M[0],
+                version: M[1]
+            };
+        }
 
         /** 
          * dom 交換順序
