@@ -406,6 +406,57 @@ var langData = {
                 "ja": "最後に挿入",
             },
 
+            reachLastFile: {
+                "zh-TW": "到達最後一個檔案時",
+                "en": "When reaching the last file",
+                "ja": "最後のファイルに到達したとき",
+            },
+            doNothing: {
+                "zh-TW": "不做任何事情",
+                "en": "Do nothing",
+                "ja": "何もしない",
+            },
+            firstFile: {
+                "zh-TW": "回到第一個檔案",
+                "en": "Back to the first file",
+                "ja": "最初のファイルに戻る",
+            },
+            nextDir: {
+                "zh-TW": "前往下一個資料夾",
+                "en": "Go to the next folder",
+                "ja": "次のフォルダに移動",
+            },
+            noneWithPrompt: {
+                "zh-TW": "不做任何事情，並顯示提示",
+                "en": "Do nothing and show prompt",
+                "ja": "何もせず、プロンプトを表示する",
+            },
+            firstFileWithPrompt: {
+                "zh-TW": "回到第一個檔案，並顯示提示",
+                "en": "Back to the first file and show prompt",
+                "ja": "最初のファイルに戻り、プロンプトを表示する",
+            },
+            nextDirWithPrompt: {
+                "zh-TW": "前往下一個資料夾，並顯示提示",
+                "en": "Go to the next folder and show prompt",
+                "ja": "次のフォルダに移動し、プロンプトを表示する",
+            },
+
+            reachLastDir: {
+                "zh-TW": "到達最後一個資料夾時",
+                "en": "When reaching the last folder",
+                "ja": "最後のフォルダに到達したとき",
+            },
+            firstDir: {
+                "zh-TW": "回到第一個資料夾",
+                "en": "Back to the first folder",
+                "ja": "最初のフォルダに戻る",
+            },
+            firstDirWithPrompt: {
+                "zh-TW": "回到第一個資料夾，並顯示提示",
+                "en": "Back to the first folder and show prompt",
+                "ja": "最初のフォルダに戻り、プロンプトを表示する",
+            },
 
             enableTouchpadGestures: {
                 "zh-TW": "啟用觸控板手勢",
@@ -2033,6 +2084,59 @@ var langData = {
             "zh-TW": "確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)",
             "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and File Sorting)",
             "ja": "Tiefsee のすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
+        },
+        //#endregion
+
+        //#region 到達最後一個檔案時
+        reachLastFile: {
+            "zh-TW": "已經是最後一個檔案",
+            "en": "This is the last file",
+            "ja": "これが最後のファイルです",
+        },
+        reachFirstFile: {
+            "zh-TW": "已經是第一個檔案",
+            "en": "This is the first file",
+            "ja": "これが最初のファイルです",
+        },
+        firstFile: {
+            "zh-TW": "載入第一個檔案",
+            "en": "Load the first file",
+            "ja": "最初のファイルを読み込む",
+        },
+        lastFile: {
+            "zh-TW": "載入最後一個檔案",
+            "en": "Load the last file",
+            "ja": "最後のファイルを読み込む",
+        },
+        nextDir: {
+            "zh-TW": "載入下一個資料夾",
+            "en": "Load the next folder",
+            "ja": "次のフォルダを読み込む",
+        },
+        prevDir: {
+            "zh-TW": "載入上一個資料夾",
+            "en": "Load the previous folder",
+            "ja": "前のフォルダを読み込む",
+        },
+        reachLastDir: {
+            "zh-TW": "已經是最後一個資料夾",
+            "en": "This is the last folder",
+            "ja": "これが最後のフォルダです",
+        },
+        reachFirstDir: {
+            "zh-TW": "已經是第一個資料夾",
+            "en": "This is the first folder",
+            "ja": "これが最初のフォルダです",
+        },
+        firstDir: {
+            "zh-TW": "載入第一個資料夾",
+            "en": "Load the first folder",
+            "ja": "最初のフォルダを読み込む",
+        },
+        lastDir: {
+            "zh-TW": "載入最後一個資料夾",
+            "en": "Load the last folder",
+            "ja": "最後のフォルダを読み込む",
         },
         //#endregion
     },

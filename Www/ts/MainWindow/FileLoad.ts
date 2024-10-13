@@ -281,19 +281,77 @@ class FileLoad {
         /**
          * 載入下一個資料夾
          */
-        async function nextDir() {
+        async function nextDir(type?: string) {
+
             _flagDir += 1;
-            if (_flagDir >= _arDirKey.length) { _flagDir = 0; }
-            showDir();
+
+            if (_flagDir >= _arDirKey.length) {
+
+                if (type === undefined) {
+                    type = M.config.settings.other.reachLastDir;
+                }
+
+                // 不做任何事情
+                if (type === "none") {
+                    _flagDir = _arDirKey.length - 1;
+                }
+                // 回到第一個資料夾
+                else if (type === "firstDir") {
+                    _flagDir = 0;
+                    showDir();
+                }
+                // 不做任何事情，並顯示提示
+                else if (type === "noneWithPrompt") {
+                    Toast.show(M.i18n.t("msg.reachLastDir"), 1000 * 3); // 已經是最後一個資料夾
+                    _flagDir = _arDirKey.length - 1;
+                }
+                // 回到第一個資料夾，並顯示提示
+                else if (type === "firstDirWithPrompt") {
+                    Toast.show(M.i18n.t("msg.firstDir"), 1000 * 3); // 載入第一個資料夾
+                    _flagDir = 0;
+                    showDir();
+                }
+            } else {
+                showDir();
+            }
         }
 
         /**
          * 載入上一個資料夾
          */
-        async function prevDir() {
+        async function prevDir(type?: string) {
+
             _flagDir -= 1;
-            if (_flagDir < 0) { _flagDir = _arDirKey.length - 1; }
-            showDir();
+
+            if (_flagDir < 0) {
+
+                if (type === undefined) {
+                    type = M.config.settings.other.reachLastDir;
+                }
+
+                // 不做任何事情
+                if (type === "none") {
+                    _flagDir = 0;
+                }
+                // 前往最後一個資料夾
+                else if (type === "firstDir") {
+                    _flagDir = _arDirKey.length - 1;
+                    showDir();
+                }
+                // 不做任何事情，並顯示提示
+                else if (type === "noneWithPrompt") {
+                    Toast.show(M.i18n.t("msg.reachFirstDir"), 1000 * 3); // 已經是第一個資料夾
+                    _flagDir = 0;
+                }
+                // 前往最後一個資料夾，並顯示提示
+                else if (type === "firstDirWithPrompt") {
+                    Toast.show(M.i18n.t("msg.lastDir"), 1000 * 3); // 載入最後一個資料夾
+                    _flagDir = _arDirKey.length - 1;
+                    showDir();
+                }
+            } else {
+                showDir();
+            }
         }
 
         /**
@@ -663,9 +721,53 @@ class FileLoad {
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }
+
             _flagFile += 1;
-            if (_flagFile >= _arFile.length) { _flagFile = 0; }
-            showFile();
+
+            if (_flagFile >= _arFile.length) {
+                const reachLastFile = M.config.settings.other.reachLastFile;
+                // 不做任何事情
+                if (reachLastFile === "none") {
+                    _flagFile = _arFile.length - 1;
+                }
+                // 回到第一個檔案
+                else if (reachLastFile === "firstFile") {
+                    _flagFile = 0;
+                    showFile();
+                }
+                // 前往下一個資料夾
+                else if (reachLastFile === "nextDir") {
+                    if (_flagDir >= _arDirKey.length - 1) {
+                        Toast.show(M.i18n.t("msg.reachLastDir"), 1000 * 3); // 已經是最後一個資料夾
+                        _flagFile = _arFile.length - 1;
+                    } else {
+                        nextDir("none");
+                    }
+                }
+                // 不做任何事情，並顯示提示
+                else if (reachLastFile === "noneWithPrompt") {
+                    Toast.show(M.i18n.t("msg.reachLastFile"), 1000 * 3); // 已經是最後一個檔案
+                    _flagFile = _arFile.length - 1;
+                }
+                // 回到第一個檔案，並顯示提示
+                else if (reachLastFile === "firstFileWithPrompt") {
+                    Toast.show(M.i18n.t("msg.firstFile"), 1000 * 3); // 載入第一個檔案
+                    _flagFile = 0;
+                    showFile();
+                }
+                // 前往下一個資料夾，並顯示提示
+                else if (reachLastFile === "nextDirWithPrompt") {
+                    if (_flagDir >= _arDirKey.length - 1) {
+                        Toast.show(M.i18n.t("msg.reachLastDir"), 1000 * 3); // 已經是最後一個資料夾
+                        _flagFile = _arFile.length - 1;
+                    } else {
+                        Toast.show(M.i18n.t("msg.nextDir"), 1000 * 3); // 載入下一個資料夾
+                        nextDir("none");
+                    }
+                }
+            } else {
+                showFile();
+            }
         }
 
         /**
@@ -679,9 +781,56 @@ class FileLoad {
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }
+
             _flagFile -= 1;
-            if (_flagFile < 0) { _flagFile = _arFile.length - 1; }
-            showFile();
+
+            if (_flagFile < 0) {
+                const reachLastFile = M.config.settings.other.reachLastFile;
+                // 不做任何事情
+                if (reachLastFile === "none") {
+                    _flagFile = 0;
+                }
+                // 回到最後一個檔案
+                else if (reachLastFile === "firstFile") {
+                    _flagFile = _arFile.length - 1;
+                    showFile();
+                }
+                // 前往上一個資料夾的最後一個檔案
+                else if (reachLastFile === "nextDir") {
+                    if (_flagDir === 0) {
+                        // 已經是第一個資料夾
+                        Toast.show(M.i18n.t("msg.reachFirstDir"), 1000 * 3);
+                        _flagFile = 0;
+                    } else {
+                        prevDir("none");
+                        // TODO 需要處理成最後一個檔案
+                    }
+                }
+                // 不做任何事情，並顯示提示
+                else if (reachLastFile === "noneWithPrompt") {
+                    Toast.show(M.i18n.t("msg.reachFirstFile"), 1000 * 3); // 已經是第一個檔案
+                    _flagFile = 0;
+                }
+                // 回到最後一個檔案，並顯示提示
+                else if (reachLastFile === "firstFileWithPrompt") {
+                    Toast.show(M.i18n.t("msg.lastFile"), 1000 * 3); // 載入最後一個檔案
+                    _flagFile = _arFile.length - 1;
+                    showFile();
+                }
+                // 前往上一個資料夾的最後一個檔案，並顯示提示
+                else if (reachLastFile === "nextDirWithPrompt") {
+                    if (_flagDir === 0) {
+                        Toast.show(M.i18n.t("msg.reachFirstDir"), 1000 * 3); // 已經是第一個資料夾
+                        _flagFile = 0;
+                    } else {
+                        Toast.show(M.i18n.t("msg.prevDir"), 1000 * 3); // 載入上一個資料夾
+                        prevDir("none");
+                        // TODO 需要處理成最後一個檔案
+                    }
+                }
+            } else {
+                showFile();
+            }
         }
 
         /**

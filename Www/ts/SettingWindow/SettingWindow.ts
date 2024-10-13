@@ -1574,10 +1574,25 @@ class SettingWindow {
             // 偵測到檔案新增時，插入於
             const select_whenInsertingFile = getDom("#select-whenInsertingFile") as HTMLSelectElement;
             select_whenInsertingFile.value = _config.settings["other"]["whenInsertingFile"];
-
             select_whenInsertingFile.addEventListener("change", () => {
                 let val = select_whenInsertingFile.value;
                 _config.settings["other"]["whenInsertingFile"] = val;
+                appleSettingOfMain();
+            });
+
+            // 到達最後一個檔案時
+            const select_reachLastFile = getDom("#select-reachLastFile") as HTMLSelectElement;
+            select_reachLastFile.value = _config.settings.other.reachLastFile;
+            select_reachLastFile.addEventListener("change", () => {
+                _config.settings.other.reachLastFile = select_reachLastFile.value;
+                appleSettingOfMain();
+            });
+
+            // 到達最後一個資料夾時
+            const select_reachLastDir = getDom("#select-reachLastDir") as HTMLSelectElement;
+            select_reachLastDir.value = _config.settings.other.reachLastDir;
+            select_reachLastDir.addEventListener("change", () => {
+                _config.settings.other.reachLastDir = select_reachLastDir.value;
                 appleSettingOfMain();
             });
 
