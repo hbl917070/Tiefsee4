@@ -29,8 +29,8 @@ public class WV_Window {
     /// <summary>
     /// 取得 webview2 版本資訊
     /// </summary>
-    public string GetBrowserVersionString() {
-        return M.Wv2Environment.BrowserVersionString;
+    public async Task<string> GetBrowserVersionString() {
+        return (await WebWindow.GetCoreWebView2Environment()).BrowserVersionString;
     }
 
     /// <summary>

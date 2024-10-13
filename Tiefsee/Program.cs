@@ -16,8 +16,6 @@ static class Program {
     public static StartWindow startWindow;
     /// <summary> 透過 UserAgent 來驗證是否有權限請求 localhost server API </summary>
     public static string webvviewUserAgent = "Tiefsee";
-    /// <summary> webview2 的啟動參數 </summary>
-    public static string webvviewArguments;
 
     /// <summary>
     /// 應用程式的主要進入點
@@ -90,12 +88,6 @@ static class Program {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // 高 DPI 模式
-
-        //--disable-web-security  允許跨域請求
-        //--disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
-        //--user-agent  覆寫userAgent
-        //--enable-features=msWebView2EnableDraggableRegions 讓webview2支援css「app-region:drag」
-        webvviewArguments = null;
 
         if (startType != 1) { AppLock(false); } // 解除鎖定
         startWindow = new StartWindow();

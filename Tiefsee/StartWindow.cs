@@ -1,4 +1,3 @@
-using Microsoft.Web.WebView2.Core;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
@@ -240,10 +239,8 @@ public class StartWindow : Form {
     /// 初始化webview2
     /// </summary>
     private async void InitWebview() {
-        var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
-        Microsoft.Web.WebView2.WinForms.WebView2 wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
-        var webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
-        await wv2.EnsureCoreWebView2Async(webView2Environment);
+        var wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
+        await wv2.EnsureCoreWebView2Async(await WebWindow.GetCoreWebView2Environment());
     }
 
     /// <summary>

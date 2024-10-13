@@ -12,7 +12,7 @@ namespace Tiefsee;
 public class WebWindow : FormNone {
 
     private WebView2 _wv2;
-    private CoreWebView2Environment _webView2Environment;
+    private static CoreWebView2Environment _webView2Environment;
     /// <summary> 父視窗 </summary>
     private WebWindow _parentWindow;
     /// <summary> 命令列參數 </summary>
@@ -35,7 +35,6 @@ public class WebWindow : FormNone {
     private bool _windowRoundedCorners = false;
 
     public WebView2 Wv2 { get { return _wv2; } }
-    public CoreWebView2Environment Wv2Environment { get { return _webView2Environment; } }
     public WebWindow ParentWindow { get { return _parentWindow; } }
     public string[] Args { get { return _args; } }
     public static WebWindow TempWindow { get { return _tempWindow; } }
@@ -290,6 +289,22 @@ public class WebWindow : FormNone {
     }
 
     /// <summary>
+    /// 取得 CoreWebView2Environment
+    /// </summary>
+    public static async Task<CoreWebView2Environment> GetCoreWebView2Environment() {
+        if (_webView2Environment != null) {
+            // --disable-web-security  允許跨域請求
+            // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
+            // --user-agent  覆寫userAgent
+            // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
+            string webvviewArguments = null;
+            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
+            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
+        }
+        return _webView2Environment;
+    }
+
+    /// <summary>
     ///
     /// </summary>
     public async Task Init() {
@@ -335,9 +350,9 @@ public class WebWindow : FormNone {
             }
         });
 
-        var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = Program.webvviewArguments };
-        _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
-        await _wv2.EnsureCoreWebView2Async(_webView2Environment); // 等待初始化完成
+        // 等待初始化完成
+        await _wv2.EnsureCoreWebView2Async(await GetCoreWebView2Environment());
+
         // 指定為深色主題
         _wv2.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark;
         // 是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
