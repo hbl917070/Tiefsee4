@@ -236,7 +236,7 @@ class FileLoad {
          * @param flag 
          * @returns 
          */
-        async function showDir(flag?: number) {
+        async function showDir(flag?: number, flagFile: number = 0) {
 
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
@@ -274,7 +274,7 @@ class FileLoad {
             M.mainDirList.updateLocation();
 
             _showDirThrottle.run = async () => {
-                await loadFile(path, _atLoadingGroupType);
+                await loadFile(path, _atLoadingGroupType, false, flagFile);
             };
         }
 
@@ -330,7 +330,7 @@ class FileLoad {
                 }
 
                 // 不做任何事情
-                if (type === "none") {
+                if (type === "none" || type === "lastFile") {
                     _flagDir = 0;
                 }
                 // 前往最後一個資料夾
@@ -350,7 +350,11 @@ class FileLoad {
                     showDir();
                 }
             } else {
-                showDir();
+                if (type === "lastFile") {
+                    showDir(undefined, Number.MAX_VALUE);
+                } else {
+                    showDir();
+                }
             }
         }
 
@@ -447,8 +451,11 @@ class FileLoad {
         /**
          * 載入單一檔案
          * @param path 
+         * @param dirGroupType 
+         * @param noLoad true 表示不重新載入圖片，單純更新列表
+         * @param flagFile 載入資料夾內的第幾個檔案(僅在載入資料夾時使用)
          */
-        async function loadFile(path: string, dirGroupType?: string, noLoad = false) {
+        async function loadFile(path: string, dirGroupType?: string, noLoad = false, flagFile: number = 0) {
 
             if (_isLoadFileFinish === false) {
                 console.log("loadFile處理中");
@@ -497,6 +504,12 @@ class FileLoad {
                     _fileLoadType = FileLoadType.userDefined;
                 }
 
+                // 目前檔案位置
+                _flagFile = flagFile;
+                if (_flagFile >= _arFile.length) {
+                    _flagFile = _arFile.length - 1;
+                }
+
             } else if (fileInfo2.Type === "file") { // 如果是檔案
 
                 let _dirPath = Lib.getDirectoryName(path); // 取得檔案所在的資料夾路徑
@@ -527,6 +540,9 @@ class FileLoad {
                 M.fileSort.readSortType(_dirPathNow); // 取得該資料夾設定的檔案排序方式
                 M.fileSort.updateMenu(); // 更新menu選單
                 _arFile = await M.fileSort.sort(_arFile);
+
+                _flagFile = _arFile.indexOf(path);
+
             } else { // 不存在
 
                 M.fileShow.openWelcome();
@@ -534,8 +550,6 @@ class FileLoad {
                 return;
             }
 
-            // 目前檔案位置
-            _flagFile = _arFile.indexOf(path);
             _isLoadFileFinish = true;
             M.mainFileList.setHide(false); // 顯示檔案預覽視窗(必須顯示出物件才能計算高度)
             M.mainFileList.init(); // 檔案預覽視窗 初始化
@@ -802,8 +816,7 @@ class FileLoad {
                         Toast.show(M.i18n.t("msg.reachFirstDir"), 1000 * 3);
                         _flagFile = 0;
                     } else {
-                        prevDir("none");
-                        // TODO 需要處理成最後一個檔案
+                        prevDir("lastFile");
                     }
                 }
                 // 不做任何事情，並顯示提示
@@ -824,8 +837,7 @@ class FileLoad {
                         _flagFile = 0;
                     } else {
                         Toast.show(M.i18n.t("msg.prevDir"), 1000 * 3); // 載入上一個資料夾
-                        prevDir("none");
-                        // TODO 需要處理成最後一個檔案
+                        prevDir("lastFile");
                     }
                 }
             } else {
