@@ -598,6 +598,7 @@ class Lib {
             || (str.startsWith('[') && str.endsWith(']'))
         ) {
             try {
+                str = str.replace(/": NaN/g, `": null`); // 將 NaN 轉成 null
                 json = JSON.parse(str);
                 jsonFormat = JSON.stringify(json, null, space);
                 ok = true;

@@ -191,6 +191,7 @@ class AiDrawingPrompt {
 
 		if (typeof jsonStr == "string") {
 			try {
+				jsonStr = jsonStr.replace(/": NaN/g, `": null`); // 將 NaN 轉成 null
 				json = JSON.parse(jsonStr);
 			} catch (e) {
 				return [];
@@ -371,12 +372,27 @@ class AiDrawingPrompt {
 
 				if (mianInputs !== undefined) {
 
+					if (classType == "easy fluxLoader") {
+
+						let model = getVal(mianInputs.ckpt_name);
+						let prompt = getPrompt(getKey(mianInputs.positive), ["positive", "text", "conditioning"]);
+
+						let node = classType;
+						let ar: { title: string, text: string | undefined }[] = [];
+						ar.push({ title: "Ckpt Name", text: model });
+						ar.push({ title: "Text", text: prompt });
+
+						retPush(node, ar);
+						continue;
+					}
+
 					mianInputs.positive = mianInputs.positive || mianInputs.sdxl_tuple;
 					mianInputs.negative = mianInputs.negative || mianInputs.sdxl_tuple;
 					mianInputs.model = mianInputs.model || mianInputs.sdxl_tuple;
 
 					// 如果是已知模型節點
 					let isModelNode = KSAMPLER_TYPES.includes(classType);
+
 					// 如果不是已知的節點，則嘗試以相容模式尋找
 					if (isModelNode === false && mianInputs.model !== undefined && mianInputs.cfg !== undefined && mianInputs.positive !== undefined) {
 						isModelNode = true;
@@ -536,6 +552,58 @@ class AiDrawingPrompt {
 					let jsonFormat = Lib.stringifyWithNewlines({
 						"Model Strength": modelWeight,
 						"Clip Strength": clipWeight
+					}, true, true);
+					arLora.push({ title: loraName, text: jsonFormat });
+				}
+
+			}
+
+			// 讀取 easy loraStack 節點
+			else if (classType === "easy loraStack") {
+				/*
+				"426": {
+					"inputs": {
+						"toggle": false,
+						"mode": "simple",
+						"num_loras": 1,
+						"lora_1_name": "AntiBlur.safetensors",
+						"lora_1_strength": 0.8,
+						"lora_1_model_strength": 1.0,
+						"lora_1_clip_strength": 1.0,
+						"lora_2_name": "None",
+						"lora_2_strength": 1.0,
+						"lora_2_model_strength": 1.0,
+						"lora_2_clip_strength": 1.0,
+						"lora_3_name": "None",
+						"lora_3_strength": 1.0,
+						"lora_3_model_strength": 1.0,
+						"lora_3_clip_strength": 1.0,
+					},
+					"class_type": "easy loraStack"
+				}*/
+
+				// easy loraStack 才有的屬性
+				if (item.inputs["toggle"] === false) { continue; }
+
+				for (let i = 1; i <= 10; i++) {
+
+					// 只顯示開啟的
+					let loraName = intputs[`lora_${i}_name`];
+					if (loraName === "None") { continue; }
+
+					let strength = intputs[`lora_${i}_strength`];
+					if (strength === undefined) { break; }
+
+					let strengthModel = intputs[`lora_${i}_model_strength`];
+					if (strengthModel === undefined) { break; }
+
+					let clipStrength = intputs[`lora_${i}_clip_strength`];
+					if (clipStrength === undefined) { break; }
+
+					let jsonFormat = Lib.stringifyWithNewlines({
+						"Strength": strength,
+						"Model Strength": strengthModel,
+						"Clip Strength": clipStrength
 					}, true, true);
 					arLora.push({ title: loraName, text: jsonFormat });
 				}
