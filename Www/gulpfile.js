@@ -132,8 +132,14 @@ gulp.task("build-rust", (done) => {
 });
 
 // 打包 - 單次
-gulp.task("build", gulp.series("scss", "ts", "svg", "ejs", "build-rust",
-    "copy-files")); // copy-files 必須放在最後
+gulp.task("build", gulp.series(
+    "build-rust",
+    "svg",
+    "ejs",
+    "scss",
+    "ts", // 必須在 ts 之後
+    "copy-files", // 必須放在最後
+));
 
 // 打包 - 持續監控檔案變化
 gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs", () => {
