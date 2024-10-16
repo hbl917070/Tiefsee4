@@ -1,7 +1,14 @@
+import { GroupType } from "../Config";
+import { Lib } from "../Lib";
+import { Throttle } from "../Throttle";
+import { Toast } from "../Toast";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
 /**
  * 載入檔案
  */
-class FileLoad {
+export class FileLoad {
 
     public getWaitingFile: () => string[];
     public setWaitingFile: (ar: string[]) => void;

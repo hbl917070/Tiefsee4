@@ -1,4 +1,8 @@
-class FileSort {
+import { Lib } from "../Lib";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class FileSort {
 
     public readSortType;
     public updateMenu;
@@ -216,7 +220,7 @@ class FileSort {
 /**
  * 排序類型
  */
-const FileSortType = {
+export const FileSortType = {
     /** 檔名自然排序 */
     name: "name",
 
@@ -254,7 +258,7 @@ const FileSortType = {
 /**
  * 遞增或遞減
  */
-const FileOrderbyType = {
+export const FileOrderbyType = {
     desc: "desc",
     asc: "asc",
 }

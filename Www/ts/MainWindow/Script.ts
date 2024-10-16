@@ -1,4 +1,11 @@
-class Script {
+import { GroupType } from "../Config";
+import { Lib } from "../Lib";
+import { TiefseeviewZoomType } from "../Tiefseeview";
+import { Toast } from "../Toast";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class Script {
 
     private M: MainWindow;
     public img: ScriptImg;
@@ -241,8 +248,7 @@ class Script {
     }
 }
 
-
-class ScriptImg {
+export class ScriptImg {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
@@ -583,7 +589,7 @@ class ScriptImg {
 
 }
 
-class ScriptFileLoad {
+export class ScriptFileLoad {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
@@ -692,14 +698,14 @@ class ScriptFileLoad {
 
 }
 
-class ScriptFileShow {
+export class ScriptFileShow {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
     }
 }
 
-class ScriptFile {
+export class ScriptFile {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
@@ -752,7 +758,7 @@ class ScriptFile {
     }
 }
 
-class ScriptMenu {
+export class ScriptMenu {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
@@ -1100,8 +1106,7 @@ class ScriptMenu {
 
 }
 
-
-class ScriptOpen {
+export class ScriptOpen {
     M: MainWindow;
     constructor(_M: MainWindow) {
         this.M = _M;
@@ -1161,7 +1166,7 @@ class ScriptOpen {
                     let src = arSrc[i];
                     let base64;
                     if (src.startsWith("file://")) {
-                        const url = WebAPI.getFile(Lib.urlToPath(src)) 
+                        const url = WebAPI.getFile(Lib.urlToPath(src))
                         let file = await this.M.downloadFileFromUrl(url);
                         if (file != null) {
                             base64 = await Lib.readFileAsDataURL(file);
@@ -1326,8 +1331,7 @@ class ScriptOpen {
 
 }
 
-
-class ScriptCopy {
+export class ScriptCopy {
 
     M: MainWindow;
     constructor(_M: MainWindow) {
@@ -1534,8 +1538,7 @@ class ScriptCopy {
     }
 }
 
-
-class ScriptSetting {
+export class ScriptSetting {
 
     M: MainWindow;
     constructor(_M: MainWindow) {
@@ -1573,8 +1576,7 @@ class ScriptSetting {
     }
 }
 
-
-class ScriptWindow {
+export class ScriptWindow {
 
     domLoading = document.querySelector("#loadingWindow") as HTMLElement;
     btnTopmost = document.querySelector("#menu-layout .js-topmost") as HTMLElement;
@@ -1670,8 +1672,7 @@ class ScriptWindow {
     }
 }
 
-
-class ScriptBulkView {
+export class ScriptBulkView {
 
     M: MainWindow;
     constructor(_M: MainWindow) {

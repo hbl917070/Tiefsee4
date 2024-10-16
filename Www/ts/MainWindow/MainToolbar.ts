@@ -1,4 +1,8 @@
-class MainToolbar {
+import { GroupType } from "../Config";
+import { Lib } from "../Lib";
+import { MainWindow } from "./MainWindow";
+
+export class MainToolbar {
 
     public setEnabled;
     public getArrray;

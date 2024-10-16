@@ -1,7 +1,9 @@
+import { Lib } from "../Lib";
+
 /**
  * 提取 AI 繪圖的 Prompt
  */
-class AiDrawingPrompt {
+export class AiDrawingPrompt {
 
 	/**
 	 * Automatic1111 (字串分割)
@@ -67,11 +69,8 @@ class AiDrawingPrompt {
 				}
 				let jsonF = Lib.jsonStrFormat(text);
 				if (jsonF.ok) { // 如果是json (例如 Hashes
-					if ("Civitai resources") {
-						text = CivitaiStringify(jsonF.json);
-					} else {
-						text = jsonF.jsonFormat; // 格式化json再顯示
-					}
+
+					text = CivitaiStringify(jsonF.json);
 
 				} else {
 					if (title === "Tiled Diffusion" && text.startsWith('{') && text.endsWith('}')) { //格式例如 {'Method': 'MultiDiffusion', 'Tile tile width': 96}

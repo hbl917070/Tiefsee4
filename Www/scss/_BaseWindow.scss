@@ -1,0 +1,233 @@
+@import "./BaseStyle";
+
+:root {
+    /** 可拖曳的邊框 */
+    --window-border: 4px;
+    /** 可拖曳的四個角落 */
+    --window-border-corner: 20px;
+    /** 視窗圓角 */
+    --window-border-radius: 0px;
+
+    --color-window-border: rgba(255, 255, 255, 0.25);
+    --color-window-background: rgba(31, 39, 43, 0.97);
+
+    //一般文字
+    --fontWeight: 400;
+    //粗體字
+    --fontWeightBold: 500;
+
+    //區塊顏色
+    --color-black: rgba(0, 0, 0, 1);
+    --color-black80: rgba(0, 0, 0, 0.8);
+    --color-black60: rgba(0, 0, 0, 0.6);
+    --color-black40: rgba(0, 0, 0, 0.4);
+    --color-black20: rgba(0, 0, 0, 0.2);
+
+    //未使用
+    --color-grey: rgba(30, 30, 30, 1);
+    --color-grey80: rgba(30, 30, 30, 0.8);
+    --color-grey60: rgba(30, 30, 30, 0.6);
+    --color-grey40: rgba(30, 30, 30, 0.4);
+    --color-grey20: rgba(30, 30, 30, 0.2);
+
+    //文字顏色、圖示顏色
+    --color-white: rgb(255, 255, 255);
+    --color-white80: rgba(255, 255, 255, 0.8);
+    --color-white60: rgba(255, 255, 255, 0.6);
+    --color-white40: rgba(255, 255, 255, 0.4);
+    --color-white30: rgba(255, 255, 255, 0.3);
+    --color-white20: rgba(255, 255, 255, 0.2);
+    --color-white10: rgba(255, 255, 255, 0.1);
+
+    //用於醒目的顏色
+    --color-blue: rgb(0, 200, 255);
+    --color-blue80: rgba(0, 200, 255, 0.8);
+    --color-blue60: rgba(0, 200, 255, 0.6);
+    --color-blue40: rgba(0, 200, 255, 0.4);
+    --color-blue20: rgba(0, 200, 255, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    overflow: hidden;
+}
+
+/* 視窗本體 */
+.window {
+    /* transition: transform 0.2s;
+  transform: translateY(10px) scale(0.98); */
+    flex: 1;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 1.5px;
+    bottom: 1.5px;
+    overflow: hidden;
+    background-color: var(--color-window-background);
+    border-radius: var(--window-border-radius);
+    border: 1px solid var(--color-window-border);
+
+    //margin-right: 1.5px;
+    //margin-bottom: 1.5px;
+    display: flex;
+    flex-direction: column;
+}
+
+// 視窗最大化時
+.window.maximized {
+    right: 0px !important;
+    bottom: 0px !important;
+    border: none;
+    border-radius: 0px;
+}
+.window.maximized .window-border {
+    display: none;
+}
+// win11 圓角
+.window.windowRoundedCorners {
+    right: 0.5px;
+    bottom: 0.5px;
+    border: none;
+    border-radius: 0px;
+}
+/*---------------------------*/
+
+/* #region window-titlebar 標題列*/
+
+/*標題列*/
+.window-titlebar {
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    justify-content: space-between;
+
+    .titlebar-text {
+        height: 100%;
+        color: var(--color-white);
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        flex: 1;
+        user-select: none;
+        overflow: hidden;
+
+        app-region: drag; //讓視窗允許拖曳
+    }
+    .titlebar-text span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .titlebar-toolbar {
+        display: flex;
+    }
+    .titlebar-toolbar-btn {
+        height: 100%;
+        width: 38px;
+        margin-left: 1px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        /* border-radius: 4px; */
+    }
+
+    .titlebar-toolbar-btn:hover {
+        background-color: var(--color-white10);
+        cursor: pointer;
+    }
+    .titlebar-toolbar-btn svg {
+        width: 25px;
+        height: 25px;
+        pointer-events: none;
+    }
+}
+/* #endregion */
+
+/*---------------------------*/
+
+/* #region window-border 改變視窗大小的框 */
+
+.window-border {
+    position: fixed;
+    z-index: 9999;
+    user-select: none;
+    app-region: no-drag; //讓視窗不允許拖曳
+}
+.window-CT {
+    height: var(--window-border);
+    top: 0;
+    left: var(--window-border-corner);
+    right: var(--window-border);
+    cursor: n-resize;
+}
+
+.window-RC {
+    width: var(--window-border);
+    top: var(--window-border);
+    right: 0;
+    bottom: var(--window-border-corner);
+    cursor: w-resize;
+}
+
+.window-CB {
+    height: var(--window-border);
+    bottom: 0;
+    left: var(--window-border-corner);
+    right: var(--window-border-corner);
+    cursor: n-resize;
+}
+
+.window-LC {
+    width: var(--window-border);
+    top: var(--window-border-corner);
+    left: 0;
+    bottom: var(--window-border-corner);
+    cursor: w-resize;
+}
+
+.window-LT {
+    width: var(--window-border-corner);
+    height: var(--window-border-corner);
+    left: 0;
+    top: 0;
+    cursor: nw-resize;
+}
+
+.window-RT {
+    width: var(--window-border);
+    height: var(--window-border);
+    right: 0;
+    top: 0;
+    cursor: ne-resize;
+}
+
+.window-LB {
+    width: var(--window-border-corner);
+    height: var(--window-border-corner);
+    left: 0;
+    bottom: 0;
+    cursor: ne-resize;
+}
+
+.window-RB {
+    width: var(--window-border-corner);
+    height: var(--window-border-corner);
+    right: 0;
+    bottom: 0;
+    cursor: nw-resize;
+}
+
+/* #endregion */

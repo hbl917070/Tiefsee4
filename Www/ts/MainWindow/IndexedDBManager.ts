@@ -1,14 +1,4 @@
-/**
- * 資料表名稱
- */
-const DbStoreName = {
-    /** Civitai Resources 的暫存資料 */
-    civitaiResources: "civitaiResources",
-    /** 詳細資訊面板內的項目折疊狀態 */
-    infoPanelCollapse: "infoPanelCollapse",
-}
-
-class IndexedDBManager {
+export class IndexedDBManager {
 
     // 資料表名稱
     private storeNames: string[] = Object.values(DbStoreName);
@@ -78,4 +68,14 @@ class IndexedDBManager {
         const objectStore = transaction.objectStore(storeName);
         objectStore.delete(id);
     }
+}
+
+/**
+ * 資料表名稱
+ */
+export const DbStoreName = {
+    /** Civitai Resources 的暫存資料 */
+    civitaiResources: "civitaiResources",
+    /** 詳細資訊面板內的項目折疊狀態 */
+    infoPanelCollapse: "infoPanelCollapse",
 }

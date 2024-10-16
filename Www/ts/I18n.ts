@@ -1,4 +1,4 @@
-class I18n {
+export class I18n {
 
     public getData; // 取得 翻譯json
     public setData; // 設定 翻譯json

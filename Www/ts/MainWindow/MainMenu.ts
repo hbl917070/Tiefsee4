@@ -1,4 +1,8 @@
-class MainMenu {
+import { Lib } from "../Lib";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class MainMenu {
 
     public updateRightMenuImageZoomRatioTxt;
     public updateMenuLayoutCheckState;

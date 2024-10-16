@@ -1,205 +1,205 @@
 /* #region main-toolbar 工具列 */
 
 .main-toolbar {
-  height: 35px;
-  color: var(--color-white);
-  overflow-x: visible;
-  overflow-y: hidden;
-  margin-bottom: 3px;
+    height: 35px;
+    color: var(--color-white);
+    overflow-x: visible;
+    overflow-y: hidden;
+    margin-bottom: 3px;
 }
 .toolbar-content {
-  display: flex;
-  position: absolute;
-  left: 0;
-  min-width: 100%;
+    display: flex;
+    position: absolute;
+    left: 0;
+    min-width: 100%;
 }
 
 // ----------
 
 // 滾動條樣式
 .main-toolbar__scrollbar {
-  position: relative;
+    position: relative;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
-  // 水平滾動條
-  .scroll-x {
-    height: 3px;
-    position: absolute;
-    bottom: 0px;
-    z-index: 1;
-  }
+    // 水平滾動條
+    .scroll-x {
+        height: 3px;
+        position: absolute;
+        bottom: 0px;
+        z-index: 1;
+    }
 
-  // 背景
-  .scroll-x .scroll-bg {
-    height: 3px;
-    width: 100%;
-    background-color: var(--color-black60);
-    position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    //top: 0;
-    bottom: 0;
-    opacity: 0;
-  }
+    // 背景
+    .scroll-x .scroll-bg {
+        height: 3px;
+        width: 100%;
+        background-color: var(--color-black60);
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        //top: 0;
+        bottom: 0;
+        opacity: 0;
+    }
 
-  // 拖曳區域
-  .scroll-x .scroll-box {
-    height: 3px;
-    background-color: var(--color-white40);
-    position: absolute;
-    bottom: 0px;
-    // border: 3px solid rgba(0, 0, 0, 0);
-    // background-clip: content-box;
-  }
+    // 拖曳區域
+    .scroll-x .scroll-box {
+        height: 3px;
+        background-color: var(--color-white40);
+        position: absolute;
+        bottom: 0px;
+        // border: 3px solid rgba(0, 0, 0, 0);
+        // background-clip: content-box;
+    }
 
-  .scroll-x:hover {
-    cursor: pointer;
-  }
+    .scroll-x:hover {
+        cursor: pointer;
+    }
 
-  // 移入與拖曳時-背景
-  .scroll-x:hover .scroll-bg,
-  .scroll-x[action="true"] .scroll-bg {
-    opacity: 1;
-  }
+    // 移入與拖曳時-背景
+    .scroll-x:hover .scroll-bg,
+    .scroll-x[action="true"] .scroll-bg {
+        opacity: 1;
+    }
 
-  // 移入與拖曳時-拖曳區域
-  .scroll-x:hover .scroll-box,
-  .scroll-x[action="true"] .scroll-box {
-  }
+    // 移入與拖曳時-拖曳區域
+    .scroll-x:hover .scroll-box,
+    .scroll-x[action="true"] .scroll-box {
+    }
 }
 
 // ----------
 
 .main-toolbar-group {
-  display: none;
-  margin-left: 3px;
-  margin-bottom: 3px;
-  flex: 1;
+    display: none;
+    margin-left: 3px;
+    margin-bottom: 3px;
+    flex: 1;
 }
 .main-toolbar-group[active="true"] {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 // ----------
 
 // 垂直線
 .main-toolbar-hr {
-  width: 1px;
-  min-width: 1px;
-  height: 29px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-white20);
-  margin: 0 3px;
+    width: 1px;
+    min-width: 1px;
+    height: 29px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-white20);
+    margin: 0 3px;
 }
 
 // ----------
 
 // 純文字資訊
 .main-toolbar-txt {
-  height: 35px;
-  font-size: 15px;
-  line-height: 17px;
-  display: flex;
-  align-items: center;
-  user-select: none;
-  white-space: nowrap;
-  padding-right: 5px;
-  margin-left: 12px;
-  position: relative;
+    height: 35px;
+    font-size: 15px;
+    line-height: 17px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    white-space: nowrap;
+    padding-right: 5px;
+    margin-left: 12px;
+    position: relative;
 }
 // 純文字資訊-左邊的垂直線
 .main-toolbar-txt::after {
-  position: absolute;
-  content: "";
-  background-color: var(--color-white20);
-  height: 29px;
-  width: 1px;
-  top: 0;
-  bottom: 0;
-  left: -9px;
-  margin: auto;
+    position: absolute;
+    content: "";
+    background-color: var(--color-white20);
+    height: 29px;
+    width: 1px;
+    top: 0;
+    bottom: 0;
+    left: -9px;
+    margin: auto;
 }
 
 // ----------
 
 // 按鈕
 .main-toolbar-btn {
-  min-width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  font-size: 15px;
-  user-select: none;
-  flex-shrink: 0; // 避免壓縮
-  &:hover {
-    cursor: pointer;
-    background-color: var(--color-white10);
-  }
-  &:active {
-    background-color: var(--color-white30);
-  }
-  svg,
-  img {
-    width: 25px;
-    height: 25px;
-    pointer-events: none;
-  }
+    min-width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 15px;
+    user-select: none;
+    flex-shrink: 0; // 避免壓縮
+    &:hover {
+        cursor: pointer;
+        background-color: var(--color-white10);
+    }
+    &:active {
+        background-color: var(--color-white30);
+    }
+    svg,
+    img {
+        width: 25px;
+        height: 25px;
+        pointer-events: none;
+    }
 }
 
 // 開啟選單時
 .main-toolbar-btn.menuActive {
-  background-color: var(--color-white20) !important;
+    background-color: var(--color-white20) !important;
 }
 
 // ----------
 
 // 置中
 #main-toolbar[toolbarAlign="center"] .main-toolbar-group::before {
-  content: "";
-  margin-left: auto;
-  display: block;
-  order: -1;
+    content: "";
+    margin-left: auto;
+    display: block;
+    order: -1;
 }
 .main-toolbar-group::after {
-  content: "";
-  margin-left: auto;
-  display: block;
-  order: 2000;
+    content: "";
+    margin-left: auto;
+    display: block;
+    order: 2000;
 }
 
 // ----------
 
 // 返回按鈕
 .main-toolbar-back {
-  // min-width: 50px;
-  position: relative;
-  margin-right: 4px;
-  display: none;
+    // min-width: 50px;
+    position: relative;
+    margin-right: 4px;
+    display: none;
 }
 .main-toolbar-back[active="true"] {
-  display: flex;
+    display: flex;
 }
 
 // 返回按鈕-右邊的垂直線
 .main-toolbar-back::after {
-  position: absolute;
-  content: "";
-  background-color: var(--color-white20);
-  height: 29px;
-  width: 1px;
-  top: 0;
-  bottom: 0;
-  right: -4px;
-  margin: auto;
+    position: absolute;
+    content: "";
+    background-color: var(--color-white20);
+    height: 29px;
+    width: 1px;
+    top: 0;
+    bottom: 0;
+    right: -4px;
+    margin: auto;
 }
 
 /* #endregion */

@@ -1,4 +1,11 @@
-class FileShow {
+import { MainWindow } from "./MainWindow";
+import { Iframes } from "./Iframes";
+import { Tiefseeview, TiefseeviewAlignType, TiefseeviewZoomType } from "../Tiefseeview";
+import { GroupType } from "../Config";
+import { WebAPI } from "../WebAPI";
+import { Lib } from "../Lib";
+
+export class FileShow {
 
     public openImage;
     public openVideo;

@@ -1,4 +1,6 @@
-class Toast {
+import { Lib } from "./Lib";
+
+export class Toast {
 
     static domToastList: undefined | HTMLElement = undefined; // 放所有 toastItem 的容器
 

@@ -1,370 +1,354 @@
 .bulkView {
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 //滾動條的容器
 .bulkView-scroll-content {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 //滾動條樣式
 .bulkView {
-  //position: relative;
+    //position: relative;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
-  /*垂直滾動條*/
-  .scroll-y {
-    width: 20px;
-    position: absolute;
-    right: 0px;
-    z-index: 1;
-  }
+    /*垂直滾動條*/
+    .scroll-y {
+        width: 20px;
+        position: absolute;
+        right: 0px;
+        z-index: 1;
+    }
 
-  /*背景*/
-  .scroll-y .scroll-bg {
-    height: 100%;
-    width: 10px;
-    background-color: var(--color-black60);
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    opacity: 0;
-  }
+    /*背景*/
+    .scroll-y .scroll-bg {
+        height: 100%;
+        width: 10px;
+        background-color: var(--color-black60);
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        opacity: 0;
+    }
 
-  /*拖曳區域*/
-  .scroll-y .scroll-box {
-    width: 10px;
-    background-color: var(--color-white40);
-    position: absolute;
-    right: 0;
-    border: 3px solid rgba(0, 0, 0, 0);
-    background-clip: content-box;
-  }
+    /*拖曳區域*/
+    .scroll-y .scroll-box {
+        width: 10px;
+        background-color: var(--color-white40);
+        position: absolute;
+        right: 0;
+        border: 3px solid rgba(0, 0, 0, 0);
+        background-clip: content-box;
+    }
 
-  .scroll-y:hover {
-    cursor: pointer;
-  }
+    .scroll-y:hover {
+        cursor: pointer;
+    }
 
-  /*移入與拖曳時-背景*/
-  .scroll-y:hover .scroll-bg,
-  .scroll-y[action="true"] .scroll-bg {
-    opacity: 1;
-  }
+    /*移入與拖曳時-背景*/
+    .scroll-y:hover .scroll-bg,
+    .scroll-y[action="true"] .scroll-bg {
+        opacity: 1;
+    }
 
-  /*移入與拖曳時-拖曳區域*/
-  .scroll-y:hover .scroll-box,
-  .scroll-y[action="true"] .scroll-box {
-  }
+    /*移入與拖曳時-拖曳區域*/
+    .scroll-y:hover .scroll-box,
+    .scroll-y[action="true"] .scroll-box {
+    }
 }
 
 .bulkView-content {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-  margin-left: 5px;
-  outline: none;
-  /* padding: 10px; */
-  /* padding-top:10px; */
-  /* padding-left:10px; */
-  position: relative;
-  flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    outline: none;
+    /* padding: 10px; */
+    /* padding-top:10px; */
+    /* padding-left:10px; */
+    position: relative;
+    flex-shrink: 0;
 }
 
 /* #region 附加選項 */
 .bulkView-content[show*="fileName"] .bulkView-fileName {
-  display: block;
+    display: block;
 }
 .bulkView-content[show*="number"] .bulkView-number {
-  display: block;
+    display: block;
 }
 .bulkView-content[show*="imageSize"] .bulkView-imageSize {
-  display: block;
+    display: block;
 }
 .bulkView-content[show*="fileSize"] .bulkView-fileSize {
-  display: block;
+    display: block;
 }
 .bulkView-content[show*="lastWriteDate"] .bulkView-lastWriteDate {
-  display: block;
+    display: block;
 }
 .bulkView-content[show*="lastWriteTime"] .bulkView-lastWriteTime {
-  display: block;
+    display: block;
 }
 //排列方向
 .bulkView-content[columns="2"][align="right"] {
-  flex-direction: row-reverse;
+    flex-direction: row-reverse;
 }
 
 //瀑布流-垂直
-.bulkView-content[waterfall="vertical"]:not([columns="1"], [columns="2"])
-  .bulkView-item {
-  position: absolute;
-  left: -9999px;
+.bulkView-content[waterfall="vertical"]:not([columns="1"], [columns="2"]) .bulkView-item {
+    position: absolute;
+    left: -9999px;
 }
 // 瀑布流-水平，tag不允許換行
 .bulkView-content[waterfall="horizontal"] .bulkView-header2 {
-  flex-wrap: nowrap;
+    flex-wrap: nowrap;
 }
 
 //鎖定寬度
 @for $i from 1 through 10 {
-  .bulkView-content[fixedWidth="#{$i*10}"] .bulkView-img {
-    width: $i * 10%;
-  }
+    .bulkView-content[fixedWidth="#{$i*10}"] .bulkView-img {
+        width: $i * 10%;
+    }
 }
 
 //無間距模式
-.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"])
-  .bulkView-item
-  .bulkView-header,
-.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"])
-  .bulkView-item
-  .bulkView-header2 {
-  display: none;
+.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"]) .bulkView-item .bulkView-header,
+.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"]) .bulkView-item .bulkView-header2 {
+    display: none;
 }
-.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"])
-  .bulkView-item {
-  padding-top: 0px;
-  padding-bottom: 0px;
-  border: none !important;
-  border-radius: 0;
+.bulkView-content:not([gaplessMode="off"]):is([columns="1"], [columns="2"]) .bulkView-item {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border: none !important;
+    border-radius: 0;
 }
 //下面的距離
-.bulkView-content[gaplessMode="0"]:is([columns="1"], [columns="2"])
-  .bulkView-item {
-  margin-bottom: -1px !important;
+.bulkView-content[gaplessMode="0"]:is([columns="1"], [columns="2"]) .bulkView-item {
+    margin-bottom: -1px !important;
 }
 @for $i from 1 through 10 {
-  .bulkView-content[gaplessMode="#{$i*10}"]:is([columns="1"], [columns="2"])
-    .bulkView-item {
-    margin-bottom: $i * 10px !important;
-  }
+    .bulkView-content[gaplessMode="#{$i*10}"]:is([columns="1"], [columns="2"]) .bulkView-item {
+        margin-bottom: $i * 10px !important;
+    }
 }
 //雙欄時，讓左右的圖片合併
-.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"])
-  .bulkView-item:nth-child(odd)
-  .bulkView-center {
-  justify-content: end;
+.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"]) .bulkView-item:nth-child(odd) .bulkView-center {
+    justify-content: end;
 }
-.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"])
-  .bulkView-item:nth-child(even)
-  .bulkView-center {
-  justify-content: start;
+.bulkView-content[columns="2"][align="left"]:not([gaplessMode="off"]) .bulkView-item:nth-child(even) .bulkView-center {
+    justify-content: start;
 }
-.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"])
-  .bulkView-item:nth-child(odd)
-  .bulkView-center {
-  justify-content: start;
+.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"]) .bulkView-item:nth-child(odd) .bulkView-center {
+    justify-content: start;
 }
-.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"])
-  .bulkView-item:nth-child(even)
-  .bulkView-center {
-  justify-content: end;
+.bulkView-content[columns="2"][align="right"]:not([gaplessMode="off"]) .bulkView-item:nth-child(even) .bulkView-center {
+    justify-content: end;
 }
 /* #endregion */
 
 .bulkView-item {
-  border: 1px solid rgba(0, 0, 0, 0);
-  min-width: 10px;
-  min-height: 10px;
-  box-sizing: border-box;
-  border-radius: 8px;
-  color: var(--color-white);
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow: hidden;
-  //border: 1px solid var(--color-white40);
-  user-select: none;
+    border: 1px solid rgba(0, 0, 0, 0);
+    min-width: 10px;
+    min-height: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    color: var(--color-white);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow: hidden;
+    //border: 1px solid var(--color-white40);
+    user-select: none;
 }
 .bulkView-item:hover {
-  border: 1px solid var(--color-white10);
+    border: 1px solid var(--color-white10);
 }
 
 .bulkView-header {
-  display: flex;
-  margin-left: 5px;
-  margin-right: 5px;
+    display: flex;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .bulkView-number {
-  margin-right: 5px;
-  margin-bottom: 5px;
-  color: var(--color-blue);
-  font-weight: var(--fontWeightBold);
-  display: none;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    color: var(--color-blue);
+    font-weight: var(--fontWeightBold);
+    display: none;
 }
 
 .bulkView-fileName {
-  display: none;
-  flex: 1;
-  margin-bottom: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: left;
+    display: none;
+    flex: 1;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
 }
 
 .bulkView-header2 {
-  margin: 0 5px;
-  margin-top: 0px;
-  display: flex;
-  flex-wrap: wrap;
+    margin: 0 5px;
+    margin-top: 0px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .bulkView-tag {
-  display: none;
-  margin-right: 5px;
-  border: 1px solid var(--color-white20);
-  padding: 3px 5px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    display: none;
+    margin-right: 5px;
+    border: 1px solid var(--color-white20);
+    padding: 3px 5px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .bulkView-center {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
 }
 
 .bulkView-loading {
-  background-image: url("./../../img/loading.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: auto 100px;
-  min-height: 100px;
+    background-image: url("./../../img/loading.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: auto 100px;
+    min-height: 100px;
 }
 
 .bulkView-img {
-  opacity: 0;
-  pointer-events: none;
-  max-width: calc(100% - 10px);
-  // margin-bottom: 5px;
-  //max-height: calc(100% - 5px);
-  /* margin-top: 5px; */
+    opacity: 0;
+    pointer-events: none;
+    max-width: calc(100% - 10px);
+    // margin-bottom: 5px;
+    //max-height: calc(100% - 5px);
+    /* margin-top: 5px; */
 }
 //避免圖片載入前顯示圖片邊框
 .bulkView-img[src] {
-  opacity: 1;
+    opacity: 1;
 }
 
 //按鈕 - 重新載入
 .bulkView-reload {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  background-color: var(--color-black40);
-  box-shadow: 0px 0px 5px var(--color-blue40);
-  backdrop-filter: saturate(180%) blur(20px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    background-color: var(--color-black40);
+    box-shadow: 0px 0px 5px var(--color-blue40);
+    backdrop-filter: saturate(180%) blur(20px);
 }
-.bulkView-reload svg { 
-  width: 30px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
+.bulkView-reload svg {
+    width: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
 }
-.bulkView-center:hover .bulkView-reload{
-  border: 1px solid var(--color-blue);
+.bulkView-center:hover .bulkView-reload {
+    border: 1px solid var(--color-blue);
 }
 
 //分頁器
 .bulkView-pagination {
-  display: none;
-  flex-direction: column;
-  text-align: center;
-  margin-bottom: 10px;
-
-  .bulkView-pagination-box {
-    height: 60px;
-    // border: 1px solid var(--color-white40);
-
-    display: inline-flex;
-    align-items: center;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  //上下一頁按鈕
-  .bulkView-pagination-prev,
-  .bulkView-pagination-next {
-    height: 100%;
-    width: 50px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-
-    color: var(--color-white);
-
-    flex: 1;
-    //opacity: 0;
-  }
-  .bulkView-pagination-prev {
-    justify-content: flex-end;
-  }
-  .bulkView-pagination-next {
-    justify-content: flex-start;
-  }
-  .bulkView-pagination-prev svg,
-  .bulkView-pagination-next svg {
-    width: 25px;
-    margin: 8px;
-  }
-
-  .bulkView-pagination-prev:hover,
-  .bulkView-pagination-next:hover,
-  .bulkView-pagination-select:hover {
-    //justify-content: center;
-    cursor: pointer;
-    opacity: 1;
-    background-color: var(--color-white10);
-    // border: 1px solid var(--color-white10);
-  }
-
-  //無法點擊的狀態
-  .bulkView-pagination-prev[freeze="true"],
-  .bulkView-pagination-next[freeze="true"] {
-    pointer-events: none;
-    opacity: 0.4;
-  }
-
-  //下拉選單
-  .bulkView-pagination-select {
-    color: var(--color-white);
-    height: 35px;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0);
-    border: none;
-    padding-left: 10px;
-    outline: none;
-    border-left: 1px solid var(--color-white40);
-    border: 1px solid var(--color-white40);
-    padding: 0 5px;
+    display: none;
+    flex-direction: column;
     text-align: center;
-  }
+    margin-bottom: 10px;
+
+    .bulkView-pagination-box {
+        height: 60px;
+        // border: 1px solid var(--color-white40);
+
+        display: inline-flex;
+        align-items: center;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    //上下一頁按鈕
+    .bulkView-pagination-prev,
+    .bulkView-pagination-next {
+        height: 100%;
+        width: 50px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+
+        color: var(--color-white);
+
+        flex: 1;
+        //opacity: 0;
+    }
+    .bulkView-pagination-prev {
+        justify-content: flex-end;
+    }
+    .bulkView-pagination-next {
+        justify-content: flex-start;
+    }
+    .bulkView-pagination-prev svg,
+    .bulkView-pagination-next svg {
+        width: 25px;
+        margin: 8px;
+    }
+
+    .bulkView-pagination-prev:hover,
+    .bulkView-pagination-next:hover,
+    .bulkView-pagination-select:hover {
+        //justify-content: center;
+        cursor: pointer;
+        opacity: 1;
+        background-color: var(--color-white10);
+        // border: 1px solid var(--color-white10);
+    }
+
+    //無法點擊的狀態
+    .bulkView-pagination-prev[freeze="true"],
+    .bulkView-pagination-next[freeze="true"] {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+
+    //下拉選單
+    .bulkView-pagination-select {
+        color: var(--color-white);
+        height: 35px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0);
+        border: none;
+        padding-left: 10px;
+        outline: none;
+        border-left: 1px solid var(--color-white40);
+        border: 1px solid var(--color-white40);
+        padding: 0 5px;
+        text-align: center;
+    }
 }
 .bulkView-pagination[active="true"] {
-  display: flex;
+    display: flex;
 }

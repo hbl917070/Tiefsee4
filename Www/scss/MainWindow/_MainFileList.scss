@@ -1,112 +1,112 @@
 /* #region 檔案預覽視窗 */
 
 :root {
-  --fileList-width: 120px;
+    --fileList-width: 120px;
 }
 .main-fileList {
-  display: none;
+    display: none;
 
-  overflow-x: hidden;
-  height: 100%;
-  width: var(--fileList-width);
+    overflow-x: hidden;
+    height: 100%;
+    width: var(--fileList-width);
 
-  .main-fileListBody {
-    overflow: hidden;
-    padding-top: 3px;
-  }
-
-  .fileList-item {
-    padding-left: 6px;
-    margin-right: 6px;
-    user-select: none;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .fileList-item:hover::before {
-    position: absolute;
-    top: -3px;
-    left: 3px;
-    right: -3px;
-    bottom: -3px;
-    border: 2px solid var(--color-white40);
-    pointer-events: none;
-    z-index: 1;
-    content: "";
-    border-radius: 7px;
-  }
-
-  //選中
-  .fileList-item[active="true"]::before {
-    position: absolute;
-    top: -3px;
-    left: 3px;
-    right: -3px;
-    bottom: -3px;
-    border: 2px solid var(--color-blue);
-    pointer-events: none;
-    z-index: 1;
-    content: "";
-    border-radius: 7px;
-  }
-
-  .fileList-title {
-    display: flex;
-    flex-direction: row;
-    font-size: 14px;
-  }
-
-  //編號
-  .fileList-no {
-    margin-bottom: 2px;
-    line-height: 14px;
-    height: 14px;
-    overflow: hidden;
-    font-weight: var(--fontWeightBold);
-    color: var(--color-blue);
-    margin-right: 3px;
-  }
-
-  //檔名
-  .fileList-name {
-    margin-bottom: 2px;
-    line-height: 14px;
-    height: 14px;
-    overflow: hidden;
-    text-align: center;
-    flex: 1;
-    white-space: nowrap;
-    color: var(--color-white);
-  }
-
-  //圖片
-  .fileList-img {
-    width: calc(var(--fileList-width) - 12px);
-    height: calc(var(--fileList-width) - 12px);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    overflow: hidden;
-    border-radius: 4px;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      user-select: none;
+    .main-fileListBody {
+        overflow: hidden;
+        padding-top: 3px;
     }
-  }
+
+    .fileList-item {
+        padding-left: 6px;
+        margin-right: 6px;
+        user-select: none;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .fileList-item:hover::before {
+        position: absolute;
+        top: -3px;
+        left: 3px;
+        right: -3px;
+        bottom: -3px;
+        border: 2px solid var(--color-white40);
+        pointer-events: none;
+        z-index: 1;
+        content: "";
+        border-radius: 7px;
+    }
+
+    //選中
+    .fileList-item[active="true"]::before {
+        position: absolute;
+        top: -3px;
+        left: 3px;
+        right: -3px;
+        bottom: -3px;
+        border: 2px solid var(--color-blue);
+        pointer-events: none;
+        z-index: 1;
+        content: "";
+        border-radius: 7px;
+    }
+
+    .fileList-title {
+        display: flex;
+        flex-direction: row;
+        font-size: 14px;
+    }
+
+    //編號
+    .fileList-no {
+        margin-bottom: 2px;
+        line-height: 14px;
+        height: 14px;
+        overflow: hidden;
+        font-weight: var(--fontWeightBold);
+        color: var(--color-blue);
+        margin-right: 3px;
+    }
+
+    //檔名
+    .fileList-name {
+        margin-bottom: 2px;
+        line-height: 14px;
+        height: 14px;
+        overflow: hidden;
+        text-align: center;
+        flex: 1;
+        white-space: nowrap;
+        color: var(--color-white);
+    }
+
+    //圖片
+    .fileList-img {
+        width: calc(var(--fileList-width) - 12px);
+        height: calc(var(--fileList-width) - 12px);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        overflow: hidden;
+        border-radius: 4px;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+        }
+    }
 }
 
 //啟用
 .main-fileList[active="true"] {
-  display: block;
+    display: block;
 }
 //暫時隱藏
 .main-fileList[hide="true"] {
-  display: none !important;
+    display: none !important;
 }
 
 /* #endregion */
@@ -116,57 +116,57 @@
 // 滾動條樣式  (小型、用於檔案預覽視窗
 
 .base-scrollbar-mini {
-  position: relative;
+    position: relative;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
-  /*垂直滾動條*/
-  .scroll-y {
-    width: 10px;
-    position: absolute;
-    right: 0px;
-    z-index: 1;
-  }
+    /*垂直滾動條*/
+    .scroll-y {
+        width: 10px;
+        position: absolute;
+        right: 0px;
+        z-index: 1;
+    }
 
-  /*背景*/
-  .scroll-y .scroll-bg {
-    height: 100%;
-    width: 10px;
-    background-color: var(--color-black60);
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    opacity: 0;
-  }
+    /*背景*/
+    .scroll-y .scroll-bg {
+        height: 100%;
+        width: 10px;
+        background-color: var(--color-black60);
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        opacity: 0;
+    }
 
-  /*拖曳區域*/
-  .scroll-y .scroll-box {
-    width: 3px;
-    background-color: var(--color-white40);
-    position: absolute;
-    right: 0;
-    border-top: 3px solid rgba(0, 0, 0, 0);
-    border-bottom: 3px solid rgba(0, 0, 0, 0);
-    background-clip: content-box;
-  }
+    /*拖曳區域*/
+    .scroll-y .scroll-box {
+        width: 3px;
+        background-color: var(--color-white40);
+        position: absolute;
+        right: 0;
+        border-top: 3px solid rgba(0, 0, 0, 0);
+        border-bottom: 3px solid rgba(0, 0, 0, 0);
+        background-clip: content-box;
+    }
 
-  .scroll-y:hover {
-    cursor: pointer;
-  }
+    .scroll-y:hover {
+        cursor: pointer;
+    }
 
-  /*移入與拖曳時-背景*/
-  .scroll-y:hover .scroll-bg,
-  .scroll-y[action="true"] .scroll-bg {
-    opacity: 1;
-    backdrop-filter: saturate(180%) blur(20px);
-  }
+    /*移入與拖曳時-背景*/
+    .scroll-y:hover .scroll-bg,
+    .scroll-y[action="true"] .scroll-bg {
+        opacity: 1;
+        backdrop-filter: saturate(180%) blur(20px);
+    }
 
-  /*移入與拖曳時-拖曳區域*/
-  .scroll-y:hover .scroll-box,
-  .scroll-y[action="true"] .scroll-box {
-    width: 7px !important;
-  }
+    /*移入與拖曳時-拖曳區域*/
+    .scroll-y:hover .scroll-box,
+    .scroll-y[action="true"] .scroll-box {
+        width: 7px !important;
+    }
 }

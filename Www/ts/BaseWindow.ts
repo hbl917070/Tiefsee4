@@ -1,20 +1,41 @@
-declare const chrome: any;
-const WV2 = chrome.webview.hostObjects;
-const WV_Window: WV_Window = WV2.WV_Window;
-const WV_Directory: WV_Directory = WV2.WV_Directory;
-const WV_File: WV_File = WV2.WV_File;
-const WV_Path: WV_Path = WV2.WV_Path;
-const WV_System: WV_System = WV2.WV_System;
-const WV_RunApp: WV_RunApp = WV2.WV_RunApp;
-const WV_Image: WV_Image = WV2.WV_Image;
-const PORT = location.hash.replace("#", "");
-const APIURL = "http://127.0.0.1:" + PORT; // api 網址
-var _dropPath: string[] | undefined = undefined; // 暫存。取得拖曳進視窗的檔案路徑
+import { Lib } from "./Lib";
+import { Throttle } from "./Throttle";
 
-interface Window {
+declare global {
+
+    var chrome: any;
+    var WV_Window: WV_Window;
+    var WV_Directory: WV_Directory;
+    var WV_File: WV_File;
+    var WV_Path: WV_Path;
+    var WV_System: WV_System;
+    var WV_RunApp: WV_RunApp;
+    var WV_Image: WV_Image;
+
+    var PORT: string;
+    var APIURL: string;
+
+    var _dropPath: string[] | undefined;
+
     /** 網頁的縮放比例，預設值 1.0 */
-    zoomFactor: number;
+    var zoomFactor: number;
+
+    var baseWindow: BaseWindow;
 }
+
+const WV2 = chrome.webview.hostObjects;
+window.WV_Window = WV2.WV_Window;
+window.WV_Directory = WV2.WV_Directory;
+window.WV_File = WV2.WV_File;
+window.WV_Path = WV2.WV_Path;
+window.WV_System = WV2.WV_System;
+window.WV_RunApp = WV2.WV_RunApp;
+window.WV_Image = WV2.WV_Image;
+window.PORT = location.hash.replace("#", "");
+window.APIURL = "http://127.0.0.1:" + PORT; // api 網址
+
+window._dropPath = undefined;
+
 
 class BaseWindow {
 
@@ -56,19 +77,6 @@ class BaseWindow {
         this.btnMaximized = _btnMaximized;
         this.btnClose = _btnClose;
         this.domTitlebarText = _domTitlebarText;
-
-        /*// 判斷作業系統類型
-        //@ts-ignore
-        navigator.userAgentData.getHighEntropyValues(["platformVersion"]).then(ua => {
-            //@ts-ignore
-            if (navigator.userAgentData.platform === "Windows") {
-                const majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
-                if (majorPlatformVersion >= 13) {
-                    console.log("Windows 11 or later");
-                    dom_window.setAttribute("os","win11");
-                }
-            } 
-        });*/
 
         (async () => {
             // 判斷目前的狀態是視窗化還是最大化
@@ -124,6 +132,7 @@ class BaseWindow {
         windowBorder(<HTMLDivElement>document.querySelector(".window-RB"), "RB"); // 右下
         // windowBorder(<HTMLDivElement>document.querySelector(".window-titlebar .titlebar-text"), "move");
 
+
         function windowBorder(dom: HTMLDivElement, type: ("CT" | "RC" | "CB" | "LC" | "LT" | "RT" | "LB" | "RB" | "move")) {
             dom.addEventListener("mousedown", async (e) => {
                 if (e.button === 0) { // 滑鼠左鍵
@@ -141,6 +150,10 @@ class BaseWindow {
                 baseWindow.touchDrop.start(dom, e, type);
             });
         }
+    }
+
+    public static init() {
+        window.baseWindow = new BaseWindow();
     }
 
     /**
@@ -218,11 +231,11 @@ class BaseWindow {
 
             if (type === "none") {
                 await WV_Window.WindowRoundedCorners(false);
-                this.domWindow.classList.remove("windowRoundedCorners");
+                this.domWindow?.classList.remove("windowRoundedCorners");
             }
             else {
                 await WV_Window.WindowRoundedCorners(true);
-                this.domWindow.classList.add("windowRoundedCorners");
+                this.domWindow?.classList.add("windowRoundedCorners");
             }
 
             await WV_Window.WindowStyle(type);
@@ -237,11 +250,11 @@ class BaseWindow {
     /** 視窗化或最大化時，標題列右邊的按鈕 */
     private updateWindowState() {
         if (this.windowState === "Maximized") {
-            this.domWindow.classList.add("maximized");
+            this.domWindow?.classList.add("maximized");
             this.btnNormal.style.display = "flex";
             this.btnMaximized.style.display = "none";
         } else {
-            this.domWindow.classList.remove("maximized");
+            this.domWindow?.classList.remove("maximized");
             this.btnNormal.style.display = "none";
             this.btnMaximized.style.display = "flex";
         }
@@ -443,3 +456,6 @@ class TouchDrop {
     }
 
 }
+
+
+export { BaseWindow };

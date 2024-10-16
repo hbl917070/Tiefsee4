@@ -1,4 +1,9 @@
-class Iframes {
+import { GroupType } from "../Config";
+import { Lib } from "../Lib";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class Iframes {
 
     public monacoEditor;
     public pdfTronWebviewer;
@@ -380,7 +385,6 @@ class MonacoEditor {
     }
 }
 
-
 class CherryMarkdown {
     public visible;
     public loadFile;
@@ -646,7 +650,6 @@ class Pdfview {
         }
     }
 }
-
 
 class Welcomeview {
 

@@ -1,87 +1,87 @@
 /* #region exif 視窗 */
 :root {
-  --mainExif-width: 240px;
-  --mainExifMaxLine: 2; //顯示的最大行數
+    --mainExif-width: 240px;
+    --mainExifMaxLine: 2; //顯示的最大行數
 }
 
 .mainExif {
-  display: none;
-  //display: flex;
-  width: var(--mainExif-width);
-  height: 100%;
-  flex-direction: column;
+    display: none;
+    //display: flex;
+    width: var(--mainExif-width);
+    height: 100%;
+    flex-direction: column;
 
-  .mainExifTop {
-    width: 100%;
-    display: flex;
-    align-items: center;
-
-    // 上面的頁籤按鈕
-    .mainExifTabs {
-      flex: 1;
-      width: 100%;
-      height: 38px;
-      margin-bottom: -3px;
-      justify-content: center;
-      overflow-x: visible;
-      overflow-y: hidden;
-      position: relative;
-      display: none;
-
-      // 頁籤按鈕下面的水平線
-      &::before {
-        content: "";
-        position: absolute;
-        bottom: 3px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background-color: var(--color-blue20);
-      }
-
-      &[active="true"] {
-        display: flex;
-      }
-
-      .mainExifTabsContent {
-        display: flex;
-        flex-direction: row;
-      }
-      position: relative;
-
-      .mainExifTabsItem {
-        flex-shrink: 1;
-        //flex: 1;
-        padding: 0 10px;
-        white-space: nowrap;
+    .mainExifTop {
+        width: 100%;
         display: flex;
         align-items: center;
-        justify-content: center;
-        height: 35px;
-        border-radius: 5px;
-        position: relative;
-        color: var(--color-white);
-        user-select: none;
 
-        &[active="true"] {
-          //border: 1px solid var(--color-blue20);
-          //background-color: var(--color-white10);          color: var(--color-blue);
-          //border-bottom: 3px solid var(--color-blue);
-          color: var(--color-blue);
-          svg * {
-            stroke: var(--color-blue) !important;
-          }
-        }
-        &[active="true"]::after {
-          position: absolute;
-          content: "";
-          width: 100%;
-          height: 3px;
-          bottom: 0px;
+        // 上面的頁籤按鈕
+        .mainExifTabs {
+            flex: 1;
+            width: 100%;
+            height: 38px;
+            margin-bottom: -3px;
+            justify-content: center;
+            overflow-x: visible;
+            overflow-y: hidden;
+            position: relative;
+            display: none;
 
-          background-color: var(--color-blue);
-        }
-        /*&[mark="true"] {
+            // 頁籤按鈕下面的水平線
+            &::before {
+                content: "";
+                position: absolute;
+                bottom: 3px;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background-color: var(--color-blue20);
+            }
+
+            &[active="true"] {
+                display: flex;
+            }
+
+            .mainExifTabsContent {
+                display: flex;
+                flex-direction: row;
+            }
+            position: relative;
+
+            .mainExifTabsItem {
+                flex-shrink: 1;
+                //flex: 1;
+                padding: 0 10px;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 35px;
+                border-radius: 5px;
+                position: relative;
+                color: var(--color-white);
+                user-select: none;
+
+                &[active="true"] {
+                    //border: 1px solid var(--color-blue20);
+                    //background-color: var(--color-white10);          color: var(--color-blue);
+                    //border-bottom: 3px solid var(--color-blue);
+                    color: var(--color-blue);
+                    svg * {
+                        stroke: var(--color-blue) !important;
+                    }
+                }
+                &[active="true"]::after {
+                    position: absolute;
+                    content: "";
+                    width: 100%;
+                    height: 3px;
+                    bottom: 0px;
+
+                    background-color: var(--color-blue);
+                }
+                /*&[mark="true"] {
           color: var(--color-white);
         }
         &[mark="true"]::before {
@@ -94,143 +94,269 @@
           border-radius: 50%;
           //background-color: var(--color-blue);
         }*/
-        &:last-child {
-          border-right: none;
+                &:last-child {
+                    border-right: none;
+                }
+                &:hover {
+                    cursor: pointer;
+                    background-color: var(--color-white10);
+                }
+            }
         }
-        &:hover {
-          cursor: pointer;
-          background-color: var(--color-white10);
+    }
+
+    // 相關檔案
+    .mainExifRelated {
+        padding: 0 5px;
+        margin-top: 5px;
+        padding-bottom: 20px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
+
+        // 用於 contenteditable 的調整
+        outline: none;
+        caret-color: transparent;
+        img::selection {
+            background: transparent;
         }
-      }
     }
-  }
 
-  // 相關檔案
-  .mainExifRelated {
-    padding: 0 5px;
-    margin-top: 5px;
-    padding-bottom: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex: 1;
+    /* #region 拖曳條 */
 
-    // 用於 contenteditable 的調整
-    outline: none;
-    caret-color: transparent;
-    img::selection {
-      background: transparent;
-    }
-  }
+    // 標題
+    .mainExifRelatedTitle {
+        color: var(--color-blue);
 
-  /* #region 拖曳條 */
+        //height: 35px;
+        border: 1px solid var(--color-blue40);
+        border-radius: 8px;
+        padding: 5px;
 
-  // 標題
-  .mainExifRelatedTitle {
-    color: var(--color-blue);
+        margin-top: 5px;
+        margin-bottom: 5px;
 
-    //height: 35px;
-    border: 1px solid var(--color-blue40);
-    border-radius: 8px;
-    padding: 5px;
-
-    margin-top: 5px;
-    margin-bottom: 5px;
-
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    font-weight: var(--fontWeightBold);
-    cursor: pointer;
-    position: relative;
-    user-select: none;
-
-    word-wrap: break-word;
-    word-break: break-all;
-
-    span {
-      //position: absolute;
-      margin-left: 25px;
-      pointer-events: none;
-      flex: 1;
-    }
-  }
-  // 標題右邊的按鈕
-  .mainExifRelatedTitleBtnList {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    bottom: 0;
-    display: flex;
-  }
-  .mainExifRelatedTitleBtn {
-    width: 24px;
-    height: 24px;
-    background-color: var(--color-black80);
-    border: 1px solid var(--color-blue40);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: 0s opacity;
-    z-index: 1;
-
-    // 移入按鈕時，顯示按鈕
-    &:hover {
-      cursor: pointer;
-      transition: 0s opacity !important;
-      opacity: 1 !important;
-    }
-    & svg {
-      width: 18px;
-      height: 18px;
-      pointer-events: none;
-      user-select: none;
-    }
-  }
-  // 移入整個項目時，顯示半透明的按鈕
-  .mainExifRelatedBox:hover .mainExifRelatedTitleBtn {
-    opacity: 0.3;
-    transition: 0.3s opacity;
-  }
-
-  .mainExifRelatedBox .mainExifRelatedTitle::after {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-right: 1px solid var(--color-blue);
-    border-bottom: 1px solid var(--color-blue);
-    pointer-events: none;
-    transition: all 0.1s;
-  }
-  // 標題左邊的箭頭
-  .mainExifRelatedBox[open="false"] .mainExifRelatedTitle::after {
-    left: 11px;
-    top: 8px;
-    transform: rotate(45deg);
-  }
-  .mainExifRelatedBox[open="true"] .mainExifRelatedTitle::after {
-    left: 11px;
-    top: 14px;
-    transform: rotate(225deg);
-  }
-
-  // 折疊內容
-  .mainExifRelatedContent {
-    transition: all 0.1s;
-    overflow: hidden;
-
-    .mainExifRelatedText {
-      padding-bottom: 20px;
-      span {
-        color: var(--color-white);
-        margin: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        font-weight: var(--fontWeightBold);
+        cursor: pointer;
+        position: relative;
+        user-select: none;
 
         word-wrap: break-word;
         word-break: break-all;
 
-        // 行數太多時結尾以...呈現
+        span {
+            //position: absolute;
+            margin-left: 25px;
+            pointer-events: none;
+            flex: 1;
+        }
+    }
+    // 標題右邊的按鈕
+    .mainExifRelatedTitleBtnList {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        bottom: 0;
+        display: flex;
+    }
+    .mainExifRelatedTitleBtn {
+        width: 24px;
+        height: 24px;
+        background-color: var(--color-black80);
+        border: 1px solid var(--color-blue40);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: 0s opacity;
+        z-index: 1;
+
+        // 移入按鈕時，顯示按鈕
+        &:hover {
+            cursor: pointer;
+            transition: 0s opacity !important;
+            opacity: 1 !important;
+        }
+        & svg {
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+            user-select: none;
+        }
+    }
+    // 移入整個項目時，顯示半透明的按鈕
+    .mainExifRelatedBox:hover .mainExifRelatedTitleBtn {
+        opacity: 0.3;
+        transition: 0.3s opacity;
+    }
+
+    .mainExifRelatedBox .mainExifRelatedTitle::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-right: 1px solid var(--color-blue);
+        border-bottom: 1px solid var(--color-blue);
+        pointer-events: none;
+        transition: all 0.1s;
+    }
+    // 標題左邊的箭頭
+    .mainExifRelatedBox[open="false"] .mainExifRelatedTitle::after {
+        left: 11px;
+        top: 8px;
+        transform: rotate(45deg);
+    }
+    .mainExifRelatedBox[open="true"] .mainExifRelatedTitle::after {
+        left: 11px;
+        top: 14px;
+        transform: rotate(225deg);
+    }
+
+    // 折疊內容
+    .mainExifRelatedContent {
+        transition: all 0.1s;
+        overflow: hidden;
+
+        .mainExifRelatedText {
+            padding-bottom: 20px;
+            span {
+                color: var(--color-white);
+                margin: 0 5px;
+
+                word-wrap: break-word;
+                word-break: break-all;
+
+                // 行數太多時結尾以...呈現
+                overflow: hidden;
+                -webkit-line-clamp: var(--mainExifMaxLine);
+                -webkit-box-orient: vertical;
+                display: -webkit-box;
+
+                // 允許顯示空白跟換行
+                white-space: pre-wrap;
+            }
+        }
+
+        .mainExifRelatedImg {
+            padding-bottom: 20px;
+            text-align: center;
+            margin: 0 5px;
+            user-select: none;
+            img {
+                max-width: 100%;
+                max-height: 400px;
+                margin: auto;
+                pointer-events: none;
+            }
+        }
+    }
+
+    //按鈕 - 新增
+    .mainExifRelatedBtnAdd {
+        height: 35px;
+        border-radius: 5px;
+        margin: auto;
+        color: var(--color-blue);
+        border: 1px solid var(--color-blue40);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 100px;
+        margin-top: 5px;
+        user-select: none;
+        cursor: pointer;
+    }
+    /* #endregion */
+
+    //資訊
+    .mainExifList {
+        padding-left: 5px;
+        padding-bottom: 20px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
+
+        // 用於 contenteditable 的調整
+        outline: none;
+        caret-color: transparent;
+        img::selection {
+            background: transparent;
+        }
+    }
+    .mainExifItem {
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        padding: 3px 0;
+
+        // 水平線
+        &::before {
+            content: "";
+            height: 1px;
+            background-color: var(--color-blue20);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 5px;
+        }
+        // 第一個項目不顯示水平線
+        &:first-child::before {
+            display: none;
+        }
+
+        word-wrap: break-word;
+        //word-break: break-all;
+        font-size: 14px;
+        position: relative;
+    }
+
+    // 匯出
+    .btnExport {
+        width: 25px;
+        height: 25px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0px;
+        margin: auto;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-blue20);
+
+        &:hover {
+            cursor: pointer;
+            background-color: var(--color-white10);
+        }
+        &:active {
+            background-color: var(--color-white30);
+        }
+        svg {
+            width: 25px;
+            height: 25px;
+            pointer-events: none;
+        }
+    }
+
+    .mainExifName {
+        flex: 1;
+        min-width: 100px; //寬度不足100時，會自動換行
+        color: var(--color-blue);
+        margin-right: 3px;
+        font-weight: var(--fontWeightBold);
+    }
+    .mainExifValue {
+        flex: 1;
+        min-width: 100px;
+        color: var(--color-white);
+
+        // 限制顯示的最大行數
         overflow: hidden;
         -webkit-line-clamp: var(--mainExifMaxLine);
         -webkit-box-orient: vertical;
@@ -238,370 +364,244 @@
 
         // 允許顯示空白跟換行
         white-space: pre-wrap;
-      }
+    }
+    // 不顯示空白跟換行
+    .mainExifValue__nowrap {
+        white-space: normal;
     }
 
-    .mainExifRelatedImg {
-      padding-bottom: 20px;
-      text-align: center;
-      margin: 0 5px;
-      user-select: none;
-      img {
-        max-width: 100%;
-        max-height: 400px;
+    // Civitai resources 的圖片
+    .mainExifImgList {
+        display: none;
+
+        &[active="true"] {
+            display: flex;
+        }
+
+        .mainExifImgItem {
+            height: 150px;
+            max-width: 150px;
+            width: 100%;
+            margin-top: 3px;
+            margin-right: 4px;
+            border-radius: 6px;
+            background-color: var(--color-white10);
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                pointer-events: none;
+                user-select: none;
+            }
+            // 沒有圖片時，隱藏
+            img:not([src]) {
+                opacity: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &:hover {
+                cursor: pointer;
+                outline: 1px solid var(--color-blue);
+                outline-offset: -1px; // outline 內縮
+            }
+        }
+    }
+
+    // google map
+    .mainExifMap {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background-color: rgb(232, 234, 237);
+        border-radius: 7px;
+        overflow: hidden;
+    }
+    .mainExifMap::after {
+        z-index: 0;
+        content: "Map Loading";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 30px;
+        text-align: center;
+        font-size: 20px;
         margin: auto;
-        pointer-events: none;
-      }
+        display: block;
+        color: #333;
     }
-  }
-
-  //按鈕 - 新增
-  .mainExifRelatedBtnAdd {
-    height: 35px;
-    border-radius: 5px;
-    margin: auto;
-    color: var(--color-blue);
-    border: 1px solid var(--color-blue40);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 100px;
-    margin-top: 5px;
-    user-select: none;
-    cursor: pointer;
-  }
-  /* #endregion */
-
-  //資訊
-  .mainExifList {
-    padding-left: 5px;
-    padding-bottom: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex: 1;
-
-    // 用於 contenteditable 的調整
-    outline: none;
-    caret-color: transparent;
-    img::selection {
-      background: transparent;
-    }
-  }
-  .mainExifItem {
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-items: center;
-    padding: 3px 0;
-
-    // 水平線
-    &::before {
-      content: "";
-      height: 1px;
-      background-color: var(--color-blue20);
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 5px;
-    }
-    // 第一個項目不顯示水平線
-    &:first-child::before {
-      display: none;
-    }
-
-    word-wrap: break-word;
-    //word-break: break-all;
-    font-size: 14px;
-    position: relative;
-  }
-
-  // 匯出
-  .btnExport {
-    width: 25px;
-    height: 25px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0px;
-    margin: auto;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-blue20);
-
-    &:hover {
-      cursor: pointer;
-      background-color: var(--color-white10);
-    }
-    &:active {
-      background-color: var(--color-white30);
-    }
-    svg {
-      width: 25px;
-      height: 25px;
-      pointer-events: none;
-    }
-  }
-
-  .mainExifName {
-    flex: 1;
-    min-width: 100px; //寬度不足100時，會自動換行
-    color: var(--color-blue);
-    margin-right: 3px;
-    font-weight: var(--fontWeightBold);
-  }
-  .mainExifValue {
-    flex: 1;
-    min-width: 100px;
-    color: var(--color-white);
-
-    // 限制顯示的最大行數
-    overflow: hidden;
-    -webkit-line-clamp: var(--mainExifMaxLine);
-    -webkit-box-orient: vertical;
-    display: -webkit-box;
-
-    // 允許顯示空白跟換行
-    white-space: pre-wrap;
-  }
-  // 不顯示空白跟換行
-  .mainExifValue__nowrap {
-    white-space: normal;
-  }
-
-  // Civitai resources 的圖片
-  .mainExifImgList {
-    display: none;
-
-    &[active="true"] {
-      display: flex;
-    }
-
-    .mainExifImgItem {
-      height: 150px;
-      max-width: 150px;
-      width: 100%;
-      margin-top: 3px;
-      margin-right: 4px;
-      border-radius: 6px;
-      background-color: var(--color-white10);
-      overflow: hidden;
-
-      img {
+    .mainExifMapIframe {
+        position: absolute;
+        z-index: 1;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        pointer-events: none;
+        border: none;
+        overflow: hidden;
         user-select: none;
-      }
-      // 沒有圖片時，隱藏
-      img:not([src]) {
-        opacity: 0;
-      }
-
-      &:last-child {
-        margin-right: 0;
-      }
-
-      &:hover {
-        cursor: pointer;
-        outline: 1px solid var(--color-blue);
-        outline-offset: -1px; // outline 內縮
-      }
     }
-  }
 
-  // google map
-  .mainExifMap {
-    position: relative;
-    width: 100%;
-    height: 200px;
-    background-color: rgb(232, 234, 237);
-    border-radius: 7px;
-    overflow: hidden;
-  }
-  .mainExifMap::after {
-    z-index: 0;
-    content: "Map Loading";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 30px;
-    text-align: center;
-    font-size: 20px;
-    margin: auto;
-    display: block;
-    color: #333;
-  }
-  .mainExifMapIframe {
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    border: none;
-    overflow: hidden;
-    user-select: none;
-  }
+    // 右上角的按鈕群
+    .mainExifBtns {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        flex-direction: row;
 
-  // 右上角的按鈕群
-  .mainExifBtns {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    flex-direction: row;
-
-    .btn {
-      width: 24px;
-      height: 24px;
-      background-color: var(--color-black80);
-      border: 1px solid var(--color-blue40);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: 0s opacity;
+        .btn {
+            width: 24px;
+            height: 24px;
+            background-color: var(--color-black80);
+            border: 1px solid var(--color-blue40);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0s opacity;
+        }
+        // 移入按鈕時，顯示按鈕
+        .btn:hover {
+            cursor: pointer;
+            transition: 0s opacity !important;
+            opacity: 1 !important;
+        }
+        .btn svg {
+            pointer-events: none;
+            width: 18px;
+            height: 18px;
+        }
     }
-    // 移入按鈕時，顯示按鈕
-    .btn:hover {
-      cursor: pointer;
-      transition: 0s opacity !important;
-      opacity: 1 !important;
+    // 移入整個項目時，顯示半透明的按鈕
+    .mainExifItem:hover .mainExifBtns .btn {
+        opacity: 0.3;
+        transition: 0.3s opacity;
     }
-    .btn svg {
-      pointer-events: none;
-      width: 18px;
-      height: 18px;
-    }
-  }
-  // 移入整個項目時，顯示半透明的按鈕
-  .mainExifItem:hover .mainExifBtns .btn {
-    opacity: 0.3;
-    transition: 0.3s opacity;
-  }
 }
 
 //寬度足夠時，橫向排列
 .mainExif--horizontal .mainExifItem {
-  display: flex;
+    display: flex;
 }
 
 //啟用
 .mainExif[active="true"] {
-  display: flex;
+    display: flex;
 }
 //暫時隱藏
 .mainExif[hide="true"] {
-  display: none !important;
+    display: none !important;
 }
 
 /* #endregion */
 
 // 側邊的文字編輯器
 .textEditor {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 35px;
-  //backdrop-filter: saturate(180%) blur(5px);
-  transform: translateX(420px);
-  transition: all 0.1s;
-  opacity: 0;
-  pointer-events: none;
-
-  &[active="true"] {
-    transform: translateX(0px);
-    opacity: 1;
-    pointer-events: initial;
-  }
-
-  .textEditor-box {
     position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
     top: 35px;
-    bottom: 5px;
-    right: 5px;
-    max-width: 400px;
-    width: calc(100% - 40px);
-    margin-left: 60px;
+    //backdrop-filter: saturate(180%) blur(5px);
+    transform: translateX(420px);
+    transition: all 0.1s;
+    opacity: 0;
+    pointer-events: none;
 
-    background-color: var(--color-black80);
-    border-radius: 8px;
-    box-shadow: 0px 0px 3px var(--color-blue40);
-    border: 1px solid var(--color-blue40);
-    backdrop-filter: saturate(180%) blur(20px);
-
-    display: flex;
-    flex-direction: column;
-  }
-
-  //上面的按鈕群
-  .textEditor-toolbar {
-    display: flex;
-    flex-direction: row;
-    margin: 5px;
-
-    .textEditor-toolbarItem {
-      height: 35px;
-      width: 35px;
-      border-radius: 5px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-      &:hover {
-        background-color: var(--color-white10);
-        cursor: pointer;
-      }
-      svg {
-        width: 25px;
-      }
+    &[active="true"] {
+        transform: translateX(0px);
+        opacity: 1;
+        pointer-events: initial;
     }
 
-    //右上角的關閉
-    .textEditor-toolbarItem__close {
-      margin-left: auto;
+    .textEditor-box {
+        position: fixed;
+        top: 35px;
+        bottom: 5px;
+        right: 5px;
+        max-width: 400px;
+        width: calc(100% - 40px);
+        margin-left: 60px;
 
-      // X圖示
-      &::after {
-        content: "";
-        height: 15px;
-        width: 2px;
-        background-color: var(--color-blue);
-        position: absolute;
-        transform: rotate(45deg);
-      }
-      &::before {
-        content: "";
-        height: 2px;
-        width: 15px;
-        background-color: var(--color-blue);
-        position: absolute;
-        transform: rotate(45deg);
-      }
+        background-color: var(--color-black80);
+        border-radius: 8px;
+        box-shadow: 0px 0px 3px var(--color-blue40);
+        border: 1px solid var(--color-blue40);
+        backdrop-filter: saturate(180%) blur(20px);
+
+        display: flex;
+        flex-direction: column;
     }
-  }
 
-  .textEditor-content {
-    flex: 1;
-    display: flex;
-  }
-  .textEditor-textarea {
-    background-color: rgba(0, 0, 0, 0);
-    color: var(--color-white);
-    border: 1px solid var(--color-white40);
-    outline: none;
-    border-radius: 8px;
-    margin: 8px;
-    padding: 5px;
-    margin-top: 0;
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    resize: none; //右下角的拖曳方塊
-  }
+    //上面的按鈕群
+    .textEditor-toolbar {
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+
+        .textEditor-toolbarItem {
+            height: 35px;
+            width: 35px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            &:hover {
+                background-color: var(--color-white10);
+                cursor: pointer;
+            }
+            svg {
+                width: 25px;
+            }
+        }
+
+        //右上角的關閉
+        .textEditor-toolbarItem__close {
+            margin-left: auto;
+
+            // X圖示
+            &::after {
+                content: "";
+                height: 15px;
+                width: 2px;
+                background-color: var(--color-blue);
+                position: absolute;
+                transform: rotate(45deg);
+            }
+            &::before {
+                content: "";
+                height: 2px;
+                width: 15px;
+                background-color: var(--color-blue);
+                position: absolute;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    .textEditor-content {
+        flex: 1;
+        display: flex;
+    }
+    .textEditor-textarea {
+        background-color: rgba(0, 0, 0, 0);
+        color: var(--color-white);
+        border: 1px solid var(--color-white40);
+        outline: none;
+        border-radius: 8px;
+        margin: 8px;
+        padding: 5px;
+        margin-top: 0;
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        resize: none; //右下角的拖曳方塊
+    }
 }

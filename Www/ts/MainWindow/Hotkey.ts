@@ -1,7 +1,11 @@
+import { GroupType } from "../Config";
+import { Lib } from "../Lib";
+import { MainWindow } from "./MainWindow";
+
 /**
  * 快速鍵
  */
-class Hotkey {
+export class Hotkey {
 
     constructor(M: MainWindow) {
 

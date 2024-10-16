@@ -1,62 +1,61 @@
 // 開啟setting視窗前的loading畫面
 
 #loadingSetting[active="true"] {
-  display: block;
+    display: block;
 }
 
 #loadingSetting {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
- 
-  .loadingSetting-box {
-    width: 90px;
-    height: 90px;
-    border-radius: 10px;
-    backdrop-filter: saturate(180%) blur(20px);
-    position: absolute;
+    display: none;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto;
-    background-color: var(--color-black80);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-  .loadingSetting-box svg {
-    width: 50px;
-    height: 50px;
-    position: relative;
-    // background: #FFF;
-    border-radius: 50%;
-    transform: rotate(45deg);
-    animation: loadingSetting-rotate 2s linear infinite;
-  }
+    .loadingSetting-box {
+        width: 90px;
+        height: 90px;
+        border-radius: 10px;
+        backdrop-filter: saturate(180%) blur(20px);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        background-color: var(--color-black80);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-  //旋轉動畫
-  @keyframes loadingSetting-rotate {
-    0% {
-      transform: rotate(45deg);
+    .loadingSetting-box svg {
+        width: 50px;
+        height: 50px;
+        position: relative;
+        // background: #FFF;
+        border-radius: 50%;
+        transform: rotate(45deg);
+        animation: loadingSetting-rotate 2s linear infinite;
     }
-    30%,
-    50%,
-    70% {
-      transform: rotate(230deg);
-    }
-    40%,
-    60%,
-    80% {
-      transform: rotate(240deg);
-    }
-    100% {
-      transform: rotate(245deg);
-    }
-  }
 
+    //旋轉動畫
+    @keyframes loadingSetting-rotate {
+        0% {
+            transform: rotate(45deg);
+        }
+        30%,
+        50%,
+        70% {
+            transform: rotate(230deg);
+        }
+        40%,
+        60%,
+        80% {
+            transform: rotate(240deg);
+        }
+        100% {
+            transform: rotate(245deg);
+        }
+    }
 }

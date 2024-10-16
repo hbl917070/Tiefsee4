@@ -1,11 +1,43 @@
-var baseWindow: BaseWindow;
+import { BaseWindow } from "../BaseWindow";
+import { IndexedDBManager } from "./IndexedDBManager";
+import { MainToolbar } from "./MainToolbar";
+import { FileLoad } from "./FileLoad";
+import { MainFileList } from "./MainFileList";
+import { MainDirList } from "./MainDirList";
+import { MainExif } from "./MainExif";
+import { FileShow } from "./FileShow";
+import { FileSort } from "./FileSort";
+import { DirSort } from "./DirSort";
+import { ImgSearch } from "./ImgSearch";
+import { MainMenu } from "./MainMenu";
+import { Menu } from "./Menu";
+import { LargeBtn } from "./LargeBtn";
+import { BulkView } from "./BulkView";
+import { Script } from "./Script";
+import { Hotkey } from "./Hotkey";
+import { TiefseeScroll } from "../TiefseeScroll";
+import { I18n } from "../I18n";
+import { WebAPI } from "../WebAPI";
+import { Config } from "../Config";
+import { Msgbox } from "../Msgbox";
+import { Toast } from "../Toast";
+import { Lib } from "../Lib";
+import { SelectionManager } from "../SelectionManager";
+import { FullScreen } from "./FullScreen";
+import { ToolbarBack } from "./ToolbarBack";
+import { TextEditor } from "./TextEditor";
+import "../DateExtensions";
 
-var mainWindow: MainWindow;
+declare global {
+    var mainWindow: MainWindow;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
-    mainWindow = new MainWindow();
+    BaseWindow.init();
+    window.mainWindow = new MainWindow();
 });
 
-class MainWindow {
+export class MainWindow {
 
     public quickLookUp;
 
@@ -43,7 +75,7 @@ class MainWindow {
 
     constructor() {
 
-        baseWindow = new BaseWindow(); // 初始化視窗
+        //baseWindow = new BaseWindow(); // 初始化視窗
 
         this.quickLookUp = quickLookUp;
 
@@ -987,156 +1019,6 @@ class MainWindow {
             let path = await WV_Window.GetAppDataPath(); // 程式的暫存資料夾
             path = Lib.combine([path, "Setting.json"]);
             await WV_File.SetText(path, s);
-        }
-
-    }
-}
-
-/**
- * 頁面的返回按鈕
- */
-class ToolbarBack {
-
-    public visible;
-    public getVisible;
-    public setEvent;
-    public runEvent;
-
-    constructor() {
-
-        const _btn = document.querySelector("#toolbar-back") as HTMLElement;
-        var _clickEvent: () => void = () => { }
-        var _active = false;
-
-        this.visible = visible;
-        this.getVisible = getVisible;
-        this.setEvent = setEvent;
-        this.runEvent = runEvent;
-
-        _btn.addEventListener("click", () => {
-            _clickEvent();
-        })
-
-        /** 
-         * 設定顯示或隱藏dom
-         */
-        function visible(val: boolean) {
-            if (val === true) {
-                _btn.setAttribute("active", "true");
-                _active = true;
-            } else {
-                _btn.setAttribute("active", "");
-                _active = false;
-            }
-        }
-
-        function getVisible() {
-            return _active;
-        }
-
-        /**
-         * 設定新的click事件
-         * @param func 
-         */
-        function setEvent(func: () => void) {
-            _clickEvent = func;
-        }
-
-        /**
-         * 執行click事件
-         */
-        function runEvent() {
-            _clickEvent();
-        }
-
-    }
-}
-
-
-/**
- * 全螢幕
- */
-class FullScreen {
-
-    M: MainWindow;
-
-    /** 是否啟用全螢幕 */
-    private enabled = false;
-    /** 當前是否顯示標題列 */
-    private showTitlebar = false;
-    /** 標題列 */
-    private domTitleBar = document.querySelector("#window-titlebar") as HTMLDivElement;
-    /** 工具列 */
-    private domMainT = document.querySelector("#main-T") as HTMLDivElement;
-    /** 標題列 - 離開全螢幕 */
-    private btnExitFullScreen = document.querySelector(".titlebar-toolbar-exitFullScreen") as HTMLDivElement;
-
-    /** 滑鼠移到視窗頂端時，顯示標題列與工具列 */
-    private mousemoveEvent = (e: MouseEvent) => {
-        // if (this.M.menu.getIsShow()) { return; }
-        if (this.showTitlebar === false && e.clientY <= 5) {
-            this.showTitlebar = true;
-            document.body.setAttribute("showTitlebar", "true");
-        } else if (this.showTitlebar === true && e.clientY < this.domTitleBar.offsetHeight + this.domMainT.offsetHeight + 10) {
-            this.showTitlebar = true;
-            document.body.setAttribute("showTitlebar", "true");
-        } else {
-            this.showTitlebar = false;
-            document.body.setAttribute("showTitlebar", "false");
-        }
-    };
-
-    /** 視窗化後就結束全螢幕 */
-    private exitEvent = async () => {
-        if (this.getEnabled() === true && baseWindow.windowState !== "Maximized") {
-            this.setEnabled(false);
-        }
-    }
-
-    /**
-     * 
-     */
-    constructor(M: MainWindow) {
-        this.M = M;
-
-        // 結束全螢幕
-        this.btnExitFullScreen.addEventListener("click", () => {
-            this.setEnabled(false);
-        });
-    }
-
-    /**
-     * 取得 是否啟用全螢幕
-     */
-    public getEnabled() {
-        return this.enabled;
-    }
-
-    /**
-     * 啟用或關閉全螢幕
-     * @param val 
-     */
-    public async setEnabled(val?: boolean) {
-        if (val === undefined) {
-            val = !this.enabled;
-        }
-        this.enabled = val;
-        this.M.menu.close();
-
-        await WV_Window.SetFullScreen(val);
-
-        if (val) {
-            document.body.setAttribute("fullScreen", "true");
-            document.addEventListener("mousemove", this.mousemoveEvent);
-            baseWindow.sizeChangeEvents.push(this.exitEvent);
-        } else {
-            document.body.setAttribute("fullScreen", "false");
-            document.removeEventListener("mousemove", this.mousemoveEvent);
-            // 移除事件
-            const index = baseWindow.sizeChangeEvents.indexOf(this.exitEvent);
-            if (index > -1) {
-                baseWindow.sizeChangeEvents.splice(index, 1);
-            }
         }
 
     }

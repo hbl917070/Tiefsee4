@@ -1,7 +1,14 @@
+import { Lib } from "../Lib";
+import { RequestLimiter } from "../RequestLimiter";
+import { Throttle } from "../Throttle";
+import { TiefseeScroll } from "../TiefseeScroll";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
 /** 
  * 大量瀏覽模式
  */
-class BulkView {
+export class BulkView {
 
     public visible;
     public load;
@@ -250,12 +257,12 @@ class BulkView {
             _originBulkViewHeight = _domBulkViewContent.offsetHeight;
             _originBulkViewScrollTop = _domBulkView.scrollTop;
 
-           const columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(_domColumns));
-           const gaplessMode = M.config.settings.bulkView.gaplessMode = _domGaplessMode.value;
-           const fixedWidth = M.config.settings.bulkView.fixedWidth = _domFixedWidth.value;
-           const align = M.config.settings.bulkView.align = _domAlign.value;
-           const indentation = M.config.settings.bulkView.indentation = _domIndentation.value;
-           const waterfall = M.config.settings.bulkView.waterfall = _domWaterfall.value;
+            const columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(_domColumns));
+            const gaplessMode = M.config.settings.bulkView.gaplessMode = _domGaplessMode.value;
+            const fixedWidth = M.config.settings.bulkView.fixedWidth = _domFixedWidth.value;
+            const align = M.config.settings.bulkView.align = _domAlign.value;
+            const indentation = M.config.settings.bulkView.indentation = _domIndentation.value;
+            const waterfall = M.config.settings.bulkView.waterfall = _domWaterfall.value;
 
             _domBulkViewContent.setAttribute("waterfall", waterfall);
             _domBulkViewContent.setAttribute("columns", columns.toString());

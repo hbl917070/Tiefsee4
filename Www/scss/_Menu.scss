@@ -1,0 +1,239 @@
+.menu {
+	background-color: rgba(0, 0, 0, 0);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100;
+	//pointer-events: none;
+	display: none;
+	//opacity: 0;
+	//transition: opacity 5s;
+	//transform: translateY(-5px);
+	app-region: no-drag; //讓視窗不允許拖曳
+}
+
+.menu[active="true"] {
+	//pointer-events: inherit;
+	display: block;
+	//transition: opacity 5s;
+	//opacity: 1;
+	//transform: translateY(0px) !important;
+}
+
+.menu-content {
+	position: absolute;
+	overflow-y: auto;
+	overflow-x: hidden;
+	//display: flex;
+	//flex-direction: column;
+	//align-items: start;
+}
+.menu-box {
+	margin-left: 5px;
+	margin-right: 4px;
+	margin-top: 5px;
+
+	margin-bottom: 5px;
+	background-color: var(--color-black80);
+	padding: 5px;
+	border-radius: 8px;
+
+	box-shadow: 0px 0px 3px var(--color-blue40);
+	border: 1px solid var(--color-blue40);
+	backdrop-filter: saturate(180%) blur(20px);
+}
+
+.menu-grid {
+	display: flex;
+	flex-direction: row;
+}
+.menu-grid-item {
+	min-width: 35px;
+	height: 35px;
+	max-width: 50px;
+	flex: 1;
+	border-radius: 5px;
+	user-select: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	//overflow: hidden;
+}
+.menu-grid-item:hover {
+	background-color: var(--color-white10);
+	cursor: pointer;
+}
+.menu-grid-item svg {
+	width: 25px;
+}
+.menu-grid-txt {
+	//width: 30px;
+	font-size: 12px;
+	color: var(--color-white);
+	padding: 3px 0;
+	//word-wrap: break-word;
+	//word-break: break-all;
+	white-space: nowrap;
+	text-align: center;
+	//transform:scaleX(0.6)
+}
+.menu-grid-hr {
+	height: 35px;
+	width: 1px;
+	background-color: var(--color-white10);
+	margin: 0px 3px;
+}
+
+/* 水平項目 */
+.menu-hor-item {
+	max-width: 330px;
+	padding: 4px 4px;
+	padding-right: 35px;
+	color: var(--color-white);
+	border-radius: 5px;
+	user-select: none;
+	display: flex;
+	align-items: center;
+}
+.menu-hor-item:hover {
+	background-color: var(--color-white10);
+	cursor: pointer;
+}
+
+//標題
+.menu-hor-title {
+	padding: 5px 5px;
+	//padding-left: 30px;
+	padding-right: 33px;
+	color: var(--color-blue);
+	user-select: none;
+}
+//文字框
+.menu-text {
+	height: 33px;
+	color: var(--color-blue);
+	border: none;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+	width: 100%;
+	user-select: all;
+}
+
+/*圖示*/
+.menu-hor-icon {
+	width: 25px;
+	height: 25px;
+	flex-shrink: 0;
+	//margin-left: 3px;
+	margin-right: 4px;
+	display: flex;
+	align-items: center;
+}
+.menu-hor-icon svg {
+	max-width: 25px;
+	max-height: 25px;
+}
+.menu-hor-icon img {
+	max-width: 25px;
+	max-height: 25px;
+}
+/*文字*/
+.menu-hor-txt {
+	line-height: 25px;
+	/*寬度不足時出現「...」*/
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/*水平線*/
+.menu-hor-hr {
+	height: 1px;
+	background-color: var(--color-white10);
+	margin: 5px 0;
+}
+
+/*滾動條樣式*/
+.menu-content::-webkit-scrollbar {
+	background-color: var(--color-black60);
+	width: 10px;
+}
+
+.menu-content::-webkit-scrollbar-track {
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.menu-content::-webkit-scrollbar-thumb {
+	background-color: var(--color-white40);
+	//產生透明框線並且剪裁掉
+	border: 3px solid rgba(0, 0, 0, 0);
+	background-clip: content-box;
+}
+
+#menu-bulkView {
+	min-width: 200px;
+	user-select: none;
+
+	.menu-bulkView-box {
+		margin-bottom: 10px;
+	}
+	.menu-bulkView-title {
+		color: var(--color-white);
+	}
+	.menu-bulkView-select {
+		background-color: rgba(0, 0, 0, 0);
+		color: var(--color-white);
+		min-height: 35px;
+		border: 1px solid var(--color-white40);
+		border-radius: 5px;
+		padding: 0 5px;
+		width: 100%;
+		cursor: pointer;
+	}
+
+	.menu-bulkView-checkbox {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		height: 24px;
+	}
+	.menu-bulkView-checkbox:hover {
+		background-color: var(--color-white10);
+	}
+	.menu-bulkView-checkbox span {
+		color: var(--color-white);
+	}
+}
+
+//---------
+
+// 大量瀏覽模式的 每行圖片數
+.menu-bulkView-columns {
+	display: flex;
+	border-radius: 5px;
+	border: 1px solid var(--color-white40);
+	overflow: hidden;
+	min-width: 220px;
+}
+.menu-bulkView-columns-item {
+	flex: 1;
+	height: 35px;
+	color: var(--color-white);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-right: 1px solid var(--color-white40);
+	cursor: pointer;
+}
+.menu-bulkView-columns-item:hover {
+	background-color: var(--color-white10);
+}
+.menu-bulkView-columns-item:last-child {
+	border-right: none;
+}
+.menu-bulkView-columns-item[active="true"] {
+	// outline: 1px solid var(--color-blue);
+	background-color: var(--color-white20);
+}

@@ -1,107 +1,104 @@
 /* #region 在下面或兩側的 大型切換按鈕 */
 
 .largeBtn {
-
-  position: absolute;
-  display: flex;
-
-  opacity: 0;
-  z-index: 5;
-  user-select: none;
-
-  .box {
-    /* backdrop-filter: saturate(180%) blur(20px); */
     position: absolute;
-    border-radius: 5px;
-    background-color: var(--color-black40);
-    border: 1px solid var(--color-white10);
-
-    width: 41px;
-    height: 41px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
 
+    opacity: 0;
+    z-index: 5;
+    user-select: none;
+
+    .box {
+        /* backdrop-filter: saturate(180%) blur(20px); */
+        position: absolute;
+        border-radius: 5px;
+        background-color: var(--color-black40);
+        border: 1px solid var(--color-white10);
+
+        width: 41px;
+        height: 41px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 .largeBtn:hover {
-  cursor: pointer;
-  opacity: 1;
+    cursor: pointer;
+    opacity: 1;
 }
 .largeBtn:active {
 }
 .largeBtn:active svg {
-  transform: scaleX(0.85);
-  transition:transform 0.1s !important;
+    transform: scaleX(0.85);
+    transition: transform 0.1s !important;
 }
 
 .largeBtn svg {
-  height: 25px;
-  transition:transform 0.5s ;
+    height: 25px;
+    transition: transform 0.5s;
 }
 
 //暫時隱藏
 .largeBtn[hide="true"] {
-  display: none !important;
+    display: none !important;
 }
 //左右兩側
 .largeBtn[data-style="leftRight-L"] {
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  width: 60px;
-  justify-content: start;
-  align-items: center;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 60px;
+    justify-content: start;
+    align-items: center;
 }
 .largeBtn[data-style="leftRight-R"] {
-  top: 0px;
-  bottom: 0px;
-  right: 0px;
-  width: 60px;
-  justify-content: end;
-  align-items: center;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    width: 60px;
+    justify-content: end;
+    align-items: center;
 }
 //左右兩側2(內縮)
 .largeBtn[data-style="leftRight2-L"] {
-  top: 20px;
-  bottom: 20px;
-  left: 20px;
-  width: 60px;
-  justify-content: start;
-  align-items: center;
+    top: 20px;
+    bottom: 20px;
+    left: 20px;
+    width: 60px;
+    justify-content: start;
+    align-items: center;
 }
 .largeBtn[data-style="leftRight2-R"] {
-  top: 20px;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  justify-content: end;
-  align-items: center;
+    top: 20px;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    justify-content: end;
+    align-items: center;
 }
 //下面
 .largeBtn[data-style="bottom-L"] {
-  bottom: 20px;
-  left: 20px;
-  right: 50%;
-  height: 60px;
-  justify-content: start;
-  align-items: end;
+    bottom: 20px;
+    left: 20px;
+    right: 50%;
+    height: 60px;
+    justify-content: start;
+    align-items: end;
 }
 .largeBtn[data-style="bottom-R"] {
-  bottom: 20px;
-  left: 50%;
-  right: 20px;
-  height: 60px;
-  justify-content: end;
-  align-items: end;
+    bottom: 20px;
+    left: 50%;
+    right: 20px;
+    height: 60px;
+    justify-content: end;
+    align-items: end;
 }
 //不顯示
 .largeBtn[data-style="none-L"] {
-  display: none;
+    display: none;
 }
 .largeBtn[data-style="none-R"] {
-  display: none;
+    display: none;
 }
 
 /* #endregion */

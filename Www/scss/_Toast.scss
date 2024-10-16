@@ -1,0 +1,94 @@
+.toastList {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 999;
+
+    @keyframes toastStart {
+        from {
+            transform: translateY(-5px);
+        }
+
+        to {
+            transform: translateY(0px);
+        }
+    }
+
+    .toastItem {
+        border-radius: 8px;
+        background-color: var(--color-black80);
+        box-shadow: 0px 0px 3px var(--color-blue40);
+        border: 1px solid var(--color-blue40);
+        backdrop-filter: saturate(180%) blur(20px);
+
+        display: flex;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        //動畫
+        animation-name: toastStart;
+        animation-iteration-count: 1;
+        animation-duration: 0.15s;
+        animation-timing-function: ease-out;
+    }
+
+    .toastItem:last-child {
+        margin-bottom: 10px;
+    }
+
+    .toastText {
+        padding: 12px;
+        flex: 1;
+        max-width: 300px;
+        color: var(--color-white);
+        font-size: 15px;
+    }
+
+    //關閉按鈕
+    .toastClose {
+        width: 23px;
+        // height: 23px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .toastClose:hover {
+        background-color: var(--color-white30);
+    }
+
+    .toastClose::before {
+        background-color: var(--color-blue);
+        position: absolute;
+        content: "";
+        height: 1px;
+        width: 14px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        transform: rotate(45deg);
+    }
+
+    .toastClose::after {
+        background-color: var(--color-blue);
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 1px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        transform: rotate(45deg);
+    }
+}

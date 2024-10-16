@@ -1,7 +1,9 @@
+import { MainWindow } from "./MainWindow";
+
 /**
  * 在下面或兩側的 大型切換按鈕
  */
-class LargeBtn {
+export class LargeBtn {
 
     public domLargeBtnLeft: HTMLElement;
     public domLargeBtnRight: HTMLElement;

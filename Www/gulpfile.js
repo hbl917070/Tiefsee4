@@ -44,46 +44,61 @@ gulp.task("svg", async () => {
 // scss -> css
 gulp.task("scss", async () => {
     await sleep(1);
-    return gulp.src("./scss/**/*.scss") // 指定要處理的 Scss 檔案目錄
+    gulp.src("./scss/MainWindow/MainWindow.scss") // 指定要處理的 Scss 檔案目錄
         .pipe(sass({
             // outputStyle: "compressed", // 壓縮
         }))
         .pipe(gulp.dest("./css")) // 指定編譯後的 css 檔案目錄
         .pipe(gulp.dest(output2 + "/css"))
 
+    gulp.src("./scss/SettingWindow/SettingWindow.scss")
+        .pipe(sass({
+        }))
+        .pipe(gulp.dest("./css"))
+        .pipe(gulp.dest(output2 + "/css"))
 });
 
 // ejs -> html
-gulp.task("ejs-main", async () => {
+gulp.task("ejs", async () => {
     await sleep(1);
-    return gulp.src("./ejs/MainWindow/MainWindow.ejs")
+    gulp.src("./ejs/MainWindow/MainWindow.ejs")
         .pipe(ejs({ readFile: readFile }, { async: true }))
         .pipe(rename({ extname: ".html" })) // 修改輸出的副檔名
         .pipe(gulp.dest("./"))
         .pipe(gulp.dest(output2 + "/"))
-});
-gulp.task("ejs-setting", async () => {
-    await sleep(1);
-    return gulp.src("./ejs/SettingWindow/SettingWindow.ejs")
+
+    gulp.src("./ejs/SettingWindow/SettingWindow.ejs")
         .pipe(ejs({ readFile: readFile }, { async: true }))
         .pipe(rename({ extname: ".html" }))
         .pipe(gulp.dest("./"))
         .pipe(gulp.dest(output2 + "/"))
-
 });
 
 // ts -> js
 gulp.task("ts", async () => {
     await sleep(1);
-    return gulp.src("./ts/**/*.ts")
-        .pipe(gulpEsbuild({
-            // minify: true, // 壓縮
-            // outfile: "bundle.js",
-            // bundle: true,
-            // loader: { ".tsx": "tsx", },
-        }))
-        .pipe(gulp.dest("./js"))
-        .pipe(gulp.dest(output2 + "/js"))
+
+    var fileMappings = [
+        { path: "./ts/MainWindow/MainWindow.ts", bundle: true },
+        { path: "./ts/SettingWindow/SettingWindow.ts", bundle: true },
+        { path: "./ts/TiefseeviewWorker.ts", bundle: true },
+        { path: "./ts/TiefseeviewWorkerSub.ts", bundle: true },
+        { path: "./ts/LibIframe.ts", bundle: false },
+    ];
+
+    for (var i = 0; i < fileMappings.length; i++) {
+
+        gulp.src(fileMappings[i].path)
+            .pipe(gulpEsbuild({
+                // minify: true, // 壓縮
+                outfile: path.basename(fileMappings[i].path, ".ts") + ".js",
+                bundle: fileMappings[i].bundle,
+                // loader: { ".tsx": "tsx", },
+            }))
+            .pipe(gulp.dest("./js"))
+            .pipe(gulp.dest(output2 + "/js"))
+    }
+
 });
 
 // 把檔案複製到開發資料夾。 (有非 ts、scss、ejs 的資源需要複製到開發資料夾時使用
@@ -117,17 +132,16 @@ gulp.task("build-rust", (done) => {
 });
 
 // 打包 - 單次
-gulp.task("build", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", "build-rust",
+gulp.task("build", gulp.series("scss", "ts", "svg", "ejs", "build-rust",
     "copy-files")); // copy-files 必須放在最後
 
 // 打包 - 持續監控檔案變化
-gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs-main", "ejs-setting", () => {
+gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs", () => {
     gulp.watch("./scss/**/*.scss", gulp.series("scss"));
     gulp.watch("./ts/**/*.ts", gulp.series("ts"));
-    gulp.watch("./ejs/MainWindow/*.ejs", gulp.series("ejs-main"));
-    gulp.watch("./ejs/SettingWindow/*.ejs", gulp.series("ejs-setting"));
+    gulp.watch("./ejs/**/*.ejs", gulp.series("ejs"));
 
-    gulp.watch("./img/default/*.svg", gulp.series("ejs-main")); // svg 圖示
+    gulp.watch("./img/default/*.svg", gulp.series("ejs")); // svg 有可能會被 ejs 引用，所以也要重新執行 ejs
     gulp.watch("./img/default/*.svg", gulp.series("svg"));
 }));
 

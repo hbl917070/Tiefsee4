@@ -1,0 +1,231 @@
+.tiefseeview {
+    overflow: hidden;
+    position: relative;
+
+    // 用於縮放 dpi
+    .tiefseeview-dpizoom {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        zoom: 1;
+    }
+
+    // 實際佔位，用於設定 left、top
+    .tiefseeview-container {
+        pointer-events: none;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    // 放圖片的容器，用於套用旋轉
+    .tiefseeview-data {
+        // 縮放是以圖片寬度為基準
+        // width: 100%;
+    }
+
+    // 圖片
+    .view-img {
+        // width: 100%;
+        // height: 100%;
+    }
+    .view-bigimg {
+        position: relative;
+    }
+    .view-bigimg-canvas {
+        position: absolute;
+    }
+    .view-bigimg-bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .tiefseeview-loading {
+        background-position: center center;
+        background-size: 200px;
+        // background-size:100%;
+        z-index: 100;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-repeat: no-repeat;
+    }
+}
+
+// --------
+
+// 垂直滾動條
+.tiefseeview .scroll-y {
+    width: 20px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    z-index: 5;
+
+    // 背景
+    .scroll-bg {
+        height: 100%;
+        width: 10px;
+        background-color: var(--color-black60);
+        position: absolute;
+        // margin: auto;
+        // left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        opacity: 0;
+    }
+
+    // 拖曳區域
+    .scroll-box {
+        width: 10px;
+        background-color: var(--color-white40);
+        position: absolute;
+        // margin: auto;
+        // left: 0;
+        right: 0;
+        // box-shadow: 0px 0px 3px 1px var(--color-black10);
+        // transform: scaleX(0.4);
+        border: 3px solid rgba(0, 0, 0, 0);
+        background-clip: content-box;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    // 移入與拖曳時-背景
+    &:hover .scroll-bg,
+    &[action="true"] .scroll-bg {
+        opacity: 1;
+        backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    // 移入與拖曳時-拖曳區域
+    &:hover .scroll-box,
+    &[action="true"] .scroll-box {
+        // background-color: rgba(255, 255, 255, 0.8);
+        // transform: scaleX(1);
+    }
+}
+
+// --------
+
+// 水平滾動條
+.tiefseeview .scroll-x {
+    height: 20px;
+    position: absolute;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    z-index: 5;
+
+    // 背景
+    .scroll-bg {
+        height: 10px;
+        width: 100%;
+        background-color: var(--color-black60);
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        // top: 0;
+        bottom: 0;
+        opacity: 0;
+    }
+
+    // 拖曳區域
+    .scroll-box {
+        height: 10px;
+        background-color: var(--color-white40);
+        position: absolute;
+        // top: 0;
+        bottom: 0px;
+        // margin: auto 0;
+        // box-shadow: 0px 0px 3px 1px var(--color-black10);
+        // transform: scaleY(0.4);
+        border: 3px solid rgba(0, 0, 0, 0);
+        background-clip: content-box;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    // 移入與拖曳時-背景
+    &:hover .scroll-bg,
+    &[action="true"] .scroll-bg {
+        opacity: 1;
+        backdrop-filter: saturate(180%) blur(20px);
+    }
+
+    // 移入與拖曳時-拖曳區域
+    &:hover .scroll-box,
+    &[action="true"] .scroll-box {
+        // background-color: rgba(255, 255, 255, 0.8);
+        // transform: scaleY(1);
+    }
+}
+
+// --------
+
+// 剪裁
+.tiefseeview {
+    // 拖曳點
+    .tiefseeview-clip {
+        position: absolute;
+        overflow: hidden;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        z-index: 3;
+        background-color: #fff;
+        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+    // 左上角
+    .tiefseeview-clip-lt {
+        cursor: nw-resize;
+    }
+    // 右上角
+    .tiefseeview-clip-rt {
+        cursor: ne-resize;
+    }
+    // 左下角
+    .tiefseeview-clip-lb {
+        cursor: sw-resize;
+    }
+    // 右下角
+    .tiefseeview-clip-rb {
+        cursor: se-resize;
+    }
+    // 中間的拖曳區塊
+    .tiefseeview-clip-c {
+        cursor: move;
+        position: absolute;
+        z-index: 1;
+    }
+    // 周圍的半透明黑色區塊
+    .tiefseeview-clip-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        pointer-events: none;
+    }
+}

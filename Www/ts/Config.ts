@@ -1,4 +1,6 @@
-class Config {
+import { BaseWindow } from "./BaseWindow";
+
+export class Config {
 
     private baseWindow: BaseWindow;
 
@@ -628,7 +630,7 @@ class Config {
     }
 }
 
-const GroupType = {
+export const GroupType = {
 
     /** 起始畫面 */
     welcome: "welcome",

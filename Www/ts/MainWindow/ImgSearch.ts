@@ -1,4 +1,8 @@
-class ImgSearch {
+import { Lib } from "../Lib";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class ImgSearch {
 
     constructor(M: MainWindow) {
 

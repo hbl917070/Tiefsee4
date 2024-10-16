@@ -1,7 +1,10 @@
+import { I18n } from "./I18n";
+import { Lib } from "./Lib";
+
 /**
  * 訊息方塊
  */
-class Msgbox {
+export class Msgbox {
 
     private _isShow = false;
     private _i18n: I18n;

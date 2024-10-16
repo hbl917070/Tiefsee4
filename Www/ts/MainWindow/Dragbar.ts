@@ -1,7 +1,9 @@
+import { Lib } from "../Lib";
+
 /**
  * 改變物件 size 的拖曳條
  */
-class Dragbar {
+export class Dragbar {
 
     public init;
     public getEventStart;

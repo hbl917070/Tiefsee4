@@ -1,4 +1,7 @@
-class Menu {
+import { Lib } from "../Lib";
+import { MainWindow } from "./MainWindow";
+
+export class Menu {
 
     public openAtButton;
     public openAtMouse;

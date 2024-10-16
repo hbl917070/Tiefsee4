@@ -1,7 +1,13 @@
+import { MainWindow } from "./MainWindow";
+import { Dragbar } from "./Dragbar";
+import { TiefseeScroll } from "../TiefseeScroll";
+import { WebAPI } from "../WebAPI";
+import { Lib } from "../Lib";
+
 /**
  * 檔案預覽視窗
  */
-class MainFileList {
+export class MainFileList {
 
     public init;
     public select;

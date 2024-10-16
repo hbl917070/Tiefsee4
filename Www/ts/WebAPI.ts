@@ -1,4 +1,6 @@
-class WebAPI {
+import { Lib } from "./Lib";
+
+export class WebAPI {
 
     static Directory = class {
 

@@ -1,7 +1,9 @@
+import { Lib } from "./Lib";
+
 /**
  * 滾動條元件
  */
-class TiefseeScroll {
+export class TiefseeScroll {
 
     public getEventChange;
     public setEventChange;

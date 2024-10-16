@@ -1,4 +1,8 @@
-class DirSort {
+import { Lib } from "../Lib";
+import { WebAPI } from "../WebAPI";
+import { MainWindow } from "./MainWindow";
+
+export class DirSort {
 
     // public getSortType;
     public readSortType;
@@ -219,7 +223,7 @@ class DirSort {
 /**
  * 排序類型
  */
-const DirSortType = {
+export const DirSortType = {
     /** 檔名自然排序 */
     name: "name",
     /** 檔名自然排序(逆) */
@@ -243,7 +247,7 @@ const DirSortType = {
 /**
  * 遞增或遞減
  */
-const DirOrderbyType = {
+export const DirOrderbyType = {
     desc: "desc",
     asc: "asc",
 }

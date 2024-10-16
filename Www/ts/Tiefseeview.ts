@@ -1,7 +1,10 @@
+import { Lib } from "./Lib";
+import { TiefseeScroll } from "./TiefseeScroll";
+
 /**
  * 圖片瀏覽器
  */
-class Tiefseeview {
+export class Tiefseeview {
 
     public domTiefseeview: HTMLDivElement; // 整體的 div
     public domCon: HTMLDivElement; // 表示整體佔位的容器，用於設定 left、topo
@@ -3282,7 +3285,7 @@ class Tiefseeview {
 /**
  * 對齊位置
  */
-enum TiefseeviewAlignType {
+export enum TiefseeviewAlignType {
     /** 上 */
     "top",
     /** 右 */
@@ -3308,7 +3311,7 @@ enum TiefseeviewAlignType {
 /**
  * 圖片縮放模式
  */
-enum TiefseeviewZoomType {
+export enum TiefseeviewZoomType {
 
     /** 圖片大於視窗則縮放到視窗內，小於視窗則用圖片原始大小 */
     "fitWindowOrImageOriginal",
@@ -3337,7 +3340,7 @@ enum TiefseeviewZoomType {
 /**
  * 圖片渲染模式
  */
-enum TiefseeviewImageRendering {
+export enum TiefseeviewImageRendering {
 
     /** 預設值，運算成本較高 */
     "auto" = 0,

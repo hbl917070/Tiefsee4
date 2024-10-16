@@ -1,8 +1,18 @@
-var baseWindow: BaseWindow;
+import { BaseWindow } from "../BaseWindow";
+import { Config } from "../Config";
+import { I18n } from "../I18n";
+import { Lib } from "../Lib";
+import { MainToolbar } from "../MainWindow/MainToolbar";
+import { Msgbox } from "../Msgbox";
+import { SelectionManager } from "../SelectionManager";
 
-var settingWindow;
+declare global {
+    var settingWindow: SettingWindow;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
-    settingWindow = new SettingWindow();
+    BaseWindow.init();
+    window.settingWindow = new SettingWindow();
 });
 
 class SettingWindow {
@@ -10,8 +20,6 @@ class SettingWindow {
     public saveData;
 
     constructor() {
-
-        baseWindow = new BaseWindow(); // 初始化視窗
 
         this.saveData = saveSetting;
 
