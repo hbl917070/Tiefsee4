@@ -282,7 +282,7 @@ public class StartWindow : Form {
         await Task.Factory.StartNew(async () => {
 
             using var server = new NamedPipeServerStream(
-                $"tiefsee-{Program.startPort}",
+                $"tiefsee-{Program.webServer.port}",
                 PipeDirection.InOut,
                 NamedPipeServerStream.MaxAllowedServerInstances,
                 PipeTransmissionMode.Message);
