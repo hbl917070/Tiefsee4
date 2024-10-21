@@ -2,40 +2,58 @@
 
 # Tiefsee 專案說明
 
-Tiefsee4 裡面包含 3 個專案
+Tiefsee4 包含以下 5 個子專案
 
 ## Tiefsee
-- 主專案，以 WinForm 來承載 WebView2
-- 專案類型： .NET 7
+程式的本體，以 WinForm 來承載 WebView2。<br>
+並透過 HttpListener 提供 視窗管理、檔案操作、圖片處理 等功能的 Web API。
+
+<br>
+
+## TiefseeLauncher
+Tiefsee 的啟動器。<br>
+由於 .NET 專案匯入函式庫後即使沒有寫任何程式碼也會拖慢啟動速度，所以使用另一個乾淨的專案作為程式入口。啟動器會檢查程式本體是否正在運行，如果已在運行狀態，則使用 Pipe 通知程式本體新建一個視窗，從而實現快速啟動。
 
 <br>
 
 ## TiefseeAppPackager
-- 用於將 Tiefsee 專案 打包成 MSIX
+用於將 Tiefsee 專案打包成 MSIX 格式。
+
+<br>
+
+## BuildAll
+用於編譯 Tiefsee 和 TiefseeLauncher，並將輸出結果打包成 ZIP 文件。
 
 <br>
 
 ## Www
-- UI 專案
-- 使用 npm 與 gulp 來編譯 EJS、TypeScript、SCSS、SVG
+Web 專案，程式主要的核心邏輯都在這裡。<br>
+使用 Gulp 來打包與編譯 EJS, TypeScript, SCSS, Rust
 
 ### 目錄結構
 ```
 Www
- ├ ejs：放 ejs 的目錄，編譯後會輸出成 html
- ├ scss：放 scss 的目錄，編譯後會輸到 css
- ├ ts：放 ts 的目錄，編譯後會輸出到 js
+ ├📁 ejs：編譯後會輸出成 html
+ ├📁 scss：編譯後會輸到 css
+ ├📁 ts：編譯後會輸出到 js
+ ├📁 rust：編譯後會輸出到 wasm
+ ├📁 lang：放翻譯檔的目錄
+ ├📁 img：放圖片的目錄，裡面的 svg 會透過 Gulp 封裝成 js
+ ├📁 iframe：iframe 頁面的 html 檔
  │
- ├ vender：放第三方 js 的目錄
+ ├📁 vender：放第三方 js 的目錄
  │
- ├ css：由 gulp 編譯生成
- ├ js：由 gulp 編譯產生
+ ├📁 css：由 Gulp 編譯生成
+ ├📁 js：由 Gulp 編譯產生
+ ├📁 wasm：由 Gulp 編譯產生
  │
- ├ MainWindow.html：主視窗，由 gulp 編譯產生
- ├ SettingWindow.html：設定視窗，由 gulp 編譯產生
+ ├ MainWindow.html：主視窗，由 Gulp 編譯產生
+ ├ SettingWindow.html：設定視窗，由 Gulp 編譯產生
  │
  └ gulpfile.js
 ```
+
+<br>
 
 ### 初始安裝
 1. 安裝 nodejs<br>
@@ -62,14 +80,32 @@ Www
 	```
 <br>
 
+5. 安裝 Rust<br>
+	https://www.rust-lang.org/tools/install
+
+<br>
+
+6. 安裝 wasm32-unknown-unknown
+	```
+	rustup target add wasm32-unknown-unknown
+	```
+
+<br>
+
+7. 安裝 wasm-pack
+	```
+	cargo install wasm-pack
+	```
+
 ### 編譯
 
-- 打包 EJS、TypeScript、SCSS，並將處理後的檔案複製到 Tiefsee 專案 的輸出資料夾內
+- 打包與編譯 EJS, TypeScript, SCSS, Rust，並將處理後的檔案複製到 Tiefsee 專案 的輸出資料夾內
 	```
 	gulp build
 	```
+<br>
 
-- 持續監控檔案變化，檔案有變化時，自動執行 `gulp build`
+- 持續監控檔案變化，檔案有變化時，自動執行打包與編譯
 
 	```
 	gulp watch
@@ -104,5 +140,5 @@ Tiefsee 具有切換主題的功能，為了讓圖示具有切換顏色的功能
 ## 補充
 
 Tiefsee 是一個全部 UI 都以 WebiVew2 來渲染的程式，<br>
-C# 常用的功能都已經經過封裝讓 JavaScript 可以直接呼叫，<br>
+C# 常用的功能都已經經過封裝，讓 JavaScript 可以直接呼叫，<br>
 在大部分情況並不需要寫 C#，因此可以直接以 Visual Studio Code 開啟 `Www` 專案來進行開發。
