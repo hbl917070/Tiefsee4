@@ -639,6 +639,7 @@ export class BulkView {
 
                 if (_tempScrollTop === -1) { return; }
                 _domBulkView.scrollTop = _tempScrollTop;
+                if (time === 0) { return; }
                 for (let i = 1; i <= 10; i++) {
                     setTimeout(() => {
                         if (_tempScrollTop === -1) { return; }
@@ -656,7 +657,7 @@ export class BulkView {
                 if (getIndentation() === "on" && getColumns() === 2) { // 如果有使用首圖縮排
                     _arFile.unshift(_svgIndentation); // 插入到最前面
                 }
-                // scrollToLastPosition(200); // 返回上次捲動的位置
+                scrollToLastPosition(0); // 返回上次捲動的位置
 
             } else if (_tempDirPath === getDirPath()) {
 
