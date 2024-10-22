@@ -94,9 +94,9 @@ class SettingWindow {
                 // 如果有滾動條，就禁止拖曳(避免無法點擊滾動條)
                 if (Lib.isScrollbarVisible(domLeftBox)) { return; }
 
-                let _dom = e.target as HTMLElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+                const dom = e.target as HTMLElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
                 if (e.button === 0) { // 滑鼠左鍵
                     await WV_Window.WindowDrag("move");
@@ -107,9 +107,9 @@ class SettingWindow {
                 // 如果有滾動條，就禁止拖曳(避免無法點擊滾動條)
                 if (Lib.isScrollbarVisible(domLeftBox)) { return; }
 
-                let _dom = e.target as HTMLDivElement;
-                if (_dom) {
-                    if (_dom.classList.contains("js-noDrag")) { return; }
+                const dom = e.target as HTMLDivElement;
+                if (dom) {
+                    if (dom.classList.contains("js-noDrag")) { return; }
                 }
                 baseWindow.touchDrop.start(domLeftBox, e, "move");
             });

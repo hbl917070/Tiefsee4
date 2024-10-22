@@ -47,11 +47,11 @@ export class Menu {
         /**
          * 
          * @param domMenu 
-         * @param _funcPosition 定位用的函數
-         * @param _funcClose 關閉時呼叫的函數
+         * @param setMenuPosition 定位用的函數
+         * @param onMenuClose 關閉時呼叫的函數
          * @returns 
          */
-        function openBase(domMenu: HTMLElement | null, _funcPosition: () => void, _funcClose: () => void) {
+        function openBase(domMenu: HTMLElement | null, setMenuPosition: () => void, onMenuClose: () => void) {
 
             if (domMenu === null) { return; }
 
@@ -63,7 +63,7 @@ export class Menu {
             domMenuBg.setAttribute("active", "true");
             domMenu.style.bottom = ""; // 避免高度計算錯誤
 
-            _funcPosition();
+            setMenuPosition();
 
             const funcClose = () => {
                 domMenuBg.setAttribute("active", ""); // 關閉menu
@@ -72,7 +72,7 @@ export class Menu {
                 });
                 domMenuBg.removeEventListener("touchstart", onmousedown);
                 domMenuBg.removeEventListener("mousedown", onmousedown);
-                _funcClose();
+                onMenuClose();
             }
             _tempCloseList.push(funcClose);
 

@@ -245,9 +245,9 @@ export class MainFileList {
                         if (_domFileListData.contains(div) === false) { return; } // 如果物件不在網頁上，就不載入圖片
 
                         _tempLoaded.push(i); // 加到全域變數，表示已經載入過
-                        const _url = getImgUrl(path);
+                        const url = getImgUrl(path);
                         const domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
-                        domImg.innerHTML = `<img src="${_url}" fetchpriority="low"/>`;
+                        domImg.innerHTML = `<img src="${url}" fetchpriority="low"/>`;
                     }, 30);
                 }
             } else {

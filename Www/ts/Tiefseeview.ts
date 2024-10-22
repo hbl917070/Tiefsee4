@@ -672,17 +672,17 @@ export class Tiefseeview {
         });
         _hammerPlural.on("rotate", async (e) => {
 
-            let _deg = (e.rotation - _tempRotateStareDegValue); // 取得旋轉角度
+            let deg = (e.rotation - _tempRotateStareDegValue); // 取得旋轉角度
 
             if (_tempTouchRotateStarting === false) {
-                if (Math.abs(_tempRotateStareDegNow - Math.abs(_deg)) > _rotateCriticalValue) { // 旋轉超過特定角度，才會開始執行旋轉
-                    _tempRotateStareDegValue -= (_tempRotateStareDegNow - _deg);
-                    _deg += (_tempRotateStareDegNow - _deg);
+                if (Math.abs(_tempRotateStareDegNow - Math.abs(deg)) > _rotateCriticalValue) { // 旋轉超過特定角度，才會開始執行旋轉
+                    _tempRotateStareDegValue -= (_tempRotateStareDegNow - deg);
+                    deg += (_tempRotateStareDegNow - deg);
                     _tempTouchRotateStarting = true;
                 }
             }
             if (_tempTouchRotateStarting) {
-                setDeg(_deg, e.center.x, e.center.y, false); // 無動畫旋轉
+                setDeg(deg, e.center.x, e.center.y, false); // 無動畫旋轉
             }
 
         });
@@ -1282,7 +1282,7 @@ export class Tiefseeview {
 
         /**
          * 載入並顯示 - img
-         * @param _url 
+         * @param url 
          * @returns 
          */
         async function loadImg(url: string) {
@@ -1312,14 +1312,14 @@ export class Tiefseeview {
 
         /**
          * 載入並顯示 - canvas
-         * @param _url 
+         * @param url 
          * @returns 
          */
         async function loadBigimg(url: string) {
 
             // setLoading(true);
             _url = url;
-            const p = await preloadImg(_url);
+            const p = await preloadImg(url);
             // setLoading(false);
             setDataType("bigimg");
 
@@ -2009,7 +2009,7 @@ export class Tiefseeview {
                 return;
             }
 
-            await new Promise((resolve, reject) => {
+            await new Promise((resolve, _) => {
 
                 $(_domData).animate({
                     "transform_rotate": _degNow, // 自訂用於動畫的變數
@@ -2017,7 +2017,7 @@ export class Tiefseeview {
                     "transform_scaleY": scaleY,
                 }, {
                     start: () => { },
-                    step: function (now: any, fx: any) {
+                    step: (now: any, fx: any) => {
 
                         // if (fx.prop == "transform_rotate") { }
 
@@ -2033,11 +2033,11 @@ export class Tiefseeview {
                         let y2 = y - toNumber(_domCon.style.top);
 
                         // 取得旋轉點在旋轉前的位置(相對坐標)
-                        let _degNow: string | null = _domData.getAttribute("transform_rotate");
-                        if (_degNow === null) { _degNow = "0"; }
-                        let rect0 = getOrigPoint(x2, y2, _domData.offsetWidth, _domData.offsetHeight, toNumber(_degNow));
-                        let x4 = rect0.x
-                        let y4 = rect0.y
+                        let degNow = _domData.getAttribute("transform_rotate");
+                        if (degNow === null) { degNow = "0"; }
+                        let rect = getOrigPoint(x2, y2, _domData.offsetWidth, _domData.offsetHeight, toNumber(degNow));
+                        let x4 = rect.x
+                        let y4 = rect.y
 
                         // 計算旋轉後的坐標
                         let rect2 = getRotateRect(_domData.offsetWidth, _domData.offsetHeight, x4, y4, andata.transform_rotate);
@@ -2477,10 +2477,10 @@ export class Tiefseeview {
             let x = 0.8; // 每次縮小的比例
             let len = 6; // 最多縮小幾次
 
-            let _scale = getScale(); // 目前的 圖片縮放比例
+            let scale = getScale(); // 目前的 圖片縮放比例
 
             // 如果不需要縮小，就直接回傳
-            if (_scale > 0.5) {
+            if (scale > 0.5) {
                 return {
                     img: _tempCan,
                     scale: 1
@@ -2502,7 +2502,7 @@ export class Tiefseeview {
                 }
 
                 // 如果下一次縮小會比目標值還小，就回傳目前
-                if (Math.pow(x, i + 2) < _scale) {
+                if (Math.pow(x, i + 2) < scale) {
                     return {
                         img: _tempBigimg[i],
                         scale: Math.pow(x, i + 1)
@@ -2722,14 +2722,14 @@ export class Tiefseeview {
             let origPoint4 = getOrigPoint(imgLeft, imgTop + _domDpiZoom.offsetHeight, w, h, _degNow);
 
             // 轉換鏡像前的坐標
-            function calc(_p: { x: number, y: number }) {
+            function calc(p: { x: number, y: number }) {
                 if (_mirrorVertical) {
-                    _p.y = toNumber(_domData.style.height) - _p.y;
+                    p.y = toNumber(_domData.style.height) - p.y;
                 }
                 if (_mirrorHorizontal) {
-                    _p.x = toNumber(_domData.style.width) - _p.x;
+                    p.x = toNumber(_domData.style.width) - p.x;
                 }
-                return _p;
+                return p;
             }
             origPoint1 = calc(origPoint1);
             origPoint2 = calc(origPoint2);
@@ -2994,6 +2994,7 @@ export class Tiefseeview {
         const debouncedSharpening = Lib.debounce(() => {
 
             if (_sharpenValue === 0) { return; }
+            if (_domBigimgCanvas.width <= 10 || _domBigimgCanvas.height <= 10) { return; }
 
             // 轉換成 ImageBitmap
             const offscreenCanvas = new OffscreenCanvas(_domBigimgCanvas.width, _domBigimgCanvas.height);

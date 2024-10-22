@@ -274,19 +274,19 @@ export class ScriptImg {
     /** 縮放至適合視窗 */
     public zoomToFit() {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindow"]);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType.fitWindow);
     }
 
     /** 縮放至圖片原始大小 */
     public zoomTo100(x?: number, y?: number) {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"], undefined, x, y);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal, undefined, x, y);
     }
 
     /** 縮放至適合視窗 或 圖片原始大小 */
     public fitWindowOrImageOriginal() {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType["fitWindowOrImageOriginal"]);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType.fitWindowOrImageOriginal);
     }
 
     /** 縮放至適合視窗/圖片原始大小 切換 */
@@ -471,10 +471,10 @@ export class ScriptImg {
 
     /**
      * 預載入圖片資源
-     * @param _url 圖片網址
+     * @param url 圖片網址
      * @returns true=載入完成、false=載入失敗
      */
-    public async preloadImg(_url: string): Promise<boolean> {
+    public async preloadImg(url: string): Promise<boolean> {
         let img = document.createElement("img");
         let p = await new Promise((resolve, reject) => {
             img.addEventListener("load", (e) => {
@@ -483,7 +483,7 @@ export class ScriptImg {
             img.addEventListener("error", (e) => {
                 resolve(false);
             });
-            img.src = _url;
+            img.src = url;
         })
 
         img.src = "";
@@ -1690,11 +1690,11 @@ export class ScriptBulkView {
     }
 
     /** 結束 大量瀏覽模式 */
-    public async close(_flag?: number | undefined) {
+    public async close(flag?: number) {
         if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.saveCurrentState();
         this.M.fileLoad.enableBulkView(false);
-        await this.M.fileLoad.showFile(_flag);
+        await this.M.fileLoad.showFile(flag);
 
         // 剛關閉大量瀏覽模式時，檔案預覽面板尚未顯示無法進行初始化，所以等待一段時間後才執行捲動
         await Lib.sleep(10);

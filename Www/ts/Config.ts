@@ -210,7 +210,7 @@ export class Config {
             /** 啟用 工具列 */
             mainToolbarEnabled: true,
             /** 工具列對齊。 [lef, center] */
-            mainToolbarAlign: "left",
+            mainToolbarAlign: "center",
 
             /** 啟用 檔案預覽視窗 */
             fileListEnabled: true,
@@ -260,8 +260,8 @@ export class Config {
             largeBtn: "bottom",
 
             /** 面版順序 */
-            filePanelOrder: 0,
-            dirPanelOrder: 1,
+            dirPanelOrder: 0,
+            filePanelOrder: 1,
             imagePanelOrder: 2,
             infoPanelOrder: 3,
         },

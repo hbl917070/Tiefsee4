@@ -225,9 +225,9 @@ export class FileShow {
             } else {
 
                 // 縮放方式與對齊方式
-                let _zoomVal: number = M.config.settings.image.tiefseeviewZoomValue;
-                let _zoomType: TiefseeviewZoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
-                if (_zoomType === undefined) { _zoomType = TiefseeviewZoomType["fitWindowOrImageOriginal"] }
+                let zoomVal = M.config.settings.image.tiefseeviewZoomValue;
+                let zoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
+                if (zoomType === undefined) { zoomType = TiefseeviewZoomType.fitWindowOrImageOriginal; }
 
                 if (arUrl.length === 1) {
                     await _tiefseeview.loadBigimg(
@@ -238,7 +238,7 @@ export class FileShow {
                     await _tiefseeview.loadBigimgscale(
                         arUrl,
                         width, height,
-                        _zoomType, _zoomVal
+                        zoomType, zoomVal
                     );
                 }
             }
@@ -439,7 +439,7 @@ export class FileShow {
             setShowType(GroupType.none); // 改變顯示類型
             M.fileLoad.stopFileWatcher();
 
-            _tiefseeview.zoomFull(TiefseeviewZoomType["imageOriginal"]);
+            _tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal);
             let dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`); // 圖片長寬
             let dom_type = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoType"]`); // 檔案類型
             let dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);   // 檔案修改時間

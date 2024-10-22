@@ -519,12 +519,12 @@ export class FileLoad {
 
             } else if (fileInfo2.Type === "file") { // 如果是檔案
 
-                let _dirPath = Lib.getDirectoryName(path); // 取得檔案所在的資料夾路徑
-                if (_dirPath === null) {
+                let dirPath = Lib.getDirectoryName(path); // 取得檔案所在的資料夾路徑
+                if (dirPath === null) {
                     _isLoadFileFinish = true;
                     return;
                 }
-                _dirPathNow = _dirPath;
+                _dirPathNow = dirPath;
                 _groupType = fileToGroupType(fileInfo2);
                 _atLoadingGroupType = _groupType;
                 _atLoadingExt = Lib.getExtension(path);

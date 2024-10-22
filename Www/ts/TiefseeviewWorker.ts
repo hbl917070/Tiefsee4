@@ -38,7 +38,7 @@
             // 用於區分是否為同一次請求
             const random = Math.random();
 
-            console.time("sharpen");
+            // console.time("sharpen");
 
             // 將圖片轉換為 ImageBitmap
             const offscreenCanvas = new OffscreenCanvas(width, height);
@@ -114,7 +114,7 @@
 
             const finalImageBitmap = resultCanvas.transferToImageBitmap();
 
-            console.timeEnd("sharpen");
+            // console.timeEnd("sharpen");
 
             self.postMessage({ type, imageBitmap: finalImageBitmap, tempDrawImage }, [finalImageBitmap]);
         }

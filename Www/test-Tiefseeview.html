@@ -130,16 +130,16 @@
         var tv;
 
         async function loadurl() {
-            let _url = $("#imgurl").val();
+            let url = $("#imgurl").val();
             let type = $("#select-type").val()
             if (type == "img") {
-                await tv.loadImg(_url);
+                await tv.loadImg(url);
             }
             if (type == "bigimg") {
-                await tv.loadBigimg(_url);
+                await tv.loadBigimg(url);
             }
             if (type == "video") {
-                await tv.loadVideo(_url);
+                await tv.loadVideo(url);
             }
 
             tv.transformRefresh(false)
