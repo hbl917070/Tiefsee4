@@ -20,18 +20,18 @@
     }
 
     .toastItem {
-        border-radius: 8px;
-        background-color: var(--color-black80);
-        box-shadow: 0px 0px 3px var(--color-blue40);
-        border: 1px solid var(--color-blue40);
-        backdrop-filter: saturate(180%) blur(20px);
-
-        display: flex;
         margin-top: 10px;
         margin-left: 10px;
         margin-right: 10px;
         overflow: hidden;
         flex-shrink: 0;
+
+        border-radius: 8px;
+        box-shadow: 0px 0px 3px var(--color-blue40);
+        border: 1px solid var(--color-blue40);
+ 
+        @include blur-base();
+        display: flex;
 
         //動畫
         animation-name: toastStart;

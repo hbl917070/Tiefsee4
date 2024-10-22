@@ -177,7 +177,7 @@
 
 //-------------------------------
 
-//全螢幕
+// 全螢幕
 body[fullScreen="true"] {
     .window-titlebar {
         position: fixed;
@@ -187,7 +187,6 @@ body[fullScreen="true"] {
         transition: top 0.3s;
         z-index: 100;
         background-color: var(--color-black80);
-        //backdrop-filter: saturate(180%) blur(20px);
     }
     .main-T {
         position: fixed;
@@ -197,7 +196,6 @@ body[fullScreen="true"] {
         transition: top 0.3s;
         z-index: 100;
         background-color: var(--color-black80);
-        //backdrop-filter: saturate(180%) blur(20px);
     }
     .titlebar-text {
         app-region: no-drag; //讓視窗不允許拖曳

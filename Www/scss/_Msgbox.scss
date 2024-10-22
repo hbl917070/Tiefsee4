@@ -19,18 +19,19 @@
     min-width: 300px;
     max-width: 500px;
     margin: 10px;
-    border-radius: 8px;
-    background-color: var(--color-black80);
-    box-shadow: 0px 0px 3px var(--color-blue40);
-    border: 1px solid var(--color-blue40);
-    backdrop-filter: saturate(180%) blur(20px);
     display: flex;
     flex-direction: column;
     color: var(--color-white);
     overflow: hidden;
     position: relative;
 
-    /*用於顯示時的動畫*/
+    border-radius: 8px;
+    box-shadow: 0px 0px 3px var(--color-blue40);
+    border: 1px solid var(--color-blue40);
+
+    @include blur-base();
+
+    // 顯示時的動畫
     transition: all 0.1s;
     transition-timing-function: cubic-bezier(0.6, 0.3, 0.33, 1.67);
     opacity: 0.8;

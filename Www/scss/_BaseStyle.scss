@@ -149,3 +149,31 @@ select optgroup {
 .base-radio:checked::before {
     transform: scale(1);
 }
+
+// 模糊
+@mixin blur-base($background-color: var(--color-black80)) {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: $background-color;
+        z-index: -2;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(15px);
+        z-index: -1;
+    }
+}

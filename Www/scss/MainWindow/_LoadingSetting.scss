@@ -16,17 +16,18 @@
         width: 90px;
         height: 90px;
         border-radius: 10px;
-        backdrop-filter: saturate(180%) blur(20px);
-        position: absolute;
+        
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         margin: auto;
-        background-color: var(--color-black80);
         display: flex;
         align-items: center;
         justify-content: center;
+
+        @include blur-base();
+        position: absolute;
     }
 
     .loadingSetting-box svg {

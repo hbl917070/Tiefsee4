@@ -508,7 +508,6 @@
     right: 0;
     bottom: 0;
     top: 35px;
-    //backdrop-filter: saturate(180%) blur(5px);
     transform: translateX(420px);
     transition: all 0.1s;
     opacity: 0;
@@ -521,22 +520,22 @@
     }
 
     .textEditor-box {
-        position: fixed;
+  
         top: 35px;
         bottom: 5px;
         right: 5px;
         max-width: 400px;
         width: calc(100% - 40px);
         margin-left: 60px;
+        display: flex;
+        flex-direction: column;
 
-        background-color: var(--color-black80);
         border-radius: 8px;
         box-shadow: 0px 0px 3px var(--color-blue40);
         border: 1px solid var(--color-blue40);
-        backdrop-filter: saturate(180%) blur(20px);
 
-        display: flex;
-        flex-direction: column;
+        @include blur-base();
+        position: fixed;
     }
 
     //上面的按鈕群

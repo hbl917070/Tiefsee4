@@ -34,15 +34,14 @@
 	margin-left: 5px;
 	margin-right: 4px;
 	margin-top: 5px;
-
 	margin-bottom: 5px;
-	background-color: var(--color-black80);
 	padding: 5px;
-	border-radius: 8px;
 
+	border-radius: 8px;
 	box-shadow: 0px 0px 3px var(--color-blue40);
 	border: 1px solid var(--color-blue40);
-	backdrop-filter: saturate(180%) blur(20px);
+
+	@include blur-base();
 }
 
 .menu-grid {

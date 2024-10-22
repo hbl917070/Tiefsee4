@@ -393,7 +393,6 @@ input::-webkit-inner-spin-button {
     box-sizing: content-box;
     transition: all 0.15s cubic-bezier(0.49, 0.37, 0.45, 1.4) !important;
     background-color: var(--color-black);
-    //backdrop-filter: saturate(180%) blur(20px);
     border: 1px solid var(--color-blue40);
     box-shadow: 0px 0px 3px var(--color-blue40);
     border-radius: 8px;
