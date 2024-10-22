@@ -187,6 +187,10 @@ body[fullScreen="true"] {
         transition: top 0.3s;
         z-index: 100;
         background-color: var(--color-black80);
+
+        // 讓背景延伸到工具列
+        height: 70px;
+        padding-bottom: 40px;
     }
     .main-T {
         position: fixed;
@@ -195,7 +199,6 @@ body[fullScreen="true"] {
         right: 0;
         transition: top 0.3s;
         z-index: 100;
-        background-color: var(--color-black80);
     }
     .titlebar-text {
         app-region: no-drag; //讓視窗不允許拖曳

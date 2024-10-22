@@ -24,7 +24,7 @@ export class FullScreen {
         if (this.showTitlebar === false && e.clientY <= 5) {
             this.showTitlebar = true;
             document.body.setAttribute("showTitlebar", "true");
-        } else if (this.showTitlebar === true && e.clientY < this.domTitleBar.offsetHeight + this.domMainT.offsetHeight + 10) {
+        } else if (this.showTitlebar === true && e.clientY < this.domTitleBar.offsetHeight + 10) {
             this.showTitlebar = true;
             document.body.setAttribute("showTitlebar", "true");
         } else {
