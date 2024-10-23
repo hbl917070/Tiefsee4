@@ -112,7 +112,7 @@ export class Msgbox {
 
         setTimeout(() => {
             donBox.setAttribute("active", "true");
-        }, 1);
+        }, 10);
 
         if (json.funcYes === undefined) { // 如果沒有指定按下「確定」的事件，就隱藏「取消」按鈕
             donBtnNo.style.display = "none";

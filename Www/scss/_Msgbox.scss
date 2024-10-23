@@ -32,14 +32,12 @@
     @include blur-base();
 
     // 顯示時的動畫
-    transition: all 0.1s;
-    transition-timing-function: cubic-bezier(0.6, 0.3, 0.33, 1.67);
-    opacity: 0.8;
-    transform: scaleY(1.05) translateY(0px);
+    transition: transform 0.1s;
+    // transition-timing-function: cubic-bezier(0.6, 0.3, 0.33, 1.67);
+    transform: translateY(-5px);
 }
 .msgbox-box[active="true"] {
-    opacity: 1;
-    transform: scaleY(1) translateY(0px);
+    transform: translateY(0);
 }
 
 .msgbox-txt {

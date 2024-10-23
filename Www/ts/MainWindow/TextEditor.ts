@@ -123,9 +123,11 @@ export class TextEditor {
 
 			_isShow = true;
 			_dom.style.display = "";
-			await Lib.sleep(1);
-			_dom.setAttribute("active", "true");
 
+			setTimeout(() => {
+				_dom.setAttribute("active", "true");
+			}, 10);
+		
 			if (path === null) { path = "" }
 			_filePath = path;
 			let t = "";

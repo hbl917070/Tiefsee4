@@ -510,12 +510,10 @@
     top: 35px;
     transform: translateX(420px);
     transition: all 0.1s;
-    opacity: 0;
     pointer-events: none;
 
     &[active="true"] {
         transform: translateX(0px);
-        opacity: 1;
         pointer-events: initial;
     }
 
