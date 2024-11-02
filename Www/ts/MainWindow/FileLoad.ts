@@ -1052,6 +1052,7 @@ export class FileLoad {
                 }
             }
 
+            // 刪除前顯示詢問視窗
             if (M.config.settings.other.fileDeletingShowCheckMsg) {
                 M.msgbox.show({
                     type: "radio",
@@ -1069,11 +1070,10 @@ export class FileLoad {
                         await runDelete(value);
                     }
                 });
-
-            } else {
-
+            }
+            // 不顯示詢問視窗直接執行
+            else {
                 await runDelete(newType);
-
             }
 
         }

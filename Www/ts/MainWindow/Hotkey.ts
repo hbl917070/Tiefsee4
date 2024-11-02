@@ -214,7 +214,11 @@ export class Hotkey {
                 M.script.fileLoad.showRenameMsg();
             }
             if (e.code === "Delete") {
-                M.script.fileLoad.showDeleteFileMsg();
+                if (e.shiftKey) {
+                    M.script.fileLoad.showDeleteFileMsg("delete"); // 永久刪除
+                } else {
+                    M.script.fileLoad.showDeleteFileMsg("moveToRecycle"); // 移到回收筒
+                }
             }
             if (e.code === "KeyO") {
                 M.script.open.revealInFileExplorer();
