@@ -593,19 +593,22 @@ export class Lib {
         if (typeof str === "object") {
             jsonFormat = JSON.stringify(str, null, space);
             ok = true;
-        } else if (
-            (str.startsWith('{') && str.endsWith('}'))
-            || (str.startsWith('[') && str.endsWith(']'))
+        }
+        else if ((str.startsWith('{') && str.endsWith('}')) ||
+            (str.startsWith('[') && str.endsWith(']'))
         ) {
             try {
-                str = str.replace(/": NaN/g, `": null`); // 將 NaN 轉成 null
+                // 將 NaN 轉成 null
+                str = str.replace(/": NaN/g, `": null`)
+                    .replace(/": \[NaN/g, `": [null`);
                 json = JSON.parse(str);
                 jsonFormat = JSON.stringify(json, null, space);
                 ok = true;
             } catch (e) {
                 jsonFormat = str;
             }
-        } else {
+        }
+        else {
             jsonFormat = str;
         }
         return {

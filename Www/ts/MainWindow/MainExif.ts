@@ -1,13 +1,13 @@
 import { MainWindow } from "./MainWindow";
 import { Dragbar } from "./Dragbar";
-import { AiDrawingPrompt } from "./AiDrawingPrompt";
-import { DbStoreName, IndexedDBManager } from "./IndexedDBManager";
+import { DbStoreName } from "./IndexedDBManager";
 import { WebAPI } from "../WebAPI";
 import { GroupType } from "../Config";
 import { Toast } from "../Toast";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { Lib } from "../Lib";
 import { RequestLimiter } from "../RequestLimiter";
+import { AiParsingUtility } from "./AiParsingUtility/AiParsingUtility";
 
 export class MainExif {
 
@@ -372,12 +372,30 @@ export class MainExif {
 							name: "Textual Data",
 							value: "parameters: " + value
 						});
-					} else {
+					}
+					else {
 
-						let jsonF = Lib.jsonStrFormat(value);
-						if (jsonF.ok) { // 解析欄位
-							if (value.startsWith(`{"prompt":`)) { // ComfyUI
+						const jsonF = Lib.jsonStrFormat(value);
+						if (jsonF.ok) {
+							// 某些情況下 ComfyUI 的資料會被放在 User Comment 裡面
+							if (value.startsWith(`{"prompt":`) && value.includes(`class_type`)) { // ComfyUI
 								comfyuiPrompt = JSON.parse(value)["prompt"];
+								// console.log("ComfyUI User Comment----");
+							}
+							// 可能來自於某種 ComfyUI 的 civitai 插件，裡面通常包含 extraMetadata 欄位
+							else if (value.includes(`"class_type":"`) && value.includes(`"inputs":{"`)) {
+								comfyuiPrompt = jsonF.json;
+								try {
+									const json = JSON.parse(jsonF.json.extraMetadata);
+									if (json.resources !== undefined) {
+										civitai.civitaiResources = json.resources;
+									}
+								} catch (e) {
+									console.warn("extraMetadata 內缺少 resources 欄位", jsonF.json);
+								}
+							}
+							else {
+								_domTabContentInfo.appendChild(getItemDom(name, value));
 							}
 						} else {
 							_domTabContentInfo.appendChild(getItemDom(name, value));
@@ -414,7 +432,7 @@ export class MainExif {
 
 							if (name === "Comment") { // NovelAI 才有的欄位
 								if (val.includes(`"steps": `)) {
-									AiDrawingPrompt.getNovelai(val).forEach(item => {
+									AiParsingUtility.getNovelai(val).forEach(item => {
 										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
@@ -429,7 +447,7 @@ export class MainExif {
 
 							else if (name === "metadata") { // 不明，資料為一般的 json
 								if (val.includes(`"seed": `)) {
-									AiDrawingPrompt.getNormalJson(val).forEach(item => {
+									AiParsingUtility.getNormalJson(val).forEach(item => {
 										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
@@ -440,12 +458,12 @@ export class MainExif {
 							else if (name === "parameters") { // Stable Diffusion webui 才有的欄位
 								if (val.includes(`"sui_image_params":`)) { // StableSwarmUI
 									let json = JSON.parse(val)["sui_image_params"];
-									AiDrawingPrompt.getNormalJson(json).forEach(item => {
+									AiParsingUtility.getNormalJson(json).forEach(item => {
 										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								}
 								else if (val.includes("Steps: ")) { // A1111
-									AiDrawingPrompt.getSdwebui(val).forEach(item => {
+									AiParsingUtility.getA1111(val).forEach(item => {
 										if (item.title == "Civitai resources") {
 											civitai.civitaiResources = item.text;
 										}
@@ -492,7 +510,7 @@ export class MainExif {
 									continue;
 								}
 
-								let items = AiDrawingPrompt.getInvokeai(val);
+								let items = AiParsingUtility.getInvokeai(val);
 								if (items.length > 0) {
 									items.forEach(item => {
 										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
@@ -544,9 +562,9 @@ export class MainExif {
 			if (comfyuiPrompt !== undefined) {
 				let jsonF = Lib.jsonStrFormat(comfyuiPrompt);
 				if (jsonF.ok) { // 解析欄位		
-					let cdata = AiDrawingPrompt.getComfyui(comfyuiPrompt);
+					let cdata = AiParsingUtility.getComfyui(comfyuiPrompt);
 					for (let i = 0; i < cdata.length; i++) {
-						const node = cdata[i].node;
+						const node = cdata[i].nodeTitle;
 						const data = cdata[i].data;
 
 						// 折疊面板
@@ -596,15 +614,13 @@ export class MainExif {
 			else if (comfyuiGenerationData !== undefined) {
 
 				if (comfyuiGenerationData.includes(`"seed":`)) {
-					AiDrawingPrompt.getNormalJson(comfyuiGenerationData).forEach(item => {
+					AiParsingUtility.getNormalJson(comfyuiGenerationData).forEach(item => {
 						_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 					})
 				} else {
 					_domTabContentInfo.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
 				}
-
 			}
-
 
 		}
 
@@ -675,7 +691,6 @@ export class MainExif {
 			) {
 				return;
 			}
-
 			let data: any = civitai.civitaiResources;
 			if (typeof data === "string") {
 				try {
@@ -1171,7 +1186,7 @@ export class MainExif {
 						</div>
 					`);
 					let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
-					AiDrawingPrompt.getSdwebui(text).forEach(item => {
+					AiParsingUtility.getA1111(text).forEach(item => {
 						domContentList.appendChild(getItemDom(item.title, item.text));
 					});
 				} else { // 一般的文字檔
