@@ -30,7 +30,7 @@ export class Config {
         startMenu: [
             { name: /mspaint/i, groupType: ["img"] },
             { name: /photoshop/i, groupType: ["img"] },
-            { name: /illustrator/i, groupType: ["img"] },
+            { name: /illustrator/i, groupType: ["img"], fileExt: ["ai"] },
             { name: /Lightroom/i, groupType: ["img"] },
             { name: /Paint/i, groupType: ["img"] },
             { name: /photo/i, groupType: ["img"] },
@@ -81,7 +81,6 @@ export class Config {
             { name: /^Brave$/i, fileExt: ["html", "pdf"] },
             { name: /Microsoft Edge/i, fileExt: ["html", "pdf"] },
 
-            { name: /Adobe Illustrator/i, fileExt: ["pdf"] },
             { name: /Adobe Acrobat/i, fileExt: ["pdf"] },
             { name: /pdf/i, fileExt: ["pdf"] },
 
@@ -394,9 +393,9 @@ export class Config {
             /** 啟用觸控板手勢 */
             enableTouchpadGestures: false,
             /** 到達最後一個檔案時 */
-            reachLastFile : "firstFile",
+            reachLastFile: "firstFile",
             /** 到達最後一個資料夾時 */
-            reachLastDir : "firstDir",
+            reachLastDir: "firstDir",
             /** 語言 */
             lang: "",
         },
