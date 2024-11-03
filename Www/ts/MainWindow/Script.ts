@@ -1065,12 +1065,6 @@ export class ScriptMenu {
         this.M.menu.openAtMouse(domMenu, 0, 0);
     }
 
-    /** 顯示右鍵選單 預設 */
-    showRightMenuDefault() {
-        let dom = document.getElementById("menu-rightMenuDefault");
-        this.M.menu.openAtMouse(dom, 0, -55);
-    }
-
     /** 顯示右鍵選單 輸入框 */
     showRightMenuTextbox(x?: number, y?: number) {
         let domInput = document.activeElement;

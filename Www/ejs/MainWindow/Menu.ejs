@@ -16,25 +16,35 @@
         <div class="menu-box">
 
             <div class="menu-hor-item js-openNewWindow">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
             </div>
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item js-revealInFileExplorer">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-dir.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item js-systemContextMenu">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.systemContextMenu">檔案右鍵選單</div>
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.systemContextMenu">系統選單</div>
             </div>
             <div class="menu-hor-item js-renameFile" show-not="bulkView,">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
             </div>
             <div class="menu-hor-item js-renameDir" show-only="bulkView,">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
             </div>
 
@@ -498,9 +508,15 @@
 
             <div class="menu-hor-hr" show-only="img,imgs,video,"></div>
 
+            <div class="menu-hor-item js-openNewWindow">
+                <div class="menu-hor-icon">
+                    <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+                </div>
+                <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
+            </div>
             <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-open.svg"); %>
+                    <%- await readFile("./img/default/tool-dir.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
@@ -682,12 +698,12 @@
 
             <div class="menu-hor-hr"></div>
 
-            <div class="menu-hor-item js-revealInFileExplorer">
+            <!-- <div class="menu-hor-item js-revealInFileExplorer">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-open.svg"); %>
+                    <%- await readFile("./img/default/tool-dir.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorerDir">在檔案總管中顯示資料夾</div>
-            </div>
+            </div> -->
             <!-- <div class="menu-hor-item js-systemContextMenu">
                 <div class="menu-hor-icon">
                     <%- await readFile("./img/default/tool-rightMenu.svg"); %>
@@ -707,18 +723,18 @@
                 <div class="menu-hor-txt" i18n="menu.deleteDir">刪除資料夾</div>
             </div> -->
 
-            <div class="menu-hor-item js-copyDirName">
+            <!-- <div class="menu-hor-item js-copyDirName">
                 <div class="menu-hor-icon">
                 </div>
                 <div class="menu-hor-txt" i18n="menu.copyDirName">複製資料夾名</div>
-            </div>
-            <div class="menu-hor-item js-copyDirPath">
+            </div> -->
+            <!-- <div class="menu-hor-item js-copyDirPath">
                 <div class="menu-hor-icon">
                 </div>
                 <div class="menu-hor-txt" i18n="menu.copyDirPath">複製資料夾路徑</div>
-            </div>
+            </div> -->
 
-            <div class="menu-hor-hr"></div>
+            <!-- <div class="menu-hor-hr"></div> -->
 
             <div class="menu-hor-item js-setting">
                 <div class="menu-hor-icon">
@@ -726,7 +742,6 @@
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
-
 
         </div>
 
@@ -831,9 +846,15 @@
         </div>
         <div class="menu-hor-hr"></div>
 
+        <div class="menu-hor-item js-openNewWindow">
+            <div class="menu-hor-icon">
+                <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+            </div>
+            <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
+        </div>
         <div class="menu-hor-item js-revealInFileExplorer">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-open.svg"); %>
+                <%- await readFile("./img/default/tool-dir.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.revealInFileExplorerFile">在檔案總管中顯示檔案</div>
         </div>
@@ -903,7 +924,7 @@
 
         <div class="menu-hor-item js-revealInFileExplorer">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-open.svg"); %>
+                <%- await readFile("./img/default/tool-dir.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.revealInFileExplorerDir">在檔案總管中顯示資料夾</div>
         </div>

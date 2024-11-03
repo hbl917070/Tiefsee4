@@ -34,7 +34,6 @@ export class MainMenu {
         initRotate();
         initRightMenuImage();
         initRightMenuWelcome();
-        initRightMenuDefault();
         initRightMenuBulkView();
         initRightMenuFilePanel();
         initRightMenuDirPanel();
@@ -131,7 +130,6 @@ export class MainMenu {
                 } else if (showType === "welcome") {
                     M.script.menu.showRightMenuWelcome(x, y);
                 } else {
-                    //M.script.menu.showRightMenuDefault();
                     M.script.menu.showRightMenuImage(x, y);
                 }
             }
@@ -637,6 +635,10 @@ export class MainMenu {
                 M.script.img.zoomTo100();
             });
 
+            dom.querySelector(".js-openNewWindow")?.addEventListener("click", () => { // 另開視窗
+                M.script.menu.close();
+                M.script.open.openNewWindow();
+            });
             dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { // 在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer();
@@ -704,57 +706,6 @@ export class MainMenu {
             dom.querySelector(".js-help")?.addEventListener("click", () => { // 說明
                 M.script.menu.close();
                 WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')
-            });
-            dom.querySelector(".js-close")?.addEventListener("click", () => { // 關閉程式
-                M.script.menu.close();
-                baseWindow.close();
-            });
-        }
-
-        /**
-         * 初始化 右鍵選單 - 預設
-         */
-        function initRightMenuDefault() {
-
-            const dom = document.getElementById("menu-rightMenuDefault")
-            if (dom === null) { return; }
-
-            dom.querySelector(".js-prev")?.addEventListener("click", () => {
-                M.script.fileLoad.prevFile();
-            });
-            dom.querySelector(".js-next")?.addEventListener("click", () => {
-                M.script.fileLoad.nextFile();
-            });
-            dom.querySelector(".js-prevDir")?.addEventListener("click", () => {
-                M.script.fileLoad.prevDir();
-            });
-            dom.querySelector(".js-nextDir")?.addEventListener("click", () => {
-                M.script.fileLoad.nextDir();
-            });
-            dom.querySelector(".js-sort")?.addEventListener("click", () => {
-                M.script.menu.close();
-                M.script.menu.showMenuSort();
-            });
-
-            dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { // 在檔案總管中顯示
-                M.script.menu.close();
-                M.script.open.revealInFileExplorer();
-            });
-            dom.querySelector(".js-systemContextMenu")?.addEventListener("click", () => { // 檔案右鍵選單
-                M.script.menu.close();
-                M.script.file.showContextMenu();
-            });
-            dom.querySelector(".js-copyFilePath")?.addEventListener("click", () => { // 複製影像
-                M.script.menu.close();
-                M.script.copy.copyFilePath();
-            });
-            dom.querySelector(".js-deleteFile")?.addEventListener("click", () => { // 刪除圖片
-                M.script.menu.close();
-                M.script.fileLoad.showDeleteFileMsg();
-            });
-            dom.querySelector(".js-setting")?.addEventListener("click", () => { // 設定
-                M.script.menu.close();
-                M.script.setting.showSetting();
             });
             dom.querySelector(".js-close")?.addEventListener("click", () => { // 關閉程式
                 M.script.menu.close();
@@ -887,6 +838,10 @@ export class MainMenu {
                 M.script.menu.showMenuImageSearch(undefined, getPath());
             });
 
+            dom.querySelector(".js-openNewWindow")?.addEventListener("click", () => { // 另開視窗
+                M.script.menu.close();
+                M.script.open.openNewWindow(getPath());
+            });
             dom.querySelector(".js-revealInFileExplorer")?.addEventListener("click", () => { // 在檔案總管中顯示
                 M.script.menu.close();
                 M.script.open.revealInFileExplorer(getPath());
