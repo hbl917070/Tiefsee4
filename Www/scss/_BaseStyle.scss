@@ -15,6 +15,11 @@ select optgroup {
     background: var(--color-black);
 }
 
+// 某些情況下 div 取得焦點後會出現框線，所以將其隱藏
+div:focus {
+    outline: none;
+}
+
 //----------------------------------------------------------------
 
 //滾動條樣式 (一般，寬度10px
