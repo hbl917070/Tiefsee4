@@ -76,7 +76,15 @@ public class StartWindow : Form {
         Adapter.LoopRun(50, () => {
 
             bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
-            bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; //按著滑鼠滾輪
+
+            // 避免與切換輸入法的快速鍵衝突
+            if (isDown == false && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) ||
+                Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ||
+                Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))) {
+                isKeyboardSpace = false;
+            }
+
+            bool isMouseMiddle = Control.MouseButtons == MouseButtons.Middle; // 按著滑鼠滾輪
 
             int quickLookRunType = 0;
             if (isKeyboardSpace) { quickLookRunType = 1; }

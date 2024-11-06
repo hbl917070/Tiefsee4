@@ -78,14 +78,10 @@ public class WV_System {
     /// 取得當前是否按著空白鍵跟滑鼠滾輪
     /// </summary>
     public string GetDownKey() {
-        bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
-        bool isMouseMiddle = System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Middle; // 按著滑鼠滾輪
-
         var obj = new {
-            isKeyboardSpace = isKeyboardSpace,
-            isMouseMiddle = isMouseMiddle
+            isKeyboardSpace = Keyboard.IsKeyDown(Key.Space), // 按著空白鍵
+            isMouseMiddle = Control.MouseButtons == MouseButtons.Middle, // 按著滑鼠滾輪
         };
-
         return JsonSerializer.Serialize(obj);
     }
 
