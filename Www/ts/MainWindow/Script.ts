@@ -395,15 +395,15 @@ export class ScriptImg {
             // 如果處理失敗，且 vipsType2 = base64，則先用 canvas 處理成 base64 再上傳到暫存資料夾
             if (imgInitInfo.code != "1" && configItem.vipsType2 === "base64") {
                 // console.log("處理失敗，改用 canvas 來處理");
-                let url = Lib.pathToUrl(path);
+                const url = await WebAPI.getFile(fileInfo2); // 取得圖片網址
                 await this.preloadImg(url);
-                let can = this.urlToCanvas(url);
-                let blob = await this.getCanvasBlob(can, 1, "medium", "png", 0.9);
+                const can = this.urlToCanvas(url);
+                const blob = await this.getCanvasBlob(can, 1, "medium", "png", 0.9);
 
                 if (blob === null) {
                     isFail = true;
                 } else {
-                    let base64 = await this.blobToBase64(blob);
+                    const base64 = await this.blobToBase64(blob);
                     if (base64 !== null) {
                         await WV_Image.Base64ToTempImg(path, base64 as string);
                         imgInitInfo = await WebAPI.Img.vipsInit("base64", fileInfo2);
