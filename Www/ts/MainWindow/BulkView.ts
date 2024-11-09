@@ -1187,7 +1187,7 @@ export class BulkView {
                     if (_isVisible === false) { return; }
 
                     let ret = arUrl[0];
-                    let boxWidth = domCenter.offsetWidth;
+                    let boxWidth = domCenter.offsetWidth * window.devicePixelRatio;
 
                     if (boxWidth <= 10) {
                         return;
