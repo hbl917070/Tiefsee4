@@ -67,6 +67,26 @@ public class WebWindow : FormNone {
     /// <returns></returns>
     public static async Task<WebWindow> Create(string url, string[] args, WebWindow parentWindow) {
 
+        // 當視窗載入完成時，觸發 baseWindow.onCreate
+        void Wv2LoadedTriggerCreate(WebWindow ww, string[] args) {
+            bool _isEventTriggered = false;
+
+            TriggerCreate(ww, args);
+
+            ww._wv2.CoreWebView2.DOMContentLoaded += (sender, e) => {
+                if (_isEventTriggered) { return; }
+
+                TriggerCreate(ww, args);
+                _isEventTriggered = true;
+            };
+
+            /* DateTime timeStart = DateTime.Now; // 計時開始
+            ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
+                Debug.WriteLine(" NavigationCompleted ----- " + (DateTime.Now - timeStart).TotalMilliseconds + " 毫秒");
+                TriggerCreate(ww, args);
+            }; */
+        }
+
         // 如果開啟非 mainwindow 的 window
         if (url.IndexOf("MainWindow.html") == -1) {
             var ww = new WebWindow();
@@ -75,9 +95,7 @@ public class WebWindow : FormNone {
             ww._parentWindow = parentWindow;
             ww._args = args;
             ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
-            ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
-                TriggerCreate(ww, args);
-            };
+            Wv2LoadedTriggerCreate(ww, args); // 網頁載入完成時，觸發 baseWindow.onCreate
             return ww;
         }
 
@@ -89,9 +107,7 @@ public class WebWindow : FormNone {
             ww._parentWindow = parentWindow;
             ww._args = args;
             ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
-            ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
-                TriggerCreate(ww, args);
-            };
+            Wv2LoadedTriggerCreate(ww, args); // 網頁載入完成時，觸發 baseWindow.onCreate
             return ww;
         }
 
@@ -106,9 +122,7 @@ public class WebWindow : FormNone {
                 _tempWindow._parentWindow = parentWindow;
                 _tempWindow._args = args;
                 _tempWindow._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
-                _tempWindow._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
-                    TriggerCreate(_tempWindow, args);
-                };
+                Wv2LoadedTriggerCreate(_tempWindow, args); // 網頁載入完成時，觸發 baseWindow.onCreate
 
                 // 如果是 單一執行+快速啟動，則在視窗關閉的時候建立下一個視窗
                 if (Program.startType == 5) {
@@ -135,9 +149,7 @@ public class WebWindow : FormNone {
             ww._parentWindow = parentWindow;
             ww._args = args;
             ww._wv2.CoreWebView2.Navigate(GetHtmlFilePath(url));
-            ww._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
-                TriggerCreate(ww, args);
-            };
+            Wv2LoadedTriggerCreate(ww, args); // 網頁載入完成時，觸發 baseWindow.onCreate
 
             NewTempWindow(url); // 新建 window，用於下次顯示
             Console.WriteLine("第一次開啟:---" + url);
@@ -149,10 +161,7 @@ public class WebWindow : FormNone {
         // 呼叫先前已經建立的 window 來顯示
         temp2._parentWindow = parentWindow;
         temp2._args = args;
-        temp2._wv2.NavigationCompleted += (sender, e) => { // 網頁載入完成時
-            TriggerCreate(temp2, args);
-        };
-        TriggerCreate(temp2, args);
+        Wv2LoadedTriggerCreate(temp2, args); // 網頁載入完成時，觸發 baseWindow.onCreate
 
         NewTempWindow(url); // 新建 window，用於下次顯示
 
