@@ -47,6 +47,7 @@ export class Config {
             { name: /Perfect Effects/i, groupType: ["img"] },
             { name: /Artweaver /i, groupType: ["img"] },
             { name: /Honeyview/i, groupType: ["img"] },
+            { name: /BandiView/i, groupType: ["img"] },
             { name: /ACDSee/i, groupType: ["img"] },
             { name: /IrfanView/i, groupType: ["img"] },
             { name: /XnView/i, groupType: ["img"] },
