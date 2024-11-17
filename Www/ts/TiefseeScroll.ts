@@ -50,11 +50,14 @@ export class TiefseeScroll {
             // 在滾動條上面滾動時
             const mouseWheel = (e: WheelEvent) => {
                 e.preventDefault(); // 禁止頁面滾動
-                let v = getTop();
+
+                // 將內容要移動的距離換算成滾動條需要移動的距離
+                const val = 100 * (_panelHeight / _contentHeight);
+
                 if (e.deltaX > 0 || e.deltaY > 0) { // 下
-                    setTop(v + 100, "wheel");
+                    setTop(getTop() + val, "wheel");
                 } else { // 上
-                    setTop(v - 100, "wheel");
+                    setTop(getTop() - val, "wheel");
                 }
             }
             _domScroll.addEventListener("wheel", (e) => { mouseWheel(e); }, true);
