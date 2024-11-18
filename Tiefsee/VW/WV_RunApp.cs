@@ -125,7 +125,13 @@ public class WV_RunApp {
                         jsonString = sr.ReadToEnd();
                     }
                 }
-                _tempUwpItem = JsonSerializer.Deserialize<Dictionary<string, UwpItem>>(jsonString);
+                _tempUwpItem = JsonSerializer.Deserialize<Dictionary<string, UwpItem>>(jsonString)
+                    // 忽略異常的資料
+                    .Where(x => string.IsNullOrEmpty(x.Value.Name) == false &&
+                        string.IsNullOrEmpty(x.Value.Logo) == false &&
+                        string.IsNullOrEmpty(x.Value.Id) == false)
+                    .ToDictionary();
+
             }
             catch (Exception) {
                 _tempUwpItem = new();
@@ -145,6 +151,10 @@ public class WV_RunApp {
                 string name = package.DisplayName; // APP在地化的名稱 (取得成本高)
                 string logo = package.Logo.ToString(); // 圖示的路徑 (取得成本高)
                 string id = package.Id.Name + "_" + package.Id.PublisherId;
+                // 忽略異常的資料
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(logo) || string.IsNullOrEmpty(id)) {
+                    continue;
+                }
                 _tempUwpItem.Add(fullName, new UwpItem {
                     Logo = logo,
                     Name = name,
