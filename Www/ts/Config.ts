@@ -456,13 +456,16 @@ export class Config {
                 { ext: "ico", type: "web" },
 
                 // 優先使用 vips 處理圖片，失敗則直接在瀏覽器用 canvase 處理成 base64
-                { ext: "avif", type: "vips", vipsType: "magick", vipsType2: "base64" },
+                { ext: "avif", type: "vips", vipsType: "vips", vipsType2: "base64" },
                 { ext: "avifs", type: "web" },
 
                 { ext: "tif", type: "vips", vipsType: "tif" },
                 { ext: "tiff", type: "vips", vipsType: "tif" },
-                { ext: "dds", type: "vips", vipsType: "wpf,magick" },
-                { ext: "jxr", type: "vips", vipsType: "wpf" },
+                { ext: "dds", type: "vips", vipsType: "uwp,magick" },
+                
+                { ext: "jxr", type: "vips", vipsType: "hdrfix,uwp" },
+                { ext: "wdp", type: "vips", vipsType: "hdrfix,uwp" },
+                { ext: "hdp", type: "vips", vipsType: "hdrfix,uwp" },
 
                 { ext: "psd", type: "vips", vipsType: "magick" },
                 { ext: "psb", type: "vips", vipsType: "magick" },

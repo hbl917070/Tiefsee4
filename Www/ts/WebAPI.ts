@@ -114,8 +114,8 @@ export class WebAPI {
             if (type === "icon") {
                 return this.fileIcon(path);
             }
-            if (type === "wpf") {
-                return APIURL + `/api/img/wpf?path=${encodePath}&${fileTime}`;
+            if (type === "uwp") {
+                return APIURL + `/api/img/uwp?path=${encodePath}&${fileTime}`;
             }
             if (type === "magick" || type === "magickBmp") {
                 return APIURL + `/api/img/magick?type=bmp&path=${encodePath}&${fileTime}`;

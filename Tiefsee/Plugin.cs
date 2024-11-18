@@ -8,6 +8,7 @@ namespace Tiefsee;
 public static class Plugin {
 
     public static string pathNConvert;
+    public static string pathHdrfix;
     public static string pathQuickLook;
     public static string pathPDFTronWebviewer;
     public static string pathMonacoEditor;
@@ -20,6 +21,9 @@ public static class Plugin {
 
         pathNConvert = Path.Combine(AppPath.appDataPlugin, "NConvert/nconvert.exe");
         dataPlugin.NConvert = File.Exists(pathNConvert);
+
+        pathHdrfix = Path.Combine(AppPath.appDataPlugin, "hdrfix/hdrfix.exe");
+        dataPlugin.Hdrfix = File.Exists(pathHdrfix);
 
         pathQuickLook = Path.Combine(AppPath.appDataPlugin, "QuickLook/Tiefsee.QuickLook.dll");
         dataPlugin.QuickLook = File.Exists(pathQuickLook);
@@ -140,6 +144,7 @@ public static class PluginQuickLook {
 
 public class DataPlugin {
     public bool NConvert { get; set; } = false;
+    public bool Hdrfix { get; set; } = false;
     public bool QuickLook { get; set; } = false;
     public bool MonacoEditor { get; set; } = false;
     public bool PDFTronWebviewer { get; set; } = false;

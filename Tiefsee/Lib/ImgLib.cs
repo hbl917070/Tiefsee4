@@ -10,6 +10,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Tiefsee;
 
@@ -66,6 +68,40 @@ public class ImgLib {
         encoder.Save(stream);
         stream.Position = 0;
         return stream;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static async Task<Stream> Uwp_PathToStream(string path, Guid encoderId) {
+        var ras = await _Uwp_PathToStream(path, encoderId);
+        return ras.AsStream();
+    }
+    // 直接回傳 Stream 會無法編譯
+    private static async Task<IRandomAccessStream> _Uwp_PathToStream(string path, Guid encoderId) {
+
+        var sourceFile = await StorageFile.GetFileFromPathAsync(path);
+        using var sourceStream = await sourceFile.OpenAsync(FileAccessMode.Read);
+        var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(sourceStream);
+
+        var softwareBitmap = await decoder.GetSoftwareBitmapAsync(
+            decoder.BitmapPixelFormat,
+            decoder.BitmapAlphaMode,
+            new() { },
+            Windows.Graphics.Imaging.ExifOrientationMode.RespectExifOrientation,
+            Windows.Graphics.Imaging.ColorManagementMode.DoNotColorManage
+        );
+
+        // 創建輸出串流
+        var outputStream = new InMemoryRandomAccessStream();
+
+        // 編碼設定
+        var encoder = await Windows.Graphics.Imaging.BitmapEncoder.CreateAsync(encoderId, outputStream);
+        encoder.SetSoftwareBitmap(softwareBitmap);
+
+        await encoder.FlushAsync();
+        outputStream.Seek(0);
+        return outputStream;
     }
 
     /// <summary>
@@ -283,6 +319,44 @@ public class ImgLib {
             return null;
         }
     }
+
+    /// <summary>
+    /// Jxr 轉檔後取得檔案路徑
+    /// </summary>
+    public static string Jxr_PathToPath(string path) {
+
+        if (File.Exists(Plugin.pathHdrfix) == false) {
+            throw new Exception("hdrfix.exe 不存在");
+        }
+
+        string hashName = FileLib.FileToHash(path) + "_hdrfix.png"; // 暫存檔案名稱
+        string outputPath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
+
+        if (File.Exists(outputPath)) { // 如果檔案已經存在，就直接回傳
+            return outputPath;
+        }
+
+        if (Directory.Exists(AppPath.tempDirImgProcessed) == false) { // 如果暫存資料夾不存在就建立
+            Directory.CreateDirectory(AppPath.tempDirImgProcessed);
+        }
+
+        string arg = $"\"{path}\" \"{outputPath}\"";
+
+        using (var p = new Process()) {
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = Plugin.pathHdrfix;
+            p.StartInfo.Arguments = arg;
+            p.Start();
+
+            string result = p.StandardOutput.ReadToEnd();
+            p.WaitForExit(30 * 1000);
+        }
+
+        return outputPath;
+    }
+
 
     #region Nconvert
 
@@ -646,7 +720,7 @@ public class ImgLib {
         if (type == "tif" || type == "tiff") {
             NetVips.Image vImg = GetNetVips(path, "tif");
 
-            //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual); //套用顏色
+            //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual); // 套用顏色
             VipsSave(vImg, path100, "auto");
 
             return GetImgInitInfo(path100, "vips", vipsType);
@@ -665,9 +739,9 @@ public class ImgLib {
 
         if (type == "jpg") {
             if (IsCMYK(path)) { // 如果是 CMYK，就先套用顏色
-                NetVips.Image Vimg = GetNetVips(path, "jpg");
-                using (var Vimg2 = Vimg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { //套用顏色
-                    Vimg2.Jpegsave(path100);
+                NetVips.Image vImg = GetNetVips(path, "jpg");
+                using (var vImg2 = vImg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { // 套用顏色
+                    vImg2.Jpegsave(path100);
                 }
                 return GetImgInitInfo(path100, "vips", vipsType);
             }
@@ -694,6 +768,18 @@ public class ImgLib {
                 }
             });
             return GetImgInitInfo(path100, "vips", vipsType);
+        }
+
+        if (type == "uwp") {
+            using var ms = Uwp_PathToStream(path, Windows.Graphics.Imaging.BitmapEncoder.TiffEncoderId).Result;
+            using var vImg = NetVips.Image.NewFromStream(ms);
+            VipsSave(vImg, path100, "png");
+            return GetImgInitInfo(path100, "vips", vipsType);
+        }
+
+        if (type == "hdrfix") {
+            var pngPath = Jxr_PathToPath(path);
+            return GetImgInitInfo(pngPath, "vips", vipsType);
         }
 
         if (type == "magick") {
@@ -791,15 +877,22 @@ public class ImgLib {
             Directory.CreateDirectory(AppPath.tempDirImgZoom);
         }
 
-        string img100 = PathToImgProcessed(path, vipsType);
-        if (File.Exists(img100)) {
-            File.SetLastAccessTime(img100, DateTime.Now); // 調整最後存取時間，延後暫存被清理
+        // 取得處理後的暫存當路徑
+        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
+        if (File.Exists(imgProcessed)) {
+            File.SetLastAccessTime(imgProcessed, DateTime.Now); // 調整最後存取時間，延後暫存被清理
         }
-        else { // 如果沒有處理過的暫存檔
-            img100 = path; // 直接只用原檔
+        else {
+            imgProcessed = PathToImgProcessed(path, vipsType, "png");
+            if (File.Exists(imgProcessed)) {
+                File.SetLastAccessTime(imgProcessed, DateTime.Now); // 調整最後存取時間，延後暫存被清理
+            }
+            else { // 如果沒有處理過的暫存檔
+                imgProcessed = path; // 直接只用原檔
+            }
         }
 
-        NetVips.Image im = GetNetVips(img100, fileType);
+        NetVips.Image im = GetNetVips(imgProcessed, fileType);
 
         Enums.Kernel? kernel = Enums.Kernel.Lanczos3;
         double? gap = 4;
@@ -845,8 +938,7 @@ public class ImgLib {
     private static void VipsSave(NetVips.Image vImg, string path, string type) {
 
         if (type == "jpg") {
-            vImg.Jpegsave(filename: path, q: 89);
-
+            vImg.Jpegsave(filename: path, q: 100);
         }
         else if (type == "png") {
             vImg.Pngsave(
@@ -888,12 +980,11 @@ public class ImgLib {
     /// 取得「ImgProcessed」暫存資料夾裡面的檔案名稱
     /// </summary>
     /// <param name="path"></param>
-    /// <param name="addStr"> 串在檔名後面的字串 </param>
+    /// <param name="vipsType"> 串在檔名後面的字串 </param>
     /// <param name="ext"> 副檔名 </param>
     /// <returns></returns>
-    public static string PathToImgProcessed(string path, string vipsType) {
-        string ext = ".jpg";
-        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}{ext}"; // 暫存檔案名稱
+    public static string PathToImgProcessed(string path, string vipsType, string ext = "jpg") {
+        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
         string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
         if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
             Directory.CreateDirectory(AppPath.tempDirImgProcessed);

@@ -580,6 +580,7 @@ interface AppInfo {
 /** 判斷哪些擴充有啟用 */
 interface AppInfoPlugin {
     NConvert: bool,
+    Hdrfix: bool,
     QuickLook: bool,
     MonacoEditor: bool,
     PDFTronWebviewer: bool,

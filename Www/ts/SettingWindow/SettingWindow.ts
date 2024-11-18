@@ -1495,11 +1495,13 @@ class SettingWindow {
                 // const dom_NConvert = getDom("#pluginLiet-NConvert") as HTMLInputElement;
                 const dom_PDFTronWebviewer = getDom("#pluginLiet-PDFTronWebviewer") as HTMLInputElement;
                 const dom_MonacoEditor = getDom("#pluginLiet-MonacoEditor") as HTMLInputElement;
+                const dom_hdrfix = getDom("#pluginLiet-hdrfix") as HTMLInputElement;
 
                 dom_QuickLook.innerHTML = getHtml(baseWindow.appInfo.plugin.QuickLook);
                 // dom_NConvert.innerHTML = getHtml(baseWindow.appInfo.plugin.NConvert);
                 dom_PDFTronWebviewer.innerHTML = getHtml(baseWindow.appInfo.plugin.PDFTronWebviewer);
                 dom_MonacoEditor.innerHTML = getHtml(baseWindow.appInfo.plugin.MonacoEditor);
+                dom_hdrfix.innerHTML = getHtml(baseWindow.appInfo.plugin.Hdrfix);
 
                 // 如果未安裝QuickLook擴充套件，就顯示提示文字，並且禁止編輯
                 const dom_noInstalled = getDom("#quickLook-noInstalled") as HTMLInputElement;
@@ -1744,6 +1746,9 @@ class SettingWindow {
          * 重新啟動 Tiefsee
          */
         async function restartTiefsee() {
+
+            // 清理 webview2 的暫存
+            await WV_Window.ClearBrowserCache();
 
             // 儲存 ini、Setting.json
             const arFunc = baseWindow.closingEvents;
