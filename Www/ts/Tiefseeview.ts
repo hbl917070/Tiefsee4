@@ -1563,7 +1563,7 @@ export class Tiefseeview {
                 _domData.style.imageRendering = "pixelated";
 
             } else if (renderin === TiefseeviewImageRendering.autoOrPixelated) {
-                if (getZoomRatio() > 1) {
+                if (getZoomRatio() > 1 / _dpiZoom) {
                     _domData.style.imageRendering = "pixelated";
                 } else {
                     _domData.style.imageRendering = "auto";
@@ -2687,8 +2687,14 @@ export class Tiefseeview {
                     url: ""
                 }
             }
+            const w = toNumber(_domData.style.width); // 原始圖片大小(旋轉前的大小)
+            const h = toNumber(_domData.style.height);
+
             let dpiZoom = _dpiZoom;
-            if (dpiZoom < 1) { dpiZoom = 1; } // 低於 1 倍時圖片會變得模糊
+            // 低於 1 倍時圖片會變得模糊
+            if (dpiZoom < 1) { dpiZoom = 1; }
+            // 當圖片縮放比例大於100%，就沒有必要用 dpiZoom 渲染更多的像素
+            if (w / getOriginalWidth() * dpiZoom > 1) { dpiZoom = 1; }
 
             const bigimgTemp = getBigimgTemp(); // 判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return; }
@@ -2698,8 +2704,6 @@ export class Tiefseeview {
             const temp_can_width = can.width;
             const temp_can_height = can.height;
 
-            const w = toNumber(_domData.style.width); // 原始圖片大小(旋轉前的大小)
-            const h = toNumber(_domData.style.height);
             if (w === 0 || h === 0) { return; }
             const margin = 35 * dpiZoom; // 多繪製的區域
             const scale = w / getOriginalWidth() * dpiZoom; // 目前的 圖片縮放比例
