@@ -353,10 +353,10 @@ export class Tiefseeview {
          */
         function getClipInfo() {
             return {
-                x: Math.round(_clipX),
-                y: Math.round(_clipY),
-                width: Math.round(_clipWidth),
-                height: Math.round(_clipHeight),
+                x: Math.floor(_clipX),
+                y: Math.floor(_clipY),
+                width: Math.floor(_clipWidth),
+                height: Math.floor(_clipHeight),
                 deg: _degNow, // 旋轉角度   
                 mirrorHorizontal: _mirrorHorizontal, // 鏡像-水平
                 mirrorVertical: _mirrorVertical, // 鏡像-垂直
@@ -1906,8 +1906,8 @@ export class Tiefseeview {
 
             if (animationDuration <= 0) {
 
-                _domCon.style.top = Math.round(top) + "px";
-                _domCon.style.left = Math.round(left) + "px";
+                _domCon.style.top = Math.floor(top) + "px";
+                _domCon.style.left = Math.floor(left) + "px";
                 initScroll(); // 初始化滾動條的位置(跟隨圖片位置同步)
 
             } else {
@@ -1931,8 +1931,8 @@ export class Tiefseeview {
                             duration: animationDuration, // 動畫時間
                             start: () => { },
                             complete: () => { // 動畫結束時
-                                _domCon.style.top = Math.round(top) + "px";
-                                _domCon.style.left = Math.round(left) + "px";
+                                _domCon.style.top = Math.floor(top) + "px";
+                                _domCon.style.left = Math.floor(left) + "px";
                                 resolve(0);
                             },
                             easing: "easeOutExpo"
@@ -2072,7 +2072,7 @@ export class Tiefseeview {
          */
         function getScale() {
             const w = toNumber(_domData.style.width); // 原始圖片大小(旋轉前的大小)
-            const scale = w / getOriginalWidth(); // 目前的 圖片縮放比例
+            const scale = w / getOriginalWidth() * _dpiZoom; // 目前的 圖片縮放比例
             return scale;
         }
 
@@ -2427,7 +2427,7 @@ export class Tiefseeview {
 
             for (let i = _arBigimgscale.length - 1; i >= 0; i--) {
                 const item = _arBigimgscale[i];
-                if (item.scale / dpiZoom >= scale) {
+                if (item.scale >= scale) {
                     ret = item;
                     break;
                 }
@@ -2489,7 +2489,7 @@ export class Tiefseeview {
 
             // 第一次縮小
             if (_tempBigimg[0] === undefined) {
-                _tempBigimg[0] = getCanvasZoom(_tempCan, x, "medium")
+                _tempBigimg[0] = getCanvasZoom(_tempCan, x, "medium");
             }
 
             for (let i = 1; i < len; i++) {
@@ -2519,10 +2519,13 @@ export class Tiefseeview {
         /** [private] 取得縮放後的Canvas */
         function getCanvasZoom(img: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: ("high" | "low" | "medium")) {
 
-            const width = Math.round(img.width * zoom);
-            const height = Math.round(img.height * zoom);
+            const width = Math.floor(img.width * zoom);
+            const height = Math.floor(img.height * zoom);
 
             const canvas = document.createElement("canvas");
+
+            if (width <= 0 || height <= 0) { return canvas; }
+
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -2785,17 +2788,17 @@ export class Tiefseeview {
             dHeight *= dpiZoom;
 
             // 避免以浮點數進行運算
-            function toRound() {
-                sx = Math.round(sx);
-                sy = Math.round(sy);
-                sWidth = Math.round(sWidth);
-                sHeight = Math.round(sHeight);
-                dx = Math.round(dx);
-                dy = Math.round(dy);
-                dWidth = Math.round(dWidth);
-                dHeight = Math.round(dHeight);
+            function toFloor() {
+                sx = Math.floor(sx);
+                sy = Math.floor(sy);
+                sWidth = Math.floor(sWidth);
+                sHeight = Math.floor(sHeight);
+                dx = Math.floor(dx);
+                dy = Math.floor(dy);
+                dWidth = Math.floor(dWidth);
+                dHeight = Math.floor(dHeight);
             }
-            toRound();
+            toFloor();
 
             // 圖片如果有旋轉，或是移動超過多餘渲染區塊的1/2，才會再次渲染
             if (
@@ -2827,12 +2830,12 @@ export class Tiefseeview {
                     return;
                 }
 
-                _domBigimgCanvas.width = Math.round((viewWidth + margin * 2) / radio_can * dpiZoom);
-                _domBigimgCanvas.height = Math.round((viewHeight + margin * 2) / radio_can * dpiZoom);
-                _domBigimgCanvas.style.width = Math.round(viewWidth + margin * 2) + "px";
-                _domBigimgCanvas.style.height = Math.round(viewHeight + margin * 2) + "px";
-                _domBigimgCanvas.style.left = Math.round(dx / dpiZoom) + "px";
-                _domBigimgCanvas.style.top = Math.round(dy / dpiZoom) + "px";
+                _domBigimgCanvas.width = alignToPixel((viewWidth + margin * 2) / radio_can * dpiZoom);
+                _domBigimgCanvas.height = alignToPixel((viewHeight + margin * 2) / radio_can * dpiZoom);
+                _domBigimgCanvas.style.width = alignToPixel(viewWidth + margin * 2) + "px";
+                _domBigimgCanvas.style.height = alignToPixel(viewHeight + margin * 2) + "px";
+                _domBigimgCanvas.style.left = alignToPixel(dx / dpiZoom) + "px";
+                _domBigimgCanvas.style.top = alignToPixel(dy / dpiZoom) + "px";
                 let ctx = _domBigimgCanvas.getContext("2d") as CanvasRenderingContext2D;
                 // ctx.imageSmoothingEnabled = false;
 
@@ -2851,7 +2854,7 @@ export class Tiefseeview {
                     sHeight = sHeight * bigimgTemp.scale
                     dWidth = dWidth
                     dHeight = dHeight
-                    toRound();
+                    toFloor();
                     // ctx.imageSmoothingQuality = "high";
                     ctx.drawImage(can,
                         sx, sy, sWidth, sHeight,
@@ -2866,7 +2869,7 @@ export class Tiefseeview {
                     sy = sy * bigimgTemp.scale
                     dWidth = dWidth / bigimgTemp.scale
                     dHeight = dHeight / bigimgTemp.scale
-                    toRound();
+                    toFloor();
                     ctx.drawImage(can,
                         sx, sy, sWidth, sHeight,
                         0, 0, dWidth, dHeight
@@ -2880,7 +2883,7 @@ export class Tiefseeview {
                     sy = sy * bigimgTemp.scale
                     dWidth = dWidth / bigimgTemp.scale
                     dHeight = dHeight / bigimgTemp.scale
-                    toRound();
+                    toFloor();
                     const oc = new OffscreenCanvas(sWidth, sHeight); // 創建一個canvas畫布
                     const oc2d = oc.getContext("2d"); // canvas 畫筆
                     if (oc2d == null) { return; }
@@ -2907,7 +2910,7 @@ export class Tiefseeview {
                     sy = dy * -1
                     dWidth = temp_can_width * scale / bigimgTemp.scale
                     dHeight = temp_can_height * scale / bigimgTemp.scale
-                    toRound();
+                    toFloor();
                     await createImageBitmap(can, 0, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -2926,7 +2929,7 @@ export class Tiefseeview {
                     sy = dy * -1
                     dWidth = dWidth / bigimgTemp.scale
                     dHeight = getOriginalHeight() * scale
-                    toRound();
+                    toFloor();
                     await createImageBitmap(can, sx, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -2945,7 +2948,7 @@ export class Tiefseeview {
                     sy = sy * bigimgTemp.scale
                     dWidth = getOriginalWidth() * scale
                     dHeight = dHeight / bigimgTemp.scale
-                    toRound();
+                    toFloor();
                     await createImageBitmap(can, 0, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -2962,7 +2965,7 @@ export class Tiefseeview {
                     dWidth = dWidth / bigimgTemp.scale
                     sy = sy * bigimgTemp.scale
                     dHeight = dHeight / bigimgTemp.scale
-                    toRound();
+                    toFloor();
                     await createImageBitmap(can, sx, sy, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
                         .then(function (sprites) {
@@ -3026,24 +3029,24 @@ export class Tiefseeview {
         function setDataSize(width: number) {
             if (_dataType === "img") {
                 const ratio = getOriginalHeight() / getOriginalWidth();
-                _domData.style.width = Math.round(width) + "px";
-                _domData.style.height = Math.round(width * ratio) + "px";
-                _domImg.style.width = Math.round(width) + "px";
-                _domImg.style.height = Math.round(width * ratio) + "px";
+                _domData.style.width = Math.floor(width) + "px";
+                _domData.style.height = Math.floor(width * ratio) + "px";
+                _domImg.style.width = Math.floor(width) + "px";
+                _domImg.style.height = Math.floor(width * ratio) + "px";
             }
             if (_dataType === "bigimg" || _dataType === "bigimgscale") {
                 const ratio = getOriginalHeight() / getOriginalWidth();
                 const w = width;
                 const h = width * ratio;
-                _domData.style.width = Math.round(w) + "px";
-                _domData.style.height = Math.round(h) + "px";
+                _domData.style.width = Math.floor(w) + "px";
+                _domData.style.height = Math.floor(h) + "px";
             }
             if (_dataType === "video") {
                 const ratio = getOriginalHeight() / getOriginalWidth();
-                _domData.style.width = Math.round(width) + "px";
-                _domData.style.height = Math.round(width * ratio) + "px";
-                _domVideo.style.width = Math.round(width) + "px";
-                _domVideo.style.height = Math.round(width * ratio) + "px";
+                _domData.style.width = Math.floor(width) + "px";
+                _domData.style.height = Math.floor(width * ratio) + "px";
+                _domVideo.style.width = Math.floor(width) + "px";
+                _domVideo.style.height = Math.floor(width * ratio) + "px";
             }
         }
 
@@ -3143,6 +3146,14 @@ export class Tiefseeview {
         // -----------------------------------------------
 
         //#region Lib
+
+        /**
+         * 用於計算 canvas 的像素對齊
+         */
+        function alignToPixel(value: number) {
+            const dpr = window.devicePixelRatio;
+            return Math.floor(value * dpr) / dpr;
+        }
 
         /**
          * 網頁比例縮放或是 DPI 變化時
