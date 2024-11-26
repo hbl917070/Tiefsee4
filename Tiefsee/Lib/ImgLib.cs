@@ -191,7 +191,7 @@ public class ImgLib {
             byte[] bytes = new byte[len];
             sr.Read(bytes, 0, len);
             string s = System.Text.Encoding.ASCII.GetString(bytes);
-            if (s.Contains("prtrCMYK")) {
+            if (s.Contains("prtrCMYK") || s.Contains("proofCMYK")) {
                 return true;
             }
         }
