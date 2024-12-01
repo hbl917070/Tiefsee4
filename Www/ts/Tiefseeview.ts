@@ -122,10 +122,13 @@ export class Tiefseeview {
         var _worker: Worker;
         var _url: string; // 目前的圖片網址
         var _dataType: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale") = "img"; // 資料類型
+        /** 圖片當前被設定寬度 (含小數點，避免計算縮放時失去精度。還必須乘 _dpiZoom 才是當前實際的像素) */
+        var _nowWidth = 1;
+        var _nowHeight = 1;
 
         var _dpiZoom = 1;
         var _isDpizoomAUto = true;
-        var _degNow = 0; // 目前的角度 0~359
+        var _nowDeg = 0; // 目前的角度 0~359
         var _zoomRatio = 1.1; // 縮放比率(必須大於1)
         var _transformDuration = 200; // transform 動畫時間(毫秒)
         var _mirrorHorizontal = false; // 水平鏡像
@@ -357,7 +360,7 @@ export class Tiefseeview {
                 y: Math.floor(_clipY),
                 width: Math.floor(_clipWidth),
                 height: Math.floor(_clipHeight),
-                deg: _degNow, // 旋轉角度   
+                deg: _nowDeg, // 旋轉角度   
                 mirrorHorizontal: _mirrorHorizontal, // 鏡像-水平
                 mirrorVertical: _mirrorVertical, // 鏡像-垂直
             }
@@ -370,7 +373,7 @@ export class Tiefseeview {
             if (_isClip === false) { return; }
 
             // 取得旋轉後的 size
-            let rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _degNow);
+            let rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _nowDeg);
             let oWidth = rect.rectWidth;
             let oHeight = rect.rectHeight;
 
@@ -546,7 +549,7 @@ export class Tiefseeview {
                 if (type === "c") {
 
                     // 取得旋轉後的 size
-                    let rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _degNow);
+                    let rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _nowDeg);
                     let oWidth = rect.rectWidth;
                     let oHeight = rect.rectHeight;
 
@@ -591,7 +594,7 @@ export class Tiefseeview {
             if (oWidth === 1 || oHeight === 1) { return; }
 
             // 取得旋轉後的 size
-            const rect = getRotateRect(oWidth, oHeight, 0, 0, _degNow);
+            const rect = getRotateRect(oWidth, oHeight, 0, 0, _nowDeg);
             oWidth = rect.rectWidth;
             oHeight = rect.rectHeight;
 
@@ -666,8 +669,8 @@ export class Tiefseeview {
 
         // 雙指旋轉  
         _hammerPlural.on("rotatestart", (e) => {
-            _tempRotateStareDegNow = _degNow;
-            _tempRotateStareDegValue = e.rotation - _degNow;
+            _tempRotateStareDegNow = _nowDeg;
+            _tempRotateStareDegValue = e.rotation - _nowDeg;
             _tempTouchRotateStarting = false;
         });
         _hammerPlural.on("rotate", async (e) => {
@@ -688,7 +691,7 @@ export class Tiefseeview {
         });
         _hammerPlural.on("rotateend", (e) => {
             _tempTouchRotateStarting = false;
-            const r = _degNow % 90; // 如果不足 90 度
+            const r = _nowDeg % 90; // 如果不足 90 度
             if (r === 0) { return; }
             if (r > 45 || (r < 0 && r > -45)) {
                 setDegForward(e.center.x, e.center.y, true); // 順時針旋轉
@@ -1121,7 +1124,7 @@ export class Tiefseeview {
             }
 
             // 放大上限為100萬px
-            if (_domData.offsetWidth > 999999 || _domData.offsetHeight > 999999) {
+            if (_nowWidth > 999999 || _nowHeight > 999999) {
                 return true;
             }
 
@@ -1136,12 +1139,12 @@ export class Tiefseeview {
 
             // 寬度或高度小於10px的圖片，縮小下限為1px
             if (getOriginalWidth() <= 10 || getOriginalHeight() <= 10) {
-                if (_domData.offsetWidth <= 1 || _domData.offsetHeight <= 1) {
+                if (_nowWidth <= 1 || _nowHeight <= 1) {
                     return true;
                 }
             } else {
                 // 縮小下限為10px
-                if (_domData.offsetWidth <= 10 || _domData.offsetHeight <= 10) {
+                if (_nowWidth <= 10 || _nowHeight <= 10) {
                     return true;
                 }
             }
@@ -1440,7 +1443,7 @@ export class Tiefseeview {
         /**
          * 取得縮放比例。原始1.00
          */
-        function getZoomRatio(): number { return _domData.offsetWidth / getOriginalWidth(); }
+        function getZoomRatio(): number { return _nowWidth / getOriginalWidth(); }
 
         /**
          * 取得 是否圖片隨視窗縮放
@@ -1672,7 +1675,7 @@ export class Tiefseeview {
          * @param enableAnimation 是否使用動畫
          */
         async function setDegForward(x: number | undefined, y: number | undefined, enableAnimation: boolean = true) {
-            let deg: number = _degNow;
+            let deg: number = _nowDeg;
             deg = (Math.floor(deg / 90) + 1) * 90;
             await setDeg(deg, x, y, enableAnimation);
         }
@@ -1681,7 +1684,7 @@ export class Tiefseeview {
          * @param enableAnimation 是否使用動畫
          */
         async function setDegReverse(x: number | undefined, y: number | undefined, enableAnimation: boolean = true) {
-            let deg: number = _degNow;
+            let deg: number = _nowDeg;
             deg = (Math.ceil(deg / 90) - 1) * 90;
             await setDeg(deg, x, y, enableAnimation);
         }
@@ -1705,8 +1708,8 @@ export class Tiefseeview {
                 clipInfo = getClipInfo();
             }
 
-            if (_degNow !== 0) {
-                setDeg(360 - _degNow, undefined, undefined, true); // 先旋轉成鏡像後的角度
+            if (_nowDeg !== 0) {
+                setDeg(360 - _nowDeg, undefined, undefined, true); // 先旋轉成鏡像後的角度
             }
 
             _mirrorHorizontal = isMirrored;
@@ -1726,12 +1729,12 @@ export class Tiefseeview {
             // top = dom_data.getBoundingClientRect().height - top;
 
             // 取得中心點在旋轉前的實際坐標
-            let origPoint = getOrigPoint(left, top, toNumber(_domData.style.width), toNumber(_domData.style.height), _degNow);
+            let origPoint = getOrigPoint(left, top, _nowWidth, _nowHeight, _nowDeg);
             left = origPoint.x;
             top = origPoint.y;
 
             // 取得旋轉回原本角度的坐標
-            let rotateRect = getRotateRect(toNumber(_domData.style.width), toNumber(_domData.style.height), left, top, _degNow);
+            let rotateRect = getRotateRect(_nowWidth, _nowHeight, left, top, _nowDeg);
             left = rotateRect.x;
             top = rotateRect.y;
 
@@ -1749,7 +1752,7 @@ export class Tiefseeview {
             // 如果有啟用剪裁框，則重新計算剪裁框的位置
             if (isUpdateClip) {
                 // 計算圖片旋轉後的大小
-                const rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _degNow);
+                const rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _nowDeg);
 
                 // 鏡像後的坐標
                 const clipX = rect.rectWidth - clipInfo.x - clipInfo.width;
@@ -1778,8 +1781,8 @@ export class Tiefseeview {
                 clipInfo = getClipInfo();
             }
 
-            if (_degNow !== 0) {
-                setDeg(360 - _degNow, undefined, undefined, true); // 先旋轉成鏡像後的角度
+            if (_nowDeg !== 0) {
+                setDeg(360 - _nowDeg, undefined, undefined, true); // 先旋轉成鏡像後的角度
             }
 
             _mirrorVertical = isMirror;
@@ -1799,12 +1802,12 @@ export class Tiefseeview {
             top = _domData.getBoundingClientRect().height - top;
 
             // 取得中心點在旋轉前的實際坐標
-            let origPoint = getOrigPoint(left, top, toNumber(_domData.style.width), toNumber(_domData.style.height), _degNow);
+            let origPoint = getOrigPoint(left, top, _nowWidth, _nowHeight, _nowDeg);
             left = origPoint.x;
             top = origPoint.y;
 
             // 取得旋轉回原本角度的坐標
-            let rotateRect = getRotateRect(toNumber(_domData.style.width), toNumber(_domData.style.height), left, top, _degNow);
+            let rotateRect = getRotateRect(_nowWidth, _nowHeight, left, top, _nowDeg);
             left = rotateRect.x;
             top = rotateRect.y;
 
@@ -1822,7 +1825,7 @@ export class Tiefseeview {
             // 如果有啟用剪裁框，則重新計算剪裁框的位置
             if (isUpdateClip) {
                 // 計算圖片旋轉後的大小
-                let rect1 = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _degNow);
+                let rect1 = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _nowDeg);
 
                 // 鏡像後的坐標
                 let clipY = rect1.rectHeight - clipInfo.y - clipInfo.height;
@@ -1836,7 +1839,7 @@ export class Tiefseeview {
          * 取得 旋轉角度
          * @returns 0 ~ 359
          */
-        function getDeg(): number { return _degNow; }
+        function getDeg(): number { return _nowDeg; }
         /**
           * 設定 旋轉角度
           * @param deg 角度
@@ -1848,15 +1851,15 @@ export class Tiefseeview {
             let isUpdateClip = false;
             let clipInfo: { x: number, y: number, width: number, height: number, deg: number } = { x: 0, y: 0, width: 0, height: 0, deg: 0 };
             if (_isClip) {
-                if (deg % 90 === 0 && _degNow % 90 === 0 && deg !== _degNow) {
+                if (deg % 90 === 0 && _nowDeg % 90 === 0 && deg !== _nowDeg) {
                     clipInfo = getClipInfo(); // 記錄旋轉前的 clip 位置
                     isUpdateClip = true;
                 }
             }
 
             // 設定旋轉角度
-            _degNow = deg;
-            _eventChangeDeg(_degNow);
+            _nowDeg = deg;
+            _eventChangeDeg(_nowDeg);
             await setTransform(x, y, enableAnimation);
 
             // 如果有啟用剪裁框，且旋轉角度是90的倍數，則重新計算剪裁框的位置
@@ -1866,8 +1869,8 @@ export class Tiefseeview {
                 let origPoint2 = getOrigPoint(clipInfo.x + clipInfo.width, clipInfo.y + clipInfo.height, getOriginalWidth(), getOriginalHeight(), clipInfo.deg);
 
                 // 計算旋轉後的剪裁框位置
-                let rect1 = getRotateRect(getOriginalWidth(), getOriginalHeight(), origPoint1.x, origPoint1.y, _degNow);
-                let rect2 = getRotateRect(getOriginalWidth(), getOriginalHeight(), origPoint2.x, origPoint2.y, _degNow);
+                let rect1 = getRotateRect(getOriginalWidth(), getOriginalHeight(), origPoint1.x, origPoint1.y, _nowDeg);
+                let rect2 = getRotateRect(getOriginalWidth(), getOriginalHeight(), origPoint2.x, origPoint2.y, _nowDeg);
 
                 // 設定剪裁框的位置
                 let rect = {
@@ -2000,11 +2003,11 @@ export class Tiefseeview {
 
             if (duration <= 0) {
                 // 如果角度超過360，就初始化
-                if (_degNow <= 0 || _degNow >= 360) { _degNow = _degNow - Math.floor(_degNow / 360) * 360; } // 避免超過360               
-                $(_domData).animate({ "transform_rotate": _degNow, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
-                _domData.style.transform = `rotate(${_degNow}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
+                if (_nowDeg <= 0 || _nowDeg >= 360) { _nowDeg = _nowDeg - Math.floor(_nowDeg / 360) * 360; } // 避免超過360               
+                $(_domData).animate({ "transform_rotate": _nowDeg, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
+                _domData.style.transform = `rotate(${_nowDeg}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
 
-                _domData.setAttribute("transform_rotate", _degNow.toString());
+                _domData.setAttribute("transform_rotate", _nowDeg.toString());
                 initPoint(false);
                 return;
             }
@@ -2012,7 +2015,7 @@ export class Tiefseeview {
             await new Promise((resolve, _) => {
 
                 $(_domData).animate({
-                    "transform_rotate": _degNow, // 自訂用於動畫的變數
+                    "transform_rotate": _nowDeg, // 自訂用於動畫的變數
                     "transform_scaleX": scaleX,
                     "transform_scaleY": scaleY,
                 }, {
@@ -2035,12 +2038,12 @@ export class Tiefseeview {
                         // 取得旋轉點在旋轉前的位置(相對坐標)
                         let degNow = _domData.getAttribute("transform_rotate");
                         if (degNow === null) { degNow = "0"; }
-                        let rect = getOrigPoint(x2, y2, _domData.offsetWidth, _domData.offsetHeight, toNumber(degNow));
+                        let rect = getOrigPoint(x2, y2, _nowWidth, _nowHeight, toNumber(degNow));
                         let x4 = rect.x
                         let y4 = rect.y
 
                         // 計算旋轉後的坐標
-                        let rect2 = getRotateRect(_domData.offsetWidth, _domData.offsetHeight, x4, y4, andata.transform_rotate);
+                        let rect2 = getRotateRect(_nowWidth, _nowHeight, x4, y4, andata.transform_rotate);
 
                         _domData.style.transform = `rotate(${andata.transform_rotate}deg) scaleX(${andata.transform_scaleX}) scaleY(${andata.transform_scaleY})`;
                         _domData.setAttribute("transform_rotate", andata.transform_rotate); // 儲存目前動畫旋轉的角度
@@ -2054,11 +2057,11 @@ export class Tiefseeview {
                     complete: () => { // 動畫結束時
 
                         // 如果角度超過360，就初始化
-                        if (_degNow <= 0 || _degNow >= 360) { _degNow = _degNow - Math.floor(_degNow / 360) * 360; } // 避免超過360               
-                        $(_domData).animate({ "transform_rotate": _degNow, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
-                        _domData.style.transform = `rotate(${_degNow}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
+                        if (_nowDeg <= 0 || _nowDeg >= 360) { _nowDeg = _nowDeg - Math.floor(_nowDeg / 360) * 360; } // 避免超過360               
+                        $(_domData).animate({ "transform_rotate": _nowDeg, "transform_scaleX": scaleX, "transform_scaleY": scaleY, }, { duration: 0 });
+                        _domData.style.transform = `rotate(${_nowDeg}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
 
-                        _domData.setAttribute("transform_rotate", _degNow.toString());
+                        _domData.setAttribute("transform_rotate", _nowDeg.toString());
                         initPoint(false);
                         resolve(0);
                     },
@@ -2071,9 +2074,7 @@ export class Tiefseeview {
          * 目前的 圖片縮放比例
          */
         function getScale() {
-            const w = toNumber(_domData.style.width); // 原始圖片大小(旋轉前的大小)
-            const scale = w / getOriginalWidth() * _dpiZoom; // 目前的 圖片縮放比例
-            return scale;
+            return _nowWidth / getOriginalWidth() * _dpiZoom;
         }
 
         /**
@@ -2119,7 +2120,7 @@ export class Tiefseeview {
             let width = 1;
 
             // 取得圖片在原始大小下，旋轉後的實際長寬(避免圖片經縮放後，長寬比例失去精度)
-            const rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _degNow);
+            const rect = getRotateRect(getOriginalWidth(), getOriginalHeight(), 0, 0, _nowDeg);
             const dom_con_offsetWidth = rect.rectWidth;
             const dom_con_offsetHeight = rect.rectHeight;
 
@@ -2208,7 +2209,7 @@ export class Tiefseeview {
             if (zoomRatio > 1 && _eventLimitMax()) { return; }
             if (zoomRatio < 1 && _eventLimitMin()) { return; }
 
-            setDataSize(_domData.offsetWidth * zoomRatio);
+            setDataSize(_nowWidth * zoomRatio);
 
             var xxx = x - toNumber(_domCon.style.left);
             var yyy = y - toNumber(_domCon.style.top);
@@ -2690,14 +2691,16 @@ export class Tiefseeview {
                     url: ""
                 }
             }
-            const w = toNumber(_domData.style.width); // 原始圖片大小(旋轉前的大小)
-            const h = toNumber(_domData.style.height);
+            const w = _nowWidth;
+            const h = _nowHeight;
 
             let dpiZoom = _dpiZoom;
             // 低於 1 倍時圖片會變得模糊
             if (dpiZoom < 1) { dpiZoom = 1; }
-            // 當圖片縮放比例大於100%，就沒有必要用 dpiZoom 渲染更多的像素
-            if (w / getOriginalWidth() * dpiZoom > 1) { dpiZoom = 1; }
+
+            // 如果啟用「呈現像素」，那麼圖片縮放比例大於100%後，就沒有必要用 dpiZoom 渲染更多的像素
+            if (_rendering === TiefseeviewImageRendering.autoOrPixelated)
+                if (w / getOriginalWidth() * dpiZoom > 1) { dpiZoom = 1; }
 
             const bigimgTemp = getBigimgTemp(); // 判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return; }
@@ -2723,18 +2726,18 @@ export class Tiefseeview {
             let imgTop = -toNumber(_domCon.style.top);
 
             // 計算顯示範圍的四個角落在圖片旋轉前的位置
-            let origPoint1 = getOrigPoint(imgLeft, imgTop, w, h, _degNow);
-            let origPoint2 = getOrigPoint(imgLeft + _domDpiZoom.offsetWidth, imgTop, w, h, _degNow);
-            let origPoint3 = getOrigPoint(imgLeft + _domDpiZoom.offsetWidth, imgTop + _domDpiZoom.offsetHeight, w, h, _degNow);
-            let origPoint4 = getOrigPoint(imgLeft, imgTop + _domDpiZoom.offsetHeight, w, h, _degNow);
+            let origPoint1 = getOrigPoint(imgLeft, imgTop, w, h, _nowDeg);
+            let origPoint2 = getOrigPoint(imgLeft + _domDpiZoom.offsetWidth, imgTop, w, h, _nowDeg);
+            let origPoint3 = getOrigPoint(imgLeft + _domDpiZoom.offsetWidth, imgTop + _domDpiZoom.offsetHeight, w, h, _nowDeg);
+            let origPoint4 = getOrigPoint(imgLeft, imgTop + _domDpiZoom.offsetHeight, w, h, _nowDeg);
 
             // 轉換鏡像前的坐標
             function calc(p: { x: number, y: number }) {
                 if (_mirrorVertical) {
-                    p.y = toNumber(_domData.style.height) - p.y;
+                    p.y = _nowHeight - p.y;
                 }
                 if (_mirrorHorizontal) {
-                    p.x = toNumber(_domData.style.width) - p.x;
+                    p.x = _nowWidth - p.x;
                 }
                 return p;
             }
@@ -2826,7 +2829,7 @@ export class Tiefseeview {
                     setDataType("img");
                     await loadImg(_url);
                     // 載入圖片後必須重新設定大小
-                    setDataSize(_domData.offsetWidth);
+                    setDataSize(_nowWidth);
                     return;
                 }
 
@@ -2891,15 +2894,25 @@ export class Tiefseeview {
                         sx, sy, sWidth, sHeight,
                         0, 0, sWidth, sHeight
                     );
-                    resizeQuality = "medium";
-                    await createImageBitmap(oc, 0, 0, sWidth, sHeight,
-                        { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
-                        .then(function (sprites) {
+                    // resizeQuality = "medium";
+
+                    // 如果啟用了「呈現像素」，則不進行縮放
+                    if (_rendering === TiefseeviewImageRendering.autoOrPixelated) {
+                        await createImageBitmap(oc, 0, 0, sWidth, sHeight).then(function (sprites) {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, 0, 0,);
                             }
                         });
-
+                    }
+                    else {
+                        await createImageBitmap(oc, 0, 0, sWidth, sHeight,
+                            { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality }
+                        ).then(function (sprites) {
+                            if (tc === _tempCanvasSN) {
+                                ctx.drawImage(sprites, 0, 0,);
+                            }
+                        });
+                    }
                 }
                 else if (sWidth > temp_can_width && sHeight > temp_can_height) {
 
@@ -3027,22 +3040,25 @@ export class Tiefseeview {
          * [private] 改變內容大小
          */
         function setDataSize(width: number) {
+
+            const ratio = getOriginalHeight() / getOriginalWidth();
+
+            _nowWidth = width;
+            _nowHeight = width * ratio;
+
             if (_dataType === "img") {
-                const ratio = getOriginalHeight() / getOriginalWidth();
                 _domData.style.width = Math.floor(width) + "px";
                 _domData.style.height = Math.floor(width * ratio) + "px";
                 _domImg.style.width = Math.floor(width) + "px";
                 _domImg.style.height = Math.floor(width * ratio) + "px";
             }
             if (_dataType === "bigimg" || _dataType === "bigimgscale") {
-                const ratio = getOriginalHeight() / getOriginalWidth();
                 const w = width;
                 const h = width * ratio;
                 _domData.style.width = Math.floor(w) + "px";
                 _domData.style.height = Math.floor(h) + "px";
             }
             if (_dataType === "video") {
-                const ratio = getOriginalHeight() / getOriginalWidth();
                 _domData.style.width = Math.floor(width) + "px";
                 _domData.style.height = Math.floor(width * ratio) + "px";
                 _domVideo.style.width = Math.floor(width) + "px";
