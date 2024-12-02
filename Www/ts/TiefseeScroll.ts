@@ -109,9 +109,16 @@ export class TiefseeScroll {
             domPanel.addEventListener("scroll", () => {
                 let val;
                 if (_type === "y") {
+                    // 避免滾動條超出範圍
+                    if (domPanel.scrollTop > domContent.clientHeight - domPanel.clientHeight) {
+                        domPanel.scrollTop = domContent.clientHeight - domPanel.clientHeight;
+                    }
                     val = domPanel.scrollTop;
                     _domScroll.style.top = val + "px"; // 坐標定位
                 } else {
+                    if (domPanel.scrollLeft > domContent.clientWidth - domPanel.clientWidth) {
+                        domPanel.scrollLeft = domContent.clientWidth - domPanel.clientWidth;
+                    }
                     val = domPanel.scrollLeft;
                     _domScroll.style.left = val + "px"; // 坐標定位
                 }
