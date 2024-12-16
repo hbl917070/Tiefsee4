@@ -27,6 +27,11 @@ export class Hotkey {
                 return;
             }
 
+            if (e.code === "F4" && e.altKey) {
+                baseWindow.close();
+                return;
+            }
+
             // 如果開啟側邊的文字編輯器
             if (M.textEditor.getIsShow()) {
                 /*if (e.code == "Escape") {
