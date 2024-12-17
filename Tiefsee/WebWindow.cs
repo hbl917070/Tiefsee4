@@ -74,7 +74,7 @@ public class WebWindow : FormNone {
             TriggerCreate(ww, args);
 
             ww._wv2.CoreWebView2.DOMContentLoaded += (sender, e) => {
-                if (_isEventTriggered) { return; }
+                // if (_isEventTriggered) { return; }
 
                 TriggerCreate(ww, args);
                 _isEventTriggered = true;
@@ -209,10 +209,10 @@ public class WebWindow : FormNone {
     /// </summary>
     private static string GetHtmlFilePath(string fileName) {
         /* return "file:///" +
-            Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName) +
-            "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址 */
-        // return $"http://tiefsee.com/www/{fileName}#{Program.webServer.port}";
-        return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
+           Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName) +
+           "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址 */
+        return $"http://app.example/{fileName}#{Program.webServer.port}";
+        // return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
     }
 
     /// <summary>
@@ -306,7 +306,7 @@ public class WebWindow : FormNone {
             // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
             // --user-agent  覆寫userAgent
             // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
-            string webvviewArguments = null;
+            string webvviewArguments = "--disable-web-security";
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
             _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
         }
@@ -386,6 +386,47 @@ public class WebWindow : FormNone {
         _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
             args.Response = _wv2.CoreWebView2.Environment
                 .CreateWebResourceResponse(null, 200, "OK", "");
+        };
+
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter("http://app.example/*", CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
+
+            var url = args.Request.Uri.Substring("http://app.example/*".Length - 1);
+
+            // 去掉？與 # 後面的字串
+            int index = url.IndexOf("?");
+            if (index != -1) { url = url.Substring(0, index); }
+            index = url.IndexOf("#");
+            if (index != -1) { url = url.Substring(0, index); }
+
+            string assetsFilePath;
+            if (url.ToLower().StartsWith("plugin/")) {
+                url = url.Substring(7);
+
+                assetsFilePath = System.IO.Path.Combine(
+                   AppPath.appDataPlugin, url);
+            }
+            else {
+                if (url.ToLower().StartsWith("www/")) {
+                    url = url.Substring(5);
+                }
+                assetsFilePath = System.IO.Path.Combine(
+                   System.AppDomain.CurrentDomain.BaseDirectory, "Www", url);
+            }
+
+            assetsFilePath = Path.GetFullPath(assetsFilePath);
+
+            try {
+                var ext = Path.GetExtension(assetsFilePath).ToLower();
+                var headers = "Content-Type: " + WebServerController.GetMimeTypeMapping(ext);
+                var fs = File.OpenRead(assetsFilePath);
+                args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
+                    fs, 200, "OK", headers);
+            }
+            catch {
+                args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
+                    null, 404, "Not found", "");
+            }
         };
 
         WV_Window = new WV_Window(this);

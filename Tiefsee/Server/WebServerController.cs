@@ -909,7 +909,7 @@ public class WebServerController {
 
     #region Headers 相關
 
-        /// <summary>
+    /// <summary>
     /// 回傳檔案時加入快取的 Headers
     /// </summary>
     /// <returns> true=304 false=正常回傳檔案 </returns>
@@ -1031,12 +1031,12 @@ public class WebServerController {
     #endregion
 
     // 取得檔案的 MIME type
-    private string GetMimeTypeMapping(string path) {
+    public static string GetMimeTypeMapping(string path) {
         return _mimeTypeMappings.TryGetValue(Path.GetExtension(path), out string mime) ?
             mime :
             "application/octet-stream";
     }
-    private IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
+    private static IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
         #region extension to MIME type list
         {".asf", "video/x-ms-asf"},
         {".asx", "video/x-ms-asf"},

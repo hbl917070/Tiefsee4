@@ -114,7 +114,8 @@ class LibIframe {
      * 取得 Plugin 的路徑
      */
     public getPluginPath() {
-        return this.APIURL + "/Plugin";
+        // return this.APIURL + "/Plugin";
+        return "/plugin";
     }
 
     /**

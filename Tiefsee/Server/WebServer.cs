@@ -63,7 +63,7 @@ public class WebServer {
         string url = request.Url.ToString();
         url = url.Substring(baseUrl.Length);
 
-        var origin = request.Headers.Get("origin");
+        /* var origin = request.Headers.Get("origin");
 
         // UserAgent 裡面不包含 "Tiefsee"，就回傳 403
         if (request?.UserAgent.Contains(Program.webvviewUserAgent) == false) {
@@ -73,7 +73,7 @@ public class WebServer {
             context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
             context.Response.Close();
             return;
-        }
+        } */
 
         // 允許任何來自任何網域的請求
         // context.Response.AddHeader("Access-Control-Allow-Origin", "*");

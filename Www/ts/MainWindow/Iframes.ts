@@ -35,7 +35,7 @@ export class Iframes {
         window.addEventListener("message", async (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== APIURL) {
+            if (e.origin !== APIURL && e.origin !== location.origin) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -153,7 +153,7 @@ class PdfTronWebviewer {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== APIURL) {
+            if (e.origin !== APIURL && e.origin !== location.origin) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -260,7 +260,7 @@ class MonacoEditor {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== APIURL) {
+            if (e.origin !== location.origin) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
@@ -412,7 +412,7 @@ class CherryMarkdown {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== APIURL) {
+            if (e.origin !== APIURL && e.origin !== location.origin) {
                 console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
