@@ -419,9 +419,11 @@ public class WebWindow : FormNone {
             try {
                 var ext = Path.GetExtension(assetsFilePath).ToLower();
                 var headers = "Content-Type: " + WebServerController.GetMimeTypeMapping(ext);
-                var fs = File.OpenRead(assetsFilePath);
+
+                FileStream fs = File.OpenRead(assetsFilePath);
+                ManagedStream ms = new ManagedStream(fs);
                 args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
-                    fs, 200, "OK", headers);
+                    ms, 200, "OK", headers);
             }
             catch {
                 args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
@@ -769,6 +771,55 @@ public class WebWindow : FormNone {
         WindowAPI.WindowRoundedCorners(this.Handle, enable);
     }
 
+}
+
+class ManagedStream : Stream {
+    public ManagedStream(Stream s) {
+        s_ = s;
+    }
+
+    public override bool CanRead => s_.CanRead;
+
+    public override bool CanSeek => s_.CanSeek;
+
+    public override bool CanWrite => s_.CanWrite;
+
+    public override long Length => s_.Length;
+
+    public override long Position { get => s_.Position; set => s_.Position = value; }
+
+    public override void Flush() {
+        throw new NotImplementedException();
+    }
+
+    public override long Seek(long offset, SeekOrigin origin) {
+        return s_.Seek(offset, origin);
+    }
+
+    public override void SetLength(long value) {
+        throw new NotImplementedException();
+    }
+
+    public override int Read(byte[] buffer, int offset, int count) {
+        int read = 0;
+        try {
+            read = s_.Read(buffer, offset, count);
+            if (read == 0) {
+                s_.Dispose();
+            }
+        }
+        catch {
+            s_.Dispose();
+            throw;
+        }
+        return read;
+    }
+
+    public override void Write(byte[] buffer, int offset, int count) {
+        throw new NotImplementedException();
+    }
+
+    private Stream s_;
 }
 
 /// <summary>
