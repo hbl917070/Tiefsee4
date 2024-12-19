@@ -301,16 +301,17 @@ public class WebWindow : FormNone {
     /// 取得 CoreWebView2Environment
     /// </summary>
     public static async Task<CoreWebView2Environment> GetCoreWebView2Environment() {
-        if (_webView2Environment == null) {
-            // --disable-web-security  允許跨域請求
-            // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
-            // --user-agent  覆寫userAgent
-            // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
-            string webvviewArguments = "--disable-web-security";
-            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
-            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
-        }
-        return _webView2Environment;
+        // if (_webView2Environment == null) {
+        // --disable-web-security  允許跨域請求
+        // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
+        // --user-agent  覆寫userAgent
+        // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
+        string webvviewArguments = "--disable-web-security " +
+            "--enable-features=msWebView2EnableDraggableRegions";
+        var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
+        var webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
+        // }
+        return webView2Environment;
     }
 
     /// <summary>
@@ -375,7 +376,7 @@ public class WebWindow : FormNone {
         // 覆寫 userAgent。用於在請求 API 時，辨識身份是否合法
         _wv2.CoreWebView2.Settings.UserAgent = _wv2.CoreWebView2.Settings.UserAgent + " " + Program.webvviewUserAgent;
         // 讓 webview2 支援 css「app - region:drag」
-        _wv2.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
+        // _wv2.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
         // 觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容
         // _wv2.CoreWebView2.Settings.IsPinchZoomEnabled = false;
         // 是否啟用特定於瀏覽器的快速鍵
