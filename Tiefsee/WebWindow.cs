@@ -211,8 +211,8 @@ public class WebWindow : FormNone {
         /* return "file:///" +
            Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName) +
            "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址 */
-        return $"http://app.example/{fileName}#{Program.webServer.port}";
-        // return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
+        // return $"http://app.example/{fileName}#{Program.webServer.port}";
+        return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
     }
 
     /// <summary>
@@ -301,17 +301,16 @@ public class WebWindow : FormNone {
     /// 取得 CoreWebView2Environment
     /// </summary>
     public static async Task<CoreWebView2Environment> GetCoreWebView2Environment() {
-        // if (_webView2Environment == null) {
-        // --disable-web-security  允許跨域請求
-        // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
-        // --user-agent  覆寫userAgent
-        // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
-        string webvviewArguments = "--disable-web-security " +
-            "--enable-features=msWebView2EnableDraggableRegions";
-        var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
-        var webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
-        // }
-        return webView2Environment;
+        if (_webView2Environment == null) {
+            // --disable-web-security  允許跨域請求
+            // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
+            // --user-agent  覆寫userAgent
+            // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
+            string webvviewArguments = "--enable-features=msWebView2EnableDraggableRegions";
+            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
+            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
+        }
+        return _webView2Environment;
     }
 
     /// <summary>
@@ -389,49 +388,6 @@ public class WebWindow : FormNone {
                 .CreateWebResourceResponse(null, 200, "OK", "");
         };
 
-        _wv2.CoreWebView2.AddWebResourceRequestedFilter("http://app.example/*", CoreWebView2WebResourceContext.All);
-        _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
-
-            var url = args.Request.Uri.Substring("http://app.example/*".Length - 1);
-
-            // 去掉？與 # 後面的字串
-            int index = url.IndexOf("?");
-            if (index != -1) { url = url.Substring(0, index); }
-            index = url.IndexOf("#");
-            if (index != -1) { url = url.Substring(0, index); }
-
-            string assetsFilePath;
-            if (url.ToLower().StartsWith("plugin/")) {
-                url = url.Substring(7);
-
-                assetsFilePath = System.IO.Path.Combine(
-                   AppPath.appDataPlugin, url);
-            }
-            else {
-                if (url.ToLower().StartsWith("www/")) {
-                    url = url.Substring(5);
-                }
-                assetsFilePath = System.IO.Path.Combine(
-                   System.AppDomain.CurrentDomain.BaseDirectory, "Www", url);
-            }
-
-            assetsFilePath = Path.GetFullPath(assetsFilePath);
-
-            try {
-                var ext = Path.GetExtension(assetsFilePath).ToLower();
-                var headers = "Content-Type: " + WebServerController.GetMimeTypeMapping(ext);
-
-                FileStream fs = File.OpenRead(assetsFilePath);
-                ManagedStream ms = new ManagedStream(fs);
-                args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
-                    ms, 200, "OK", headers);
-            }
-            catch {
-                args.Response = _wv2.CoreWebView2.Environment.CreateWebResourceResponse(
-                    null, 404, "Not found", "");
-            }
-        };
-
         WV_Window = new WV_Window(this);
         WV_Directory = new WV_Directory(this);
         WV_File = new WV_File(this);
@@ -463,8 +419,6 @@ public class WebWindow : FormNone {
                 if(window.baseWindow !== undefined) baseWindow.onRightClick({p.X},{p.Y});
             ");
         });
-
-        // webView21.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("var webBrowserObj= window.chrome.webview.hostObjects.webBrowserObj;");
 
         // 開啟時視窗時
         _wv2.CoreWebView2.NewWindowRequested += (sender2, e2) => {
@@ -772,55 +726,6 @@ public class WebWindow : FormNone {
         WindowAPI.WindowRoundedCorners(this.Handle, enable);
     }
 
-}
-
-class ManagedStream : Stream {
-    public ManagedStream(Stream s) {
-        s_ = s;
-    }
-
-    public override bool CanRead => s_.CanRead;
-
-    public override bool CanSeek => s_.CanSeek;
-
-    public override bool CanWrite => s_.CanWrite;
-
-    public override long Length => s_.Length;
-
-    public override long Position { get => s_.Position; set => s_.Position = value; }
-
-    public override void Flush() {
-        throw new NotImplementedException();
-    }
-
-    public override long Seek(long offset, SeekOrigin origin) {
-        return s_.Seek(offset, origin);
-    }
-
-    public override void SetLength(long value) {
-        throw new NotImplementedException();
-    }
-
-    public override int Read(byte[] buffer, int offset, int count) {
-        int read = 0;
-        try {
-            read = s_.Read(buffer, offset, count);
-            if (read == 0) {
-                s_.Dispose();
-            }
-        }
-        catch {
-            s_.Dispose();
-            throw;
-        }
-        return read;
-    }
-
-    public override void Write(byte[] buffer, int offset, int count) {
-        throw new NotImplementedException();
-    }
-
-    private Stream s_;
 }
 
 /// <summary>

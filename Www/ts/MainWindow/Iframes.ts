@@ -260,8 +260,7 @@ class MonacoEditor {
         window.addEventListener("message", (e) => {
 
             // 只開放特定網域呼叫
-            if (e.origin !== location.origin) {
-                console.error("錯誤的請求來源：" + e.origin)
+            if (e.origin !== APIURL && e.origin !== location.origin) {                console.error("錯誤的請求來源：" + e.origin)
                 return;
             }
 
