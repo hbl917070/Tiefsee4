@@ -281,7 +281,7 @@ export class MainExif {
 
 						// 產生新的 dom
 						let name = M.i18n.t(`exif.name.Video Duration`);
-						let domVideoNew = getItemDom(name, value);
+						let domVideoNew = getItemDom({ name: name, value: value });
 						_domTabContentInfo.appendChild(domVideoNew);
 
 						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
@@ -296,7 +296,7 @@ export class MainExif {
 
 			// 不重要的資訊，排到最後面才顯示
 			function lastItem(name: string, val: string) {
-				const itemDom = getItemDom(name, val);
+				const itemDom = getItemDom({ name: name, value: val });
 				deferredFunc.push(() => {
 					_domTabContentInfo.appendChild(itemDom);
 				})
@@ -311,7 +311,7 @@ export class MainExif {
 				// 如果是影片
 				if (groupType === GroupType.video && name === "Video Duration") {
 					// 先產生一個沒有資料的項目
-					let domVideo = getItemDom(M.i18n.t(`exif.name.${name}`), " ");
+					let domVideo = getItemDom({ name: M.i18n.t(`exif.name.${name}`), value: " " });
 					_domTabContentInfo.appendChild(domVideo);
 					// 待影片載入完畢，更新「影片長度」的資訊
 					updateVideoDuration(domVideo);
@@ -346,7 +346,7 @@ export class MainExif {
 					domBtn.addEventListener("click", () => {
 						M.script.open.showFrames(path);
 					})
-					const itemDom = getItemDom(name, domValue, nameI18n, "");
+					const itemDom = getItemDom({ name: name, value: domValue, nameI18n: nameI18n });
 
 					_domTabContentInfo.appendChild(itemDom);
 
@@ -395,10 +395,10 @@ export class MainExif {
 								}
 							}
 							else {
-								_domTabContentInfo.appendChild(getItemDom(name, value));
+								_domTabContentInfo.appendChild(getItemDom({ name: name, value: value }));
 							}
 						} else {
-							_domTabContentInfo.appendChild(getItemDom(name, value));
+							_domTabContentInfo.appendChild(getItemDom({ name: name, value: value }));
 						}
 					}
 
@@ -410,7 +410,7 @@ export class MainExif {
 						let val = vals[i];
 						let x = val.indexOf(": "); // 資料格式通常為 aaaaa: xxxxxx
 						if (x === -1) {
-							_domTabContentInfo.appendChild(getItemDom(name, val));
+							_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 
 						} else {
 
@@ -433,10 +433,10 @@ export class MainExif {
 							if (name === "Comment") { // NovelAI 才有的欄位
 								if (val.includes(`"steps": `)) {
 									AiParsingUtility.getNovelai(val).forEach(item => {
-										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 									})
 								} else {
-									_domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 								}
 							}
 							else if (name === "Generation time") { // ComfyUI
@@ -448,10 +448,10 @@ export class MainExif {
 							else if (name === "metadata") { // 不明，資料為一般的 json
 								if (val.includes(`"seed": `)) {
 									AiParsingUtility.getNormalJson(val).forEach(item => {
-										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 									})
 								} else {
-									_domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 								}
 							}
 
@@ -459,30 +459,41 @@ export class MainExif {
 								if (val.includes(`"sui_image_params":`)) { // StableSwarmUI
 									let json = JSON.parse(val)["sui_image_params"];
 									AiParsingUtility.getNormalJson(json).forEach(item => {
-										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 									})
 								}
 								else if (val.includes("Steps: ")) { // A1111
 									AiParsingUtility.getA1111(val).forEach(item => {
-										if (item.title == "Civitai resources") {
-											civitai.civitaiResources = item.text;
+
+										//if (["Prompt", "Negative prompt", "TIPO prompt", "DTG prompt", "ADetailer prompt"].indexOf(item.title) !== -1) {
+										if (item.title.search(/prompt/ig) !== -1) {
+											parseLoraSyntax(item.title, item.text, true);
 										}
-										if (item.title == "Lora hashes") {
-											civitai.lorahashes = item.text;
+										else if (item.title.toLowerCase() === "model") {
+											parseLoraSyntax(item.title, item.text, false);
 										}
-										if (item.title == "Model hash") {
-											civitai.modelHash = item.text;
+										else {
+
+											if (item.title == "Civitai resources") {
+												civitai.civitaiResources = item.text;
+											}
+											else if (item.title === "Lora hashes") {
+												civitai.lorahashes = item.text;
+											}
+											else if (item.title === "Model hash") {
+												civitai.modelHash = item.text;
+											}
+											else if (item.title === "Hashes") {
+												civitai.hashes = item.text;
+											}
+											else if (item.title === "TI hashes") {
+												civitai.tiHashes = item.text;
+											}
+											_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 										}
-										if (item.title == "Hashes") {
-											civitai.hashes = item.text;
-										}
-										if (item.title == "TI hashes") {
-											civitai.tiHashes = item.text;
-										}
-										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
 									})
 								} else {
-									_domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 								}
 							}
 
@@ -513,15 +524,15 @@ export class MainExif {
 								let items = AiParsingUtility.getInvokeai(val);
 								if (items.length > 0) {
 									items.forEach(item => {
-										_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+										_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 									})
 								} else {
-									_domTabContentInfo.appendChild(getItemDom(name, val));
+									_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 								}
 							}
 
 							else {
-								_domTabContentInfo.appendChild(getItemDom(name, val));
+								_domTabContentInfo.appendChild(getItemDom({ name: name, value: val }));
 							}
 						}
 					}
@@ -546,7 +557,7 @@ export class MainExif {
 					}
 
 					name = M.i18n.t(`exif.name.${name}`);
-					_domTabContentInfo.appendChild(getItemDom(name, value, nameI18n, valueI18n));
+					_domTabContentInfo.appendChild(getItemDom({ name: name, value: value, nameI18n: nameI18n, valueI18n: valueI18n }));
 				}
 			}
 
@@ -570,7 +581,7 @@ export class MainExif {
 						// 折疊面板
 						let collapseDom = await getCollapseDom(node, true);
 						data.forEach(item => {
-							collapseDom.domContent.appendChild(getItemDom(item.title, item.text));
+							collapseDom.domContent.appendChild(getItemDom({ name: item.title, value: item.text }));
 						});
 						_domTabContentInfo.appendChild(collapseDom.domBox);
 					}
@@ -581,7 +592,7 @@ export class MainExif {
 			if (comfyScript !== undefined) {
 				// 折疊面板
 				let collapseDom = await getCollapseDom("ComfyScript", true);
-				collapseDom.domContent.appendChild(getItemDom("ComfyScript", comfyScript));
+				collapseDom.domContent.appendChild(getItemDom({ name: "ComfyScript", value: comfyScript }));
 				_domTabContentInfo.appendChild(collapseDom.domBox);
 			}
 			// 把 ComfyUI 的原始資料放在最下面，並預設折疊
@@ -592,9 +603,9 @@ export class MainExif {
 				if (comfyuiGenerationData !== undefined) {
 					let jsonF = Lib.jsonStrFormat(comfyuiGenerationData);
 					if (jsonF.ok) { // 解析欄位
-						collapseDom.domContent.appendChild(getItemDom("Generation Data", jsonF.jsonFormat));
+						collapseDom.domContent.appendChild(getItemDom({ name: "Generation Data", value: jsonF.jsonFormat }));
 					} else {
-						collapseDom.domContent.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
+						collapseDom.domContent.appendChild(getItemDom({ name: "Generation Data", value: comfyuiGenerationData }));
 					}
 				}
 				if (comfyuiPrompt !== undefined) {
@@ -603,10 +614,10 @@ export class MainExif {
 							comfyuiPrompt = JSON.stringify(comfyuiPrompt);
 						} catch { }
 					}
-					collapseDom.domContent.appendChild(getItemDom("Prompt", comfyuiPrompt));
+					collapseDom.domContent.appendChild(getItemDom({ name: "Prompt", value: comfyuiPrompt }));
 				}
 				if (comfyuiWorkflow !== undefined) {
-					collapseDom.domContent.appendChild(getItemDom("Workflow", comfyuiWorkflow));
+					collapseDom.domContent.appendChild(getItemDom({ name: "Workflow", value: comfyuiWorkflow }));
 				}
 				_domTabContentInfo.appendChild(collapseDom.domBox);
 			}
@@ -615,14 +626,259 @@ export class MainExif {
 
 				if (comfyuiGenerationData.includes(`"seed":`)) {
 					AiParsingUtility.getNormalJson(comfyuiGenerationData).forEach(item => {
-						_domTabContentInfo.appendChild(getItemDom(item.title, item.text));
+						_domTabContentInfo.appendChild(getItemDom({ name: item.title, value: item.text }));
 					})
 				} else {
-					_domTabContentInfo.appendChild(getItemDom("Generation Data", comfyuiGenerationData));
+					_domTabContentInfo.appendChild(getItemDom({ name: "Generation Data", value: comfyuiGenerationData }));
 				}
 			}
 
 		}
+
+		/**
+		 * 剖析 LoRA 語法，加入開啟預覽卡片的功能
+		 * @param title 
+		 * @param input 
+		 * @param isPrompt true=解析 Lora 語法，false=把全部的文字當作檔名
+		 */
+		function parseLoraSyntax(title: string, input: string, isPrompt: boolean) {
+
+			let parsed = "";
+			if (isPrompt) {
+				// 分段處理：先拆分 LoRA 語法與非 LoRA 文本
+				parsed = input
+					.replace(/<([^<>]*:[^<>]*:[^<>]*)>/g, (match, loraContent) => {
+						const fileName = loraContent.split(':')[1].replace(/\"/, `\"`);
+						return `<font class="lora" data-name="${fileName}">&lt;${Lib.escape(loraContent)}&gt;</font>`;
+					})
+					.split(/(<font class="lora"[^>]*>.*?<\/font>)/g) // 分割 Lora 語法與其餘文字
+					.map((segment) => {
+						// 對非 LoRA 語法段落去除可能破壞 html 的跳脫符號
+						if (!segment.startsWith(`<font class="lora"`)) {
+							return Lib.escape(segment).replace(/\n/g, "<br>");
+						}
+						return segment; // 保留 LoRA 語法標籤不變
+					})
+					.join("");
+			}
+			else {
+				const fileName = input.replace(/\"/, `\"`);
+				parsed = `<font class="lora" data-name="${fileName}">${Lib.escape(input)}</font>`;
+			}
+
+			const domMenu = document.querySelector("#menu-lora") as HTMLElement;
+			const domMenuFile = document.querySelector("#menu-lora-file") as HTMLElement;
+			const domMenuFileBody = domMenuFile.querySelector(".menu-box") as HTMLElement;
+
+			const domImg = domMenu.querySelector(".js-img") as HTMLElement;
+			const domInfo = domMenu.querySelector(".js-info") as HTMLElement;
+			const domLoading = domMenu.querySelector(".js-loading") as HTMLElement;
+			const domNotFound = domMenu.querySelector(".js-notFound") as HTMLElement;
+			const domNotSpecified = domMenu.querySelector(".js-notSpecified") as HTMLElement;
+			const domMain = domMenu.querySelector(".js-main") as HTMLElement;
+			const btnSearch = domMenu.querySelector(".js-search") as HTMLElement;
+			const btnSetting = domMenu.querySelector(".js-setting") as HTMLElement;
+			const btnFile = domMenu.querySelector(".js-file") as HTMLElement;
+			const btnCivitai = domMenu.querySelector(".js-civitai") as HTMLElement;
+
+			function showMenu(domLora: Element, domMenu: HTMLElement, type: "loading" | "main" | "notFound" | "notSpecified") {
+
+				domLoading.style.display = "none";
+				domNotFound.style.display = "none";
+				domNotSpecified.style.display = "none";
+				domMain.style.display = "none";
+
+				if (type === "loading") domLoading.style.display = "";
+				if (type === "notFound") domNotFound.style.display = "";
+				if (type === "notSpecified") domNotSpecified.style.display = "";
+				if (type === "main") domMain.style.display = "";
+
+				M.menu.openAtButton(domMenu, domLora as HTMLElement, "active", "leftOrRight");
+			}
+
+			const itemDom = getItemDom({ name: title, value: parsed, isEscape: false, copyText: input });
+			const loraDoms = itemDom.querySelectorAll(".lora");
+			loraDoms.forEach((dom: Element) => {
+				dom.addEventListener("mouseup", async (e) => {
+
+					//e.preventDefault();
+
+					// 如果有選取文字，就不執行
+					if (Lib.isTxtSelect()) { return; }
+
+					const name = dom.getAttribute("data-name") as string;
+
+					domImg.style.backgroundImage = ``;
+					domInfo.innerHTML = "";
+
+					let a1111Models = M.config.settings.layout.a1111Models;
+
+					// 未指定 A1111 Models
+					if (a1111Models === undefined || a1111Models === "") {
+						showMenu(dom, domMenu, "notSpecified");
+						btnSetting.onclick = () => {
+							M.script.setting.showSetting("layout", "a1111Models");
+						}
+						return;
+					}
+
+					showMenu(dom, domMenu, "loading");
+					const excludeDirs = [
+						"node_modules",
+						".git",
+						"cache",
+						"venv",
+						".venv",
+						"extensions",
+						"ldm_patched",
+						"modules",
+						"repositories",
+						"python",
+						"outputs",
+					];
+					const loraResource = await WebAPI.getA1111LoraResource(a1111Models.split("\n"), [name], excludeDirs);
+					const files = loraResource[name].sort() as string[];
+
+					// 找不到檔案
+					if (files.length === 0) {
+						showMenu(dom, domMenu, "notFound");
+						const urlCivitai = `https://civitai.com/search/models?query=${name}`;
+						btnSearch.onclick = () => {
+							WV_RunApp.OpenUrl(urlCivitai);
+						}
+						return;
+					}
+
+					// 取出預覽圖
+					const ext = [".jpg", ".png", "webp", ".avif", ".bmp", ".gif", ".mp4", ".webm"];
+					let img = files.find(x => ext.some(y =>
+						x.toLowerCase().endsWith(y) &&
+						x.toLowerCase().endsWith(".preview." + y) === false));
+					// 優先取出非 preview 的圖片
+					if (img === undefined) {
+						img = files.find(x => ext.some(y => x.toLowerCase().endsWith(y)));
+					}
+					// 如果都沒有圖片，就取第一個檔案
+					if (img === undefined) {
+						img = files[0];
+					}
+
+					const imgUrl = WebAPI.Img.fileIcon(img);
+
+					// 避免重複註冊
+					if (domImg.getAttribute("data-path") === null)
+						Lib.addEventDblclick(domImg, () => {
+							const p = domImg.getAttribute("data-path") as string;
+							M.script.open.openNewWindow(p);
+						});
+					domImg.setAttribute("data-path", img);
+					domImg.style.backgroundImage = `url(${imgUrl.replace(/\(/g, "\\(").replace(/\)/g, "\\)")})`;
+
+					// 取得 .json
+					const jsonPath = files.find(x => x.toLowerCase().endsWith(".json"));
+					if (jsonPath !== undefined) {
+						try {
+
+							const json = JSON.parse(await WebAPI.getText(jsonPath));
+
+							const jsonKeys = Object.keys(json);
+
+							for (let i = 0; i < jsonKeys.length; i++) {
+								const key = jsonKeys[i];
+								let value = json[key];
+
+								if (typeof value === "string") {
+									if (value === "" || value === "Unknown") {
+										continue;
+									}
+									value = value.trim();
+								}
+								else if (typeof value === "object") {
+									value = Lib.jsonStrFormat(value).jsonFormat;
+								} else {
+									continue;
+								}
+
+								const infoDiv = Lib.newDom(`
+									<div class="loraBox-item">
+										<div class="loraBox-title"></div>
+										<div class="loraBox-text"></div>
+									</div>`);
+								infoDiv.querySelector(".loraBox-title")!.innerHTML = Lib.escape(key);
+								infoDiv.querySelector(".loraBox-text")!.innerHTML = Lib.escape(value).replace(/\n/g, "<br>");
+								domInfo.appendChild(infoDiv);
+							}
+						} catch (e) {
+							console.warn("Lora json 解析失敗", e);
+						}
+					}
+
+					// 如果有 *.civitai.info
+					const civitaiInfoPath = files.find(x => x.toLowerCase().endsWith(".civitai.info"));
+					if (civitaiInfoPath !== undefined) {
+						btnCivitai.style.display = "";
+						btnCivitai.onclick = async () => {
+							const civitaiUrl = await civitaiInfoToUrl(civitaiInfoPath, null);
+							if (civitaiUrl !== null)
+								WV_RunApp.OpenUrl(civitaiUrl);
+							else
+								Toast.show("civitai.info Error", 1000 * 3); // Civitai info 解析失敗
+						}
+
+					} else {
+						btnCivitai.style.display = "none";
+					}
+
+					btnFile.onclick = () => {
+						domMenuFileBody.innerHTML = "";
+
+						// 複製路徑
+						files.forEach(filePath => {
+							const text = `<spen>${M.i18n.t("menu.copyFilePath")}: </span>` +
+								"<b>" + Lib.getFileName(filePath).substring(name.length) + "</b>";
+							const dom = Lib.newDom(`
+								<div class="menu-hor-item">
+									<div class="menu-hor-icon"></div>
+									<div class="menu-hor-txt">${text}</div>
+								</div>
+							`);
+							dom.onclick = async () => {
+								await WV_System.SetClipboard_Text(filePath);
+								Toast.show(M.i18n.t("msg.copyFilePath"), 1000 * 3); // 已將「檔案路徑」複製至剪貼簿
+								M.script.menu.close(domMenuFile);
+							}
+							domMenuFileBody.appendChild(dom);
+						});
+
+						// 水平線
+						domMenuFileBody.appendChild(Lib.newDom(`<div class="menu-hor-hr"></div>`));
+
+						// 在檔案總管中顯示
+						files.forEach(filePath => {
+							const text = `<spen>${M.i18n.t("menu.revealInFileExplorer")}: </span>` +
+								"<b>" + Lib.getFileName(filePath).substring(name.length) + "</b>";
+							const dom = Lib.newDom(`
+								<div class="menu-hor-item">
+									<div class="menu-hor-icon"></div>
+									<div class="menu-hor-txt">${text}</div>
+								</div>
+							`);
+							dom.onclick = async () => {
+								M.script.open.revealInFileExplorer(filePath);
+								M.script.menu.close(domMenuFile);
+							}
+							domMenuFileBody.appendChild(dom);
+						});
+
+						M.menu.openAtButton(domMenuFile, btnFile as HTMLElement, "active", "leftOrRight");
+					}
+
+					showMenu(dom, domMenu, "main");
+				})
+			})
+			_domTabContentInfo.appendChild(itemDom);
+		}
+
 
 		/**
 		 * 讀取 相關檔案(於初始化後呼叫)
@@ -804,7 +1060,7 @@ export class MainExif {
 				if (error !== undefined) { continue; }
 
 				// 先產生一個空的 dom 項目，待資料載入完畢後，再替換
-				let oldDom = getItemDom(dbKey, "Loading" + "\n" + "-");
+				let oldDom = getItemDom({ name: dbKey, value: "Loading" + "\n" + "-" });
 				collapseDom.domContent.appendChild(oldDom);
 
 				let ompleteCount = 0;
@@ -1187,7 +1443,7 @@ export class MainExif {
 					`);
 					let domContentList = domContent.querySelector(".mainExifList") as HTMLElement;
 					AiParsingUtility.getA1111(text).forEach(item => {
-						domContentList.appendChild(getItemDom(item.title, item.text));
+						domContentList.appendChild(getItemDom({ name: item.title, value: item.text }));
 					});
 				} else { // 一般的文字檔
 
@@ -1203,18 +1459,14 @@ export class MainExif {
 
 				// 按鈕 - civitai
 				if (title.toLowerCase().endsWith(".civitai.info")) {
-					try {
-						let civitaiInfo = JSON.parse(text);
-						let modelId = civitaiInfo.modelId;
-						if (modelId !== undefined) {
-							let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
-							btnList.appendChild(btnCivitai);
-							btnCivitai.addEventListener("click", async () => {
-								let url = "https://civitai.com/models/" + modelId;
-								WV_RunApp.OpenUrl(url);
-							})
-						}
-					} catch (e) { }
+					const civitaiUrl = await civitaiInfoToUrl(null, text);
+					if (civitaiUrl !== null) {
+						let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
+						btnList.appendChild(btnCivitai);
+						btnCivitai.addEventListener("click", async () => {
+							WV_RunApp.OpenUrl(civitaiUrl);
+						})
+					}
 				}
 
 				// 按鈕 - 編輯
@@ -1300,6 +1552,34 @@ export class MainExif {
 		}
 
 		/**
+		 * 從 *.civitai.info 取得 civitai 的網址
+		 * @param civitaiInfoPath 
+		 * @param civitaiInfoText 
+		 * @returns 網址 或 null
+		 */
+		async function civitaiInfoToUrl(civitaiInfoPath: string | null, civitaiInfoText: string | null) {
+			try {
+				if (civitaiInfoPath === null && civitaiInfoText === null) { return null; }
+				let civitaiInfo: any;
+				if (civitaiInfoPath !== null) {
+					civitaiInfo = JSON.parse(await WebAPI.getText(civitaiInfoPath));
+				} else {
+					if (typeof civitaiInfoText === "string") {
+						civitaiInfo = JSON.parse(civitaiInfoText);
+					}
+					else {
+						civitaiInfo = civitaiInfoText;
+					}
+				}
+				const modelId = civitaiInfo.modelId;
+				if (modelId !== undefined) {
+					return "https://civitai.com/models/" + modelId;
+				}
+			} catch (e) { }
+			return null;
+		}
+
+		/**
 		 * 折疊面板的 dom
 		 * @param title 標題
 		 * @param type 初始狀態
@@ -1370,7 +1650,21 @@ export class MainExif {
 		/** 
 		 * exif 項目的 dom
 		 */
-		function getItemDom(name: string, value: string | HTMLElement, nameI18n = "", valueI18n = "") {
+		function getItemDom(data: {
+			name: string;
+			value: string | HTMLElement;
+			nameI18n?: string;
+			valueI18n?: string;
+			isEscape?: boolean;
+			copyText?: string;
+		}) {
+
+			let name = data.name;
+			let value = data.value;
+			let nameI18n = data.nameI18n ?? "";
+			let valueI18n = data.valueI18n ?? "";
+			let isEscape = data.isEscape ?? true;
+			let copyText = data.copyText ?? value.toString();
 
 			if (name === undefined || name === null) { name = ""; }
 			if (value === undefined || value === null) { value = ""; }
@@ -1392,8 +1686,8 @@ export class MainExif {
 			}
 
 			value = value.toString();
-			let oVal = value; // 原始資料
-			value = Lib.escape(value);
+			if (isEscape)
+				value = Lib.escape(value);
 
 			const div = Lib.newDom(`
 				<div class="mainExifItem">
@@ -1412,7 +1706,7 @@ export class MainExif {
 			const btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
 
 			btnCopy.addEventListener("click", async () => { // 複製到剪貼簿
-				await WV_System.SetClipboard_Text(oVal);
+				await WV_System.SetClipboard_Text(copyText);
 				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); // 已將「exifName」複製至剪貼簿
 			});
 

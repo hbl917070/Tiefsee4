@@ -25,6 +25,9 @@ public class AppPath {
     /// <summary> UWP 列表 </summary>
     public static string appDataUwpList;
 
+    /// <summary> LoRA 列表 </summary>
+    public static string appDataA1111ModelList;
+
     /// <summary> 暫存資料夾 - 處理過的圖片(原始大小) </summary>
     public static string tempDirImgProcessed = "";
 
@@ -97,6 +100,7 @@ public class AppPath {
         appDataPlugin = Path.Combine(appData, "Plugin");
         appDataSetting = Path.Combine(appData, "Setting.json");
         appDataUwpList = Path.Combine(appData, "UwpList.json");
+        appDataA1111ModelList = Path.Combine(appData, "A1111ModelList.json");
 
         string downloadsPath = KnownFolders.GetPath(KnownFolder.Downloads); // 使用者的 下載
 

@@ -144,7 +144,6 @@
     </div>
 </div>
 
-
 <!-- 下拉選單 旋轉  -->
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-rotate">
@@ -189,7 +188,6 @@
 
     </div>
 </div>
-
 
 <!-- 下拉選單 排序  -->
 <div class="menu" data-menu="none" active="">
@@ -280,7 +278,6 @@
     </div>
 </div>
 
-
 <!-- 下拉選單 layout  -->
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-layout">
@@ -321,7 +318,6 @@
     </div>
 </div>
 
-
 <!-- 下拉選單 搜圖 -->
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-imgSearch">
@@ -330,7 +326,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- 下拉選單 大量瀏覽模式 -->
 <div class="menu" data-menu="none" active="">
@@ -440,7 +435,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- 右鍵選單 圖片 -->
 <div class="menu" data-menu="none" active="">
@@ -576,7 +570,6 @@
     </div>
 </div>
 
-
 <!-- 右鍵選單 起始畫面 -->
 <div class="menu" data-menu="none" active="">
     <div class="menu-content" id="menu-rightMenuWelcome">
@@ -613,48 +606,6 @@
 
     </div>
 </div>
-
-
-<!-- 右鍵選單 輸入框 -->
-<div class="menu" data-menu="none" active="">
-    <div class="menu-content" id="menu-text">
-        <div class="menu-box">
-            <div class="menu-hor-item" id="menuitem-text-cut">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.cut">剪下</div>
-            </div>
-            <div class="menu-hor-item" id="menuitem-text-copy">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
-            </div>
-            <div class="menu-hor-item" id="menuitem-text-paste">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.paste">貼上</div>
-            </div>
-            <div class="menu-hor-item" id="menuitem-text-selectAll">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.selectAll">全選</div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<!-- 右鍵選單 一般文字 -->
-<div class="menu" data-menu="none" active="">
-    <div class="menu-content" id="menu-txt">
-        <div class="menu-box">
-
-            <div class="menu-hor-item" id="menuitem-txt-copy">
-                <div class="menu-hor-icon"></div>
-                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
 
 <!-- 右鍵選單 大量瀏覽模式 -->
 <div class="menu" data-menu="none" active="">
@@ -819,7 +770,6 @@
     </div>
 </div>
 
-
 <!-- 用js動態插入到其他選單內 -->
 <div style="display:none;">
 
@@ -960,7 +910,117 @@
             <div class="menu-hor-txt" i18n="menu.copyDirPath">複製資料夾路徑</div>
         </div>
 
-
     </div>
 
+</div>
+
+<!-- 選單 LoRA -->
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-lora">
+
+        <!-- loading -->
+        <div class="menu-box js-loading">
+            <img src="./img/loading.svg" style="width:50px;">
+        </div>
+
+        <!-- 未找到檔案 -->
+        <div class="menu-box js-notFound">
+            <div class="loraBox-card">
+                <div class="card-text" i18n="msg.notFoundFile">
+                    未找到檔案
+                </div>
+                <div class="card-btn js-search" i18n="msg.searchCivitai">
+                    從 Civitai 搜尋
+                </div>
+            </div>
+        </div>
+
+        <!-- 未指定 A1111 models 路徑 -->
+        <div class="menu-box js-notSpecified">
+            <div class="loraBox-card">
+                <div class="card-text" i18n="msg.notSpecifiedA1111Models">
+                    未指定 A1111 models 路徑
+                </div>
+                <div class="card-btn js-setting" i18n="msg.goToSetting">
+                    前往設定
+                </div>
+            </div>
+        </div>
+
+
+        <div class="menu-box loraBox js-main">
+
+            <div class="loraBox-l js-info base-scrollbar">
+                <!-- <div class="loraBox-item">
+                    <div class="loraBox-title"> negative text </div>
+                    <div class="loraBox-text"> </div>
+                </div> -->
+            </div>
+
+            <div class="loraBox-r">
+                <div class="img js-img"></div>
+                <div class="btns">
+                    <div class="btn js-file" title="" i18n="menu.showMenuFile">
+                        <%- await readFile("./img/default/tool-open.svg"); %>
+                    </div>
+                    <div class="btn js-civitai" title="Civitai">
+                        <%- await readFile("./img/default/tool-civitai.svg"); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 選單 LoRA 裡面的檔案選單 -->
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-lora-file">
+        <div class="menu-box">
+       
+        </div>
+    </div>
+</div>
+
+<!-- ---------------------------------------- -->
+<!-- 以下的必須在最下面，否則會無法顯示在其他選單上面 -->
+<!-- ---------------------------------------- -->
+
+<!-- 右鍵選單 輸入框 -->
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-text">
+        <div class="menu-box">
+            <div class="menu-hor-item" id="menuitem-text-cut">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.cut">剪下</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-text-copy">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-text-paste">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.paste">貼上</div>
+            </div>
+            <div class="menu-hor-item" id="menuitem-text-selectAll">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.selectAll">全選</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 右鍵選單 一般文字 -->
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-txt">
+        <div class="menu-box">
+
+            <div class="menu-hor-item" id="menuitem-txt-copy">
+                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-txt" i18n="menu.copy">複製</div>
+            </div>
+
+        </div>
+    </div>
 </div>

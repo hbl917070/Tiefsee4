@@ -19,7 +19,7 @@ export class Menu {
         this.getIsShow = getIsShow;
         this.close = close;
 
-        var _tempCloseList: any[] = []; // 記錄所有被開過的menu
+        var _tempCloseList: { dom: HTMLElement, closeEvent: () => void }[] = []; // 記錄所有被開過的menu
         var _mouseX = 0;
         var _mouseY = 0;
 
@@ -38,9 +38,22 @@ export class Menu {
         /**
          * 關閉 menu
          */
-        function close() {
+        function close(domMenu?: Element) {
+
+            // 關閉所有 menu
+            if (domMenu === undefined) {
+                for (let i = 0; i < _tempCloseList.length; i++) {
+                    _tempCloseList[i].closeEvent();
+                }
+                return;
+            }
+
+            // 關閉指定 menu
             for (let i = 0; i < _tempCloseList.length; i++) {
-                _tempCloseList[i]();
+                if (domMenu === _tempCloseList[i].dom.querySelector(".menu-content")) {
+                    _tempCloseList[i].closeEvent();
+                    return;
+                }
             }
         }
 
@@ -62,19 +75,21 @@ export class Menu {
 
             domMenuBg.setAttribute("active", "true");
             domMenu.style.bottom = ""; // 避免高度計算錯誤
+            domMenu.style.left = "0px";
+            domMenu.style.top = "0px";
 
             setMenuPosition();
 
             const funcClose = () => {
                 domMenuBg.setAttribute("active", ""); // 關閉menu
                 _tempCloseList = _tempCloseList.filter((item) => {
-                    return item !== funcClose;
+                    return item.closeEvent !== funcClose;
                 });
                 domMenuBg.removeEventListener("touchstart", onmousedown);
                 domMenuBg.removeEventListener("mousedown", onmousedown);
                 onMenuClose();
             }
-            _tempCloseList.push(funcClose);
+            _tempCloseList.push({ dom: domMenuBg, closeEvent: funcClose });
 
             const onmousedown = (sender: TouchEvent | MouseEvent) => {
                 let dom = sender.target as HTMLElement;
@@ -107,27 +122,51 @@ export class Menu {
          * @param domMenu 
          * @param domBtn 
          * @param css 
+         * @param position 
          */
-        function openAtButton(domMenu: HTMLElement | null, domBtn: HTMLElement | null, css: string) {
+        function openAtButton(domMenu: HTMLElement | null, domBtn: HTMLElement | null, css: string, position: "leftOrRight" | "bottom" = "bottom") {
             if (domMenu === null) { return; }
             if (domBtn === null) { return; }
 
             const funcPosition = () => {
+                const btnRect = domBtn.getBoundingClientRect();
+                const menuRect = domMenu.getBoundingClientRect();
+                const bodyRect = document.body.getBoundingClientRect();
+
                 let left = 0;
                 let top = 0;
-                top = domBtn.getBoundingClientRect().top + domBtn.getBoundingClientRect().height;
-                left = domBtn.getBoundingClientRect().left + (domBtn.getBoundingClientRect().width / 2) - (domMenu.getBoundingClientRect().width / 2);
-                if (left < 0) { left = 0; }
-                if (left > document.body.getBoundingClientRect().width - domMenu.getBoundingClientRect().width) {
-                    left = document.body.getBoundingClientRect().width - domMenu.getBoundingClientRect().width;
+
+                if (position === "bottom") {
+                    top = btnRect.top + btnRect.height;
+                    left = btnRect.left + (btnRect.width / 2) - (menuRect.width / 2);
                 }
+                else if (position === "leftOrRight") {
+                    // 判斷要顯示在左側或右側
+                    if (btnRect.left > window.innerWidth / 2) {
+                        left = btnRect.left - menuRect.width - 5;
+                        top = btnRect.top;
+                    } else {
+                        left = btnRect.right + 5;
+                        top = btnRect.top;
+                    }
+
+                    if (menuRect.height + top > bodyRect.height) {
+                        top = bodyRect.height - menuRect.height - 5; // 靠齊視窗下面
+                    } 
+                }
+
+                if (left < 0) { left = 0; }
+                if (left > bodyRect.width - menuRect.width) {
+                    left = bodyRect.width - menuRect.width;
+                }
+                if (top < 5) { top = 5; }
 
                 domMenu.style.left = left + "px";
                 domMenu.style.top = top + "px";
                 domMenu.style.bottom = "0";
                 domBtn.classList.add(css);
             };
-            let funcClose = () => {
+            const funcClose = () => {
                 domBtn.classList.remove(css);
             };
             openBase(domMenu, funcPosition, funcClose);

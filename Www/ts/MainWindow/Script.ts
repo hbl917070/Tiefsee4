@@ -765,8 +765,8 @@ export class ScriptMenu {
     }
 
     /** 關閉所有 menu */
-    close() {
-        this.M.menu.close();
+    close(domMenu?: Element) {
+        this.M.menu.close(domMenu);
     }
 
     /** 顯示選單 檔案 */

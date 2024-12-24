@@ -129,8 +129,10 @@ export class MainWindow {
         const selectionManager = new SelectionManager("whitelist");
         selectionManager.add(".mainExifName"); // 詳細資料面板的標題
         selectionManager.add(".mainExifValue"); // 詳細資料面板的內容
+        selectionManager.add(".mainExifValue .lora"); // 詳細資料面板的內容
         selectionManager.add(".mainExifRelatedText *"); // 相關檔案的文字
         selectionManager.add(".msgbox-txt *"); // 訊息視窗的標題
+        selectionManager.add("#menu-lora .js-info *"); // lora 預覽視窗
         selectionManager.add("[allowSelection]");
 
         (async () => {

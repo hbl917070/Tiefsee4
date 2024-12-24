@@ -238,6 +238,8 @@ export class Config {
             mainExifShowWidth: 150,
             /** 顯示的最大行數 */
             mainExifMaxLine: 20,
+            /** A1111 models 路徑 */
+            a1111Models: "",
             /** 寬度足夠時，橫向排列 */
             mainExifHorizontal: false,
             /** 記錄折疊狀態 */
@@ -462,7 +464,7 @@ export class Config {
                 { ext: "tif", type: "vips", vipsType: "tif" },
                 { ext: "tiff", type: "vips", vipsType: "tif" },
                 { ext: "dds", type: "vips", vipsType: "uwp,magick" },
-                
+
                 { ext: "jxr", type: "vips", vipsType: "hdrfix,uwp" },
                 { ext: "wdp", type: "vips", vipsType: "hdrfix,uwp" },
                 { ext: "hdp", type: "vips", vipsType: "hdrfix,uwp" },

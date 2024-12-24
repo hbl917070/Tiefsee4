@@ -99,29 +99,32 @@ export class MainMenu {
          */
         function showMenu(e: MouseEvent, x?: number, y?: number) {
 
+            if (Lib.isTextFocused()) { // 焦點在輸入框上
+                M.script.menu.showRightMenuTextbox(x, y);
+                return;
+            }
+            else if (Lib.isTxtSelect()) { // 有選取文字
+                M.script.menu.showRightMenuTxt(x, y);
+                return;
+            }
+
             if (M.menu.getIsShow()) { return; }
 
             if (_dataMenu === "") {
 
             } if (_dataMenu === "none") {
 
-            } else if (Lib.isTextFocused()) { //焦點在輸入框上
-                M.script.menu.showRightMenuTextbox(x, y);
-
-            } else if (Lib.isTxtSelect()) { //有選取文字的話
-                M.script.menu.showRightMenuTxt(x, y);
-
-            } else if (_dataMenu === "filePanel") { //檔案預覽面板
+            } else if (_dataMenu === "filePanel") { // 檔案預覽面板
                 M.script.menu.showRightMenuFilePanel(e);
 
-            } else if (_dataMenu === "dirPanel") { //資料夾預覽面板
+            } else if (_dataMenu === "dirPanel") { // 資料夾預覽面板
                 M.script.menu.showRightMenuDirPanel(e);
 
-            } else if (_dataMenu === "file") { //純檔案
+            } else if (_dataMenu === "file") { // 純檔案
                 M.script.menu.showRightMenuFile(e);
 
             } else {
-                //根據當前的顯示類型來決定右鍵選單
+                // 根據當前的顯示類型來決定右鍵選單
                 const showType = document.body.getAttribute("showType") ?? "";
                 if (showType === "img" || showType === "imgs" || showType === "video") {
                     M.script.menu.showRightMenuImage(x, y);
@@ -985,7 +988,7 @@ export class MainMenu {
          */
         async function initTextbox() {
 
-            const domMenu = document.getElementById("menu-text");
+            const domMenu = document.getElementById("menu-text") as HTMLElement;
             if (domMenu !== null) {
                 domMenu.addEventListener("mousedown", (e) => {
                     e.preventDefault(); // 避免搶走輸入框的焦點
@@ -996,7 +999,7 @@ export class MainMenu {
             if (domCut !== null) {
                 domCut.onclick = async () => {
                     await WV_System.SendKeys_CtrlAnd("x");
-                    M.menu.close();
+                    M.menu.close(domMenu);
                 }
             }
 
@@ -1006,7 +1009,7 @@ export class MainMenu {
                     let selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Text(selection.toString()); // 存入剪貼簿
-                    M.menu.close();
+                    M.menu.close(domMenu);
                 }
             }
 
@@ -1015,13 +1018,13 @@ export class MainMenu {
                 domPaste.onclick = async () => {
                     await Lib.sleep(10);
                     await WV_System.SendKeys_CtrlAnd("v");
-                    M.menu.close();
+                    M.menu.close(domMenu);
                 }
 
                 const domSelectAll = document.getElementById("menuitem-text-selectAll"); // 全選
                 if (domSelectAll !== null) {
                     domSelectAll.onclick = async () => {
-                        M.menu.close();
+                        M.menu.close(domMenu);
                         const domInput = document.activeElement as HTMLInputElement;
                         if (domInput === null) { return; }
                         domInput.setSelectionRange(0, domInput.value.length)
@@ -1035,7 +1038,7 @@ export class MainMenu {
          */
         async function initText() {
 
-            const domMenu = document.getElementById("menu-txt");
+            const domMenu = document.getElementById("menu-txt") as HTMLElement;
             if (domMenu !== null) {
                 domMenu.addEventListener("mousedown", (e) => {
                     e.preventDefault(); // 避免搶走輸入框的焦點
@@ -1045,7 +1048,7 @@ export class MainMenu {
             const domCopy = document.getElementById("menuitem-txt-copy"); // 複製
             if (domCopy !== null) {
                 domCopy.onclick = async () => {
-                    M.menu.close();
+                    M.menu.close(domMenu);
                     const selection = document.getSelection();
                     if (selection === null) { return; }
                     WV_System.SetClipboard_Text(selection.toString()); // 存入剪貼簿

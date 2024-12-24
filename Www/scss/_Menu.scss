@@ -236,3 +236,118 @@
 	// outline: 1px solid var(--color-blue);
 	background-color: var(--color-white20);
 }
+
+//---------
+
+// 選單 LoRA
+#menu-lora {
+	.loraBox {
+		max-width: 400px;
+		max-height: 80vh;
+		padding: 5px;
+		display: flex;
+		box-sizing: border-box;
+
+		.img {
+			width: 100px;
+			height: 150px;
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+
+		.loraBox-l {
+			overflow-y: auto;
+			overflow-x: hidden;
+			flex: 1;
+		}
+		.loraBox-r {
+			width: 100px;
+			height: 100%;
+
+			.btns {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-end;
+
+				.btn {
+					width: 30px;
+					height: 30px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					margin-top: 5px;
+					margin-left: 5px;
+					border: 1px solid var(--color-blue40);
+					border-radius: 5px;
+					text-align: center;
+
+					&:hover {
+						cursor: pointer;
+						background-color: var(--color-white10);
+					}
+					&.active {
+						background-color: var(--color-white20);
+					}
+					svg {
+						width: 25px;
+					}
+				}
+			}
+		}
+		.loraBox-item {
+			position: relative;
+			word-wrap: break-word;
+			margin-right: 5px;
+
+			.loraBox-title {
+				color: var(--color-blue);
+			}
+			.loraBox-text {
+				color: var(--color-white);
+				white-space: pre-wrap;
+			}
+
+			// 水平線
+			&::before {
+				content: "";
+				height: 1px;
+				background-color: var(--color-blue20);
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 5px;
+			}
+			// 第一個項目不顯示水平線
+			&:first-child::before {
+				display: none;
+			}
+		}
+	}
+
+	.loraBox-card {
+		width: 200px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.card-text {
+			margin-top: 20px;
+			color: var(--color-white);
+			text-align: center;
+		}
+
+		.card-btn {
+			margin-top: 20px;
+			margin-bottom: 20px;
+			border: 1px solid var(--color-blue40);
+			color: var(--color-blue);
+			border-radius: 5px;
+			text-align: center;
+			padding: 5px;
+			cursor: pointer;
+		}
+	}
+}

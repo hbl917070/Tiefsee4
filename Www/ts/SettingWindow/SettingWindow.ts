@@ -1106,6 +1106,19 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
+            const text_a1111Models = getDom("#text-a1111Models") as HTMLInputElement;
+            text_a1111Models.value = _config.settings.layout.a1111Models;
+            text_a1111Models.addEventListener("change", () => {
+                // 取出每一行，去除前後空白，並且不重複
+                const ar = text_a1111Models.value.split("\n")
+                    .map(item => item.trim())
+                    .filter((item, index, self) => self.indexOf(item) === index);
+                const t = ar.join("\n");
+                text_a1111Models.value = t;
+                _config.settings.layout.a1111Models = t;
+                appleSettingOfMain();
+            });
+
             // 顯示 Civitai Resources 
             const divCivitaiBox = getDom("#civitaiBox") as HTMLElement;
             function updateCivitaiBox() {

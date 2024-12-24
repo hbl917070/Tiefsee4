@@ -364,6 +364,19 @@
 
         // 允許顯示空白跟換行
         white-space: pre-wrap;
+
+        // lora 標籤
+        .lora {
+            cursor: pointer;
+            color: var(--color-blue);
+            filter: hue-rotate(30deg);
+
+            &:hover,
+            &.active {
+                // 文字底線
+                text-decoration: underline;
+            }
+        }
     }
     // 不顯示空白跟換行
     .mainExifValue__nowrap {
@@ -518,7 +531,6 @@
     }
 
     .textEditor-box {
-  
         top: 35px;
         bottom: 5px;
         right: 5px;

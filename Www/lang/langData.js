@@ -697,6 +697,25 @@ var langData = {
                 "en": "Maximum number of lines displayed (1~1000)",
                 "ja": "最大表示行数 (1~1000)",
             },
+            a1111Models: {
+                "zh-TW": "A1111 models 路徑",
+                "en": "A1111 models path",
+                "ja": "A1111 models パス",
+            },
+            a1111ModelsTooltip: {
+                "zh-TW": `
+                    指定 A1111 models 的路徑後，Prompt 裡面的 &lt;LoRA&gt; 就能顯示預覽圖。 <br>
+                    如果有多個路徑，則一行一個路徑。
+                `,
+                "en": `
+                    After specifying the path of A1111 models, the preview image of &lt;LoRA&gt; in the Prompt can be displayed. <br>
+                    If there are multiple paths, one path per line.
+                `,
+                "ja": `
+                    A1111モデルのパスを指定すると、プロンプト内の&lt;LoRA&gt;のプレビュー画像が表示されます。 <br>
+                    複数のパスがある場合は、1行に1つのパスを記載してください。
+                `,
+            },
             horizontal: {
                 "zh-TW": "寬度足夠時，橫向排列",
                 "en": "Horizontal arrangement when width enough",
@@ -2150,6 +2169,30 @@ var langData = {
             "ja": "最後のフォルダを読み込む",
         },
         //#endregion
+
+        //#region LoRA
+        notFoundFile: {
+            "zh-TW": "未找到檔案",
+            "en": "File not found",
+            "ja": "ファイルが見つかりません",
+        },
+        searchCivitai: {
+            "zh-TW": "從 Civitai 搜尋",
+            "en": "Search from Civitai",
+            "ja": "Civitai から検索",
+        },
+        notSpecifiedA1111Models: {
+            "zh-TW": "未指定 A1111 models 路徑",
+            "en": "Not specified A1111 models path",
+            "ja": "A1111 models パスが指定されていません",
+        },
+        goToSetting: {
+            "zh-TW": "前往設定",
+            "en": "Go to setting",
+            "ja": "設定に移動",
+        },
+        //#endregion
+
     },
 
     exif: {

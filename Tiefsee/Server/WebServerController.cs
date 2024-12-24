@@ -40,6 +40,7 @@ public class WebServerController {
         _webServer.RouteAdd("/api/forwardRequest", ForwardRequest);
         _webServer.RouteAdd("/api/sort", GetSort);
         _webServer.RouteAdd("/api/sort2", GetSort2);
+        _webServer.RouteAdd("/api/getA1111LoraResource", GetA1111LoraResource);
 
         _webServer.RouteAdd("/api/getVideo", GetVideo);
         _webServer.RouteAdd("/api/getFile", GetFile);
@@ -905,6 +906,21 @@ public class WebServerController {
 
         await WriteJson(d,
             new FileSort().Sort2(dir, ar, type));
+    }
+
+    /// <summary>
+    /// 取得 lora 相關資源
+    /// </summary>
+    private async Task GetA1111LoraResource(RequestData d) {
+
+        var json = JsonDocument.Parse(d.postData);
+        string[] searchDirs = json.GetStringArray("searchDirs");
+        string[] loraNames = json.GetStringArray("loraNames");
+        string[] excludeDirs = json.GetStringArray("excludeDirs");
+
+        var a1111Manager = new A1111Manager(AppPath.appDataA1111ModelList);
+        var result = a1111Manager.GetA1111LoraResource(searchDirs, loraNames, excludeDirs);
+        await WriteJson(d, result);
     }
 
     #region Headers 相關

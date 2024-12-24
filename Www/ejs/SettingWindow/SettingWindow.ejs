@@ -632,6 +632,16 @@
                             <input class="text-input" type="number" id="text-mainExifMaxLine">
                         </div>
 
+                        <div class="text-title" data-toDom="a1111Models">
+                            <span i18n="sw.informationPanel.a1111Models"> A1111 models 路徑 </span>
+                            <div class="img-help" data-i18n="sw.informationPanel.a1111ModelsTooltip">
+                                <%- await readFile("./img/default/tool-help.svg"); %>
+                            </div>
+                        </div>
+                        <div class="text-content">
+                            <textarea class="text-input" rows="2" id="text-a1111Models"></textarea>
+                        </div>
+
                         <!-- Civitai Resources -->
                         <div class="text-title" i18n="sw.informationPanel.civitaiResourcesEnabled"> 顯示 Civitai Resources </div>
                         <div class="text-content">
@@ -669,7 +679,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="box">
                         <div class="box-title" i18n="sw.largeBtn.title"> 大型選擇按鈕 </div>

@@ -435,6 +435,19 @@ export class WebAPI {
     }
 
     /**
+    * 取得 lora 相關資源
+    */
+    static async getA1111LoraResource(searchDirs: string[], loraNames: string[], excludeDirs: string[]) {
+        const url = APIURL + "/api/getA1111LoraResource";
+        const postData = { searchDirs, loraNames, excludeDirs };
+        const retAr = await WebAPI.sendPost(url, postData);
+        for (let i = 0; i < retAr.length; i++) {
+            retAr[i].FullPath = retAr[i].Path;
+        }
+        return retAr;
+    }
+
+    /**
      * 轉送 post
      */
     static async forwardPost(url: string, formData: FormData, timeout: number) {
