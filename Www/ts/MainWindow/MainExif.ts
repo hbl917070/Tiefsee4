@@ -39,6 +39,10 @@ export class MainExif {
 		const _domTabContentInfo = _domMainExif.querySelector(".js-tabContent-info") as HTMLElement;
 		const _domTabContentRelated = _domMainExif.querySelector(".js-tabContent-related") as HTMLElement;
 
+		// 避免滑鼠超出邊界而觸發全選
+		Lib.controlTextSelection(_domTabContentInfo);
+		Lib.controlTextSelection(_domTabContentRelated);
+
 		const _relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
 		var _fileInfo2: FileInfo2;
 

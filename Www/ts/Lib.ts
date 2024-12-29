@@ -643,6 +643,33 @@ export class Lib {
         return jsonFormat;
     }
 
+    /**
+     * 讓元素進入編輯狀態，避免選取文字時，因滑鼠超出邊界而觸發全選
+     */
+    public static controlTextSelection(div: HTMLElement) {
+
+        // 在滑鼠按下的狀態使用輸入法，依然會導致文字被修改，但一般人不會這樣操作，所以不處理
+
+        // 阻止編輯
+        div.addEventListener("beforeinput", async (e) => {
+            e.preventDefault();
+        });
+
+        // 如果一直處於編輯狀態，會導致跳出輸入法
+        // 所以開始選取文字才啟用編輯
+        div.addEventListener("mousedown", () => {
+            if (div.getAttribute("contenteditable") !== "true") {
+                div.setAttribute("contenteditable", "true");
+            }
+        });
+        // 滑鼠放開後，取消編輯
+        document.addEventListener("mouseup", () => {
+            if (div.getAttribute("contenteditable") !== "false") {
+                div.setAttribute("contenteditable", "false");
+            }
+        });
+    }
+
     /** file 轉 base64 */
     public static async readFileAsDataURL(file: File): Promise<string> {
         return await new Promise((resolve, reject) => {
