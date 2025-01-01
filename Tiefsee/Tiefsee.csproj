@@ -43,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="14.2.0" />
+		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="14.3.0" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
