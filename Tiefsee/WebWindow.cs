@@ -33,6 +33,8 @@ public class WebWindow : FormNone {
     private bool _tempFullScreen = false;
     /// <summary> 視窗是否有圓角 </summary>
     private bool _windowRoundedCorners = false;
+    /// <summary> 記錄視窗最小化前的狀態 </summary>
+    private FormWindowState _lastWindowState = FormWindowState.Normal;
 
     public WebView2 Wv2 { get { return _wv2; } }
     public WebWindow ParentWindow { get { return _parentWindow; } }
@@ -485,6 +487,11 @@ public class WebWindow : FormNone {
             else {
                 this.Padding = new(0);
             }
+
+            // 記錄視窗最小化前的狀態
+            if (this.WindowState != FormWindowState.Minimized) {
+                _lastWindowState = this.WindowState;
+            }
         };
 
         this.Move += (sender, e) => {
@@ -565,7 +572,8 @@ public class WebWindow : FormNone {
         // 如果視窗已經顯示了，則只取得焦點，不做其他事情
         if (_isShow) {
             if (this.WindowState == FormWindowState.Minimized) {
-                this.WindowState = FormWindowState.Normal; // 視窗化
+                // 將視窗恢復到最小化之前的狀態
+                this.WindowState = _lastWindowState;
             }
             SetFocus(); // 讓視窗在最上面並且取得焦點
             return;
