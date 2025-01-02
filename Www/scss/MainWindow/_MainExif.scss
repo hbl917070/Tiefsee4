@@ -64,12 +64,9 @@
                 user-select: none;
 
                 &[active="true"] {
-                    //border: 1px solid var(--color-blue20);
-                    //background-color: var(--color-white10);          color: var(--color-blue);
-                    //border-bottom: 3px solid var(--color-blue);
-                    color: var(--color-blue);
                     svg * {
                         stroke: var(--color-blue) !important;
+                        fill: var(--color-blue) !important;
                     }
                 }
                 &[active="true"]::after {

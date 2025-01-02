@@ -129,12 +129,12 @@
                             <div class="bulkView-scroll-content">
                                 <div class="bulkView-pagination">
                                     <div class="bulkView-pagination-box">
-                                        <div class="bulkView-pagination-prev" freeze="true">
+                                        <div class="bulkView-pagination-prev svg-box" freeze="true">
                                             <%- await readFile("./img/default/tool-prev.svg"); %>
                                         </div>
                                         <select class="bulkView-pagination-select">
                                         </select>
-                                        <div class="bulkView-pagination-next">
+                                        <div class="bulkView-pagination-next svg-box">
                                             <%- await readFile("./img/default/tool-next.svg"); %>
                                         </div>
                                     </div>
@@ -142,12 +142,12 @@
                                 <div class="bulkView-content" show=""></div>
                                 <div class="bulkView-pagination">
                                     <div class="bulkView-pagination-box">
-                                        <div class="bulkView-pagination-prev">
+                                        <div class="bulkView-pagination-prev svg-box">
                                             <%- await readFile("./img/default/tool-prev.svg"); %>
                                         </div>
                                         <select class="bulkView-pagination-select">
                                         </select>
-                                        <div class="bulkView-pagination-next">
+                                        <div class="bulkView-pagination-next svg-box">
                                             <%- await readFile("./img/default/tool-next.svg"); %>
                                         </div>
                                     </div>
@@ -157,12 +157,12 @@
 
                         <!-- 大型切換按鈕 -->
                         <div id="largeBtnLeft" class="largeBtn" data-style="leftRight-L">
-                            <div class="box">
+                            <div class="box svg-box">
                                 <%- await readFile("./img/default/tool-prev.svg"); %>
                             </div>
                         </div>
                         <div id="largeBtnRight" class="largeBtn" data-style="leftRight-R">
-                            <div class="box">
+                            <div class="box svg-box">
                                 <%- await readFile("./img/default/tool-next.svg"); %>
                             </div>
                         </div>
@@ -179,22 +179,28 @@
                                 <div class="mainExifTabs js-tabBtns main-toolbar__scrollbar ">
                                     <div class="mainExifTabsContent">
                                         <!-- 資訊 -->
-                                        <div class="mainExifTabsItem js-tabBtn-info" mark="true" i18n="menu.information" title="">
-                                            <svg width="23px" height="23px" stroke-width="1" viewBox="0 0 24 24" fill="none" color="var(--color-white)">
-                                                <path d="M16 16L16 8" stroke="var(--color-white)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                <path d="M12 16L12 11" stroke="var(--color-white)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                <path d="M8 16L8 13" stroke="var(--color-white)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                <path d="M3 20.4V3.6C3 3.26863 3.26863 3 3.6 3H20.4C20.7314 3 21 3.26863 21 3.6V20.4C21 20.7314 20.7314 21 20.4 21H3.6C3.26863 21 3 20.7314 3 20.4Z" stroke="var(--color-white)" stroke-width="1"></path>
+                                        <div class="mainExifTabsItem js-tabBtn-info svg-box" mark="true" i18n="menu.information" title="">
+                                            <svg width="23px" height="23px" viewBox="0 0 23 23">
+                                                <g style="fill:var(--color-white)">
+                                                    <rect x="15" y="7" width="1" height="8" />
+                                                    <rect x="11" y="10" width="1" height="5" />
+                                                    <rect x="7" y="12" width="1" height="3" />
+                                                    <path d="M19.4,3H3.6C3.3,3,3,3.3,3,3.6v15.8C3,19.7,3.3,20,3.6,20h15.8c0.3,0,0.6-0.3,0.6-0.6V3.6C20,3.3,19.7,3,19.4,3z M19,19H4V4,h15V19z" />
+                                                </g>
                                             </svg>
                                         </div>
                                         <!-- 相關檔案 -->
-                                        <div class="mainExifTabsItem js-tabBtn-related" mark="true" i18n="menu.relatedFiles" title="">
-                                            <svg width="23px" height="23px" stroke-width="1" viewBox="0 0 24 24" fill="none" color="var(--color-white)">
-                                                <rect width="7" height="5" rx="0.6" transform="matrix(0 -1 -1 0 22 21)" stroke="var(--color-white)" stroke-width="1" stroke-width="1.5"></rect>
-                                                <rect width="7" height="5" rx="0.6" transform="matrix(0 -1 -1 0 7 15.5)" stroke="var(--color-white)" stroke-width="1" stroke-width="1.5"></rect>
-                                                <rect width="7" height="5" rx="0.6" transform="matrix(0 -1 -1 0 22 10)" stroke="var(--color-white)" stroke-width="1" stroke-width="1.5"></rect>
-                                                <path d="M17 17.5H13.5C12.3954 17.5 11.5 16.6046 11.5 15.5V8.5C11.5 7.39543 12.3954 6.5 13.5 6.5H17" stroke="var(--color-white)" stroke-width="1"></path>
-                                                <path d="M11.5 12H7" stroke="var(--color-white)" stroke-width="1"></path>
+                                        <div class="mainExifTabsItem js-tabBtn-related svg-box" mark="true" i18n="menu.relatedFiles" title="">
+                                            <svg width="23px" height="23px" viewBox="0 0 23 23">
+                                                <g style="fill:var(--color-white)">
+                                                    <path d="M16.1,10h3.8c0.6,0,1.1-0.5,1.1-1.1V3.1C21,2.5,20.5,2,19.9,2h-3.8C15.5,2,15,2.5,15,3.1V5h-2.5C11.1,5,10,6.1,10,7.5V11H7
+                                                        V8.1C7,7.5,6.5,7,5.9,7H2.1C1.5,7,1,7.5,1,8.1v6.8C1,15.5,1.5,16,2.1,16h3.8C6.5,16,7,15.5,7,14.9V12h3v3.5c0,1.4,1.1,2.5,2.5,2.5
+                                                        H15v1.9c0,0.6,0.5,1.1,1.1,1.1h3.8c0.6,0,1.1-0.5,1.1-1.1v-5.8c0-0.6-0.5-1.1-1.1-1.1h-3.8c-0.6,0-1.1,0.5-1.1,1.1V17h-2.5
+                                                        c-0.8,0-1.5-0.7-1.5-1.5V12v-1V7.5C11,6.7,11.7,6,12.5,6H15v2.9C15,9.5,15.5,10,16.1,10z M16,3.1C16,3,16,3,16.1,3h3.8
+                                                        C20,3,20,3,20,3.1v5.8C20,9,20,9,19.9,9h-3.8C16,9,16,9,16,8.9V3.1z M6,11v1v2.9C6,15,6,15,5.9,15H2.1C2,15,2,15,2,14.9V8.1
+                                                        C2,8,2,8,2.1,8h3.8C6,8,6,8,6,8.1V11z M16,14.1C16,14,16,14,16,14.1l3.9-0.1c0.1,0,0.1,0,0.1,0.1v5.8c0,0.1,0,0.1-0.1,0.1h-3.8
+                                                        C16,20,16,20,16,19.9V14.1z"/>
+                                                </g>
                                             </svg>
                                         </div>
                                     </div>
@@ -229,10 +235,10 @@
     <div class="textEditor" id="textEditor" style="display:none;">
         <div class="textEditor-box">
             <div class="textEditor-toolbar">
-                <div class="textEditor-toolbarItem js-save" title="" i18n="menu.showSave">
+                <div class="textEditor-toolbarItem svg-box js-save" title="" i18n="menu.showSave">
                     <%- await readFile("./img/default/tool-save.svg"); %>
                 </div>
-                <div class="textEditor-toolbarItem js-pretty" title="" i18n="menu.formatJson">
+                <div class="textEditor-toolbarItem svg-box js-pretty" title="" i18n="menu.formatJson">
                     <%- await readFile("./img/default/tool-code.svg"); %>
                 </div>
                 <div class="textEditor-toolbarItem textEditor-toolbarItem__close js-close">
