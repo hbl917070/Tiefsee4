@@ -323,11 +323,12 @@ public class WebWindow : FormNone {
         _wv2 = new WebView2();
         _wv2.ZoomFactor = 1;
         _wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+        this.Controls.Add(_wv2);
 
         var panel = new Panel();
         panel.Dock = DockStyle.Fill;
-        panel.Controls.Add(_wv2);
         this.Controls.Add(panel);
+
         this.Hide();
 
         // 降低調整 webview 縮放頻率，可提升縮放視窗的流暢度
@@ -337,8 +338,8 @@ public class WebWindow : FormNone {
 
             var w = panel.Width;
             var h = panel.Height;
-            var l = 0;
-            var t = 0;
+            var l = panel.Left;
+            var t = panel.Top;
             // 在網頁內使用 border 繪製視窗外框時，在縮放過比例的螢幕可能會導致 broder 被裁切
             // 所以網頁在視窗化時會內縮 1px
             // 因此這裡必須把 webview2 外推 1px，避免 Acrylic 效果溢出到視窗外
@@ -347,7 +348,7 @@ public class WebWindow : FormNone {
                 h += 1;
             }
             // win11 的圓角效果，邊框會往內吃掉 1px，所以要主動把 webview2 往外內 1px，避免右邊的捲動條被遮住
-            if (_windowRoundedCorners && this.WindowState == FormWindowState.Normal) {
+            else if (_windowRoundedCorners && this.WindowState == FormWindowState.Normal) {
                 w -= 2;
                 h -= 2;
                 l = 1;
