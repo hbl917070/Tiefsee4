@@ -1469,35 +1469,36 @@ export class ScriptCopy {
         if (path === undefined) {
             path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
-        let fileInfo2 = await WebAPI.getFileInfo2(path);
+        const fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
-        let imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
+        const imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
             && this.M.fileLoad.getFilePath() === path
             && this.M.fileLoad.getGroupType() === GroupType.video
         ) {
 
-            let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，再取得base64
+            const base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到 canvas 上面，再取得 base64
             await WV_System.SetClipboard_Text(base64);
 
         } else if (imgType === "svg") {
-            // await WV_System.SetClipboard_FileToImage(path, false); // 直接用C#讀取圖片
-            let base64: string = await Lib.sendGet("base64", path); // 取得檔案的base64
+
+            const base64: string = await Lib.sendGet("base64", WebAPI.getFile(path)); // 取得檔案的 base64
             await WV_System.SetClipboard_Text(base64);
 
         } else {
-            let imgData = await this.M.script.img.getImgData(fileInfo2);
-            let imtUrl = imgData.arUrl[0].url;
-            let p = await this.M.script.img.preloadImg(imtUrl);
+            
+            const imgData = await this.M.script.img.getImgData(fileInfo2);
+            const imtUrl = imgData.arUrl[0].url;
+            const p = await this.M.script.img.preloadImg(imtUrl);
             if (p === false) {
-                console.log(" 複製影像Base64 失敗。無法載入圖片");
+                console.log("複製影像 Base64 失敗。無法載入圖片");
                 return null;
             }
-            let canvas = await this.M.script.img.urlToCanvas(imtUrl);
-            let blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png", 0.9);
+            const canvas = await this.M.script.img.urlToCanvas(imtUrl);
+            const blob = await this.M.script.img.getCanvasBlob(canvas, 1, "medium", "png", 0.9);
             if (blob === null) { return; }
-            let base64 = await this.M.script.img.blobToBase64(blob);
+            const base64 = await this.M.script.img.blobToBase64(blob);
             if (typeof base64 !== "string") { return; }
             await WV_System.SetClipboard_Text(base64);
         }
@@ -1512,11 +1513,8 @@ export class ScriptCopy {
         }
         if (await WV_File.Exists(path) === false) { return; }
 
-        let base64: string = await Lib.sendGet("base64", path); // 取得檔案的base64
+        const base64: string = await Lib.sendGet("base64", WebAPI.getFile(path)); // 取得檔案的 base64
         await WV_System.SetClipboard_Text(base64);
-
-        // WV_System.SetClipboard_FileToBase64(path);
-
         Toast.show(this.M.i18n.t("msg.copyBase64"), 1000 * 3); // 已將「base64」複製至剪貼簿
     }
 
@@ -1528,7 +1526,6 @@ export class ScriptCopy {
         if (await WV_File.Exists(path) === false) { return; }
         await WV_System.SetClipboard_FileToText(path);
         Toast.show(this.M.i18n.t("msg.copyText"), 1000 * 3); // 已將「文字」複製至剪貼簿
-
     }
 }
 
