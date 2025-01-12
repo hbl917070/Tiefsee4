@@ -130,6 +130,9 @@ public class WV_System {
     public void DeleteAllTemp() {
         DeleteTemp(AppPath.tempDirImgProcessed, 0);
         DeleteTemp(AppPath.tempDirImgZoom, 0);
+
+        var a1111Manager = new A1111Manager(AppPath.appDataA1111ModelList);
+        a1111Manager.ClearTemp();
     }
 
     /// <summary>

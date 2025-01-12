@@ -12,6 +12,8 @@ public class A1111Manager {
     private string _tempPath = null;
     // 判斷是否需要更新暫存檔
     private bool _isNeedUpdateTemp = false;
+    // 當前版本
+    private const int _version = 1;
 
     public A1111Manager(string tempPath) {
         _tempPath = tempPath;
@@ -24,9 +26,12 @@ public class A1111Manager {
         try {
             if (File.Exists(_tempPath)) {
                 var jsonText = File.ReadAllText(_tempPath);
-                var json = JsonSerializer.Deserialize<Dictionary<string, SafetensorsData>>(jsonText);
-                lock (_dicSafetensorsData) {
-                    _dicSafetensorsData = json;
+                var json = JsonSerializer.Deserialize<A1111Model>(jsonText);
+                // 暫存檔的版本必須與當前版本相同
+                if (json.Version == _version) {
+                    lock (_dicSafetensorsData) {
+                        _dicSafetensorsData = json.Data;
+                    }
                 }
             }
         }
@@ -80,7 +85,6 @@ public class A1111Manager {
                 var data = (fileExtension == ".safetensors") ? GetSafetensorsData(filePath) : null;
 
                 foreach (var loraResourcs in loraResources.Keys) {
-
                     // 例如 lora 的名稱是 aa-3.2
                     // 那麼 aa-3.2.png 跟 aa-3.2.private.png 都要加進去
                     // 而 aa-3.21.png 則應該不加進去
@@ -100,11 +104,7 @@ public class A1111Manager {
 
         if (_isNeedUpdateTemp) {
             _isNeedUpdateTemp = false;
-            string jsongText = null;
-            lock (_dicSafetensorsData) {
-                jsongText = JsonSerializer.Serialize(_dicSafetensorsData, new JsonSerializerOptions());
-            }
-            File.WriteAllText(_tempPath, jsongText);
+            UpdateTemp(); // 更新暫存
         }
 
         return loraResources;
@@ -129,7 +129,7 @@ public class A1111Manager {
         // 小於 3G 應該就是 LoRA，嘗試從裡面提取真實名稱
         if (fileinfo.Length < (long)1024 * 1024 * 1024 * 3) {
 
-            var text = GetFileHeader(path, 1000 * 50);
+            var text = GetFileHeader(path, 1000 * 300);
 
             /* var indexSshsModelHash = text.IndexOf("\"sshs_model_hash\"");
             if (indexSshsModelHash != -1)
@@ -191,6 +191,35 @@ public class A1111Manager {
     }
 
     /// <summary>
+    /// 清理暫存
+    /// </summary>
+    public void ClearTemp() {
+        var keys = _dicSafetensorsData.Keys.ToArray();
+        foreach (var key in keys) {
+            var item = _dicSafetensorsData[key];
+            // 如果檔案不存在就移除
+            if (File.Exists(key) == false) {
+                _dicSafetensorsData.Remove(key);
+            }
+        }
+        UpdateTemp(); // 更新暫存
+    }
+
+    /// <summary>
+    /// 更新暫存
+    /// </summary>
+    private void UpdateTemp() {
+        string jsongText = null;
+        lock (_dicSafetensorsData) {
+            jsongText = JsonSerializer.Serialize(new A1111Model {
+                Version = _version,
+                Data = _dicSafetensorsData
+            }, new JsonSerializerOptions());
+        }
+        File.WriteAllText(_tempPath, jsongText);
+    }
+
+    /// <summary>
     /// 取得2進制檔案內容的前幾個字元
     /// </summary>
     /// <param name="path"></param>
@@ -238,7 +267,17 @@ public class A1111Manager {
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
     }
+}
 
+public class A1111Model {
+    /// <summary>
+    /// 版本
+    /// </summary>
+    public int Version { get; set; }
+    /// <summary>
+    /// 資料
+    /// </summary>
+    public Dictionary<string, SafetensorsData> Data { get; set; }
 }
 
 public class SafetensorsData {
