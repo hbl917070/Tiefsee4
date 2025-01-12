@@ -859,14 +859,14 @@ export class FileLoad {
             if (_isBulkView) {
                 const filePath = getFilePath();
                 if (filePath === undefined) { return; }
-                let title = Lib.getDirectoryName(filePath) ?? "";
-                title = Lib.getFileName(title);
-                baseWindow.setTitle(title);
+                let dirPath = Lib.getDirectoryName(filePath) ?? "";
+                let fileName = Lib.getFileName(dirPath);
+                baseWindow.setTitle(fileName, dirPath);
             } else {
                 const filePath = getFilePath();
                 if (filePath === undefined) { return; }
-                const title = `「${_flagFile + 1}/${_arFile.length}」 ${Lib.getFileName(filePath)}`;
-                baseWindow.setTitle(title);
+                const text = `「${_flagFile + 1}/${_arFile.length}」 ${Lib.getFileName(filePath)}`;
+                baseWindow.setTitle(text, filePath);
             }
         }
 

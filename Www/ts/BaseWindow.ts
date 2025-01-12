@@ -177,9 +177,15 @@ class BaseWindow {
     /**
      * 設定視窗標題
      */
-    public async setTitle(text: string) {
+    public async setTitle(text: string, title?: string) {
         WV_Window.Text = text;
-        this.domTitlebarText.innerHTML = `<span>${text}</span>`;
+        if (typeof title !== "string" || title === "") {
+            title = "";
+        }
+        const span = Lib.newDom(`<span>${text}</span>`);
+        span.setAttribute("title", title);
+        this.domTitlebarText.innerHTML = "";
+        this.domTitlebarText.appendChild(span);
     }
 
     /**
