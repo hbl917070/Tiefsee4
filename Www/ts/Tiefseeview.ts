@@ -2155,13 +2155,13 @@ export class Tiefseeview {
                 type = TiefseeviewZoomType.windowHeightRatio;
             }
             if (type === TiefseeviewZoomType.windowWidthRatio) { // 以視窗寬度比例設定
-                let w = _domDpiZoom.offsetWidth - _marginLeft - _marginRight - 5; // 顯示範圍 - 邊距
+                let w = _domDpiZoom.offsetWidth - _marginLeft - _marginRight; // 顯示範圍 - 邊距
                 if (w < 10) { w = 10; }
                 const ratio = getOriginalWidth() / dom_con_offsetWidth;
                 width = w * ratio * (val / 100);
             }
             if (type === TiefseeviewZoomType.windowHeightRatio) { // 以視窗高度比例設定
-                let w = _domDpiZoom.offsetHeight - _marginTop - _marginBottom - 5; // 顯示範圍 - 邊距
+                let w = _domDpiZoom.offsetHeight - _marginTop - _marginBottom; // 顯示範圍 - 邊距
                 if (w < 10) { w = 10; }
                 const ratio = getOriginalWidth() / dom_con_offsetWidth; // 旋轉後的比例
                 const ratio_xy = dom_con_offsetWidth / dom_con_offsetHeight; // 旋轉後圖片長寬的比例

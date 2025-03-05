@@ -144,7 +144,7 @@ export class MainWindow {
 
             WV_Window.SetMinimumSize(250 * window.devicePixelRatio, 250 * window.devicePixelRatio); // 設定視窗最小size
 
-            _fileShow.tiefseeview.setMargin(0, 10, 10, 0);
+            _fileShow.tiefseeview.setMargin(0, 0, 0, 0);
 
             // 視窗改變大小時觸發
             baseWindow.sizeChangeEvents.push(async () => {
