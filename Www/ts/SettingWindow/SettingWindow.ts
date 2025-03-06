@@ -89,8 +89,7 @@ class SettingWindow {
 
             // 拖曳視窗
             const domLeftBox = getDom("#window-left .pagetab") as HTMLElement;
-            domLeftBox.addEventListener("mousedown", async (e) => {
-
+            Lib.addDragThresholdListener(domLeftBox, 1, async (e) => { // 移動一定距離後觸發
                 // 如果有滾動條，就禁止拖曳(避免無法點擊滾動條)
                 if (Lib.isScrollbarVisible(domLeftBox)) { return; }
 

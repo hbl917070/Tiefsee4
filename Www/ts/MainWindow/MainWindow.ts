@@ -228,9 +228,9 @@ export class MainWindow {
                 if (windowState === "Maximized" && _fullScreen.getEnabled() === false) {
                     baseWindow.normal();
                 } else {
-                    setTimeout(() => {
+                    setTimeout(() => { // 直接全螢幕會與視窗拖曳衝突，所以加入延遲
                         baseWindow.maximized();
-                    }, 50);
+                    }, 150);
                 }
             });
             Lib.addEventDblclick(_fileShow.iframes.welcomeview.dom, async () => { // 歡迎頁面
@@ -240,12 +240,12 @@ export class MainWindow {
                 } else {
                     setTimeout(() => {
                         baseWindow.maximized();
-                    }, 50);
+                    }, 150);
                 }
             });
 
             // 讓工具列允許拖曳視窗
-            _domToolbar.addEventListener("mousedown", async (e) => {
+            Lib.addDragThresholdListener(_domToolbar, 1, async (e) => { // 移動一定距離後觸發
                 if (_fullScreen.getEnabled() === true) { return; }
                 const dom = e.target as HTMLDivElement;
                 if (dom) {
