@@ -15,7 +15,7 @@ jobs:
 
       - name: Spinning up Node.js
         id: node-with-cache
-        uses: magnetikonline/action-node-modules-cache@v4
+        uses: magnetikonline/action-node-modules-cache@v3
         with:
           node-version: 18.x
           node-modules-path: Www/node_modules
