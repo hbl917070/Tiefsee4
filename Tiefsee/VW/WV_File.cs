@@ -46,13 +46,14 @@ public class WV_File {
             }
 
             // 把 Base64 儲存成檔案
+            base64 = Uri.UnescapeDataString(base64);
             int x = base64.IndexOf("base64,"); // 去掉開頭的 data:image/png;base64,
             if (x != -1) { base64 = base64.Substring(x + 7); }
+            base64 = base64.Trim();
             byte[] buffer = Convert.FromBase64String(base64);
             File.WriteAllBytes(path, buffer);
 
             return path;
-
         }
         catch (Exception e) {
             Console.WriteLine(e.Message);

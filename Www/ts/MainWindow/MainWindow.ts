@@ -405,7 +405,8 @@ export class MainWindow {
                     }
                 }
 
-                if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/file=/) === 0) {
 
                     // ex: http://127.0.0.1:7860/file=D:/ai/a.png
 
@@ -414,8 +415,10 @@ export class MainWindow {
                     let path = text.match(/file=(.+)/)?.[1] || "";
                     path = Lib.urlToPath(path);
                     await _fileLoad.loadFile(path);
+                }
 
-                } else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/) === 0) { // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                // 如果是 Stable Diffusion webui 的圖片，則直接開啟檔案
+                else if (text.search(/^http:\/\/127\.0\.0\.1:\d+\/.*\?filename=([^&]+).*$/) === 0) {
 
                     // ex: http://127.0.0.1:7860/sd_extra_networks/thumb?filename=D%3A/ai/stable-diffusion-webui/models/Lora/aaa.png&mtime=1676408109.8893292
 
@@ -428,8 +431,10 @@ export class MainWindow {
                         path = Lib.urlToPath(path);
                         await _fileLoad.loadFile(path);
                     }
+                }
 
-                } else if (text.indexOf("https://cdn.discordapp.com/attachments/") === 0) { // 如果是 discord 的圖片
+                // 如果是 discord 的圖片
+                else if (text.indexOf("https://cdn.discordapp.com/attachments/") === 0) {
 
                     e.preventDefault();
 
@@ -442,7 +447,19 @@ export class MainWindow {
                             await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
                         }
                     }
-                } else if (text.search(/^((blob:)?http[s]?|file):[/][/]/) === 0 && files.length > 0) { // 網頁的圖片
+                }
+
+                // 本機的檔案
+                else if ((text.indexOf("file://") === 0) && files.length > 0) {
+
+                    let path = Lib.urlToPath(text); // 取得檔案路徑
+
+                    await _fileLoad.loadDropFile([path]);
+                    e.preventDefault();
+                }
+
+                // 網頁的圖片
+                else if (text.search(/^((blob:)?http[s]?|file):[/][/]/) === 0 && files.length > 0) {
 
                     e.preventDefault();
 
@@ -471,18 +488,23 @@ export class MainWindow {
                         // Toast.show(i18n.t("msg.unsupportedFileTypes"), 1000 * 3); // 不支援的檔案類型
                     }
 
-                } else if (text.indexOf("data:image/") === 0) { // base64
+                }
 
+                // base64
+                else if (text.indexOf("data:image/") === 0) {
                     e.preventDefault();
 
                     const base64 = text;
                     const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
+                        console.log("base64 path:", path);
                         await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
                     }
+                }
 
-                } else if (text.search(/^http[s]:[/][/]/) === 0) { // 如果是超連結
+                // 如果是超連結
+                else if (text.search(/^http[s]:[/][/]/) === 0) {
 
                     e.preventDefault();
 
@@ -495,14 +517,17 @@ export class MainWindow {
                             await reloadImageAfterDownload(path); // 下載檔案後，判斷是否需要重新載入圖片
                         }
                     }
-                } else if (textUrl.search(/^file:[/][/]/) === 0) { // 某些應用程式的檔案連結，例如vscode
+                }
 
+                // 某些應用程式的檔案連結，例如vscode
+                else if (textUrl.search(/^file:[/][/]/) === 0) {
                     e.preventDefault();
                     const path = Lib.urlToPath(textUrl);
                     await _fileLoad.loadFile(path);
+                }
 
-                } else if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) { // 本機的檔案
-
+                // 本機的檔案
+                else if ((text === "" || text.indexOf("file://") === 0) && files.length > 0) {
                     // 取得拖曳進來的檔案路徑
                     chrome.webview.postMessageWithAdditionalObjects("FilesDropped", files);
                     const arFile = await baseWindow.getDropPath();
@@ -510,7 +535,6 @@ export class MainWindow {
                     if (arFile === undefined) { return; }
                     await _fileLoad.loadDropFile(arFile);
                     e.preventDefault();
-
                 }
             }
 
