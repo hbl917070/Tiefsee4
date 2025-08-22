@@ -147,7 +147,9 @@
         function initCherry() {
 
             let lang = libIframe.getLang(); // 取得使用者選擇的語言
-            if (lang == "zh-TW") {
+            if (lang == "zh-CN") {
+                lang = "zh_CN";
+            } else if (lang == "zh-TW") {
                 lang = "zh_TW";
             } else {
                 lang = "en_US";

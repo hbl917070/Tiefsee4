@@ -113,7 +113,9 @@
             //-------------
 
             let lang = libIframe.getLang(); // 取得使用者選擇的語言
-            if (lang == "zh-TW") {
+            if (lang == "zh-CN") {
+                lang = "zh-cn";
+            } else if (lang == "zh-TW") {
                 lang = "zh-tw";
             } else if (lang == "ja") {
                 lang = "ja";
@@ -177,7 +179,7 @@
         async function loadFile(text, path) {
             monaco.editor.getModels().forEach(model => model.dispose()); // 清除所有已存在的 Model
             const model = monaco.editor.createModel(text, undefined, monaco.Uri.file(path));
-            editor.setModel(model);       
+            editor.setModel(model);
         }
 
         /**

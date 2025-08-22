@@ -353,7 +353,10 @@ export class Lib {
      */
     public static getBrowserLang() {
         let browserLang = navigator.language.toLowerCase();
-        if (browserLang == "zh" || browserLang.startsWith("zh-")) {
+        if (browserLang == "zh-cn") {
+            return "zh-CN";
+        }
+        if (browserLang.startsWith("zh")) {
             return "zh-TW";
         }
         if (browserLang.indexOf("ja") === 0) { // 日本
