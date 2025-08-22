@@ -43,12 +43,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="14.3.0" />
-		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="14.8.0" />
+		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc3" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3477-prerelease" />
 		<PackageReference Include="NetVips.Extensions" Version="2.3.0" />
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
-		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.6" />
+		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.7" />
 		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
 	</ItemGroup>
 
