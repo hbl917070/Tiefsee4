@@ -603,29 +603,28 @@ public class ImgLib {
     /// <summary>
     /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要 using
     /// </summary>
-    public static NetVips.Image GetNetVips(string path, string type) {
+    public static (NetVips.Image Img, FileStream Fs) GetNetVips(string path, string type) {
 
         lock (tempArNewVips) {
 
             string key = FileLib.FileToHash(path);
             for (int i = 0; i < tempArNewVips.Count; i++) {
                 if (tempArNewVips[i].key == key) {
-                    return tempArNewVips[i].vips;
+                    return (tempArNewVips[i].vips, null);
                 }
             }
 
             NetVips.Cache.MaxFiles = 0; // 避免NetVips主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
-
+            FileStream sr = null;
             NetVips.Image img;
+
             if (type == "webp") { // 如果是webp就從steam讀取，不這麼做的話，vips會有鎖住檔案的BUG
-                using (var sr = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                    img = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
-                }
+                sr = new FileStream(path, FileMode.Open, FileAccess.Read);
+                img = NetVips.Image.NewFromStream(sr, access: NetVips.Enums.Access.Random);
             }
             else {
                 img = NetVips.Image.NewFromFile(path, true, NetVips.Enums.Access.Random);
             }
-
 
             tempArNewVips.Add(new DataVips {
                 key = key,
@@ -637,7 +636,7 @@ public class ImgLib {
                 tempArNewVips[0].vips = null;
                 tempArNewVips.RemoveAt(0);
             }
-            return img;
+            return (img, sr);
         }
     }
 
@@ -718,7 +717,7 @@ public class ImgLib {
         }
 
         if (type == "tif" || type == "tiff") {
-            NetVips.Image vImg = GetNetVips(path, "tif");
+            NetVips.Image vImg = GetNetVips(path, "tif").Img;
 
             //im = im.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual); // 套用顏色
             VipsSave(vImg, path100, "auto");
@@ -727,7 +726,7 @@ public class ImgLib {
         }
 
         if (type == "avif") {
-            NetVips.Image vImg = GetNetVips(path, "avif");
+            NetVips.Image vImg = GetNetVips(path, "avif").Img;
             VipsSave(vImg, path100, "auto");
             imgInfo.width = vImg.Width;
             imgInfo.height = vImg.Height;
@@ -739,7 +738,7 @@ public class ImgLib {
 
         if (type == "jpg") {
             if (IsCMYK(path)) { // 如果是 CMYK，就先套用顏色
-                NetVips.Image vImg = GetNetVips(path, "jpg");
+                NetVips.Image vImg = GetNetVips(path, "jpg").Img;
                 using (var vImg2 = vImg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) { // 套用顏色
                     vImg2.Jpegsave(path100);
                 }
@@ -892,7 +891,8 @@ public class ImgLib {
             }
         }
 
-        NetVips.Image im = GetNetVips(imgProcessed, fileType);
+        var vipsData = GetNetVips(imgProcessed, fileType);
+        NetVips.Image im = vipsData.Img;
 
         Enums.Kernel? kernel = Enums.Kernel.Lanczos3;
         double? gap = 4;
@@ -903,6 +903,10 @@ public class ImgLib {
         }
         using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
         VipsSave(imR, filePath, "auto");
+
+        // im.Dispose(); // 在 GetNetVips 裡面有做暫存機制，不需要釋放
+        if (vipsData.Fs != null)
+            vipsData.Fs.Dispose();
 
         StartWindow.isRunGC = true; // 定時執行GC
 
