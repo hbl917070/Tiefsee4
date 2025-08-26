@@ -5,8 +5,8 @@ import { Lib } from "../../Lib";
  */
 export function getComfyui(jsonStr: string) {
 
-    const _promptBaseKeys = ["positive", "text_positive", "populated_text", "text", "text_g", "conditioning_from", "conditioning", "prompt", "string", "t5xxl", "text_b", "base_ctx", "text_pos_g", "file_path"];
-    const _negativePromptBaseKeys = ["negative", "text_negative", "populated_text", "text", "conditioning_from", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path"];
+    const _promptBaseKeys = ["positive", "text_positive", "populated_text", "text", "text_g", "conditioning", "prompt", "string", "t5xxl", "text_b", "base_ctx", "text_pos_g", "file_path"];
+    const _negativePromptBaseKeys = ["negative", "text_negative", "populated_text", "text", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path"];
     const _stepsBaseKeys = ["steps"];
     const _samplerBaseKeys = ["sampler_name", "sampler"];
     const _schedulerBaseKeys = ["scheduler"];
@@ -99,7 +99,17 @@ export function getComfyui(jsonStr: string) {
         if (value === undefined) { return undefined; }
         const type = typeof value;
         if (type !== "string" && type !== "number") { return undefined; }
-        return value.toString();
+        return toFixedPrecision(value).toString();
+    }
+
+    /**
+     * 去除浮點數多餘的位數 (避免出現 1.2000000000000002)
+     */
+    function toFixedPrecision(val: number) {
+        if (typeof val === "number") {
+            return Number(val.toFixed(12));
+        }
+        return val;
     }
 
     /**
@@ -119,7 +129,7 @@ export function getComfyui(jsonStr: string) {
             if (text !== undefined) {
                 const type = typeof text;
                 if (type === "string" || type === "number") {
-                    return text.toString();
+                    return toFixedPrecision(text).toString();
                 }
                 else if (Array.isArray(text) && text.length > 0) {
                     if (key === undefined) {
@@ -184,6 +194,12 @@ export function getComfyui(jsonStr: string) {
                 inputs.delimiter
             );
         }
+        else if (obj.class_type === "ConditioningConcat") {
+            return getConcatenatedPrompts(["conditioning_to", "conditioning_from"], key, searchKeys);
+        }
+        else if (obj.class_type === "JoinStringMulti") {
+            return getConcatenatedPrompts("string_", key, searchKeys);
+        }
 
         let text;
         const arKey = Object.keys(inputs);
@@ -195,8 +211,11 @@ export function getComfyui(jsonStr: string) {
                 // 無視大小寫
                 if (arKey[j].toLowerCase() === key.toLowerCase()) {
                     text = inputs[arKey[j]];
-                    if (typeof text === "string" || (allowNumber && typeof text === "number")) {
+                    if (typeof text === "string") {
                         return text.toString();
+                    }
+                    if (allowNumber && typeof text === "number") {
+                        return toFixedPrecision(text).toString();
                     }
                 }
             }
@@ -423,7 +442,7 @@ export function getComfyui(jsonStr: string) {
 
     // FluxSamplerParams+
     foreachNode((item, inputs, classType) => {
-        if (classType === "FluxSamplerParams+") {
+        if (classType === "FluxSamplerParams+" || classType === "FluxSampler") {
             const prompt = getPrompt(getItemKey(inputs.conditioning), _promptBaseKeys);
             const steps = getStringValue(inputs.steps);
             const sampler = getStringValue(inputs.sampler);
@@ -560,6 +579,7 @@ export function getComfyui(jsonStr: string) {
         "KSampler (Efficient)",
         "KSampler Adv. (Efficient)",
         "KSampler SDXL (Eff.)",
+        "WanMoeKSampler",
     ];
 
     // 在結尾加入 null，表示在最後使用相容模式尋找
@@ -584,10 +604,11 @@ export function getComfyui(jsonStr: string) {
                 inputs.positive !== undefined) {
 
                 isModelNode = true;
-
-                // 如果是已知的節點，則略過
-                if (nodeNames.includes(classType)) { return; }
             }
+
+            // 如果是已知的節點，則略過
+            if (nodeName === null && nodeNames.includes(classType)) { return; }
+
             if (isModelNode === false) { return; }
 
             let prompt = getPrompt(getItemKey(inputs.positive), _promptBaseKeys);
@@ -682,8 +703,8 @@ export function getComfyui(jsonStr: string) {
                 if (modelStr === 0 && clipStr === 0) { continue; } // 如果都是 0，則略過
                 if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
                 let jsonFormat = Lib.stringifyWithNewlines({
-                    "Model Strength": modelStr,
-                    "Clip Strength": clipStr
+                    "Model Strength": toFixedPrecision(modelStr),
+                    "Clip Strength": toFixedPrecision(clipStr)
                 }, true, true);
                 arLora.push({ title: loraName, text: jsonFormat });
 
@@ -730,8 +751,8 @@ export function getComfyui(jsonStr: string) {
                 if (modelWeight === 0 && clipWeight === 0) { continue; } // 如果都是 0，則略過		
                 if (loraName === "None" || loraName === "none") { continue; } // 如果是 None，則略過
                 let jsonFormat = Lib.stringifyWithNewlines({
-                    "Model Strength": modelWeight,
-                    "Clip Strength": clipWeight
+                    "Model Strength": toFixedPrecision(modelWeight),
+                    "Clip Strength": toFixedPrecision(clipWeight)
                 }, true, true);
                 arLora.push({ title: loraName, text: jsonFormat });
             }
@@ -781,9 +802,9 @@ export function getComfyui(jsonStr: string) {
                 if (clipStrength === undefined) { break; }
 
                 let jsonFormat = Lib.stringifyWithNewlines({
-                    "Strength": strength,
-                    "Model Strength": strengthModel,
-                    "Clip Strength": clipStrength
+                    "Strength": toFixedPrecision(strength),
+                    "Model Strength": toFixedPrecision(strengthModel),
+                    "Clip Strength": toFixedPrecision(clipStrength)
                 }, true, true);
                 arLora.push({ title: loraName, text: jsonFormat });
             }
@@ -801,7 +822,7 @@ export function getComfyui(jsonStr: string) {
                     if (value.on === "true" && value.lora !== "None") {
                         arLora.push({
                             title: value.lora,
-                            text: "Strength: " + value.strength
+                            text: "Strength: " + toFixedPrecision(value.strength)
                         });
                     }
                 }
@@ -834,13 +855,13 @@ export function getComfyui(jsonStr: string) {
                     if (value === 0) { return; } // 如果是 0，則略過
 
                     if (key === "strength_model" || key === "lora_model_strength") {
-                        arStrength["Model Strength"] = value;
+                        arStrength["Model Strength"] = toFixedPrecision(value);
                     }
                     else if (key === "strength_clip" || key === "lora_clip_strength") {
-                        arStrength["Clip Strength"] = value;
+                        arStrength["Clip Strength"] = toFixedPrecision(value);
                     }
                     else if (key.includes("strength")) {
-                        arStrength[key] = value;
+                        arStrength[key] = toFixedPrecision(value);
                     }
                 }
             });
