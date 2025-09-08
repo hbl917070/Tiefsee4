@@ -200,6 +200,9 @@ export function getComfyui(jsonStr: string) {
         else if (obj.class_type === "JoinStringMulti") {
             return getConcatenatedPrompts("string_", key, searchKeys);
         }
+        else if (obj.class_type === "StringConcatenate") {
+            return getConcatenatedPrompts(["string_a", "string_b"], key, searchKeys);
+        }
 
         let text;
         const arKey = Object.keys(inputs);
@@ -571,6 +574,64 @@ export function getComfyui(jsonStr: string) {
         }
     });
 
+    // easy fullkSampler
+    foreachNode((item, inputs, classType) => {
+        if (classType === "easy fullkSampler") {
+            const prompt = getPrompt(getItemKey(inputs.pipe), _promptBaseKeys);
+            const promptNegative = getPrompt(getItemKey(inputs.pipe), _negativePromptBaseKeys);
+            const steps = getStringValue(inputs.steps);
+            const samplerName = getStringValue(inputs.sampler_name);
+            const scheduler = getStringValue(inputs.scheduler);
+            const cfg = getStringValue(inputs.cfg);
+            const seed = getStringValue(inputs.seed);
+            const model = getPrompt(getItemKey(inputs.model), _modelBaseKeys);
+            const denoise = getStringValue(inputs.denoise);
+
+            retPush(classType, [
+                { title: "Prompt", text: prompt },
+                { title: "Negative prompt", text: promptNegative },
+                { title: "Steps", text: steps },
+                { title: "Sampler", text: samplerName },
+                { title: "Scheduler", text: scheduler },
+                { title: "CFG", text: cfg },
+                { title: "Seed", text: seed },
+                { title: "Model", text: model },
+                { title: "Denoise", text: denoise },
+            ]);
+        }
+    });
+
+    // WanMoeKSampler
+    foreachNode((item, inputs, classType) => {
+        if (classType === "WanMoeKSampler") {
+            const prompt = getPrompt(getItemKey(inputs.positive), _promptBaseKeys);
+            const promptNegative = getPrompt(getItemKey(inputs.negative), _negativePromptBaseKeys);
+            const steps = getStringValue(inputs.steps);
+            const samplerName = getStringValue(inputs.sampler_name);
+            const scheduler = getStringValue(inputs.scheduler);
+            const cfgHigh = getStringValue(inputs.cfg_high_noise);
+            const cfgLow = getStringValue(inputs.cfg_low_noise);
+            const seed = getStringValue(inputs.seed);
+            const modelHigh = getPrompt(getItemKey(inputs.model_high_noise), _modelBaseKeys);
+            const modelLow = getPrompt(getItemKey(inputs.model_low_noise), _modelBaseKeys);
+            const denoise = getStringValue(inputs.denoise);
+
+            retPush(classType, [
+                { title: "Prompt", text: prompt },
+                { title: "Negative prompt", text: promptNegative },
+                { title: "Steps", text: steps },
+                { title: "Sampler", text: samplerName },
+                { title: "Scheduler", text: scheduler },
+                { title: "CFG High", text: cfgHigh },
+                { title: "CFG Low", text: cfgLow },
+                { title: "Seed", text: seed },
+                { title: "Model High", text: modelHigh },
+                { title: "Model Low", text: modelLow },
+                { title: "Denoise", text: denoise },
+            ]);
+        }
+    });
+
     const nodeNames = [
         "KSampler",
         "KSamplerAdvanced",
@@ -579,7 +640,6 @@ export function getComfyui(jsonStr: string) {
         "KSampler (Efficient)",
         "KSampler Adv. (Efficient)",
         "KSampler SDXL (Eff.)",
-        "WanMoeKSampler",
     ];
 
     // 在結尾加入 null，表示在最後使用相容模式尋找
