@@ -348,7 +348,7 @@ public class Exif {
                 .Where(x => x.group == "GIF Animation")
                 .Where(x => x.name == "Iteration Count")
                 .Select(x => x.value)
-                .SingleOrDefault() ?? "";
+                .FirstOrDefault() ?? "";
             if (loopString.Contains(" times")) {
                 exif.data.Add(new ImgExifItem {
                     group = "Frames",
