@@ -29,7 +29,7 @@ Tiefsee
 
 > 運行需求：64位元的 Windows 10 或 Windows 11
 
-### 當前版本 Tiefsee 4.2.7
+### 當前版本 Tiefsee 4.2.8
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
