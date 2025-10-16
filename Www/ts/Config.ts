@@ -33,7 +33,7 @@ export class Config {
             { name: /illustrator/i, groupType: ["img"], fileExt: ["ai"] },
             { name: /Lightroom/i, groupType: ["img"] },
             { name: /Paint/i, groupType: ["img"] },
-            { name: /photo/i, groupType: ["img"] },
+            { name: /photo(?!n)/i, groupType: ["img"] }, // 可以匹配 photo，但不匹配 photon (這個是「Windows 功能體驗套件」)
             { name: /^gimp/i, groupType: ["img"] },
             { name: /FireAlpaca/i, groupType: ["img"] },
             { name: /openCanvas/i, groupType: ["img"] },
