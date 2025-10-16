@@ -1,5 +1,5 @@
+using SpaceWizards.HttpListener;
 using System.IO;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,7 +22,7 @@ public class WebServer {
     /// <returns> 初始化成功或失敗 </returns>
     public bool Init() {
 
-        port = GetAllowPost(); // 取得能使用的port
+        port = GetAllowPort(); // 取得能使用的port
 
         for (int i = 0; i < 100; i++) {
             try {
@@ -163,40 +163,18 @@ public class WebServer {
         arRoute.Add(func2);
     }
 
-
-    /// <summary>
-    /// 檢查 port 是否有被佔用
-    /// </summary>
-    public bool PortInUse(int port) {
-        bool inUse = false;
-        IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-        IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
-        foreach (IPEndPoint endPoint in ipEndPoints) {
-            if (endPoint.Port == port) {
-                inUse = true;
-                break;
-            }
-        }
-        return inUse;
-    }
-
     /// <summary>
     /// 取得能用的 port
     /// </summary>
-    public int GetAllowPost() {
+    public int GetAllowPort() {
 
-        IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-        IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
+        // 取得所有被使用的 port
+        var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+        var ipEndPoints = ipProperties.GetActiveTcpListeners();
+        var usedPorts = ipEndPoints.Select(p => p.Port).ToHashSet();
 
-        for (int i = Program.startPort; i < 65535; i++) {
-            bool inUse = false;
-            foreach (IPEndPoint endPoint in ipEndPoints) {
-                if (endPoint.Port == i) {
-                    inUse = true;
-                    break;
-                }
-            }
-            if (inUse == false) {
+        for (var i = Program.startPort; i < 65535; i++) {
+            if (usedPorts.Contains(i) == false) {
                 return i;
             }
         }
