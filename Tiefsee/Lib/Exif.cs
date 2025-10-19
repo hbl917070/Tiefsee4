@@ -243,10 +243,10 @@ public class Exif {
                         value = value
                     });
                 }
-                else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖，所以不抓
+                else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1 && group != "Exif IFD0") { // Thumbnail 是縮圖，IFD0 是圖片編輯前的資訊，所以不抓
                     w = directory.GetString(tag.Type);
                 }
-                else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
+                else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1 && group != "Exif IFD0") {
                     h = directory.GetString(tag.Type);
                 }
                 else {
