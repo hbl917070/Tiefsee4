@@ -112,6 +112,9 @@ public class Exif {
         });
         string w = "";
         string h = "";
+        // ifd0W , ifd0H 儲存 IFD0 的 Image Width/Height 作為沒有其它 Image Width/Height 時的備用
+        string ifd0W = "";
+        string ifd0H = "";
         IEnumerable<MetadataExtractor.Directory> directories;
 
         try {
@@ -243,11 +246,19 @@ public class Exif {
                         value = value
                     });
                 }
-                else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1 && group != "Exif IFD0") { // Thumbnail 是縮圖，IFD0 是圖片編輯前的資訊，所以不抓
-                    w = directory.GetString(tag.Type);
+                else if (name == "Image Width" && group.IndexOf("Thumbnail") == -1) { // Thumbnail 是縮圖
+                    // IFD0 為原始圖片的資訊，可能會被編輯後的 Exif 覆蓋 , 所以作為備用
+                    if (group == "Exif IFD0")
+                        ifd0W = directory.GetString(tag.Type);
+                    else
+                        w = directory.GetString(tag.Type);
                 }
-                else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1 && group != "Exif IFD0") {
-                    h = directory.GetString(tag.Type);
+                else if (name == "Image Height" && group.IndexOf("Thumbnail") == -1) {
+                    // IFD0 為原始圖片的資訊，可能會被編輯後的 Exif 覆蓋 , 所以作為備用
+                    if (group == "Exif IFD0")
+                        ifd0H = directory.GetString(tag.Type);
+                    else
+                        h = directory.GetString(tag.Type);
                 }
                 else {
                     exif.data.Add(new ImgExifItem {
@@ -258,6 +269,12 @@ public class Exif {
                 }
             }
         }
+
+        // 如果不存在 IFD0 外的 Image Width/Height，則使用 IFD0 的值
+        if (w == "" && ifd0W != "")
+            w = ifd0W;
+        if (h == "" && ifd0H != "")
+            h = ifd0H;
 
         // 新增圖片 size 的資訊
         if (w != "" && h != "") {
