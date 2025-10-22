@@ -1108,7 +1108,7 @@ export class ScriptOpen {
 
     /** 載入檔案 */
     public async openFile() {
-        let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*", this.M.i18n.get("menu.openFile"));
+        let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*|JPEG|*.jpg;*.jpeg|PNG|*.png|GIF|*.gif|BMP|*.bmp|WEBP|*.webp|SVG|*.svg|TIFF|*.tiff", this.M.i18n.get("menu.openFile"));
         if (arFile.length === 0) { return; }
         if (arFile.length === 1) {
             this.M.fileLoad.loadFile(arFile[0]);
