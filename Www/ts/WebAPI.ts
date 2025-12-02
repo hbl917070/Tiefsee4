@@ -304,10 +304,14 @@ export class WebAPI {
     /**
      * 取得檔案
      */
-    static getFile(file: string | FileInfo2) {
+    static getFile(file: string | FileInfo2, lastWriteTimeUtc?: string | number) {
 
         if (typeof file === "string") {
             const encodePath = encodeURIComponent(file);
+            if (lastWriteTimeUtc) {
+                const fileTime = `LastWriteTimeUtc=${lastWriteTimeUtc}`;
+                return APIURL + `/api/getFile?path=${encodePath}&${fileTime}`;
+            }
             return APIURL + `/api/getFile?path=${encodePath}`;
         }
 

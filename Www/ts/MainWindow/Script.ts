@@ -425,7 +425,7 @@ export class ScriptImg {
                 if (ratio < 0.5) { ratio = 0.5; }
 
                 // 設定縮放的比例
-                arUrl.push({ scale: 1, url: await WebAPI.getFile(imgInitInfo.path) });
+                arUrl.push({ scale: 1, url: await WebAPI.getFile(imgInitInfo.path, fileInfo2.LastWriteTimeUtc) });
 
                 for (let i = 1; i <= 30; i++) {
                     let scale = Number(Math.pow(ratio, i).toFixed(3));
@@ -1487,7 +1487,7 @@ export class ScriptCopy {
             await WV_System.SetClipboard_Text(base64);
 
         } else {
-            
+
             const imgData = await this.M.script.img.getImgData(fileInfo2);
             const imtUrl = imgData.arUrl[0].url;
             const p = await this.M.script.img.preloadImg(imtUrl);
