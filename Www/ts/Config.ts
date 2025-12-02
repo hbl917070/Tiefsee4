@@ -61,6 +61,7 @@ export class Config {
             { name: /PhoXo/i, groupType: ["img"] },
             { name: /ScreenSketch/i, groupType: ["img"] }, // Windows的剪裁工具
             { name: /imageGlass/i, groupType: ["img"] },
+            { name: /Affinity/i, groupType: ["img"] },
 
             { name: /Visual Studio Code/i, groupType: ["txt"] },
             { name: /Notepad/i, groupType: ["txt"] },
@@ -514,6 +515,7 @@ export class Config {
 
                 { ext: "afphoto", type: "vips", vipsType: "extractPng" },
                 { ext: "afdesign", type: "vips", vipsType: "extractPng" },
+                { ext: "af", type: "vips", vipsType: "extractPng" },
                 { ext: "clip", type: "vips", vipsType: "clip" },
             ]
 
