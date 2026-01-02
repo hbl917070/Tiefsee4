@@ -534,6 +534,32 @@ public class WebWindow : FormNone {
     /// 以 js 呼叫此函數後才會顯示視窗 (初始化 坐標 與 size
     /// </summary>
     public async void ShowWindowAtPosition(int x, int y, int width, int height, string windowState) {
+
+        #region 檢查視窗是否超出螢幕範圍
+        if (windowState == "Maximized" || windowState == "Normal") {
+
+            // 檢查視窗是否至少 1/4 在螢幕內
+            var screens = Screen.AllScreens;
+            var isVisible = screens
+                .Any(screen =>
+                    screen.Bounds.IntersectsWith(new Rectangle(x + (width / 4), y + (height / 4), 1, 1)) ||
+                    screen.Bounds.IntersectsWith(new Rectangle(x + (width / 4 * 3), y + (height / 4), 1, 1)) ||
+                    screen.Bounds.IntersectsWith(new Rectangle(x + (width / 4), y + (height / 4 * 3), 1, 1)) ||
+                    screen.Bounds.IntersectsWith(new Rectangle(x + (width / 4 * 3), y + (height / 4 * 3), 1, 1)
+                ));
+
+            if (isVisible == false) {
+                this.SetSize(800, 600);
+                // 用預設位置顯示視窗
+                await ShowWindow(() => {
+                    this.WindowState = windowState == "Maximized"
+                        ? FormWindowState.Maximized
+                        : FormWindowState.Normal;
+                });
+            }
+        }
+        #endregion
+
         await ShowWindow(() => {
 
             this.SetPosition(x, y);
