@@ -651,8 +651,10 @@ export class MainExif {
 			if (isPrompt) {
 				// 分段處理：先拆分 LoRA 語法與非 LoRA 文本
 				parsed = input
-					.replace(/<([^<>]*:[^<>]*:[^<>]*)>/g, (match, loraContent) => {
-						const fileName = loraContent.split(':')[1].replace(/\"/, `\"`);
+					.replace(/<(lora:[^>]+)>/g, (match, loraContent) => {
+						const parts = loraContent.split(':');
+						// 取出名稱部分 (parts[0] 是 'lora', parts[1] 是檔名)，若沒有檔名則回傳空字串
+						const fileName = (parts[1] || '').replace(/\"/g, '"');
 						return `<font class="lora" data-name="${fileName}">&lt;${Lib.escape(loraContent)}&gt;</font>`;
 					})
 					.split(/(<font class="lora"[^>]*>.*?<\/font>)/g) // 分割 Lora 語法與其餘文字
