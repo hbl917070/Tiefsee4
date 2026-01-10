@@ -156,9 +156,10 @@ public class WebServerController {
         var buffer = new byte[64 * 1024]; // 64KB buffer
         int bytesRead;
         while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0 && response.OutputStream.CanWrite) {
-            if (nowKey != _cache[key]) { return; }
+            if (nowKey != _cache[key]) { break; }
             await response.OutputStream.WriteAsync(buffer, 0, bytesRead);
         }
+        response.SendChunked = false;
     }
 
     /// <summary>
