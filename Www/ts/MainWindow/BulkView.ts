@@ -1210,10 +1210,7 @@ export class BulkView {
                         }
                     }
 
-                    if (domImg.getAttribute("src") !== ret.url) {
-                        // dom_img.setAttribute("src", ret.url);
-                        _limiter.addRequest(domImg, ret.url);
-                    }
+                    _limiter.addRequest(domImg, ret.url);
                     updateSize();
 
                 }, 300)).observe(div);
