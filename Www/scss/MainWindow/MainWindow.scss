@@ -1,17 +1,17 @@
-@import "../BaseWindow";
-@import "../Menu";
-@import "../Msgbox";
-@import "../Toast";
-@import "../Tiefseeview";
+@use "../BaseWindow";
+@use "../Menu";
+@use "../Msgbox";
+@use "../Toast";
+@use "../Tiefseeview";
 
-@import "./LargeBtn";
-@import "./Dragbar";
-@import "./MainDirList";
-@import "./MainExif";
-@import "./MainFileList";
-@import "./MainToolbar";
-@import "./LoadingSetting";
-@import "./BulkView";
+@use "./LargeBtn";
+@use "./Dragbar";
+@use "./MainDirList";
+@use "./MainExif";
+@use "./MainFileList";
+@use "./MainToolbar";
+@use "./LoadingSetting";
+@use "./BulkView";
 
 :root {
     //圖示粗細

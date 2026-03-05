@@ -15,21 +15,20 @@ const output2 = "./../Output/Www"; // 把打包後的檔案也複製到開發資
 
 // 將資料夾內的所有 svg 打包成一個 js
 gulp.task("svg", async () => {
-    await sleep(1);
-    return gulp.src("./img/default/*.svg")
+    gulp.src("./img/default/*.svg")
         .pipe(fc2json("SvgList.js"))
         .pipe(jsonTransform(function (data) {
 
-            var resultJson = "",
-                objects = [],
-                keys = Object.keys(data);
+            let resultJson = "";
+            let objects = [];
+            let keys = Object.keys(data);
 
-            for (var i = 0; i < keys.length; i++) {
+            for (let i = 0; i < keys.length; i++) {
                 objects.push(data[keys[i]]);
             }
 
-            var i = 0;
-            objects.map(function (e) {
+            let i = 0;
+            objects.map((e) => {
                 i++;
                 resultJson += JSON.stringify(e) +
                     (i == keys.length ? "" : ",\n");
@@ -43,7 +42,6 @@ gulp.task("svg", async () => {
 
 // scss -> css
 gulp.task("scss", async () => {
-    await sleep(1);
     gulp.src("./scss/MainWindow/MainWindow.scss") // 指定要處理的 Scss 檔案目錄
         .pipe(sass({
             // outputStyle: "compressed", // 壓縮
@@ -60,7 +58,6 @@ gulp.task("scss", async () => {
 
 // ejs -> html
 gulp.task("ejs", async () => {
-    await sleep(1);
     gulp.src("./ejs/MainWindow/MainWindow.ejs")
         .pipe(ejs({ readFile: readFile }, { async: true }))
         .pipe(rename({ extname: ".html" })) // 修改輸出的副檔名
@@ -76,9 +73,7 @@ gulp.task("ejs", async () => {
 
 // ts -> js
 gulp.task("ts", async () => {
-    await sleep(1);
-
-    var fileMappings = [
+    const fileMappings = [
         { path: "./ts/MainWindow/MainWindow.ts", bundle: true },
         { path: "./ts/SettingWindow/SettingWindow.ts", bundle: true },
         { path: "./ts/TiefseeviewWorker.ts", bundle: true },
@@ -103,9 +98,8 @@ gulp.task("ts", async () => {
 
 // 把檔案複製到開發資料夾。 (有非 ts、scss、ejs 的資源需要複製到開發資料夾時使用
 gulp.task("copy-files", async () => {
-    await sleep(1);
     // 使用 "!" 前綴符號來排除指定的檔案跟目錄
-    return gulp
+    gulp
         .src([
             "./**/**",
             "!./scss/**", "!./ts/**", "!./ejs/**",
@@ -165,12 +159,4 @@ async function readFile(path) {
         });
     })
     return t;
-}
-
-async function sleep(ms) {
-    await new Promise((resolve, reject) => {
-        setTimeout(function () {
-            resolve();
-        }, ms);
-    })
 }
