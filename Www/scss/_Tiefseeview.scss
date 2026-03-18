@@ -1,3 +1,5 @@
+@use "./BaseStyle";
+
 .tiefseeview {
     overflow: hidden;
     position: relative;
@@ -82,7 +84,7 @@
         bottom: 0;
         opacity: 0;
         
-        @include blur-base(var(--color-black60));
+        @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
     }
 
@@ -136,7 +138,7 @@
         bottom: 0;
         opacity: 0;
 
-        @include blur-base(var(--color-black60));
+        @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
     }
 

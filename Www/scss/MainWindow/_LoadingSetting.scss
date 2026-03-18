@@ -1,3 +1,5 @@
+@use "../BaseStyle";
+
 // 開啟setting視窗前的loading畫面
 
 #loadingSetting[active="true"] {
@@ -26,7 +28,7 @@
         align-items: center;
         justify-content: center;
 
-        @include blur-base();
+        @include BaseStyle.blur-base();
         position: absolute;
     }
 

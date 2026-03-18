@@ -15,8 +15,8 @@
     "gulp-rename": "^2.1.0"
   },
   "devDependencies": {
-    "eslint": "^10.0.2",
+    "eslint": "^10.0.3",
     "gulp-sass": "^6.0.1",
-    "sass": "^1.97.3"
+    "sass": "^1.98.0"
   }
 }

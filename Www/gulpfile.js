@@ -8,67 +8,62 @@ const sass = require("gulp-sass")(require("sass"));
 const newer = require("gulp-newer");
 const { exec } = require("child_process");
 
-const fc2json = require("gulp-file-contents-to-json"); // 處理 svg
-const jsonTransform = require("gulp-json-transform"); // 處理 svg
+const fc2json = require("gulp-file-contents-to-json");
+const jsonTransform = require("gulp-json-transform");
 
-const output2 = "./../Output/Www"; // 把打包後的檔案也複製到開發資料夾 (用於方便測試)
+const output2 = "./../Output/Www";
+
+// --- 輔助函數 ---
+async function readFile(path) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(path, "utf8", (err, data) => {
+            if (err) resolve(""); // 避免讀取失敗中斷流程
+            resolve(data);
+        });
+    });
+}
+
+// --- Tasks ---
 
 // 將資料夾內的所有 svg 打包成一個 js
-gulp.task("svg", async () => {
-    gulp.src("./img/default/*.svg")
+gulp.task("svg", () => {
+    return gulp.src("./img/default/*.svg")
         .pipe(fc2json("SvgList.js"))
         .pipe(jsonTransform(function (data) {
-
             let resultJson = "";
-            let objects = [];
-            let keys = Object.keys(data);
+            let objects = Object.values(data);
 
-            for (let i = 0; i < keys.length; i++) {
-                objects.push(data[keys[i]]);
-            }
-
-            let i = 0;
-            objects.map((e) => {
-                i++;
-                resultJson += JSON.stringify(e) +
-                    (i == keys.length ? "" : ",\n");
+            objects.forEach((e, i) => {
+                resultJson += JSON.stringify(e) + (i === objects.length - 1 ? "" : ",\n");
             });
 
             return "var SvgList = " + resultJson;
         }))
         .pipe(gulp.dest("./js"))
-        .pipe(gulp.dest(output2 + "/js"))
+        .pipe(gulp.dest(output2 + "/js"));
 });
 
 // scss -> css
-gulp.task("scss", async () => {
-    gulp.src("./scss/MainWindow/MainWindow.scss") // 指定要處理的 Scss 檔案目錄
-        .pipe(sass({
-            // outputStyle: "compressed", // 壓縮
-        }))
-        .pipe(gulp.dest("./css")) // 指定編譯後的 css 檔案目錄
-        .pipe(gulp.dest(output2 + "/css"))
-
-    gulp.src("./scss/SettingWindow/SettingWindow.scss")
-        .pipe(sass({
-        }))
+gulp.task("scss", () => {
+    return gulp.src([
+        "./scss/MainWindow/MainWindow.scss",
+        "./scss/SettingWindow/SettingWindow.scss"
+    ], {})
+        .pipe(sass().on("error", sass.logError))
         .pipe(gulp.dest("./css"))
-        .pipe(gulp.dest(output2 + "/css"))
+        .pipe(gulp.dest(output2 + "/css"));
 });
 
 // ejs -> html
-gulp.task("ejs", async () => {
-    gulp.src("./ejs/MainWindow/MainWindow.ejs")
-        .pipe(ejs({ readFile: readFile }, { async: true }))
-        .pipe(rename({ extname: ".html" })) // 修改輸出的副檔名
-        .pipe(gulp.dest("./"))
-        .pipe(gulp.dest(output2 + "/"))
-
-    gulp.src("./ejs/SettingWindow/SettingWindow.ejs")
+gulp.task("ejs", () => {
+    return gulp.src([
+        "./ejs/MainWindow/MainWindow.ejs",
+        "./ejs/SettingWindow/SettingWindow.ejs"
+    ], {})
         .pipe(ejs({ readFile: readFile }, { async: true }))
         .pipe(rename({ extname: ".html" }))
         .pipe(gulp.dest("./"))
-        .pipe(gulp.dest(output2 + "/"))
+        .pipe(gulp.dest(output2 + "/"));
 });
 
 // ts -> js
@@ -81,39 +76,39 @@ gulp.task("ts", async () => {
         { path: "./ts/LibIframe.ts", bundle: false },
     ];
 
-    for (var i = 0; i < fileMappings.length; i++) {
+    const streams = fileMappings.map(file => {
+        return new Promise((resolve, reject) => {
+            gulp.src(file.path)
+                .pipe(gulpEsbuild({
+                    outfile: path.basename(file.path, ".ts") + ".js",
+                    bundle: file.bundle,
+                }))
+                .on("error", reject)
+                .pipe(gulp.dest("./js"))
+                .pipe(gulp.dest(output2 + "/js"))
+                .on("end", resolve);
+        });
+    });
 
-        gulp.src(fileMappings[i].path)
-            .pipe(gulpEsbuild({
-                // minify: true, // 壓縮
-                outfile: path.basename(fileMappings[i].path, ".ts") + ".js",
-                bundle: fileMappings[i].bundle,
-                // loader: { ".tsx": "tsx", },
-            }))
-            .pipe(gulp.dest("./js"))
-            .pipe(gulp.dest(output2 + "/js"))
-    }
-
+    return Promise.all(streams);
 });
 
 // 把檔案複製到開發資料夾。 (有非 ts、scss、ejs 的資源需要複製到開發資料夾時使用
-gulp.task("copy-files", async () => {
-    // 使用 "!" 前綴符號來排除指定的檔案跟目錄
-    await gulp
-        .src([
-            "./**/**",
-            "!./scss/**", "!./ts/**", "!./ejs/**",
-            "!./img/.vscode/**", "!./img/default/**",
-            "!./rust/**",
-            "!./node_modules/**",
-            "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
-            "!./Www.esproj", "!./Www.esproj.user"
-        ], {
-            encoding: false, // 防止二進位檔案毀損
-            buffer: true     // 確保以緩衝區模式處理
-        })
-        .pipe(newer(output2)) // 使用 gulp-newer 檢查目標資料夾中的檔案是否已更新
-        .pipe(gulp.dest(output2))
+gulp.task("copy-files", () => {
+    return gulp.src([
+        "./**/**",
+        "!./scss/**", "!./ts/**", "!./ejs/**",
+        "!./img/.vscode/**", "!./img/default/**",
+        "!./rust/**",
+        "!./node_modules/**",
+        "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
+        "!./Www.esproj", "!./Www.esproj.user"
+    ], {
+        encoding: false,
+        buffer: true
+    })
+        .pipe(newer(output2))
+        .pipe(gulp.dest(output2));
 });
 
 // rust -> wasm
@@ -138,28 +133,10 @@ gulp.task("build", gulp.series(
     "copy-files", // 必須放在最後
 ));
 
-// 打包 - 持續監控檔案變化
+// 打包 - 持續監控
 gulp.task("watch", gulp.series("scss", "ts", "svg", "ejs", () => {
     gulp.watch("./scss/**/*.scss", gulp.series("scss"));
     gulp.watch("./ts/**/*.ts", gulp.series("ts"));
     gulp.watch("./ejs/**/*.ejs", gulp.series("ejs"));
-
-    gulp.watch("./img/default/*.svg", gulp.series("ejs")); // svg 有可能會被 ejs 引用，所以也要重新執行 ejs
-    gulp.watch("./img/default/*.svg", gulp.series("svg"));
+    gulp.watch("./img/default/*.svg", gulp.series("svg", "ejs"));
 }));
-
-//------------------------------------------------
-
-/**
- * 讀取文字檔(用於ejs匯入svg
- * @param {*} path 
- * @returns 
- */
-async function readFile(path) {
-    let t = await new Promise((resolve, reject) => {
-        fs.readFile(path, "utf8", function (err, data) {
-            resolve(data);
-        });
-    })
-    return t;
-}

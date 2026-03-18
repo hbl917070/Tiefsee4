@@ -1,3 +1,5 @@
+@use "./BaseStyle";
+
 .menu {
 	background-color: rgba(0, 0, 0, 0);
 	position: fixed;
@@ -41,7 +43,7 @@
 	box-shadow: 0px 0px 3px var(--color-blue40);
 	border: 1px solid var(--color-blue40);
 
-	@include blur-base();
+	@include BaseStyle.blur-base();
 }
 
 .menu-grid {
