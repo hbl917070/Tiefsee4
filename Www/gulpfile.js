@@ -99,7 +99,7 @@ gulp.task("ts", async () => {
 // 把檔案複製到開發資料夾。 (有非 ts、scss、ejs 的資源需要複製到開發資料夾時使用
 gulp.task("copy-files", async () => {
     // 使用 "!" 前綴符號來排除指定的檔案跟目錄
-    gulp
+    await gulp
         .src([
             "./**/**",
             "!./scss/**", "!./ts/**", "!./ejs/**",
@@ -108,7 +108,10 @@ gulp.task("copy-files", async () => {
             "!./node_modules/**",
             "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
             "!./Www.esproj", "!./Www.esproj.user"
-        ])
+        ], {
+            encoding: false, // 防止二進位檔案毀損
+            buffer: true     // 確保以緩衝區模式處理
+        })
         .pipe(newer(output2)) // 使用 gulp-newer 檢查目標資料夾中的檔案是否已更新
         .pipe(gulp.dest(output2))
 });
