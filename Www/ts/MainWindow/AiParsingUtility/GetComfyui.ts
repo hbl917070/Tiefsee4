@@ -632,6 +632,34 @@ export function getComfyui(jsonStr: string) {
         }
     });
 
+    // KSampler (Efficient) 💬ED
+    foreachNode((item, inputs, classType) => {
+        if (classType === "KSampler (Efficient) 💬ED") {
+            const prompt = getPrompt(getItemKey(inputs.context), _promptBaseKeys);
+            const promptNegative = getPrompt(getItemKey(inputs.context), _negativePromptBaseKeys);
+            const steps = getStringValue(inputs.steps);
+            const samplerName = getStringValue(inputs.sampler_name);
+            const scheduler = getStringValue(inputs.scheduler);
+            const cfg = getStringValue(inputs.cfg);
+            const seed = getPrompt(getItemKey(inputs.context), _seedBaseKeys, true);
+            const ckptName = getPrompt(getItemKey(inputs.context), _modelBaseKeys);
+            const denoise = getStringValue(inputs.denoise);
+
+            retPush(classType, [
+                { title: "Prompt", text: prompt },
+                { title: "Negative prompt", text: promptNegative },
+                { title: "Steps", text: steps },
+                { title: "Sampler", text: samplerName },
+                { title: "Scheduler", text: scheduler },
+                { title: "CFG", text: cfg },
+
+                { title: "Seed", text: seed },
+                { title: "Model", text: ckptName },
+                { title: "Denoise", text: denoise },
+            ]);
+        }
+    });
+
     const nodeNames = [
         "KSampler",
         "KSamplerAdvanced",
