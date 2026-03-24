@@ -355,12 +355,12 @@ export class MainExif {
 					_domTabContentInfo.appendChild(itemDom);
 
 				}
-				else if (name === "Make" && value.startsWith("Prompt:{")) { // ComfyUI 的 webp
+				else if ((name === "Make" || name === "Model") && value.toLowerCase().startsWith("prompt:{")) { // ComfyUI 的 webp
 
 					comfyuiPrompt = value.substring(7);
 
 				}
-				else if (name === "Image Description" && value.startsWith("Workflow:{")) { // ComfyUI 的 webp
+				else if ((name === "Make" || name === "Image Description") && value.toLowerCase().startsWith("workflow:{")) { // ComfyUI 的 webp
 
 					comfyuiWorkflow = value.substring(9);
 
@@ -978,6 +978,27 @@ export class MainExif {
 			 */
 			function addHash(hashList: string | undefined) {
 				if (typeof hashList !== "string") { return; }
+
+				// 如果是 json 就直接解析
+				if (hashList.trim().startsWith("{")) {
+					try {
+						const json = JSON.parse(hashList);
+						console.log(json);
+						for (const key in json) {
+							if (json.hasOwnProperty(key)) {
+								const value = json[key];
+								if (typeof value === "string") {
+									data.push({ type: "", hash: value });
+								}
+							}
+						}
+					} catch (e) {
+						console.warn("解析 hashList 失敗", hashList);
+					}
+					console.warn(data);
+					return;
+				}
+
 				let hashes = hashList.split(",");
 				hashes.forEach((item: string) => {
 					let x = item.split(": ");
@@ -1011,6 +1032,19 @@ export class MainExif {
 				const item = data[i];
 				let hash = item.hash;
 				let modelVersionId = item.modelVersionId;
+
+				// 新版的 API 會把資源記錄在 air 欄位
+				// 例如 "urn:air:anima:lora:civitai:1560760@2798518"
+				if (item.air !== undefined) {
+					const atIndex = item.air.lastIndexOf("@");
+					if (atIndex !== -1) {
+						const airId = item.air.substring(atIndex + 1);
+						if (airId.length > 4) {
+							modelVersionId = airId;
+						}
+					}
+				}
+
 				let dbKey = modelVersionId || hash;
 				if (dbKey === undefined || dbKey === null) {
 					console.warn("Civitai 未預期的格式", item);
