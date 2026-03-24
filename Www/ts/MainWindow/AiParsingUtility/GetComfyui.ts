@@ -970,6 +970,51 @@ export function getComfyui(jsonStr: string) {
 
         }
 
+        // 讀取 Lora Loader (LoraManager)
+        else if (classType === "Lora Loader (LoraManager)") {
+            /*
+            "57": {
+                "inputs": {
+                    "text": "<lora:aaa:1>",
+                    "loras": {
+                        "__value__": [
+                            {
+                                "name": "aaa",
+                                "strength": 1,
+                                "active": true,
+                                "expanded": false,
+                                "clipStrength": 1,
+                                "locked": false
+                            }
+                        ]
+                    },
+                    "model": [
+                        "60",
+                        0
+                    ],
+                    "clip": [
+                        "45",
+                        0
+                    ]
+                },
+                "class_type": "Lora Loader (LoraManager)",
+            */
+
+            const loras = intputs["loras"];
+            if (loras === undefined) { return; }
+            const values = loras.__value__;
+            if (values === undefined || !Array.isArray(values)) { return; }
+            values.forEach((lora: any) => {
+                if (lora.active === true && lora.name !== "None") {
+                    let jsonFormat = Lib.stringifyWithNewlines({
+                        "Strength": toFixedPrecision(lora.strength),
+                        "Clip Strength": toFixedPrecision(lora.clipStrength)
+                    }, true, true);
+                    arLora.push({ title: lora.name, text: jsonFormat });
+                }
+            });
+        }
+
         // 節點內有 lora_name 屬性，則視為 LoRA 節點
         else {
             let loraName = intputs["lora_name"];
