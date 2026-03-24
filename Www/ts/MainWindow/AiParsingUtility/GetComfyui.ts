@@ -5,8 +5,8 @@ import { Lib } from "../../Lib";
  */
 export function getComfyui(jsonStr: string) {
 
-    const _promptBaseKeys = ["positive", "text_positive", "populated_text", "text", "text_g", "conditioning", "prompt", "string", "t5xxl", "text_b", "base_ctx", "text_pos_g", "file_path"];
-    const _negativePromptBaseKeys = ["negative", "text_negative", "populated_text", "text", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path"];
+    const _promptBaseKeys = ["positive", "text_positive", "populated_text", "text", "text_g", "conditioning", "prompt", "string", "t5xxl", "text_b", "base_ctx", "text_pos_g", "file_path", "any",];
+    const _negativePromptBaseKeys = ["negative", "text_negative", "populated_text", "text", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path", "any",];
     const _stepsBaseKeys = ["steps"];
     const _samplerBaseKeys = ["sampler_name", "sampler"];
     const _schedulerBaseKeys = ["scheduler"];
@@ -204,6 +204,11 @@ export function getComfyui(jsonStr: string) {
             return getConcatenatedPrompts(["string_a", "string_b"], key, searchKeys);
         }
 
+        // 需要單獨處理的節點
+        else if (obj.class_type === "OllamaGenerateV2") {
+            return inputs.system || inputs.prompt;
+        }
+
         let text;
         const arKey = Object.keys(inputs);
 
@@ -305,7 +310,7 @@ export function getComfyui(jsonStr: string) {
             // 避免循環參考
             if (currentKey === key) { continue; }
 
-            const prompt = getPrompt(currentKey, searchKeys);
+            const prompt = getPrompt(currentKey, [...searchKeys, "value"]);
             if (typeof prompt === "string" && prompt !== "") {
                 result.push(prompt);
             }
