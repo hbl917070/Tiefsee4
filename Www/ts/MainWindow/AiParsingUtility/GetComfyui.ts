@@ -912,7 +912,7 @@ export function getComfyui(jsonStr: string) {
                 let value = intputs[key];
                 let type = typeof value;
                 if (type === "object") {
-                    if (value.on === "true" && value.lora !== "None") {
+                    if ((value.on === "true" || value.on === true) && value.lora !== "None") {
                         arLora.push({
                             title: value.lora,
                             text: "Strength: " + toFixedPrecision(value.strength)
