@@ -890,6 +890,53 @@ export function getComfyui(jsonStr: string) {
 
         }
 
+        // 讀取 Lora Loader Stack (rgthree) 節點
+        else if (classType === "Lora Loader Stack (rgthree)") {
+            /*
+            "71": {
+                "inputs": {
+                    "lora_01": "aaa.safetensors",
+                    "strength_01": 0.7,
+                    "lora_02": "bbb.safetensors",
+                    "strength_02": 0.5,
+                    "lora_03": "None",
+                    "strength_03": 1.0,
+                    "lora_04": "None",
+                    "strength_04": 1.0,
+                    "model": [
+                        "1",
+                        0
+                    ],
+                    "clip": [
+                        "2",
+                        0
+                    ]
+                },
+                "class_type": "Lora Loader Stack (rgthree)",
+                "_meta": {
+                    "title": "Lora Loader Stack (rgthree)"
+                }
+            */
+
+            // 數量是動態的，但理論上不會有人用到超過 30 個
+            for (let i = 1; i <= 30; i++) {
+
+                let loraName = intputs["lora_" + i.toString().padStart(2, "0")];
+                if (loraName === "None") { continue; } // 只顯示有名稱的
+
+                if (loraName === undefined) { break; }
+
+                let strength = intputs["strength_" + i.toString().padStart(2, "0")];
+                if (strength === 0 && strength === 0) { continue; } // 如果都是 0，則略過		
+
+                let jsonFormat = Lib.stringifyWithNewlines({
+                    "Strength": toFixedPrecision(strength)
+                }, true, true);
+                arLora.push({ title: loraName, text: jsonFormat });
+            }
+
+        }
+
         // 節點內有 lora_name 屬性，則視為 LoRA 節點
         else {
             let loraName = intputs["lora_name"];
