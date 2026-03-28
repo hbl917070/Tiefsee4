@@ -247,7 +247,7 @@ public class StartWindow : Form {
     /// 初始化webview2
     /// </summary>
     private async void InitWebview() {
-        var wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
+        using var wv2 = new Microsoft.Web.WebView2.WinForms.WebView2();
         await wv2.EnsureCoreWebView2Async(await WebWindow.GetCoreWebView2Environment());
     }
 

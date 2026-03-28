@@ -8,7 +8,7 @@ public static class Adapter {
     public static bool isRuning = true;
 
     /// <summary>
-    /// 請於UI執行緒呼叫此方法
+    /// 請於 UI 執行緒呼叫此方法
     /// </summary>
     public static void Initialize() {
         if (Adapter.Dispacher == null)
@@ -26,6 +26,16 @@ public static class Adapter {
     /// 在 Dispatcher 關聯的執行緒上以同步方式執行指定的委派
     /// </summary>
     public static void Invoke(SendOrPostCallback d, object state) {
+        if (Dispacher == null) {
+            d(state);
+            return;
+        }
+
+        if (SynchronizationContext.Current == Dispacher) {
+            d(state);
+            return;
+        }
+
         Dispacher.Send(d, state);
     }
 
@@ -37,81 +47,83 @@ public static class Adapter {
     }
 
     /// <summary>
-    /// 在UI執行緒執行
+    /// 在 UI 執行緒執行
     /// </summary>
-    /// <param name="ac"></param>
-    public static void UIThread(Action ac) {
-        Adapter.Invoke(new SendOrPostCallback(obj => { // 呼叫UI執行緒
-            ac();
-        }), null);
+    /// <param name="action"></param>
+    public static void UIThread(Action action) {
+        if (Dispacher == null) {
+            action();
+            return;
+        }
+
+        if (SynchronizationContext.Current == Dispacher) {
+            action();
+            return;
+        }
+
+        Dispacher.Post(_ => action(), null);
     }
 
     /// <summary>
     /// 延遲執行
     /// </summary>
     /// <param name="interval"></param>
-    /// <param name="func"></param>
+    /// <param name="action"></param>
     /// <param name="isAsync"></param>
-    public static void DelayRun(int interval, Action func, bool isAsync = false) {
-        new Thread(() => {
-            ThreadSleep(interval);
+    public static void DelayRun(int interval, Action action, bool isAsync = false) {
+        Task.Run(async () => {
+            await Task.Delay(interval);
+            if (isRuning == false) { return; }
+
             if (isAsync) {
-                func();
+                action();
             }
             else {
-                UIThread(func);
+                UIThread(action);
             }
-        }).Start();
+        });
     }
 
     /// <summary>
     /// 循環執行
     /// </summary>
     /// <param name="interval"></param>
-    /// <param name="func"></param>
+    /// <param name="action"></param>
     /// <param name="isAsync"></param>
-    public static void LoopRun(int interval, Action func, bool isAsync = false) {
-        new Thread(() => {
+    public static void LoopRun(int interval, Action action, bool isAsync = false) {
+        Task.Run(async () => {
             while (isRuning) {
                 if (isAsync) {
-                    func();
+                    action();
                 }
                 else {
-                    UIThread(func);
+                    UIThread(action);
                 }
-                ThreadSleep(interval);
-            }
-        }).Start();
-    }
 
-    /// <summary>
-    /// 等同於 Thread.Sleep()，但程式結束後會立即停止睡眠
-    /// </summary>
-    /// <param name="interval"></param>
-    private static void ThreadSleep(int interval) {
-        int x = interval;
-        while (isRuning) { // 每 100毫秒 檢查一次程式是否還在運行
-            if (x > 100) {
-                Thread.Sleep(100);
+                if (interval <= 0) {
+                    continue;
+                }
+
+                try {
+                    await Task.Delay(interval);
+                }
+                catch {
+                    break;
+                }
             }
-            else {
-                Thread.Sleep(x);
-                return;
-            }
-            x -= 100;
-        }
+        });
     }
 
     /// <summary>
     /// 超時就強制結束
     /// </summary>
     /// <param name="timeoutSeconds"> 最長秒數 </param>
-    /// <param name="func"></param>
-    public static void RunWithTimeout(double timeoutSeconds, Action func) {
+    /// <param name="action"></param>
+    public static void RunWithTimeout(double timeoutSeconds, Action action) {
         CancellationTokenSource cts = new();
         cts.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds)); // 設定超時時間
 
-        Task task = Task.Run(func, cts.Token); // 將 CancellationToken 傳遞給 Task.Run
+        Task task = Task.Run(action, cts.Token); // 將 CancellationToken 傳遞給 Task.Run
 
         task.Wait(cts.Token); // 等待任務完成或超時
     }

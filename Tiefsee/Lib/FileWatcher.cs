@@ -25,6 +25,7 @@ public class FileWatcher {
         if (dicFileWatcher[key] != null) {
             dicFileWatcher[key].queue.Clear();
             dicFileWatcher[key].timer.Stop();
+            dicFileWatcher[key].timer.Dispose();
             dicFileWatcher[key].fileWatcher.Dispose();
             dicFileWatcher[key] = null;
         }
@@ -135,6 +136,7 @@ public class FileWatcher {
             if (dicFileWatcher[key] != null) {
                 dicFileWatcher[key].queue.Clear();
                 dicFileWatcher[key].timer.Stop();
+                dicFileWatcher[key].timer.Dispose();
                 dicFileWatcher[key].fileWatcher.Dispose();
                 dicFileWatcher[key] = null;
             }
