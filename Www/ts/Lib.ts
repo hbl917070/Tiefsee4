@@ -558,26 +558,38 @@ export class Lib {
     public static addDragThresholdListener(domElement: HTMLElement, thresholdDistance: number, eventHandler: (e: MouseEvent) => void) {
         let isDragging = false;
         let startX = 0;
+        let startY = 0;
+
+        const removeWindowEvents = () => {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+        };
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (isDragging === false) { return; }
+
+            const deltaX = Math.abs(e.clientX - startX);
+            const deltaY = Math.abs(e.clientY - startY);
+            if (Math.max(deltaX, deltaY) >= thresholdDistance) {
+                eventHandler(e);
+                isDragging = false;
+                removeWindowEvents();
+            }
+        };
+
+        const onMouseUp = () => {
+            isDragging = false;
+            removeWindowEvents();
+        };
 
         domElement.addEventListener("mousedown", (e) => {
             if (e.button === 0) {
                 isDragging = true;
                 startX = e.clientX;
+                startY = e.clientY;
+                window.addEventListener("mousemove", onMouseMove);
+                window.addEventListener("mouseup", onMouseUp);
             }
-        });
-
-        window.addEventListener("mousemove", (e) => {
-            if (isDragging) {
-                const deltaX = Math.abs(e.clientX - startX);
-                if (deltaX >= thresholdDistance) {
-                    eventHandler(e);
-                    isDragging = false;
-                }
-            }
-        });
-
-        window.addEventListener("mouseup", () => {
-            isDragging = false;
         });
 
         /*domElement.addEventListener("mouseleave", () => {
