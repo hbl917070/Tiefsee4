@@ -2611,6 +2611,7 @@ export class Tiefseeview {
 
                     if (tempUrl !== getUrl()) { // 避免已經切換圖片了
                         // console.log("old:" + tempUrl + "   new:" + getUrl())
+                        domImg.close();
                         return;
                     }
 
@@ -2619,6 +2620,7 @@ export class Tiefseeview {
                     canvas.width = domImg.width;
                     canvas.height = domImg.height;
                     ctx.drawImage(domImg, 0, 0, domImg.width, domImg.height);
+                    domImg.close();
 
                     _tempBigimgscale[scale] = canvas;
 
@@ -2645,6 +2647,7 @@ export class Tiefseeview {
                         const ctx = _domBigimgCanvas.getContext("2d") as CanvasRenderingContext2D;
                         ctx.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height);
                     }
+                    imageBitmap.close();
 
                 }
 
@@ -2902,6 +2905,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, 0, 0,);
                             }
+                            sprites.close();
                         });
                     }
                     else {
@@ -2911,6 +2915,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, 0, 0,);
                             }
+                            sprites.close();
                         });
                     }
                 }
@@ -2930,6 +2935,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, sx, sy,);
                             }
+                            sprites.close();
                         });
 
                 }
@@ -2949,6 +2955,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, 0, sy);
                             }
+                            sprites.close();
                         });
 
                 }
@@ -2968,6 +2975,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, sx, 0);
                             }
+                            sprites.close();
                         });
 
                 }
@@ -2985,6 +2993,7 @@ export class Tiefseeview {
                             if (tc === _tempCanvasSN) {
                                 ctx.drawImage(sprites, 0, 0,);
                             }
+                            sprites.close();
                         });
                 }
 

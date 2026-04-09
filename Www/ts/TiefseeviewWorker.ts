@@ -44,6 +44,7 @@
             const offscreenCanvas = new OffscreenCanvas(width, height);
             const ctx = offscreenCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
             ctx.drawImage(imageBitmap, 0, 0);
+            imageBitmap.close();
             // 套用模糊
             if (blur > 0) {
                 ctx.filter = `blur(${blur}px)`;
@@ -83,21 +84,24 @@
 
                         // 超時
                         const timeout = setTimeout(() => {
+                            worker.removeEventListener("message", onMessage);
                             resolve({ error: "Worker timeout" });
                         }, 5 * 1000);
 
-                        worker.onmessage = (e) => {
+                        const onMessage = (e: MessageEvent) => {
                             if (e.data.random === random) {
                                 clearTimeout(timeout);
+                                worker.removeEventListener("message", onMessage);
                                 resolve(e.data);
                             }
                         };
 
+                        worker.addEventListener("message", onMessage);
                         worker.postMessage({ chunk: chunks[index], sharpen }, [chunks[index].imageBitmap]);
                     })
                 )
             ) as { error: string, imageBitmap: ImageBitmap, startY: number }[];
-
+            processedImageBitmap.close();
             // 將每個處理後的 chunk 合併回來
             const resultCanvas = new OffscreenCanvas(width, height);
             const resultCtx = resultCanvas.getContext("2d");
@@ -110,6 +114,7 @@
                     return;
                 }
                 resultCtx.drawImage(chunk.imageBitmap, 0, chunk.startY);
+                chunk.imageBitmap.close();
             }
 
             const finalImageBitmap = resultCanvas.transferToImageBitmap();

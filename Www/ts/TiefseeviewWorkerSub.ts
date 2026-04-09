@@ -15,7 +15,7 @@
 
         // 畫出收到的區塊圖片
         ctx.drawImage(imageBitmap, 0, 0);
-
+        imageBitmap.close();
         const imageData = ctx.getImageData(0, 0, width, height);
 
         // 使用卷積核進行銳化處理
