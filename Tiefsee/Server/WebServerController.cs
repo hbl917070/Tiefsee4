@@ -860,10 +860,10 @@ public class WebServerController {
         int maxTextLength = int.Parse(d.args["maxTextLength"]);
 
         ClipboardLib.ClipboardContent clipboardContentData = null;
-        Adapter.UIThread(() => {
+        Adapter.Invoke(_ => {
             var clipboardLib = new ClipboardLib();
             clipboardContentData = clipboardLib.GetClipboardContent(maxTextLength);
-        });
+        }, null);
 
         await WriteJson(d, clipboardContentData);
     }
