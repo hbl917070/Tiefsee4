@@ -48,6 +48,9 @@ export class MainExif {
 
 		var _isHide = false; // 暫時隱藏
 		var _isEnabled = true; // 啟用 檔案預覽視窗
+		// 共用同一個 observer，避免每個預覽圖各自建立 callback 而導致 detached DOM 無法回收
+		let _imgIntersectionObserver: IntersectionObserver | null = null;
+		let _imgIntersectionObserverMap = new Map<Element, { img: HTMLImageElement, url: string }>();
 
 		/** 請求限制器 */
 		const _limiter = new RequestLimiter(1);
@@ -220,6 +223,42 @@ export class MainExif {
 		}
 
 		/**
+		 * 清除 IntersectionObserver，避免記憶體洩漏
+		 */
+		function clearInfoImageObserver() {
+			_imgIntersectionObserver?.disconnect();
+			_imgIntersectionObserver = null;
+			_imgIntersectionObserverMap.clear();
+		}
+
+		/**
+		 * 獲取資訊圖片的 IntersectionObserver，使用 lazy load 的方式載入圖片，避免一次載入過多圖片導致記憶體洩漏
+		 */
+		function getInfoImageObserver() {
+			if (_imgIntersectionObserver !== null) {
+				return _imgIntersectionObserver;
+			}
+
+			_imgIntersectionObserver = new IntersectionObserver((entries) => {
+				for (let i = 0; i < entries.length; i++) {
+					const entry = entries[i];
+					if (entry.intersectionRatio <= 0) { continue; }
+
+					const data = _imgIntersectionObserverMap.get(entry.target);
+					if (data === undefined) { continue; }
+
+					_imgIntersectionObserverMap.delete(entry.target);
+					_imgIntersectionObserver?.unobserve(entry.target);
+					_limiter.addRequest(data.img, data.url);
+				}
+			}, {
+				threshold: 0.1,
+			});
+
+			return _imgIntersectionObserver;
+		}
+
+		/**
 		 * 讀取 資訊(於初始化後呼叫)
 		 */
 		async function loadInfo(noCheckPath = false) {
@@ -227,6 +266,7 @@ export class MainExif {
 			if (_isEnabled === false) { return; }
 			if (_tabType !== TabType.info) { return; }
 
+			clearInfoImageObserver();
 			_domTabContentInfo.innerHTML = "";
 
 			if (_fileInfo2.Type === "none") { // 如果檔案不存在
@@ -885,7 +925,6 @@ export class MainExif {
 			_domTabContentInfo.appendChild(itemDom);
 		}
 
-
 		/**
 		 * 讀取 相關檔案(於初始化後呼叫)
 		 */
@@ -1273,19 +1312,18 @@ export class MainExif {
 								const domImg = imgItem.querySelector("img") as HTMLImageElement;
 
 								// 圖片出現在畫面時，載入圖片
-								const observer = new IntersectionObserver(entries => {
-									if (entries[0].intersectionRatio <= 0) { return; }
-									_limiter.addRequest(domImg, imgUrl); // 發出請求
-									observer.unobserve(imgItem); // 在第一次觸發後，停止觀察該元素
-								}, {
-									threshold: 0.1,
-								});
-								observer.observe(imgItem);
-
 								divImgList.appendChild(imgItem);
+								// 由共用 observer 管理懶載入，切換檔案時可統一 disconnect
+								_imgIntersectionObserverMap.set(imgItem, {
+									img: domImg,
+									url: imgUrl
+								});
+								getInfoImageObserver().observe(imgItem);
 
 								// 圖片載入失敗時
 								domImg.addEventListener("error", () => {
+									_imgIntersectionObserverMap.delete(imgItem);
+									_imgIntersectionObserver?.unobserve(imgItem);
 									console.warn("Civitai image load error", imgPath);
 									// 顯示錯誤圖示
 									/*domImg.src = "./img/error.svg";
