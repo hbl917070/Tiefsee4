@@ -1778,6 +1778,7 @@ export class MainExif {
 					</div>
 				</div>`
 			);
+			div.setAttribute("data-copy-text", copyText);
 			const divValue = div.querySelector(".mainExifValue") as HTMLElement;
 			const btnCopy = div.querySelector(".mainExifBtnCopy") as HTMLElement; // 複製
 			const btnExpand = div.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊

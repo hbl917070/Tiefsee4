@@ -39,6 +39,9 @@ interface WebWindow {
 
 interface WV_Window {
 
+    /** 開啟開發人員工具 */
+    OpenDevTools(): void;
+
     /** 清理 webview2 的暫存 */
     ClearBrowserCache(): void;
 
@@ -272,6 +275,14 @@ interface WV_File {
      * @returns 錯誤訊息，成功的話回傳空字串
      */
     Move(sourceFileName: string, destFileName: string): string;
+
+    /**
+     * 複製檔案到新位置
+     * @param sourceFileName 原始檔案路徑
+     * @param destFileName 目標檔案路徑
+     * @returns 錯誤訊息，成功的話回傳空字串
+     */
+    Copy(sourceFileName: string, destFileName: string): string;
 
     /** 取得檔案的建立時間 */
     GetCreationTimeUtc(path: string): number;

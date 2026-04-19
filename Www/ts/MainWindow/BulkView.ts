@@ -15,6 +15,8 @@ export class BulkView {
     public load2;
     public pageNext;
     public pagePrev;
+    public pageFirst;
+    public pageLast;
     public setColumns;
     public setFocus;
     public saveCurrentState;
@@ -91,6 +93,8 @@ export class BulkView {
         this.visible = visible;
         this.pageNext = pageNext;
         this.pagePrev = pagePrev;
+        this.pageFirst = pageFirst;
+        this.pageLast = pageLast;
         this.load = load;
         this.load2 = load2;
         this.setColumns = setColumns;
@@ -1245,6 +1249,25 @@ export class BulkView {
                 _pageNow = page;
                 showPage();
             }
+        }
+
+        /**
+         * 第一頁
+         */
+        function pageFirst() {
+            if (_pageNow === 1) { return; }
+            _pageNow = 1;
+            showPage();
+        }
+
+        /**
+         * 最後一頁
+         */
+        function pageLast() {
+            const pageMax = Math.max(1, Math.ceil(_arFile.length / _imgMaxCount));
+            if (_pageNow === pageMax) { return; }
+            _pageNow = pageMax;
+            showPage();
         }
 
         /**

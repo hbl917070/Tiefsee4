@@ -48,7 +48,7 @@
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n="sw.tabs.layout"> 版面 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
                 <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
-                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n=""> 快速鍵 </div> -->
+                <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n="sw.tabs.hotkey"> 快速鍵 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-mouse" i18n="sw.tabs.mouse"> 滑鼠 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association" show-not="storeApp"> 設為預設程式 </div>
                 <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
@@ -754,98 +754,142 @@
                 <div class="page-tabsPage" id="tabsPage-mouse">
                     <div class="page-title" i18n="sw.tabs.mouse"> 滑鼠 </div>
 
-                    <div class="box">
-                        <div class="box-title" i18n="sw.mouse.mouseButton"> 滑鼠按鍵 </div>
-
-                        <div class="text-title" i18n="sw.mouse.leftDoubleClick"> 左鍵雙擊 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-leftDoubleClick"> </select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollWheelButton"> 滾輪鍵 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollWheelButton"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.mouseButton4"> 滑鼠按鍵 4 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-mouseButton4"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.mouseButton5"> 滑鼠按鍵 5 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-mouseButton5"></select>
-                        </div>
-                    </div>
-
-
-                    <div class="box">
-                        <div class="box-title" i18n="sw.mouse.mouseScrollWheel"> 滑鼠滾輪 </div>
-
-                        <div class="text-title" i18n="sw.mouse.scrollUp"> 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollUp"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDown"> 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollDown"></select>
-                        </div>
-
-                        <div class="text-title" i18n="sw.mouse.scrollUpCtrl"> Ctrl + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollUpCtrl"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownCtrl"> Ctrl + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollDownCtrl"></select>
-                        </div>
-
-                        <div class="text-title" i18n="sw.mouse.scrollUpShift"> Shift + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollUpShift"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownShift"> Shift + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollDownShift"></select>
-                        </div>
-
-                        <div class="text-title" i18n="sw.mouse.scrollUpAlt"> Alt + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollUpAlt"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownAlt"> Alt + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-scrollDownAlt"></select>
+                    <div class="box settings-group js-settingsGroup">
+                        <div class="box-title settings-groupTitle collapse-title" i18n="sw.mouse.mouseButton"> 滑鼠按鍵 </div>
+                        <div class="settings-groupContent collapse-content">
+                            <div class="settings-optionList">
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.leftDoubleClick"> 左鍵雙擊 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-leftDoubleClick"> </select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollWheelButton"> 滾輪鍵 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollWheelButton"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.mouseButton4"> 滑鼠按鍵 4 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-mouseButton4"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.mouseButton5"> 滑鼠按鍵 5 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-mouseButton5"></select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
 
-                    <div class="box">
-                        <div class="box-title" i18n="sw.mouse.bulkViewMouseScrollWheel"> 大量瀏覽模式 - 滑鼠滾輪 </div>
+                    <div class="box settings-group js-settingsGroup">
+                        <div class="box-title settings-groupTitle collapse-title" i18n="sw.mouse.mouseScrollWheel"> 滑鼠滾輪 </div>
+                        <div class="settings-groupContent collapse-content">
+                            <div class="settings-optionList">
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUp"> 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollUp"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDown"> 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollDown"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpCtrl"> Ctrl + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollUpCtrl"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownCtrl"> Ctrl + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollDownCtrl"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpShift"> Shift + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollUpShift"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownShift"> Shift + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollDownShift"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpAlt"> Alt + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollUpAlt"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownAlt"> Alt + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-scrollDownAlt"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="text-title" i18n="sw.mouse.scrollUpCtrl"> Ctrl + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollUpCtrl"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownCtrl"> Ctrl + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollDownCtrl"></select>
-                        </div>
 
-                        <div class="text-title" i18n="sw.mouse.scrollUpShift"> Shift + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollUpShift"></select>
+                    <div class="box settings-group js-settingsGroup">
+                        <div class="box-title settings-groupTitle collapse-title" i18n="sw.mouse.bulkViewMouseScrollWheel"> 大量瀏覽模式 - 滑鼠滾輪 </div>
+                        <div class="settings-groupContent collapse-content">
+                            <div class="settings-optionList">
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpCtrl"> Ctrl + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollUpCtrl"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownCtrl"> Ctrl + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollDownCtrl"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpShift"> Shift + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollUpShift"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownShift"> Shift + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollDownShift"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollUpAlt"> Alt + 向上捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollUpAlt"></select>
+                                    </div>
+                                </div>
+                                <div class="settings-option">
+                                    <div class="settings-optionTitle" i18n="sw.mouse.scrollDownAlt"> Alt + 向下捲動 </div>
+                                    <div class="settings-optionControl">
+                                        <select class="text-input" id="select-bulkViewScrollDownAlt"></select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownShift"> Shift + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollDownShift"></select>
-                        </div>
+                    </div>
 
-                        <div class="text-title" i18n="sw.mouse.scrollUpAlt"> Alt + 向上捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollUpAlt"></select>
-                        </div>
-                        <div class="text-title" i18n="sw.mouse.scrollDownAlt"> Alt + 向下捲動 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-bulkViewScrollDownAlt"></select>
-                        </div>
+                    <div class="settings-pageFooter">
+                        <div class="btn settings-resetAllBtn" id="btn-mouse-resetAll" i18n="sw.mouse.resetAll">重置所有滑鼠設定</div>
                     </div>
                 </div>
 
@@ -856,11 +900,25 @@
 
                 <!-- 快速鍵 -->
                 <div class="page-tabsPage" id="tabsPage-hotkey">
-                    <div class="page-title" i18n=""> 快速鍵 </div>
-                    <div class="box">
-                        <div class="box-title">
-                            還在做
+                    <div class="page-title" i18n="sw.tabs.hotkey"> 快速鍵 </div>
+
+                    <div class="settings-pageIntro">
+                        <div class="settings-pageTips">
+                            <div class="settings-pageTip settings-pageTip__title" i18n="sw.hotkey.tipTitle">操作說明</div>
+                            <ul class="settings-pageTipsList">
+                                <li class="settings-pageTip" i18n="sw.hotkey.tipEdit">點一下快速鍵欄位後，就會開始編輯，直接按下想設定的按鍵即可。</li>
+                                <li class="settings-pageTip" i18n="sw.hotkey.tipModifier">支援 Ctrl、Shift、Alt 等組合鍵。</li>
+                                <li class="settings-pageTip" i18n="sw.hotkey.tipCombine">同一組按鍵可以綁定到不同設定，會依序一起觸發。</li>
+                            </ul>
+                            <div class="settings-pageTipNote" i18n="sw.hotkey.tipExample">例如「圖片往上」和「圖片往右」同時綁定時，會變成圖片往右上；「下一個檔案」如果綁 5 次，會變成下 5 個檔案。</div>
                         </div>
+                    </div>
+
+                    <div class="js-hotkey">
+                    </div>
+
+                    <div class="settings-pageFooter">
+                        <div class="btn settings-resetAllBtn" id="btn-hotkey-resetAll" i18n="sw.hotkey.resetAll">重置所有快速鍵</div>
                     </div>
                 </div>
 
@@ -1095,7 +1153,7 @@
                             <div class="pluginLiet-item">
                                 <div class="pluginLiet-L">
                                     <div class="pluginLiet-title">hdrfix</div>
-                                    <div class="pluginLiet-text" i18n="sw.plugin.hdrfix"> 
+                                    <div class="pluginLiet-text" i18n="sw.plugin.hdrfix">
                                         讓 JPEG XR (.jxr) 的 HDR 色彩更好的顯示 <br>
                                         (將 HDR 色彩空間以 Hable 算法處理成 SDR 色彩空間)
                                     </div>

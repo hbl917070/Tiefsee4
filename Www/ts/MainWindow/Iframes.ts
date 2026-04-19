@@ -3,6 +3,8 @@ import { Lib } from "../Lib";
 import { WebAPI } from "../WebAPI";
 import { MainWindow } from "./MainWindow";
 
+const IFRAME_INIT_DATA_KEY = "tiefsee-iframe-init";
+
 export class Iframes {
 
     public monacoEditor;
@@ -184,8 +186,8 @@ class PdfTronWebviewer {
         async function loadFile(path: string) {
 
             if (_domPdftronWebviewer.src == "") {
-                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                _domPdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+                window.localStorage.setItem(IFRAME_INIT_DATA_KEY, JSON.stringify(baseWindow.appInfo));
+                _domPdftronWebviewer.src = `./iframe/PDFTronWebviewer.html?lang=${M.script.window.getLang()}`;
             }
 
             for (let i = 0; i < 2000; i++) { //等待套件初始化
@@ -286,8 +288,8 @@ class MonacoEditor {
 
         async function awaitInit() {
             if (_domMonacoEditor.src == "") {
-                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                _domMonacoEditor.src = `./iframe/MonacoEditor.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}`;
+                window.localStorage.setItem(IFRAME_INIT_DATA_KEY, JSON.stringify(baseWindow.appInfo));
+                _domMonacoEditor.src = `./iframe/MonacoEditor.html?lang=${M.script.window.getLang()}`;
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化
@@ -439,8 +441,8 @@ class CherryMarkdown {
 
         async function awaitInit() {
             if (_domIframe.src == "") {
-                const appInfoJson = encodeURIComponent(JSON.stringify(baseWindow.appInfo));
-                _domIframe.src = `./iframe/CherryMarkdown.html?appInfo=${appInfoJson}&lang=${M.script.window.getLang()}&allowCors=true`;
+                window.localStorage.setItem(IFRAME_INIT_DATA_KEY, JSON.stringify(baseWindow.appInfo));
+                _domIframe.src = `./iframe/CherryMarkdown.html?lang=${M.script.window.getLang()}&allowCors=true`;
             }
 
             for (let i = 0; i < 2000; i++) { // 等待套件初始化

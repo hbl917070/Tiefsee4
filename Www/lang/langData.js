@@ -54,6 +54,12 @@ var langData = {
                 "en": "Toolbar",
                 "ja": "ツールバー",
             },
+            hotkey: {
+                "zh-TW": "快速鍵",
+                "zh-CN": "快捷键",
+                "en": "Hotkey",
+                "ja": "ホットキー",
+            },
             mouse: {
                 "zh-TW": "滑鼠",
                 "zh-CN": "鼠标",
@@ -1023,6 +1029,67 @@ var langData = {
 
         //#endregion
 
+        //#region 快捷鍵
+
+        hotkey: {
+            restoreDefaultValue: {
+                "zh-TW": "恢復初始值",
+                "zh-CN": "恢复初始值",
+                "en": "Restore default value",
+                "ja": "初期値に戻す",
+            },
+            resetAll: {
+                "zh-TW": "重置所有快速鍵",
+                "zh-CN": "重置所有快捷键",
+                "en": "Reset all hotkeys",
+                "ja": "すべてのホットキーをリセット",
+            },
+            add: {
+                "zh-TW": "新增",
+                "zh-CN": "新增",
+                "en": "Add",
+                "ja": "追加",
+            },
+            delete: {
+                "zh-TW": "刪除",
+                "zh-CN": "删除",
+                "en": "Delete",
+                "ja": "削除",
+            },
+            tipTitle: {
+                "zh-TW": "操作說明",
+                "zh-CN": "操作说明",
+                "en": "Instructions",
+                "ja": "操作説明",
+            },
+            tipEdit: {
+                "zh-TW": "點一下快速鍵欄位後，就會開始編輯，直接按下想設定的按鍵即可。",
+                "zh-CN": "点一下快捷键栏位后，就会开始编辑，直接按下想设定的按键即可。",
+                "en": "Click a hotkey field to start editing, then press the key combination you want to assign.",
+                "ja": "ホットキー欄をクリックすると編集が始まるので、そのまま割り当てたいキーを押してください。",
+            },
+            tipModifier: {
+                "zh-TW": "支援 Ctrl、Shift、Alt 等組合鍵。",
+                "zh-CN": "支持 Ctrl、Shift、Alt 等组合键。",
+                "en": "Supports combinations such as Ctrl, Shift, and Alt.",
+                "ja": "Ctrl、Shift、Alt などの組み合わせキーに対応しています。",
+            },
+            tipCombine: {
+                "zh-TW": "同一組按鍵可以綁定到不同設定，會依序一起觸發。",
+                "zh-CN": "同一组按键可以绑定到不同设定，会依序一起触发。",
+                "en": "The same key combination can be bound to multiple actions, and they will run in sequence.",
+                "ja": "同じキーの組み合わせを複数の設定に割り当てることができ、順番に実行されます。",
+            },
+            tipExample: {
+                "zh-TW": "例如「圖片往上」和「圖片往右」同時綁定時，會變成圖片往右上；「下一個檔案」如果綁 5 次，會變成往後切換 5 個檔案。",
+                "zh-CN": "例如“图片往上”和“图片往右”同时绑定时，会变成图片往右上；“下一个文件”如果绑 5 次，会变成向后切换 5 个文件。",
+                "en": "For example, binding both Move Up and Move Right will move the image diagonally up-right. Binding Next File five times will advance by five files.",
+                "ja": "例えば「画像を上へ」と「画像を右へ」を同時に割り当てると、画像は右上へ移動します。「次のファイル」を 5 回割り当てると、5 ファイル先へ進みます。",
+            },
+        },
+
+        //#endregion
+
         //#region 滑鼠
 
         mouse: {
@@ -1115,6 +1182,12 @@ var langData = {
                 "zh-CN": "批量浏览模式 - 鼠标滚轮",
                 "en": "Bulk View - Mouse scroll wheel",
                 "ja": "バルクビュー - スクロールホイール"
+            },
+            resetAll: {
+                "zh-TW": "重置所有滑鼠設定",
+                "zh-CN": "重置所有鼠标设置",
+                "en": "Reset all mouse settings",
+                "ja": "すべてのマウス設定をリセット"
             },
         },
 
@@ -2234,6 +2307,13 @@ var langData = {
             "ja": "画像解析に失敗しました",
         },
 
+        promptNotFound: {
+            "zh-TW": "未找到 Prompt",
+            "zh-CN": "未找到 Prompt",
+            "en": `"Prompt" not found`,
+            "ja": `"Prompt" が見つかりません`,
+        },
+
         //#region download
         fileDownloadFailed: {
             "zh-TW": "檔案下載失敗",
@@ -2343,6 +2423,12 @@ var langData = {
             "en": `"{v}" copying completed`,
             "ja": "コピー「{v}」完了",
         },
+        copyPrompt: {
+            "zh-TW": "已將「Prompt」複製至剪貼簿",
+            "zh-CN": "已将「Prompt」复制至剪贴板",
+            "en": `"Prompt" copying completed`,
+            "ja": "コピー「Prompt」完了",
+        },
         //#endregion
 
         //#region 重新命名
@@ -2421,6 +2507,18 @@ var langData = {
             "en": `"Permanently Delete" completed`,
             "ja": "「完全に削除」完了",
         },
+        moveFileToCompleted: {
+            "zh-TW": "檔案已移動至「{name}」",
+            "zh-CN": "文件已移动至「{name}」",
+            "en": `File moved to "{name}"`,
+            "ja": "ファイルを「{name}」へ移動しました",
+        },
+        copyFileToCompleted: {
+            "zh-TW": "檔案已複製至「{name}」",
+            "zh-CN": "文件已复制至「{name}」",
+            "en": `File copied to "{name}"`,
+            "ja": "ファイルを「{name}」へコピーしました",
+        },
         fileDeletionFailed: {
             "zh-TW": "刪除失敗",
             "zh-CN": "删除失败",
@@ -2488,6 +2586,18 @@ var langData = {
             "zh-CN": "确定要将 Tiefsee 的所有设置恢复成默认值吗？<br>(不会影响扩展插件与文件排序)",
             "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and File Sorting)",
             "ja": "Tiefsee のすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
+        },
+        hotkeyResetAll: {
+            "zh-TW": "確定要將所有快速鍵恢復成初始設定嗎？<br>(只會影響快速鍵，不會變更其他設定)",
+            "zh-CN": "确定要将所有快捷键恢复成初始设置吗？<br>(只会影响快捷键，不会变更其他设置)",
+            "en": "Are you sure you want to restore all hotkeys to their default settings?<br>(Only hotkeys will be changed.)",
+            "ja": "すべてのホットキーを初期設定に戻してもよろしいですか？<br>（変更されるのはホットキーのみです）",
+        },
+        mouseResetAll: {
+            "zh-TW": "確定要將所有滑鼠設定恢復成初始設定嗎？<br>(只會影響滑鼠設定，不會變更其他設定)",
+            "zh-CN": "确定要将所有鼠标设置恢复成初始设置吗？<br>(只会影响鼠标设置，不会变更其他设置)",
+            "en": "Are you sure you want to restore all mouse settings to their default settings?<br>(Only mouse settings will be changed.)",
+            "ja": "すべてのマウス設定を初期設定に戻してもよろしいですか？<br>（変更されるのはマウス設定のみです）",
         },
         //#endregion
 
@@ -2990,6 +3100,37 @@ var langData = {
             "ja": "なし",
         },
 
+        distancePx: {
+            "zh-TW": "距離(px)",
+            "zh-CN": "距离(px)",
+            "en": "Distance(px)",
+            "ja": "距離(px)",
+        },
+        path: {
+            "zh-TW": "路徑",
+            "zh-CN": "路径",
+            "en": "Path",
+            "ja": "パス",
+        },
+        folderPath: {
+            "zh-TW": "資料夾路徑",
+            "zh-CN": "文件夹路径",
+            "en": "Folder Path",
+            "ja": "フォルダーパス",
+        },
+        filePath: {
+            "zh-TW": "檔案路徑",
+            "zh-CN": "文件路径",
+            "en": "File Path",
+            "ja": "ファイルパス",
+        },
+        numberValue: {
+            "zh-TW": "數值",
+            "zh-CN": "数值",
+            "en": "Value",
+            "ja": "値",
+        },
+
         //#region 圖片
         image: {
             "zh-TW": "圖片",
@@ -3133,6 +3274,32 @@ var langData = {
         openWith: "menu.openWith", //用其他程式開啟
         fileToRecycleBin: "msg.fileToRecycleBin", //移至資源回收桶
         fileToPermanentlyDelete: "msg.fileToPermanentlyDelete", //永久刪除
+        reloadAll: "menu.reload", //重新載入
+        loadPath: {
+            "zh-TW": "載入檔案/資料夾",
+            "zh-CN": "加载文件/文件夹",
+            "en": "Load File/Folder",
+            "ja": "ファイル/フォルダーを読み込む",
+        },
+        openClipboard: "menu.openClipboard", //載入剪貼簿內容
+        moveFileTo: {
+            "zh-TW": "移動檔案至",
+            "zh-CN": "移动文件至",
+            "en": "Move File To",
+            "ja": "ファイルを移動",
+        },
+        copyFileTo: {
+            "zh-TW": "複製檔案至",
+            "zh-CN": "复制文件至",
+            "en": "Copy File To",
+            "ja": "ファイルをコピー",
+        },
+        openWithSpecifiedApp: {
+            "zh-TW": "用指定程式開啟",
+            "zh-CN": "用指定程序开启",
+            "en": "Open with Specified App",
+            "ja": "指定したアプリで開く",
+        },
         //#endregion
 
         //#region 複製
@@ -3150,6 +3317,12 @@ var langData = {
         copyImage: "menu.copyImage", //複製影像
         copyImageBase64: "menu.copyImageBase64", //複製影像 Base64
         copyText: "menu.copyText", //複製文字
+        copyPrompt: {
+            "zh-TW": "複製 Prompt",
+            "zh-CN": "复制 Prompt",
+            "en": "Copy Prompt",
+            "ja": "Prompt をコピー",
+        },
         //#endregion
 
         //#region 佈局
@@ -3171,6 +3344,18 @@ var langData = {
         showFilePanel: "menu.showFilePanel", //檔案預覽面板
         showDirectoryPanel: "menu.showDirectoryPanel", //資料夾預覽面板
         showInformationPanel: "menu.showInformationPanel", //詳細資料面板
+        closeWindow: {
+            "zh-TW": "關閉程式",
+            "zh-CN": "关闭程序",
+            "en": "Close Program",
+            "ja": "アプリを閉じる",
+        },
+        developerTools: {
+            "zh-TW": "開發人員工具",
+            "zh-CN": "开发人员工具",
+            "en": "Developer Tools",
+            "ja": "開発者ツール",
+        },
         //#endregion
 
         //#region 其他
@@ -3180,8 +3365,26 @@ var langData = {
             "en": "Other",
             "ja": "その他",
         },
+        interaction: {
+            "zh-TW": "互動",
+            "zh-CN": "交互",
+            "en": "Interaction",
+            "ja": "操作",
+        },
         back: "menu.back", //返回
         showSetting: "menu.showSetting", //設定
+        cancel: {
+            "zh-TW": "取消 / 返回",
+            "zh-CN": "取消 / 返回",
+            "en": "Cancel / Back",
+            "ja": "キャンセル / 戻る",
+        },
+        confirm: {
+            "zh-TW": "確認",
+            "zh-CN": "确认",
+            "en": "Confirm",
+            "ja": "確認",
+        },
         //#endregion
 
         //#region 文字編輯器
@@ -3197,46 +3400,76 @@ var langData = {
             "en": "Save",
             "ja": "アーカイブ",
         },
+        saveTextEditor: {
+            "zh-TW": "儲存編輯內容",
+            "zh-CN": "保存编辑内容",
+            "en": "Save Edited Content",
+            "ja": "編集内容を保存",
+        },
         //#endregion
 
         //#region 大量瀏覽模式
 
         bulkView: "menu.bulkView", //大量瀏覽模式
+        closeBulkView: {
+            "zh-TW": "關閉大量瀏覽模式",
+            "zh-CN": "关闭批量浏览模式",
+            "en": "Close Bulk View",
+            "ja": "バルクビューを閉じる",
+        },
         prevPage: {
             "zh-TW": "上一頁",
             "zh-CN": "上一页",
             "en": "Previous Page",
-            "ja": "前のページ"
+            "ja": "前のページ",
         },
         nextPage: {
             "zh-TW": "下一頁",
             "zh-CN": "下一页",
             "en": "Next Page",
-            "ja": "次のページ"
+            "ja": "次のページ",
+        },
+        firstPage: {
+            "zh-TW": "移至第一頁",
+            "zh-CN": "移至第一页",
+            "en": "Go to First Page",
+            "ja": "最初のページへ移動",
+        },
+        lastPage: {
+            "zh-TW": "移至最後一頁",
+            "zh-CN": "移至最后一页",
+            "en": "Go to Last Page",
+            "ja": "最後のページへ移動",
+        },
+        setBulkViewColumns: {
+            "zh-TW": "設定欄數為 1~8",
+            "zh-CN": "设置列数为 1~8",
+            "en": "Set Columns to 1-8",
+            "ja": "列数を 1〜8 に設定",
         },
         incrColumns: {
             "zh-TW": "增加「每行圖片數」",
             "zh-CN": "增加「每行图片数」",
             "en": "Increase 'Images per Row'",
-            "ja": "「行ごとの画像数」を増やす"
+            "ja": "「行ごとの画像数」を増やす",
         },
         decColumns: {
             "zh-TW": "減少「每行圖片數」",
             "zh-CN": "减少「每行图片数」",
             "en": "Decrease 'Images per Row'",
-            "ja": "「行ごとの画像数」を減らす"
+            "ja": "「行ごとの画像数」を減らす",
         },
         incrFixedWidth: {
             "zh-TW": "增加「鎖定寬度」",
             "zh-CN": "增加「锁定宽度」",
             "en": "Increase 'Fixed Width'",
-            "ja": "「固定幅」を増やす"
+            "ja": "「固定幅」を増やす",
         },
         decFixedWidth: {
             "zh-TW": "減少「鎖定寬度」",
             "zh-CN": "减少「锁定宽度」",
             "en": "Decrease 'Fixed Width'",
-            "ja": "「固定幅」を減らす"
+            "ja": "「固定幅」を減らす",
         }
         //#endregion
 

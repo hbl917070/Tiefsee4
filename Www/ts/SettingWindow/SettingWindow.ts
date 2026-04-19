@@ -5,6 +5,7 @@ import { Lib } from "../Lib";
 import { MainToolbar } from "../MainWindow/MainToolbar";
 import { Msgbox } from "../Msgbox";
 import { SelectionManager } from "../SelectionManager";
+import { hotkeyActionKeys, hotkeyDefinitions } from "../HotkeyDefinitions";
 
 declare global {
     var settingWindow: SettingWindow;
@@ -45,6 +46,23 @@ class SettingWindow {
 
         function getDom(selectors: string) {
             return document.querySelector(selectors) as HTMLElement;
+        }
+
+        function initSettingsGroups(root: ParentNode) {
+            const domGroups = root.querySelectorAll(".js-settingsGroup");
+            domGroups.forEach((domGroup) => {
+                const domBox = domGroup as HTMLElement;
+                if (domBox.getAttribute("data-collapse-init") === "true") { return; }
+                domBox.setAttribute("data-collapse-init", "true");
+
+                const domTitle = domBox.querySelector(".settings-groupTitle") as HTMLElement | null;
+                if (domTitle === null) { return; }
+
+                Lib.collapse(domBox, "init-true");
+                domTitle.addEventListener("click", () => {
+                    Lib.collapse(domBox, "toggle");
+                });
+            });
         }
 
         // 指定不能被選取的元素
@@ -308,6 +326,314 @@ class SettingWindow {
             }
             select_toolbarListType.onchange = eventChange;
             eventChange();
+        });
+
+        // 快速鍵
+        addLoadEvent(() => {
+
+            const dom = getDom(".js-hotkey") as HTMLElement;
+            const btnResetAll = getDom("#btn-hotkey-resetAll") as HTMLElement;
+            type HotkeyItem = { key: string, hotkey: string, subOptions?: string[] };
+            _config.settings.hotkeys = normalizeHotkeys(_config.settings.hotkeys);
+
+            renderHotkeyPage();
+
+            // 重置所有快速鍵
+            btnResetAll.addEventListener("click", () => {
+                _msgbox.show({
+                    txt: _i18n.t("msg.hotkeyResetAll"),
+                    funcYes: (domMsg: HTMLElement) => {
+                        _msgbox.close(domMsg);
+                        _config.settings.hotkeys = getDefaultHotkeys();
+                        renderHotkeyPage();
+                        appleSettingOfMain();
+                    }
+                });
+            });
+
+            /**
+             * 渲染快速鍵設定頁面
+             */
+            function renderHotkeyPage() {
+                const configHotkeys = normalizeHotkeys(_config.settings.hotkeys);
+                _config.settings.hotkeys = configHotkeys;
+                dom.innerHTML = "";
+
+                // 大分類
+                hotkeyDefinitions.forEach((data) => {
+                    const domBox = Lib.newDom(
+                        `<div class="box settings-group hotkey-category js-settingsGroup">
+                            <div class="box-title settings-groupTitle hotkey-categoryTitle collapse-title" i18n="script.${data.title}"></div>
+                            <div class="settings-groupContent hotkey-categoryContent collapse-content">
+                                <div class="js-boxList"></div>
+                            </div>
+                        </div>`);
+                    const domBoxList = domBox.querySelector(".js-boxList") as HTMLElement;
+
+                    data.content.forEach((content) => {
+                        const titleI18n = "script." + content.key;
+                        const resetTitle = Lib.escape(_i18n.t("sw.hotkey.restoreDefaultValue"));
+                        const addTitle = Lib.escape(_i18n.t("sw.hotkey.add"));
+                        const deleteTitle = Lib.escape(_i18n.t("sw.hotkey.delete"));
+                        const domContent = Lib.newDom(
+                            `<div class="hotkey" data-key="${content.key}">
+                                <div class="hotkey-title">
+                                    <span class="hotkey-name" i18n="${titleI18n}"></span>
+                                    <div class="btns">
+                                        <div class="btn hotkey-iconBtn js-reset" title="${resetTitle}" i18n="sw.hotkey.restoreDefaultValue">${SvgList["tool-rotateCw.svg"]}</div>
+                                        <div class="btn hotkey-iconBtn js-add" title="${addTitle}" i18n="sw.hotkey.add">${SvgList["tool-zoomIn.svg"]}</div>
+                                    </div>
+                                </div>
+                                <div class="js-list">
+                                </div>
+                            </div>`);
+
+                        const btnAdd = domContent.querySelector(".js-add") as HTMLElement;
+                        const btnReset = domContent.querySelector(".js-reset") as HTMLElement;
+                        const divList = domContent.querySelector(".js-list") as HTMLElement;
+                        const contentSubOptions = "subOptions" in content ? content.subOptions : undefined;
+
+                        // 按鈕：新增
+                        btnAdd.addEventListener("click", () => {
+                            createHotkeyItem(divList, contentSubOptions);
+                            hotkeyToConfig();
+                        });
+
+                        // 按鈕：重置
+                        btnReset.addEventListener("click", () => {
+                            divList.innerHTML = "";
+                            const items = getDefaultHotkeys().filter(item => item.key === content.key);
+                            items.forEach(item => {
+                                createHotkeyItem(divList, contentSubOptions, item);
+                            });
+                            hotkeyToConfig();
+                        });
+
+                        const items = configHotkeys.filter(item => item.key === content.key);
+                        items.forEach(item => {
+                            createHotkeyItem(divList, contentSubOptions, item);
+                        });
+                        updateResetButton();
+
+                        domBoxList.appendChild(domContent);
+
+                        /**
+                         * 新增單一快速鍵項目
+                         */
+                        function createHotkeyItem(divList: HTMLElement, subOptions?: string[], item?: HotkeyItem) {
+                            const subHtml = getSubHtml(subOptions);
+                            const hotkeyDom = Lib.newDom(
+                                `<div class="hotkey-content">
+                                    <input class="text-input hotkey-input js-text">
+                                    ${subHtml}
+                                    <div class="btn hotkey-iconBtn hotkey-deleteBtn js-delete" title="${deleteTitle}" i18n="sw.hotkey.delete">
+                                        ${SvgList["no.svg"]}
+                                    </div>
+                                </div>`);
+
+                            const domText = hotkeyDom.querySelector(".js-text") as HTMLInputElement;
+                            domText.value = item?.hotkey ?? "";
+                            domText.addEventListener("keydown", (e) => {
+                                e.preventDefault();
+                                const text = Lib.keyboardEventToHotkeyString(e);
+                                if (text === "") { return; }
+                                domText.value = text;
+                                hotkeyToConfig();
+                            });
+                            // 唯讀
+                            domText.setAttribute("readonly", "readonly");
+
+                            // 子選項的輸入框
+                            const subTextDoms = hotkeyDom.querySelectorAll(".js-subText") as NodeListOf<HTMLInputElement>;
+                            subTextDoms.forEach((domSubText, index) => {
+                                domSubText.value = item?.subOptions?.[index] ?? "";
+                                domSubText.addEventListener("change", () => {
+                                    hotkeyToConfig();
+                                });
+                            });
+
+                            // 按鈕：刪除
+                            const btnDelete = hotkeyDom.querySelector(".js-delete") as HTMLElement;
+                            btnDelete.addEventListener("click", () => {
+                                hotkeyDom.remove();
+                                hotkeyToConfig();
+                            });
+
+                            divList.appendChild(hotkeyDom);
+                        }
+
+                        function updateResetButton() {
+                            const defaultItems = getDefaultHotkeys().filter(item => item.key === content.key);
+                            const currentItems = getCurrentHotkeyItems(divList, content.key);
+                            const isSame = isHotkeyItemListEqual(defaultItems, currentItems);
+                            btnReset.style.display = isSame ? "none" : "";
+                        }
+
+                        function getSubHtml(subOptions?: string[]) {
+                            if (subOptions === undefined) { return ""; }
+
+                            let html = "";
+                            subOptions.forEach((sub) => {
+                                const subI18n = "script." + sub;
+                                const subText = Lib.escape(_i18n.t(subI18n));
+                                html +=
+                                    `<label class="hotkey-subField">
+                                        <span class="hotkey-subLabel" i18n="${subI18n}">${subText}</span>
+                                        <input class="text-input hotkey-subInput js-subText">
+                                    </label>`;
+                            });
+                            return html;
+                        }
+                    });
+
+                    dom.appendChild(domBox);
+                });
+
+                initSettingsGroups(dom);
+                _i18n.setAll();
+            }
+
+            /**
+             * 將畫面上的快速鍵設定轉換成設定檔中的格式，並儲存到設定檔中
+             */
+            function hotkeyToConfig() {
+                const hotkeyDoms = dom.querySelectorAll(".hotkey");
+                const hotkeyItems: HotkeyItem[] = [];
+
+                hotkeyDoms.forEach(hotkeyDom => {
+                    const key = hotkeyDom.getAttribute("data-key") + "";
+                    const contentDoms = hotkeyDom.querySelectorAll(".hotkey-content");
+                    contentDoms.forEach(contentDom => {
+                        const textDoms = contentDom.querySelectorAll(".js-text") as NodeListOf<HTMLInputElement>;
+                        const hotkey = textDoms[0].value;
+                        if (hotkey === "") { return; }
+
+                        const data: HotkeyItem = {
+                            key: key,
+                            hotkey: hotkey,
+                        };
+
+                        const subTextDoms = contentDom.querySelectorAll(".js-subText") as NodeListOf<HTMLInputElement>;
+                        if (subTextDoms.length > 0) {
+                            data.subOptions = [];
+                            for (let i = 0; i < subTextDoms.length; i++) {
+                                data.subOptions.push(subTextDoms[i].value);
+                            }
+                        }
+                        hotkeyItems.push(data);
+                    });
+                });
+
+                _config.settings.hotkeys = hotkeyItems;
+                appleSettingOfMain();
+                updateResetButtons();
+            }
+
+            /**
+             * 將設定檔中的快速鍵項目轉換成 HotkeyItem 的格式，並過濾掉不合法的項目
+             * @param hotkeys 設定檔中的快速鍵項目
+             * @returns 轉換後的 HotkeyItem 列表
+             */
+            function normalizeHotkeys(hotkeys: any): HotkeyItem[] {
+                if (Array.isArray(hotkeys) === false) { return []; }
+
+                return hotkeys
+                    .filter((item: any) => item && typeof item === "object")
+                    .map((item: any) => {
+                        const data: HotkeyItem = {
+                            key: typeof item.key === "string" ? item.key : "",
+                            hotkey: typeof item.hotkey === "string" ? item.hotkey : "",
+                        };
+
+                        if (Array.isArray(item.subOptions)) {
+                            data.subOptions = item.subOptions.map((sub: any) => String(sub));
+                        }
+
+                        return data;
+                    })
+                    .filter(item => item.key !== "" && item.hotkey !== "");
+            }
+
+            /**
+             * 從預設設定中取得快速鍵項目列表，轉換成 HotkeyItem 的格式
+             * @returns 轉換後的 HotkeyItem 列表
+             */
+            function getDefaultHotkeys(): HotkeyItem[] {
+                return normalizeHotkeys(new Config(baseWindow).settings.hotkeys);
+            }
+
+            /**
+             * 從畫面上讀取目前的快速鍵設定，轉換成 HotkeyItem 的格式
+             * @param divList 包含快速鍵設定的容器元素
+             * @param key 快速鍵的鍵值
+             * @returns 轉換後的 HotkeyItem 列表
+             */
+            function getCurrentHotkeyItems(divList: HTMLElement, key: string): HotkeyItem[] {
+                const items: HotkeyItem[] = [];
+                const contentDoms = divList.querySelectorAll(".hotkey-content");
+                contentDoms.forEach(contentDom => {
+                    const domText = contentDom.querySelector(".js-text") as HTMLInputElement | null;
+                    const hotkey = domText?.value ?? "";
+                    if (hotkey === "") { return; }
+
+                    const data: HotkeyItem = {
+                        key: key,
+                        hotkey: hotkey,
+                    };
+
+                    const subTextDoms = contentDom.querySelectorAll(".js-subText") as NodeListOf<HTMLInputElement>;
+                    if (subTextDoms.length > 0) {
+                        data.subOptions = [];
+                        subTextDoms.forEach((domSubText) => {
+                            data.subOptions!.push(domSubText.value);
+                        });
+                    }
+
+                    items.push(data);
+                });
+                return items;
+            }
+
+            /**
+             * 更新重置按鈕的顯示狀態              
+             * 只有當目前的快速鍵設定與預設值不同時，才顯示重置按鈕
+             */
+            function updateResetButtons() {
+                const hotkeyDoms = dom.querySelectorAll(".hotkey");
+                hotkeyDoms.forEach((hotkeyDom) => {
+                    const key = hotkeyDom.getAttribute("data-key") + "";
+                    const btnReset = hotkeyDom.querySelector(".js-reset") as HTMLElement | null;
+                    const divList = hotkeyDom.querySelector(".js-list") as HTMLElement | null;
+                    if (btnReset === null || divList === null) { return; }
+
+                    const defaultItems = getDefaultHotkeys().filter(item => item.key === key);
+                    const currentItems = getCurrentHotkeyItems(divList, key);
+                    const isSame = isHotkeyItemListEqual(defaultItems, currentItems);
+                    btnReset.style.display = isSame ? "none" : "";
+                });
+            }
+
+            /**
+             * 比較兩個快速鍵項目列表是否相等
+             * @param a 第一個快速鍵項目列表
+             * @param b 第二個快速鍵項目列表
+             * @returns 如果兩個列表相等，返回 true，否則返回 false
+             */
+            function isHotkeyItemListEqual(a: HotkeyItem[], b: HotkeyItem[]) {
+                if (a.length !== b.length) { return false; }
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i].key !== b[i].key) { return false; }
+                    if (a[i].hotkey !== b[i].hotkey) { return false; }
+
+                    const aSubOptions = a[i].subOptions ?? [];
+                    const bSubOptions = b[i].subOptions ?? [];
+                    if (aSubOptions.length !== bSubOptions.length) { return false; }
+                    for (let j = 0; j < aSubOptions.length; j++) {
+                        if (aSubOptions[j] !== bSubOptions[j]) { return false; }
+                    }
+                }
+                return true;
+            }
         });
 
         // 主題
@@ -818,190 +1144,167 @@ class SettingWindow {
 
         // 滑鼠按鍵 + 滑鼠滾輪
         addLoadEvent(() => {
+            const mousePage = getDom("#tabsPage-mouse") as HTMLElement;
+            const btnResetAllMouse = getDom("#btn-mouse-resetAll") as HTMLElement;
 
-            const select_leftDoubleClick = getDom("#select-leftDoubleClick") as HTMLSelectElement;
-            const select_scrollWheelButton = getDom("#select-scrollWheelButton") as HTMLSelectElement;
-            const select_mouseButton4 = getDom("#select-mouseButton4") as HTMLSelectElement;
-            const select_mouseButton5 = getDom("#select-mouseButton5") as HTMLSelectElement;
-            const select_scrollUp = getDom("#select-scrollUp") as HTMLSelectElement;
-            const select_scrollDown = getDom("#select-scrollDown") as HTMLSelectElement;
-            const select_scrollUpCtrl = getDom("#select-scrollUpCtrl") as HTMLSelectElement;
-            const select_scrollDownCtrl = getDom("#select-scrollDownCtrl") as HTMLSelectElement;
-            const select_scrollUpShift = getDom("#select-scrollUpShift") as HTMLSelectElement;
-            const select_scrollDownShift = getDom("#select-scrollDownShift") as HTMLSelectElement;
-            const select_scrollUpAlt = getDom("#select-scrollUpAlt") as HTMLSelectElement;
-            const select_scrollDownAlt = getDom("#select-scrollDownAlt") as HTMLSelectElement;
+            const normalMouseItems = [
+                { dom: getDom("#select-leftDoubleClick") as HTMLSelectElement, config: "leftDoubleClick" },
+                { dom: getDom("#select-scrollWheelButton") as HTMLSelectElement, config: "scrollWheelButton" },
+                { dom: getDom("#select-mouseButton4") as HTMLSelectElement, config: "mouseButton4" },
+                { dom: getDom("#select-mouseButton5") as HTMLSelectElement, config: "mouseButton5" },
+                { dom: getDom("#select-scrollUp") as HTMLSelectElement, config: "scrollUp" },
+                { dom: getDom("#select-scrollDown") as HTMLSelectElement, config: "scrollDown" },
+                { dom: getDom("#select-scrollUpCtrl") as HTMLSelectElement, config: "scrollUpCtrl" },
+                { dom: getDom("#select-scrollDownCtrl") as HTMLSelectElement, config: "scrollDownCtrl" },
+                { dom: getDom("#select-scrollUpShift") as HTMLSelectElement, config: "scrollUpShift" },
+                { dom: getDom("#select-scrollDownShift") as HTMLSelectElement, config: "scrollDownShift" },
+                { dom: getDom("#select-scrollUpAlt") as HTMLSelectElement, config: "scrollUpAlt" },
+                { dom: getDom("#select-scrollDownAlt") as HTMLSelectElement, config: "scrollDownAlt" },
+            ] as const;
 
-            const arDom = [
-                { dom: select_leftDoubleClick, config: "leftDoubleClick" },
-                { dom: select_scrollWheelButton, config: "scrollWheelButton" },
-                { dom: select_mouseButton4, config: "mouseButton4" },
-                { dom: select_mouseButton5, config: "mouseButton5" },
-                { dom: select_scrollUp, config: "scrollUp" },
-                { dom: select_scrollDown, config: "scrollDown" },
-                { dom: select_scrollUpCtrl, config: "scrollUpCtrl" },
-                { dom: select_scrollDownCtrl, config: "scrollDownCtrl" },
-                { dom: select_scrollUpShift, config: "scrollUpShift" },
-                { dom: select_scrollDownShift, config: "scrollDownShift" },
-                { dom: select_scrollUpAlt, config: "scrollUpAlt" },
-                { dom: select_scrollDownAlt, config: "scrollDownAlt" },
-            ];
+            const bulkViewMouseItems = [
+                { dom: getDom("#select-bulkViewScrollUpCtrl") as HTMLSelectElement, config: "bulkViewScrollUpCtrl" },
+                { dom: getDom("#select-bulkViewScrollDownCtrl") as HTMLSelectElement, config: "bulkViewScrollDownCtrl" },
+                { dom: getDom("#select-bulkViewScrollUpShift") as HTMLSelectElement, config: "bulkViewScrollUpShift" },
+                { dom: getDom("#select-bulkViewScrollDownShift") as HTMLSelectElement, config: "bulkViewScrollDownShift" },
+                { dom: getDom("#select-bulkViewScrollUpAlt") as HTMLSelectElement, config: "bulkViewScrollUpAlt" },
+                { dom: getDom("#select-bulkViewScrollDownAlt") as HTMLSelectElement, config: "bulkViewScrollDownAlt" },
+            ] as const;
 
-            const data: { [key: string]: string[] } = {
+            const normalMouseData: { [key: string]: string[] } = {
                 "image": [
-                    "imageFitWindowOrImageOriginal", // 縮放至適合視窗 或 圖片原始大小
-                    "switchFitWindowAndOriginal", // 縮放至適合視窗/圖片原始大小 切換
-                    "imageFitWindow", // 強制縮放至適合視窗
-                    "imageOriginal", // 圖片原始大小
-                    "imageZoomIn", // 放大
-                    "imageZoomOut", // 縮小
-                    "imageRotateCw", // 順時針90°
-                    "imageRotateCcw", // 逆時針90°
-                    "imageFlipHorizontal", // 水平鏡像
-                    "imageFlipVertical", // 垂直鏡像
-                    "imageInitialRotation", // 圖初始化旋轉
-                    "imageMoveUp", // 圖片向上移動
-                    "imageMoveDown", // 圖片向下移動
-                    "imageMoveLeft", // 圖片向左移動
-                    "imageMoveRight", // 圖片向右移動
-                    "imageMoveUpOrPrevFile", // 圖片向上移動 or 上一個檔案
-                    "imageMoveDownOrNextFile", // 圖片向下移動 or 下一個檔案
-                    "imageMoveLeftOrPrevFile", // 圖片向左移動 or 上一個檔案
-                    "imageMoveRightOrNextFile", // 圖片向右移動 or 下一個檔案
-                    "imageMoveRightOrPrevFile", // 圖片向右移動 or 上一個檔案
-                    "imageMoveLeftOrNextFile", // 圖片向左移動 or 下一個檔案
+                    hotkeyActionKeys.imageFitWindowOrImageOriginal,
+                    hotkeyActionKeys.switchFitWindowAndOriginal,
+                    hotkeyActionKeys.imageFitWindow,
+                    hotkeyActionKeys.imageOriginal,
+                    hotkeyActionKeys.imageZoomIn,
+                    hotkeyActionKeys.imageZoomOut,
+                    hotkeyActionKeys.imageRotateCw,
+                    hotkeyActionKeys.imageRotateCcw,
+                    hotkeyActionKeys.imageFlipHorizontal,
+                    hotkeyActionKeys.imageFlipVertical,
+                    hotkeyActionKeys.imageInitialRotation,
+                    hotkeyActionKeys.imageMoveUp,
+                    hotkeyActionKeys.imageMoveDown,
+                    hotkeyActionKeys.imageMoveLeft,
+                    hotkeyActionKeys.imageMoveRight,
+                    hotkeyActionKeys.imageMoveUpOrPrevFile,
+                    hotkeyActionKeys.imageMoveDownOrNextFile,
+                    hotkeyActionKeys.imageMoveLeftOrPrevFile,
+                    hotkeyActionKeys.imageMoveRightOrNextFile,
+                    hotkeyActionKeys.imageMoveRightOrPrevFile,
+                    hotkeyActionKeys.imageMoveLeftOrNextFile,
                 ],
                 "file": [
-                    "prevFile", // 上一個檔案
-                    "nextFile", // 下一個檔案
-                    "firstFile", // 第一個檔案
-                    "lastFile", // 最後一個檔案
-                    "prevDir", // 上一個資料夾
-                    "nextDir", // 下一個資料夾
-                    "firstDir", // 第一個資料夾
-                    "lastDir", // 最後一個資料夾
-                    "newWindow", // 另開視窗
-                    "revealInFileExplorer", // 在檔案總管中顯示
-                    "systemContextMenu", // 系統選單
-                    "openWith", // 用其他程式開啟
-                    "renameFile", // 重新命名
-                    "fileToRecycleBin", // 移至資源回收桶
-                    "fileToPermanentlyDelete", // 永久刪除
+                    hotkeyActionKeys.prevFile,
+                    hotkeyActionKeys.nextFile,
+                    hotkeyActionKeys.firstFile,
+                    hotkeyActionKeys.lastFile,
+                    hotkeyActionKeys.prevDir,
+                    hotkeyActionKeys.nextDir,
+                    hotkeyActionKeys.firstDir,
+                    hotkeyActionKeys.lastDir,
+                    hotkeyActionKeys.newWindow,
+                    hotkeyActionKeys.revealInFileExplorer,
+                    hotkeyActionKeys.systemContextMenu,
+                    hotkeyActionKeys.openWith,
+                    hotkeyActionKeys.renameFile,
+                    hotkeyActionKeys.fileToRecycleBin,
+                    hotkeyActionKeys.fileToPermanentlyDelete,
                 ],
                 "copy": [
-                    "copyFile", // 複製檔案
-                    "copyFileName", // 複製檔名
-                    // "copyDirName", // 複製資料夾名
-                    "copyFilePath", // 複製檔案路徑
-                    // "copyDirPath", // 複製資料夾路徑
-                    "copyImage", // 複製影像
-                    "copyImageBase64", // 複製影像 Base64
-                    "copyText", // 複製文字
+                    hotkeyActionKeys.copyFile,
+                    hotkeyActionKeys.copyFileName,
+                    hotkeyActionKeys.copyFilePath,
+                    hotkeyActionKeys.copyImage,
+                    hotkeyActionKeys.copyImageBase64,
+                    hotkeyActionKeys.copyText,
                 ],
                 "layout": [
-                    "maximizeWindow", // 視窗最大化
-                    "topmost", // 視窗固定最上層
-                    "fullScreen", // 全螢幕
-                    "showToolbar", // 工具列
-                    "showDirectoryPanel", // 資料夾預覽面板
-                    "showFilePanel", // 檔案預覽面板
-                    "showInformationPanel", // 詳細資料面板
+                    hotkeyActionKeys.maximizeWindow,
+                    hotkeyActionKeys.topmost,
+                    hotkeyActionKeys.fullScreen,
+                    hotkeyActionKeys.showToolbar,
+                    hotkeyActionKeys.showDirectoryPanel,
+                    hotkeyActionKeys.showFilePanel,
+                    hotkeyActionKeys.showInformationPanel,
                 ],
                 "other": [
-                    "bulkView", // 大量瀏覽模式
-                    // "back", // 返回
-                    // "showSetting", // 設定
+                    hotkeyActionKeys.bulkView,
                 ],
-                // "textEditor":[
-                //    "save", // 儲存檔案
-                // ],
-            }
-            let htmlString = `
-                <optgroup label="-">
-                    <option value="none" i18n="script.none"></option>
-                </optgroup>
-            `;
-            for (const key in data) {
-                htmlString += `<optgroup label="" i18n="script.${key}">`;
-                for (const value of data[key]) {
-                    htmlString += `<option value="${value}" i18n="script.${value}"></option>`;
-                }
-                htmlString += `</optgroup>`;
-            }
+            };
 
-            arDom.forEach(item => {
-
-                const dom = item.dom;
-
-                // 初始化設定值
-                dom.innerHTML = htmlString;
-                // @ts-ignore
-                dom.value = _config.settings.mouse[item.config];
-
-                dom.addEventListener("change", () => {
-                    // @ts-ignore
-                    _config.settings.mouse[item.config] = dom.value;
-                    appleSettingOfMain();
-                });
-
-            })
-
-        })
-
-        // 大量瀏覽模式 - 滑鼠滾輪
-        addLoadEvent(() => {
-
-            const select_scrollUpCtrl = getDom("#select-bulkViewScrollUpCtrl") as HTMLSelectElement;
-            const select_scrollDownCtrl = getDom("#select-bulkViewScrollDownCtrl") as HTMLSelectElement;
-            const select_scrollUpShift = getDom("#select-bulkViewScrollUpShift") as HTMLSelectElement;
-            const select_scrollDownShift = getDom("#select-bulkViewScrollDownShift") as HTMLSelectElement;
-            const select_scrollUpAlt = getDom("#select-bulkViewScrollUpAlt") as HTMLSelectElement;
-            const select_scrollDownAlt = getDom("#select-bulkViewScrollDownAlt") as HTMLSelectElement;
-
-            const arDom = [
-                { dom: select_scrollUpCtrl, config: "bulkViewScrollUpCtrl" },
-                { dom: select_scrollDownCtrl, config: "bulkViewScrollDownCtrl" },
-                { dom: select_scrollUpShift, config: "bulkViewScrollUpShift" },
-                { dom: select_scrollDownShift, config: "bulkViewScrollDownShift" },
-                { dom: select_scrollUpAlt, config: "bulkViewScrollUpAlt" },
-                { dom: select_scrollDownAlt, config: "bulkViewScrollDownAlt" },
-            ];
-
-            const data: { [key: string]: string[] } = {
+            const bulkViewMouseData: { [key: string]: string[] } = {
                 "bulkView": [
-                    "prevPage", // 上一頁
-                    "nextPage", // 下一頁
-                    "incrColumns", // 增加「每行圖片數」
-                    "decColumns", // 減少「每行圖片數」
-                    "incrFixedWidth", // 增加「鎖定寬度」
-                    "decFixedWidth", // 減少「鎖定寬度」
+                    hotkeyActionKeys.prevPage,
+                    hotkeyActionKeys.nextPage,
+                    hotkeyActionKeys.incrColumns,
+                    hotkeyActionKeys.decColumns,
+                    hotkeyActionKeys.incrFixedWidth,
+                    hotkeyActionKeys.decFixedWidth,
                 ],
-            }
-            let htmlString = ``;
-            for (const key in data) {
-                htmlString += `<optgroup label="" i18n="script.${key}">`;
-                for (const value of data[key]) {
-                    htmlString += `<option value="${value}" i18n="script.${value}"></option>`;
+            };
+
+            function buildOptionHtml(data: { [key: string]: string[] }, showNone: boolean) {
+                let htmlString = "";
+                if (showNone) {
+                    htmlString = `
+                        <optgroup label="-">
+                            <option value="none" i18n="script.none"></option>
+                        </optgroup>
+                    `;
                 }
-                htmlString += `</optgroup>`;
+
+                for (const key in data) {
+                    htmlString += `<optgroup label="" i18n="script.${key}">`;
+                    for (const value of data[key]) {
+                        htmlString += `<option value="${value}" i18n="script.${value}"></option>`;
+                    }
+                    htmlString += `</optgroup>`;
+                }
+                return htmlString;
             }
 
-            arDom.forEach(item => {
-
-                const dom = item.dom;
-
-                // 初始化設定值
-                dom.innerHTML = htmlString;
-                // @ts-ignore
-                dom.value = _config.settings.mouse[item.config];
-
-                dom.addEventListener("change", () => {
+            function applyMouseConfigToDom() {
+                const normalHtml = buildOptionHtml(normalMouseData, true);
+                normalMouseItems.forEach((item) => {
+                    item.dom.innerHTML = normalHtml;
                     // @ts-ignore
-                    _config.settings.mouse[item.config] = dom.value;
+                    item.dom.value = _config.settings.mouse[item.config];
+                });
+
+                const bulkViewHtml = buildOptionHtml(bulkViewMouseData, false);
+                bulkViewMouseItems.forEach((item) => {
+                    item.dom.innerHTML = bulkViewHtml;
+                    // @ts-ignore
+                    item.dom.value = _config.settings.mouse[item.config];
+                });
+
+                _i18n.setAll();
+            }
+
+            [...normalMouseItems, ...bulkViewMouseItems].forEach((item) => {
+                item.dom.addEventListener("change", () => {
+                    // @ts-ignore
+                    _config.settings.mouse[item.config] = item.dom.value;
                     appleSettingOfMain();
                 });
-            })
+            });
 
+            btnResetAllMouse.addEventListener("click", () => {
+                _msgbox.show({
+                    txt: _i18n.t("msg.mouseResetAll"),
+                    funcYes: (domMsg: HTMLElement) => {
+                        _msgbox.close(domMsg);
+                        _config.settings.mouse = JSON.parse(JSON.stringify(new Config(baseWindow).settings.mouse));
+                        applyMouseConfigToDom();
+                        appleSettingOfMain();
+                    }
+                });
+            });
+
+            applyMouseConfigToDom();
+            initSettingsGroups(mousePage);
         })
 
         // 檔案預覽視窗
@@ -1657,7 +1960,7 @@ class SettingWindow {
             tabs.add(getDom("#tabsBtn-toolbar"), getDom("#tabsPage-toolbar"), () => { goTop() }); // 工具列
             tabs.add(getDom("#tabsBtn-mouse"), getDom("#tabsPage-mouse"), () => { goTop() }); // 滑鼠
             // tabs.add(getDom("#tabsBtn-image"), getDom("#tabsPage-image"), () => { goTop() });
-            // tabs.add(getDom("#tabsBtn-shortcutKeys"),getDom("#tabsPage-hotkey"), () => { goTop() });/快速鍵
+            tabs.add(getDom("#tabsBtn-hotkey"), getDom("#tabsPage-hotkey"), () => { goTop() }); // 快速鍵
             tabs.add(getDom("#tabsBtn-extension"), getDom("#tabsPage-extension"), () => { goTop() }); // 設為預設程式
             tabs.add(getDom("#tabsBtn-advanced"), getDom("#tabsPage-advanced"), () => { goTop() }); // 進階設定
             tabs.add(getDom("#tabsBtn-about"), getDom("#tabsPage-about"), () => { goTop() }); // 關於

@@ -73,7 +73,7 @@ gulp.task("ts", async () => {
         { path: "./ts/SettingWindow/SettingWindow.ts", bundle: true },
         { path: "./ts/TiefseeviewWorker.ts", bundle: true },
         { path: "./ts/TiefseeviewWorkerSub.ts", bundle: true },
-        { path: "./ts/LibIframe.ts", bundle: false },
+        { path: "./ts/LibIframe.ts", bundle: true },
     ];
 
     const streams = fileMappings.map(file => {

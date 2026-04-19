@@ -306,6 +306,19 @@ public class WV_File {
     }
 
     /// <summary>
+    /// 複製檔案到新位置
+    /// </summary>
+    public string Copy(string sourceFileName, string destFileName) {
+        try {
+            File.Copy(sourceFileName, destFileName);
+        }
+        catch (Exception e) {
+            return e.Message;
+        }
+        return "";
+    }
+
+    /// <summary>
     ///
     /// </summary>
     long ToUnix(DateTime time) {

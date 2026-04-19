@@ -1,12 +1,24 @@
+import { hotkeyActionKeys } from "./HotkeyDefinitions";
+
+declare global {
+    interface Window {
+        LibIframe: typeof LibIframe;
+    }
+}
+
 class LibIframe {
+
+    private static readonly IFRAME_INIT_DATA_KEY = "tiefsee-iframe-init";
 
     public appInfo: AppInfo;
     public APIURL: string;
+    private hotkeys: { key: string, hotkey: string, subOptions?: string[] }[] = [];
 
     constructor() {
 
         this.appInfo = this.getAppInfo();
         this.APIURL = "http://127.0.0.1:" + this.appInfo.mainPort;
+        this.hotkeys = this.getSettingHotkeys();
 
         //處理唯讀
         window.addEventListener("keydown", (e) => {
@@ -80,11 +92,21 @@ class LibIframe {
     }
 
     /**
-     * 按 ctrl + S 時，儲存文字檔
+     * 按下設定中的「儲存編輯內容」快捷鍵時，儲存文字檔
      */
     public initTextHotkey() {
         window.addEventListener("keydown", async (e) => {
-            if (e.code === "KeyS" && e.ctrlKey) {
+            const hotkey = this.keyboardEventToHotkeyString(e);
+            if (hotkey === "") { return; }
+
+            const isSaveHotkey = this.hotkeys.some(item =>
+                item.key === hotkeyActionKeys.saveTextEditor &&
+                item.hotkey === hotkey
+            );
+
+            if (isSaveHotkey) {
+                e.preventDefault();
+                e.stopPropagation();
                 this.postMsg({
                     type: "saveText",
                 });
@@ -103,11 +125,70 @@ class LibIframe {
      * 取得 AppInfo
      */
     public getAppInfo(): AppInfo {
-        const getUrlString = location.href;
-        const url = new URL(getUrlString);
-        const appInfo = url.searchParams.get("appInfo");
-        if (appInfo == null) { throw new Error("appInfo is null"); }
-        return JSON.parse(appInfo);
+        const appInfoStorage = window.localStorage.getItem(LibIframe.IFRAME_INIT_DATA_KEY);
+        if (appInfoStorage !== null) {
+            return JSON.parse(appInfoStorage);
+        }
+
+        throw new Error("appInfo is null");
+    }
+
+    /**
+     * 取得 setting.json 內的快速鍵設定
+     */
+    private getSettingHotkeys() {
+        try {
+            const userSetting = JSON.parse(this.appInfo.settingTxt);
+            const hotkeys = userSetting?.hotkeys;
+            if (Array.isArray(hotkeys) === false) { return []; }
+
+            return hotkeys
+                .filter((item: any) => item && typeof item === "object")
+                .filter((item: any) => typeof item.key === "string" && typeof item.hotkey === "string")
+                .map((item: any) => {
+                    const hotkeyItem = {
+                        key: item.key,
+                        hotkey: item.hotkey,
+                    } as { key: string, hotkey: string, subOptions?: string[] };
+
+                    if (Array.isArray(item.subOptions)) {
+                        hotkeyItem.subOptions = item.subOptions.map((sub: any) => String(sub));
+                    }
+
+                    return hotkeyItem;
+                });
+        } catch (e) {
+            return [];
+        }
+    }
+
+    /**
+     * 將鍵盤事件轉成與主頁一致的快速鍵字串格式
+     */
+    private keyboardEventToHotkeyString(e: KeyboardEvent) {
+        const modifierCodes = ["ControlLeft", "ControlRight", "ShiftLeft", "ShiftRight", "AltLeft", "AltRight", "MetaLeft", "MetaRight"];
+        if (modifierCodes.includes(e.code)) {
+            return e.code;
+        }
+
+        let key = e.code;
+
+        if (e.code.startsWith("Key") && e.key.length === 1) {
+            key = e.key.toUpperCase();
+        } else if (e.code.startsWith("Digit") && e.key.length === 1) {
+            key = e.key;
+        } else if (e.code === "Space") {
+            key = "Space";
+        }
+
+        const ar: string[] = [];
+        if (e.ctrlKey) { ar.push("Ctrl"); }
+        if (e.altKey) { ar.push("Alt"); }
+        if (e.shiftKey) { ar.push("Shift"); }
+        if (e.metaKey) { ar.push("Meta"); }
+        ar.push(key);
+
+        return ar.join(" + ");
     }
 
     /**
@@ -252,3 +333,5 @@ class LibIframe {
         return path;
     }
 }
+
+window.LibIframe = LibIframe;

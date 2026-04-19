@@ -27,6 +27,14 @@ public class WV_Window {
     }
 
     /// <summary>
+    /// 開啟開發人員工具
+    /// </summary>
+    public void OpenDevTools() {
+        if (M.Wv2?.CoreWebView2 == null) { return; }
+        M.Wv2.CoreWebView2.OpenDevToolsWindow();
+    }
+
+    /// <summary>
     /// 取得 webview2 版本資訊
     /// </summary>
     public async Task<string> GetBrowserVersionString() {

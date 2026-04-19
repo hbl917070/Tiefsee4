@@ -1,6 +1,37 @@
 export class Lib {
 
     /**
+     * 將鍵盤事件轉成顯示用的快速鍵字串
+     */
+    public static keyboardEventToHotkeyString(e: KeyboardEvent) {
+
+        // 單獨按下修飾鍵時，保留左右側資訊，讓使用者可以分別綁定
+        const modifierCodes = ["ControlLeft", "ControlRight", "ShiftLeft", "ShiftRight", "AltLeft", "AltRight", "MetaLeft", "MetaRight"];
+        if (modifierCodes.includes(e.code)) {
+            return e.code;
+        }
+
+        let key = e.code;
+
+        if (e.code.startsWith("Key") && e.key.length === 1) {
+            key = e.key.toUpperCase();
+        } else if (e.code.startsWith("Digit") && e.key.length === 1) {
+            key = e.key;
+        } else if (e.code === "Space") {
+            key = "Space";
+        }
+
+        const ar: string[] = [];
+        if (e.ctrlKey) { ar.push("Ctrl"); }
+        if (e.altKey) { ar.push("Alt"); }
+        if (e.shiftKey) { ar.push("Shift"); }
+        if (e.metaKey) { ar.push("Meta"); }
+        ar.push(key);
+
+        return ar.join(" + ");
+    }
+
+    /**
      * 取得資料夾路徑
      */
     public static getDirectoryName = (path: string) => {

@@ -1,4 +1,5 @@
 import { BaseWindow } from "./BaseWindow";
+import { hotkeyActionKeys } from "./HotkeyDefinitions";
 
 export class Config {
 
@@ -407,29 +408,73 @@ export class Config {
         /** 滑鼠 */
         mouse: {
             //滑鼠按鍵
-            leftDoubleClick: "maximizeWindow",
+            leftDoubleClick: hotkeyActionKeys.maximizeWindow,
             scrollWheelButton: "none",
-            mouseButton4: "prevFile",
-            mouseButton5: "nextFile",
+            mouseButton4: hotkeyActionKeys.prevFile,
+            mouseButton5: hotkeyActionKeys.nextFile,
 
             //滑鼠滾輪
-            scrollUp: "imageZoomIn",
-            scrollDown: "imageZoomOut",
-            scrollUpCtrl: "imageZoomIn",
-            scrollDownCtrl: "imageZoomOut",
-            scrollUpShift: "imageMoveRight",
-            scrollDownShift: "imageMoveLeft",
-            scrollUpAlt: "imageMoveUp",
-            scrollDownAlt: "imageMoveDown",
+            scrollUp: hotkeyActionKeys.imageZoomIn,
+            scrollDown: hotkeyActionKeys.imageZoomOut,
+            scrollUpCtrl: hotkeyActionKeys.imageZoomIn,
+            scrollDownCtrl: hotkeyActionKeys.imageZoomOut,
+            scrollUpShift: hotkeyActionKeys.imageMoveRight,
+            scrollDownShift: hotkeyActionKeys.imageMoveLeft,
+            scrollUpAlt: hotkeyActionKeys.imageMoveUp,
+            scrollDownAlt: hotkeyActionKeys.imageMoveDown,
 
             //大量瀏覽模式 - 滑鼠滾輪
-            bulkViewScrollUpCtrl: "decColumns",
-            bulkViewScrollDownCtrl: "incrColumns",
-            bulkViewScrollUpShift: "incrFixedWidth",
-            bulkViewScrollDownShift: "decFixedWidth",
-            bulkViewScrollUpAlt: "prevPage",
-            bulkViewScrollDownAlt: "nextPage",
+            bulkViewScrollUpCtrl: hotkeyActionKeys.decColumns,
+            bulkViewScrollDownCtrl: hotkeyActionKeys.incrColumns,
+            bulkViewScrollUpShift: hotkeyActionKeys.incrFixedWidth,
+            bulkViewScrollDownShift: hotkeyActionKeys.decFixedWidth,
+            bulkViewScrollUpAlt: hotkeyActionKeys.prevPage,
+            bulkViewScrollDownAlt: hotkeyActionKeys.nextPage,
         },
+
+        /** 預設快速鍵 */
+        "hotkeys": [
+            { "key": hotkeyActionKeys.imageFitWindow, "hotkey": "F" },
+            { "key": hotkeyActionKeys.imageZoomIn, "hotkey": "ShiftRight" },
+            { "key": hotkeyActionKeys.imageZoomOut, "hotkey": "ControlRight" },
+            { "key": hotkeyActionKeys.imageRotateCw, "hotkey": "R" },
+            { "key": hotkeyActionKeys.imageFlipHorizontal, "hotkey": "H" },
+            { "key": hotkeyActionKeys.imageFlipVertical, "hotkey": "V" },
+            { "key": hotkeyActionKeys.imageMoveUpOrPrevFile, "hotkey": "ArrowUp", "subOptions": ["50"] },
+            { "key": hotkeyActionKeys.imageMoveDownOrNextFile, "hotkey": "ArrowDown", "subOptions": ["50"] },
+            { "key": hotkeyActionKeys.imageMoveLeftOrPrevFile, "hotkey": "ArrowLeft", "subOptions": ["50"] },
+            { "key": hotkeyActionKeys.imageMoveRightOrNextFile, "hotkey": "ArrowRight", "subOptions": ["50"] },
+            { "key": hotkeyActionKeys.prevDir, "hotkey": "Comma" },
+            { "key": hotkeyActionKeys.nextDir, "hotkey": "Period" },
+            { "key": hotkeyActionKeys.firstFile, "hotkey": "Home" },
+            { "key": hotkeyActionKeys.lastFile, "hotkey": "End" },
+            { "key": hotkeyActionKeys.revealInFileExplorer, "hotkey": "O" },
+            { "key": hotkeyActionKeys.systemContextMenu, "hotkey": "M" },
+            { "key": hotkeyActionKeys.renameFile, "hotkey": "F2" },
+            { "key": hotkeyActionKeys.fileToRecycleBin, "hotkey": "Delete" },
+            { "key": hotkeyActionKeys.fileToPermanentlyDelete, "hotkey": "Shift + Delete" },
+            { "key": hotkeyActionKeys.reloadAll, "hotkey": "F5" },
+            { "key": hotkeyActionKeys.openClipboard, "hotkey": "Ctrl + V" },
+            { "key": hotkeyActionKeys.copyImage, "hotkey": "Ctrl + C" },
+            { "key": hotkeyActionKeys.fullScreen, "hotkey": "F11" },
+            { "key": hotkeyActionKeys.closeWindow, "hotkey": "Alt + F4" },
+            { "key": hotkeyActionKeys.developerTools, "hotkey": "F12" },
+            { "key": hotkeyActionKeys.cancel, "hotkey": "Backspace" },
+            { "key": hotkeyActionKeys.cancel, "hotkey": "Escape" },
+            { "key": hotkeyActionKeys.confirm, "hotkey": "Enter" },
+            { "key": hotkeyActionKeys.saveTextEditor, "hotkey": "Ctrl + S" },
+            { "key": hotkeyActionKeys.bulkView, "hotkey": "B" },
+            { "key": hotkeyActionKeys.prevPage, "hotkey": "ArrowLeft" },
+            { "key": hotkeyActionKeys.nextPage, "hotkey": "ArrowRight" },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad1", "subOptions": ["1"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad2", "subOptions": ["2"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad3", "subOptions": ["3"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad4", "subOptions": ["4"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad5", "subOptions": ["5"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad6", "subOptions": ["6"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad7", "subOptions": ["7"] },
+            { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad8", "subOptions": ["8"] }
+        ] as { key: string, hotkey: string, subOptions?: string[] }[],
     }
 
     private _allowFile_img: { ext: string; type: string; vipsType?: string; vipsType2?: string; }[] = [];
