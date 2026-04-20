@@ -1,3 +1,4 @@
+import Hammer from "hammerjs";
 import { Lib } from "./Lib";
 import { TiefseeScroll } from "./TiefseeScroll";
 

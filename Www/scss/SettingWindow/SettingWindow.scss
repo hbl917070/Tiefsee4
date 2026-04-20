@@ -340,7 +340,7 @@ input::-webkit-inner-spin-button {
             border: 1px solid var(--color-white10);
             margin-top: 0;
 
-            // 刪除按鈕 
+            // 刪除按鈕
             .hotkey-deleteBtn {
                 align-self: center;
                 margin-left: auto;
@@ -413,7 +413,9 @@ input::-webkit-inner-spin-button {
             height: 8px;
             border-right: 1px solid var(--color-white80);
             border-bottom: 1px solid var(--color-white80);
-            transition: transform 0.16s ease, top 0.16s ease;
+            transition:
+                transform 0.16s ease,
+                top 0.16s ease;
         }
     }
 
@@ -667,17 +669,20 @@ input::-webkit-inner-spin-button {
     box-sizing: content-box;
     transition: all 0.15s cubic-bezier(0.49, 0.37, 0.45, 1.4) !important;
     background-color: var(--color-black);
+    color: var(--color-white);
     border: 1px solid var(--color-blue40);
     box-shadow: 0px 0px 3px var(--color-blue40);
     border-radius: 8px;
+    padding: 5px;
 }
+
 .tippy-box[data-animation="tippyMyAnimation"][data-state="hidden"] {
     //自訂動畫
     opacity: 0;
     transform: scale(0.92);
     //padding: 5px;
     //margin:-5px;
-    transition: all 0s !important; //滑鼠離開後立即關閉
+    transition: all 0s !important; // 滑鼠離開後立即關閉
 }
 //#endregion
 
@@ -803,9 +808,28 @@ input::-webkit-inner-spin-button {
     }
 }
 
-//---------------------
+// ---------------------
 
 // 如果是商店APP版，就隱藏區塊
 body[showType="storeApp"] [show-not="storeApp"] {
     display: none;
+}
+
+// -------- minicolors 的樣式 -------------
+.minicolors-theme-default.minicolors {
+    width: 100%;
+}
+.minicolors-theme-default .minicolors-input {
+    width: inherit;
+}
+.minicolors-theme-default .minicolors-swatch {
+    top: 0;
+    margin: auto;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    bottom: 0;
+}
+.minicolors-theme-default .minicolors-input {
+    padding-left: 33px;
 }

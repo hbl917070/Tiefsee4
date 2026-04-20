@@ -28,30 +28,12 @@ Tiefsee 的啟動器。<br>
 
 ## Www
 Web 專案，程式主要的核心邏輯都在這裡。<br>
-使用 Gulp 來打包與編譯 EJS, TypeScript, SCSS, Rust
+使用 Gulp 來打包與編譯 EJS, TypeScript, SCSS, Rust，並將產生的靜態檔輸出到 `Output/Www`
 
 ### 目錄結構
-```
-Www
- ├📁 ejs：編譯後會輸出成 html
- ├📁 scss：編譯後會輸到 css
- ├📁 ts：編譯後會輸出到 js
- ├📁 rust：編譯後會輸出到 wasm
- ├📁 lang：放翻譯檔的目錄
- ├📁 img：放圖片的目錄，裡面的 svg 會透過 Gulp 封裝成 js
- ├📁 iframe：iframe 頁面的 html 檔
- │
- ├📁 vender：放第三方 js 的目錄
- │
- ├📁 css：由 Gulp 編譯生成
- ├📁 js：由 Gulp 編譯產生
- ├📁 wasm：由 Gulp 編譯產生
- │
- ├ MainWindow.html：主視窗，由 Gulp 編譯產生
- ├ SettingWindow.html：設定視窗，由 Gulp 編譯產生
- │
- └ gulpfile.js
-```
+`Www` 放的是前端原始碼，包含 EJS、SCSS、TypeScript、Rust、圖片以及開發時使用的其他靜態資源。
+
+`Output/Www` 放的是執行 `gulp build` 後產生的輸出結果，包含 HTML、CSS、JS、WASM，以及建置時一併複製的第三方檔案。
 
 <br>
 
@@ -116,7 +98,7 @@ Www
 
 ### SVG 圖示使用說明
 Tiefsee 具有切換主題的功能，為了讓圖示具有切換顏色的功能，因此所有圖示皆使用 SVG。  
-執行 `gulp build` 後， `Www/img/default` 裡面的 SVG 檔案會全部封裝成一個 js，輸出到 `Www/js/SvgList.js`  
+執行 `gulp build` 後， `Www/img/default` 裡面的 SVG 檔案會全部封裝成一個 js，輸出到 `Output/Www/js/SvgList.js`  
 
 - 在 SVG 裡面可以用 `var(--color-white)` 來取得當前主題的主顏色，例如
 	```svg

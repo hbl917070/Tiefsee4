@@ -11,7 +11,7 @@ const { exec } = require("child_process");
 const fc2json = require("gulp-file-contents-to-json");
 const jsonTransform = require("gulp-json-transform");
 
-const output2 = "./../Output/Www";
+const output = "./../Output/Www";
 
 // --- 輔助函數 ---
 async function readFile(path) {
@@ -39,8 +39,7 @@ gulp.task("svg", () => {
 
             return "var SvgList = " + resultJson;
         }))
-        .pipe(gulp.dest("./js"))
-        .pipe(gulp.dest(output2 + "/js"));
+        .pipe(gulp.dest(output + "/js"));
 });
 
 // scss -> css
@@ -50,8 +49,7 @@ gulp.task("scss", () => {
         "./scss/SettingWindow/SettingWindow.scss"
     ], {})
         .pipe(sass().on("error", sass.logError))
-        .pipe(gulp.dest("./css"))
-        .pipe(gulp.dest(output2 + "/css"));
+        .pipe(gulp.dest(output + "/css"));
 });
 
 // ejs -> html
@@ -62,8 +60,7 @@ gulp.task("ejs", () => {
     ], {})
         .pipe(ejs({ readFile: readFile }, { async: true }))
         .pipe(rename({ extname: ".html" }))
-        .pipe(gulp.dest("./"))
-        .pipe(gulp.dest(output2 + "/"));
+        .pipe(gulp.dest(output + "/"));
 });
 
 // ts -> js
@@ -84,8 +81,7 @@ gulp.task("ts", async () => {
                     bundle: file.bundle,
                 }))
                 .on("error", reject)
-                .pipe(gulp.dest("./js"))
-                .pipe(gulp.dest(output2 + "/js"))
+                .pipe(gulp.dest(output + "/js"))
                 .on("end", resolve);
         });
     });
@@ -95,32 +91,82 @@ gulp.task("ts", async () => {
 
 // 把檔案複製到開發資料夾。 (有非 ts、scss、ejs 的資源需要複製到開發資料夾時使用
 gulp.task("copy-files", () => {
-    return gulp.src([
-        "./**/**",
-        "!./scss/**", "!./ts/**", "!./ejs/**",
-        "!./img/.vscode/**", "!./img/default/**",
-        "!./rust/**",
-        "!./node_modules/**",
-        "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
-        "!./Www.esproj", "!./Www.esproj.user"
-    ], {
-        encoding: false,
-        buffer: true
-    })
-        .pipe(newer(output2))
-        .pipe(gulp.dest(output2));
+    return Promise.all([
+
+        new Promise((resolve, reject) => {
+            gulp.src([
+                "./**/**",
+                "!./scss/**", "!./ts/**", "!./ejs/**",
+                "!./img/.vscode/**", "!./img/default/**",
+                "!./rust/**",
+                "!./node_modules/**",
+                "!./package-lock.json", "!./.eslintrc.json", "!./gulpfile.js", "!./package.json", "!./tsconfig.json", "!./nuget.config",
+                "!./Www.esproj", "!./Www.esproj.user"
+            ], {
+                encoding: false,
+                buffer: true
+            })
+                .pipe(newer(output))
+                .pipe(gulp.dest(output))
+                .on("end", resolve)
+                .on("error", reject);
+        }),
+
+        // 把從 npm 安裝的套件複製到 vender
+        new Promise((resolve, reject) => {
+            gulp
+                .src([
+                    "./node_modules/jquery/dist/jquery.min.js",
+                ], {
+                    encoding: false,
+                    buffer: true
+                })
+                .pipe(gulp.dest(output + "/vender/jquery"))
+                .pipe(gulp.dest(output + "/vender/jquery"))
+                .on("end", resolve)
+                .on("error", reject);
+        }),
+        new Promise((resolve, reject) => {
+            gulp
+                .src([
+                    "./node_modules/@claviska/jquery-minicolors/jquery.minicolors.png",
+                    "./node_modules/@claviska/jquery-minicolors/jquery.minicolors.css",
+                    "./node_modules/@claviska/jquery-minicolors/jquery.minicolors.min.js",
+                ], {
+                    encoding: false,
+                    buffer: true
+                })
+                .pipe(gulp.dest(output + "/vender/jquery-minicolors"))
+                .pipe(gulp.dest(output + "/vender/jquery-minicolors"))
+                .on("end", resolve)
+                .on("error", reject);
+        }),
+        new Promise((resolve, reject) => {
+            gulp
+                .src([
+                    "./node_modules/jquery.easing/jquery.easing.min.js",
+                ], {
+                    encoding: false,
+                    buffer: true
+                })
+                .pipe(gulp.dest(output + "/vender/jquery-easing"))
+                .pipe(gulp.dest(output + "/vender/jquery-easing"))
+                .on("end", resolve)
+                .on("error", reject);
+        }),
+    ]);
 });
 
 // rust -> wasm
 gulp.task("build-rust", (done) => {
     exec("wasm-pack build --target web --out-dir ../wasm", { cwd: "./rust" }, (err, stdout, stderr) => {
-        if (err) {
-            console.error(`Error: ${stderr}`);
-            done(err);
-        } else {
-            done();
-        }
-    });
+            if (err) {
+                console.error(`Error: ${stderr}`);
+                done(err);
+            } else {
+                done();
+            }
+        });
 });
 
 // 打包 - 單次
@@ -129,7 +175,7 @@ gulp.task("build", gulp.series(
     "svg",
     "ejs",
     "scss",
-    "ts", // 必須在 ts 之後
+    "ts", // 必須在 build-rust 之後
     "copy-files", // 必須放在最後
 ));
 

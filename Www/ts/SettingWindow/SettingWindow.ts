@@ -6,6 +6,8 @@ import { MainToolbar } from "../MainWindow/MainToolbar";
 import { Msgbox } from "../Msgbox";
 import { SelectionManager } from "../SelectionManager";
 import { hotkeyActionKeys, hotkeyDefinitions } from "../HotkeyDefinitions";
+import tippy from "tippy.js";
+import Sortable from "sortablejs";
 
 declare global {
     var settingWindow: SettingWindow;

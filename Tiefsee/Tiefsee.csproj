@@ -59,26 +59,12 @@
 	</ItemGroup>
 
 	<!-- 編譯時複製這些資料夾 -->
+	<!-- 注意：編譯前必須先執行 gulp build，產生到靜態資源到 Output/Www -->
 	<ItemGroup>
-		<Content Include="..\Www\**">
+		<Content Include="..\Output\Www\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Link>Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</Content>
-		<Content Remove="..\Www\node_modules\**" />
-		<Content Remove="..\Www\ejs\**" />
-		<Content Remove="..\Www\ts\**" />
-		<Content Remove="..\Www\scss\**" />
-		<Content Remove="..\Www\rust\**" />
-		<Content Remove="..\Www\.vscode\**" />
-
-		<Content Remove="..\Www\package-lock.json" />
-		<Content Remove="..\Www\.eslintrc.json" />
-		<Content Remove="..\Www\Www.esproj" />
-		<Content Remove="..\Www\Www.esproj.user" />
-		<Content Remove="..\Www\gulpfile.js" />
-		<Content Remove="..\Www\package.json" />
-		<Content Remove="..\Www\tsconfig.json" />
-		<Content Remove="..\Www\nuget.config" />
 	</ItemGroup>
 
 	<ItemGroup>

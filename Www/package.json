@@ -3,8 +3,9 @@
     "start": "gulp build"
   },
   "dependencies": {
+    "@claviska/jquery-minicolors": "^2.3.6",
+    "@popperjs/core": "^2.11.8",
     "@types/hammerjs": "^2.0.46",
-    "@types/jquery": "^4.0.0",
     "@types/offscreencanvas": "^2019.7.3",
     "gulp": "^5.0.1",
     "gulp-ejs": "^5.1.0",
@@ -12,9 +13,16 @@
     "gulp-file-contents-to-json": "^0.2.2",
     "gulp-json-transform": "^0.5.0",
     "gulp-newer": "^1.4.0",
-    "gulp-rename": "^2.1.0"
+    "gulp-rename": "^2.1.0",
+    "hammerjs": "^2.0.8",
+    "jquery": "^4.0.0",
+    "jquery.easing": "^1.4.1",
+    "sortablejs": "^1.15.7",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
+    "@types/jquery": "^4.0.0",
+    "@types/sortablejs": "^1.15.9",
     "eslint": "^10.0.3",
     "gulp-sass": "^6.0.1",
     "sass": "^1.98.0"
