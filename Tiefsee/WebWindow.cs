@@ -304,12 +304,27 @@ public class WebWindow : FormNone {
     /// </summary>
     public static async Task<CoreWebView2Environment> GetCoreWebView2Environment() {
         if (_webView2Environment == null) {
-            // --disable-web-security  允許跨域請求
-            // --disable-features=msWebOOUI,msPdfOOUI  禁止迷你選單
-            // --user-agent  覆寫userAgent
-            // --enable-features=msWebView2EnableDraggableRegions 讓 webview2 支援 css「app-region:drag」
-            string webvviewArguments = "--enable-features=msWebView2EnableDraggableRegions";
-            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = webvviewArguments };
+            var arguments = new[] {
+                "--enable-features=msWebView2EnableDraggableRegions", // 讓 webview2 支援 css「app-region:drag」
+                // "--disable-web-security", // 允許跨域請求
+                // $"--user-agent {}", // 覆寫 userAgent
+                // "--disable-gpu", // 禁用硬體加速
+                // "--disable-background-timer-throttling", // 讓 webview2 在背景時，仍然可以正常運行 js 的 setTimeout、setInterval
+                // "--no-sandbox", // 停用安全沙箱。使啟動大幅提升，但會讓瀏覽器極易受攻擊
+                
+                // -------
+
+                // 下面的參數據說可以提升啟動速度，但我體感沒有區別
+                "--disable-plugins", // 停用所有插件
+                "--disable-sync", // 停用 Google 帳號同步功能
+                "--disable-features=CalculateNativeWinOcclusion", // 禁用遮蔽計算。瀏覽器將不再偵測自己是否被擋住，無論視窗是否在最上層，都會持續以正常狀態運行
+                "--disable-background-networking", // 停用背景網路請求（如更新檢查、自動收集數據）
+                "--disable-default-apps", // 啟動時不加載預裝的預設應用程式
+                "--disable-component-update", // 停用組件（如翻譯、安全列表）的自動更新檢查
+                "--dns-prefetch-disable", // 停用 DNS 預取，減少初始網路活動
+                "--msWebView2CancelInitialNavigation", // 取消 webview2 預設的導航行為
+            };
+            var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = string.Join(" ", arguments) };
             _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
         }
         return _webView2Environment;
