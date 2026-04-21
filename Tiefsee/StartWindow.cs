@@ -34,6 +34,9 @@ public class StartWindow : Form {
         InitJumpTask(); // 初始化 JumpTask
         InitNamedPipeServer();
 
+        NetVips.Cache.MaxFiles = 0; // 避免 NetVips 主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
+        // NetVips.Cache.Max = 0;
+
         //--------------
 
         this.Opacity = 0;
