@@ -4,14 +4,17 @@ using System.Runtime.InteropServices;
 namespace Tiefsee;
 
 [ComVisible(true)]
-public class WV_Directory {
+public class DirectoryWebViewBridge {
 
     WebWindow M;
 
-    public WV_Directory(WebWindow m) {
+    /// <summary>
+    /// 建立資料夾相關的 WebView bridge
+    /// </summary>
+    public DirectoryWebViewBridge(WebWindow m) {
         this.M = m;
     }
-    public WV_Directory() { }
+    public DirectoryWebViewBridge() { }
 
 
     /// <summary>

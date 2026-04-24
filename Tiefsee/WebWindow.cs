@@ -41,13 +41,13 @@ public class WebWindow : FormNone {
     public string[] Args { get { return _args; } }
     public static WebWindow TempWindow { get { return _tempWindow; } }
 
-    public WV_Window WV_Window;
-    public WV_Directory WV_Directory;
-    public WV_File WV_File;
-    public WV_Path WV_Path;
-    public WV_System WV_System;
-    public WV_RunApp WV_RunApp;
-    public WV_Image WV_Image;
+    public WindowWebViewBridge WindowBridge;
+    public DirectoryWebViewBridge DirectoryBridge;
+    public FileWebViewBridge FileBridge;
+    public PathWebViewBridge PathBridge;
+    public SystemWebViewBridge SystemBridge;
+    public RunAppWebViewBridge RunAppBridge;
+    public ImageWebViewBridge ImageBridge;
 
     /// <summary>
     ///
@@ -406,22 +406,27 @@ public class WebWindow : FormNone {
                 .CreateWebResourceResponse(null, 200, "OK", "");
         };
 
-        WV_Window = new WV_Window(this);
-        WV_Directory = new WV_Directory(this);
-        WV_File = new WV_File(this);
-        WV_Path = new WV_Path(this);
-        WV_System = new WV_System(this);
-        WV_RunApp = new WV_RunApp(this);
-        WV_Image = new WV_Image(this);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_Window", WV_Window);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_Directory", WV_Directory);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_File", WV_File);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_Path", WV_Path);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_System", WV_System);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", WV_RunApp);
-        _wv2.CoreWebView2.AddHostObjectToScript("WV_Image", WV_Image);
-        // wv2.CoreWebView2.AddHostObjectToScript("WV_T", new WV_T());
-
+        WindowBridge = new WindowWebViewBridge(this);
+        DirectoryBridge = new DirectoryWebViewBridge(this);
+        FileBridge = new FileWebViewBridge(this);
+        PathBridge = new PathWebViewBridge(this);
+        SystemBridge = new SystemWebViewBridge(this);
+        RunAppBridge = new RunAppWebViewBridge(this);
+        ImageBridge = new ImageWebViewBridge(this);
+        _wv2.CoreWebView2.AddHostObjectToScript("WindowBridge", WindowBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("DirectoryBridge", DirectoryBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("FileBridge", FileBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("PathBridge", PathBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("SystemBridge", SystemBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("RunAppBridge", RunAppBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("ImageBridge", ImageBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_Window", WindowBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_Directory", DirectoryBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_File", FileBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_Path", PathBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_System", SystemBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", RunAppBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_Image", ImageBridge);
         // 按下右鍵時
         SetOnRightClick((Point p) => {
             // 最大化時，視窗內縮
@@ -521,7 +526,7 @@ public class WebWindow : FormNone {
         //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
 
         this.FormClosed += (sender, e) => {
-            WV_System.FileWatcherDispose(); // 停止偵測檔案變化
+            SystemBridge.FileWatcherDispose(); // 停止偵測檔案變化
             QuickRun.WindowFreed();
         };
     }

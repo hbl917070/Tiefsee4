@@ -34,7 +34,7 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
 
         if (await CheckDirExist(d, path) == false) { return; }
 
-        await WriteJson(d, new WV_Directory().GetSiblingDir(path, arExt, maxCount));
+        await WriteJson(d, new DirectoryWebViewBridge().GetSiblingDir(path, arExt, maxCount));
     }
 
     /// <summary>
@@ -45,9 +45,9 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
         string dirPath = json.GetString("dirPath");
         string[] arName = json.GetStringArray("arName");
 
-        // 底層仍使用既有 WV_Directory 邏輯，這裡只負責轉成較省流量的回傳格式
+        // 底層仍使用既有 bridge 邏輯，這裡只負責轉成較省流量的回傳格式
         int pathLen = dirPath.Length;
-        var ret = new WV_Directory().GetFiles2(dirPath, arName)
+        var ret = new DirectoryWebViewBridge().GetFiles2(dirPath, arName)
             .Select(filePath => filePath.Substring(pathLen))
             .ToArray();
 

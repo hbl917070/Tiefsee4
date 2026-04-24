@@ -25,7 +25,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
     /// 取得系統內可啟動的 UWP app 清單
     /// </summary>
     private async Task GetUwpList(RequestData d) {
-        await WriteJson(d, new WV_RunApp().GetUwpList());
+        await WriteJson(d, new RunAppWebViewBridge().GetUwpList());
     }
 
     /// <summary>

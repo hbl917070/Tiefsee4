@@ -5,11 +5,17 @@ using System.Runtime.InteropServices;
 namespace Tiefsee;
 
 [ComVisible(true)]
-public class WV_Image {
+public class ImageWebViewBridge {
 
-    WebWindow M;
-    public WV_Image(WebWindow m) {
-        this.M = m;
+    private readonly WebWindow _window;
+    private readonly ImageBase64Service _imageBase64Service;
+
+    /// <summary>
+    /// 建立圖片相關的 WebView bridge
+    /// </summary>
+    public ImageWebViewBridge(WebWindow window) {
+        _window = window;
+        _imageBase64Service = new ImageBase64Service();
     }
 
     /// <summary>
@@ -23,22 +29,10 @@ public class WV_Image {
     }
 
     /// <summary>
-    /// 
+    /// 將 Bitmap 轉成可直接給前端使用的 base64 字串
     /// </summary>
     public string BitmapToBase64(Bitmap bmp) {
-        string base64String = "";
-        try {
-            byte[] temp;
-            using (MemoryStream ms = new MemoryStream()) {
-                bmp.Save(ms, ImageFormat.Png);
-                temp = ms.ToArray();
-            }
-            base64String = "data:image/png;base64," + Convert.ToBase64String(temp);
-        }
-        catch (Exception e) {
-            System.Windows.Forms.MessageBox.Show(e.ToString());
-        }
-        return base64String;
+        return _imageBase64Service.BitmapToBase64Png(bmp);
     }
 
     /// <summary>

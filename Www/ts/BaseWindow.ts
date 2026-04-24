@@ -11,6 +11,13 @@ declare global {
     var WV_System: WV_System;
     var WV_RunApp: WV_RunApp;
     var WV_Image: WV_Image;
+    var WindowBridge: WV_Window;
+    var DirectoryBridge: WV_Directory;
+    var FileBridge: WV_File;
+    var PathBridge: WV_Path;
+    var SystemBridge: WV_System;
+    var RunAppBridge: WV_RunApp;
+    var ImageBridge: WV_Image;
 
     var PORT: string;
     var APIURL: string;
@@ -31,6 +38,13 @@ window.WV_Path = WV2.WV_Path;
 window.WV_System = WV2.WV_System;
 window.WV_RunApp = WV2.WV_RunApp;
 window.WV_Image = WV2.WV_Image;
+window.WindowBridge = WV2.WindowBridge;
+window.DirectoryBridge = WV2.DirectoryBridge;
+window.FileBridge = WV2.FileBridge;
+window.PathBridge = WV2.PathBridge;
+window.SystemBridge = WV2.SystemBridge;
+window.RunAppBridge = WV2.RunAppBridge;
+window.ImageBridge = WV2.ImageBridge;
 window.PORT = location.hash.replace("#", "");
 window.APIURL = "http://127.0.0.1:" + PORT; // api 網址
 

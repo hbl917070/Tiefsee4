@@ -1,20 +1,23 @@
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using static Tiefsee.WindowAPI;
 
-
 namespace Tiefsee;
 
 [ComVisible(true)]
-public class WV_Window {
-
-    // 子視窗快取，用來判斷是否已經開啟過，並取得已開啟的視窗
-    private readonly Dictionary<string, WebWindow> _subWindowCache = new();
+public class WindowWebViewBridge {
 
     public WebWindow M;
+    private readonly WindowBrowserService _windowBrowserService = new();
+    private readonly WindowStartupConfigService _windowStartupConfigService = new();
+    private readonly AppRuntimePathService _appRuntimePathService = new();
+    private readonly SubWindowService _subWindowService = new();
 
-    public WV_Window(WebWindow m) {
+    /// <summary>
+    /// 建立視窗相關的 WebView bridge
+    /// </summary>
+    /// <param name="m"></param>
+    public WindowWebViewBridge(WebWindow m) {
         this.M = m;
     }
 
@@ -22,23 +25,21 @@ public class WV_Window {
     /// 清理 webview2 的暫存
     /// </summary>
     public void ClearBrowserCache() {
-        // M.wv2.CoreWebView2.Profile.ClearBrowsingDataAsync(); // 會清除使用者資料
-        M.Wv2.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.clearBrowserCache", "{}");
+        _windowBrowserService.ClearBrowserCache(M);
     }
 
     /// <summary>
     /// 開啟開發人員工具
     /// </summary>
     public void OpenDevTools() {
-        if (M.Wv2?.CoreWebView2 == null) { return; }
-        M.Wv2.CoreWebView2.OpenDevToolsWindow();
+        _windowBrowserService.OpenDevTools(M);
     }
 
     /// <summary>
     /// 取得 webview2 版本資訊
     /// </summary>
     public async Task<string> GetBrowserVersionString() {
-        return (await WebWindow.GetCoreWebView2Environment()).BrowserVersionString;
+        return await _windowBrowserService.GetBrowserVersionString();
     }
 
     /// <summary>
@@ -47,11 +48,7 @@ public class WV_Window {
     /// <param name="startPort"> 程式開始的 port </param>
     /// <param name="startType"> 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐 </param>
     public void SetStartIni(int startPort, int startType) {
-        IniManager iniManager = new IniManager(AppPath.appDataStartIni);
-        iniManager.WriteIniFile("setting", "startPort", startPort);
-        iniManager.WriteIniFile("setting", "startType", startType);
-        Program.startPort = startPort;
-        Program.startType = startType;
+        _windowStartupConfigService.SetStartIni(startPort, startType);
     }
 
     /// <summary>
@@ -59,7 +56,7 @@ public class WV_Window {
     /// </summary>
     /// <returns></returns>
     public string GetAppInfo() {
-        return WebWindow.GetAppInfo(M.Args, 0);
+        return _appRuntimePathService.GetAppInfo(M);
     }
 
     /// <summary>
@@ -69,8 +66,7 @@ public class WV_Window {
     /// <param name="args"></param>
     /// <returns></returns>
     public async Task<WebWindow> NewWindow(string url, object[] args) {
-        var w = await WebWindow.Create(url, args.Select(x => x.ToString()).ToArray(), M);
-        return w;
+        return await _subWindowService.NewWindow(M, url, args);
     }
 
     /// <summary>
@@ -81,22 +77,7 @@ public class WV_Window {
     /// <param name="windowKey"> 用於判斷是否已經啟動過視窗的 key </param>
     /// <returns> true=啟動成功 false=已經啟動過 </returns>
     public async Task<bool> NewSubWindow(string url, object[] args, string windowKey) {
-        // 子視窗已建立過，不再建立
-        if (_subWindowCache.ContainsKey(windowKey)) {
-            _subWindowCache[windowKey]?.ShowWindow();
-            return false;
-        };
-
-        var w = await NewWindow(url, args);
-        SetOwner(w);
-
-        // 記錄子視窗快取
-        _subWindowCache.Add(windowKey, w);
-        w.Closed += (sender, eventArgs) => {
-            _subWindowCache.Remove(windowKey);
-        };
-
-        return true;
+        return await _subWindowService.NewSubWindow(M, url, args, windowKey, SetOwner);
     }
 
     /// <summary>
@@ -137,7 +118,6 @@ public class WV_Window {
     /// <summary>
     /// 設定視窗最小size
     /// </summary>
-    /// </summary>
     /// <param name="w"></param>
     /// <param name="h"></param>
     public void SetMinimumSize(int w, int h) {
@@ -165,36 +145,35 @@ public class WV_Window {
     /// <summary>
     /// 視窗效果
     /// </summary>
+    /// <param name="type"></param>
     public void WindowStyle(string type) {
-
         type = type.ToLower();
 
-        // 此效果只能用於 win11
         if (StartWindow.isWin11) {
             if (type == "none" || type == "default") {
                 M.WindowStyleForWin11(SystemBackdropType.None);
             }
-            else if (type == "AcrylicDark".ToLower()) {
+            else if (type == "acrylicdark") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
                 M.WindowStyleForWin11(SystemBackdropType.Acrylic);
             }
-            else if (type == "AcrylicLight".ToLower()) {
+            else if (type == "acryliclight") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
                 M.WindowStyleForWin11(SystemBackdropType.Acrylic);
             }
-            else if (type == "MicaDark".ToLower()) {
+            else if (type == "micadark") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
                 M.WindowStyleForWin11(SystemBackdropType.Mica);
             }
-            else if (type == "MicaLight".ToLower()) {
+            else if (type == "micalight") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
                 M.WindowStyleForWin11(SystemBackdropType.Mica);
             }
-            else if (type == "MicaAltDark".ToLower()) {
+            else if (type == "micaaltdark") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Enabled);
                 M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
             }
-            else if (type == "MicaAltLight".ToLower()) {
+            else if (type == "micaaltlight") {
                 M.WindowThemeForWin11(ImmersiveDarkMode.Disabled);
                 M.WindowStyleForWin11(SystemBackdropType.MicaAlt);
             }
@@ -204,10 +183,10 @@ public class WV_Window {
         }
     }
 
-
     /// <summary>
     /// win11 視窗圓角
     /// </summary>
+    /// <param name="enable"></param>
     public void WindowRoundedCorners(bool enable) {
         M.WindowRoundedCorners(enable);
     }
@@ -233,22 +212,13 @@ public class WV_Window {
     /// </summary>
     /// <param name="window"></param>
     public void SetOwner(object window) {
-        if (window != null) {
-            WebWindow webwindow = (WebWindow)window;
-            if (TopMost == true) {
-                TopMost = false; // 設定子視窗的時候，如果父視窗有使用TopMost，必須先解除，否則子視窗會被蓋到下面
-                webwindow.Owner = M;
-                TopMost = true;
-            }
-            else {
-                webwindow.Owner = M;
-            }
-        }
+        _subWindowService.SetOwner(M, window);
     }
 
     /// <summary>
     /// 在父親視窗運行 js
     /// </summary>
+    /// <param name="js"></param>
     public async Task<string> RunJsOfParent(string js) {
         if (M.ParentWindow == null) { return ""; }
         if (M.ParentWindow.Wv2.CoreWebView2 == null) { return ""; }
@@ -258,6 +228,7 @@ public class WV_Window {
     /// <summary>
     /// 設定視窗的 icon
     /// </summary>
+    /// <param name="path"></param>
     public void SetIcon(string path) {
         if (File.Exists(path)) {
             M.Icon = new(path);
@@ -267,47 +238,39 @@ public class WV_Window {
     /// <summary>
     /// 取得程式的暫存資料夾，例如 C:\Users\user\AppData\Local\Tiefsee
     /// </summary>
+    /// <returns></returns>
     public string GetAppDataPath() {
-        string path = AppPath.appData;
-        if (Directory.Exists(path) == false) {
-            Directory.CreateDirectory(path);
-        }
-        return path;
+        return _appRuntimePathService.GetAppDataPath();
     }
 
     /// <summary>
     /// 取得執行檔所在的資料夾
     /// </summary>
+    /// <returns></returns>
     public string GetAppDirPath() {
-        return System.AppDomain.CurrentDomain.BaseDirectory;
+        return _appRuntimePathService.GetAppDirPath();
     }
 
     /// <summary>
     /// 取得執行檔路徑 (TiefseeCore.exe 的路徑)
     /// </summary>
+    /// <returns></returns>
     public string GetAppPath() {
-        string exePath = Process.GetCurrentProcess().MainModule.FileName;
-        return exePath;
+        return _appRuntimePathService.GetAppPath();
     }
 
     /// <summary>
     /// 取得 Tiefsee.exe 的路徑
-    /// </summary>    
+    /// </summary>
+    /// <returns></returns>
     public string GetTiefseePath() {
-        var dir = GetAppDirPath();
-
-        var path = Path.Combine(dir, "Tiefsee.exe");
-        if (File.Exists(path)) { return path; }
-
-        path = Path.Combine(dir, "../TiefseeLauncher/Tiefsee.exe");
-        if (File.Exists(path)) { return Path.GetFullPath(path); }
-
-        return GetAppPath();
+        return _appRuntimePathService.GetTiefseePath();
     }
 
     /// <summary>
     /// 取得命令列參數
     /// </summary>
+    /// <returns></returns>
     public string[] GetArguments() {
         return M.Args;
     }
@@ -315,6 +278,7 @@ public class WV_Window {
     /// <summary>
     /// 返回 WebWindow
     /// </summary>
+    /// <returns></returns>
     public WebWindow This() {
         return M;
     }
@@ -347,7 +311,7 @@ public class WV_Window {
         set { M.Height = value; }
     }
 
-    public Boolean Visible {
+    public bool Visible {
         get { return M.Visible; }
         set { M.Visible = value; }
     }
@@ -363,24 +327,16 @@ public class WV_Window {
             return "null";
         }
         set {
-            if (value == "Maximized") {
-                // WebWindow.ShowWindow(M.Handle, WebWindow.SW_MAXIMIZE);
-                M.WindowState = FormWindowState.Maximized;
-            }
-            if (value == "Minimized") {
-                // WebWindow.ShowWindow(M.Handle, WebWindow.SW_MINIMIZE);
-                M.WindowState = FormWindowState.Minimized;
-            }
-            if (value == "Normal") {
-                // WebWindow.ShowWindow(M.Handle, WebWindow.SW_NORMAL);
-                M.WindowState = FormWindowState.Normal;
-            }
+            if (value == "Maximized") { M.WindowState = FormWindowState.Maximized; }
+            if (value == "Minimized") { M.WindowState = FormWindowState.Minimized; }
+            if (value == "Normal") { M.WindowState = FormWindowState.Normal; }
         }
     }
 
     /// <summary>
     /// 啟用或關閉 全螢幕
     /// </summary>
+    /// <param name="val"></param>
     public void SetFullScreen(bool val) {
         M.SetFullScreen(val);
     }
@@ -388,6 +344,7 @@ public class WV_Window {
     /// <summary>
     /// 取得當前是否為 全螢幕
     /// </summary>
+    /// <returns></returns>
     public bool GetFullScreen() {
         return M.GetFullScreen();
     }
@@ -422,13 +379,14 @@ public class WV_Window {
     /// <summary>
     /// 拖曳視窗
     /// </summary>
+    /// <param name="type"></param>
     public void WindowDrag(string type) {
-
-        // 避免滑鼠在沒有按下的情況下執行
+        // 只有滑鼠左鍵按下時才允許拖曳或縮放視窗
         if (Control.MouseButtons != MouseButtons.Left) {
             return;
         }
 
+        // 將前端傳入的縮寫轉成 Win32 視窗拖曳方向
         var resizeDirection = ResizeDirection.Move;
         if (type == "CT") { resizeDirection = ResizeDirection.CT; }
         if (type == "RC") { resizeDirection = ResizeDirection.RC; }
@@ -441,5 +399,4 @@ public class WV_Window {
 
         M.WindowDrag(resizeDirection);
     }
-
 }

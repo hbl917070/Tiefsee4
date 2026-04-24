@@ -1,15 +1,17 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Tiefsee;
 
 [ComVisible(true)]
-public class WV_Path {
+public class PathWebViewBridge {
 
-    WebWindow M;
-    public WV_Path(WebWindow m) {
-        this.M = m;
+    private readonly PathInteropService _pathInteropService = new();
+
+    /// <summary>
+    /// 建立路徑相關的 WebView bridge
+    /// </summary>
+    public PathWebViewBridge(WebWindow m) {
     }
 
     /// <summary>
@@ -22,6 +24,8 @@ public class WV_Path {
     /// <summary>
     /// 變更路徑字串的副檔名
     /// </summary>
+    /// <param name="path"></param>
+    /// <param name="extension"></param>
     public string ChangeExtension(string path, string extension) {
         return Path.ChangeExtension(path, extension);
     }
@@ -29,16 +33,14 @@ public class WV_Path {
     /// <summary>
     /// 將一個字串陣列合併為單一路徑
     /// </summary>
+    /// <param name="path"></param>
     public string Combine(object[] path) {
-        String[] ar = new string[path.Length];
+        string[] ar = new string[path.Length];
         for (int i = 0; i < path.Length; i++) {
             string name = "";
             if (path[i] != null) { name = path[i].ToString(); }
-            if (i != 0) {
-                if (name.Length > 0)
-                    if (name.Substring(0, 1) == "\\" || name.Substring(0, 1) == "/") {
-                        name = name.Substring(1); // 拿掉的斜線
-                    }
+            if (i != 0 && name.Length > 0 && (name.StartsWith("\\") || name.StartsWith("/"))) {
+                name = name.Substring(1);
             }
             ar[i] = name;
         }
@@ -49,6 +51,7 @@ public class WV_Path {
     /// <summary>
     /// 傳回指定路徑字串的目錄資訊
     /// </summary>
+    /// <param name="path"></param>
     public string GetDirectoryName(string path) {
         return Path.GetDirectoryName(path);
     }
@@ -56,6 +59,7 @@ public class WV_Path {
     /// <summary>
     /// 傳回指定路徑字串的副檔名
     /// </summary>
+    /// <param name="path"></param>
     public string GetExtension(string path) {
         return Path.GetExtension(path);
     }
@@ -63,6 +67,7 @@ public class WV_Path {
     /// <summary>
     /// 傳回指定路徑字串的檔案名稱和副檔名
     /// </summary>
+    /// <param name="path"></param>
     public string GetFileName(string path) {
         return Path.GetFileName(path);
     }
@@ -70,6 +75,7 @@ public class WV_Path {
     /// <summary>
     /// 傳回沒有副檔名的指定路徑字串的檔案名稱
     /// </summary>
+    /// <param name="path"></param>
     public string GetFileNameWithoutExtension(string path) {
         return Path.GetFileNameWithoutExtension(path);
     }
@@ -77,6 +83,7 @@ public class WV_Path {
     /// <summary>
     /// 傳回指定路徑字串的絕對路徑
     /// </summary>
+    /// <param name="path"></param>
     public string GetFullPath(string path) {
         return Path.GetFullPath(path);
     }
@@ -84,29 +91,10 @@ public class WV_Path {
     /// <summary>
     /// 把長路經轉成虛擬路徑
     /// </summary>
+    /// <param name="path"></param>
     public string GetShortPath(string path) {
-        int MAX_PATH = 255;
-        var shortPath = new StringBuilder(MAX_PATH);
-        if (path.StartsWith("\\\\?\\") == false) { // win11必須經過是 \\?\ 開頭的長路經才能處理
-            path = "\\\\?\\" + path;
-        }
-        GetShortPathName(path, shortPath, MAX_PATH);
-        string result = shortPath.ToString();
-        if (result.StartsWith("\\\\?\\")) {
-            result = result.Substring(4);
-        }
-        return result;
-        /*int MAX_PATH = 255;
-        var shortPath = new StringBuilder(MAX_PATH);
-        GetShortPathName(path, shortPath, MAX_PATH);
-        return shortPath.ToString();*/
+        return _pathInteropService.GetShortPath(path);
     }
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-    public static extern int GetShortPathName(
-        [MarshalAs(UnmanagedType.LPTStr)] string path,
-        [MarshalAs(UnmanagedType.LPTStr)] StringBuilder shortPath,
-        int shortPathLength
-    );
 
     /// <summary>
     /// 取得陣列，該陣列包含檔案名稱中不允許的字元
@@ -125,6 +113,7 @@ public class WV_Path {
     /// <summary>
     /// 要從中取得根目錄資訊的路徑
     /// </summary>
+    /// <param name="path"></param>
     public string GetPathRoot(string path) {
         return Path.GetPathRoot(path);
     }
@@ -153,6 +142,7 @@ public class WV_Path {
     /// <summary>
     /// 判斷路徑是否包括副檔名
     /// </summary>
+    /// <param name="path"></param>
     public bool HasExtension(string path) {
         return Path.HasExtension(path);
     }
@@ -160,8 +150,8 @@ public class WV_Path {
     /// <summary>
     /// 取得值，該值指出指定的路徑字串是否包含根目錄
     /// </summary>
+    /// <param name="path"></param>
     public bool IsPathRooted(string path) {
         return Path.IsPathRooted(path);
     }
-
 }

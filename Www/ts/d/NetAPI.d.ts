@@ -170,6 +170,8 @@ interface WV_Window {
     WindowDrag(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move')): void;
 }
 
+interface WindowBridge extends WV_Window { }
+
 interface WV_Directory {
 
     /**
@@ -217,6 +219,8 @@ interface WV_Directory {
     /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
     GetLastWriteTimeUtc(path: string): number;
 }
+
+interface DirectoryBridge extends WV_Directory { }
 
 interface WV_File {
 
@@ -290,6 +294,8 @@ interface WV_File {
     /** 傳回指定檔案或目錄上次被寫入的日期和時間 */
     GetLastWriteTimeUtc(path: string): number;
 }
+
+interface FileBridge extends WV_File { }
 
 interface WV_FileInfo {
 
@@ -388,6 +394,8 @@ interface WV_Path {
     /** 取得值，該值指出指定的路徑字串是否包含根目錄 */
     IsPathRooted(path: string): bool;
 }
+
+interface PathBridge extends WV_Path { }
 
 interface WV_System {
 
@@ -505,6 +513,8 @@ interface WV_System {
     Sort2(dir: string, ar: string[], type: string)
 }
 
+interface SystemBridge extends WV_System { }
+
 interface WV_RunApp {
 
     /** 以其他程式開啟(系統原生選單) */
@@ -529,6 +539,8 @@ interface WV_RunApp {
     OpenUrl(url: string): boolean;
 }
 
+interface RunAppBridge extends WV_RunApp { }
+
 interface WV_Image {
 
     /**
@@ -545,6 +557,8 @@ interface WV_Image {
      */
     Base64ToTempImg(path: string, base64: string): string;
 }
+
+interface ImageBridge extends WV_Image { }
 
 interface AppInfo {
 

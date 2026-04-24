@@ -57,7 +57,7 @@ public class StartWindow : Form {
         // 如果有進行圖片運算的話，定時執行GC
         Adapter.LoopRun(30 * 1000, () => {
             if (isRunGC) {
-                WV_System._Collect();
+                ProcessMemoryService.CollectCurrentProcessMemory();
                 isRunGC = false;
             }
         }, true);
