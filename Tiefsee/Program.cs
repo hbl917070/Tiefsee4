@@ -12,6 +12,8 @@ static class Program {
     public static int startType;
     /// <summary> 本地伺服器 </summary>
     public static WebServer webServer;
+    /// <summary> app 啟動後共享的服務註冊表 </summary>
+    public static ServiceRegistry services;
     /// <summary> 起始視窗，關閉此視窗就會結束程式 </summary>
     public static StartWindow startWindow;
     /// <summary> 透過 UserAgent 來驗證是否有權限請求 localhost server API </summary>
@@ -34,6 +36,7 @@ static class Program {
         var isStoreApp = iniManager.ReadIniFile("temporary", "isStoreApp", "") == "True";
 
         AppPath.Init(appData, isStoreApp);
+        services = AppBootstrapper.Bootstrap();
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
         if (StartWindow.isStoreApp) {
@@ -84,6 +87,7 @@ static class Program {
             System.Windows.Forms.MessageBox.Show("Tiefsee localhost server error");
             return;
         }
+        services.SetWebServer(webServer);
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
