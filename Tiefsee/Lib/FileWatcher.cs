@@ -116,8 +116,12 @@ public class FileWatcher {
             };
             queue.Add(data);
 
-            timer.Stop();
-            timer.Start();
+            // 如果視窗已經關閉了，timer 就會被釋放導致拋錯
+            try {
+                timer.Stop();
+                timer.Start();
+            }
+            catch { }
         };
 
         // 註冊事件處理程序
