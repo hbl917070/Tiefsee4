@@ -162,8 +162,8 @@
 
 11. `WindowAPI.cs`
     屬於視窗與 Win32 操作，應該往 `Features/Window` 或 `Infrastructure`，但牽涉 `WebWindow` 靜態呼叫，建議晚一點整理。
-12. `ShellContextMenu.cs`
-    功能明確，但內容偏底層 shell interop，且看起來比較像獨立來源碼，建議最後再決定是放 `Infrastructure` 還是 `Vendor`。
+12. `ShellContextMenu.cs`（已完成，搬移到 `Infrastructure/Vendor`）
+    這個檔案屬於第三方函式庫，因此直接搬到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
 13. `RJDropdownMenu.cs`
     這是 WinForms UI 元件，應該歸類到視窗/UI 相關位置，但目前只有 `StartWindow` 使用，優先度不高。
 14. `JsonExtensions.cs`
