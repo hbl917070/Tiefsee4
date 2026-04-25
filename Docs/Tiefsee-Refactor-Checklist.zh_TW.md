@@ -167,8 +167,8 @@
     這個檔案屬於第三方函式庫，因此直接搬到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
 13. `RJDropdownMenu.cs`（已完成，搬移到 `Features/Window` 相關位置）
     這是 WinForms UI 元件，且目前只有 `StartWindow` 使用，因此只做位置整理，收斂到 `Features/Window` 底下，不另外抽成共用 service 或 helper。
-14. `JsonExtensions.cs`
-    目前幾乎沒有實際使用點，先確認是否仍需要保留，再決定要搬到共用工具區還是直接刪除。
+14. `JsonExtensions.cs`（已完成，保留為共用 JSON 擴充函數）
+    這個檔案目前仍有實際使用，因此維持 extension class 的角色即可，整理到共用 extensions 位置即可，不需要改成 helper 或 service。
 15. `LRUCache.cs`
     這是共用基礎結構，但目前主要被 `Exif` / `FileLib` 吃到；等前面真正用到它的檔案整理完，再決定是留成共用 utility，還是移到 `Infrastructure`。
 
