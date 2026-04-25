@@ -142,7 +142,7 @@
    與捷徑建立直接相關，建議跟 `ShortcutService` 放在同一區域，先和 `LnkToExe.cs` 一起整理。
 4. `DataObjectUtilities.cs`（已完成，搬移到 `Features/File/Application`）
    目前只給拖放流程使用，適合搬到 `Features/File/Application`。
-5. `FileSort.cs`
+5. `FileSort.cs`（已完成，搬移到 `Features/Directory/Application`）
    已經主要被目錄排序與系統 bridge 使用，建議搬到 `Features/File` 或 `Features/Directory/Application`，後續再看是否要包成 service。
 
 ### 第 2 批：再處理功能型核心 helper
