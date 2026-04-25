@@ -153,8 +153,8 @@
    原本名稱偏向圖片 Exif，但實際責任已涵蓋通用檔案中繼資料與前端回傳模型，因此改名後收斂到 `Features/File/Application` 與 `Features/File/Contracts` 較合適。
 8. `ImgFrames.cs`（已完成，搬移到 `Features/Image/Application`）
    這個類別主要負責圖片影格與動畫資訊處理，搬到 `Features/Image/Application` 後，與 `ImageHttpEndpoints`、`FileMetadataService` 的依賴關係也比較清楚。
-9. `WindowsThumbnailProvider.cs`
-   明確給圖片與檔案縮圖使用，建議整理到 `Features/Image/Application` 或 `Infrastructure`，但因為目前已被 `ImageProcessingService` 吃進去，放在 `Exif` / `ImgFrames` 後面較穩。
+9. `WindowsThumbnailProvider.cs`（已完成，搬移到 `Infrastructure/Vendor`）
+   這個檔案屬於第三方函式庫，因此只搬移到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
 10. `ClipboardLib.cs`
     雖然主要在系統整合，但剪貼簿格式與 COM 細節較多，適合在前面幾個低風險檔案收斂後再搬。
 
