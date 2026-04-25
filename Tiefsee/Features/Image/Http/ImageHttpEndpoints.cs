@@ -202,6 +202,6 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         string imgPath = json.GetString("imgPath");
         string outputDir = json.GetString("outputDir");
 
-        await WriteJson(d, ImgFrames.ExtractFrames(imgPath, outputDir));
+        await WriteJson(d, AnimatedImageHelper.ExtractFrames(imgPath, outputDir));
     }
 }

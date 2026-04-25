@@ -246,7 +246,7 @@ public class FileMetadataService {
         }
         // 如果是 webp 動圖，則加入「總幀數、循環次數」資訊
         else if (fileType == "webps") {
-            var animationInfo = ImgFrames.GetWebpInfo(path);
+            var animationInfo = AnimatedImageHelper.GetWebpInfo(path);
             if (animationInfo.FrameCount > 1) {
                 metadata.data.Add(new FileMetadataItem {
                     group = "Frames",
@@ -264,7 +264,7 @@ public class FileMetadataService {
         }
         // 如果檔案類型是 APNG，則加入「總幀數、循環次數」資訊
         else if (fileType == "apng") {
-            var apngInfo = ImgFrames.GetApngInfo(path);
+            var apngInfo = AnimatedImageHelper.GetApngInfo(path);
             // 總幀數
             if (apngInfo.FrameCount > 0) {
                 metadata.data.Add(new FileMetadataItem {
@@ -342,7 +342,7 @@ public class FileMetadataService {
         }
         // 如果檔案類型是 DCM HEIC，則加入「總幀數」資訊
         else if (fileType == "dcm" || fileType == "heic" || fileType == "heif") {
-            int frames = ImgFrames.GetAnimationInfo(path);
+            int frames = AnimatedImageHelper.GetAnimationInfo(path);
             if (frames > 1) {
                 metadata.data.Add(new FileMetadataItem {
                     group = "Frames",

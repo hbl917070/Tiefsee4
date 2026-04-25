@@ -8,9 +8,9 @@ using System.Text.Json;
 namespace Tiefsee;
 
 /// <summary>
-/// 處理多幀圖片
+/// 動圖
 /// </summary>
-public class ImgFrames {
+public class AnimatedImageHelper {
 
     #region 匯出多幀圖片
 
@@ -397,11 +397,26 @@ public class ImgFrames {
 
 }
 
+/// <summary>
+/// 動圖幀數資訊
+/// </summary>
 public class AnimationInfo {
+    /// <summary>
+    /// 總幀數
+    /// </summary>
     public int FrameCount { get; set; }
+    /// <summary>
+    /// 循環次數
+    /// </summary>
     public int LoopCount { get; set; }
 }
 
+/// <summary>
+/// 動圖每一幀的資訊
+/// </summary>
 public class AnimationItemInfo {
+    /// <summary>
+    /// 幀延遲時間（毫秒）
+    /// </summary>
     public int Delay { get; set; }
 }
