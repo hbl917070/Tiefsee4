@@ -165,8 +165,8 @@
     屬於視窗與 Win32 操作，應該往 `Features/Window` 或 `Infrastructure`，但牽涉 `WebWindow` 靜態呼叫，建議晚一點整理。
 12. `ShellContextMenu.cs`（已完成，搬移到 `Infrastructure/Vendor`）
     這個檔案屬於第三方函式庫，因此直接搬到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
-13. `RJDropdownMenu.cs`
-    這是 WinForms UI 元件，應該歸類到視窗/UI 相關位置，但目前只有 `StartWindow` 使用，優先度不高。
+13. `RJDropdownMenu.cs`（已完成，搬移到 `Features/Window` 相關位置）
+    這是 WinForms UI 元件，且目前只有 `StartWindow` 使用，因此只做位置整理，收斂到 `Features/Window` 底下，不另外抽成共用 service 或 helper。
 14. `JsonExtensions.cs`
     目前幾乎沒有實際使用點，先確認是否仍需要保留，再決定要搬到共用工具區還是直接刪除。
 15. `LRUCache.cs`
