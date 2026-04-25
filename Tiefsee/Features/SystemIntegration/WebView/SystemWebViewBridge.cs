@@ -1,4 +1,3 @@
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows.Input;
@@ -12,7 +11,6 @@ public class SystemWebViewBridge {
     private readonly WebViewFileWatcherService _fileWatcherService = new();
     private readonly StartupTaskService _startupTaskService = new();
     private readonly TempCleanupService _tempCleanupService = new();
-    private readonly ClipboardService _clipboardService = new();
     private readonly FileAssociationService _fileAssociationService = new();
     private readonly KeyboardSimulationService _keyboardSimulationService = new();
     private readonly ShortcutService _shortcutService = new();
@@ -139,7 +137,7 @@ public class SystemWebViewBridge {
     /// <param name="isTransparent"> 是否要支援透明色 </param>
     /// <returns></returns>
     public bool SetClipboard_Base64ToImage(string base64, bool isTransparent) {
-        return _clipboardService.SetClipboardBase64ToImage(base64, isTransparent);
+        return ClipboardHelper.SetClipboardBase64ToImage(base64, isTransparent);
     }
 
     /// <summary>
@@ -150,35 +148,35 @@ public class SystemWebViewBridge {
     /// <param name="isTransparent"> 是否要支援透明色 </param>
     /// <returns></returns>
     public bool SetClipboard_FileToImage(string path, bool isTransparent) {
-        return _clipboardService.SetClipboardFileToImage(path, isTransparent);
+        return ClipboardHelper.SetClipboardFileToImage(path, isTransparent);
     }
 
     /// <summary>
     /// 存入剪貼簿 - 傳入檔案路徑，以UTF8開啟，複製成文字
     /// </summary>
     public bool SetClipboard_FileToText(string path) {
-        return _clipboardService.SetClipboardFileToText(path);
+        return ClipboardHelper.SetClipboardFileToText(path);
     }
 
     /// <summary>
     /// 存入剪貼簿 - 傳入檔案路徑，複製成 base64
     /// </summary>
     public bool SetClipboard_FileToBase64(string path) {
-        return _clipboardService.SetClipboardFileToBase64(path);
+        return ClipboardHelper.SetClipboardFileToBase64(path);
     }
 
     /// <summary>
     /// 存入剪貼簿 - 字串
     /// </summary>
     public bool SetClipboard_Text(string text) {
-        return _clipboardService.SetClipboardText(text);
+        return ClipboardHelper.SetClipboardText(text);
     }
 
     /// <summary>
     /// 存入剪貼簿 - 檔案
     /// </summary>
     public bool SetClipboard_File(string path) {
-        return _clipboardService.SetClipboardFile(path);
+        return ClipboardHelper.SetClipboardFile(path);
     }
 
     /// <summary>

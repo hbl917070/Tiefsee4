@@ -34,11 +34,10 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
     private async Task GetClipboardContent(RequestData d) {
         int maxTextLength = int.Parse(d.args["maxTextLength"]);
 
-        ClipboardLib.ClipboardContent clipboardContentData = null;
+        ClipboardContent clipboardContentData = null;
         // 剪貼簿存取需透過既有 UI/STA 包裝呼叫
         Adapter.Invoke(_ => {
-            var clipboardLib = new ClipboardLib();
-            clipboardContentData = clipboardLib.GetClipboardContent(maxTextLength);
+            clipboardContentData = ClipboardHelper.GetClipboardContent(maxTextLength);
         }, null);
 
         await WriteJson(d, clipboardContentData);

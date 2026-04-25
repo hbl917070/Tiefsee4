@@ -155,8 +155,8 @@
    這個類別主要負責圖片影格與動畫資訊處理，搬到 `Features/Image/Application` 後，與 `ImageHttpEndpoints`、`FileMetadataService` 的依賴關係也比較清楚。
 9. `WindowsThumbnailProvider.cs`（已完成，搬移到 `Infrastructure/Vendor`）
    這個檔案屬於第三方函式庫，因此只搬移到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
-10. `ClipboardLib.cs`
-    雖然主要在系統整合，但剪貼簿格式與 COM 細節較多，適合在前面幾個低風險檔案收斂後再搬。
+10. `ClipboardLib.cs`（已完成，改名並搬移為 `ClipboardHelper`，`ClipboardContent` 抽到 `Contracts`）
+    這個類別主要處理系統剪貼簿讀寫與格式轉換，因此搬到 `Features/SystemIntegration/Application` 較合適；同時移除沒有實質價值的 `ClipboardService`，讓 `SystemHttpEndpoints` 與 `SystemWebViewBridge` 直接使用 `ClipboardHelper`。
 
 ### 第 3 批：最後處理跨層 / UI / 近似外部來源碼
 

@@ -3,14 +3,17 @@ using System.Text;
 
 namespace Tiefsee;
 
-public class ClipboardLib {
+/// <summary>
+/// 剪貼簿
+/// </summary>
+public class ClipboardHelper {
 
     /// <summary>
     /// 取得剪貼簿內容
     /// </summary>
     /// <param name="maxTextLength"> 文字最大讀取長度，超過會返回 type: exceededLength </param>
     /// <returns></returns>
-    public ClipboardContent GetClipboardContent(int maxTextLength = 5000) {
+    public static ClipboardContent GetClipboardContent(int maxTextLength = 5000) {
         try {
 
             // html
@@ -78,17 +81,12 @@ public class ClipboardLib {
 
         return new ClipboardContent { Type = "unknown", Data = "" };
     }
-    public class ClipboardContent {
-        public string Type { get; set; }
-        public string Data { get; set; }
-    }
-
     /// <summary>
     /// 
     /// </summary>
     /// <param name="base64String"></param>
     /// <returns></returns>
-    private MemoryStream Base64ToMemoryStream(string base64String) {
+    private static MemoryStream Base64ToMemoryStream(string base64String) {
         // 去掉開頭的 data:image/png;base64,
         int x = base64String.IndexOf("base64,");
         if (x != -1) { base64String = base64String.Substring(x + 7); }
@@ -107,7 +105,7 @@ public class ClipboardLib {
     /// <param name="base64"></param>
     /// <param name="isTransparent"> 是否要支援透明色 </param>
     /// <returns></returns>
-    public bool SetClipboard_Base64ToImage(string base64, bool isTransparent) {
+    public static bool SetClipboardBase64ToImage(string base64, bool isTransparent) {
         try {
             using (MemoryStream ms = Base64ToMemoryStream(base64)) {
                 using (var bm = new Bitmap(ms)) {
@@ -135,7 +133,7 @@ public class ClipboardLib {
     /// <param name="path"></param>
     /// <param name="isTransparent"> 是否要支援透明色 </param>
     /// <returns></returns>
-    public bool SetClipboard_FileToImage(string path, bool isTransparent) {
+    public static bool SetClipboardFileToImage(string path, bool isTransparent) {
         try {
             if (File.Exists(path) == false) { return false; }
 
@@ -164,7 +162,7 @@ public class ClipboardLib {
     /// </summary>
     /// <param name="txt"></param>
     /// <returns></returns>
-    public bool SetClipboard_FileToText(string path) {
+    public static bool SetClipboardFileToText(string path) {
         try {
             if (File.Exists(path) == false) { return false; }
             using (var sr = new StreamReader(path, Encoding.UTF8)) {
@@ -182,7 +180,7 @@ public class ClipboardLib {
     /// </summary>
     /// <param name="txt"></param>
     /// <returns></returns>
-    public bool SetClipboard_FileToBase64(string path) {
+    public static bool SetClipboardFileToBase64(string path) {
 
         if (File.Exists(path) == false) { return false; }
 
@@ -225,7 +223,7 @@ public class ClipboardLib {
     /// </summary>
     /// <param name="txt"></param>
     /// <returns></returns>
-    /*public bool SetClipboard_FileToImg(string path) {
+    /*public static bool SetClipboard_FileToImg(string path) {
         try {
             using (System.Drawing.Bitmap bm_transparent = new System.Drawing.Bitmap(path)) {
                 System.Windows.Forms.Clipboard.SetImage(bm_transparent);
@@ -240,7 +238,7 @@ public class ClipboardLib {
     /// <summary>
     /// 存入剪貼簿 - 字串
     /// </summary>
-    public bool SetClipboard_Text(string text) {
+    public static bool SetClipboardText(string text) {
         try {
             Clipboard.SetDataObject(text, false, 5, 200); // 存入剪貼簿
             return true;
@@ -253,7 +251,7 @@ public class ClipboardLib {
     /// <summary>
     /// 存入剪貼簿 - 檔案
     /// </summary>
-    public bool SetClipboard_File(string path) {
+    public static bool SetClipboardFile(string path) {
         try {
             // 檔案或資料夾存在才複製
             if (File.Exists(path) || Directory.Exists(path)) {
