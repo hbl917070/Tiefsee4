@@ -77,7 +77,7 @@
    - `FileWatcher`（已完成）
    - `IniManager`（已完成）
    - `SQLite`（已完成，搬移到 `Infrastructure/Vendor`）
-   - `A1111Manager`
+   - `A1111Manager`（已完成）
 3. 把需要設定、初始化、資源管理的 class 改成 instance service
 4. 真正無狀態的 helper 才保留 `static`
 

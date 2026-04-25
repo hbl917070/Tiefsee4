@@ -14,8 +14,8 @@ public sealed class TempCleanupService {
         DeleteTempDirectory(AppPath.tempDirImgProcessed, 0);
         DeleteTempDirectory(AppPath.tempDirImgZoom, 0);
 
-        var a1111Manager = new A1111Manager(AppPath.appDataA1111ModelList);
-        a1111Manager.ClearTemp();
+        var a1111ResourceService = new A1111ResourceService(AppPath.appDataA1111ModelList);
+        a1111ResourceService.ClearTemp();
     }
 
     /// <summary>
@@ -58,4 +58,3 @@ public sealed class TempCleanupService {
         }
     }
 }
-

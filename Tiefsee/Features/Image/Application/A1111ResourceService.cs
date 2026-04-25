@@ -6,7 +6,10 @@ using System.Text.Json;
 
 namespace Tiefsee;
 
-public class A1111Manager {
+/// <summary>
+/// 處理 A1111 LoRA 相關資源與 Safetensors 資料
+/// </summary>
+public class A1111ResourceService {
 
     private static Dictionary<string, SafetensorsData> _dicSafetensorsData = new();
     private string _tempPath = null;
@@ -15,7 +18,7 @@ public class A1111Manager {
     // 當前版本
     private const int _version = 1;
 
-    public A1111Manager(string tempPath) {
+    public A1111ResourceService(string tempPath) {
         _tempPath = tempPath;
 
         lock (_dicSafetensorsData) {
@@ -267,35 +270,4 @@ public class A1111Manager {
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
     }
-}
-
-public class A1111Model {
-    /// <summary>
-    /// 版本
-    /// </summary>
-    public int Version { get; set; }
-    /// <summary>
-    /// 資料
-    /// </summary>
-    public Dictionary<string, SafetensorsData> Data { get; set; }
-}
-
-public class SafetensorsData {
-    /// <summary>
-    /// 嵌入在檔案裡面的資訊 sshs_model_hash
-    /// </summary>
-    // public string SshsModelHash { get; set; }
-    /// <summary>
-    /// 嵌入在檔案裡面的資訊 ss_output_name
-    /// </summary>
-    public string SsOutputName { get; set; }
-
-    /// <summary>
-    /// 檔案最後寫入時間
-    /// </summary>
-    public DateTime LastWriteTimeUtc { get; set; }
-    /// <summary>
-    /// 檔案路徑的雜湊
-    /// </summary>
-    // public string PathHash { get; set; }
 }
