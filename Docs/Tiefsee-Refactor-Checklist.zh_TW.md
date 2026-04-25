@@ -169,8 +169,8 @@
     這是 WinForms UI 元件，且目前只有 `StartWindow` 使用，因此只做位置整理，收斂到 `Features/Window` 底下，不另外抽成共用 service 或 helper。
 14. `JsonExtensions.cs`（已完成，保留為共用 JSON 擴充函數）
     這個檔案目前仍有實際使用，因此維持 extension class 的角色即可，整理到共用 extensions 位置即可，不需要改成 helper 或 service。
-15. `LRUCache.cs`
-    這是共用基礎結構，但目前主要被 `Exif` / `FileLib` 吃到；等前面真正用到它的檔案整理完，再決定是留成共用 utility，還是移到 `Infrastructure`。
+15. `LRUCache.cs`（已完成，搬移到 `Infrastructure/Caching`）
+    這是共用快取基礎元件，因此整理到 `Infrastructure/Caching` 較合適，不歸屬於特定 feature，也不需要改成 helper 或 service。
 
 ## 補充原則
 
