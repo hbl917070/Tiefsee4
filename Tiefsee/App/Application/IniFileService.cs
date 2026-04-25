@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Tiefsee;
@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 存取 ini 檔
 /// </summary>
-public class IniManager {
+public class IniFileService {
     private string filePath;
     private StringBuilder lpReturnedString;
     private int bufferSize;
@@ -17,20 +17,24 @@ public class IniManager {
     [DllImport("kernel32")]
     private static extern int GetPrivateProfileString(string section, string key, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
 
-    public IniManager(string iniPath) {
+    public IniFileService(string iniPath) {
         filePath = iniPath;
         bufferSize = 512;
         lpReturnedString = new StringBuilder(bufferSize);
     }
 
-    // read ini date depend on section and key
+    /// <summary>
+    /// 依據 section 與 key 讀取 ini 內容
+    /// </summary>
     public string ReadIniFile(string section, string key, string defaultValue) {
         lpReturnedString.Clear();
         GetPrivateProfileString(section, key, defaultValue, lpReturnedString, bufferSize, filePath);
         return lpReturnedString.ToString();
     }
 
-    // write ini data depend on section and key
+    /// <summary>
+    /// 依據 section 與 key 寫入 ini 內容
+    /// </summary>
     public void WriteIniFile(string section, string key, Object value) {
         WritePrivateProfileString(section, key, value.ToString(), filePath);
     }

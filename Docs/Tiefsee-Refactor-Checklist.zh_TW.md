@@ -75,7 +75,7 @@
 1. 先拆 `ImgLib`（已完成）
 2. 再處理：
    - `FileWatcher`（已完成）
-   - `IniManager`
+   - `IniManager`（已完成）
    - `SQLite`
    - `A1111Manager`
 3. 把需要設定、初始化、資源管理的 class 改成 instance service

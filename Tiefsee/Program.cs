@@ -29,7 +29,7 @@ static class Program {
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         AppPath.InitAppData();
 
-        var iniManager = new IniManager(AppPath.appDataStartIni);
+        var iniManager = new IniFileService(AppPath.appDataStartIni);
         startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
         var appData = iniManager.ReadIniFile("temporary", "appData", "");
