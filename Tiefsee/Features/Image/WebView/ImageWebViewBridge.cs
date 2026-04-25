@@ -9,6 +9,7 @@ public class ImageWebViewBridge {
 
     private readonly WebWindow _window;
     private readonly ImageBase64Service _imageBase64Service;
+    private readonly ImageProcessingService _imageProcessingService;
 
     /// <summary>
     /// 建立圖片相關的 WebView bridge
@@ -16,6 +17,7 @@ public class ImageWebViewBridge {
     public ImageWebViewBridge(WebWindow window) {
         _window = window;
         _imageBase64Service = new ImageBase64Service();
+        _imageProcessingService = Program.services.ImageProcessing;
     }
 
     /// <summary>
@@ -23,7 +25,7 @@ public class ImageWebViewBridge {
     /// </summary>
     /// <returns> Base64 </returns>
     public string GetFileIcon(string path, int size) {
-        using Bitmap icon = ImgLib.GetFileIcon(path, size);
+        using Bitmap icon = _imageProcessingService.GetFileIcon(path, size);
         if (icon == null) { return ""; }
         return BitmapToBase64(icon);
     }
@@ -39,7 +41,7 @@ public class ImageWebViewBridge {
     /// 將圖片的 base64 存入暫存資料夾
     /// </summary>
     public string Base64ToTempImg(string path, string base64) {
-        return ImgLib.Base64ToTempImg(path, base64);
+        return _imageProcessingService.Base64ToTempImg(path, base64);
     }
 
 }

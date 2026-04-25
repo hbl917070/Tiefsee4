@@ -9,6 +9,7 @@ namespace Tiefsee;
 
 public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
 
+    private readonly ImageProcessingService _imageProcessingService;
     /// <summary>
     /// 記錄同一個視窗針對同一影片的最新串流請求序號
     /// </summary>
@@ -18,6 +19,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public FileHttpEndpoints(WebServer webServer) : base(webServer) {
+        _imageProcessingService = Program.services.ImageProcessing;
     }
 
     /// <summary>
@@ -158,7 +160,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        using Bitmap icon = ImgLib.GetFileIcon(path, size, 3);
+        using Bitmap icon = _imageProcessingService.GetFileIcon(path, size, 3);
         if (icon == null) {
             await WriteError(d, 500, "圖示取得失敗");
             return;
@@ -215,7 +217,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         d.context.Response.ContentType = "image/png";
         if (HeadersAdd304(d, path)) { return; }
 
-        using Bitmap icon = ImgLib.GetFileIcon(tempPath, size, 3);
+        using Bitmap icon = _imageProcessingService.GetFileIcon(tempPath, size, 3);
         if (icon == null) {
             await WriteError(d, 500, "圖示取得失敗");
             return;

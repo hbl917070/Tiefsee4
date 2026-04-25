@@ -7,6 +7,8 @@ namespace Tiefsee;
 /// </summary>
 public sealed class FileDragDropService {
 
+    private readonly ImageProcessingService _imageProcessingService = Program.services.ImageProcessing;
+
     /// <summary>
     /// 觸發檔案拖曳
     /// </summary>
@@ -20,7 +22,7 @@ public sealed class FileDragDropService {
             if (isFile && path == Path.GetFullPath(path)) {
                 var dataObject = DataObjectUtilities.GetFileDataObject(path);
                 int size = 92;
-                using Bitmap bitmap = ImgLib.GetFileIcon(path, size);
+                using Bitmap bitmap = _imageProcessingService.GetFileIcon(path, size);
                 if (bitmap == null) {
                     throw new Exception("bitmap == null");
                 }

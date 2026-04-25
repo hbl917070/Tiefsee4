@@ -5,10 +5,11 @@ namespace Tiefsee;
 /// </summary>
 public sealed class ServiceRegistry {
 
+    public ImageProcessingService ImageProcessing { get; } = new();
+
     public WebServer WebServer { get; private set; }
 
     public void SetWebServer(WebServer webServer) {
         WebServer = webServer;
     }
 }
-

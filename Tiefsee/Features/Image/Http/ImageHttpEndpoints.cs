@@ -6,10 +6,13 @@ namespace Tiefsee;
 
 public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
 
+    private readonly ImageProcessingService _imageProcessingService;
+
     /// <summary>
     /// 建立圖片相關的 HTTP endpoints
     /// </summary>
     public ImageHttpEndpoints(WebServer webServer) : base(webServer) {
+        _imageProcessingService = Program.services.ImageProcessing;
     }
 
     /// <summary>
@@ -48,7 +51,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
             for (int i = 0; i < arType.Length; i++) {
                 string type = arType[i];
                 try {
-                    imgInfo = ImgLib.GetImgInitInfo(path, type, type);
+                    imgInfo = _imageProcessingService.GetImgInitInfo(path, type, type);
                 }
                 catch { }
 
@@ -76,7 +79,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         string imgPath = null;
         // vips 轉檔可能較久，加入超時機制避免無限等待
         Adapter.RunWithTimeout(60, () => {
-            imgPath = ImgLib.VipsResize(path, scale, fileType, vipsType);
+            imgPath = _imageProcessingService.VipsResize(path, scale, fileType, vipsType);
         });
 
         if (imgPath == null) {
@@ -98,8 +101,8 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (HeadersAdd304(d, path)) { return; }
 
         string imgPath = type == "png"
-            ? ImgLib.Nconvert_PathToPath(path, false, "png")
-            : ImgLib.Nconvert_PathToPath(path, false, "bmp");
+            ? _imageProcessingService.Nconvert_PathToPath(path, false, "png")
+            : _imageProcessingService.Nconvert_PathToPath(path, false, "bmp");
 
         await WriteString(d, imgPath);
     }
@@ -114,7 +117,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        using var stream = ImgLib.MagickImage_PathToStream(path, type);
+        using var stream = _imageProcessingService.MagickImage_PathToStream(path, type);
         await WriteStream(d, stream);
     }
 
@@ -128,7 +131,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (HeadersAdd304(d, path)) { return; }
 
         d.context.Response.ContentType = "image/bmp";
-        using var stream = ImgLib.Wpf_PathToStream(path);
+        using var stream = _imageProcessingService.Wpf_PathToStream(path);
         await WriteStream(d, stream);
     }
 
@@ -141,9 +144,9 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        if (ImgLib.IsCMYK(path)) {
+        if (_imageProcessingService.IsCMYK(path)) {
             d.context.Response.ContentType = "image/bmp";
-            using var stream = ImgLib.Wpf_PathToStream(path);
+            using var stream = _imageProcessingService.Wpf_PathToStream(path);
             await WriteStream(d, stream);
             return;
         }
@@ -161,7 +164,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (HeadersAdd304(d, path)) { return; }
 
         d.context.Response.ContentType = "image/bmp";
-        using var stream = ImgLib.RawThumbnail_PathToStream(path, 800, out int width, out int height);
+        using var stream = _imageProcessingService.RawThumbnail_PathToStream(path, 800, out int width, out int height);
         await WriteStream(d, stream);
     }
 
@@ -174,7 +177,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        using var stream = ImgLib.ClipToStream(path);
+        using var stream = _imageProcessingService.ClipToStream(path);
         await WriteStream(d, stream);
     }
 
@@ -187,7 +190,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        using var stream = ImgLib.ExtractPngToStream(path);
+        using var stream = _imageProcessingService.ExtractPngToStream(path);
         await WriteStream(d, stream);
     }
 
