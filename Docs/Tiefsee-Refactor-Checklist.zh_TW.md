@@ -127,3 +127,53 @@
 3. `ImgLib` 拆成 service
 
 這三件做完，後面的重構就會容易很多。
+
+## 剩餘 `Lib` 建議處理順序
+
+下面順序是依照目前 `Tiefsee/Lib` 剩餘檔案的使用範圍、相依關係、搬移風險來排，目標是先消掉容易分類的檔案，再處理牽涉較多交叉依賴的檔案。
+
+### 第 1 批：先搬可直接歸位的檔案
+
+1. `KnownFolders.cs`（已完成，搬移到 `Infrastructure/Windows`）
+   放到 `Infrastructure` 或 `Features/SystemIntegration/Application` 附近都合理，責任單純、呼叫點少，幾乎是最低風險搬移。
+2. `LnkToExe.cs`
+   目前只服務捷徑解析，建議往 `Features/SystemIntegration/Application` 或 `Infrastructure` 收斂，和 `ShortcutService` 對齊。
+3. `ShellLink.cs`
+   與捷徑建立直接相關，建議跟 `ShortcutService` 放在同一區域，先和 `LnkToExe.cs` 一起整理。
+4. `DataObjectUtilities.cs`
+   目前只給拖放流程使用，適合搬到 `Features/File/Application`。
+5. `FileSort.cs`
+   已經主要被目錄排序與系統 bridge 使用，建議搬到 `Features/File` 或 `Features/Directory/Application`，後續再看是否要包成 service。
+
+### 第 2 批：再處理功能型核心 helper
+
+6. `FileLib.cs`
+   使用點很多，已經跨 `File` 與 `Image`，要先判斷哪些是檔案語意、哪些只是共用 helper，再拆成較小責任。
+7. `Exif.cs`
+   明確屬於圖片 metadata，建議往 `Features/Image/Application` 收，但它依賴 `FileLib`、`ImgFrames`、`LRUCache`，所以要放在 `FileLib` 後面。
+8. `ImgFrames.cs`
+   屬於圖片影格與動畫資訊處理，應搬到 `Features/Image/Application`，但它也依賴 `Exif` / `FileLib`，適合和 `Exif` 成對整理。
+9. `WindowsThumbnailProvider.cs`
+   明確給圖片與檔案縮圖使用，建議整理到 `Features/Image/Application` 或 `Infrastructure`，但因為目前已被 `ImageProcessingService` 吃進去，放在 `Exif` / `ImgFrames` 後面較穩。
+10. `ClipboardLib.cs`
+    雖然主要在系統整合，但剪貼簿格式與 COM 細節較多，適合在前面幾個低風險檔案收斂後再搬。
+
+### 第 3 批：最後處理跨層 / UI / 近似外部來源碼
+
+11. `WindowAPI.cs`
+    屬於視窗與 Win32 操作，應該往 `Features/Window` 或 `Infrastructure`，但牽涉 `WebWindow` 靜態呼叫，建議晚一點整理。
+12. `ShellContextMenu.cs`
+    功能明確，但內容偏底層 shell interop，且看起來比較像獨立來源碼，建議最後再決定是放 `Infrastructure` 還是 `Vendor`。
+13. `RJDropdownMenu.cs`
+    這是 WinForms UI 元件，應該歸類到視窗/UI 相關位置，但目前只有 `StartWindow` 使用，優先度不高。
+14. `JsonExtensions.cs`
+    目前幾乎沒有實際使用點，先確認是否仍需要保留，再決定要搬到共用工具區還是直接刪除。
+15. `LRUCache.cs`
+    這是共用基礎結構，但目前主要被 `Exif` / `FileLib` 吃到；等前面真正用到它的檔案整理完，再決定是留成共用 utility，還是移到 `Infrastructure`。
+
+## 補充原則
+
+- 如果是明確只服務單一 feature 的 helper，就優先搬到該 feature 底下，不必硬留在共用層。
+- 如果是 Win32 / Shell / COM / OS 整合，優先考慮 `Infrastructure`，不要塞回 `Features`。
+- 如果看起來接近第三方或外部來源碼，先評估是否該進 `Infrastructure/Vendor`，不要為了統一命名而硬改 class 名稱。
+- `FileLib`、`Exif`、`ImgFrames` 這三個彼此有依賴，最好當成同一段工作規劃，不要完全拆散。
