@@ -136,7 +136,7 @@
 
 1. `KnownFolders.cs`（已完成，搬移到 `Infrastructure/Windows`）
    放到 `Infrastructure` 或 `Features/SystemIntegration/Application` 附近都合理，責任單純、呼叫點少，幾乎是最低風險搬移。
-2. `LnkToExe.cs`
+2. `LnkToExe.cs`（已完成，搬移到 `Infrastructure/Windows`）
    目前只服務捷徑解析，建議往 `Features/SystemIntegration/Application` 或 `Infrastructure` 收斂，和 `ShortcutService` 對齊。
 3. `ShellLink.cs`
    與捷徑建立直接相關，建議跟 `ShortcutService` 放在同一區域，先和 `LnkToExe.cs` 一起整理。
