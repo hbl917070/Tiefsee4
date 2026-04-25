@@ -26,7 +26,7 @@ public class FileWebViewBridge {
     /// 檢查檔案是否為二進制檔
     /// </summary>
     public bool IsBinary(string filePath, int requiredConsecutiveNul = 1) {
-        return FileLib.IsBinary(filePath, requiredConsecutiveNul);
+        return FileInfoHelper.IsBinary(filePath, requiredConsecutiveNul);
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class FileWebViewBridge {
     /// 取得基本檔案資訊
     /// </summary>
     public string GetFileInfo2(string path) {
-        FileInfo2 info = FileLib.GetFileInfo2(path);
+        FileInfo2 info = FileInfoHelper.GetFileInfo2(path);
         return JsonSerializer.Serialize(info);
     }
 
@@ -101,14 +101,14 @@ public class FileWebViewBridge {
     /// 取得文字資料
     /// </summary>
     public string GetText(string path) {
-        return FileLib.GetText(path);
+        return FileInfoHelper.GetText(path);
     }
 
     /// <summary>
     /// 儲存文字資料
     /// </summary>
     public void SetText(string path, string text) {
-        FileLib.SetText(path, text);
+        FileInfoHelper.SetText(path, text);
     }
 
     /// <summary>
@@ -187,21 +187,21 @@ public class FileWebViewBridge {
     ///
     /// </summary>
     long ToUnix(DateTime time) {
-        return FileLib.ToUnix(time);
+        return FileInfoHelper.ToUnix(time);
     }
 
     /// <summary>
     /// 取得檔案的建立時間
     /// </summary>
     public long GetCreationTimeUtc(string path) {
-        return FileLib.GetCreationTimeUtc(path);
+        return FileInfoHelper.GetCreationTimeUtc(path);
     }
 
     /// <summary>
     /// 傳回指定檔案或目錄上次被寫入的日期和時間
     /// </summary>
     public long GetLastWriteTimeUtc(string path) {
-        return FileLib.GetLastWriteTimeUtc(path);
+        return FileInfoHelper.GetLastWriteTimeUtc(path);
     }
 
 }

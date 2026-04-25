@@ -328,7 +328,7 @@ public sealed class ImageProcessingService {
             throw new Exception("hdrfix.exe 不存在");
         }
 
-        string hashName = FileLib.FileToHash(path) + "_hdrfix.png"; // 暫存檔案名稱
+        string hashName = FileTypeHelper.FileToHash(path) + "_hdrfix.png"; // 暫存檔案名稱
         string outputPath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
 
         if (File.Exists(outputPath)) {
@@ -364,7 +364,7 @@ public sealed class ImageProcessingService {
     public string Nconvert_PathToPath(string path, bool thumbnail, string type) {
 
         type = type.ToLower();
-        string hashName = FileLib.FileToHash(path) + ".jpg";
+        string hashName = FileTypeHelper.FileToHash(path) + ".jpg";
         string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName);
 
         if (File.Exists(filePath)) {
@@ -584,7 +584,7 @@ public sealed class ImageProcessingService {
 
         lock (_vipsCache) {
 
-            string key = FileLib.FileToHash(path);
+            string key = FileTypeHelper.FileToHash(path);
             for (int i = 0; i < _vipsCache.Count; i++) {
                 if (_vipsCache[i].key == key) {
                     return _vipsCache[i].vips;
@@ -616,7 +616,7 @@ public sealed class ImageProcessingService {
     /// <param name="autoOrientation"> 如果圖片有旋轉90°或270°，就長寬對調 </param>
     public int[] GetImgSize(string path, bool autoOrientation) {
 
-        string hash = FileLib.FileToHash(path);
+        string hash = FileTypeHelper.FileToHash(path);
 
         // 先檢查 cache 裡面有沒有
         lock (_imgSizeCache) {
@@ -834,7 +834,7 @@ public sealed class ImageProcessingService {
     /// </summary>
     public string VipsResize(string path, double scale, string fileType, string vipsType) {
 
-        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
+        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
         string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); // 暫存檔案的路徑
 
         // 如果檔案已經存在，就直接回傳
@@ -951,7 +951,7 @@ public sealed class ImageProcessingService {
     /// 取得「ImgProcessed」暫存資料夾裡面的檔案名稱
     /// </summary>
     private string PathToImgProcessed(string path, string vipsType, string ext = "jpg") {
-        string hashName = $"{FileLib.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
+        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
         string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
         if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
             Directory.CreateDirectory(AppPath.tempDirImgProcessed);

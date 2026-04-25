@@ -19,7 +19,7 @@ public class ImgFrames {
     /// </summary>
     public static string ExtractFrames(string imgPath, string outputDir) {
 
-        string hase = FileLib.FileToHash(imgPath);
+        string hase = FileTypeHelper.FileToHash(imgPath);
 
         if (outputDir == null || outputDir == "") { // 未指定資料夾
             string name = Path.GetFileNameWithoutExtension(imgPath);
@@ -80,7 +80,7 @@ public class ImgFrames {
             Directory.CreateDirectory(outputDir);
         }
 
-        string ext = FileLib.GetFileType(imgPath);
+        string ext = FileTypeHelper.GetFileType(imgPath);
         if (ext == "gif") {
             ExtractGif(imgPath, outputDir);
         }
@@ -296,7 +296,7 @@ public class ImgFrames {
     /// </summary>
     public static void ExtractFramesSaveInfo(string outputDir, string path, int frameCount, int? loopCount, Dictionary<int, AnimationItemInfo> frames) {
 
-        string hase = FileLib.FileToHash(path);
+        string hase = FileTypeHelper.FileToHash(path);
         object data;
         if (loopCount != null && frames != null && frames.Count > 0) {
             data = new {
@@ -344,7 +344,7 @@ public class ImgFrames {
     public static int GetAnimationInfo(string path) {
 
         // 如果已經讀取過，就從暫存裡面取得
-        string hash = FileLib.FileToHash(path);
+        string hash = FileTypeHelper.FileToHash(path);
         if (_tempGetFrameCount.ContainsKey(hash)) {
             return _tempGetFrameCount[hash];
         }

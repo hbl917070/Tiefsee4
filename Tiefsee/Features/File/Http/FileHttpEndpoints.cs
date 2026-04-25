@@ -114,7 +114,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        await WriteString(d, FileLib.GetText(path));
+        await WriteString(d, FileInfoHelper.GetText(path));
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        await WriteJson(d, FileLib.GetFileInfo2(path));
+        await WriteJson(d, FileInfoHelper.GetFileInfo2(path));
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         var json = JsonDocument.Parse(d.postData);
         string[] ar = json.GetStringArray("ar");
 
-        await WriteJson(d, FileLib.GetFileInfo2List(ar));
+        await WriteJson(d, FileInfoHelper.GetFileInfo2List(ar));
     }
 
     /// <summary>
@@ -299,6 +299,6 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }
 
-        await WriteString(d, FileLib.IsBinary(path).ToString());
+        await WriteString(d, FileInfoHelper.IsBinary(path).ToString());
     }
 }

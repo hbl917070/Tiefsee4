@@ -147,8 +147,8 @@
 
 ### 第 2 批：再處理功能型核心 helper
 
-6. `FileLib.cs`
-   使用點很多，已經跨 `File` 與 `Image`，要先判斷哪些是檔案語意、哪些只是共用 helper，再拆成較小責任。
+6. `FileLib.cs`（已完成，拆成 `FileItemHelper`、`FileTypeHelper`、`FileInfo2`）
+   原本使用點很多，且跨 `File` 與 `Image`，因此先拆出檔案資訊、檔案型別、回傳模型三個明顯責任，再處理後續相依。
 7. `Exif.cs`
    明確屬於圖片 metadata，建議往 `Features/Image/Application` 收，但它依賴 `FileLib`、`ImgFrames`、`LRUCache`，所以要放在 `FileLib` 後面。
 8. `ImgFrames.cs`

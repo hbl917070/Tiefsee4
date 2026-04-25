@@ -84,7 +84,7 @@ public class Exif {
     public static ImgExif GetExif(string path, int maxLength) {
 
         // 如果存在快取，則直接回傳
-        string hash = FileLib.FileToHash(path);
+        string hash = FileTypeHelper.FileToHash(path);
         var lruExif = _lruGetExif.Get(hash);
         if (lruExif != null) { return lruExif; }
 
@@ -286,7 +286,7 @@ public class Exif {
         }
 
         // 如果是影片，則另外讀取 Comment 資訊
-        string fileType = FileLib.GetFileType(path);
+        string fileType = FileTypeHelper.GetFileType(path);
         if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
             string comment = null;
             Task.Run(async () => {
