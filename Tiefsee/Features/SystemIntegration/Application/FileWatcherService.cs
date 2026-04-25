@@ -2,8 +2,11 @@ using System.IO;
 
 namespace Tiefsee;
 
-public class FileWatcher {
+public class FileWatcherService {
 
+    /// <summary>
+    /// 保存單一檔案監看器的執行狀態與暫存事件佇列
+    /// </summary>
     private class WatcherInfo {
         public FileSystemWatcher fileWatcher;
         public List<FileWatcherData> queue;
@@ -147,12 +150,4 @@ public class FileWatcher {
         }
         dicFileWatcher = new();
     }
-}
-
-public class FileWatcherData {
-    public string Key { get; set; }
-    public string FullPath { get; set; }
-    public string OldFullPath { get; set; }
-    public string ChangeType { get; set; }
-    public string FileType { get; set; }
 }

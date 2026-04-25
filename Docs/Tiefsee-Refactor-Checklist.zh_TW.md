@@ -72,9 +72,9 @@
 
 要做的事：
 
-1. 先拆 `ImgLib`
+1. 先拆 `ImgLib`（已完成）
 2. 再處理：
-   - `FileWatcher`
+   - `FileWatcher`（已完成）
    - `IniManager`
    - `SQLite`
    - `A1111Manager`
@@ -127,4 +127,3 @@
 3. `ImgLib` 拆成 service
 
 這三件做完，後面的重構就會容易很多。
-

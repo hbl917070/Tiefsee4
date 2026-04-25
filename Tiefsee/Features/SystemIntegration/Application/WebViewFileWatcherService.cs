@@ -7,7 +7,7 @@ namespace Tiefsee;
 /// </summary>
 public sealed class WebViewFileWatcherService {
 
-    private readonly FileWatcher _fileWatcher = new();
+    private readonly FileWatcherService _fileWatcher = new();
 
     /// <summary>
     /// 建立新的檔案監看
@@ -26,4 +26,3 @@ public sealed class WebViewFileWatcherService {
         _fileWatcher.FileWatcherDispose();
     }
 }
-
