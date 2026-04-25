@@ -149,8 +149,8 @@
 
 6. `FileLib.cs`（已完成，拆成 `FileItemHelper`、`FileTypeHelper`、`FileInfo2`）
    原本使用點很多，且跨 `File` 與 `Image`，因此先拆出檔案資訊、檔案型別、回傳模型三個明顯責任，再處理後續相依。
-7. `Exif.cs`
-   明確屬於圖片 metadata，建議往 `Features/Image/Application` 收，但它依賴 `FileLib`、`ImgFrames`、`LRUCache`，所以要放在 `FileLib` 後面。
+7. `Exif.cs`（已完成，改名並搬移為 `FileMetadataService`、`FileMetadataResult`、`FileMetadataItem` 到 `Features/File`）
+   原本名稱偏向圖片 Exif，但實際責任已涵蓋通用檔案中繼資料與前端回傳模型，因此改名後收斂到 `Features/File/Application` 與 `Features/File/Contracts` 較合適。
 8. `ImgFrames.cs`
    屬於圖片影格與動畫資訊處理，應搬到 `Features/Image/Application`，但它也依賴 `Exif` / `FileLib`，適合和 `Exif` 成對整理。
 9. `WindowsThumbnailProvider.cs`

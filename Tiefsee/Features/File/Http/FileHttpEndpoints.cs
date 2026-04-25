@@ -10,6 +10,7 @@ namespace Tiefsee;
 public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
 
     private readonly ImageProcessingService _imageProcessingService;
+    private readonly FileMetadataService _fileMetadataService;
     /// <summary>
     /// 記錄同一個視窗針對同一影片的最新串流請求序號
     /// </summary>
@@ -20,13 +21,14 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// </summary>
     public FileHttpEndpoints(WebServer webServer) : base(webServer) {
         _imageProcessingService = Program.services.ImageProcessing;
+        _fileMetadataService = Program.services.FileMetadata;
     }
 
     /// <summary>
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/metadata/exif", GetExif, "/api/getExif");
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/metadata/exif", GetMetadata, "/api/getExif");
         HttpEndpointRegistrar.Map(WebServer, "/api/files/icon", GetFileIcon, "/api/getFileIcon");
         HttpEndpointRegistrar.Map(WebServer, "/api/web/icon", GetWebIcon, "/api/getWebIcon");
         HttpEndpointRegistrar.Map(WebServer, "/api/files/info", GetFileInfo, "/api/getFileInfo2");
@@ -132,22 +134,22 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     }
 
     /// <summary>
-    /// 取得檔案的 Exif 資訊
+    /// 取得檔案的 Metadata 資訊
     /// </summary>
-    private async Task GetExif(RequestData d) {
+    private async Task GetMetadata(RequestData d) {
         int maxLength = int.Parse(d.args["maxLength"]);
         string path = Uri.UnescapeDataString(d.args["path"]);
 
         if (File.Exists(path) == false) {
             d.context.Response.StatusCode = 404;
-            await WriteJson(d, new ImgExif());
+            await WriteJson(d, new FileMetadataResult());
             return;
         }
 
         if (HeadersAdd304(d, path)) { return; }
 
-        var exif = Exif.GetExif(path, maxLength);
-        await WriteJson(d, exif);
+        var metadata = _fileMetadataService.GetMetadata(path, maxLength);
+        await WriteJson(d, metadata);
     }
 
     /// <summary>

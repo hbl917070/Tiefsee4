@@ -130,7 +130,7 @@ public class ImgFrames {
 
         // --------
 
-        var exif = Exif.GetExif(imgPath, 500);
+        var exif = Program.services.FileMetadata.GetMetadata(imgPath, 500);
         Dictionary<int, AnimationItemInfo> itemInfo = new Dictionary<int, AnimationItemInfo>();
 
         // 取得每一幀的延遲(毫秒)

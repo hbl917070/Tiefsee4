@@ -6,6 +6,7 @@ namespace Tiefsee;
 public sealed class ServiceRegistry {
 
     public ImageProcessingService ImageProcessing { get; } = new();
+    public FileMetadataService FileMetadata { get; } = new();
 
     public WebServer WebServer { get; private set; }
 
