@@ -1,6 +1,6 @@
 namespace Tiefsee;
 
-public static class Adapter {
+public static class UiThreadScheduler {
 
     public static SynchronizationContext Dispacher { get; private set; }
 
@@ -11,8 +11,8 @@ public static class Adapter {
     /// 請於 UI 執行緒呼叫此方法
     /// </summary>
     public static void Initialize() {
-        if (Adapter.Dispacher == null)
-            Adapter.Dispacher = SynchronizationContext.Current;
+        if (UiThreadScheduler.Dispacher == null)
+            UiThreadScheduler.Dispacher = SynchronizationContext.Current;
     }
 
     /// <summary>

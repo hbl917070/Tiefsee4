@@ -26,7 +26,7 @@ public class StartWindow : Form {
         isWin11 = Environment.OSVersion.Version.Build >= 22000;
         desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-        Adapter.Initialize();
+        UiThreadScheduler.Initialize();
         PluginRegistry.Init();
 
         PortLock(); // 寫入檔案，表示此 port 已經被佔用
@@ -55,7 +55,7 @@ public class StartWindow : Form {
         };
 
         // 如果有進行圖片運算的話，定時執行GC
-        Adapter.LoopRun(30 * 1000, () => {
+        UiThreadScheduler.LoopRun(30 * 1000, () => {
             if (isRunGC) {
                 ProcessMemoryManager.CollectCurrentProcessMemory();
                 isRunGC = false;
@@ -76,7 +76,7 @@ public class StartWindow : Form {
 
         bool isDown = false;
 
-        Adapter.LoopRun(50, () => {
+        UiThreadScheduler.LoopRun(50, () => {
 
             bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
 
@@ -263,7 +263,7 @@ public class StartWindow : Form {
             if (IsWebView2Runtime() == true) { // 檢查安裝webview2執行環境
                 return;
             }
-            Adapter.UIThread(() => { // 如果沒有執行環境，就用瀏覽器開啟下載頁面
+            UiThreadScheduler.UIThread(() => { // 如果沒有執行環境，就用瀏覽器開啟下載頁面
                 MessageBox.Show("WebView2 must be installed to run this application");
                 System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
                 this.Close();
@@ -299,11 +299,11 @@ public class StartWindow : Form {
                 PipeTransmissionMode.Message);
 
             // 等待客戶端連接
-            while (Adapter.isRuning) {
+            while (UiThreadScheduler.isRuning) {
                 server.WaitForConnection();
 
                 // 客戶端已連接
-                while (Adapter.isRuning) {
+                while (UiThreadScheduler.isRuning) {
 
                     // 讀取客戶端發送的訊息
                     var buffer = new byte[1024];
@@ -318,7 +318,7 @@ public class StartWindow : Form {
 
                     // 將字串剖析回命令列參數
                     string[] args = message.Split('\n');
-                    Adapter.UIThread(() => {
+                    UiThreadScheduler.UIThread(() => {
                         WebWindow.Create("MainWindow.html", args, null);
                     });
 

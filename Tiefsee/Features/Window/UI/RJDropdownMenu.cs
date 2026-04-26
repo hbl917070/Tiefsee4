@@ -97,7 +97,7 @@ public class RJDropdownMenu : ContextMenuStrip {
         // 顯示選單後，讓選單取得焦點
         VisibleChanged += (sender, e) => {
             if (Visible) {
-                Adapter.DelayRun(1, () => {
+                UiThreadScheduler.DelayRun(1, () => {
                     Focus();
                 });
             }

@@ -36,7 +36,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
 
         ClipboardContent clipboardContentData = null;
         // 剪貼簿存取需透過既有 UI/STA 包裝呼叫
-        Adapter.Invoke(_ => {
+        UiThreadScheduler.Invoke(_ => {
             clipboardContentData = ClipboardHelper.GetClipboardContent(maxTextLength);
         }, null);
 

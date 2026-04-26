@@ -41,7 +41,7 @@ public sealed class ImageProcessingService {
         Bitmap icon = null;
 
         try {
-            Adapter.RunWithTimeout(waitSec, () => {
+            UiThreadScheduler.RunWithTimeout(waitSec, () => {
                 // 取得圖片在檔案總管的縮圖
                 icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
             });

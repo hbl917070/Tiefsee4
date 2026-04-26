@@ -179,7 +179,7 @@ public class WebWindow : FormNone {
 
         url = GetHtmlFilePath(url);
 
-        Adapter.DelayRun(10, async () => {
+        UiThreadScheduler.DelayRun(10, async () => {
             if (_tempWindow != null) { return; }
             WebWindow temp3 = new();
             temp3._isDelayInit = true;
@@ -188,12 +188,12 @@ public class WebWindow : FormNone {
             temp3._wv2.CoreWebView2.Navigate(url);
             // 如果視窗載入完成時，tempWindow 已經被暫用，則釋放這個 window
             void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
-                Adapter.DelayRun(100, () => {
+                UiThreadScheduler.DelayRun(100, () => {
                     if (_tempWindow == null) {
                         _tempWindow = temp3;
                     }
                     else {
-                        Adapter.DelayRun(5000, () => {
+                        UiThreadScheduler.DelayRun(5000, () => {
                             Console.WriteLine("釋放");
                             SingleInstanceCoordinator.WindowCreate(); // 避免釋放後，window 數量對不起來
                             temp3.Close();
@@ -347,7 +347,7 @@ public class WebWindow : FormNone {
         this.Hide();
 
         // 降低調整 webview 縮放頻率，可提升縮放視窗的流暢度
-        Adapter.LoopRun(20, () => {
+        UiThreadScheduler.LoopRun(20, () => {
 
             if (_isShow == false) { return; }
 
@@ -652,7 +652,7 @@ public class WebWindow : FormNone {
     /// 關閉視窗
     /// </summary>
     public void CloseWindow() {
-        Adapter.DelayRun(1, () => {
+        UiThreadScheduler.DelayRun(1, () => {
             if (_tempWindow == this) { _tempWindow = null; }
             Close();
         });

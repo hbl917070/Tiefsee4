@@ -32,7 +32,7 @@ public class SystemWebViewBridge {
     /// <param name="path"> 要偵測的資料夾 </param>
     public void NewFileWatcher(string key, string path) {
         _fileWatcherService.NewFileWatcher(key, path, (string data) => {
-            Adapter.UIThread(() => {
+            UiThreadScheduler.UIThread(() => {
                 M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
             });
         });
