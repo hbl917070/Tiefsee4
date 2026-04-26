@@ -88,6 +88,7 @@ static class Program {
             return;
         }
         services.SetWebServer(webServer);
+        services.RegisterHttpRoutes();
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);

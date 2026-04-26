@@ -10,7 +10,6 @@ public class WebServer {
 
     public int port; // 當前掛載的 port
     public string origin;
-    public WebServerController controller;
     private HttpListener httpListener;
     private List<Func<RequestData, Task<bool>>> arRoute = new(); // 路由
 
@@ -34,7 +33,6 @@ public class WebServer {
                 httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
                 httpListener.Start();
                 httpListener.BeginGetContext(new AsyncCallback(GetContextCallBack), httpListener);
-                controller = new WebServerController(this);
 
                 break;
             }
