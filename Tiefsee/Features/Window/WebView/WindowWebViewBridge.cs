@@ -1,6 +1,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
-using static Tiefsee.WindowAPI;
+using static Tiefsee.WindowStyle;
 
 namespace Tiefsee;
 
@@ -387,15 +387,15 @@ public class WindowWebViewBridge {
         }
 
         // 將前端傳入的縮寫轉成 Win32 視窗拖曳方向
-        var resizeDirection = ResizeDirection.Move;
-        if (type == "CT") { resizeDirection = ResizeDirection.CT; }
-        if (type == "RC") { resizeDirection = ResizeDirection.RC; }
-        if (type == "CB") { resizeDirection = ResizeDirection.CB; }
-        if (type == "LC") { resizeDirection = ResizeDirection.LC; }
-        if (type == "LT") { resizeDirection = ResizeDirection.LT; }
-        if (type == "RT") { resizeDirection = ResizeDirection.RT; }
-        if (type == "LB") { resizeDirection = ResizeDirection.LB; }
-        if (type == "RB") { resizeDirection = ResizeDirection.RB; }
+        var resizeDirection = Tiefsee.WindowDrag.ResizeDirection.Move;
+        if (type == "CT") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.CT; }
+        if (type == "RC") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.RC; }
+        if (type == "CB") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.CB; }
+        if (type == "LC") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.LC; }
+        if (type == "LT") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.LT; }
+        if (type == "RT") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.RT; }
+        if (type == "LB") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.LB; }
+        if (type == "RB") { resizeDirection = Tiefsee.WindowDrag.ResizeDirection.RB; }
 
         M.WindowDrag(resizeDirection);
     }

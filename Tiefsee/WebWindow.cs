@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using static Tiefsee.WindowAPI;
+using static Tiefsee.WindowStyle;
 
 namespace Tiefsee;
 
@@ -733,8 +733,8 @@ public class WebWindow : FormNone {
 
         this.TopMost = true;
         this.TopMost = false;
-        WindowAPI.SwitchToThisWindow(this.Handle, true);
-        WindowAPI.GlobalActivate(this.Handle);
+        WindowActivation.SwitchToThisWindow(this.Handle, true);
+        WindowActivation.GlobalActivate(this.Handle);
         // this.Activate();
         this._wv2.Focus();
 
@@ -747,8 +747,8 @@ public class WebWindow : FormNone {
     /// <summary>
     /// 拖曳視窗
     /// </summary>
-    public void WindowDrag(ResizeDirection type) {
-        WindowAPI.WindowDrag(Handle, type);
+    public void WindowDrag(WindowDrag.ResizeDirection type) {
+        Tiefsee.WindowDrag.Start(Handle, type);
     }
 
     /// <summary>
@@ -756,21 +756,21 @@ public class WebWindow : FormNone {
     /// </summary>
     /// <param name="type"> acrylic | aero </param>
     public void WindowStyleForWin10(string type) {
-        WindowAPI.WindowStyleForWin10(this.Handle, type);
+        WindowStyle.WindowStyleForWin10(this.Handle, type);
     }
 
     /// <summary>
     /// win11 視窗效果
     /// </summary>
     public void WindowStyleForWin11(SystemBackdropType type) {
-        WindowAPI.WindowStyleForWin11(this.Handle, type);
+        WindowStyle.WindowStyleForWin11(this.Handle, type);
     }
 
     /// <summary>
     /// win11 暗黑模式
     /// </summary>
     public void WindowThemeForWin11(ImmersiveDarkMode type) {
-        WindowAPI.WindowThemeForWin11(this.Handle, type);
+        WindowStyle.WindowThemeForWin11(this.Handle, type);
     }
 
     /// <summary>
@@ -778,7 +778,7 @@ public class WebWindow : FormNone {
     /// </summary>
     public void WindowRoundedCorners(bool enable) {
         _windowRoundedCorners = enable;
-        WindowAPI.WindowRoundedCorners(this.Handle, enable);
+        WindowStyle.WindowRoundedCorners(this.Handle, enable);
     }
 
 }
@@ -933,4 +933,57 @@ public class FormNone : Form {
         base.WndProc(ref m);
     }
 
+
+    #region 任務欄
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct APPBARDATA {
+        public int cbSize;
+        public IntPtr hWnd;
+        public uint uCallbackMessage;
+        public uint uEdge;
+        public RECT rc;
+        public int lParam;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+    }
+
+    [DllImport("shell32.dll", SetLastError = true)]
+    public static extern uint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+
+    // ABM_GETSTATE 用來檢查任務欄狀態的訊息
+    public const uint ABM_GETSTATE = 0x00000004;
+
+    public const uint ABM_GETTASKBARPOS = 0x00000005;
+
+    // 設定任務欄的狀態，當值為 ABS_AUTOHIDE 時，表示啟用了自動隱藏
+    public const int ABS_AUTOHIDE = 0x1;
+
+    // APPBARDATA edge 可能的值
+    public const uint ABE_LEFT = 0;
+    public const uint ABE_TOP = 1;
+    public const uint ABE_RIGHT = 2;
+    public const uint ABE_BOTTOM = 3;
+
+    #endregion
+
+    /// <summary>
+    /// 描述視窗的位置和大小的結構體
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WINDOWPOS {
+        public IntPtr hwnd;
+        public IntPtr hwndInsertAfter;
+        public int x;
+        public int y;
+        public int cx;
+        public int cy;
+        public uint flags;
+    }
 }

@@ -161,8 +161,8 @@
 
 ### 第 3 批：最後處理跨層 / UI / 近似外部來源碼
 
-11. `WindowAPI.cs`
-    屬於視窗與 Win32 操作，應該往 `Features/Window` 或 `Infrastructure`，但牽涉 `WebWindow` 靜態呼叫，建議晚一點整理。
+11. `WindowAPI.cs`（已完成，拆分後搬移到 `Infrastructure/Windows`）
+    視窗拖曳、視窗效果、視窗取得焦點等 Win32 視窗操作已拆分並搬移到 `Infrastructure/Windows`；而 `WndProc` 與 `FormNone` 直接使用的 `WINDOWPOS`、任務欄相關 interop 型別則保留在 `WebWindow` 附近，避免為了抽離而讓訊息處理變得更繞。
 12. `ShellContextMenu.cs`（已完成，搬移到 `Infrastructure/Vendor`）
     這個檔案屬於第三方函式庫，因此直接搬到 `Infrastructure/Vendor`，不調整 class 名稱、命名空間或內部實作。
 13. `RJDropdownMenu.cs`（已完成，搬移到 `Features/Window` 相關位置）
