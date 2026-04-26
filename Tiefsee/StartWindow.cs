@@ -27,7 +27,7 @@ public class StartWindow : Form {
         desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
         Adapter.Initialize();
-        Plugin.Init();
+        PluginRegistry.Init();
 
         PortLock(); // 寫入檔案，表示此 port 已經被佔用
         CheckWebView2(); // 檢查是否有 webview2 執行環境
@@ -98,7 +98,7 @@ public class StartWindow : Form {
                 if (isDown == false) {
                     isDown = true;
 
-                    string selectedItem = PluginQuickLook.GetCurrentSelection(); // 取得檔案總管目前選取的檔案
+                    string selectedItem = QuickLookSelectionService.GetCurrentSelection(); // 取得檔案總管目前選取的檔案
                     if (selectedItem == "") { return; }
 
                     // 再次檢查是否按著空白鍵或滑鼠中鍵

@@ -324,7 +324,7 @@ public sealed class ImageProcessingService {
     /// </summary>
     public string Jxr_PathToPath(string path) {
 
-        if (File.Exists(Plugin.pathHdrfix) == false) {
+        if (File.Exists(PluginRegistry.pathHdrfix) == false) {
             throw new Exception("hdrfix.exe 不存在");
         }
 
@@ -345,7 +345,7 @@ public sealed class ImageProcessingService {
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = Plugin.pathHdrfix;
+            p.StartInfo.FileName = PluginRegistry.pathHdrfix;
             p.StartInfo.Arguments = arg;
             p.Start();
 
@@ -412,7 +412,7 @@ public sealed class ImageProcessingService {
     /// <returns></returns>
     private string RunNconvert(string arg, int timeout) {
 
-        string NconvertExe = Plugin.pathNConvert;
+        string NconvertExe = PluginRegistry.pathNConvert;
 
         using (var p = new Process()) {
             p.StartInfo.UseShellExecute = false;

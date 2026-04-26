@@ -296,7 +296,7 @@ public class WebWindow : FormNone {
         /// <summary> 是否為 win11 </summary>
         public bool isWin11 { get; set; }
         /// <summary> 哪些擴充是有啟用的 </summary>
-        public DataPlugin plugin { get; set; } = Plugin.dataPlugin;
+        public PluginAvailability plugin { get; set; } = PluginRegistry.pluginAvailability;
     }
 
     /// <summary>
