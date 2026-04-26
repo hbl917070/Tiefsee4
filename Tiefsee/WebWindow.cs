@@ -102,7 +102,7 @@ public class WebWindow : FormNone {
         }
 
         // 如果啟動類型是直接啟動
-        if (Program.startType == 1) {
+        if (Program.startType == StartMode.Normal) {
             var ww = new WebWindow();
             ww._isDelayInit = false;
             await ww.Init();
@@ -114,7 +114,7 @@ public class WebWindow : FormNone {
         }
 
         // 單一執行個體
-        if (Program.startType == 4 || Program.startType == 5) {
+        if (Program.startType == StartMode.SingleInstance || Program.startType == StartMode.SingleInstanceResident) {
             if (_tempWindow == null || _tempWindow._wv2.CoreWebView2 == null) { // 沒有暫存的 window
 
                 // 新建
@@ -127,7 +127,7 @@ public class WebWindow : FormNone {
                 Wv2LoadedTriggerCreate(_tempWindow, args); // 網頁載入完成時，觸發 baseWindow.onCreate
 
                 // 如果是 單一執行+快速啟動，則在視窗關閉的時候建立下一個視窗
-                if (Program.startType == 5) {
+                if (Program.startType == StartMode.SingleInstanceResident) {
                     _tempWindow.FormClosing += (sender2, e2) => {
                         NewTempWindow(url); // 新建 window，用於下次顯示
                     };

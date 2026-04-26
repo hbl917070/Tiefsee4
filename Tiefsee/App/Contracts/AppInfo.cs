@@ -3,8 +3,8 @@ namespace Tiefsee;
 public class AppInfo {
     /// <summary> 命令列參數 </summary>
     public string[] args { get; set; }
-    /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
-    public int startType { get; set; }
+    /// <summary> 啟動模式 </summary>
+    public StartMode startType { get; set; }
     /// <summary> 程式開始的port </summary>
     public int startPort { get; set; }
     /// <summary> 程式所在的資料夾 </summary>

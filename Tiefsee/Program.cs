@@ -6,10 +6,10 @@ namespace Tiefsee;
 
 static class Program {
 
-    /// <summary> 程式開始的port </summary>
+    /// <summary> 程式開始的 port </summary>
     public static int startPort;
-    /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
-    public static int startType;
+    /// <summary> 啟動模式 </summary>
+    public static StartMode startType;
     /// <summary> 本地伺服器 </summary>
     public static WebServer webServer;
     /// <summary> app 啟動後共享的服務註冊表 </summary>
@@ -30,8 +30,8 @@ static class Program {
         AppPath.InitAppData();
 
         var iniManager = new IniFileHelper(AppPath.appDataStartIni);
-        startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-        startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
+        startPort = int.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
+        startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
         var appData = iniManager.ReadIniFile("temporary", "appData", "");
         var isStoreApp = iniManager.ReadIniFile("temporary", "isStoreApp", "") == "True";
 
@@ -65,7 +65,7 @@ static class Program {
         else {
             // 啟動模式不是常駐背景，就直接離開
             if (argsIsNone) {
-                if (startType == 3 || startType == 5) {
+                if (startType == StartMode.QuickStartResident || startType == StartMode.SingleInstanceResident) {
                 }
                 else {
                     return;
@@ -76,7 +76,7 @@ static class Program {
         }
 
         // 「直接啟動」之外的，都要避免連續啟動
-        if (startType != 1) {
+        if (startType != StartMode.Normal) {
             if (AppLock(true)) { return; }
         }
 
@@ -93,7 +93,7 @@ static class Program {
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // 高 DPI 模式
 
-        if (startType != 1) { AppLock(false); } // 解除鎖定
+        if (startType != StartMode.Normal) { AppLock(false); } // 解除鎖定
         startWindow = new StartWindow();
 
         if (argsIsNone == false) {

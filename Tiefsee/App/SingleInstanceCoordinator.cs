@@ -37,7 +37,7 @@ public class SingleInstanceCoordinator {
     public static bool Check(string[] args) {
 
         // 直接啟動
-        if (Program.startType == 1) {
+        if (Program.startType == StartMode.Normal) {
             return false;
         }
 
@@ -71,7 +71,7 @@ public class SingleInstanceCoordinator {
     public static void CloseAllWindow() {
 
         // 如果是 直接啟動，直接強制結束所有 process
-        if (Program.startType == 1) {
+        if (Program.startType == StartMode.Normal) {
             Process[] proc = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
             for (int i = proc.Length - 1; i >= 0; i--) {
                 try {

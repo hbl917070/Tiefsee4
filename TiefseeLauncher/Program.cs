@@ -24,8 +24,8 @@ namespace TiefseeLauncher {
         private string appDataStartIni;
         /// <summary> Port Dir </summary>
         private string appDataPort;
-        /// <summary> 1=直接啟動  2=快速啟動  3=快速啟動且常駐  4=單一執行個體  5=單一執行個體且常駐 </summary>
-        private int startType;
+        /// <summary> 啟動模式 </summary>
+        private StartMode startType;
 
         public void Init(string[] args) {
 
@@ -61,11 +61,11 @@ namespace TiefseeLauncher {
 
             appDataStartIni = Path.Combine(appData, "Start.ini");
             appDataPort = Path.Combine(appData, "Port");
-            var iniManager = new IniManager(appDataStartIni);
-            startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
+            var iniManager = new IniFileHelper(appDataStartIni);
+            startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
 
             // 如果是直接啟動
-            if (startType == 1) {
+            if (startType == StartMode.Normal) {
                 RunTiefseeCore(args);
                 return;
             }
@@ -147,7 +147,7 @@ namespace TiefseeLauncher {
     /// <summary>
     /// 存取 ini 檔
     /// </summary>
-    class IniManager {
+    class IniFileHelper {
         private string filePath;
         private StringBuilder lpReturnedString;
         private int bufferSize;
@@ -155,7 +155,7 @@ namespace TiefseeLauncher {
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
 
-        public IniManager(string iniPath) {
+        public IniFileHelper(string iniPath) {
             filePath = iniPath;
             bufferSize = 512;
             lpReturnedString = new StringBuilder(bufferSize);
@@ -168,6 +168,22 @@ namespace TiefseeLauncher {
             return lpReturnedString.ToString();
         }
 
+    }
+
+    /// <summary>
+    /// 啟動模式
+    /// </summary>
+    enum StartMode : byte {
+        /// <summary> 直接啟動 </summary>
+        Normal = 1,
+        /// <summary> 快速啟動 </summary>
+        QuickStart = 2,
+        /// <summary> 快速啟動且常駐 </summary>
+        QuickStartResident = 3,
+        /// <summary> 單一執行個體 </summary>
+        SingleInstance = 4,
+        /// <summary> 單一執行個體且常駐 </summary>
+        SingleInstanceResident = 5
     }
 
 }

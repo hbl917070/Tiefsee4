@@ -13,6 +13,6 @@ public sealed class WindowStartupConfigService {
         iniManager.WriteIniFile("setting", "startPort", startPort);
         iniManager.WriteIniFile("setting", "startType", startType);
         Program.startPort = startPort;
-        Program.startType = startType;
+        Program.startType = (StartMode)startType;
     }
 }

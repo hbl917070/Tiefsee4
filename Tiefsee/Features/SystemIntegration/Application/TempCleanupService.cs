@@ -23,7 +23,7 @@ public sealed class TempCleanupService {
     /// </summary>
     public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
         new Thread(() => {
-            if (Program.startType == 3 || Program.startType == 5) {
+            if (Program.startType == StartMode.QuickStartResident || Program.startType == StartMode.SingleInstanceResident) {
                 if (SingleInstanceCoordinator.runNumber <= 2) {
                     DeleteTempDirectory(AppPath.tempDirImgProcessed, maxImgProcessed);
                     DeleteTempDirectory(AppPath.tempDirImgZoom, maxImgZoom);

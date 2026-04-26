@@ -44,11 +44,11 @@ public class StartWindow : Form {
 
         this.Shown += (sender, e) => {
             this.Hide();
-            if (Program.startType == 3) { // 快速啟動且常駐
+            if (Program.startType == StartMode.QuickStartResident) { // 快速啟動且常駐
                 RunNotifyIcon();
             }
 
-            if (Program.startType == 5) { // 快速啟動且常駐
+            if (Program.startType == StartMode.SingleInstanceResident) { // 單一執行個體且常駐
                 RunNotifyIcon();
             }
             InitWebview(); // 初始化webview2(常駐在背景
@@ -70,7 +70,7 @@ public class StartWindow : Form {
     /// </summary>
     private void InitQuickLook() {
 
-        if (Program.startType == 1) {
+        if (Program.startType == StartMode.Normal) {
             return;
         }
 
@@ -114,12 +114,12 @@ public class StartWindow : Form {
                         }
                     }
 
-                    if (Program.startType == 2 || Program.startType == 3) {
+                    if (Program.startType == StartMode.QuickStart || Program.startType == StartMode.QuickStartResident) {
                         if (WebWindow.TempWindow == null) { return; }
                         WebWindow.TriggerCreate(WebWindow.TempWindow, [selectedItem], quickLookRunType);
 
                     }
-                    else if (Program.startType == 4 || Program.startType == 5) { // 單一執行個體，用原來的視窗開啟
+                    else if (Program.startType == StartMode.SingleInstance || Program.startType == StartMode.SingleInstanceResident) { // 單一執行個體，用原來的視窗開啟
                         WebWindow.Create("MainWindow.html", [selectedItem], null);
                     }
                 }
@@ -235,7 +235,7 @@ public class StartWindow : Form {
         // 清除默認的 JumpList
         jumpList.Items.Clear();
 
-        if (Program.startType != 4 && Program.startType != 5) {
+        if (Program.startType != StartMode.SingleInstance && Program.startType != StartMode.SingleInstanceResident) {
             var item = JumpListItem.CreateWithArguments("closeAll", "Close All Tiefsee Windows");
             // item.Description = "Close all Tiefsee";
             // item.Logo = new Uri("ms-appx:///t1.ico");
@@ -288,7 +288,7 @@ public class StartWindow : Form {
     /// </summary>
     private async void InitNamedPipeServer() {
 
-        if (Program.startType == 1) { return; }
+        if (Program.startType == StartMode.Normal) { return; }
 
         await Task.Factory.StartNew(async () => {
 

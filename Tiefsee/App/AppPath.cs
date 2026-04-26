@@ -124,8 +124,8 @@ public class AppPath {
         if (needUpdateIni) {
             // 重新讀取 ini
             var iniManager = new IniFileHelper(AppPath.appDataStartIni);
-            Program.startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-            Program.startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
+            Program.startPort = int.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
+            Program.startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
             // 把資料寫入 ini 檔案，下次就可以直接讀取
             iniManager.WriteIniFile("temporary", "appData", appData);
             iniManager.WriteIniFile("temporary", "isStoreApp", StartWindow.isStoreApp.ToString());
