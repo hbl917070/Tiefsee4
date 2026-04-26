@@ -16,7 +16,7 @@ public class SystemWebViewBridge {
     private readonly ShortcutService _shortcutService = new();
     private readonly WallpaperService _wallpaperService = new();
     private readonly SystemEnvironmentService _systemEnvironmentService = new();
-    private readonly ProcessMemoryService _processMemoryService = new();
+    private readonly ProcessMemoryManager _processMemoryService = new();
 
     /// <summary>
     /// 建立系統整合相關的 WebView bridge

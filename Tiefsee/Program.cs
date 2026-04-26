@@ -29,7 +29,7 @@ static class Program {
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         AppPath.InitAppData();
 
-        var iniManager = new IniFileService(AppPath.appDataStartIni);
+        var iniManager = new IniFileHelper(AppPath.appDataStartIni);
         startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
         startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
         var appData = iniManager.ReadIniFile("temporary", "appData", "");
@@ -53,7 +53,7 @@ static class Program {
 
         // 啟動參數是 closeAll
         if (args.Length == 1 && args[0] == "closeAll") {
-            QuickRun.CloseAllWindow();
+            SingleInstanceCoordinator.CloseAllWindow();
             return;
         }
 
@@ -72,7 +72,7 @@ static class Program {
                 }
             }
             // 如果允許快速啟動，就不開啟新個體
-            if (QuickRun.Check(args)) { return; }
+            if (SingleInstanceCoordinator.Check(args)) { return; }
         }
 
         // 「直接啟動」之外的，都要避免連續啟動

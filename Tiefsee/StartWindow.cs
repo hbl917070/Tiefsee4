@@ -57,7 +57,7 @@ public class StartWindow : Form {
         // 如果有進行圖片運算的話，定時執行GC
         Adapter.LoopRun(30 * 1000, () => {
             if (isRunGC) {
-                ProcessMemoryService.CollectCurrentProcessMemory();
+                ProcessMemoryManager.CollectCurrentProcessMemory();
                 isRunGC = false;
             }
         }, true);
@@ -185,7 +185,7 @@ public class StartWindow : Form {
     /// </summary>
     public void RunNotifyIcon() {
 
-        QuickRun.WindowCreate();
+        SingleInstanceCoordinator.WindowCreate();
 
         System.Windows.Forms.NotifyIcon nIcon = new();
         nIcon.Icon = new System.Drawing.Icon(AppPath.logoIcon);
@@ -217,7 +217,7 @@ public class StartWindow : Form {
         item3.Click += (sender2, e2) => {
             nIcon.Visible = false;
             // QuickRun.runNumber = 0; // 不論存在幾個視窗都直接關閉
-            QuickRun.WindowFreed();
+            SingleInstanceCoordinator.WindowFreed();
         };
         cm.Items.Add(item3);
 

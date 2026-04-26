@@ -24,7 +24,7 @@ public sealed class TempCleanupService {
     public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
         new Thread(() => {
             if (Program.startType == 3 || Program.startType == 5) {
-                if (QuickRun.runNumber <= 2) {
+                if (SingleInstanceCoordinator.runNumber <= 2) {
                     DeleteTempDirectory(AppPath.tempDirImgProcessed, maxImgProcessed);
                     DeleteTempDirectory(AppPath.tempDirImgZoom, maxImgZoom);
                 }
@@ -33,7 +33,7 @@ public sealed class TempCleanupService {
 
             if (Directory.Exists(AppPath.appDataPort) == false) { return; }
             int portCount = Directory.GetFiles(AppPath.appDataPort).Length;
-            if (portCount == 1 && QuickRun.runNumber <= 1) {
+            if (portCount == 1 && SingleInstanceCoordinator.runNumber <= 1) {
                 DeleteTempDirectory(AppPath.tempDirImgProcessed, maxImgProcessed);
                 DeleteTempDirectory(AppPath.tempDirImgZoom, maxImgZoom);
             }

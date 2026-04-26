@@ -123,7 +123,7 @@ public class AppPath {
 
         if (needUpdateIni) {
             // 重新讀取 ini
-            var iniManager = new IniFileService(AppPath.appDataStartIni);
+            var iniManager = new IniFileHelper(AppPath.appDataStartIni);
             Program.startPort = Int32.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
             Program.startType = Int32.Parse(iniManager.ReadIniFile("setting", "startType", "3"));
             // 把資料寫入 ini 檔案，下次就可以直接讀取

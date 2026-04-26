@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝目前行程的記憶體整理與查詢
 /// </summary>
-public sealed class ProcessMemoryService {
+public sealed class ProcessMemoryManager {
 
     /// <summary>
     /// 取得目前行程記憶體使用量
@@ -36,7 +36,7 @@ public sealed class ProcessMemoryService {
     /// 提供舊呼叫點共用的靜態入口
     /// </summary>
     public static void CollectCurrentProcessMemory() {
-        new ProcessMemoryService().Collect();
+        new ProcessMemoryManager().Collect();
     }
 
     /// <summary>

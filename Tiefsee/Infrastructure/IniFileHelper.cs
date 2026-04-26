@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 存取 ini 檔
 /// </summary>
-public class IniFileService {
+public class IniFileHelper {
     private string filePath;
     private StringBuilder lpReturnedString;
     private int bufferSize;
@@ -17,7 +17,7 @@ public class IniFileService {
     [DllImport("kernel32")]
     private static extern int GetPrivateProfileString(string section, string key, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
 
-    public IniFileService(string iniPath) {
+    public IniFileHelper(string iniPath) {
         filePath = iniPath;
         bufferSize = 512;
         lpReturnedString = new StringBuilder(bufferSize);

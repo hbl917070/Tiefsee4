@@ -9,7 +9,7 @@ public sealed class WindowStartupConfigService {
     /// 儲存到 start.ini
     /// </summary>
     public void SetStartIni(int startPort, int startType) {
-        IniFileService iniManager = new(AppPath.appDataStartIni);
+        IniFileHelper iniManager = new(AppPath.appDataStartIni);
         iniManager.WriteIniFile("setting", "startPort", startPort);
         iniManager.WriteIniFile("setting", "startType", startType);
         Program.startPort = startPort;

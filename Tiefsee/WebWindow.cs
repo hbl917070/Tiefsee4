@@ -195,7 +195,7 @@ public class WebWindow : FormNone {
                     else {
                         Adapter.DelayRun(5000, () => {
                             Console.WriteLine("釋放");
-                            QuickRun.WindowCreate(); // 避免釋放後，window 數量對不起來
+                            SingleInstanceCoordinator.WindowCreate(); // 避免釋放後，window 數量對不起來
                             temp3.Close();
                         });
                     }
@@ -527,7 +527,7 @@ public class WebWindow : FormNone {
 
         this.FormClosed += (sender, e) => {
             SystemBridge.FileWatcherDispose(); // 停止偵測檔案變化
-            QuickRun.WindowFreed();
+            SingleInstanceCoordinator.WindowFreed();
         };
     }
 
@@ -626,7 +626,7 @@ public class WebWindow : FormNone {
             return;
         }
 
-        QuickRun.WindowCreate();
+        SingleInstanceCoordinator.WindowCreate();
 
         // --------
 
@@ -663,7 +663,7 @@ public class WebWindow : FormNone {
     /// </summary>
     public void HideWindow() {
         if (_isShow) {
-            QuickRun.WindowFreed();
+            SingleInstanceCoordinator.WindowFreed();
             _isShow = false;
             this.Hide();
         }

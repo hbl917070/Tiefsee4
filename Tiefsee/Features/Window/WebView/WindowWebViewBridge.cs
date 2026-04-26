@@ -84,7 +84,7 @@ public class WindowWebViewBridge {
     /// 關閉全部的視窗
     /// </summary>
     public void Exit() {
-        QuickRun.Exit();
+        SingleInstanceCoordinator.Exit();
     }
 
     /// <summary>

@@ -4,7 +4,10 @@ using System.Net.Http;
 
 namespace Tiefsee;
 
-public class QuickRun {
+/// <summary>
+/// 協調單一實例，用於實現快速啟動
+/// </summary>
+public class SingleInstanceCoordinator {
 
     public static int runNumber = 0; // 目前的視窗數量
 
