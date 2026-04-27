@@ -25,7 +25,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
     /// 取得系統內可啟動的 UWP app 清單
     /// </summary>
     private async Task GetUwpList(RequestData d) {
-        await WriteJson(d, new RunAppWebViewBridge().GetUwpList());
+        await WriteJson(d, new ExternalLauncherWebViewBridge().GetUwpList());
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
 
         ClipboardContent clipboardContentData = null;
         // 剪貼簿存取需透過既有 UI/STA 包裝呼叫
-        UiThreadScheduler.Invoke(_ => {
+        AppScheduler.Invoke(_ => {
             clipboardContentData = ClipboardHelper.GetClipboardContent(maxTextLength);
         }, null);
 
@@ -111,7 +111,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
         string[] loraNames = json.GetStringArray("loraNames");
         string[] excludeDirs = json.GetStringArray("excludeDirs");
 
-        var a1111ResourceService = new A1111ResourceService(AppPath.appDataA1111ModelList);
+        var a1111ResourceService = new A1111ResourceService(AppPaths.appDataA1111ModelList);
         var result = a1111ResourceService.GetA1111LoraResource(searchDirs, loraNames, excludeDirs);
         await WriteJson(d, result);
     }

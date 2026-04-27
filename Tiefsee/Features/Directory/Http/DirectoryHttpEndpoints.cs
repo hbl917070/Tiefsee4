@@ -98,7 +98,7 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
         string[] ar = json.GetStringArray("ar");
         string type = json.GetString("type");
 
-        await WriteJson(d, new FileSort().Sort(ar, type));
+        await WriteJson(d, new FileSortHelper().Sort(ar, type));
     }
 
     /// <summary>
@@ -110,6 +110,6 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
         string[] ar = json.GetStringArray("ar");
         string type = json.GetString("type");
 
-        await WriteJson(d, new FileSort().Sort2(dir, ar, type));
+        await WriteJson(d, new FileSortHelper().Sort2(dir, ar, type));
     }
 }

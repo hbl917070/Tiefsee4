@@ -39,15 +39,15 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         string[] arType = d.args["type"].Split(',');
 
         if (File.Exists(path) == false) {
-            await WriteJson(d, new ImgInitInfo());
+            await WriteJson(d, new ImageInitInfo());
             return;
         }
 
         if (HeadersAdd304(d, path)) { return; }
 
-        ImgInitInfo imgInfo = new();
+        ImageInitInfo imgInfo = new();
         // 依序嘗試不同解碼方式，找到第一個可成功取得尺寸的結果
-        UiThreadScheduler.RunWithTimeout(60, () => {
+        AppScheduler.RunWithTimeout(60, () => {
             for (int i = 0; i < arType.Length; i++) {
                 string type = arType[i];
                 try {
@@ -78,7 +78,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
 
         string imgPath = null;
         // vips 轉檔可能較久，加入超時機制避免無限等待
-        UiThreadScheduler.RunWithTimeout(60, () => {
+        AppScheduler.RunWithTimeout(60, () => {
             imgPath = _imageProcessingService.VipsResize(path, scale, fileType, vipsType);
         });
 

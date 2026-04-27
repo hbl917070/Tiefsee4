@@ -1,9 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Tiefsee;
 
-public class FileSort {
+public class FileSortHelper {
 
     /// <summary>
     /// 對檔案進行排序

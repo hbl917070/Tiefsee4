@@ -29,10 +29,10 @@ public class AnimatedImageHelper {
 
                 // 如果資料夾已經存在，則在資料夾後面加上「 (2)」
                 if (i == 1) {
-                    outputDir = Path.Combine(AppPath.tempDirWebFile, name);
+                    outputDir = Path.Combine(AppPaths.tempDirWebFile, name);
                 }
                 else {
-                    outputDir = Path.Combine(AppPath.tempDirWebFile, name) + $" ({i})";
+                    outputDir = Path.Combine(AppPaths.tempDirWebFile, name) + $" ({i})";
                 }
 
                 string infoPath = Path.Combine(outputDir, "info.json");

@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝外部程式啟動與開始選單掃描
 /// </summary>
-public sealed class ExternalLauncherService {
+public sealed class ExternalLaunchHelper {
 
     /// <summary>
     /// 顯示以其他程式開啟選單
@@ -43,19 +43,6 @@ public sealed class ExternalLauncherService {
         }
 
         return arFile.Where(file => Path.GetExtension(file).ToLower() == ".lnk").ToArray();
-    }
-
-    /// <summary>
-    /// 以 UWP 開啟檔案
-    /// </summary>
-    public async Task RunUwp(string uwpId, string filePath) {
-        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
-        if (file == null) { return; }
-
-        var options = new Windows.System.LauncherOptions {
-            TargetApplicationPackageFamilyName = uwpId
-        };
-        await Windows.System.Launcher.LaunchFileAsync(file, options);
     }
 
     /// <summary>

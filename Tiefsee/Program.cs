@@ -27,15 +27,15 @@ static class Program {
 
         // 修改 工作目錄 為程式資料夾 (如果有傳入 args 的話，工作目錄會被修改，所以需要改回來
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-        AppPath.InitAppData();
+        AppPaths.InitAppData();
 
-        var iniManager = new IniFileHelper(AppPath.appDataStartIni);
+        var iniManager = new IniFileHelper(AppPaths.appDataStartIni);
         startPort = int.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
         startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
         var appData = iniManager.ReadIniFile("temporary", "appData", "");
         var isStoreApp = iniManager.ReadIniFile("temporary", "isStoreApp", "") == "True";
 
-        AppPath.Init(appData, isStoreApp);
+        AppPaths.Init(appData, isStoreApp);
         services = AppBootstrapper.Bootstrap();
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
@@ -115,10 +115,10 @@ static class Program {
     private static bool AppLock(bool val) {
         if (val) {
 
-            if (File.Exists(AppPath.appDataLock)) {
+            if (File.Exists(AppPaths.appDataLock)) {
                 try {
                     long ticks = 0;
-                    using (StreamReader sr = new StreamReader(AppPath.appDataLock, System.Text.Encoding.UTF8)) {
+                    using (StreamReader sr = new StreamReader(AppPaths.appDataLock, System.Text.Encoding.UTF8)) {
                         ticks = long.Parse(sr.ReadToEnd());
                     }
 
@@ -135,7 +135,7 @@ static class Program {
             }
             else {
                 //using (File.Create(lockPath)) { }
-                using (FileStream fs = new FileStream(AppPath.appDataLock, FileMode.Create)) {
+                using (FileStream fs = new FileStream(AppPaths.appDataLock, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) {
                         sw.Write(DateTime.Now.Ticks.ToString());
                     }
@@ -145,8 +145,8 @@ static class Program {
 
         }
         else {
-            if (File.Exists(AppPath.appDataLock)) {
-                File.Delete(AppPath.appDataLock);
+            if (File.Exists(AppPaths.appDataLock)) {
+                File.Delete(AppPaths.appDataLock);
             }
         }
         return false;

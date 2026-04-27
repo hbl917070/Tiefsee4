@@ -5,7 +5,7 @@ namespace Tiefsee;
 /// <summary>
 /// 處理開機自動啟動狀態
 /// </summary>
-public sealed class StartupTaskService {
+public sealed class StartupTaskHelper {
 
     /// <summary>
     /// 取得目前的開機自動啟動狀態

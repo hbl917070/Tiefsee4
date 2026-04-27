@@ -4,12 +4,15 @@ using System.Text;
 
 namespace Tiefsee;
 
-public class LnkToExe {
+/// <summary>
+/// 處理從 lnk 捷徑抓取真實檔案位置
+/// </summary>
+public class ShortcutResolver {
 
     /// <summary>
     /// 從 lnk 捷徑抓取真實檔案位置
     /// </summary>
-    public static string GetExePate(string filename) {
+    public static string GetExePath(string filename) {
         ShellLink link = new ShellLink();
         ((IPersistFile)link).Load(filename, STGM_READ);
         // TODO: if I can get hold of the hwnd call resolve first. This handles moved and renamed files.

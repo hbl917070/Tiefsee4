@@ -188,7 +188,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         string path = Uri.UnescapeDataString(d.args["path"]);
         string url = Uri.UnescapeDataString(d.args["url"]);
 
-        string tempPath = Path.Combine(AppPath.tempDirWebFile, path);
+        string tempPath = Path.Combine(AppPaths.tempDirWebFile, path);
 
         string tempDir = Path.GetDirectoryName(tempPath);
         // 先確保暫存資料夾存在，避免下載完成後無法落檔

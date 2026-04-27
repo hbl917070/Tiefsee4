@@ -9,13 +9,13 @@ public class SystemWebViewBridge {
 
     WebWindow M;
     private readonly WebViewFileWatcherService _fileWatcherService = new();
-    private readonly StartupTaskService _startupTaskService = new();
+    private readonly StartupTaskHelper _startupTaskService = new();
     private readonly TempCleanupService _tempCleanupService = new();
-    private readonly FileAssociationService _fileAssociationService = new();
-    private readonly KeyboardSimulationService _keyboardSimulationService = new();
-    private readonly ShortcutService _shortcutService = new();
-    private readonly WallpaperService _wallpaperService = new();
-    private readonly SystemEnvironmentService _systemEnvironmentService = new();
+    private readonly FileAssociationHelper _fileAssociationService = new();
+    private readonly KeyboardSimulator _keyboardSimulationService = new();
+    private readonly ShortcutHelper _shortcutService = new();
+    private readonly WallpaperHelper _wallpaperService = new();
+    private readonly SystemEnvironmentHelper _systemEnvironmentService = new();
     private readonly ProcessMemoryManager _processMemoryService = new();
 
     /// <summary>
@@ -32,7 +32,7 @@ public class SystemWebViewBridge {
     /// <param name="path"> 要偵測的資料夾 </param>
     public void NewFileWatcher(string key, string path) {
         _fileWatcherService.NewFileWatcher(key, path, (string data) => {
-            UiThreadScheduler.UIThread(() => {
+            AppScheduler.UIThread(() => {
                 M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
             });
         });
@@ -267,7 +267,7 @@ public class SystemWebViewBridge {
         for (int i = 0; i < arFile.Length; i++) {
             arFile[i] = ar[i].ToString();
         }
-        var filesort = new FileSort();
+        var filesort = new FileSortHelper();
         return filesort.Sort(arFile, type);
     }
 
@@ -279,7 +279,7 @@ public class SystemWebViewBridge {
     /// <param name="type"></param>
     /// <returns></returns>
     public string[] Sort2(string dir, object[] ar, string type) {
-        var filesort = new FileSort();
+        var filesort = new FileSortHelper();
         return filesort.Sort2(dir, ar, type);
     }
 

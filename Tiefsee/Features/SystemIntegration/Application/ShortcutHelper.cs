@@ -5,7 +5,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝捷徑建立與解析
 /// </summary>
-public sealed class ShortcutService {
+public sealed class ShortcutHelper {
 
     /// <summary>
     /// 建立捷徑
@@ -25,6 +25,6 @@ public sealed class ShortcutService {
     /// 將 lnk 轉成 exe 路徑
     /// </summary>
     public string LnkToExePath(string path) {
-        return LnkToExe.GetExePate(path);
+        return ShortcutResolver.GetExePath(path);
     }
 }

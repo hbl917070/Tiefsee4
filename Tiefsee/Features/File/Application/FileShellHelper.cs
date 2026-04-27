@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝檔案總管與原生右鍵選單相關操作
 /// </summary>
-public sealed class FileShellService {
+public sealed class FileShellHelper {
 
     /// <summary>
     /// 取得作業系統所在的磁碟根目錄

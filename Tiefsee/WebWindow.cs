@@ -46,7 +46,7 @@ public class WebWindow : FormNone {
     public FileWebViewBridge FileBridge;
     public PathWebViewBridge PathBridge;
     public SystemWebViewBridge SystemBridge;
-    public RunAppWebViewBridge RunAppBridge;
+    public ExternalLauncherWebViewBridge RunAppBridge;
     public ImageWebViewBridge ImageBridge;
 
     /// <summary>
@@ -179,7 +179,7 @@ public class WebWindow : FormNone {
 
         url = GetHtmlFilePath(url);
 
-        UiThreadScheduler.DelayRun(10, async () => {
+        AppScheduler.DelayRun(10, async () => {
             if (_tempWindow != null) { return; }
             WebWindow temp3 = new();
             temp3._isDelayInit = true;
@@ -188,12 +188,12 @@ public class WebWindow : FormNone {
             temp3._wv2.CoreWebView2.Navigate(url);
             // 如果視窗載入完成時，tempWindow 已經被暫用，則釋放這個 window
             void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
-                UiThreadScheduler.DelayRun(100, () => {
+                AppScheduler.DelayRun(100, () => {
                     if (_tempWindow == null) {
                         _tempWindow = temp3;
                     }
                     else {
-                        UiThreadScheduler.DelayRun(5000, () => {
+                        AppScheduler.DelayRun(5000, () => {
                             Console.WriteLine("釋放");
                             SingleInstanceCoordinator.WindowCreate(); // 避免釋放後，window 數量對不起來
                             temp3.Close();
@@ -250,10 +250,10 @@ public class WebWindow : FormNone {
             startType = Program.startType,
             startPort = Program.startPort,
             appDirPath = System.AppDomain.CurrentDomain.BaseDirectory,
-            appDataPath = AppPath.appData,
-            tempDirWebFile = AppPath.tempDirWebFile,
+            appDataPath = AppPaths.appData,
+            tempDirWebFile = AppPaths.tempDirWebFile,
             mainPort = Program.webServer.port,
-            settingPath = AppPath.appDataSetting,
+            settingPath = AppPaths.appDataSetting,
             quickLookRunType = quickLookRunType,
             isWin11 = StartWindow.isWin11,
             isStoreApp = StartWindow.isStoreApp
@@ -296,7 +296,7 @@ public class WebWindow : FormNone {
                 "--msWebView2CancelInitialNavigation", // 取消 webview2 預設的導航行為
             };
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = string.Join(" ", arguments) };
-            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPath.appData, opts);
+            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPaths.appData, opts);
         }
         return _webView2Environment;
     }
@@ -318,7 +318,7 @@ public class WebWindow : FormNone {
         this.Hide();
 
         // 降低調整 webview 縮放頻率，可提升縮放視窗的流暢度
-        UiThreadScheduler.LoopRun(20, () => {
+        AppScheduler.LoopRun(20, () => {
 
             if (_isShow == false) { return; }
 
@@ -382,7 +382,7 @@ public class WebWindow : FormNone {
         FileBridge = new FileWebViewBridge(this);
         PathBridge = new PathWebViewBridge(this);
         SystemBridge = new SystemWebViewBridge(this);
-        RunAppBridge = new RunAppWebViewBridge(this);
+        RunAppBridge = new ExternalLauncherWebViewBridge(this);
         ImageBridge = new ImageWebViewBridge(this);
         _wv2.CoreWebView2.AddHostObjectToScript("WindowBridge", WindowBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("DirectoryBridge", DirectoryBridge);
@@ -623,7 +623,7 @@ public class WebWindow : FormNone {
     /// 關閉視窗
     /// </summary>
     public void CloseWindow() {
-        UiThreadScheduler.DelayRun(1, () => {
+        AppScheduler.DelayRun(1, () => {
             if (_tempWindow == this) { _tempWindow = null; }
             Close();
         });

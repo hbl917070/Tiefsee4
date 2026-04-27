@@ -1,4 +1,4 @@
-﻿//
+//
 // https://github.com/RJCodeAdvance/Dropdown-Menu-CSharp-WinForms
 //
 
@@ -97,7 +97,7 @@ public class RJDropdownMenu : ContextMenuStrip {
         // 顯示選單後，讓選單取得焦點
         VisibleChanged += (sender, e) => {
             if (Visible) {
-                UiThreadScheduler.DelayRun(1, () => {
+                AppScheduler.DelayRun(1, () => {
                     Focus();
                 });
             }

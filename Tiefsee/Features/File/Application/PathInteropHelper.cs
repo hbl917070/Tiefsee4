@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝 Windows 路徑互通相關處理
 /// </summary>
-public sealed class PathInteropService {
+public sealed class PathInteropHelper {
 
     /// <summary>
     /// 把長路徑轉成短路徑

@@ -24,7 +24,7 @@ public sealed class WindowHttpEndpoints : HttpEndpointModuleBase {
         string[] args = arg.Split('\n');
 
         // 視窗建立必須切回 UI thread 執行
-        UiThreadScheduler.UIThread(() => {
+        AppScheduler.UIThread(() => {
             WebWindow.Create("MainWindow.html", args, null);
         });
 
@@ -35,7 +35,7 @@ public sealed class WindowHttpEndpoints : HttpEndpointModuleBase {
     /// 關閉目前所有可見視窗
     /// </summary>
     private async Task CloseAllWindow(RequestData d) {
-        UiThreadScheduler.UIThread(() => {
+        AppScheduler.UIThread(() => {
             WebWindow.CloseAllWindow();
         });
         await WriteString(d, "ok");

@@ -7,7 +7,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝副檔名關聯設定
 /// </summary>
-public sealed class FileAssociationService {
+public sealed class FileAssociationHelper {
 
     /// <summary>
     /// 建立副檔名關聯

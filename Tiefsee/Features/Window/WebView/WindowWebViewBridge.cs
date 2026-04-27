@@ -8,9 +8,9 @@ namespace Tiefsee;
 public class WindowWebViewBridge {
 
     public WebWindow M;
-    private readonly WindowBrowserService _windowBrowserService = new();
+    private readonly WebViewBrowserHelper _windowBrowserService = new();
     private readonly WindowStartupConfigService _windowStartupConfigService = new();
-    private readonly AppRuntimePathService _appRuntimePathService = new();
+    private readonly AppInfoService _appRuntimePathService = new();
     private readonly SubWindowService _subWindowService = new();
 
     /// <summary>
@@ -240,7 +240,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppDataPath() {
-        return _appRuntimePathService.GetAppDataPath();
+        return AppPaths.GetAppDataPath();
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppDirPath() {
-        return _appRuntimePathService.GetAppDirPath();
+        return AppPaths.GetAppDirPath();
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppPath() {
-        return _appRuntimePathService.GetAppPath();
+        return AppPaths.GetAppPath();
     }
 
     /// <summary>
@@ -264,7 +264,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetTiefseePath() {
-        return _appRuntimePathService.GetTiefseePath();
+        return AppPaths.GetTiefseePath();
     }
 
     /// <summary>

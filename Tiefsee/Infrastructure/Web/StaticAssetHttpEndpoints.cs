@@ -45,7 +45,7 @@ public sealed class StaticAssetHttpEndpoints : HttpEndpointModuleBase {
     /// 取得 plugin 目錄中的靜態資源
     /// </summary>
     private async Task GetPlugin(RequestData d) {
-        string path = Path.Combine(AppPath.appDataPlugin, d.value);
+        string path = Path.Combine(AppPaths.appDataPlugin, d.value);
 
         if (await CheckFileExist(d, path) == false) { return; }
         if (HeadersAdd304(d, path)) { return; }

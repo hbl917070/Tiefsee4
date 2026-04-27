@@ -3,7 +3,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝檔案選擇對話框
 /// </summary>
-public sealed class FileOpenDialogService {
+public sealed class FileOpenDialogHelper {
 
     /// <summary>
     /// 開啟檔案選擇視窗

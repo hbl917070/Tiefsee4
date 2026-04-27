@@ -6,7 +6,7 @@ namespace Tiefsee;
 [ComVisible(true)]
 public class PathWebViewBridge {
 
-    private readonly PathInteropService _pathInteropService = new();
+    private readonly PathInteropHelper _pathInteropService = new();
 
     /// <summary>
     /// 建立路徑相關的 WebView bridge

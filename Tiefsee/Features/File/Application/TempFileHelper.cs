@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 處理暫存檔建立與 base64 落檔
 /// </summary>
-public sealed class TempFileService {
+public sealed class TempFileHelper {
 
     /// <summary>
     /// 將 base64 內容寫入 tempDirWebFile 並回傳路徑
@@ -40,7 +40,7 @@ public sealed class TempFileService {
     private string GetUniqueTempFilePath(string extension) {
         while (true) {
             string name = DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + GenerateRandomString(10) + "." + extension;
-            string path = Path.Combine(AppPath.tempDirWebFile, name);
+            string path = Path.Combine(AppPaths.tempDirWebFile, name);
             if (File.Exists(path) == false) {
                 return path;
             }
@@ -51,8 +51,8 @@ public sealed class TempFileService {
     /// 確保暫存目錄存在
     /// </summary>
     private void EnsureTempDirectory() {
-        if (Directory.Exists(AppPath.tempDirWebFile) == false) {
-            Directory.CreateDirectory(AppPath.tempDirWebFile);
+        if (Directory.Exists(AppPaths.tempDirWebFile) == false) {
+            Directory.CreateDirectory(AppPaths.tempDirWebFile);
         }
     }
 

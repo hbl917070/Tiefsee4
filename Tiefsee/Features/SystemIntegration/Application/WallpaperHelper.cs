@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝桌布設定
 /// </summary>
-public sealed class WallpaperService {
+public sealed class WallpaperHelper {
 
     /// <summary>
     /// 設定桌布

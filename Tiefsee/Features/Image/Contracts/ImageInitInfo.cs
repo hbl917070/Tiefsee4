@@ -3,7 +3,7 @@ namespace Tiefsee;
 /// <summary>
 /// 圖片初始化後的基本資訊
 /// </summary>
-public class ImgInitInfo {
+public class ImageInitInfo {
     /// <summary>
     /// "1" 代表成功，其他值代表失敗
     /// </summary>

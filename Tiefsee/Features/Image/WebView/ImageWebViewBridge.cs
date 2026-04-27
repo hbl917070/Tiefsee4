@@ -8,7 +8,7 @@ namespace Tiefsee;
 public class ImageWebViewBridge {
 
     private readonly WebWindow _window;
-    private readonly ImageBase64Service _imageBase64Service;
+    private readonly ImageBase64Helper _imageBase64Service;
     private readonly ImageProcessingService _imageProcessingService;
 
     /// <summary>
@@ -16,7 +16,7 @@ public class ImageWebViewBridge {
     /// </summary>
     public ImageWebViewBridge(WebWindow window) {
         _window = window;
-        _imageBase64Service = new ImageBase64Service();
+        _imageBase64Service = new ImageBase64Helper();
         _imageProcessingService = Program.services.ImageProcessing;
     }
 

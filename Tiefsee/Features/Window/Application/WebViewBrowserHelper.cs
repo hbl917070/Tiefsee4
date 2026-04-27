@@ -3,7 +3,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝 WebView2 開發工具與瀏覽器資訊
 /// </summary>
-public sealed class WindowBrowserService {
+public sealed class WebViewBrowserHelper {
 
     /// <summary>
     /// 清理 webview2 的暫存

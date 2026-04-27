@@ -6,20 +6,33 @@ using Windows.Management.Deployment;
 namespace Tiefsee;
 
 /// <summary>
-/// 取得與快取 UWP app 清單
+/// UWP App
 /// </summary>
 public sealed class UwpAppService {
 
-    private static Dictionary<string, UwpItem> _tempUwpItem = null;
+    private Dictionary<string, UwpItem> _tempUwpItems = null;
+
+    /// <summary>
+    /// 以 UWP 開啟檔案
+    /// </summary>
+    public async Task RunUwp(string uwpId, string filePath) {
+        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
+        if (file == null) { return; }
+
+        var options = new Windows.System.LauncherOptions {
+            TargetApplicationPackageFamilyName = uwpId
+        };
+        await Windows.System.Launcher.LaunchFileAsync(file, options);
+    }
 
     /// <summary>
     /// 取得 UWP 列表
     /// </summary>
     public List<UwpItem> GetUwpList() {
         bool isFirstRun = false;
-        if (_tempUwpItem == null) {
+        if (_tempUwpItems == null) {
             isFirstRun = true;
-            _tempUwpItem = LoadCache();
+            _tempUwpItems = LoadCache();
         }
 
         var tempAppDataUwpList = new Dictionary<string, UwpItem>();
@@ -30,19 +43,19 @@ public sealed class UwpAppService {
         foreach (var package in packages) {
             string fullName = package.Id.FullName;
 
-            if (_tempUwpItem.ContainsKey(fullName) == false) {
+            if (_tempUwpItems.ContainsKey(fullName) == false) {
                 TryAddPackage(package, fullName);
             }
 
-            if (_tempUwpItem.ContainsKey(fullName) == false) {
+            if (_tempUwpItems.ContainsKey(fullName) == false) {
                 continue;
             }
 
             if (isFirstRun) {
-                tempAppDataUwpList.Add(fullName, _tempUwpItem[fullName]);
+                tempAppDataUwpList.Add(fullName, _tempUwpItems[fullName]);
             }
 
-            result.Add(_tempUwpItem[fullName]);
+            result.Add(_tempUwpItems[fullName]);
         }
 
         if (isFirstRun) {
@@ -58,8 +71,8 @@ public sealed class UwpAppService {
     private Dictionary<string, UwpItem> LoadCache() {
         try {
             string jsonString = "{}";
-            if (File.Exists(AppPath.appDataUwpList)) {
-                using StreamReader sr = new(AppPath.appDataUwpList, Encoding.UTF8);
+            if (File.Exists(AppPaths.appDataUwpList)) {
+                using StreamReader sr = new(AppPaths.appDataUwpList, Encoding.UTF8);
                 jsonString = sr.ReadToEnd();
             }
 
@@ -86,7 +99,7 @@ public sealed class UwpAppService {
                 return;
             }
 
-            _tempUwpItem.Add(fullName, new UwpItem {
+            _tempUwpItems.Add(fullName, new UwpItem {
                 Logo = logo,
                 Name = name,
                 Id = id
@@ -99,7 +112,7 @@ public sealed class UwpAppService {
     /// 將快取寫回檔案
     /// </summary>
     private void SaveCache(Dictionary<string, UwpItem> tempAppDataUwpList) {
-        using var fs = new FileStream(AppPath.appDataUwpList, FileMode.Create);
+        using var fs = new FileStream(AppPaths.appDataUwpList, FileMode.Create);
         using var sw = new StreamWriter(fs, Encoding.UTF8);
         sw.Write(JsonSerializer.Serialize(tempAppDataUwpList));
     }

@@ -5,7 +5,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝拖曳檔案到外部程式的行為
 /// </summary>
-public sealed class FileDragDropService {
+public sealed class FileDragDropHelper {
 
     private readonly ImageProcessingService _imageProcessingService = Program.services.ImageProcessing;
 

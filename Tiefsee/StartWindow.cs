@@ -26,7 +26,7 @@ public class StartWindow : Form {
         isWin11 = Environment.OSVersion.Version.Build >= 22000;
         desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-        UiThreadScheduler.Initialize();
+        AppScheduler.Initialize();
         PluginRegistry.Init();
 
         PortLock(); // 寫入檔案，表示此 port 已經被佔用
@@ -55,7 +55,7 @@ public class StartWindow : Form {
         };
 
         // 如果有進行圖片運算的話，定時執行GC
-        UiThreadScheduler.LoopRun(30 * 1000, () => {
+        AppScheduler.LoopRun(30 * 1000, () => {
             if (isRunGC) {
                 ProcessMemoryManager.CollectCurrentProcessMemory();
                 isRunGC = false;
@@ -76,7 +76,7 @@ public class StartWindow : Form {
 
         bool isDown = false;
 
-        UiThreadScheduler.LoopRun(50, () => {
+        AppScheduler.LoopRun(50, () => {
 
             bool isKeyboardSpace = Keyboard.IsKeyDown(Key.Space); // 按著空白鍵
 
@@ -148,12 +148,12 @@ public class StartWindow : Form {
     /// <param name="post"></param>
     public void PortLock() {
 
-        if (Directory.Exists(AppPath.appDataPort) == false) { // 如果資料夾不存在，就新建
-            Directory.CreateDirectory(AppPath.appDataPort);
+        if (Directory.Exists(AppPaths.appDataPort) == false) { // 如果資料夾不存在，就新建
+            Directory.CreateDirectory(AppPaths.appDataPort);
         }
 
         int port = Program.webServer.port;
-        string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
+        string portFile = Path.Combine(AppPaths.appDataPort, port.ToString());
         if (File.Exists(portFile) == false) {
             fsPort = new FileStream(portFile, FileMode.Create);
         }
@@ -174,7 +174,7 @@ public class StartWindow : Form {
         catch { }
 
         int port = Program.webServer.port;
-        string portFile = Path.Combine(AppPath.appDataPort, port.ToString());
+        string portFile = Path.Combine(AppPaths.appDataPort, port.ToString());
         if (File.Exists(portFile) == true) {
             File.Delete(portFile);
         }
@@ -188,7 +188,7 @@ public class StartWindow : Form {
         SingleInstanceCoordinator.WindowCreate();
 
         System.Windows.Forms.NotifyIcon nIcon = new();
-        nIcon.Icon = new System.Drawing.Icon(AppPath.logoIcon);
+        nIcon.Icon = new System.Drawing.Icon(AppPaths.logoIcon);
         nIcon.Text = "TiefSee";
         nIcon.Visible = true;
         nIcon.DoubleClick += (sender, e) => {
@@ -263,7 +263,7 @@ public class StartWindow : Form {
             if (IsWebView2Runtime() == true) { // 檢查安裝webview2執行環境
                 return;
             }
-            UiThreadScheduler.UIThread(() => { // 如果沒有執行環境，就用瀏覽器開啟下載頁面
+            AppScheduler.UIThread(() => { // 如果沒有執行環境，就用瀏覽器開啟下載頁面
                 MessageBox.Show("WebView2 must be installed to run this application");
                 System.Diagnostics.Process.Start("https://developer.microsoft.com/microsoft-edge/webview2/");
                 this.Close();
@@ -299,11 +299,11 @@ public class StartWindow : Form {
                 PipeTransmissionMode.Message);
 
             // 等待客戶端連接
-            while (UiThreadScheduler.isRuning) {
+            while (AppScheduler.isRuning) {
                 server.WaitForConnection();
 
                 // 客戶端已連接
-                while (UiThreadScheduler.isRuning) {
+                while (AppScheduler.isRuning) {
 
                     // 讀取客戶端發送的訊息
                     var buffer = new byte[1024];
@@ -318,7 +318,7 @@ public class StartWindow : Form {
 
                     // 將字串剖析回命令列參數
                     string[] args = message.Split('\n');
-                    UiThreadScheduler.UIThread(() => {
+                    AppScheduler.UIThread(() => {
                         WebWindow.Create("MainWindow.html", args, null);
                     });
 

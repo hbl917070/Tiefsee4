@@ -1,6 +1,6 @@
 namespace Tiefsee;
 
-public static class UiThreadScheduler {
+public static class AppScheduler {
 
     public static SynchronizationContext Dispacher { get; private set; }
 
@@ -11,8 +11,8 @@ public static class UiThreadScheduler {
     /// 請於 UI 執行緒呼叫此方法
     /// </summary>
     public static void Initialize() {
-        if (UiThreadScheduler.Dispacher == null)
-            UiThreadScheduler.Dispacher = SynchronizationContext.Current;
+        if (AppScheduler.Dispacher == null)
+            AppScheduler.Dispacher = SynchronizationContext.Current;
     }
 
     /// <summary>

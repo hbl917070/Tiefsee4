@@ -6,7 +6,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝作業系統與桌面環境資訊
 /// </summary>
-public sealed class SystemEnvironmentService {
+public sealed class SystemEnvironmentHelper {
 
     /// <summary>
     /// 取得作業系統所在的磁碟根目錄

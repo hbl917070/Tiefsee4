@@ -9,10 +9,10 @@ namespace Tiefsee;
 public class FileWebViewBridge {
 
     WebWindow M;
-    private readonly TempFileService _tempFileService = new();
-    private readonly FileShellService _fileShellService = new();
-    private readonly FileOpenDialogService _fileOpenDialogService = new();
-    private readonly FileDragDropService _fileDragDropService = new();
+    private readonly TempFileHelper _tempFileService = new();
+    private readonly FileShellHelper _fileShellService = new();
+    private readonly FileOpenDialogHelper _fileOpenDialogService = new();
+    private readonly FileDragDropHelper _fileDragDropService = new();
 
     /// <summary>
     /// 建立檔案相關的 WebView bridge

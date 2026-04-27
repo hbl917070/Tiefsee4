@@ -7,7 +7,7 @@ namespace Tiefsee;
 /// <summary>
 /// 處理圖片與 base64 互轉的服務
 /// </summary>
-public sealed class ImageBase64Service {
+public sealed class ImageBase64Helper {
 
     /// <summary>
     /// 將 Bitmap 轉成 data URL 格式的 PNG base64 字串

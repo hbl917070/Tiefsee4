@@ -5,7 +5,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝鍵盤模擬操作
 /// </summary>
-public sealed class KeyboardSimulationService {
+public sealed class KeyboardSimulator {
 
     private const int KEYEVENTF_KEYUP = 2;
 

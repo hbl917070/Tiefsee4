@@ -25,7 +25,7 @@ public class SingleInstanceCoordinator {
         runNumber -= 1;
 
         if (runNumber <= 0) {
-            UiThreadScheduler.Shutdown();
+            AppScheduler.Shutdown();
             Program.startWindow.PortFreed();
             Program.startWindow.Close(); // 關閉此視窗，程式就會完全結束
         }
@@ -42,7 +42,7 @@ public class SingleInstanceCoordinator {
         }
 
         // 找不到記錄 port 的資料夾
-        if (Directory.Exists(AppPath.appDataPort) == false) {
+        if (Directory.Exists(AppPaths.appDataPort) == false) {
             return false;
         }
 
@@ -83,7 +83,7 @@ public class SingleInstanceCoordinator {
             }
 
             // 刪除所有的 port 檔案
-            foreach (string filePort in Directory.GetFiles(AppPath.appDataPort, "*")) {
+            foreach (string filePort in Directory.GetFiles(AppPaths.appDataPort, "*")) {
                 try {
                     File.Delete(filePort);
                     continue;
@@ -103,7 +103,7 @@ public class SingleInstanceCoordinator {
     /// </summary>
     private static int GetPort() {
 
-        foreach (string filePort in Directory.GetFiles(AppPath.appDataPort, "*")) { // 判斷目前已經開啟的視窗
+        foreach (string filePort in Directory.GetFiles(AppPaths.appDataPort, "*")) { // 判斷目前已經開啟的視窗
 
             try {
                 using (FileStream flagFile = File.Open(filePort, FileMode.Open)) { }

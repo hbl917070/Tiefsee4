@@ -41,7 +41,7 @@ public sealed class ImageProcessingService {
         Bitmap icon = null;
 
         try {
-            UiThreadScheduler.RunWithTimeout(waitSec, () => {
+            AppScheduler.RunWithTimeout(waitSec, () => {
                 // 取得圖片在檔案總管的縮圖
                 icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
             });
@@ -329,14 +329,14 @@ public sealed class ImageProcessingService {
         }
 
         string hashName = FileTypeHelper.FileToHash(path) + "_hdrfix.png"; // 暫存檔案名稱
-        string outputPath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
+        string outputPath = Path.Combine(AppPaths.tempDirImgProcessed, hashName); // 暫存檔案的路徑
 
         if (File.Exists(outputPath)) {
             return outputPath;
         }
 
-        if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPath.tempDirImgProcessed);
+        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
         }
 
         string arg = $"\"{path}\" \"{outputPath}\"";
@@ -365,14 +365,14 @@ public sealed class ImageProcessingService {
 
         type = type.ToLower();
         string hashName = FileTypeHelper.FileToHash(path) + ".jpg";
-        string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName);
+        string filePath = Path.Combine(AppPaths.tempDirImgProcessed, hashName);
 
         if (File.Exists(filePath)) {
             return filePath;
         }
 
-        if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPath.tempDirImgProcessed);
+        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
         }
 
         string argOut = "";
@@ -661,9 +661,9 @@ public sealed class ImageProcessingService {
     /// <summary>
     /// 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
     /// </summary>
-    public ImgInitInfo GetImgInitInfo(string path, string type, string vipsType) {
+    public ImageInitInfo GetImgInitInfo(string path, string type, string vipsType) {
 
-        ImgInitInfo imgInfo = new();
+        ImageInitInfo imgInfo = new();
 
         string path100 = PathToImgProcessed(path, vipsType);
 
@@ -835,7 +835,7 @@ public sealed class ImageProcessingService {
     public string VipsResize(string path, double scale, string fileType, string vipsType) {
 
         string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
-        string filePath = Path.Combine(AppPath.tempDirImgZoom, hashName); // 暫存檔案的路徑
+        string filePath = Path.Combine(AppPaths.tempDirImgZoom, hashName); // 暫存檔案的路徑
 
         // 如果檔案已經存在，就直接回傳
         if (File.Exists(filePath)) {
@@ -844,8 +844,8 @@ public sealed class ImageProcessingService {
             return filePath;
         }
 
-        if (Directory.Exists(AppPath.tempDirImgZoom) == false) {
-            Directory.CreateDirectory(AppPath.tempDirImgZoom);
+        if (Directory.Exists(AppPaths.tempDirImgZoom) == false) {
+            Directory.CreateDirectory(AppPaths.tempDirImgZoom);
         }
 
         string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
@@ -952,9 +952,9 @@ public sealed class ImageProcessingService {
     /// </summary>
     private string PathToImgProcessed(string path, string vipsType, string ext = "jpg") {
         string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
-        string filePath = Path.Combine(AppPath.tempDirImgProcessed, hashName); // 暫存檔案的路徑
-        if (Directory.Exists(AppPath.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPath.tempDirImgProcessed);
+        string filePath = Path.Combine(AppPaths.tempDirImgProcessed, hashName); // 暫存檔案的路徑
+        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
         }
         return filePath;
     }
