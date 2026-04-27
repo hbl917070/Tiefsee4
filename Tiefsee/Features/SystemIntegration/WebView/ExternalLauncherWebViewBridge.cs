@@ -6,9 +6,9 @@ namespace Tiefsee;
 public class ExternalLauncherWebViewBridge {
 
     WebWindow M;
-    private readonly UwpAppService _uwpAppService = new();
-    private readonly SystemEnvironmentHelper _systemEnvironmentService = new();
-    private readonly ExternalLaunchHelper _externalLauncherService = new();
+    private readonly UwpAppService _uwpAppService;
+    private readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
+    private readonly ExternalLaunchHelper _externalLauncherHelper = new();
 
     /// <summary>
     /// 建立外部程式啟動相關的 WebView bridge
@@ -16,33 +16,29 @@ public class ExternalLauncherWebViewBridge {
     /// <param name="m"></param>
     public ExternalLauncherWebViewBridge(WebWindow m) {
         this.M = m;
+        _uwpAppService = Program.services.UwpApp;
     }
-
-    /// <summary>
-    /// 提供序列化或設計工具使用的空白建構式
-    /// </summary>
-    public ExternalLauncherWebViewBridge() { }
 
     /// <summary>
     /// 以其他程式開啟(系統原生選單)
     /// </summary>
     /// <param name="path"></param>
     public void ShowMenu(string path) {
-        _externalLauncherService.ShowOpenWithMenu(path);
+        _externalLauncherHelper.ShowOpenWithMenu(path);
     }
 
     /// <summary>
     /// 取得開始選單裡面的所有 lnk
     /// </summary>
     public string[] GetStartMenuList() {
-        return _externalLauncherService.GetStartMenuList(GetSystemRoot());
+        return _externalLauncherHelper.GetStartMenuList(GetSystemRoot());
     }
 
     /// <summary>
     /// 取得系統槽，例如 C:\
     /// </summary>
     public string GetSystemRoot() {
-        return _systemEnvironmentService.GetSystemRoot();
+        return _systemEnvironmentHelper.GetSystemRoot();
     }
 
     /// <summary>
@@ -69,7 +65,7 @@ public class ExternalLauncherWebViewBridge {
     /// <param name="CreateNoWindow"></param>
     /// <param name="UseShellExecute"></param>
     public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
-        _externalLauncherService.ProcessStart(FileName, Arguments, CreateNoWindow, UseShellExecute);
+        _externalLauncherHelper.ProcessStart(FileName, Arguments, CreateNoWindow, UseShellExecute);
     }
 
     /// <summary>
@@ -77,6 +73,6 @@ public class ExternalLauncherWebViewBridge {
     /// </summary>
     /// <param name="url"></param>
     public bool OpenUrl(string url) {
-        return _externalLauncherService.OpenUrl(url);
+        return _externalLauncherHelper.OpenUrl(url);
     }
 }

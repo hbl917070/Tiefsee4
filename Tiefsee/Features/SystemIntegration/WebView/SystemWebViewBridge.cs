@@ -8,15 +8,15 @@ namespace Tiefsee;
 public class SystemWebViewBridge {
 
     WebWindow M;
-    private readonly WebViewFileWatcherService _fileWatcherService = new();
-    private readonly StartupTaskHelper _startupTaskService = new();
+    private readonly WebViewFileWatcherService _webViewFileWatcherService = new();
+    private readonly StartupTaskHelper _startupTaskHelper = new();
     private readonly TempCleanupService _tempCleanupService = new();
-    private readonly FileAssociationHelper _fileAssociationService = new();
-    private readonly KeyboardSimulator _keyboardSimulationService = new();
-    private readonly ShortcutHelper _shortcutService = new();
-    private readonly WallpaperHelper _wallpaperService = new();
-    private readonly SystemEnvironmentHelper _systemEnvironmentService = new();
-    private readonly ProcessMemoryManager _processMemoryService = new();
+    private readonly FileAssociationHelper _fileAssociationHelper = new();
+    private readonly KeyboardSimulator _keyboardSimulator = new();
+    private readonly ShortcutHelper _shortcutHelper = new();
+    private readonly WallpaperHelper _wallpaperHelper = new();
+    private readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
+    private readonly ProcessMemoryManager _processMemoryManager = new();
 
     /// <summary>
     /// 建立系統整合相關的 WebView bridge
@@ -31,7 +31,7 @@ public class SystemWebViewBridge {
     /// <param name="key"> 如果需要偵測多個資料夾，用此欄位來進行區分 </param>
     /// <param name="path"> 要偵測的資料夾 </param>
     public void NewFileWatcher(string key, string path) {
-        _fileWatcherService.NewFileWatcher(key, path, (string data) => {
+        _webViewFileWatcherService.NewFileWatcher(key, path, (string data) => {
             AppScheduler.UIThread(() => {
                 M.RunJs($@"if(window.baseWindow !== undefined) baseWindow.onFileWatcher({data});");
             });
@@ -42,21 +42,21 @@ public class SystemWebViewBridge {
     /// 停止偵測檔案變化
     /// </summary>
     public void FileWatcherDispose() {
-        _fileWatcherService.Dispose();
+        _webViewFileWatcherService.Dispose();
     }
 
     /// <summary>
     /// 取得當前是否有使用「開機自動啟動」
     /// </summary>
     public async Task<string> GetTiefseTask() {
-        return await _startupTaskService.GetTiefseeTaskState();
+        return await _startupTaskHelper.GetTiefseeTaskState();
     }
 
     /// <summary>
     /// 設定當前是否有使用「開機自動啟動」
     /// </summary>
     public async Task<string> SetTiefseTask(bool val) {
-        return await _startupTaskService.SetTiefseeTaskState(val);
+        return await _startupTaskHelper.SetTiefseeTaskState(val);
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public class SystemWebViewBridge {
     /// <param name="lnkPath"> 要儲存的ink路徑 </param>
     /// <param name="args"> 啟動參數 </param>
     public void NewLnk(string exePath, string lnkPath, string args) {
-        _shortcutService.CreateShortcut(exePath, lnkPath, args);
+        _shortcutHelper.CreateShortcut(exePath, lnkPath, args);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class SystemWebViewBridge {
     /// </summary>
     /// <param name="key"> 例如 A = ctrl+A </param>
     public void SendKeys_CtrlAnd(string key) {
-        _keyboardSimulationService.SendCtrlAnd(key);
+        _keyboardSimulator.SendCtrlAnd(key);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public class SystemWebViewBridge {
     /// </summary>
     /// <param name="keys"> 例如^a = ctrl+A </param>
     public void SendKeys_Send(string keys) {
-        _keyboardSimulationService.Send(keys);
+        _keyboardSimulator.Send(keys);
     }
 
     /// <summary>
@@ -183,35 +183,35 @@ public class SystemWebViewBridge {
     /// 取得作業系統所在的槽，例如 「C:\」
     /// </summary>
     public string GetSystemRoot() {
-        return _systemEnvironmentService.GetSystemRoot();
+        return _systemEnvironmentHelper.GetSystemRoot();
     }
 
     /// <summary>
     /// 取得滑鼠的坐標
     /// </summary>
     public int[] GetMousePosition() {
-        return _systemEnvironmentService.GetMousePosition();
+        return _systemEnvironmentHelper.GetMousePosition();
     }
 
     /// <summary>
     /// 設定桌布
     /// </summary>
     public void SetWallpaper(string path) {
-        _wallpaperService.SetWallpaper(path);
+        _wallpaperHelper.SetWallpaper(path);
     }
 
     /// <summary>
     /// 判斷是否為 win10
     /// </summary>
     public bool IsWindows10() {
-        return _systemEnvironmentService.IsWindows10();
+        return _systemEnvironmentHelper.IsWindows10();
     }
 
     /// <summary>
     /// 判斷是否為 win7
     /// </summary>
     public bool IsWindows7() {
-        return _systemEnvironmentService.IsWindows7();
+        return _systemEnvironmentHelper.IsWindows7();
     }
 
     /// <summary>
@@ -219,21 +219,21 @@ public class SystemWebViewBridge {
     /// </summary>
     /// <param name="path"> lnk捷徑 </param>
     public string LnkToExePath(string path) {
-        return _shortcutService.LnkToExePath(path);
+        return _shortcutHelper.LnkToExePath(path);
     }
 
     /// <summary>
     /// 回傳程式目前記憶體使用量（MB
     /// </summary>
     public float GetMemory_mb() {
-        return _processMemoryService.GetMemoryMb();
+        return _processMemoryManager.GetMemoryMb();
     }
 
     /// <summary>
     /// 回收記憶體
     /// </summary>
     public void Collect() {
-        _processMemoryService.Collect();
+        _processMemoryManager.Collect();
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public class SystemWebViewBridge {
     /// <param name="OpenWith"></param>
     /// <param name="ExecutableName"></param>
     public void AssociationExtension(object[] arExtension, string appPath) {
-        _fileAssociationService.AssociationExtension(arExtension, appPath);
+        _fileAssociationHelper.AssociationExtension(arExtension, appPath);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public class SystemWebViewBridge {
     /// <param name="OpenWith"></param>
     /// <param name="ExecutableName"></param>
     public void RemoveAssociationExtension(object[] arExtension, string appPath) {
-        _fileAssociationService.RemoveAssociationExtension(arExtension, appPath);
+        _fileAssociationHelper.RemoveAssociationExtension(arExtension, appPath);
     }
 
     /// <summary>

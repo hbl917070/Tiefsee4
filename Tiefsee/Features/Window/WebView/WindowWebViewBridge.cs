@@ -8,9 +8,9 @@ namespace Tiefsee;
 public class WindowWebViewBridge {
 
     public WebWindow M;
-    private readonly WebViewBrowserHelper _windowBrowserService = new();
-    private readonly WindowStartupConfigService _windowStartupConfigService = new();
-    private readonly AppInfoService _appRuntimePathService = new();
+    private readonly WebViewBrowserHelper _webViewBrowserHelper = new();
+    private readonly StartIniConfigService _startIniConfigService = new();
+    private readonly AppInfoService _appInfoService = new();
     private readonly SubWindowService _subWindowService = new();
 
     /// <summary>
@@ -25,21 +25,21 @@ public class WindowWebViewBridge {
     /// 清理 webview2 的暫存
     /// </summary>
     public void ClearBrowserCache() {
-        _windowBrowserService.ClearBrowserCache(M);
+        _webViewBrowserHelper.ClearBrowserCache(M);
     }
 
     /// <summary>
     /// 開啟開發人員工具
     /// </summary>
     public void OpenDevTools() {
-        _windowBrowserService.OpenDevTools(M);
+        _webViewBrowserHelper.OpenDevTools(M);
     }
 
     /// <summary>
     /// 取得 webview2 版本資訊
     /// </summary>
     public async Task<string> GetBrowserVersionString() {
-        return await _windowBrowserService.GetBrowserVersionString();
+        return await _webViewBrowserHelper.GetBrowserVersionString();
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class WindowWebViewBridge {
     /// <param name="startPort"> 程式開始的 port </param>
     /// <param name="startType"> 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一個體  5=單一個體+常駐 </param>
     public void SetStartIni(int startPort, int startType) {
-        _windowStartupConfigService.SetStartIni(startPort, startType);
+        _startIniConfigService.SetStartIni(startPort, startType);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppInfo() {
-        return _appRuntimePathService.GetAppInfo(M);
+        return _appInfoService.GetAppInfo(M);
     }
 
     /// <summary>

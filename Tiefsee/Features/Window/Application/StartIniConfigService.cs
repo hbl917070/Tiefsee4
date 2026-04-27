@@ -3,7 +3,7 @@ namespace Tiefsee;
 /// <summary>
 /// 封裝 start.ini 相關設定
 /// </summary>
-public sealed class WindowStartupConfigService {
+public sealed class StartIniConfigService {
 
     /// <summary>
     /// 儲存到 start.ini

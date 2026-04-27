@@ -9,10 +9,10 @@ namespace Tiefsee;
 public class FileWebViewBridge {
 
     WebWindow M;
-    private readonly TempFileHelper _tempFileService = new();
-    private readonly FileShellHelper _fileShellService = new();
-    private readonly FileOpenDialogHelper _fileOpenDialogService = new();
-    private readonly FileDragDropHelper _fileDragDropService = new();
+    private readonly TempFileHelper _tempFileHelper = new();
+    private readonly FileShellHelper _fileShellHelper = new();
+    private readonly FileOpenDialogHelper _fileOpenDialogHelper = new();
+    private readonly FileDragDropHelper _fileDragDropHelper = new();
 
     /// <summary>
     /// 建立檔案相關的 WebView bridge
@@ -20,7 +20,6 @@ public class FileWebViewBridge {
     public FileWebViewBridge(WebWindow m) {
         this.M = m;
     }
-    public FileWebViewBridge() { }
 
     /// <summary>
     /// 檢查檔案是否為二進制檔
@@ -36,7 +35,7 @@ public class FileWebViewBridge {
     /// <param name="extension"> 副檔名 </param>
     /// <returns></returns>
     public string Base64ToTempFile(string base64, string extension) {
-        return _tempFileService.Base64ToTempFile(base64, extension);
+        return _tempFileHelper.Base64ToTempFile(base64, extension);
     }
 
     /// <summary>
@@ -52,7 +51,7 @@ public class FileWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetSystemRoot() {
-        return _fileShellService.GetSystemRoot();
+        return _fileShellHelper.GetSystemRoot();
     }
 
     /// <summary>
@@ -60,7 +59,7 @@ public class FileWebViewBridge {
     /// </summary>
     /// <param name="path"></param>
     public void ShowOnExplorer(string path) {
-        _fileShellService.ShowOnExplorer(path);
+        _fileShellHelper.ShowOnExplorer(path);
     }
 
     /// <summary>
@@ -71,14 +70,14 @@ public class FileWebViewBridge {
     /// <param name="Title"> 視窗標題 </param>
     /// <returns></returns>
     public string[] OpenFileDialog(bool Multiselect, string Filter, string Title) {
-        return _fileOpenDialogService.OpenFileDialog(Multiselect, Filter, Title);
+        return _fileOpenDialogHelper.OpenFileDialog(Multiselect, Filter, Title);
     }
 
     /// <summary>
     /// 快速拖曳 (拖出檔案
     /// </summary>
     public void DragDropFile(string path) {
-        _fileDragDropService.DragDropFile(M, path);
+        _fileDragDropHelper.DragDropFile(M, path);
     }
 
     /// <summary>
@@ -87,14 +86,14 @@ public class FileWebViewBridge {
     /// <param name="path"> 檔案路徑 </param>
     /// <param name="followMouse"> true=顯示於游標旁邊、false=視窗左上角 </param>
     public void ShowContextMenu(string path, bool followMouse) {
-        _fileShellService.ShowContextMenu(M, path, followMouse);
+        _fileShellHelper.ShowContextMenu(M, path, followMouse);
     }
 
     /// <summary>
     /// 列印文件
     /// </summary>
     public void PrintFile(string path) {
-        _fileShellService.PrintFile(path);
+        _fileShellHelper.PrintFile(path);
     }
 
     /// <summary>
