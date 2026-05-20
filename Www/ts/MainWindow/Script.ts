@@ -840,10 +840,17 @@ export class ScriptFile {
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
-        if (await WV_Directory.Exists(folderPath) === false) { return; }
+    //    if (await WV_Directory.Exists(folderPath) === false) { return; }
 
-        const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
-        const folderName = Lib.getFileName(folderPath);
+    //    const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
+    //    const folderName = Lib.getFileName(folderPath);
+        const resolvedPath = this.resolveRelativePath(folderPath, sourcePath);
+        if (await WV_Directory.Exists(resolvedPath) === false) {
+            await WV_Directory.CreateDirectory(resolvedPath);
+        }
+        const destPath = Lib.combine([resolvedPath, Lib.getFileName(sourcePath)]);
+        const folderName = Lib.getFileName(resolvedPath);
+
         const err = await WV_File.Move(sourcePath, destPath);
         if (err !== "") {
             Toast.show(err, 1000 * 3);
@@ -867,10 +874,17 @@ export class ScriptFile {
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
-        if (await WV_Directory.Exists(folderPath) === false) { return; }
+    //    if (await WV_Directory.Exists(folderPath) === false) { return; }
 
-        const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
-        const folderName = Lib.getFileName(folderPath);
+    //    const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
+    //    const folderName = Lib.getFileName(folderPath);
+        const resolvedPath = this.resolveRelativePath(folderPath, sourcePath);
+        if (await WV_Directory.Exists(resolvedPath) === false) {
+            await WV_Directory.CreateDirectory(resolvedPath);
+        }
+        const destPath = Lib.combine([resolvedPath, Lib.getFileName(sourcePath)]);
+        const folderName = Lib.getFileName(resolvedPath);
+        
         const err = await WV_File.Copy(sourcePath, destPath);
         if (err !== "") {
             Toast.show(err, 1000 * 3);
@@ -879,6 +893,15 @@ export class ScriptFile {
 
         Toast.show(this.M.i18n.t("msg.copyFileToCompleted", { name: folderName }), 1000 * 3);
     }
+
+    private resolveRelativePath(path: string, sourcePath: string): string {
+        if (path.includes("%source_dir%")) {
+            const currentDir = Lib.getDirectoryName(sourcePath);
+            return path.replace(/%source_dir%/g, currentDir);
+        }
+        return path;
+    }
+
 }
 
 export class ScriptMenu {
