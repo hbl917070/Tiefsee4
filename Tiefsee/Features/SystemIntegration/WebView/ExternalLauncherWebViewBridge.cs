@@ -64,8 +64,8 @@ public class ExternalLauncherWebViewBridge {
     /// <param name="Arguments"></param>
     /// <param name="CreateNoWindow"></param>
     /// <param name="UseShellExecute"></param>
-    public void ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
-        _externalLauncherHelper.ProcessStart(FileName, Arguments, CreateNoWindow, UseShellExecute);
+    public bool ProcessStart(string FileName, string Arguments, bool CreateNoWindow, bool UseShellExecute) {
+        return _externalLauncherHelper.ProcessStart(FileName, Arguments, CreateNoWindow, UseShellExecute);
     }
 
     /// <summary>

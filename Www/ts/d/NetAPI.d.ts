@@ -533,7 +533,7 @@ interface WV_RunApp {
      * @param CreateNoWindow 是否使用新視窗
      * @param UseShellExecute false=新視窗個體 
      */
-    ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean); void
+    ProcessStart(FileName: string, Arguments: string, CreateNoWindow: boolean, UseShellExecute: boolean): boolean
 
     /** 用瀏覽器開啟網址 */
     OpenUrl(url: string): boolean;

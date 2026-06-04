@@ -1453,10 +1453,19 @@ export class ScriptOpen {
         if (filePath === undefined) {
             filePath = this.M.fileLoad.getFilePath();
         }
-        if (await WV_File.Exists(appPath) === false) { return; }
+        // if (await WV_File.Exists(appPath) === false) { return; }
         if (await WV_File.Exists(filePath) === false) { return; }
 
-        WV_RunApp.ProcessStart(appPath, `"${filePath}"`, true, false);
+        const appName = Lib.getFileName(appPath);
+        const isSuccess = await WV_RunApp.ProcessStart(appPath, `"${filePath}"`, true, false);
+        if (isSuccess) {
+            // 已用「{name}」開啟
+            Toast.show(this.M.i18n.t("msg.openWithSpecifiedAppCompleted", { name: appName }), 1000 * 3);
+            return;
+        }
+
+        // 無法用「{name}」開啟
+        Toast.show(this.M.i18n.t("msg.openWithSpecifiedAppFailed", { name: appName }), 1000 * 3);
     }
 
 }

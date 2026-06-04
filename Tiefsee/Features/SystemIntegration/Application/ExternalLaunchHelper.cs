@@ -48,15 +48,20 @@ public sealed class ExternalLaunchHelper {
     /// <summary>
     /// 啟動外部程式
     /// </summary>
-    public void ProcessStart(string fileName, string arguments, bool createNoWindow, bool useShellExecute) {
-        var psi = new ProcessStartInfo {
-            FileName = fileName,
-            WorkingDirectory = Path.GetDirectoryName(fileName),
-            Arguments = arguments,
-            CreateNoWindow = createNoWindow,
-            UseShellExecute = useShellExecute
-        };
-        Process.Start(psi);
+    public bool ProcessStart(string fileName, string arguments, bool createNoWindow, bool useShellExecute) {
+        try {
+            var psi = new ProcessStartInfo {
+                FileName = fileName,
+                WorkingDirectory = Path.GetDirectoryName(fileName),
+                Arguments = arguments,
+                CreateNoWindow = createNoWindow,
+                UseShellExecute = useShellExecute
+            };
+            return Process.Start(psi) != null;
+        }
+        catch {
+            return false;
+        }
     }
 
     /// <summary>

@@ -2519,6 +2519,18 @@ var langData = {
             "en": `File copied to "{name}"`,
             "ja": "ファイルを「{name}」へコピーしました",
         },
+        openWithSpecifiedAppCompleted: {
+            "zh-TW": "已用「{name}」開啟",
+            "zh-CN": "已用「{name}」开启",
+            "en": `Opened with "{name}"`,
+            "ja": "「{name}」で開きました",
+        },
+        openWithSpecifiedAppFailed: {
+            "zh-TW": "無法用「{name}」開啟",
+            "zh-CN": "无法用「{name}」开启",
+            "en": `Unable to open with "{name}"`,
+            "ja": "「{name}」で開けませんでした",
+        },
         fileDeletionFailed: {
             "zh-TW": "刪除失敗",
             "zh-CN": "删除失败",
