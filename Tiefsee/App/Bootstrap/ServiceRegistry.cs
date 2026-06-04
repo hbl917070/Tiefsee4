@@ -19,7 +19,7 @@ public sealed class ServiceRegistry {
 
     public ServiceRegistry(AppRuntimeContext runtimeContext) {
         RuntimeContext = runtimeContext;
-        ImageProcessing = new ImageProcessingService();
+        ImageProcessing = new ImageProcessingService(runtimeContext.TempDirImgProcessed, runtimeContext.TempDirImgZoom);
         FileMetadata = new FileMetadataService();
         UwpApp = new UwpAppService(runtimeContext.AppDataUwpList);
         // A1111Resource 需要先知道執行期的暫存檔路徑，所以在 bootstrap 階段建立

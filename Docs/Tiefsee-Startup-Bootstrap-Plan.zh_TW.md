@@ -362,6 +362,8 @@ static void Main(string[] args) {
 - `Program`、`SingleInstanceCoordinator`、`StartWindow`、`StartIniConfigService` 已改為直接讀 `Program.runtimeContext`
 - `UwpAppService` 已改為由 bootstrap 階段接收 `AppDataUwpList`
 - `TempCleanupService` 已同步改為直接讀 `Program.runtimeContext`
+- `ImageProcessingService` 已改為由 bootstrap 階段接收 `TempDirImgProcessed` / `TempDirImgZoom`
+- `TempFileHelper`、`AnimatedImageHelper`、`FileHttpEndpoints`、`WebWindow` 已改為直接讀 `Program.runtimeContext` 的 temp / setting 路徑
 - 目前仍先透過 `AppPaths.ApplyRuntimeContext(...)` 保留相容過渡層，供其他尚未收斂的舊程式碼使用
 
 ## 第二輪收尾任務
@@ -375,7 +377,14 @@ static void Main(string[] args) {
 3. 已完成：把 `StartWindow` 內與 `appDataPort`、`logoIcon` 相關的讀法改成直接依賴 `Program.runtimeContext`
 4. 已完成：把 `StartIniConfigService` 改成直接依賴 `Program.runtimeContext.AppDataStartIni`
 5. 已完成：把 `UwpAppService` 改成由 bootstrap 階段接收 `AppDataUwpList`
-6. 下一步：視收斂情況，讓 `ImageProcessingService` 接收 `TempDirImgProcessed` / `TempDirImgZoom`
+6. 已完成：讓 `ImageProcessingService` 接收 `TempDirImgProcessed` / `TempDirImgZoom`
+
+下一步可優先處理：
+
+- `PluginRegistry`
+- `StaticAssetHttpEndpoints`
+- `WindowWebViewBridge`
+- `AppPaths` 內剩餘的過渡 helper 是否還有保留必要
 
 這一輪的目標不是一次刪掉 `AppPaths`，而是先把它縮成真正的過渡層：
 

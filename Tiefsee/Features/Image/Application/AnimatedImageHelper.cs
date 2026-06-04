@@ -23,16 +23,17 @@ public class AnimatedImageHelper {
 
         if (outputDir == null || outputDir == "") { // 未指定資料夾
             string name = Path.GetFileNameWithoutExtension(imgPath);
+            string tempDirWebFile = Program.runtimeContext.TempDirWebFile;
 
             for (int i = 1; i <= 100; i++) {
                 if (i == 100) { throw new Exception(); }
 
                 // 如果資料夾已經存在，則在資料夾後面加上「 (2)」
                 if (i == 1) {
-                    outputDir = Path.Combine(AppPaths.tempDirWebFile, name);
+                    outputDir = Path.Combine(tempDirWebFile, name);
                 }
                 else {
-                    outputDir = Path.Combine(AppPaths.tempDirWebFile, name) + $" ({i})";
+                    outputDir = Path.Combine(tempDirWebFile, name) + $" ({i})";
                 }
 
                 string infoPath = Path.Combine(outputDir, "info.json");

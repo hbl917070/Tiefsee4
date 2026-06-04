@@ -20,8 +20,15 @@ namespace Tiefsee;
 /// </summary>
 public sealed class ImageProcessingService {
 
+    private readonly string _tempDirImgProcessed;
+    private readonly string _tempDirImgZoom;
     private readonly Dictionary<string, int[]> _imgSizeCache = new();
     private readonly List<CachedVipsImage> _vipsCache = new();
+
+    public ImageProcessingService(string tempDirImgProcessed, string tempDirImgZoom) {
+        _tempDirImgProcessed = tempDirImgProcessed;
+        _tempDirImgZoom = tempDirImgZoom;
+    }
 
     private sealed class CachedVipsImage {
         public string key;
@@ -329,14 +336,14 @@ public sealed class ImageProcessingService {
         }
 
         string hashName = FileTypeHelper.FileToHash(path) + "_hdrfix.png"; // 暫存檔案名稱
-        string outputPath = Path.Combine(AppPaths.tempDirImgProcessed, hashName); // 暫存檔案的路徑
+        string outputPath = Path.Combine(_tempDirImgProcessed, hashName); // 暫存檔案的路徑
 
         if (File.Exists(outputPath)) {
             return outputPath;
         }
 
-        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
+        if (Directory.Exists(_tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(_tempDirImgProcessed);
         }
 
         string arg = $"\"{path}\" \"{outputPath}\"";
@@ -365,14 +372,14 @@ public sealed class ImageProcessingService {
 
         type = type.ToLower();
         string hashName = FileTypeHelper.FileToHash(path) + ".jpg";
-        string filePath = Path.Combine(AppPaths.tempDirImgProcessed, hashName);
+        string filePath = Path.Combine(_tempDirImgProcessed, hashName);
 
         if (File.Exists(filePath)) {
             return filePath;
         }
 
-        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
+        if (Directory.Exists(_tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(_tempDirImgProcessed);
         }
 
         string argOut = "";
@@ -835,7 +842,7 @@ public sealed class ImageProcessingService {
     public string VipsResize(string path, double scale, string fileType, string vipsType) {
 
         string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
-        string filePath = Path.Combine(AppPaths.tempDirImgZoom, hashName); // 暫存檔案的路徑
+        string filePath = Path.Combine(_tempDirImgZoom, hashName); // 暫存檔案的路徑
 
         // 如果檔案已經存在，就直接回傳
         if (File.Exists(filePath)) {
@@ -844,8 +851,8 @@ public sealed class ImageProcessingService {
             return filePath;
         }
 
-        if (Directory.Exists(AppPaths.tempDirImgZoom) == false) {
-            Directory.CreateDirectory(AppPaths.tempDirImgZoom);
+        if (Directory.Exists(_tempDirImgZoom) == false) {
+            Directory.CreateDirectory(_tempDirImgZoom);
         }
 
         string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
@@ -952,9 +959,9 @@ public sealed class ImageProcessingService {
     /// </summary>
     private string PathToImgProcessed(string path, string vipsType, string ext = "jpg") {
         string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
-        string filePath = Path.Combine(AppPaths.tempDirImgProcessed, hashName); // 暫存檔案的路徑
-        if (Directory.Exists(AppPaths.tempDirImgProcessed) == false) {
-            Directory.CreateDirectory(AppPaths.tempDirImgProcessed);
+        string filePath = Path.Combine(_tempDirImgProcessed, hashName); // 暫存檔案的路徑
+        if (Directory.Exists(_tempDirImgProcessed) == false) {
+            Directory.CreateDirectory(_tempDirImgProcessed);
         }
         return filePath;
     }

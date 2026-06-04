@@ -38,9 +38,10 @@ public sealed class TempFileHelper {
     /// 建立不重複的暫存檔路徑
     /// </summary>
     private string GetUniqueTempFilePath(string extension) {
+        string tempDirWebFile = Program.runtimeContext.TempDirWebFile;
         while (true) {
             string name = DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + GenerateRandomString(10) + "." + extension;
-            string path = Path.Combine(AppPaths.tempDirWebFile, name);
+            string path = Path.Combine(tempDirWebFile, name);
             if (File.Exists(path) == false) {
                 return path;
             }
@@ -51,8 +52,9 @@ public sealed class TempFileHelper {
     /// 確保暫存目錄存在
     /// </summary>
     private void EnsureTempDirectory() {
-        if (Directory.Exists(AppPaths.tempDirWebFile) == false) {
-            Directory.CreateDirectory(AppPaths.tempDirWebFile);
+        string tempDirWebFile = Program.runtimeContext.TempDirWebFile;
+        if (Directory.Exists(tempDirWebFile) == false) {
+            Directory.CreateDirectory(tempDirWebFile);
         }
     }
 
@@ -70,4 +72,3 @@ public sealed class TempFileHelper {
         return sb.ToString();
     }
 }
-

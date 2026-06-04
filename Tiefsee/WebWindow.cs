@@ -250,10 +250,10 @@ public class WebWindow : FormNone {
             startType = Program.startType,
             startPort = Program.startPort,
             appDirPath = System.AppDomain.CurrentDomain.BaseDirectory,
-            appDataPath = AppPaths.appData,
-            tempDirWebFile = AppPaths.tempDirWebFile,
+            appDataPath = Program.runtimeContext.AppData,
+            tempDirWebFile = Program.runtimeContext.TempDirWebFile,
             mainPort = Program.webServer.port,
-            settingPath = AppPaths.appDataSetting,
+            settingPath = Program.runtimeContext.AppDataSetting,
             quickLookRunType = quickLookRunType,
             isWin11 = StartWindow.isWin11,
             isStoreApp = StartWindow.isStoreApp
@@ -296,7 +296,7 @@ public class WebWindow : FormNone {
                 "--msWebView2CancelInitialNavigation", // 取消 webview2 預設的導航行為
             };
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = string.Join(" ", arguments) };
-            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, AppPaths.appData, opts);
+            _webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.runtimeContext.AppData, opts);
         }
         return _webView2Environment;
     }
