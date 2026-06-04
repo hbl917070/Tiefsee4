@@ -11,6 +11,7 @@ namespace Tiefsee;
 [ComVisible(true)]
 public class WebWindow : FormNone {
 
+    private static readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
     private WebView2 _wv2;
     private static CoreWebView2Environment _webView2Environment;
     /// <summary> 父視窗 </summary>
@@ -255,7 +256,7 @@ public class WebWindow : FormNone {
             mainPort = Program.webServer.port,
             settingPath = Program.runtimeContext.AppDataSetting,
             quickLookRunType = quickLookRunType,
-            isWin11 = StartWindow.isWin11,
+            isWin11 = _systemEnvironmentHelper.IsWindows11(),
             isStoreApp = Program.runtimeContext.IsStoreApp
         };
 

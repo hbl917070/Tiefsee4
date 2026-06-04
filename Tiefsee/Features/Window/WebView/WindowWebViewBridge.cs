@@ -8,6 +8,7 @@ namespace Tiefsee;
 [ComVisible(true)]
 public class WindowWebViewBridge {
 
+    private readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
     public WebWindow M;
     private readonly WebViewBrowserHelper _webViewBrowserHelper = new();
     private readonly StartIniConfigService _startIniConfigService = new();
@@ -150,7 +151,7 @@ public class WindowWebViewBridge {
     public void WindowStyle(string type) {
         type = type.ToLower();
 
-        if (StartWindow.isWin11) {
+        if (_systemEnvironmentHelper.IsWindows11()) {
             if (type == "none" || type == "default") {
                 M.WindowStyleForWin11(SystemBackdropType.None);
             }

@@ -24,6 +24,19 @@ public sealed class SystemEnvironmentHelper {
     }
 
     /// <summary>
+    /// 判斷是否為 Windows 7
+    /// </summary>
+    public bool IsWindows7() {
+        try {
+            string os = Environment.OSVersion.Version.ToString();
+            return os.Length > 3 && os.Substring(0, 3) == "6.1";
+        }
+        catch {
+            return false;
+        }
+    }
+    
+    /// <summary>
     /// 判斷是否為 Windows 10
     /// </summary>
     public bool IsWindows10() {
@@ -38,12 +51,11 @@ public sealed class SystemEnvironmentHelper {
     }
 
     /// <summary>
-    /// 判斷是否為 Windows 7
+    /// 判斷是否為 Windows 11
     /// </summary>
-    public bool IsWindows7() {
+    public bool IsWindows11() {
         try {
-            string os = Environment.OSVersion.Version.ToString();
-            return os.Length > 3 && os.Substring(0, 3) == "6.1";
+            return Environment.OSVersion.Version.Build >= 22000;
         }
         catch {
             return false;

@@ -9,6 +9,8 @@ namespace Tiefsee;
 /// </summary>
 public class WindowStyle {
 
+    private static readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
+
     /// <summary>
     /// win10 視窗效果
     /// </summary>
@@ -24,7 +26,7 @@ public class WindowStyle {
             accent.GradientColor = (_blurOpacity << 24) | (_blurBackgroundColor & 0xFFFFFF);
         }
         else if (type == "aero") {
-            if (StartWindow.isWin11) { return; }
+            if (_systemEnvironmentHelper.IsWindows11()) { return; }
             accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
         }
         else {
@@ -50,7 +52,7 @@ public class WindowStyle {
     /// win11 視窗效果 
     /// </summary>
     public static void WindowStyleForWin11(IntPtr hwnd, SystemBackdropType type) {
-        if (StartWindow.isWin11 == false) { return; }
+        if (_systemEnvironmentHelper.IsWindows11() == false) { return; }
         SetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.DWMWA_SYSTEMBACKDROP_TYPE, (int)type);
     }
 
@@ -58,7 +60,7 @@ public class WindowStyle {
     /// win11 暗黑模式
     /// </summary>
     public static void WindowThemeForWin11(IntPtr hwnd, ImmersiveDarkMode type) {
-        if (StartWindow.isWin11 == false) { return; }
+        if (_systemEnvironmentHelper.IsWindows11() == false) { return; }
         SetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE, (int)type);
     }
 

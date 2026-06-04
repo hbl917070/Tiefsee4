@@ -8,18 +8,16 @@ namespace Tiefsee;
 
 public class StartWindow : Form {
 
+    private static readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
     /// <summary> 改成 true 後，定時執行 GC </summary>
     public static bool isRunGC = false;
     /// <summary> 用於鎖定 port 檔案 </summary>
     private FileStream fsPort;
-    /// <summary> 是否為 win11 </summary>
-    public static bool isWin11 = false;
     /// <summary> 桌面的路徑 </summary>
     private string desktopDir;
 
     public StartWindow() {
 
-        isWin11 = Environment.OSVersion.Version.Build >= 22000;
         desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
         AppScheduler.Initialize();
@@ -103,7 +101,7 @@ public class StartWindow : Form {
                     if (isMouseMiddle == false && isKeyboardSpace == false) { return; }
 
                     // win11 對資料夾按下滑鼠滾輪會觸發新開檔案總管的分頁，停止使用此功能避免衝突
-                    if (isMouseMiddle && isWin11 && Directory.Exists(selectedItem)) {
+                    if (isMouseMiddle && _systemEnvironmentHelper.IsWindows11() && Directory.Exists(selectedItem)) {
                         // 桌面不會衝突
                         if (Path.GetDirectoryName(selectedItem) != desktopDir) {
                             return;

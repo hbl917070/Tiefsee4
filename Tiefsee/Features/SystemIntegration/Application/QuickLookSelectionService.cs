@@ -9,6 +9,7 @@ namespace Tiefsee;
 /// </summary>
 public static class QuickLookSelectionService {
 
+    private static readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
     private static MethodInfo meth = null;
     private static Object obj = null;
 
@@ -61,7 +62,7 @@ public static class QuickLookSelectionService {
     /// 判斷當前的焦點是否在 win11 的檔案總管輸入框
     /// </summary>
     private static bool IsFocusOnExplorerInput() {
-        if (StartWindow.isWin11 == false) { return false; }
+        if (_systemEnvironmentHelper.IsWindows11() == false) { return false; }
 
         const int maxChars = 256;
         StringBuilder className = new StringBuilder(maxChars);
