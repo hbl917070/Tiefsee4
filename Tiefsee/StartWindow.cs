@@ -10,10 +10,6 @@ public class StartWindow : Form {
 
     /// <summary> 改成 true 後，定時執行 GC </summary>
     public static bool isRunGC = false;
-    /// <summary> 是否為商店版 APP </summary>
-    public static bool isStoreApp = false;
-    /// <summary> 是否為 便攜模式 </summary>
-    public static bool isPortableMode = false;
     /// <summary> 用於鎖定 port 檔案 </summary>
     private FileStream fsPort;
     /// <summary> 是否為 win11 </summary>

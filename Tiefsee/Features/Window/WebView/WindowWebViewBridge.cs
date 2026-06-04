@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using static Tiefsee.WindowStyle;
@@ -240,7 +241,11 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppDataPath() {
-        return AppPaths.GetAppDataPath();
+        string path = Program.runtimeContext.AppData;
+        if (Directory.Exists(path) == false) {
+            Directory.CreateDirectory(path);
+        }
+        return path;
     }
 
     /// <summary>
@@ -248,7 +253,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppDirPath() {
-        return AppPaths.GetAppDirPath();
+        return AppDomain.CurrentDomain.BaseDirectory;
     }
 
     /// <summary>
@@ -256,7 +261,7 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetAppPath() {
-        return AppPaths.GetAppPath();
+        return Process.GetCurrentProcess().MainModule.FileName;
     }
 
     /// <summary>
@@ -264,7 +269,15 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetTiefseePath() {
-        return AppPaths.GetTiefseePath();
+        var dir = GetAppDirPath();
+
+        var path = Path.Combine(dir, "Tiefsee.exe");
+        if (File.Exists(path)) { return path; }
+
+        path = Path.Combine(dir, "../TiefseeLauncher/Tiefsee.exe");
+        if (File.Exists(path)) { return Path.GetFullPath(path); }
+
+        return GetAppPath();
     }
 
     /// <summary>

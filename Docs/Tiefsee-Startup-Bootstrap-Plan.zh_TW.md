@@ -364,7 +364,8 @@ static void Main(string[] args) {
 - `TempCleanupService` 已同步改為直接讀 `Program.runtimeContext`
 - `ImageProcessingService` 已改為由 bootstrap 階段接收 `TempDirImgProcessed` / `TempDirImgZoom`
 - `TempFileHelper`、`AnimatedImageHelper`、`FileHttpEndpoints`、`WebWindow` 已改為直接讀 `Program.runtimeContext` 的 temp / setting 路徑
-- 目前仍先透過 `AppPaths.ApplyRuntimeContext(...)` 保留相容過渡層，供其他尚未收斂的舊程式碼使用
+- `PluginRegistry`、`StaticAssetHttpEndpoints`、`WindowWebViewBridge` 也已完成收斂
+- `AppPaths` 過渡層已移除，`StartWindow.isPortableMode` / `StartWindow.isStoreApp` 改由 `Program` 直接同步 runtime context
 
 ## 第二輪收尾任務
 
@@ -381,10 +382,9 @@ static void Main(string[] args) {
 
 下一步可優先處理：
 
-- `PluginRegistry`
-- `StaticAssetHttpEndpoints`
-- `WindowWebViewBridge`
-- `AppPaths` 內剩餘的過渡 helper 是否還有保留必要
+- 檢查是否還需要額外保留 `StartWindow` 的 static 狀態同步
+- 評估 `Program.startPort` / `Program.startType` 是否也值得逐步收斂到 `Program.runtimeContext`
+- 如果不再需要過渡期，可把文件從「收尾任務」進一步改成「已完成的整理結果」
 
 這一輪的目標不是一次刪掉 `AppPaths`，而是先把它縮成真正的過渡層：
 

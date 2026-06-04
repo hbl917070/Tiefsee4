@@ -35,15 +35,12 @@ static class Program {
         var startupConfig = new StartupConfigLoader().Load(earlyPaths.StartIniPath);
         runtimeContext = new AppRuntimeContextBuilder().Build(earlyPaths, startupConfig);
 
-        // 先保留 AppPaths 作為過渡層，讓尚未完成收斂的舊程式碼仍可沿用原本的 static 存取方式
-        AppPaths.ApplyRuntimeContext(runtimeContext);
-
         startPort = runtimeContext.StartPort;
         startType = runtimeContext.StartType;
         services = AppBootstrapper.Bootstrap(runtimeContext);
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
-        if (StartWindow.isStoreApp) {
+        if (runtimeContext.IsStoreApp) {
             try {
                 var args2 = AppInstance.GetActivatedEventArgs();
                 if (args2 != null) {

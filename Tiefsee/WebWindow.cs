@@ -256,7 +256,7 @@ public class WebWindow : FormNone {
             settingPath = Program.runtimeContext.AppDataSetting,
             quickLookRunType = quickLookRunType,
             isWin11 = StartWindow.isWin11,
-            isStoreApp = StartWindow.isStoreApp
+            isStoreApp = Program.runtimeContext.IsStoreApp
         };
 
         if (File.Exists(appInfo.settingPath)) {
