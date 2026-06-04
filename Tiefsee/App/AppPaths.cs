@@ -31,101 +31,25 @@ public class AppPaths {
     public static string logoIcon = "";
 
     /// <summary>
-    /// 在使用 Init() 之前如果就需要使用 appData 的話，就使用此方法
+    /// 套用已組裝完成的執行期環境資訊，提供舊程式碼過渡使用
     /// </summary>
-    public static void InitAppData() {
-        if (appData != null) { return; }
+    public static void ApplyRuntimeContext(AppRuntimeContext runtimeContext) {
+        appData = runtimeContext.AppData;
+        appDataStartIni = runtimeContext.AppDataStartIni;
+        appDataLock = runtimeContext.AppDataLock;
+        appDataPort = runtimeContext.AppDataPort;
+        appDataPlugin = runtimeContext.AppDataPlugin;
+        appDataSetting = runtimeContext.AppDataSetting;
+        appDataUwpList = runtimeContext.AppDataUwpList;
+        appDataA1111ModelList = runtimeContext.AppDataA1111ModelList;
+        tempDirImgProcessed = runtimeContext.TempDirImgProcessed;
+        tempDirImgZoom = runtimeContext.TempDirImgZoom;
+        tempDirWebFile = runtimeContext.TempDirWebFile;
+        logoIcon = runtimeContext.LogoIcon;
 
-        // 便攜模式 (如果存在此資料夾，就把資料儲存在這裡
-        string portableMode = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PortableMode");
-        if (Directory.Exists(portableMode)) {
-            appData = portableMode;
-            StartWindow.isPortableMode = true;
-        }
-        else {
-            appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
-            StartWindow.isPortableMode = false;
-        }
-        appDataStartIni = Path.Combine(appData, "Start.ini");
-    }
-
-    /// <summary>
-    /// 初始化 AppData 路徑，並且判斷是商店版還是傳統應用程式版
-    /// </summary>
-    /// <param name="iniAppData"></param>
-    /// <param name="iniIsStoreApp"></param>
-    public static void Init(string iniAppData, bool iniIsStoreApp) {
-
-        InitAppData();
-
-        // 需要更新 ini
-        bool needUpdateIni = false;
-
-        // 便攜模式
-        if (StartWindow.isPortableMode) {
-            StartWindow.isStoreApp = false;
-        }
-        // 不存在此路徑，表示是傳統應用程式版
-        else if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../TiefseeLauncher/Tiefsee.exe")) == false) {
-            StartWindow.isStoreApp = false;
-        }
-        // 如果已經 ini 檔案有資料，就使用 ini 檔案的資料
-        else if (iniAppData != "") {
-            StartWindow.isStoreApp = iniIsStoreApp;
-            appData = iniAppData;
-        }
-        else {
-            try {
-                // 商店版
-                appData = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
-                appData = Path.Combine(appData, "Local", "Tiefsee");
-                StartWindow.isStoreApp = true;
-                needUpdateIni = true;
-            }
-            catch {
-                // 傳統應用程式版
-                appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Tiefsee");
-                StartWindow.isStoreApp = false;
-            }
-        }
-
-        appDataLock = Path.Combine(appData, "Lock");
-        appDataStartIni = Path.Combine(appData, "Start.ini");
-        appDataPort = Path.Combine(appData, "Port");
-        appDataPlugin = Path.Combine(appData, "Plugin");
-        appDataSetting = Path.Combine(appData, "Setting.json");
-        appDataUwpList = Path.Combine(appData, "UwpList.json");
-        appDataA1111ModelList = Path.Combine(appData, "A1111ModelList.json");
-
-        string downloadsPath = KnownFolders.GetPath(KnownFolder.Downloads); // 使用者的 下載
-
-        tempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed");
-        tempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom");
-        tempDirWebFile = Path.Combine(downloadsPath, "Tiefsee");
-        // tempDirWebFile = Path.Combine(Path.GetTempPath(), "Tiefsee\\WebFile");
-
-        logoIcon = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www\\img\\logo.ico");
-
-        //------
-
-        // 如果資料夾不存在，就新建
-        if (Directory.Exists(appData) == false) {
-            Directory.CreateDirectory(appData);
-        }
-        if (Directory.Exists(appDataPlugin) == false) {
-            Directory.CreateDirectory(appDataPlugin);
-        }
-
-        if (needUpdateIni) {
-            // 重新讀取 ini
-            var iniManager = new IniFileHelper(AppPaths.appDataStartIni);
-            Program.startPort = int.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-            Program.startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
-            // 把資料寫入 ini 檔案，下次就可以直接讀取
-            iniManager.WriteIniFile("temporary", "appData", appData);
-            iniManager.WriteIniFile("temporary", "isStoreApp", StartWindow.isStoreApp.ToString());
-        }
-
+        // 目前仍有不少舊流程直接讀 StartWindow 的 static 狀態，先在這裡同步
+        StartWindow.isPortableMode = runtimeContext.IsPortableMode;
+        StartWindow.isStoreApp = runtimeContext.IsStoreApp;
     }
 
     /// <summary>

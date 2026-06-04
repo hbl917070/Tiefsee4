@@ -111,8 +111,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
         string[] loraNames = json.GetStringArray("loraNames");
         string[] excludeDirs = json.GetStringArray("excludeDirs");
 
-        var a1111ResourceService = new A1111ResourceService(AppPaths.appDataA1111ModelList);
-        var result = a1111ResourceService.GetA1111LoraResource(searchDirs, loraNames, excludeDirs);
+        var result = Program.services.A1111Resource.GetA1111LoraResource(searchDirs, loraNames, excludeDirs);
         await WriteJson(d, result);
     }
 }

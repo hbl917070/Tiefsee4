@@ -14,6 +14,8 @@ static class Program {
     public static WebServer webServer;
     /// <summary> app 啟動後共享的服務註冊表 </summary>
     public static ServiceRegistry services;
+    /// <summary> app 啟動後共享的執行期環境資訊 </summary>
+    public static AppRuntimeContext runtimeContext;
     /// <summary> 起始視窗，關閉此視窗就會結束程式 </summary>
     public static StartWindow startWindow;
     /// <summary> 透過 UserAgent 來驗證是否有權限請求 localhost server API </summary>
@@ -27,16 +29,18 @@ static class Program {
 
         // 修改 工作目錄 為程式資料夾 (如果有傳入 args 的話，工作目錄會被修改，所以需要改回來
         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-        AppPaths.InitAppData();
 
-        var iniManager = new IniFileHelper(AppPaths.appDataStartIni);
-        startPort = int.Parse(iniManager.ReadIniFile("setting", "startPort", "4876"));
-        startType = (StartMode)int.Parse(iniManager.ReadIniFile("setting", "startType", ((byte)StartMode.QuickStartResident).ToString()));
-        var appData = iniManager.ReadIniFile("temporary", "appData", "");
-        var isStoreApp = iniManager.ReadIniFile("temporary", "isStoreApp", "") == "True";
+        // 啟動流程分成：早期路徑 -> ini 設定 -> 執行期環境 -> 共享服務
+        var earlyPaths = EarlyAppPathResolver.Resolve();
+        var startupConfig = new StartupConfigLoader().Load(earlyPaths.StartIniPath);
+        runtimeContext = new AppRuntimeContextBuilder().Build(earlyPaths, startupConfig);
 
-        AppPaths.Init(appData, isStoreApp);
-        services = AppBootstrapper.Bootstrap();
+        // 先保留 AppPaths 作為過渡層，讓舊程式碼仍可沿用原本的 static 存取方式
+        AppPaths.ApplyRuntimeContext(runtimeContext);
+
+        startPort = runtimeContext.StartPort;
+        startType = runtimeContext.StartType;
+        services = AppBootstrapper.Bootstrap(runtimeContext);
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
         if (StartWindow.isStoreApp) {

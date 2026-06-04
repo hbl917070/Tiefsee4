@@ -14,8 +14,7 @@ public sealed class TempCleanupService {
         DeleteTempDirectory(AppPaths.tempDirImgProcessed, 0);
         DeleteTempDirectory(AppPaths.tempDirImgZoom, 0);
 
-        var a1111ResourceService = new A1111ResourceService(AppPaths.appDataA1111ModelList);
-        a1111ResourceService.ClearTemp();
+        Program.services.A1111Resource.ClearTemp();
     }
 
     /// <summary>

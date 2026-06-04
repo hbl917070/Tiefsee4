@@ -5,8 +5,7 @@ namespace Tiefsee;
 /// </summary>
 public static class AppBootstrapper {
 
-    public static ServiceRegistry Bootstrap() {
-        return new ServiceRegistry();
+    public static ServiceRegistry Bootstrap(AppRuntimeContext runtimeContext) {
+        return new ServiceRegistry(runtimeContext);
     }
 }
-
