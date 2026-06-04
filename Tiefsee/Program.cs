@@ -35,7 +35,7 @@ static class Program {
         var startupConfig = new StartupConfigLoader().Load(earlyPaths.StartIniPath);
         runtimeContext = new AppRuntimeContextBuilder().Build(earlyPaths, startupConfig);
 
-        // 先保留 AppPaths 作為過渡層，讓舊程式碼仍可沿用原本的 static 存取方式
+        // 先保留 AppPaths 作為過渡層，讓尚未完成收斂的舊程式碼仍可沿用原本的 static 存取方式
         AppPaths.ApplyRuntimeContext(runtimeContext);
 
         startPort = runtimeContext.StartPort;
@@ -119,10 +119,10 @@ static class Program {
     private static bool AppLock(bool val) {
         if (val) {
 
-            if (File.Exists(AppPaths.appDataLock)) {
+            if (File.Exists(runtimeContext.AppDataLock)) {
                 try {
                     long ticks = 0;
-                    using (StreamReader sr = new StreamReader(AppPaths.appDataLock, System.Text.Encoding.UTF8)) {
+                    using (StreamReader sr = new StreamReader(runtimeContext.AppDataLock, System.Text.Encoding.UTF8)) {
                         ticks = long.Parse(sr.ReadToEnd());
                     }
 
@@ -139,7 +139,7 @@ static class Program {
             }
             else {
                 //using (File.Create(lockPath)) { }
-                using (FileStream fs = new FileStream(AppPaths.appDataLock, FileMode.Create)) {
+                using (FileStream fs = new FileStream(runtimeContext.AppDataLock, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) {
                         sw.Write(DateTime.Now.Ticks.ToString());
                     }
@@ -149,8 +149,8 @@ static class Program {
 
         }
         else {
-            if (File.Exists(AppPaths.appDataLock)) {
-                File.Delete(AppPaths.appDataLock);
+            if (File.Exists(runtimeContext.AppDataLock)) {
+                File.Delete(runtimeContext.AppDataLock);
             }
         }
         return false;

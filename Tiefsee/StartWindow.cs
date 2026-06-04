@@ -148,12 +148,13 @@ public class StartWindow : Form {
     /// <param name="post"></param>
     public void PortLock() {
 
-        if (Directory.Exists(AppPaths.appDataPort) == false) { // 如果資料夾不存在，就新建
-            Directory.CreateDirectory(AppPaths.appDataPort);
+        string appDataPort = Program.runtimeContext.AppDataPort;
+        if (Directory.Exists(appDataPort) == false) { // 如果資料夾不存在，就新建
+            Directory.CreateDirectory(appDataPort);
         }
 
         int port = Program.webServer.port;
-        string portFile = Path.Combine(AppPaths.appDataPort, port.ToString());
+        string portFile = Path.Combine(appDataPort, port.ToString());
         if (File.Exists(portFile) == false) {
             fsPort = new FileStream(portFile, FileMode.Create);
         }
@@ -174,7 +175,7 @@ public class StartWindow : Form {
         catch { }
 
         int port = Program.webServer.port;
-        string portFile = Path.Combine(AppPaths.appDataPort, port.ToString());
+        string portFile = Path.Combine(Program.runtimeContext.AppDataPort, port.ToString());
         if (File.Exists(portFile) == true) {
             File.Delete(portFile);
         }
@@ -188,7 +189,7 @@ public class StartWindow : Form {
         SingleInstanceCoordinator.WindowCreate();
 
         System.Windows.Forms.NotifyIcon nIcon = new();
-        nIcon.Icon = new System.Drawing.Icon(AppPaths.logoIcon);
+        nIcon.Icon = new System.Drawing.Icon(Program.runtimeContext.LogoIcon);
         nIcon.Text = "TiefSee";
         nIcon.Visible = true;
         nIcon.DoubleClick += (sender, e) => {

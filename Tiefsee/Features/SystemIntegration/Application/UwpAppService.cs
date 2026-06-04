@@ -10,7 +10,12 @@ namespace Tiefsee;
 /// </summary>
 public sealed class UwpAppService {
 
+    private readonly string _appDataUwpListPath;
     private Dictionary<string, UwpItem> _tempUwpItems = null;
+
+    public UwpAppService(string appDataUwpListPath) {
+        _appDataUwpListPath = appDataUwpListPath;
+    }
 
     /// <summary>
     /// 以 UWP 開啟檔案
@@ -71,8 +76,8 @@ public sealed class UwpAppService {
     private Dictionary<string, UwpItem> LoadCache() {
         try {
             string jsonString = "{}";
-            if (File.Exists(AppPaths.appDataUwpList)) {
-                using StreamReader sr = new(AppPaths.appDataUwpList, Encoding.UTF8);
+            if (File.Exists(_appDataUwpListPath)) {
+                using StreamReader sr = new(_appDataUwpListPath, Encoding.UTF8);
                 jsonString = sr.ReadToEnd();
             }
 
@@ -112,7 +117,7 @@ public sealed class UwpAppService {
     /// 將快取寫回檔案
     /// </summary>
     private void SaveCache(Dictionary<string, UwpItem> tempAppDataUwpList) {
-        using var fs = new FileStream(AppPaths.appDataUwpList, FileMode.Create);
+        using var fs = new FileStream(_appDataUwpListPath, FileMode.Create);
         using var sw = new StreamWriter(fs, Encoding.UTF8);
         sw.Write(JsonSerializer.Serialize(tempAppDataUwpList));
     }

@@ -41,8 +41,10 @@ public class SingleInstanceCoordinator {
             return false;
         }
 
+        string appDataPort = Program.runtimeContext.AppDataPort;
+
         // 找不到記錄 port 的資料夾
-        if (Directory.Exists(AppPaths.appDataPort) == false) {
+        if (Directory.Exists(appDataPort) == false) {
             return false;
         }
 
@@ -83,7 +85,7 @@ public class SingleInstanceCoordinator {
             }
 
             // 刪除所有的 port 檔案
-            foreach (string filePort in Directory.GetFiles(AppPaths.appDataPort, "*")) {
+            foreach (string filePort in Directory.GetFiles(Program.runtimeContext.AppDataPort, "*")) {
                 try {
                     File.Delete(filePort);
                     continue;
@@ -102,8 +104,9 @@ public class SingleInstanceCoordinator {
     /// 
     /// </summary>
     private static int GetPort() {
+        string appDataPort = Program.runtimeContext.AppDataPort;
 
-        foreach (string filePort in Directory.GetFiles(AppPaths.appDataPort, "*")) { // 判斷目前已經開啟的視窗
+        foreach (string filePort in Directory.GetFiles(appDataPort, "*")) { // 判斷目前已經開啟的視窗
 
             try {
                 using (FileStream flagFile = File.Open(filePort, FileMode.Open)) { }

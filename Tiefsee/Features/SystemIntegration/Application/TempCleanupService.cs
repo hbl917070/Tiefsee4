@@ -11,8 +11,8 @@ public sealed class TempCleanupService {
     /// 立即刪除所有圖片暫存
     /// </summary>
     public void DeleteAllTemp() {
-        DeleteTempDirectory(AppPaths.tempDirImgProcessed, 0);
-        DeleteTempDirectory(AppPaths.tempDirImgZoom, 0);
+        DeleteTempDirectory(Program.runtimeContext.TempDirImgProcessed, 0);
+        DeleteTempDirectory(Program.runtimeContext.TempDirImgZoom, 0);
 
         Program.services.A1111Resource.ClearTemp();
     }
@@ -24,17 +24,17 @@ public sealed class TempCleanupService {
         new Thread(() => {
             if (Program.startType == StartMode.QuickStartResident || Program.startType == StartMode.SingleInstanceResident) {
                 if (SingleInstanceCoordinator.runNumber <= 2) {
-                    DeleteTempDirectory(AppPaths.tempDirImgProcessed, maxImgProcessed);
-                    DeleteTempDirectory(AppPaths.tempDirImgZoom, maxImgZoom);
+                    DeleteTempDirectory(Program.runtimeContext.TempDirImgProcessed, maxImgProcessed);
+                    DeleteTempDirectory(Program.runtimeContext.TempDirImgZoom, maxImgZoom);
                 }
                 return;
             }
 
-            if (Directory.Exists(AppPaths.appDataPort) == false) { return; }
-            int portCount = Directory.GetFiles(AppPaths.appDataPort).Length;
+            if (Directory.Exists(Program.runtimeContext.AppDataPort) == false) { return; }
+            int portCount = Directory.GetFiles(Program.runtimeContext.AppDataPort).Length;
             if (portCount == 1 && SingleInstanceCoordinator.runNumber <= 1) {
-                DeleteTempDirectory(AppPaths.tempDirImgProcessed, maxImgProcessed);
-                DeleteTempDirectory(AppPaths.tempDirImgZoom, maxImgZoom);
+                DeleteTempDirectory(Program.runtimeContext.TempDirImgProcessed, maxImgProcessed);
+                DeleteTempDirectory(Program.runtimeContext.TempDirImgZoom, maxImgZoom);
             }
         }).Start();
     }
