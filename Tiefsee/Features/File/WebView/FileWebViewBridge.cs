@@ -161,7 +161,10 @@ public class FileWebViewBridge {
     /// </summary>
     public string Move(string sourceFileName, string destFileName) {
         try {
-            File.Move(sourceFileName, destFileName);
+            string resolvedSourceFileName = Path.GetFullPath(sourceFileName);
+            string resolvedDestFileName = ResolveDestinationPath(resolvedSourceFileName, destFileName);
+            EnsureDestinationDirectory(resolvedDestFileName);
+            File.Move(resolvedSourceFileName, resolvedDestFileName);
         }
         catch (Exception e) {
             return e.Message;
@@ -174,12 +177,75 @@ public class FileWebViewBridge {
     /// </summary>
     public string Copy(string sourceFileName, string destFileName) {
         try {
-            File.Copy(sourceFileName, destFileName);
+            string resolvedSourceFileName = Path.GetFullPath(sourceFileName);
+            string resolvedDestFileName = ResolveDestinationPath(resolvedSourceFileName, destFileName);
+            EnsureDestinationDirectory(resolvedDestFileName);
+            File.Copy(resolvedSourceFileName, resolvedDestFileName);
         }
         catch (Exception e) {
             return e.Message;
         }
         return "";
+    }
+
+    /// <summary>
+    /// 解析目標路徑。若為相對路徑，則相對於來源檔案所在資料夾
+    /// </summary>
+    private string ResolveDestinationPath(string sourceFileName, string destFileName) {
+        if (string.IsNullOrWhiteSpace(destFileName)) {
+            throw new ArgumentException("Destination path is empty.");
+        }
+
+        string normalizedDestFileName = destFileName.Trim().Replace('/', '\\');
+        if (IsUnsupportedDriveRelativePath(normalizedDestFileName)) {
+            throw new ArgumentException("Drive-relative paths like D:sub are not supported.");
+        }
+
+        if (Path.IsPathFullyQualified(normalizedDestFileName) == false) {
+            string sourceDir = Path.GetDirectoryName(sourceFileName)
+                ?? throw new DirectoryNotFoundException("Source directory not found.");
+            normalizedDestFileName = normalizedDestFileName.TrimStart('\\');
+            normalizedDestFileName = Path.Combine(sourceDir, normalizedDestFileName);
+        }
+
+        return Path.GetFullPath(normalizedDestFileName);
+    }
+
+    /// <summary>
+    /// 確保目標檔案的資料夾存在
+    /// 若目標資料夾不存在，僅在上一層存在時自動建立
+    /// </summary>
+    private void EnsureDestinationDirectory(string destFileName) {
+        string targetDir = Path.GetDirectoryName(destFileName);
+        if (string.IsNullOrWhiteSpace(targetDir)) {
+            throw new DirectoryNotFoundException("Destination directory not found.");
+        }
+        if (Directory.Exists(targetDir)) {
+            return;
+        }
+
+        string parentDir = Path.GetDirectoryName(targetDir);
+        if (string.IsNullOrWhiteSpace(parentDir) || Directory.Exists(parentDir) == false) {
+            throw new DirectoryNotFoundException("Parent directory of destination does not exist.");
+        }
+
+        Directory.CreateDirectory(targetDir);
+    }
+
+    /// <summary>
+    /// Windows 的 D:sub 是合法的 drive-relative path，不是完整絕對路徑。
+    /// 這種格式會依賴磁碟目前工作目錄，結果不夠直覺，因此在這裡明確拒絕。
+    /// 其他情況盡量交由 Path 的內建判斷處理。
+    /// </summary>
+    private bool IsUnsupportedDriveRelativePath(string path) {
+        if (OperatingSystem.IsWindows() == false) {
+            return false;
+        }
+
+        return path.Length >= 2
+            && char.IsLetter(path[0])
+            && path[1] == ':'
+            && Path.IsPathFullyQualified(path) == false;
     }
 
     /// <summary>

@@ -840,10 +840,8 @@ export class ScriptFile {
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
-        if (await WV_Directory.Exists(folderPath) === false) { return; }
-
-        const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
-        const folderName = Lib.getFileName(folderPath);
+        const destPath = Lib.combine([folderPath.trim(), Lib.getFileName(sourcePath)]);
+        const folderName = Lib.getFileName(folderPath.trim().replace(/[\\/]+$/, ""));
         const err = await WV_File.Move(sourcePath, destPath);
         if (err !== "") {
             Toast.show(err, 1000 * 3);
@@ -867,10 +865,8 @@ export class ScriptFile {
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
-        if (await WV_Directory.Exists(folderPath) === false) { return; }
-
-        const destPath = Lib.combine([folderPath, Lib.getFileName(sourcePath)]);
-        const folderName = Lib.getFileName(folderPath);
+        const destPath = Lib.combine([folderPath.trim(), Lib.getFileName(sourcePath)]);
+        const folderName = Lib.getFileName(folderPath.trim().replace(/[\\/]+$/, ""));
         const err = await WV_File.Copy(sourcePath, destPath);
         if (err !== "") {
             Toast.show(err, 1000 * 3);
