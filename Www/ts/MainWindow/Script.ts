@@ -1,7 +1,7 @@
 import { GroupType } from "../Config";
 import { hotkeyActionKeys, HotkeyAction } from "../HotkeyDefinitions";
 import { Lib } from "../Lib";
-import { TiefseeviewZoomType } from "../Tiefseeview";
+import { TiefseeviewAlignType, TiefseeviewZoomType } from "../Tiefseeview";
 import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
 import { MainWindow } from "./MainWindow";
@@ -51,13 +51,13 @@ export class Script {
             this.img.fitWindowOrImageOriginal();
         }
         else if (s === hotkeyActionKeys.switchFitWindowAndOriginal) { // 縮放至適合視窗/圖片原始大小 切換
-            this.img.switchFitWindowAndOriginal(option.x, option.y);
+            this.img.switchFitWindowAndOriginal();
         }
         else if (s === hotkeyActionKeys.imageFitWindow) { // 強制縮放至適合視窗
             this.img.zoomToFit();
         }
         else if (s === hotkeyActionKeys.imageOriginal) { // 圖片原始大小
-            this.img.zoomTo100(option.x, option.y);
+            this.img.zoomTo100();
         }
         else if (s === hotkeyActionKeys.imageZoomIn) { // 放大
             this.img.zoomIn(option.x, option.y);
@@ -355,9 +355,13 @@ export class ScriptImg {
     }
 
     /** 縮放至圖片原始大小 */
-    public zoomTo100(x?: number, y?: number) {
+    public zoomTo100() {
         if (this.isImg() === false) { return; }
-        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal, undefined, x, y);
+        this.M.fileShow.tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal);
+
+        // 對齊
+        let alignType: TiefseeviewAlignType = (<any>TiefseeviewAlignType)[this.M.config.settings.image.tiefseeviewAlignType];
+        this.M.fileShow.tiefseeview.setAlign(alignType);
     }
 
     /** 縮放至適合視窗 或 圖片原始大小 */
@@ -367,12 +371,12 @@ export class ScriptImg {
     }
 
     /** 縮放至適合視窗/圖片原始大小 切換 */
-    public switchFitWindowAndOriginal(x?: number, y?: number) {
+    public switchFitWindowAndOriginal() {
         if (this.isImg() === false) { return; }
-        if (Math.abs(this.M.fileShow.tiefseeview.getZoomRatio() - 1) < 0.05) { // 100%
+        if (Math.abs(this.M.fileShow.tiefseeview.getDisplayZoomRatio() - 1) < 0.05) { // 100%
             this.zoomToFit();
         } else { // 不是100%
-            this.zoomTo100(x, y);
+            this.zoomTo100();
         }
     }
 

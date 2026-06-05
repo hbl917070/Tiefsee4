@@ -34,6 +34,7 @@ export class Tiefseeview {
     public getOriginalWidth; // 取得圖片原始寬度
     public getOriginalHeight; // 取得圖片原始高度
     public getZoomRatio; // 取得縮放比例。原始 1.00
+    public getDisplayZoomRatio; // 取得實際顯示縮放比例。原始 1.00
     public zoomFull; // 圖片全滿
     public zoomIn; // 圖片放大
     public zoomOut; // 圖片縮小
@@ -247,6 +248,7 @@ export class Tiefseeview {
         this.getOriginalWidth = getOriginalWidth;
         this.getOriginalHeight = getOriginalHeight;
         this.getZoomRatio = getZoomRatio;
+        this.getDisplayZoomRatio = getDisplayZoomRatio;
         this.setMargin = setMargin;
         this.getMargin = getMargin;
         this.getOverflowDistance = getOverflowDistance;
@@ -1445,6 +1447,11 @@ export class Tiefseeview {
          * 取得縮放比例。原始1.00
          */
         function getZoomRatio(): number { return _nowWidth / getOriginalWidth(); }
+
+        /**
+         * 取得實際顯示縮放比例。原始1.00
+         */
+        function getDisplayZoomRatio(): number { return getZoomRatio() * _dpiZoom; }
 
         /**
          * 取得 是否圖片隨視窗縮放
