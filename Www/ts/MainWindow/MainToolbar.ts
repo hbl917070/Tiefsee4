@@ -316,7 +316,7 @@ export class MainToolbar {
                 icon: "",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
-                        M?.script.img.zoomTo100();
+                        M?.script.img.switchFitWindowAndOriginal();
                     });
                 },
             })
