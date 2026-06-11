@@ -373,7 +373,7 @@ export class ScriptImg {
     /** 縮放至適合視窗/圖片原始大小 切換 */
     public switchFitWindowAndOriginal() {
         if (this.isImg() === false) { return; }
-        if (Math.abs(this.M.fileShow.tiefseeview.getDisplayZoomRatio() - 1) < 0.05) { // 100%
+        if (Math.abs(this.M.fileShow.tiefseeview.getDisplayZoomRatio() - 1) < 0.01) { // 100%
             this.zoomToFit();
         } else { // 不是100%
             this.zoomTo100();
