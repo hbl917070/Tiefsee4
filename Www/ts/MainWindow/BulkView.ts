@@ -64,31 +64,41 @@ export class BulkView {
         /** 首圖縮排 的svg圖示 */
         var _svgIndentation = "";
 
-        /** 記錄離開時捲動到哪個位置 */
-        var _tempScrollTop = -1;
+        /** 離開大量瀏覽模式時進入的圖片 */
+        let _tempCurrentFilePath = "";
+        /** 點擊圖片後，FileLoad 切換索引前暫存即將進入的圖片 */
+        let _pendingCurrentFilePath = "";
+        /** 離開時圖片相對大量瀏覽容器頂端的位置 */
+        let _tempCurrentImageTop = 0;
         /** 用於判斷列表是否有異動 */
         var _tempArFile: string[] = [];
         /** 用於判斷是否有切換資料夾 */
         var _tempDirPath = "";
-        /** 離開前記錄當時的頁碼 */
-        var _tempPageNow = -1;
         /** 判斷是否有修改排序方式， SortType + OrderbyType */
         var _tempFileSortType = "";
-        /** 判斷是否有捲動 */
-        var _tempHasScrolled = false;
-        /** 離開前記錄bulkViewContent的寬度 */
-        var _tempScrollWidth = 0;
-        /** 離開前記錄bulkViewContent的高度 */
-        var _tempScrollHeight = 0;
+        /** 使用者進入大量瀏覽模式後是否曾主動捲動 */
+        let _hasUserScrolled = false;
+        /** 監聽圖片尺寸變化，持續修正當前圖片位置 */
+        let _currentImageScrollObserver: ResizeObserver | undefined;
+        /** 合併同一畫面更新週期內的多次當前圖片位置修正 */
+        let _currentImageScrollAnimationFrame = 0;
+        /** 垂直瀑布流在 updateSize() 完成後呼叫的位置修正函數 */
+        let _currentImageScrollCorrection: (() => void) | undefined;
+        /** 使用者捲動後，版面重排時用於維持視口位置的圖片及其頂端偏移 */
+        let _viewportAnchor: { path: string, top: number } | undefined;
+        /** 延後到捲動停止才掃描可見項目的計時器 */
+        let _viewportAnchorTimer = 0;
+        /** 下一次 updateSize() 完成後是否需要恢復視口錨點 */
+        let _restoreViewportAnchorAfterLayout = false;
+        /** 目前的 scroll event 是否來自最近一次明確的使用者捲動操作 */
+        let _isUserScrollActive = false;
         /** 切換欄時，記錄上一次的值。用於辨識是否使用首圖縮排 */
         let _tempColumns = -1;
 
-        /** 記錄改變寬度前的高度及捲動位置 */
-        let _originBulkViewHeight = 0;
-        let _originBulkViewScrollTop = 0;
-
         /** 請求限制器 */
         const _limiter = new RequestLimiter(3);
+        /** 每個圖片項目的尺寸監聽器 */
+        const _itemResizeObservers = new Map<HTMLElement, ResizeObserver>();
 
         this.visible = visible;
         this.pageNext = pageNext;
@@ -117,7 +127,8 @@ export class BulkView {
 
             initGroupRadio(_domColumns); // 初始化群組按鈕
 
-            new ResizeObserver(Lib.debounce(() => { // 區塊改變大小時    
+            new ResizeObserver(Lib.debounce(() => { // 區塊改變大小時
+                prepareViewportAnchorRestore(false);
                 updateSize();
             }, 30)).observe(_domBulkView);
 
@@ -125,10 +136,27 @@ export class BulkView {
 
             //判斷是否有捲動
             _domBulkView.addEventListener("wheel", () => {
-                _tempHasScrolled = true;
+                startUserScroll();
             });
-            _domBulkView.addEventListener("touchmove", () => {
-                _tempHasScrolled = true;
+            _domBulkView.addEventListener("touchstart", () => {
+                startUserScroll();
+            });
+            _domBulkView.addEventListener("pointerdown", (e) => {
+                const dom = e.target as HTMLElement;
+                if (dom.closest(".scroll-y") !== null) {
+                    startUserScroll();
+                }
+            });
+            _domBulkView.addEventListener("keydown", (e) => {
+                const scrollKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+                if (scrollKeys.includes(e.key)) {
+                    startUserScroll();
+                }
+            });
+            _domBulkView.addEventListener("scroll", () => {
+                if (_isUserScrollActive) {
+                    scheduleSaveViewportAnchor();
+                }
             });
 
             (_domBulkView.querySelectorAll(".bulkView-pagination-prev") as NodeListOf<HTMLDivElement>).forEach(dom => {
@@ -169,11 +197,15 @@ export class BulkView {
 
             arDomCheckbox.forEach((dom) => {
                 dom.addEventListener("input", (e) => {
+                    const scrollTop = _domBulkView.scrollTop;
+                    if (dom !== _domIndentation) {
+                        prepareViewportAnchorRestore(true);
+                    }
                     apply();
                     if (dom === _domIndentation) {
                         let columns = Number.parseInt(getGroupRadioVal(_domColumns));
                         if (columns === 2) {
-                            load(_pageNow);
+                            load(_pageNow, undefined, 0, scrollTop);
                         }
                     }
                 });
@@ -258,9 +290,6 @@ export class BulkView {
          * 套用設定
          */
         function apply() {
-            _originBulkViewHeight = _domBulkViewContent.offsetHeight;
-            _originBulkViewScrollTop = _domBulkView.scrollTop;
-
             const columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(_domColumns));
             const gaplessMode = M.config.settings.bulkView.gaplessMode = _domGaplessMode.value;
             const fixedWidth = M.config.settings.bulkView.fixedWidth = _domFixedWidth.value;
@@ -350,11 +379,16 @@ export class BulkView {
             setGroupRadioVal(_domColumns, columns.toString());
             //dom_columns.dispatchEvent(new Event("input"));
 
+            prepareViewportAnchorRestore(true);
             apply();
 
             const indentation = _domIndentation.value;
-            if (indentation === "on") { // 在開啟首圖進縮的情況下
-                if (_tempColumns === 2 || columns === 2) { // 從2欄切換成其他，或從其他切換成2欄
+            // 首圖縮排只影響兩欄模式，進出兩欄時需要重建當頁項目。
+            if (indentation === "on" && (_tempColumns === 2 || columns === 2)) {
+                if (_viewportAnchor !== undefined) {
+                    _restoreViewportAnchorAfterLayout = false;
+                    load(_pageNow, _viewportAnchor.path, _viewportAnchor.top);
+                } else {
                     load(_pageNow);
                 }
             }
@@ -382,12 +416,6 @@ export class BulkView {
                 _domBulkViewContent.setAttribute("fixedWidth", width);
             } else {
                 _domBulkViewContent.setAttribute("fixedWidth", "");
-            }
-            // 設定捲動條位置
-            let currentBulkViewHeight = _domBulkViewContent.offsetHeight;
-            let ratio = _originBulkViewHeight == 0 ? 1 : _originBulkViewScrollTop / _originBulkViewHeight;
-            if (_originBulkViewHeight !== currentBulkViewHeight) {
-                _domBulkView.scrollTop = currentBulkViewHeight * ratio;
             }
         }
 
@@ -568,6 +596,10 @@ export class BulkView {
                     _domBulkViewContent.style.height = ""; //復原總高度
                 }
 
+                if (getWaterfall() === "vertical" && columns >= 3) {
+                    _currentImageScrollCorrection?.();
+                }
+                restoreViewportAnchor();
             }
         }
 
@@ -589,23 +621,34 @@ export class BulkView {
          */
         function saveCurrentState() {
             _isVisible = false;
-            _tempScrollTop = _domBulkView.scrollTop; // 記錄離開時捲動到哪個位置
-            _tempScrollWidth = _domBulkViewContent.scrollWidth;
-            _tempScrollHeight = _domBulkViewContent.scrollHeight;
+            stopAutomaticScrollCorrection();
+            _tempCurrentFilePath = _pendingCurrentFilePath || M.fileLoad.getFilePath();
+            _pendingCurrentFilePath = "";
+            _tempCurrentImageTop = 0;
 
-            _tempArFile = _arFile;
+            const currentItem = Array.from(_domBulkViewContent.querySelectorAll(".bulkView-item"))
+                .find(dom => dom.getAttribute("data-path") === _tempCurrentFilePath);
+            if (currentItem !== undefined) {
+                _tempCurrentImageTop = currentItem.getBoundingClientRect().top
+                    - _domBulkView.getBoundingClientRect().top;
+            }
+
+            _tempArFile = Array.from(_arFile);
             if (_tempArFile[0] === _svgIndentation) { // 如果有使用首圖縮排
                 _tempArFile.shift(); // 移除第一筆
             }
             _tempDirPath = getDirPath();
             _tempFileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
-            _tempPageNow = _pageNow;
 
             // M.fileLoad.setWaitingFile(arFile);
         }
 
         /**
-         * 載入列表，並恢復到上次捲動的位置
+         * 載入大量瀏覽列表：
+         * - 返回時仍是離開大量瀏覽模式時進入的同一張圖片，保留原本捲動位置。
+         * - 圖片模式切換成其他圖片後返回，切換到新圖片所在頁並將圖片貼齊容器頂端。
+         * - 列表需要重建但仍是同一張圖片時，以離開前相對容器的位置作為錨點。
+         * - 圖片尺寸或垂直瀑布流排版持續變動時修正錨點；使用者捲動後立即停止。
          */
         async function load2() {
 
@@ -615,7 +658,10 @@ export class BulkView {
                 M.script.bulkView.close();
             });
 
-            _tempHasScrolled = false;
+            _hasUserScrolled = false;
+            _viewportAnchor = undefined;
+            _restoreViewportAnchorAfterLayout = false;
+            cancelViewportAnchorCapture();
 
             // 比較兩個 string[] 是否一樣
             function arraysEqual(a: string[], b: string[]) {
@@ -629,59 +675,65 @@ export class BulkView {
                 return true;
             }
 
-            // 返回上次捲動的位置
-            function scrollToLastPosition(time: number) {
-
-                // 如果寬度變化小於100，則暫時使用上次的高度，避免圖片載入完成前導致移位
-                if (Math.abs(_domBulkViewContent.scrollWidth - _tempScrollWidth) < 100) {
-                    _domBulkViewContent.style.minHeight = _tempScrollHeight + "px";
-                    setTimeout(() => {
-                        _domBulkViewContent.style.minHeight = "";
-                        _tempScrollTop = -1;
-                    }, time);
-                }
-
-                if (_tempScrollTop === -1) { return; }
-                _domBulkView.scrollTop = _tempScrollTop;
-                if (time === 0) { return; }
-                for (let i = 1; i <= 10; i++) {
-                    setTimeout(() => {
-                        if (_tempScrollTop === -1) { return; }
-                        if (_tempHasScrolled === false && _tempPageNow === _pageNow) {
-                            _domBulkView.scrollTop = _tempScrollTop;
-                        }
-                    }, (time / 10) * i);
-                }
-            }
-
             _arFile = Array.from(M.fileLoad.getWaitingFile());
+            const currentFilePath = M.fileLoad.getFilePath();
+            const currentFileIndex = _arFile.indexOf(currentFilePath);
+            const hasCurrentFile = currentFileIndex !== -1;
+            const isReturningToSameFile = currentFilePath === _tempCurrentFilePath;
+            const indentationOffset = getIndentation() === "on" && getColumns() === 2 ? 1 : 0;
+            const currentPage = hasCurrentFile
+                ? Math.floor((currentFileIndex + indentationOffset) / _imgMaxCount) + 1
+                : _pageNow;
 
             if (_tempDirPath === getDirPath() && arraysEqual(_arFile, _tempArFile)) { // 完全一樣
 
                 if (getIndentation() === "on" && getColumns() === 2) { // 如果有使用首圖縮排
                     _arFile.unshift(_svgIndentation); // 插入到最前面
                 }
-                scrollToLastPosition(0); // 返回上次捲動的位置
+                if (isReturningToSameFile) {
+                    requestAnimationFrame(() => {
+                        keepCurrentImageVisible(currentFilePath, _tempCurrentImageTop);
+                    });
+                } else if (hasCurrentFile) {
+                    if (currentPage === _pageNow) {
+                        requestAnimationFrame(() => {
+                            keepCurrentImageVisible(currentFilePath, 0);
+                        });
+                    } else {
+                        showPage(currentPage, currentFilePath, 0);
+                    }
+                }
 
             } else if (_tempDirPath === getDirPath()) {
 
                 let fileSortType = M.fileSort.getSortType() + M.fileSort.getOrderbyType();
                 if (_tempFileSortType === fileSortType) { // 資料夾一樣，排序一樣 (名單不一樣)
 
-                    scrollToLastPosition(800); // 返回上次捲動的位置
-                    await load(_pageNow);
+                    await load(
+                        hasCurrentFile ? currentPage : _pageNow,
+                        hasCurrentFile ? currentFilePath : undefined,
+                        isReturningToSameFile ? _tempCurrentImageTop : 0
+                    );
 
                 } else { // 資料夾一樣，排序不一樣
 
                     _domBulkView.scrollTop = 0; // 捲動到最上面
-                    await load();
+                    await load(
+                        hasCurrentFile ? currentPage : 0,
+                        hasCurrentFile ? currentFilePath : undefined,
+                        0
+                    );
 
                 }
 
             } else { // 完全不一樣
 
                 _domBulkView.scrollTop = 0; // 捲動到最上面
-                await load();
+                await load(
+                    hasCurrentFile ? currentPage : 0,
+                    hasCurrentFile ? currentFilePath : undefined,
+                    0
+                );
 
             }
 
@@ -690,27 +742,38 @@ export class BulkView {
 
         /**
          * 載入列表
-         * @param page 
+         * @param page
+         * @param currentFilePath 要捲動到可見範圍的當前圖片
+         * @param targetTop 當前圖片相對容器頂端的目標位置
+         * @param scrollTop 重建列表後要保留的捲動位置
          */
-        async function load(page = 0) {
+        async function load(page = 0, currentFilePath?: string, targetTop = 0, scrollTop?: number) {
 
             _arFile = Array.from(M.fileLoad.getWaitingFile());
             if (_arFile === undefined) { return; }
 
             if (getIndentation() === "on" && getColumns() === 2) {
                 _arFile.unshift(_svgIndentation); // 插入到最前面
+                if (currentFilePath !== undefined) {
+                    const currentFileIndex = _arFile.indexOf(currentFilePath);
+                    page = Math.floor(currentFileIndex / _imgMaxCount) + 1;
+                }
             }
 
-            showPage(page);
+            showPage(page, currentFilePath, targetTop, scrollTop);
         }
 
         var showPageThrottle = new Throttle(50); // 節流
         /**
          * 載入頁面
-         * @param page 
+         * @param page
+         * @param currentFilePath 要捲動到可見範圍的當前圖片
+         * @param targetTop 當前圖片相對容器頂端的目標位置
+         * @param scrollTop 重建列表後要保留的捲動位置
          */
-        async function showPage(page?: number) {
+        async function showPage(page?: number, currentFilePath?: string, targetTop = 0, scrollTop?: number) {
 
+            stopCurrentImageScrollObserver();
             if (page === undefined) { page = _pageNow; }
             if (page !== undefined) { _pageNow = page; }
             _pageNow = page;
@@ -722,7 +785,13 @@ export class BulkView {
 
             showPageThrottle.run = async () => {
 
-                _domBulkView.scrollTop = 0; //捲動到最上面
+                if (scrollTop === undefined) {
+                    _domBulkView.scrollTop = 0; //捲動到最上面
+                } else {
+                    // 清空列表時先維持內容高度，避免瀏覽器將 scrollTop 強制歸零。
+                    _domBulkViewContent.style.minHeight = _domBulkViewContent.scrollHeight + "px";
+                }
+                disconnectAllItemResizeObservers();
                 _domBulkViewContent.innerHTML = "";
 
                 let temp = _pageNow + getDirPath();
@@ -743,14 +812,184 @@ export class BulkView {
                         const item = retAr[j];
                         let domItem = newItem(item);
                         _domBulkViewContent.appendChild(domItem);
+                        if (item.Path === currentFilePath || item.FullPath === currentFilePath) {
+                            keepCurrentImageVisible(currentFilePath, targetTop);
+                        }
                     }
 
                     start += n;
                 }
 
                 updateSize();
+                if (scrollTop !== undefined) {
+                    _domBulkViewContent.style.minHeight = "";
+                    _domBulkView.scrollTop = scrollTop;
+                }
             }
 
+        }
+
+        /**
+         * 將當前圖片對齊指定位置，並在圖片尺寸或垂直瀑布流位置陸續更新時維持錨點。
+         * 使用者透過滾輪、觸控、鍵盤或拖曳捲軸後，立即停止所有自動修正。
+         */
+        function keepCurrentImageVisible(currentFilePath: string, targetTop: number) {
+            stopCurrentImageScrollObserver();
+
+            const arItem = Array.from(_domBulkViewContent.querySelectorAll(".bulkView-item")) as HTMLElement[];
+            const targetIndex = arItem.findIndex(dom => dom.getAttribute("data-path") === currentFilePath);
+            if (targetIndex === -1) { return; }
+
+            const target = arItem[targetIndex];
+            const panelRect = _domBulkView.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const anchorTop = targetTop;
+            _domBulkView.scrollTop += targetRect.top - panelRect.top - anchorTop;
+
+            requestAnimationFrame(() => {
+                if (_hasUserScrolled || _isVisible === false || document.body.contains(target) === false) {
+                    return;
+                }
+
+                _currentImageScrollCorrection = () => {
+                    cancelAnimationFrame(_currentImageScrollAnimationFrame);
+                    _currentImageScrollAnimationFrame = requestAnimationFrame(() => {
+                        if (_hasUserScrolled || _isVisible === false || document.body.contains(target) === false) {
+                            stopCurrentImageScrollObserver();
+                            return;
+                        }
+
+                        const currentPanelRect = _domBulkView.getBoundingClientRect();
+                        const currentTargetRect = target.getBoundingClientRect();
+                        const currentTop = currentTargetRect.top - currentPanelRect.top;
+                        const offset = currentTop - anchorTop;
+                        if (Math.abs(offset) >= 1) {
+                            _domBulkView.scrollTop += offset;
+                        }
+                    });
+                };
+
+                const isVerticalWaterfall = getWaterfall() === "vertical" && getColumns() >= 3;
+                if (isVerticalWaterfall === false) {
+                    _currentImageScrollObserver = new ResizeObserver(() => {
+                        _currentImageScrollCorrection?.();
+                    });
+
+                    _currentImageScrollObserver.observe(_domBulkViewContent);
+                    for (let i = 0; i <= targetIndex; i++) {
+                        _currentImageScrollObserver.observe(arItem[i]);
+                    }
+                }
+            });
+        }
+
+        /** 使用者開始捲動後停止所有自動捲動修正 */
+        function stopAutomaticScrollCorrection() {
+            _hasUserScrolled = true;
+            stopCurrentImageScrollObserver();
+        }
+
+        /** 標記接下來的 scroll event 可更新視口錨點 */
+        function startUserScroll() {
+            _isUserScrollActive = true;
+            stopAutomaticScrollCorrection();
+        }
+
+        /** 停止追蹤圖片尺寸與取消尚未執行的位置修正 */
+        function stopCurrentImageScrollObserver() {
+            _currentImageScrollObserver?.disconnect();
+            _currentImageScrollObserver = undefined;
+            _currentImageScrollCorrection = undefined;
+            cancelAnimationFrame(_currentImageScrollAnimationFrame);
+            _currentImageScrollAnimationFrame = 0;
+        }
+
+        /** 停止本次使用者捲動的錨點捕捉，版面重排產生的 scroll 不得改寫錨點 */
+        function cancelViewportAnchorCapture() {
+            clearTimeout(_viewportAnchorTimer);
+            _isUserScrollActive = false;
+        }
+
+        /** 捲動停止後記錄最接近容器左上角的可見圖片，避免每個 scroll event 都掃描項目 */
+        function scheduleSaveViewportAnchor() {
+            clearTimeout(_viewportAnchorTimer);
+            _viewportAnchorTimer = window.setTimeout(() => {
+                saveViewportAnchor();
+                _isUserScrollActive = false;
+            }, 50);
+        }
+
+        /** 記錄最接近容器左上角的可見圖片與目前頂端偏移 */
+        function saveViewportAnchor() {
+            if (_isVisible === false) { return; }
+
+            const panelRect = _domBulkView.getBoundingClientRect();
+            const arItem = Array.from(_domBulkViewContent.querySelectorAll(".bulkView-item")) as HTMLElement[];
+            let anchor: HTMLElement | undefined;
+            let anchorTopDistance = Number.POSITIVE_INFINITY;
+            let anchorLeftDistance = Number.POSITIVE_INFINITY;
+            let anchorTop = 0;
+
+            for (const item of arItem) {
+                if (item.getAttribute("data-path") === null) { continue; }
+
+                const rect = item.getBoundingClientRect();
+                const isVisible = rect.bottom > panelRect.top
+                    && rect.top < panelRect.bottom
+                    && rect.right > panelRect.left
+                    && rect.left < panelRect.right;
+                if (isVisible === false) { continue; }
+
+                const topDistance = Math.abs(rect.top - panelRect.top);
+                const leftDistance = Math.abs(rect.left - panelRect.left);
+                if (topDistance < anchorTopDistance
+                    || (topDistance === anchorTopDistance && leftDistance < anchorLeftDistance)
+                ) {
+                    anchor = item;
+                    anchorTopDistance = topDistance;
+                    anchorLeftDistance = leftDistance;
+                    anchorTop = rect.top - panelRect.top;
+                }
+            }
+
+            if (anchor === undefined) { return; }
+            const path = anchor.getAttribute("data-path");
+            if (path === null) { return; }
+            _viewportAnchor = { path, top: anchorTop };
+        }
+
+        /**
+         * 使用者捲動後不再追蹤當前圖片；視窗或欄位設定改變時，
+         * 改以最接近容器左上角的可見圖片維持原本視口位置。
+         * 錨點只由明確的使用者捲動更新，避免水平排版暫時換行或程式捲動覆蓋錨點。
+         * @param captureCurrent true 表示在版面變更前立即重抓錨點；ResizeObserver
+         * 已發生版面變更，只能使用最近一次使用者捲動所保存的錨點。
+         */
+        function prepareViewportAnchorRestore(captureCurrent: boolean) {
+            if (_hasUserScrolled === false) { return; }
+            cancelViewportAnchorCapture();
+            if (captureCurrent) {
+                saveViewportAnchor();
+            }
+            _restoreViewportAnchorAfterLayout = _viewportAnchor !== undefined;
+        }
+
+        /** updateSize() 完成後，將保存的圖片恢復到原本的視口偏移 */
+        function restoreViewportAnchor() {
+            const viewportAnchor = _viewportAnchor;
+            if (_restoreViewportAnchorAfterLayout === false || viewportAnchor === undefined) { return; }
+            _restoreViewportAnchorAfterLayout = false;
+
+            const anchor = Array.from(_domBulkViewContent.querySelectorAll(".bulkView-item"))
+                .find(dom => dom.getAttribute("data-path") === viewportAnchor.path);
+            if (anchor === undefined) { return; }
+
+            const currentTop = anchor.getBoundingClientRect().top
+                - _domBulkView.getBoundingClientRect().top;
+            const offset = currentTop - viewportAnchor.top;
+            if (Math.abs(offset) >= 1) {
+                _domBulkView.scrollTop += offset;
+            }
         }
 
         /**
@@ -875,7 +1114,7 @@ export class BulkView {
                         if (items.length > _imgMaxCount) {
                             let removeCount = items.length - _imgMaxCount;
                             for (let i = items.length - 1; i >= items.length - removeCount; i--) {
-                                items[i].remove();
+                                removeItem(items[i] as HTMLElement);
                             }
                         }
 
@@ -904,7 +1143,7 @@ export class BulkView {
                         // 刪除當前顯示的第1張圖片
                         let arDom = _domBulkView.querySelectorAll(".bulkView-item");
                         if (arDom.length > 0) {
-                            arDom[0].remove();
+                            removeItem(arDom[0] as HTMLElement);
                         }
 
                         if (_pageNow < pageMax) { // 如果不是最後一頁
@@ -939,7 +1178,9 @@ export class BulkView {
                                 let thirdItem = items[items.length - 1];
                                 thirdItem.insertAdjacentElement("afterend", newItemDom);
                             }
-                            domItem?.remove();
+                            if (domItem !== undefined) {
+                                removeItem(domItem as HTMLElement);
+                            }
                             updateItemNumber(); // 更新左上角的圖片編號
                         }
                         updatePagination(); // 更新分頁器
@@ -960,7 +1201,7 @@ export class BulkView {
                     if (domItem !== undefined) {
                         let newItemDom = await pathToItem(fileWatcherData.FullPath);
                         domItem.insertAdjacentElement("afterend", newItemDom);
-                        domItem.remove();
+                        removeItem(domItem);
                         updateItemNumber(); // 更新左上角的圖片編號
                     } else {
                         return;
@@ -1139,11 +1380,13 @@ export class BulkView {
                     if (div.getAttribute("data-reload") === "true") {
                         let newItemDom = await pathToItem(fileInfo2.Path);
                         div.insertAdjacentElement("afterend", newItemDom);
-                        div.remove();
+                        removeItem(div);
                         updateItemNumber(); // 更新左上角的圖片編號
 
                     } else if (n !== 0) {
 
+                        // saveCurrentState 執行時 FileLoad 尚未切換索引，先記錄即將進入的圖片
+                        _pendingCurrentFilePath = fileInfo2.FullPath;
                         M.fileLoad.setIsBulkViewSub(true);
                         let index = _arFile.indexOf(fileInfo2.FullPath);
 
@@ -1185,8 +1428,10 @@ export class BulkView {
                     }
                 }
 
+                if (document.body.contains(div) === false) { return; }
+
                 // 區塊改變大小時
-                new ResizeObserver(Lib.debounce(() => {
+                const itemResizeObserver = new ResizeObserver(Lib.debounce(() => {
 
                     if (_isVisible === false) { return; }
 
@@ -1217,11 +1462,28 @@ export class BulkView {
                     _limiter.addRequest(domImg, ret.url);
                     updateSize();
 
-                }, 300)).observe(div);
+                }, 300));
+                _itemResizeObservers.set(div, itemResizeObserver);
+                itemResizeObserver.observe(div);
 
             }, 0);
 
             return div;
+        }
+
+        /** 移除項目前一併釋放其 ResizeObserver */
+        function removeItem(item: HTMLElement) {
+            _itemResizeObservers.get(item)?.disconnect();
+            _itemResizeObservers.delete(item);
+            item.remove();
+        }
+
+        /** 重建整頁前釋放所有項目的 ResizeObserver */
+        function disconnectAllItemResizeObservers() {
+            _itemResizeObservers.forEach(observer => {
+                observer.disconnect();
+            });
+            _itemResizeObservers.clear();
         }
 
         /**
