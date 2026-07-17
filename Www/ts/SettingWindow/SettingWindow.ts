@@ -1932,6 +1932,14 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
+            // 在檔案預覽面板透過滑鼠滾輪切換圖片
+            const select_filePanelMouseWheel = getDom("#select-filePanelMouseWheel") as HTMLSelectElement;
+            select_filePanelMouseWheel.value = _config.settings.other.filePanelMouseWheel;
+            select_filePanelMouseWheel.addEventListener("change", () => {
+                _config.settings.other.filePanelMouseWheel = select_filePanelMouseWheel.value;
+                appleSettingOfMain();
+            });
+
         })
 
         // 關於

@@ -397,6 +397,8 @@ export class Config {
             whenInsertingFile: "auto",
             /** 啟用觸控板手勢 */
             enableTouchpadGestures: false,
+            /** 在檔案預覽面板透過滑鼠滾輪切換圖片。 [none, enable, reverse] */
+            filePanelMouseWheel: "none",
             /** 到達最後一個檔案時 */
             reachLastFile: "firstFile",
             /** 到達最後一個資料夾時 */

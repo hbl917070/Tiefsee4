@@ -574,6 +574,31 @@ var langData = {
                 `,
             },
 
+            filePanelMouseWheel: {
+                "zh-TW": "在檔案預覽面板透過滑鼠滾輪切換圖片",
+                "zh-CN": "在文件预览面板通过鼠标滚轮切换图片",
+                "en": "Switch images with the mouse wheel over the file preview panel",
+                "ja": "ファイルプレビューパネル上でマウスホイールを使って画像を切り替える",
+            },
+            filePanelMouseWheelNone: {
+                "zh-TW": "不啟用",
+                "zh-CN": "不启用",
+                "en": "Disabled",
+                "ja": "無効",
+            },
+            filePanelMouseWheelEnable: {
+                "zh-TW": "啟用",
+                "zh-CN": "启用",
+                "en": "Enabled",
+                "ja": "有効",
+            },
+            filePanelMouseWheelReverse: {
+                "zh-TW": "啟用（反向）",
+                "zh-CN": "启用（反向）",
+                "en": "Enabled (reverse)",
+                "ja": "有効（反転）",
+            },
+
         },
 
         //#endregion

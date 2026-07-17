@@ -52,6 +52,41 @@ export class MainFileList {
         const _sc = new TiefseeScroll(); // 滾動條元件
         _sc.initGeneral(_domFileList, "y");
 
+        const _filePanelMouseWheelThreshold = 30; // 滑鼠滾輪切換圖片的累計門檻
+        let _filePanelMouseWheelValue = 0;
+        let _filePanelMouseWheelDirection: "up" | "down" | "" = "";
+        _domFileList.addEventListener("wheel", (e: WheelEvent) => {
+            const mode = M.config.settings.other.filePanelMouseWheel;
+            if (mode === "none") {
+                _filePanelMouseWheelValue = 0;
+                _filePanelMouseWheelDirection = "";
+                return;
+            }
+            if (e.deltaY === 0) { return; }
+
+            e.preventDefault(); // 啟用切圖時，禁止檔案預覽面板原本的捲動
+
+            const direction: "up" | "down" = e.deltaY < 0 ? "up" : "down";
+            if (_filePanelMouseWheelDirection !== direction) {
+                _filePanelMouseWheelValue = 0;
+                _filePanelMouseWheelDirection = direction;
+            }
+
+            const zoomFactor = window.zoomFactor || 1;
+            _filePanelMouseWheelValue += Math.abs(e.deltaY * zoomFactor);
+            if (_filePanelMouseWheelValue < _filePanelMouseWheelThreshold) { return; }
+
+            _filePanelMouseWheelValue = 0; // 超過門檻也只觸發一次，不保留剩餘值
+
+            const shouldNext = mode === "reverse" ? direction === "up" : direction === "down";
+            if (shouldNext) {
+                M.fileLoad.nextFile();
+            } else {
+                M.fileLoad.prevFile();
+            }
+            setStartLocation(); // 切換後將高亮項目置中
+        }, { passive: false });
+
         // 拖曳改變size
         const _dragbar = this.dragbar = new Dragbar();
         _dragbar.init("right", _domFileList, _domDragbarMainFileList, M.domMainL);
