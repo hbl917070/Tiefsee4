@@ -409,13 +409,13 @@ export class Config {
 
         /** 滑鼠 */
         mouse: {
-            //滑鼠按鍵
+            // 滑鼠按鍵
             leftDoubleClick: hotkeyActionKeys.maximizeWindow,
             scrollWheelButton: "none",
             mouseButton4: hotkeyActionKeys.prevFile,
             mouseButton5: hotkeyActionKeys.nextFile,
 
-            //滑鼠滾輪
+            // 滑鼠滾輪
             scrollUp: hotkeyActionKeys.imageZoomIn,
             scrollDown: hotkeyActionKeys.imageZoomOut,
             scrollUpCtrl: hotkeyActionKeys.imageZoomIn,
@@ -425,13 +425,16 @@ export class Config {
             scrollUpAlt: hotkeyActionKeys.imageMoveUp,
             scrollDownAlt: hotkeyActionKeys.imageMoveDown,
 
-            //大量瀏覽模式 - 滑鼠滾輪
+            // 大量瀏覽模式 - 滑鼠滾輪
             bulkViewScrollUpCtrl: hotkeyActionKeys.decColumns,
             bulkViewScrollDownCtrl: hotkeyActionKeys.incrColumns,
             bulkViewScrollUpShift: hotkeyActionKeys.incrFixedWidth,
             bulkViewScrollDownShift: hotkeyActionKeys.decFixedWidth,
             bulkViewScrollUpAlt: hotkeyActionKeys.prevPage,
             bulkViewScrollDownAlt: hotkeyActionKeys.nextPage,
+
+            // 大量瀏覽模式 - 滑鼠按鍵
+            bulkViewScrollWheelButton: hotkeyActionKeys.movePage,
         },
 
         /** 預設快速鍵 */

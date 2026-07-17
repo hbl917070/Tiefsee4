@@ -108,6 +108,7 @@ export class Hotkey {
                 const bulkAllowKeys: HotkeyAction[] = [
                     // 大量瀏覽模式本身的操作
                     hotkeyActionKeys.bulkView,
+                    hotkeyActionKeys.closeBulkView,
                     hotkeyActionKeys.prevPage,
                     hotkeyActionKeys.nextPage,
                     hotkeyActionKeys.firstPage,
@@ -311,6 +312,7 @@ export class Hotkey {
                 hotkeyActionKeys.showSetting,
                 hotkeyActionKeys.developerTools,
                 hotkeyActionKeys.bulkView,
+                hotkeyActionKeys.closeBulkView,
                 hotkeyActionKeys.prevPage,
                 hotkeyActionKeys.nextPage,
                 hotkeyActionKeys.firstPage,

@@ -1164,6 +1164,10 @@ class SettingWindow {
                 { dom: getDom("#select-scrollDownAlt") as HTMLSelectElement, config: "scrollDownAlt" },
             ] as const;
 
+            const bulkViewMouseButtonItems = [
+                { dom: getDom("#select-bulkViewScrollWheelButton") as HTMLSelectElement, config: "bulkViewScrollWheelButton" },
+            ] as const;
+
             const bulkViewMouseItems = [
                 { dom: getDom("#select-bulkViewScrollUpCtrl") as HTMLSelectElement, config: "bulkViewScrollUpCtrl" },
                 { dom: getDom("#select-bulkViewScrollDownCtrl") as HTMLSelectElement, config: "bulkViewScrollDownCtrl" },
@@ -1247,6 +1251,21 @@ class SettingWindow {
                 ],
             };
 
+            const bulkViewMouseButtonData: { [key: string]: string[] } = {
+                "bulkView": [
+                    hotkeyActionKeys.prevPage,
+                    hotkeyActionKeys.nextPage,
+                    hotkeyActionKeys.incrColumns,
+                    hotkeyActionKeys.decColumns,
+                    hotkeyActionKeys.incrFixedWidth,
+                    hotkeyActionKeys.decFixedWidth,
+                ],
+                "other": [
+                    hotkeyActionKeys.movePage,
+                    hotkeyActionKeys.closeBulkView,
+                ],
+            };
+
             function buildOptionHtml(data: { [key: string]: string[] }, showNone: boolean) {
                 let htmlString = "";
                 if (showNone) {
@@ -1275,6 +1294,13 @@ class SettingWindow {
                     item.dom.value = _config.settings.mouse[item.config];
                 });
 
+                const bulkViewMouseButtonHtml = buildOptionHtml(bulkViewMouseButtonData, false);
+                bulkViewMouseButtonItems.forEach((item) => {
+                    item.dom.innerHTML = bulkViewMouseButtonHtml;
+                    // @ts-ignore
+                    item.dom.value = _config.settings.mouse[item.config];
+                });
+
                 const bulkViewHtml = buildOptionHtml(bulkViewMouseData, false);
                 bulkViewMouseItems.forEach((item) => {
                     item.dom.innerHTML = bulkViewHtml;
@@ -1285,7 +1311,7 @@ class SettingWindow {
                 _i18n.setAll();
             }
 
-            [...normalMouseItems, ...bulkViewMouseItems].forEach((item) => {
+            [...normalMouseItems, ...bulkViewMouseButtonItems, ...bulkViewMouseItems].forEach((item) => {
                 item.dom.addEventListener("change", () => {
                     // @ts-ignore
                     _config.settings.mouse[item.config] = item.dom.value;

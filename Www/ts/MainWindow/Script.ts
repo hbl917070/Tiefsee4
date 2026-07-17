@@ -292,6 +292,11 @@ export class Script {
                 this.M.script.bulkView.show();
             }
         }
+        else if (s === hotkeyActionKeys.closeBulkView) { // 退出大量瀏覽模式
+            if (this.M.fileLoad.getIsBulkView()) {
+                await this.M.script.bulkView.close();
+            }
+        }
         else if (s === hotkeyActionKeys.prevPage) { // 上一頁
             this.bulkView.pagePrev();
         }

@@ -1208,6 +1208,12 @@ var langData = {
                 "en": "Bulk View - Mouse scroll wheel",
                 "ja": "バルクビュー - スクロールホイール"
             },
+            bulkViewMouseButton: {
+                "zh-TW": "大量瀏覽模式 - 滑鼠按鍵",
+                "zh-CN": "批量浏览模式 - 鼠标按键",
+                "en": "Bulk View - Mouse button",
+                "ja": "バルクビュー - マウスボタン"
+            },
             resetAll: {
                 "zh-TW": "重置所有滑鼠設定",
                 "zh-CN": "重置所有鼠标设置",
@@ -3137,6 +3143,13 @@ var langData = {
             "ja": "なし",
         },
 
+        movePage: {
+            "zh-TW": "移動頁面",
+            "zh-CN": "移动页面",
+            "en": "Move page",
+            "ja": "ページを移動",
+        },
+
         distancePx: {
             "zh-TW": "距離(px)",
             "zh-CN": "距离(px)",
@@ -3449,10 +3462,10 @@ var langData = {
 
         bulkView: "menu.bulkView", //大量瀏覽模式
         closeBulkView: {
-            "zh-TW": "關閉大量瀏覽模式",
-            "zh-CN": "关闭批量浏览模式",
-            "en": "Close Bulk View",
-            "ja": "バルクビューを閉じる",
+            "zh-TW": "退出大量瀏覽模式",
+            "zh-CN": "退出批量浏览模式",
+            "en": "Exit Bulk View",
+            "ja": "バルクビューを終了",
         },
         prevPage: {
             "zh-TW": "上一頁",

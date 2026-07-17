@@ -109,6 +109,8 @@ export const hotkeyDefinitions = [
         title: "bulkView", // 大量瀏覽模式
         content: [
             { key: "bulkView" }, // 切換大量瀏覽模式
+            { key: "closeBulkView" }, // 退出大量瀏覽模式
+            { key: "movePage" }, // 移動頁面 (瀏覽器預設功能，實則不做任何事情)
             { key: "prevPage" }, // 上一頁
             { key: "nextPage" }, // 下一頁
             { key: "firstPage" }, // 移至第一頁

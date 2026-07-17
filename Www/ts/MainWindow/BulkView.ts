@@ -1,3 +1,4 @@
+import { HotkeyAction, hotkeyActionKeys } from "../HotkeyDefinitions";
 import { Lib } from "../Lib";
 import { RequestLimiter } from "../RequestLimiter";
 import { Throttle } from "../Throttle";
@@ -138,6 +139,15 @@ export class BulkView {
             _domBulkView.addEventListener("wheel", () => {
                 startUserScroll();
             });
+            _domBulkView.addEventListener("mousedown", (e: MouseEvent) => {
+                if (e.button !== 1) { return; } // 滾輪鍵
+
+                const sc = M.config.settings.mouse.bulkViewScrollWheelButton;
+                if (sc === hotkeyActionKeys.movePage) { return; } // 「移動頁面」為瀏覽器預設功能，無需自定義動作
+
+                M.script.run(sc);
+                e.preventDefault(); // 執行自定義動作時禁止瀏覽器預設功能
+            });
             _domBulkView.addEventListener("touchstart", () => {
                 startUserScroll();
             });
@@ -234,7 +244,7 @@ export class BulkView {
             // 大量瀏覽模式 - 滑鼠滾輪
             _domBulkView.addEventListener("wheel", (e: WheelEvent) => {
                 const deltaY = e.deltaY; // 上下滾動的量
-                let sc = "";
+                let sc: HotkeyAction | null = null;
                 if (deltaY > 0) { // 下
                     if (e.ctrlKey) {
                         sc = M.config.settings.mouse.bulkViewScrollDownCtrl;
@@ -253,7 +263,7 @@ export class BulkView {
                         sc = M.config.settings.mouse.bulkViewScrollUpAlt;
                     }
                 }
-                if (sc !== "") {
+                if (sc !== null) {
                     M.script.run(sc, { x: e.offsetX, y: e.offsetY });
                     e.preventDefault(); // 禁止頁面滾動
                 }
