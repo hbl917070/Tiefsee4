@@ -444,6 +444,12 @@ var langData = {
                 "en": "Other",
                 "ja": "その他",
             },
+            checkerboardBackground: {
+                "zh-TW": "使用格子背景",
+                "zh-CN": "使用格子背景",
+                "en": "Use checkerboard background",
+                "ja": "市松模様の背景を使用する",
+            },
             rawImageThumbnail: {
                 "zh-TW": "開啟 RAW 圖片時，顯示內嵌的預覽圖",
                 "zh-CN": "开启 RAW 图片时，显示内嵌的预览图",

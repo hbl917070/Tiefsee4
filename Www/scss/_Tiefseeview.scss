@@ -24,6 +24,18 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
+        isolation: isolate;
+    }
+
+    // 使用格子背景
+    body[checkerboard-background="true"] & .tiefseeview-container::before {
+        content: "";
+        position: absolute;
+        inset: 1px;
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj48cmVjdCB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNjY2NjY2MiLz48cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2NjY2NjYyIvPjwvc3ZnPg==");
+        background-size: 20px 20px;
+        pointer-events: none;
+        z-index: -1;
     }
 
     // 放圖片的容器，用於套用旋轉

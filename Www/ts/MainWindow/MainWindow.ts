@@ -895,6 +895,9 @@ export class MainWindow {
             const tiefseeviewImageRendering = Number(_config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
             _fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
+            // 使用格子背景
+            cssRoot.setAttribute("checkerboard-background", _config.settings.other.checkerboardBackground ? "true" : "false");
+
             _fileShow.tiefseeview.enableTouchpadGestures(
                 _config.settings.other.enableTouchpadGestures); // 啟用觸控板手勢
 

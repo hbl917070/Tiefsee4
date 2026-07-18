@@ -389,6 +389,8 @@ export class Config {
 
         /** 其他 */
         other: {
+            /** 使用格子背景 */
+            checkerboardBackground: false,
             /** 開啟 RAW 圖片時，顯示內嵌的預覽圖 */
             rawImageThumbnail: true,
             /** 刪除前顯示詢問視窗 */

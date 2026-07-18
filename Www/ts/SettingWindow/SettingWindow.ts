@@ -1906,6 +1906,14 @@ class SettingWindow {
         // 其他
         addLoadEvent(() => {
 
+            // 使用格子背景
+            const switch_checkerboardBackground = getDom("#switch-checkerboardBackground") as HTMLInputElement;
+            switch_checkerboardBackground.checked = _config.settings.other.checkerboardBackground;
+            switch_checkerboardBackground.addEventListener("change", () => {
+                _config.settings.other.checkerboardBackground = switch_checkerboardBackground.checked;
+                appleSettingOfMain();
+            });
+
             // 開啟 RAW 圖片時，顯示內嵌的預覽圖
             const switch_rawImageThumbnail = getDom("#switch-rawImageThumbnail") as HTMLInputElement;
             switch_rawImageThumbnail.checked = _config.settings["other"]["rawImageThumbnail"];
