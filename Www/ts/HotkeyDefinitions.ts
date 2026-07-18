@@ -37,6 +37,7 @@ export const hotkeyDefinitions = [
             { key: "imageMoveRightOrNextFile", subOptions: ["distancePx"] }, // 圖片向右移動 or 下一個檔案
             { key: "imageMoveLeftOrNextFile", subOptions: ["distancePx"] }, // 圖片向左移動 or 下一個檔案
             { key: "imageMoveRightOrPrevFile", subOptions: ["distancePx"] }, // 圖片向右移動 or 上一個檔案
+            { key: "toggleCheckerboardBackground" }, // 切換格子背景
         ]
     },
     {

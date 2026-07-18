@@ -136,6 +136,9 @@ export class Script {
                 this.fileLoad.nextFile();
             }
         }
+        else if (s === hotkeyActionKeys.toggleCheckerboardBackground) { // 切換格子背景
+            await this.img.toggleCheckerboardBackground();
+        }
         // #endregion 
 
         // #region 檔案
@@ -351,6 +354,16 @@ export class ScriptImg {
             return true;
         }
         return false;
+    }
+
+    /** 切換格子背景 */
+    public async toggleCheckerboardBackground() {
+        if (this.isImg() === false) { return; }
+
+        this.M.config.settings.other.checkerboardBackground =
+            !this.M.config.settings.other.checkerboardBackground;
+        this.M.applySetting(this.M.config.settings);
+        await this.M.saveSetting();
     }
 
     /** 縮放至適合視窗 */

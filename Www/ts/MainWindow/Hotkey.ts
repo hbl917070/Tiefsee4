@@ -273,6 +273,7 @@ export class Hotkey {
                 hotkeyActionKeys.imageMoveLeftOrNextFile,
                 hotkeyActionKeys.imageMoveRightOrPrevFile,
                 hotkeyActionKeys.imageMoveRightOrNextFile,
+                hotkeyActionKeys.toggleCheckerboardBackground,
                 hotkeyActionKeys.newWindow,
                 hotkeyActionKeys.prevFile,
                 hotkeyActionKeys.nextFile,

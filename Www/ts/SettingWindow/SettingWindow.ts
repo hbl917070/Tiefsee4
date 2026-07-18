@@ -1200,6 +1200,7 @@ class SettingWindow {
                     hotkeyActionKeys.imageMoveRightOrNextFile,
                     hotkeyActionKeys.imageMoveRightOrPrevFile,
                     hotkeyActionKeys.imageMoveLeftOrNextFile,
+                    hotkeyActionKeys.toggleCheckerboardBackground,
                 ],
                 "file": [
                     hotkeyActionKeys.prevFile,

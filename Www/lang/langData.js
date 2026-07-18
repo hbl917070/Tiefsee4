@@ -3286,6 +3286,7 @@ var langData = {
             "en": "Move Image Left or Next File",
             "ja": "画像を左に移動 or 次のファイル"
         },
+        toggleCheckerboardBackground: "sw.other.checkerboardBackground", // 使用格子背景
         //#endregion
 
         //#region 檔案
