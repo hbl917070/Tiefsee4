@@ -5,7 +5,7 @@ import { Lib } from "../Lib";
 import { MainToolbar } from "../MainWindow/MainToolbar";
 import { Msgbox } from "../Msgbox";
 import { SelectionManager } from "../SelectionManager";
-import { hotkeyActionKeys, hotkeyDefinitions } from "../HotkeyDefinitions";
+import { hasActionInput, hotkeyActionKeys, hotkeyDefinitions } from "../HotkeyDefinitions";
 import tippy from "tippy.js";
 import Sortable from "sortablejs";
 
@@ -363,6 +363,9 @@ class SettingWindow {
 
                 // 大分類
                 hotkeyDefinitions.forEach((data) => {
+                    const hotkeyContents = data.content
+                        .filter(content => hasActionInput(content, "hotkey"));
+
                     const domBox = Lib.newDom(
                         `<div class="box settings-group hotkey-category js-settingsGroup">
                             <div class="box-title settings-groupTitle hotkey-categoryTitle collapse-title" i18n="script.${data.title}"></div>
@@ -372,7 +375,7 @@ class SettingWindow {
                         </div>`);
                     const domBoxList = domBox.querySelector(".js-boxList") as HTMLElement;
 
-                    data.content.forEach((content) => {
+                    hotkeyContents.forEach((content) => {
                         const titleI18n = "script." + content.key;
                         const resetTitle = Lib.escape(_i18n.t("sw.hotkey.restoreDefaultValue"));
                         const addTitle = Lib.escape(_i18n.t("sw.hotkey.add"));
@@ -422,7 +425,7 @@ class SettingWindow {
                         /**
                          * 新增單一快速鍵項目
                          */
-                        function createHotkeyItem(divList: HTMLElement, subOptions?: string[], item?: HotkeyItem) {
+                        function createHotkeyItem(divList: HTMLElement, subOptions?: readonly string[], item?: HotkeyItem) {
                             const subHtml = getSubHtml(subOptions);
                             const hotkeyDom = Lib.newDom(
                                 `<div class="hotkey-content">
@@ -471,7 +474,7 @@ class SettingWindow {
                             btnReset.style.display = isSame ? "none" : "";
                         }
 
-                        function getSubHtml(subOptions?: string[]) {
+                        function getSubHtml(subOptions?: readonly string[]) {
                             if (subOptions === undefined) { return ""; }
 
                             let html = "";
@@ -1218,6 +1221,8 @@ class SettingWindow {
                     hotkeyActionKeys.renameFile,
                     hotkeyActionKeys.fileToRecycleBin,
                     hotkeyActionKeys.fileToPermanentlyDelete,
+                    hotkeyActionKeys.reloadAll,
+                    hotkeyActionKeys.openClipboard,
                 ],
                 "copy": [
                     hotkeyActionKeys.copyFile,
@@ -1226,6 +1231,7 @@ class SettingWindow {
                     hotkeyActionKeys.copyImage,
                     hotkeyActionKeys.copyImageBase64,
                     hotkeyActionKeys.copyText,
+                    hotkeyActionKeys.copyPrompt,
                 ],
                 "layout": [
                     hotkeyActionKeys.maximizeWindow,
@@ -1238,6 +1244,7 @@ class SettingWindow {
                 ],
                 "other": [
                     hotkeyActionKeys.bulkView,
+                    hotkeyActionKeys.closeWindow,
                 ],
             };
 
@@ -1245,6 +1252,8 @@ class SettingWindow {
                 "bulkView": [
                     hotkeyActionKeys.prevPage,
                     hotkeyActionKeys.nextPage,
+                    hotkeyActionKeys.firstPage,
+                    hotkeyActionKeys.lastPage,
                     hotkeyActionKeys.incrColumns,
                     hotkeyActionKeys.decColumns,
                     hotkeyActionKeys.incrFixedWidth,
@@ -1256,6 +1265,8 @@ class SettingWindow {
                 "bulkView": [
                     hotkeyActionKeys.prevPage,
                     hotkeyActionKeys.nextPage,
+                    hotkeyActionKeys.firstPage,
+                    hotkeyActionKeys.lastPage,
                     hotkeyActionKeys.incrColumns,
                     hotkeyActionKeys.decColumns,
                     hotkeyActionKeys.incrFixedWidth,
@@ -1264,6 +1275,7 @@ class SettingWindow {
                 "other": [
                     hotkeyActionKeys.movePage,
                     hotkeyActionKeys.closeBulkView,
+                    hotkeyActionKeys.closeWindow,
                 ],
             };
 
