@@ -589,6 +589,7 @@ export class Config {
                 { ext: "mp4", type: "video" },
                 { ext: "webm", type: "video" },
                 { ext: "ogv", type: "video" },
+                { ext: "mkv", type: "video" },
             ]
         })();
 

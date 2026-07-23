@@ -225,7 +225,7 @@ public class FileMetadataService {
 
         // 如果是影片，則另外讀取 Comment 資訊
         string fileType = FileTypeHelper.GetFileType(path);
-        if (fileType == "mp4" || fileType == "webm" || fileType == "avi") {
+        if (fileType == "mp4" || fileType == "webm" || fileType == "avi" || fileType == "mkv") {
             string comment = null;
             Task.Run(async () => {
                 try {
