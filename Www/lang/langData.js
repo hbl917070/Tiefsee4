@@ -919,6 +919,12 @@ var langData = {
                 "en": `Number of images`,
                 "ja": `画像の数`,
             },
+            civitaiResourcesDomain: {
+                "zh-TW": `Civitai 網域`,
+                "zh-CN": `Civitai 域名`,
+                "en": `Civitai domain`,
+                "ja": `Civitai ドメイン`,
+            },
             civitaiResourcesNsfwLevel: {
                 "zh-TW": `允許 NSFW 圖片`,
                 "zh-CN": `允许 NSFW 图片`,

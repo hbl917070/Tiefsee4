@@ -1499,6 +1499,14 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
+            // Civitai 網域
+            const select_civitaiResourcesDomain = getDom("#select-civitaiResourcesDomain") as HTMLSelectElement;
+            select_civitaiResourcesDomain.value = _config.settings.layout.civitaiResourcesDomain;
+            select_civitaiResourcesDomain.addEventListener("change", () => {
+                _config.settings.layout.civitaiResourcesDomain = select_civitaiResourcesDomain.value;
+                appleSettingOfMain();
+            });
+
             // 允許 NSFW 圖片
             const switch_civitaiResourcesNsfwLevel = getDom("#switch-civitaiResourcesNsfwLevel") as HTMLInputElement;
             switch_civitaiResourcesNsfwLevel.checked = _config.settings.layout.civitaiResourcesNsfwLevel == 99;

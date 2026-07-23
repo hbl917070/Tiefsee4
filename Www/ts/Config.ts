@@ -261,6 +261,8 @@ export class Config {
 
             /** 啓用 Civitai Resources */
             civitaiResourcesEnabled: true,
+            /** Civitai 網域 */
+            civitaiResourcesDomain: "civitai.red",
             /** 圖片預設狀態 true=展開、false=折疊 */
             civitaiResourcesDefault: true,
             /** 圖片數量 */

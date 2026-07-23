@@ -78,6 +78,11 @@ export class MainExif {
 		/** 請求限制器 */
 		const _limiter = new RequestLimiter(1);
 
+		/** 取得目前使用的 Civitai 網域 */
+		function getCivitaiDomain() {
+			return M.config.settings.layout.civitaiResourcesDomain;
+		}
+
 		/** 頁籤的類型 */
 		const TabType = {
 			/** 資訊 */
@@ -792,8 +797,8 @@ export class MainExif {
 					// 找不到檔案
 					if (files.length === 0) {
 						showMenu(dom, domMenu, "notFound");
-						const urlCivitai = `https://civitai.com/search/models?query=${name}`;
 						btnSearch.onclick = () => {
+							const urlCivitai = `https://${getCivitaiDomain()}/search/models?query=${name}`;
 							WV_RunApp.OpenUrl(urlCivitai);
 						}
 						return;
@@ -1170,18 +1175,18 @@ export class MainExif {
 						try {
 							if (hash) {
 
-								url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
+								url = `https://${getCivitaiDomain()}/api/v1/model-versions/by-hash/` + hash;
 								result = await Lib.sendGet("json", url, timeout);
 
 								// 如果 hash 超過 10 個字，且找不到資源，則只取前 10 個字再試一次
 								if (result.error && hash.length > 10) {
 									hash = hash.substring(0, 10);
-									url = `https://civitai.com/api/v1/model-versions/by-hash/` + hash;
+									url = `https://${getCivitaiDomain()}/api/v1/model-versions/by-hash/` + hash;
 									result = await Lib.sendGet("json", url, timeout);
 									// console.log("Civitai 重新請求資料", url);
 								}
 							} else {
-								url = `https://civitai.com/api/v1/model-versions/` + modelVersionId;
+								url = `https://${getCivitaiDomain()}/api/v1/model-versions/` + modelVersionId;
 								result = await Lib.sendGet("json", url, timeout);
 							}
 						} catch (e) {
@@ -1351,7 +1356,7 @@ export class MainExif {
 						}
 
 						btnCivitai.addEventListener("click", async () => {
-							let url = "https://civitai.com/models/" + modelId + "?modelVersionId=" + modelVersionId;
+							let url = "https://" + getCivitaiDomain() + "/models/" + modelId + "?modelVersionId=" + modelVersionId;
 							WV_RunApp.OpenUrl(url);
 						});
 
@@ -1655,7 +1660,7 @@ export class MainExif {
 				}
 				const modelId = civitaiInfo.modelId;
 				if (modelId !== undefined) {
-					return "https://civitai.com/models/" + modelId;
+					return "https://" + getCivitaiDomain() + "/models/" + modelId;
 				}
 			} catch (e) { }
 			return null;
