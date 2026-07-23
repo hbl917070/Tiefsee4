@@ -4,6 +4,7 @@ import { Tiefseeview, TiefseeviewAlignType, TiefseeviewZoomType } from "../Tiefs
 import { GroupType } from "../Config";
 import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
+import { VideoToolbar } from "./VideoToolbar";
 
 export class FileShow {
 
@@ -16,6 +17,7 @@ export class FileShow {
     public openBulkView;
     public getIsLoaded;
     public getGroupType;
+    public videoToolbar;
 
     public tiefseeview;
     public dom_imgview;
@@ -26,6 +28,7 @@ export class FileShow {
 
         const _domImgview = document.querySelector("#mView-tiefseeview") as HTMLDivElement;
         const _tiefseeview: Tiefseeview = new Tiefseeview(_domImgview);
+        const _videoToolbar = new VideoToolbar(M);
         const _iframes = new Iframes(M);
         var _isLoaded = true;
         /** 目前顯示的類型 */
@@ -40,6 +43,7 @@ export class FileShow {
         this.openBulkView = openBulkView;
         this.getIsLoaded = getIsLoaded;
         this.getGroupType = getGroupType;
+        this.videoToolbar = _videoToolbar;
 
         this.dom_imgview = _domImgview;
         this.tiefseeview = _tiefseeview;
@@ -58,6 +62,7 @@ export class FileShow {
          */
         function setShowType(groupType: string) {
 
+            const previousGroupType = _groupType;
             _groupType = groupType;
 
             document.body.setAttribute("showType", groupType); // 搭配CSS，用於顯示或隱藏某些選項
@@ -100,6 +105,10 @@ export class FileShow {
                 _iframes.welcomeview.visible(true);
             } else {
                 _iframes.welcomeview.visible(false);
+            }
+            
+            if (previousGroupType === GroupType.video && groupType !== GroupType.video) {
+                _videoToolbar.setVisible(false);
             }
 
             if (groupType === GroupType.img || groupType === GroupType.video) {
@@ -254,6 +263,9 @@ export class FileShow {
 
             _isLoaded = false;
             const path = fileInfo2.Path;
+            if (_groupType === GroupType.video) {
+                _videoToolbar.setVisible(false);
+            }
             setShowType(GroupType.video); // 改變顯示類型
 
             let imgurl: string; // 圖片網址
@@ -264,9 +276,10 @@ export class FileShow {
             }
 
             _tiefseeview.setLoading(true, 200);
-            await _tiefseeview.loadVideo(imgurl);
+            const isVideoLoaded = await _tiefseeview.loadVideo(imgurl);
 
             initTiefseeview(fileInfo2);
+            _videoToolbar.setVisible(isVideoLoaded === true);
             _isLoaded = true;
         }
 

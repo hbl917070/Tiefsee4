@@ -1,0 +1,40 @@
+<div id="video-toolbar" class="video-toolbar" visible="false">
+    <div class="video-toolbar-content">
+        <div class="video-toolbar-progress">
+            <input class="video-toolbar-progress-input" type="range" min="0" max="0" step="any" value="0" title="影片進度" i18n="videoToolbar.progress">
+        </div>
+
+        <div class="video-toolbar-controls">
+            <div class="video-toolbar-left">
+                <button class="video-toolbar-button video-toolbar-play" type="button" title="播放" i18n="videoToolbar.play">
+                    <span class="video-toolbar-play-icon" style="padding-left: 3px;">
+                        <%- await readFile("./img/default/icon-play.svg"); %>
+                    </span>
+                    <span class="video-toolbar-pause-icon">
+                        <%- await readFile("./img/default/icon-pause.svg"); %>
+                    </span>
+                </button>
+
+                <div class="video-toolbar-volume-group">
+                    <button class="video-toolbar-button video-toolbar-volume-button" type="button" title="靜音" i18n="videoToolbar.mute">
+                        <span class="video-toolbar-volume-icon">
+                            <%- await readFile("./img/default/icon-volume.svg"); %>
+                        </span>
+                        <span class="video-toolbar-volume-mute-icon">
+                            <%- await readFile("./img/default/icon-volumeMute.svg"); %>
+                        </span>
+                    </button>
+                    <input class="video-toolbar-volume-input" type="range" min="0" max="1" step="0.01" value="1" title="音量" i18n="videoToolbar.volume">
+                </div>
+
+                <span class="video-toolbar-time" title="播放時間" i18n="videoToolbar.playbackTime">0:00 / 0:00</span>
+            </div>
+
+            <div class="video-toolbar-right">
+                <button class="video-toolbar-button video-toolbar-rate-button" type="button" title="播放速度" i18n="videoToolbar.playbackSpeed">
+                    <span class="video-toolbar-rate-value">1x</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

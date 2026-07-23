@@ -198,6 +198,16 @@ export class Config {
             sharpenValue: 0,
         },
 
+        /** 影片播放 */
+        video: {
+            /** 是否靜音 */
+            muted: false,
+            /** 音量，範圍 0～1 */
+            volume: 1,
+            /** 播放速率，範圍 0.25～3 */
+            playbackRate: 1,
+        },
+
         /** 預設排序 */
         sort: {
             /** 預設檔案排序 */

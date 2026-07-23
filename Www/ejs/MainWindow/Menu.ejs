@@ -1025,3 +1025,28 @@
         </div>
     </div>
 </div>
+
+<!-- 影片播放速度選單 -->
+<div class="menu" data-menu="none" active="">
+    <div class="menu-content" id="menu-video-toolbar-rate">
+        <div class="menu-box video-toolbar-rate-menu">
+            <div class="video-toolbar-rate-range-row">
+                <button class="video-toolbar-rate-step video-toolbar-rate-decrease" type="button" title="降低播放速度" i18n="videoToolbar.decreaseSpeed">
+                    <%- await readFile("./img/default/icon-minus.svg"); %>
+                </button>
+                <input class="video-toolbar-rate-input" type="range" min="0.25" max="3" step="0.05" value="1" title="播放速率" i18n="videoToolbar.playbackSpeed">
+                <button class="video-toolbar-rate-step video-toolbar-rate-increase" type="button" title="提高播放速度" i18n="videoToolbar.increaseSpeed">
+                    <%- await readFile("./img/default/icon-plus.svg"); %>
+                </button>
+            </div>
+            <div class="video-toolbar-rate-presets">
+                <button type="button" data-rate="0.5">0.5</button>
+                <button type="button" data-rate="0.75">0.75</button>
+                <button type="button" data-rate="1">1.0</button>
+                <button type="button" data-rate="1.25">1.25</button>
+                <button type="button" data-rate="1.5">1.5</button>
+                <button type="button" data-rate="2">2.0</button>
+            </div>
+        </div>
+    </div>
+</div>

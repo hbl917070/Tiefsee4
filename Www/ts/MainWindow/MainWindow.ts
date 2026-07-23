@@ -895,6 +895,12 @@ export class MainWindow {
             const tiefseeviewImageRendering = Number(_config.settings["image"]["tiefseeviewImageRendering"]); // 設定 圖片的渲染模式
             _fileShow.tiefseeview.setRendering(tiefseeviewImageRendering);
 
+            // 影片播放設定
+            _fileShow.videoToolbar.setSettings(
+                _config.settings.video.muted,
+                _config.settings.video.volume,
+                _config.settings.video.playbackRate);
+
             // 使用格子背景
             cssRoot.setAttribute("checkerboard-background", _config.settings.other.checkerboardBackground ? "true" : "false");
 

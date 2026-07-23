@@ -42,8 +42,9 @@ export class Menu {
 
             // 關閉所有 menu
             if (domMenu === undefined) {
-                for (let i = 0; i < _tempCloseList.length; i++) {
-                    _tempCloseList[i].closeEvent();
+                // closeEvent 會同步移除目前項目，因此不能用遞增 index 遍歷，否則會跳過下一個 menu。
+                while (_tempCloseList.length > 0) {
+                    _tempCloseList[0].closeEvent();
                 }
                 return;
             }
@@ -71,6 +72,12 @@ export class Menu {
             let domMenuBg = domMenu.parentNode as HTMLElement;
             if (domMenuBg === null) { return; }
 
+            // 避免同一個 menu 重複加入 close list，造成事件與關閉回呼累積。
+            const openedMenu = _tempCloseList.find((item) => item.dom === domMenuBg);
+            if (openedMenu !== undefined) {
+                openedMenu.closeEvent();
+            }
+
             M.updateDomVisibility(); // 更新元素顯示或隱藏
 
             domMenuBg.setAttribute("active", "true");
@@ -87,6 +94,7 @@ export class Menu {
                 });
                 domMenuBg.removeEventListener("touchstart", onmousedown);
                 domMenuBg.removeEventListener("mousedown", onmousedown);
+                domMenuBg.onwheel = null;
                 onMenuClose();
             }
             _tempCloseList.push({ dom: domMenuBg, closeEvent: funcClose });
@@ -124,7 +132,7 @@ export class Menu {
          * @param css 
          * @param position 
          */
-        function openAtButton(domMenu: HTMLElement | null, domBtn: HTMLElement | null, css: string, position: "leftOrRight" | "bottom" = "bottom") {
+        function openAtButton(domMenu: HTMLElement | null, domBtn: HTMLElement | null, css: string, position: "leftOrRight" | "bottom" = "bottom", onMenuClose: () => void = () => { }) {
             if (domMenu === null) { return; }
             if (domBtn === null) { return; }
 
@@ -168,6 +176,7 @@ export class Menu {
             };
             const funcClose = () => {
                 domBtn.classList.remove(css);
+                onMenuClose();
             };
             openBase(domMenu, funcPosition, funcClose);
         }

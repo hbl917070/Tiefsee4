@@ -1,0 +1,349 @@
+.video-toolbar {
+    // 外層固定在原位置，作為完整 hover 命中區域；視覺位移交給內層處理
+    position: absolute;
+    right: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    color: var(--color-white);
+    visibility: hidden;
+    pointer-events: none;
+
+    &[visible="true"] {
+        visibility: visible;
+        pointer-events: auto;
+
+        // hover 或選單開啟時顯示內層，外層本身不做 transform，避免命中區域偏移
+        &:hover .video-toolbar-content,
+        &[menu-open="true"] .video-toolbar-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+.video-toolbar-content {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.video-toolbar-progress {
+    // 進度條橫跨整個工具列寬度
+    width: 100%;
+    height: 18px;
+    padding: 0 16px;
+}
+
+.video-toolbar-progress-input,
+.video-toolbar-volume-input,
+.video-toolbar-rate-input {
+    appearance: none;
+    height: 17px;
+    margin: 0;
+    outline: none;
+    cursor: pointer;
+    touch-action: none;
+    background: transparent;
+
+    &::-webkit-slider-runnable-track {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(
+            to right,
+            var(--color-blue) 0 var(--progress, 0%),
+            var(--color-white60) var(--progress, 0%) 100%
+        );
+    }
+
+    &::-webkit-slider-thumb {
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        margin-top: -4px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--color-blue);
+        box-shadow: 0 1px 3px var(--color-black40);
+    }
+
+    &:focus-visible::-webkit-slider-thumb {
+        box-shadow: 0 0 0 2px var(--color-white), 0 1px 3px var(--color-black40);
+    }
+}
+
+.video-toolbar-progress-input {
+    display: block;
+    width: 100%;
+}
+
+.video-toolbar-controls {
+    // 控制列空間不足時只裁切內容，不產生換行或捲動條
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 36px;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0 16px;
+}
+
+.video-toolbar-left {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 7px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.video-toolbar-right {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 7px;
+    min-width: 0;
+}
+
+.video-toolbar-button {
+    // 播放、音量與速度按鈕維持固定尺寸，不被旁邊內容壓縮
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-white);
+    background: var(--color-black60);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--color-black80);
+    }
+
+    &:active {
+        background: var(--color-black);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-white);
+        outline-offset: 2px;
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+        pointer-events: none;
+    }
+}
+
+.video-toolbar-play-icon,
+.video-toolbar-volume-icon {
+    display: inline-flex;
+}
+
+.video-toolbar-pause-icon,
+.video-toolbar-volume-mute-icon {
+    display: none;
+}
+
+.video-toolbar-play[data-playing="true"] {
+    .video-toolbar-play-icon {
+        display: none;
+    }
+
+    .video-toolbar-pause-icon {
+        display: inline-flex;
+    }
+}
+
+.video-toolbar-volume-button[data-muted="true"] {
+    .video-toolbar-volume-icon {
+        display: none;
+    }
+
+    .video-toolbar-volume-mute-icon {
+        display: inline-flex;
+    }
+}
+
+.video-toolbar-volume-group {
+    // 音量拉條平時收合，滑鼠移入時展開
+    display: flex;
+    align-items: center;
+    width: 36px;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--color-black60);
+    transition: width 0.15s ease;
+
+    &:hover {
+        width: 134px;
+    }
+}
+
+.video-toolbar-volume-group .video-toolbar-button {
+    background: transparent;
+}
+
+.video-toolbar-volume-input {
+    width: 90px;
+    flex: 0 0 90px;
+    opacity: 0;
+    pointer-events: none;
+    --progress: 100%;
+
+    &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+            to right,
+            var(--color-white) 0 var(--progress, 100%),
+            var(--color-white40) var(--progress, 100%) 100%
+        );
+    }
+
+    &::-webkit-slider-thumb {
+        width: 11px;
+        height: 11px;
+        background: var(--color-white);
+    }
+}
+
+.video-toolbar-volume-group:hover .video-toolbar-volume-input {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-toolbar-time {
+    // 時間自然依內容伸展；寬度不足時保持單行並直接截斷
+    width: max-content;
+    min-width: 0;
+    max-width: 100%;
+    flex: 0 1 auto;
+    overflow: hidden;
+    padding: 8px 11px;
+    border-radius: 18px;
+    color: var(--color-white);
+    background: var(--color-black60);
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    user-select: none;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+
+.video-toolbar-rate-button {
+    // 速度選單由 Menu.ts 以 fixed overlay 顯示，按鈕只負責觸發狀態
+    width: auto;
+    min-width: 58px;
+    padding: 0 12px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: var(--fontWeightBold);
+
+    &.active {
+        background: var(--color-black80);
+    }
+}
+
+.video-toolbar-rate-menu {
+    width: 264px;
+    padding: 8px;
+}
+
+.video-toolbar-rate-range-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.video-toolbar-rate-step {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    &:hover {
+        background: var(--color-white30);
+    }
+}
+
+.video-toolbar-rate-input {
+    flex: 1;
+    min-width: 0;
+    --progress: 27%;
+
+    &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+            to right,
+            var(--color-white) 0 var(--progress, 27%),
+            var(--color-white40) var(--progress, 27%) 100%
+        );
+    }
+
+    &::-webkit-slider-thumb {
+        background: var(--color-white);
+    }
+}
+
+.video-toolbar-rate-presets {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+
+    button {
+        min-width: 34px;
+        min-height: 34px;
+        flex: 1;
+        padding: 4px;
+        border: 0;
+        border-radius: 7px;
+        color: var(--color-white);
+        background: var(--color-white10);
+        cursor: pointer;
+        font-size: 12px;
+
+        &:hover,
+        &[data-active="true"] {
+            background: var(--color-white30);
+        }
+
+    }
+}
+
+@media (max-width: 480px) {
+    // 小視窗減少左右留白，將可用空間留給控制項
+    .video-toolbar-progress {
+        padding: 0 8px;
+    }
+
+    .video-toolbar-controls {
+        padding: 0 8px;
+    }
+
+    .video-toolbar-time {
+        min-width: 0;
+        padding-right: 7px;
+        padding-left: 7px;
+        font-size: 12px;
+    }
+
+    .video-toolbar-rate-menu {
+        width: min(264px, calc(100vw - 16px));
+    }
+}
