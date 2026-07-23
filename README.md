@@ -44,7 +44,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
  - Quick start: Tiefsee can be opened quickly as long as Tiefsee is not completely closed.
  - Quick Drag File: Drag and drop pictures directly to other programs for opening or uploading.
  - Open Web Image: You can drag and drop images from your browser directly into Tiefsee to open it.
- - Online image search: support sauceNAO, Yandex, Ascii2d, Google, Google Lens, Bing.
+ - Online image search: support sauceNAO, Yandex, Ascii2d, Google, Bing.
  - File Panel: Preview the pictures in the same folder.
  - Directory Panel: Show the list of folders and preview the pictures in the folders.
  - Information Panel: EXIF information, location where the picture was taken, AI drawing prompt (A1111, NovelAI, ComfyUI, InvokeAI).
