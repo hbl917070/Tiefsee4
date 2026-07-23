@@ -17,6 +17,7 @@ export class MainExif {
 	public setHide;
 	public setItemWidth;
 	public setHorizontal;
+	public updateVideoDuration: (duration: number) => void;
 	public updateFileWatcher;
 	public dragbar;
 
@@ -28,6 +29,7 @@ export class MainExif {
 		this.setHide = setHide;
 		this.setItemWidth = setItemWidth;
 		this.setHorizontal = setHorizontal;
+		this.updateVideoDuration = updateVideoDuration;
 		this.updateFileWatcher = updateFileWatcher;
 
 		const _domMainExif = document.getElementById("mainExif") as HTMLElement;
@@ -45,6 +47,27 @@ export class MainExif {
 
 		const _relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
 		var _fileInfo2: FileInfo2;
+		let _videoDuration = 0;
+		let _domVideoDuration: HTMLElement | undefined;
+
+		/**
+		 * 儲存影片長度，並更新目前已建立的詳細資料項目
+		 */
+		function updateVideoDuration(duration: number) {
+			_videoDuration = duration;
+
+			if (_domVideoDuration?.isConnected !== true) {
+				_domVideoDuration = undefined;
+				return;
+			}
+
+			const domValue = _domVideoDuration.querySelector(".mainExifValue") as HTMLElement;
+			if (domValue === null) { return; }
+
+			const value = duration > 0 ? formatVideoLength(duration) : " ";
+			domValue.textContent = value;
+			_domVideoDuration.setAttribute("data-copy-text", value);
+		}
 
 		var _isHide = false; // 暫時隱藏
 		var _isEnabled = true; // 啟用 檔案預覽視窗
@@ -263,6 +286,7 @@ export class MainExif {
 		 */
 		async function loadInfo(noCheckPath = false) {
 
+			_domVideoDuration = undefined;
 			if (_isEnabled === false) { return; }
 			if (_tabType !== TabType.info) { return; }
 
@@ -312,30 +336,10 @@ export class MainExif {
 				modelHash: undefined as string | undefined,
 			};
 
-			// 待影片載入完畢，更新「影片長度」的資訊
-			async function updateVideoDuration(domVideo: HTMLElement) {
-				await Lib.sleep(10);
-				for (let i = 0; i < 100; i++) {
-
-					let duration = M.fileShow.tiefseeview.getVideoDuration();
-
-					if (isNaN(duration) === false) {
-
-						let value = formatVideoLength(duration);
-
-						// 產生新的 dom
-						let name = M.i18n.t(`exif.name.Video Duration`);
-						let domVideoNew = getItemDom({ name: name, value: value });
-						_domTabContentInfo.appendChild(domVideoNew);
-
-						// 把新的 dom 插到原有的 dom 後面，然後刪除原有的 dom
-						domVideo.insertAdjacentElement("afterend", domVideoNew);
-						domVideo.parentNode?.removeChild(domVideo);
-
-						return;
-					}
-					await Lib.sleep(100);
-				}
+			// 設定影片長度項目，並套用播放列目前已取得的值
+			function setVideoDurationElement(domVideo: HTMLElement) {
+				_domVideoDuration = domVideo;
+				updateVideoDuration(_videoDuration);
 			}
 
 			// 不重要的資訊，排到最後面才顯示
@@ -358,7 +362,7 @@ export class MainExif {
 					let domVideo = getItemDom({ name: M.i18n.t(`exif.name.${name}`), value: " " });
 					_domTabContentInfo.appendChild(domVideo);
 					// 待影片載入完畢，更新「影片長度」的資訊
-					updateVideoDuration(domVideo);
+					setVideoDurationElement(domVideo);
 					continue;
 				}
 

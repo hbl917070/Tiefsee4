@@ -277,6 +277,7 @@ export class VideoToolbar {
          **/
         function updateProgress() {
             const duration = getDuration();
+            M.mainExif?.updateVideoDuration(duration);
             _domProgress.max = duration.toString();
             _domProgress.disabled = duration <= 0;
             if (_isSeeking === false) {
@@ -298,6 +299,7 @@ export class VideoToolbar {
             _domProgress.max = "0";
             _domProgress.value = "0";
             _domProgress.disabled = true;
+            M.mainExif?.updateVideoDuration(0);
         }
 
         /** 
