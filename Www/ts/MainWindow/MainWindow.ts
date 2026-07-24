@@ -27,6 +27,7 @@ import { FullScreen } from "./FullScreen";
 import { ToolbarBack } from "./ToolbarBack";
 import { TextEditor } from "./TextEditor";
 import "../DateExtensions";
+import { HotkeyAction } from "../HotkeyDefinitions";
 
 declare global {
     var mainWindow: MainWindow;
@@ -306,8 +307,9 @@ export class MainWindow {
 
             // 按下
             _fileShow.dom_imgview.addEventListener("mousedown", (e) => {
-                let sc = "";
+                let sc: HotkeyAction | "none" = "none";
                 let type = e.button;
+
                 if (type === 1) { // 滾輪鍵
                     sc = _config.settings.mouse.scrollWheelButton;
                 }
@@ -317,10 +319,11 @@ export class MainWindow {
                 if (type === 4) { // 按鍵5
                     sc = _config.settings.mouse.mouseButton5;
                 }
-
-                let offsetX = e.x - _fileShow.dom_imgview.getBoundingClientRect().left;
-                let offsetY = e.y - _fileShow.dom_imgview.getBoundingClientRect().top;
-                _script.run(sc, { x: offsetX, y: offsetY });
+                if (sc !== "none") {
+                    let offsetX = e.x - _fileShow.dom_imgview.getBoundingClientRect().left;
+                    let offsetY = e.y - _fileShow.dom_imgview.getBoundingClientRect().top;
+                    _script.run(sc, { x: offsetX, y: offsetY });
+                }
             })
 
             // 雙擊左鍵
@@ -333,8 +336,8 @@ export class MainWindow {
 
             // 覆寫滾動事件
             _fileShow.tiefseeview.setEventMouseWheel((type: ("up" | "down"), e: WheelEvent, offsetX: number, offsetY: number) => {
+                let sc: HotkeyAction | "none" = "none";
 
-                let sc = "";
                 if (type === "up") {
                     if (e.ctrlKey) {
                         sc = _config.settings.mouse.scrollUpCtrl;

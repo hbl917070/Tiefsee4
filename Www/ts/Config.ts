@@ -423,7 +423,7 @@ export class Config {
         mouse: {
             // 滑鼠按鍵
             leftDoubleClick: hotkeyActionKeys.maximizeWindow,
-            scrollWheelButton: "none",
+            scrollWheelButton: "none" as const,
             mouseButton4: hotkeyActionKeys.prevFile,
             mouseButton5: hotkeyActionKeys.nextFile,
 
