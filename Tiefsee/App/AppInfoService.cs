@@ -9,6 +9,6 @@ public sealed class AppInfoService {
     /// 取得 AppInfo
     /// </summary>
     public string GetAppInfo(WebWindow window) {
-        return WebWindow.GetAppInfo(window.Args, 0);
+        return WebWindow.GetAppInfo(window, window.Args, 0);
     }
 }

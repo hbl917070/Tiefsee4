@@ -50,6 +50,7 @@
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.18.4" />
 		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.7" />
 		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
+		<PackageReference Include="SharpSevenZip" Version="2.0.109" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -83,6 +84,10 @@
 		<RemoveDir Directories="$(OutputPath)\runtimes\unix" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-arm64" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-x86" />
+
+		<!-- SharpSevenZip 會同時複製 x86/x64 native DLL；Tiefsee 固定以 x64 執行，刪除不需要的 x86 版本 -->
+		<Delete Files="$(OutputPath)\x86\7z.dll" />
+		<RemoveDir Directories="$(OutputPath)\x86" />
 	</Target>
 
 </Project>

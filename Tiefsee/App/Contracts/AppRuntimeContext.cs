@@ -28,6 +28,8 @@ public sealed class AppRuntimeContext {
     public string TempDirImgZoom { get; set; } = "";
     /// <summary> 暫存資料夾 - 從網路下載的檔案 </summary>
     public string TempDirWebFile { get; set; } = "";
+    /// <summary> 暫存資料夾 - 壓縮檔解壓後的檔案 </summary>
+    public string TempDirArchive { get; set; } = "";
     /// <summary> 工作列右下角的圖示路徑 </summary>
     public string LogoIcon { get; set; } = "";
     /// <summary> 是否為商店應用程式 </summary>

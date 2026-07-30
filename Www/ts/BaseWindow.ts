@@ -76,6 +76,13 @@ class BaseWindow {
     public fileWatcherEvents: ((data: FileWatcherData[]) => void)[] = []; // 檔案發生變化時時執行的 function
     public touchDrop = new TouchDrop(this);
 
+    public get windowId(): string {
+        if (this.appInfo?.windowId) {
+            return this.appInfo.windowId;
+        }
+        throw new Error("windowId 尚未初始化。");
+    }
+
     constructor() {
 
         const _domWindow = document.querySelector(".window") as HTMLDivElement;
@@ -285,6 +292,7 @@ class BaseWindow {
      * @param jsonTxt 
      */
     public onCreate(json: AppInfo) {
+        this.appInfo = json;
         WV_Window.ShowWindow(); //顯示視窗 
     }
 

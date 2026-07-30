@@ -1,6 +1,8 @@
 namespace Tiefsee;
 
 public class AppInfo {
+    /// <summary> 窗識別碼 </summary>
+    public string windowId { get; set; }
     /// <summary> 命令列參數 </summary>
     public string[] args { get; set; }
     /// <summary> 啟動模式 </summary>
@@ -28,5 +30,4 @@ public class AppInfo {
     /// <summary> 哪些擴充是有啟用的 </summary>
     public PluginAvailability plugin { get; set; } = PluginRegistry.pluginAvailability;
 }
-
 

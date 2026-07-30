@@ -55,6 +55,7 @@ public sealed class AppRuntimeContextBuilder {
             TempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed"),
             TempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom"),
             TempDirWebFile = Path.Combine(KnownFolders.GetPath(KnownFolder.Downloads), "Tiefsee"),
+            TempDirArchive = Path.Combine(Path.GetTempPath(), "Tiefsee\\Archives"),
             LogoIcon = Path.Combine(earlyPaths.BaseDirectory, "Www\\img\\logo.ico"),
             IsStoreApp = isStoreApp,
             IsPortableMode = earlyPaths.IsPortableMode,

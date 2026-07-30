@@ -322,15 +322,12 @@ export class WebAPI {
         return APIURL + `/api/getFile?path=${encodePath}&${fileTime}`;
     }
 
-    // 用於區別影片來自哪個視窗
-    private static windowId = Math.random();
-
     /**
      * 取得影片
      */
     static getVideo(path: string) {
         const encodePath = encodeURIComponent(path);
-        return APIURL + `/api/getVideo?path=${encodePath}&windowId=${this.windowId}`;
+        return APIURL + `/api/getVideo?path=${encodePath}&windowId=${encodeURIComponent(baseWindow.windowId)}`;
     }
 
     /**

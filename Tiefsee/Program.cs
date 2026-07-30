@@ -90,6 +90,8 @@ static class Program {
         }
         services.SetWebServer(webServer);
         services.RegisterHttpRoutes();
+        // 程式結束時釋放 native archive instance 與記憶體中的密碼快取。
+        Application.ApplicationExit += (_, _) => services?.ArchivePreview?.Dispose();
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);

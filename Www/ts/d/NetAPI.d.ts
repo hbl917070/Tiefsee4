@@ -426,16 +426,17 @@ interface WV_System {
     GetScreenFromPoint(x: number, y: number): number[4];
 
     /**
-     * 立即刪除所有圖片暫存
+     * 立即刪除所有圖片與壓縮檔暫存，但保留仍被開啟中壓縮檔 session 使用的檔案
      */
     DeleteAllTemp();
 
     /**
-     * 刪除圖片暫存
+     * 刪除圖片與壓縮檔暫存
      * @param maxImgProcessed 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量
      * @param maxImgZoom 暫存資料夾 tempDirImgZoom 最多保留的檔案數量
+     * @param maxArchive 暫存資料夾 tempDirArchive 最多保留的檔案數量
      */
-    DeleteTemp(maxImgProcessed: number, maxImgZoom: number): void;
+    DeleteTemp(maxImgProcessed: number, maxImgZoom: number, maxArchive: number): void;
 
     /**
      * 模擬鍵盤
@@ -561,6 +562,9 @@ interface WV_Image {
 interface ImageBridge extends WV_Image { }
 
 interface AppInfo {
+
+    /** 視窗識別碼 */
+    windowId: string;
 
     /** 命令列參數 */
     args: string[];

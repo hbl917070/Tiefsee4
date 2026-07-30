@@ -98,19 +98,20 @@ public class SystemWebViewBridge {
     }
 
     /// <summary>
-    /// 立即刪除所有圖片暫存
+    /// 立即刪除所有圖片與壓縮檔暫存，但保留仍被開啟中壓縮檔 session 使用的檔案
     /// </summary>
     public void DeleteAllTemp() {
         _tempCleanupService.DeleteAllTemp();
     }
 
     /// <summary>
-    /// 刪除圖片暫存 (保留一定數量
+    /// 刪除圖片與壓縮檔暫存
     /// </summary>
     /// <param name="maxImgProcessed"> 暫存資料夾 tempDirImgProcessed 最多保留的檔案數量 </param>
     /// <param name="maxImgZoom"> 暫存資料夾 tempDirImgZoom 最多保留的檔案數量 </param>
-    public void DeleteTemp(int maxImgProcessed, int maxImgZoom) {
-        _tempCleanupService.DeleteTemp(maxImgProcessed, maxImgZoom);
+    /// <param name="maxArchive"> 暫存資料夾 tempDirArchive 最多保留的檔案數量 </param>
+    public void DeleteTemp(int maxImgProcessed, int maxImgZoom, int maxArchive) {
+        _tempCleanupService.DeleteTemp(maxImgProcessed, maxImgZoom, maxArchive);
     }
 
     /// <summary>

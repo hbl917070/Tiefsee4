@@ -15,6 +15,7 @@ public sealed class ServiceRegistry {
     public UwpAppService UwpApp { get; }
     /// <summary> 共用的 A1111 資源 service </summary>
     public A1111ResourceService A1111Resource { get; }
+    public ArchivePreviewService ArchivePreview { get; }
     public WebServer WebServer { get; private set; }
 
     public ServiceRegistry(AppRuntimeContext runtimeContext) {
@@ -24,6 +25,7 @@ public sealed class ServiceRegistry {
         UwpApp = new UwpAppService(runtimeContext.AppDataUwpList);
         // A1111Resource 需要先知道執行期的暫存檔路徑，所以在 bootstrap 階段建立
         A1111Resource = new A1111ResourceService(runtimeContext.AppDataA1111ModelList);
+        ArchivePreview = new ArchivePreviewService(runtimeContext.TempDirArchive);
     }
 
     public void SetWebServer(WebServer webServer) {
@@ -37,6 +39,7 @@ public sealed class ServiceRegistry {
         new DirectoryHttpEndpoints(WebServer).RegisterRoutes();
         new ImageHttpEndpoints(WebServer).RegisterRoutes();
         new SystemHttpEndpoints(WebServer).RegisterRoutes();
+        new ArchiveHttpEndpoints(WebServer).RegisterRoutes();
         new StaticAssetHttpEndpoints(WebServer).RegisterRoutes();
     }
 }

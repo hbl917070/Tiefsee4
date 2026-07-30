@@ -34,6 +34,8 @@ public class WebWindow : FormNone {
     private bool _tempFullScreen = false;
     /// <summary> 視窗是否有圓角 </summary>
     private bool _windowRoundedCorners = false;
+    /// <summary> 目前 WebWindow 的識別碼，供後端服務辨識資源擁有者 </summary>
+    public string WindowId { get; } = Guid.NewGuid().ToString("N")[..10];
     /// <summary> 記錄視窗最小化前的狀態 </summary>
     private FormWindowState _lastWindowState = FormWindowState.Normal;
 
@@ -238,15 +240,16 @@ public class WebWindow : FormNone {
     /// 觸發 js 的 baseWindow.onCreate
     /// </summary>
     public static void TriggerCreate(WebWindow w, string[] args, int quickLookRunType = 0) {
-        w.RunJs($"baseWindow.onCreate({GetAppInfo(args, quickLookRunType)});");
+        w.RunJs($"baseWindow.onCreate({GetAppInfo(w, args, quickLookRunType)});");
     }
 
     /// <summary>
     ///
     /// </summary>
-    public static string GetAppInfo(string[] args, int quickLookRunType) {
+    public static string GetAppInfo(WebWindow window, string[] args, int quickLookRunType) {
 
         AppInfo appInfo = new() {
+            windowId = window.WindowId,
             args = args,
             startType = Program.startType,
             startPort = Program.startPort,
@@ -499,6 +502,9 @@ public class WebWindow : FormNone {
 
         this.FormClosed += (sender, e) => {
             SystemBridge.FileWatcherDispose(); // 停止偵測檔案變化
+            // 視窗關閉時由 WinForm 直接釋放此 windowId 的全部 archive session，
+            // 不經過前端 HTTP API，作為前端未逐一釋放時的最後一道防線。
+            Program.services?.ArchivePreview?.CloseWindow(WindowId);
             SingleInstanceCoordinator.WindowFreed();
         };
     }
