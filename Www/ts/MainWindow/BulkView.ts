@@ -4,6 +4,7 @@ import { RequestLimiter } from "../RequestLimiter";
 import { Throttle } from "../Throttle";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { WebAPI } from "../WebAPI";
+import { ArchiveEntryItem, getArchiveLogicalPath } from "../Archive/ArchiveTypes";
 import { MainWindow } from "./MainWindow";
 
 /** 
@@ -814,6 +815,45 @@ export class BulkView {
                     }
                     let end = start + n;
                     let newArr = _arFile.slice(start, end); //取得陣列特定範圍
+
+                    // archive mode 的 logical path 不是實體檔案；先經 resolver 呼叫
+                    // entry-path 取得 materialized FileInfo2，再沿用既有 newItem HTML 與圖片流程。
+                    if (M.fileLoad.getIsArchiveMode()) {
+                        const archiveItems: ArchiveEntryItem[] = M.fileLoad.getArchiveEntryItems();
+
+                        for (const logicalPath of newArr) {
+                            const archiveItem = archiveItems.find(item => getArchiveLogicalPath(item) === logicalPath);
+                            if (archiveItem === undefined) { continue; }
+                            try {
+                                const fileInfo2 = await M.fileLoad.resolveArchiveEntryFileInfo(archiveItem);
+                                if (temp !== _pageNow + getDirPath()) {
+                                    return;
+                                }
+                                const domItem = newItem(fileInfo2);
+                                _domBulkViewContent.appendChild(domItem);
+                                if (fileInfo2.FullPath === currentFilePath || fileInfo2.Path === currentFilePath) {
+                                    keepCurrentImageVisible(currentFilePath, targetTop);
+                                }
+                            }
+                            catch (error) {
+                                // entry-path 失敗不應中斷同一頁其他 entry；保留 item 並使用錯誤圖片。
+                                console.warn("[Archive] BulkView entry 載入失敗。", {
+                                    entryPath: archiveItem.logicalPath,
+                                    entryId: archiveItem.ref.entryId,
+                                    error,
+                                });
+                                if (temp !== _pageNow + getDirPath()) {
+                                    return;
+                                }
+                                const errorInfo = await createArchiveErrorItemInfo(archiveItem);
+                                const domItem = newItem(errorInfo.displayFileInfo, errorInfo.imageFileInfo, false);
+                                _domBulkViewContent.appendChild(domItem);
+                            }
+                        }
+                        start += n;
+                        continue;
+                    }
+
                     let retAr = await WebAPI.getFileInfo2List(newArr);
                     if (temp !== _pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
                         return;
@@ -1033,6 +1073,9 @@ export class BulkView {
          * 檔案被修改時呼叫
          */
         function updateFileWatcher(fileWatcherData: FileWatcherData) {
+
+            // archive source 在開啟期間視為固定快照，不接受實體資料夾 watcher 的增刪事件。
+            if (M.fileLoad.getIsArchiveMode()) { return; }
 
             const newAr = Array.from(M.fileLoad.getWaitingFile());
             const dirPath = getDirPath();
@@ -1256,6 +1299,39 @@ export class BulkView {
         }
 
         /**
+         * 建立 archive entry 解壓失敗時的 BulkView item 資訊。
+         * displayFileInfo 保留 entry 的 logical path、大小與 entry 日期，
+         * imageFileInfo 則改用前端固定的 ./img/error.svg，讓既有 newItem
+         * 仍負責產生相同 HTML 與點擊流程，但不再嘗試讀取失敗的 entry。
+         */
+        async function createArchiveErrorItemInfo(archiveItem: ArchiveEntryItem): Promise<{
+            displayFileInfo: FileInfo2,
+            imageFileInfo: FileInfo2,
+        }> {
+            const logicalPath = getArchiveLogicalPath(archiveItem);
+            const lastWriteTimeUtc = archiveItem.lastWriteTimeUtc;
+            const displayFileInfo: FileInfo2 = {
+                Type: "file",
+                Path: logicalPath,
+                FullPath: logicalPath,
+                Lenght: archiveItem.size,
+                CreationTimeUtc: 0,
+                LastWriteTimeUtc: lastWriteTimeUtc,
+                HexValue: "",
+            };
+            const imageFileInfo: FileInfo2 = {
+                Type: "file",
+                Path: "./img/error.svg",
+                FullPath: "./img/error.svg",
+                Lenght: 0,
+                CreationTimeUtc: 0,
+                LastWriteTimeUtc: lastWriteTimeUtc,
+                HexValue: "",
+            };
+            return { displayFileInfo, imageFileInfo };
+        }
+
+        /**
          * 更新分頁器
          */
         function updatePagination() {
@@ -1309,9 +1385,12 @@ export class BulkView {
         /**
          * 
          */
-        function newItem(fileInfo2: FileInfo2) {
+        function newItem(fileInfo2: FileInfo2, imageFileInfo2: FileInfo2 = fileInfo2, canDrag = true) {
 
-            let n = _arFile.indexOf(fileInfo2.Path) + 1;
+            // 一般檔案的 Path 與 FullPath 通常相同；archive entry 則是
+            // Path=實體暫存檔、FullPath=logical path，列表身份必須使用後者。
+            const itemPath = fileInfo2.FullPath || fileInfo2.Path;
+            let n = _arFile.indexOf(itemPath) + 1;
             if (getIndentation() === "on" && getColumns() === 2) { // 如果有使用首圖縮排
                 n -= 1;
             }
@@ -1326,7 +1405,7 @@ export class BulkView {
                 </div>
             `);
             if (n !== 0) {
-                div.setAttribute("data-path", fileInfo2.Path);
+                div.setAttribute("data-path", itemPath);
             }
             div.style.width = size + "px";
             div.style.minHeight = size + "px";
@@ -1335,14 +1414,25 @@ export class BulkView {
             setTimeout(async () => {
 
                 // 把長路經轉回虛擬路徑，避免瀏覽器無法載入圖片
-                if (fileInfo2.Path.length > 255) {
-                    fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
+                if (imageFileInfo2.Path.length > 255) {
+                    imageFileInfo2.Path = await WV_Path.GetShortPath(imageFileInfo2.Path);
                 }
 
-                let imgData = await M.script.img.getImgData(fileInfo2);
-                let width = imgData.width;
-                let height = imgData.height;
-                let arUrl = imgData.arUrl;
+                // 錯誤 item 已經指定固定圖片，不再對失敗的 archive entry
+                // 執行圖片辨識或 vips 初始化，避免 placeholder 又變成死圖。
+                const isErrorImage = imageFileInfo2.Path === "./img/error.svg";
+                let width = 256;
+                let height = 256;
+                let arUrl: { scale: number, url: string }[] = [{
+                    scale: 1,
+                    url: "./img/error.svg",
+                }];
+                if (isErrorImage === false) {
+                    const imgData = await M.script.img.getImgData(imageFileInfo2);
+                    width = imgData.width;
+                    height = imgData.height;
+                    arUrl = imgData.arUrl;
+                }
 
                 if (temp !== _pageNow + getDirPath()) { // 已經載入其他資料夾，或是切換到其他頁
                     return;
@@ -1359,9 +1449,12 @@ export class BulkView {
 
                 const fileName = Lib.getFileName(fileInfo2.FullPath);
                 const LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
-                const LastWriteTime = new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss");
-                const writeDate = new Date(LastWriteTimeUtc).format("yyyy-MM-dd");
-                const writeTime = new Date(LastWriteTimeUtc).format("hh:mm:ss");
+                const hasLastWriteTime = Number.isFinite(LastWriteTimeUtc) && LastWriteTimeUtc > 0;
+                const LastWriteTime = hasLastWriteTime
+                    ? new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss")
+                    : "0000-00-00 00:00:00";
+                const writeDate = hasLastWriteTime ? LastWriteTime.substring(0, 10) : "0000-00-00";
+                const writeTime = hasLastWriteTime ? LastWriteTime.substring(11) : "00:00:00";
                 const fileSize = Lib.getFileLength(fileInfo2.Lenght);
 
                 div.innerHTML = /*html*/`
@@ -1396,9 +1489,9 @@ export class BulkView {
                     } else if (n !== 0) {
 
                         // saveCurrentState 執行時 FileLoad 尚未切換索引，先記錄即將進入的圖片
-                        _pendingCurrentFilePath = fileInfo2.FullPath;
+                        _pendingCurrentFilePath = itemPath;
                         M.fileLoad.setIsBulkViewSub(true);
-                        let index = _arFile.indexOf(fileInfo2.FullPath);
+                        let index = _arFile.indexOf(itemPath);
 
                         if (_arFile.length > 0 && _arFile[0] === _svgIndentation) { // 如果有使用首圖縮排
                             index -= 1;
@@ -1414,11 +1507,13 @@ export class BulkView {
                 });
 
                 // 快速拖曳
-                Lib.addDragThresholdListener(div, 5, () => {
-                    if (n !== 0) {
-                        M.script.file.dragDropFile(fileInfo2.FullPath);
-                    }
-                });
+                if (canDrag) {
+                    Lib.addDragThresholdListener(div, 5, () => {
+                        if (n !== 0) {
+                            M.script.file.dragDropFile(fileInfo2.FullPath);
+                        }
+                    });
+                }
 
                 const domImg = div.querySelector(".bulkView-img") as HTMLImageElement;
                 const domCenter = div.querySelector(".bulkView-center") as HTMLDivElement;

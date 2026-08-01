@@ -1944,6 +1944,14 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
+            // 載入壓縮檔時
+            const select_archiveLoadMode = getDom("#select-archiveLoadMode") as HTMLSelectElement;
+            select_archiveLoadMode.value = _config.settings.other.archiveLoadMode;
+            select_archiveLoadMode.addEventListener("change", () => {
+                _config.settings.other.archiveLoadMode = select_archiveLoadMode.value;
+                appleSettingOfMain();
+            });
+
             // 檔案刪除前顯示確認視窗
             const switch_fileDeletingShowCheckMsg = getDom("#switch-fileDeletingShowCheckMsg") as HTMLInputElement;
             switch_fileDeletingShowCheckMsg.checked = _config.settings["other"]["fileDeletingShowCheckMsg"];

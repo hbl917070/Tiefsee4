@@ -85,6 +85,17 @@ export class FileSort {
                 if (_sortType === FileSortType.creationTimeDesc) { _sortType = FileSortType.creationTime; }
             }
 
+            if (M.fileLoad.getIsArchiveMode()) {
+                // archive entry 不是實體檔案，禁止送進一般檔案排序 API，且不保存到 localStorage。
+                M.fileLoad.sortArchiveItems(_sortType);
+                updateMenu();
+                if (M.fileLoad.getIsBulkView()) {
+                    // BulkView 自己保留頁面陣列，排序後必須依新的 entry 順序重建內容。
+                    M.bulkView.load();
+                }
+                return;
+            }
+
             const path = M.fileLoad.getFilePath();
             const dirPath = Lib.getDirectoryName(path);
             if (dirPath === null) { return; }
@@ -117,6 +128,32 @@ export class FileSort {
          * 更新 menu 選單
          */
         function updateMenu() {
+
+            const isArchiveMode = M.fileLoad.getIsArchiveMode();
+            const archiveUnavailableItems = [
+                _domFileSortLastAccessTime,
+                _domFileSortCreationTime,
+            ];
+            for (const item of archiveUnavailableItems) {
+                item.style.display = isArchiveMode ? "none" : "";
+            }
+            // archive entry 的名稱、大小與修改時間都依 sessions/open metadata 在前端完成排序。
+            _domFileSortLength.style.display = "";
+            _domFileSortRandom.style.display = "";
+
+            if (isArchiveMode) {
+                const isUnavailable = [
+                    FileSortType.lastAccessTime,
+                    FileSortType.lastAccessTimeDesc,
+                    FileSortType.creationTime,
+                    FileSortType.creationTimeDesc,
+                ].indexOf(_sortType) !== -1;
+                if (isUnavailable) {
+                    // 使用者原本的預設值在 archive mode 不可用時，固定 fallback 到檔名遞增。
+                    _sortType = FileSortType.name;
+                    _orderbyType = FileOrderbyType.asc;
+                }
+            }
 
             _domFileSortName.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
             _domFileSortLastWriteTime.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";

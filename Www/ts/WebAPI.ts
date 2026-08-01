@@ -1,6 +1,13 @@
 import { Lib } from "./Lib";
 
+import { ArchiveApiClient } from "./Archive/ArchiveApi";
+
 export class WebAPI {
+
+    /**
+     * 壓縮檔
+     */
+    static Archive = new ArchiveApiClient();
 
     static Directory = class {
 

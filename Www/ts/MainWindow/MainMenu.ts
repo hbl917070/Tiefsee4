@@ -320,8 +320,8 @@ export class MainMenu {
                     `);
 
                     dom.onclick = async () => {
-                        let filePath = await M.fileLoad.getFileShortPath(getPath()); // 目前顯示的檔案
-                        if (await WV_File.Exists(filePath) === false) { return; }
+                        let filePath = await M.script.open.resolvePhysicalPath(getPath()); // 目前顯示的檔案
+                        if (filePath === undefined || await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close();
                         WV_RunApp.ProcessStart(exe.path, `"${filePath}"`, true, false); // 開啟檔案
                     };
@@ -370,8 +370,8 @@ export class MainMenu {
                     `);
 
                     dom.onclick = async () => {
-                        let filePath = await M.fileLoad.getFileShortPath(getPath()); // 目前顯示的檔案
-                        if (await WV_File.Exists(filePath) === false) { return; }
+                        let filePath = await M.script.open.resolvePhysicalPath(getPath()); // 目前顯示的檔案
+                        if (filePath === undefined || await WV_File.Exists(filePath) === false) { return; }
                         M.menu.close();
                         WV_RunApp.RunUwp(uwpItem.id, filePath); // 開啟檔案
                     };

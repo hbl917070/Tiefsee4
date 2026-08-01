@@ -781,7 +781,12 @@ export class ScriptFileLoad {
     public async reloadAll() {
         this.M.msgbox.closeAll();
         this.M.menu.close();
-        await this.M.fileLoad.loadFile(this.M.fileLoad.getFilePath());
+        const ref = this.M.fileLoad.getCurrentFileRef();
+        const reloadPath = ref?.kind === "archive"
+            ? ref.archivePath
+            : this.M.fileLoad.getFilePath();
+        if (reloadPath === undefined) { return; }
+        await this.M.fileLoad.loadFile(reloadPath);
         await this.reloadDirPanel();
     }
 
@@ -813,34 +818,62 @@ export class ScriptFile {
     /** 快速拖曳(拖出檔案) */
     public dragDropFile(path?: string) {
         setTimeout(async () => {
-            if (path === undefined) {
-                if (this.M.fileLoad.getIsBulkView()) {
-                    path = this.M.fileLoad.getDirPath();
-                } else {
-                    path = this.M.fileLoad.getFilePath();
+            let physicalPath: string | undefined;
+            if (this.M.fileLoad.getIsArchiveMode() && (path === undefined || this.M.fileLoad.isArchiveEntryPath(path))) {
+                physicalPath = await this.M.script.open.resolvePhysicalPath(path);
+            } else {
+                physicalPath = path;
+                if (physicalPath === undefined) {
+                    if (this.M.fileLoad.getIsBulkView()) {
+                        physicalPath = this.M.fileLoad.getDirPath();
+                    } else {
+                        physicalPath = this.M.fileLoad.getFilePath();
+                    }
+                }
+                if (this.M.fileLoad.getIsArchiveMode()
+                    && physicalPath !== undefined
+                    && await WV_File.Exists(physicalPath) === false
+                    && await WV_Directory.Exists(physicalPath) === false) {
+                    return;
                 }
             }
-            if (path.length > 255) {
-                path = await WV_Path.GetShortPath(path); // 把長路經轉回虛擬路徑，避免某些程式不支援長路經
+            if (physicalPath === undefined) { return; }
+            if (physicalPath.length > 255) {
+                physicalPath = await WV_Path.GetShortPath(physicalPath); // 把長路經轉回虛擬路徑，避免某些程式不支援長路經
             }
-            WV_File.DragDropFile(path);
+            WV_File.DragDropFile(physicalPath);
         }, 50);
     }
 
     /** 顯示檔案原生右鍵選單 */
     public async showContextMenu(path?: string) {
-        if (path === undefined) {
-            if (this.M.fileLoad.getIsBulkView()) {
-                path = this.M.fileLoad.getDirPath();
-            } else {
-                path = this.M.fileLoad.getFilePath();
+        let physicalPath: string | undefined;
+        if (this.M.fileLoad.getIsArchiveMode() && (path === undefined || this.M.fileLoad.isArchiveEntryPath(path))) {
+            physicalPath = await this.M.script.open.resolvePhysicalPath(path);
+        } else {
+            physicalPath = path;
+            if (physicalPath === undefined) {
+                physicalPath = this.M.fileLoad.getIsBulkView()
+                    ? this.M.fileLoad.getDirPath()
+                    : this.M.fileLoad.getFilePath();
+            }
+            if (this.M.fileLoad.getIsArchiveMode()
+                && physicalPath !== undefined
+                && await WV_File.Exists(physicalPath) === false
+                && await WV_Directory.Exists(physicalPath) === false) {
+                return;
             }
         }
-        WV_File.ShowContextMenu(path, true);
+        if (physicalPath === undefined) { return; }
+        if (physicalPath.length > 255) {
+            physicalPath = await WV_Path.GetShortPath(physicalPath);
+        }
+        WV_File.ShowContextMenu(physicalPath, true);
     }
 
     /** 儲存文字檔 */
     public async save(btn?: HTMLElement) {
+        if (this.M.fileLoad.getIsArchiveMode()) { return; }
         const t = await this.M.fileShow.iframes.getText();
         const path = this.M.fileLoad.getFilePath();
         this.M.msgbox.closeAll(); // 關閉所有訊息視窗
@@ -858,7 +891,7 @@ export class ScriptFile {
 
     /** 移動目前檔案至指定資料夾 */
     public async moveFileTo(folderPath: string) {
-        if (this.M.fileLoad.getIsBulkView()) { return; }
+        if (this.M.fileLoad.getIsBulkView() || this.M.fileLoad.getIsArchiveMode()) { return; }
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
@@ -883,7 +916,7 @@ export class ScriptFile {
 
     /** 複製目前檔案至指定資料夾 */
     public async copyFileTo(folderPath: string) {
-        if (this.M.fileLoad.getIsBulkView()) { return; }
+        if (this.M.fileLoad.getIsBulkView() || this.M.fileLoad.getIsArchiveMode()) { return; }
 
         const sourcePath = this.M.fileLoad.getFilePath();
         if (await WV_File.Exists(sourcePath) === false) { return; }
@@ -1247,6 +1280,35 @@ export class ScriptOpen {
         this.M = _M;
     }
 
+    /**
+     * 將目前檔案或 archive entry 解析成可交給 Windows 的實體路徑。
+     * archive entry 只接受目前 source 內的 logical path，並透過共用
+     * resolver 呼叫 entry-path；不會把 logical path 直接交給 Windows。
+     */
+    public async resolvePhysicalPath(path?: string): Promise<string | undefined> {
+        if (this.M.fileLoad.getIsArchiveMode()) {
+            try {
+                const physicalPath = await this.M.fileLoad.resolveArchiveEntryPhysicalPath(path);
+                if (physicalPath === undefined) {
+                    Toast.show(this.M.i18n.t("msg.archiveFileNotReady"), 1000 * 3);
+                }
+                return physicalPath;
+            }
+            catch (error) {
+                console.warn("[Archive] 取得外部操作實體路徑失敗。", error);
+                Toast.show(this.M.i18n.t("msg.archiveFilePrepareFailed"), 1000 * 3);
+                return undefined;
+            }
+        }
+
+        let physicalPath = path ?? this.M.fileLoad.getFilePath();
+        if (physicalPath === undefined) { return undefined; }
+        if (physicalPath.length > 255) {
+            physicalPath = await WV_Path.GetShortPath(physicalPath);
+        }
+        return physicalPath;
+    }
+
     /** 載入檔案 */
     public async openFile() {
         let arFile = await WV_File.OpenFileDialog(true, "All files (*.*)|*.*", this.M.i18n.get("menu.openFile"));
@@ -1383,9 +1445,15 @@ export class ScriptOpen {
 
     /** 另開視窗 */
     public async openNewWindow(path?: string) {
-        if (path === undefined) {
+        if (this.M.fileLoad.getIsArchiveMode()) {
+            const ref = this.M.fileLoad.getCurrentFileRef();
+            if (ref?.kind !== "archive") { return; }
+            // archive entry 沒有獨立的啟動參數；新視窗一律重新開啟原始壓縮檔。
+            path = ref.archivePath;
+        } else if (path === undefined) {
             path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
         }
+        if (path === undefined) { return; }
         let exePath = await WV_Window.GetTiefseePath();
         await this.M.saveSetting();
         WV_RunApp.ProcessStart(exePath, `"${path}"`, true, false);
@@ -1393,9 +1461,10 @@ export class ScriptOpen {
 
     /** 解析多幀圖片 */
     public async showFrames(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        // 詳細資料面板傳入的是 FileInfo2.Path；archive mode 下改以目前
+        // entry identity 重新走 entry-path，避免把 materialized path 當成身份。
+        path = await this.resolvePhysicalPath(this.M.fileLoad.getIsArchiveMode() ? undefined : path);
+        if (path === undefined) { return; }
         let exePath = await WV_Window.GetTiefseePath();
         await this.M.saveSetting();
         WV_RunApp.ProcessStart(exePath, `showFrames "${path}"`, true, false);
@@ -1403,15 +1472,20 @@ export class ScriptOpen {
 
     /** 在檔案總管顯示 */
     public async revealInFileExplorer(path?: string) {
-        if (path === undefined) {
+        if (this.M.fileLoad.getIsArchiveMode() && (path === undefined || this.M.fileLoad.isArchiveEntryPath(path))) {
+            path = await this.resolvePhysicalPath(path);
+        } else if (this.M.fileLoad.getIsArchiveMode() && path !== undefined) {
+            if (await WV_File.Exists(path) === false && await WV_Directory.Exists(path) === false) { return; }
+        } else if (path === undefined) {
             if (this.M.fileLoad.getIsBulkView()) {
                 path = this.M.fileLoad.getDirPath();
                 if (await WV_Directory.Exists(path) === false) { return; }
             } else {
-                path = this.M.fileLoad.getFilePath();
-                if (await WV_File.Exists(path) === false) { return; }
+                path = await this.resolvePhysicalPath();
+                if (path === undefined || await WV_File.Exists(path) === false) { return; }
             }
         }
+        if (path === undefined) { return; }
         // 把長路經轉回虛擬路徑
         if (path.length > 255) {
             path = await WV_Path.GetShortPath(path);
@@ -1421,7 +1495,11 @@ export class ScriptOpen {
 
     /** 顯示檔案右鍵選單 */
     public async systemContextMenu(path?: string) {
-        if (path === undefined) {
+        if (this.M.fileLoad.getIsArchiveMode() && (path === undefined || this.M.fileLoad.isArchiveEntryPath(path))) {
+            path = await this.resolvePhysicalPath(path);
+        } else if (this.M.fileLoad.getIsArchiveMode() && path !== undefined) {
+            if (await WV_File.Exists(path) === false && await WV_Directory.Exists(path) === false) { return; }
+        } else if (path === undefined) {
             if (this.M.fileLoad.getIsBulkView()) {
                 path = this.M.fileLoad.getDirPath();
                 if (await WV_Directory.Exists(path) === false) { return; }
@@ -1430,6 +1508,7 @@ export class ScriptOpen {
                 if (await WV_File.Exists(path) === false) { return; }
             }
         }
+        if (path === undefined) { return; }
         // 把長路經轉回虛擬路徑
         if (path.length > 255) {
             path = await WV_Path.GetShortPath(path);
@@ -1439,27 +1518,24 @@ export class ScriptOpen {
 
     /** 列印 */
     public async print(path?: string) {
-        if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
-        }
+        path = await this.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         // if (await WV_File.Exists(path) === false) { return; }
         WV_File.PrintFile(path);
     }
 
     /** 設成桌布 */
     public async setAsDesktop(path?: string) {
-        if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
-        }
+        path = await this.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         if (await WV_File.Exists(path) === false) { return; }
         WV_System.SetWallpaper(path);
     }
 
     /** 選擇其他應用程式*/
     public async openWith(path?: string) {
-        if (path === undefined) {
-            path = await this.M.fileLoad.getFileShortPath(); // 目前顯示的檔案
-        }
+        path = await this.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         if (await WV_File.Exists(path) === false) { return; }
         WV_RunApp.ShowMenu(path);
     }
@@ -1468,9 +1544,8 @@ export class ScriptOpen {
     public async openWithSpecifiedApp(appPath: string, filePath?: string) {
         if (this.M.fileLoad.getIsBulkView()) { return; }
 
-        if (filePath === undefined) {
-            filePath = this.M.fileLoad.getFilePath();
-        }
+        filePath = await this.resolvePhysicalPath(filePath);
+        if (filePath === undefined) { return; }
         // if (await WV_File.Exists(appPath) === false) { return; }
         if (await WV_File.Exists(filePath) === false) { return; }
 
@@ -1497,9 +1572,8 @@ export class ScriptCopy {
 
     /** 複製 檔案 */
     public async copyFile(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        path = await this.M.script.open.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         if (await WV_File.Exists(path) === false) { return; }
         await WV_System.SetClipboard_File(path);
         Toast.show(this.M.i18n.t("msg.copyFile"), 1000 * 3); // 已將「檔案」複製至剪貼簿
@@ -1534,7 +1608,7 @@ export class ScriptCopy {
 
     /** 複製 檔案路徑 或 資料夾路徑 */
     public async copyPath(path?: string) {
-        if (this.M.fileLoad.getIsBulkView()) {
+        if (this.M.fileLoad.getIsArchiveMode() || this.M.fileLoad.getIsBulkView()) {
             await this.copyFilePath(path);
         } else {
             await this.copyDirPath(path);
@@ -1559,16 +1633,16 @@ export class ScriptCopy {
 
     /** 複製 影像 */
     public async copyImage(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        const isCurrentFile = path === undefined || path === this.M.fileLoad.getFilePath();
+        path = await this.M.script.open.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
 
         let fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
         let imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
-            && this.M.fileLoad.getFilePath() === path
+            && isCurrentFile
             && this.M.fileLoad.getGroupType() === GroupType.video
         ) {
             let base64 = await this.M.fileShow.tiefseeview.getCanvasBase64(1, "medium"); // 把圖片繪製到canvas上面，在取得base64
@@ -1629,15 +1703,15 @@ export class ScriptCopy {
 
     /** 複製 影像 Base64  */
     public async copyImageBase64(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        const isCurrentFile = path === undefined || path === this.M.fileLoad.getFilePath();
+        path = await this.M.script.open.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         const fileInfo2 = await WebAPI.getFileInfo2(path);
         if (fileInfo2.Type === "none") { return; } // 如果檔案不存在
         const imgType = Lib.getFileType(fileInfo2); // 取得檔案類型
 
         if (this.M.fileLoad.getIsBulkView() === false
-            && this.M.fileLoad.getFilePath() === path
+            && isCurrentFile
             && this.M.fileLoad.getGroupType() === GroupType.video
         ) {
 
@@ -1671,9 +1745,8 @@ export class ScriptCopy {
 
     /** 複製 Base64  */
     public async copyTextBase64(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        path = await this.M.script.open.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         if (await WV_File.Exists(path) === false) { return; }
 
         const base64: string = await Lib.sendGet("base64", WebAPI.getFile(path)); // 取得檔案的 base64
@@ -1683,9 +1756,8 @@ export class ScriptCopy {
 
     /** 複製 文字 */
     public async copyText(path?: string) {
-        if (path === undefined) {
-            path = this.M.fileLoad.getFilePath(); // 目前顯示的檔案
-        }
+        path = await this.M.script.open.resolvePhysicalPath(path);
+        if (path === undefined) { return; }
         if (await WV_File.Exists(path) === false) { return; }
         await WV_System.SetClipboard_FileToText(path);
         Toast.show(this.M.i18n.t("msg.copyText"), 1000 * 3); // 已將「文字」複製至剪貼簿
@@ -1854,13 +1926,22 @@ export class ScriptBulkView {
         this.M = _M;
     }
 
-    /** 進入 大量瀏覽模式 */
-    public show() {
+    /**
+     * 進入大量瀏覽模式。
+     * archive mode 只依賴 metadata 建立 BulkView，不先要求目前 entry
+     * 成功 materialize；否則目前 entry 解壓失敗時會停在半切換狀態。
+     */
+    public async show() {
         if (this.M.fileLoad.getIsBulkView() === true) { return; }
         if (this.M.fileLoad.getGroupType() === GroupType.welcome) { return; }
         this.M.fileLoad.enableBulkView(true);
         if (this.M.fileLoad.getGroupType() !== GroupType.none) {
-            this.M.fileLoad.showFile();
+            if (this.M.fileLoad.getIsArchiveMode()) {
+                await this.M.fileShow.openBulkView();
+            }
+            else {
+                await this.M.fileLoad.showFile();
+            }
         }
     }
 

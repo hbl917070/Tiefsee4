@@ -1,7 +1,7 @@
+using SharpSevenZip;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using SharpSevenZip;
 
 namespace Tiefsee;
 
@@ -110,9 +110,6 @@ public sealed class ArchivePreviewService : IDisposable {
         FileInfo fileInfo = new(fullPath);
         if (fileInfo.Exists == false) {
             throw new ArchivePreviewException("archiveNotFound", "找不到壓縮檔。", 404);
-        }
-        if (fileInfo.Length > ArchivePreviewSession.MaxArchiveBytes) {
-            throw new ArchivePreviewException("archiveSizeLimitExceeded", "壓縮檔超過 100 MB 限制。", 413);
         }
 
         string sessionId = CreateSessionId(fullPath, fileInfo);
@@ -463,20 +460,12 @@ public sealed class ArchivePreviewService : IDisposable {
     }
 
     /// <summary>
-    /// 將 SharpSevenZip、檔案系統或密碼相關例外轉換成對前端穩定的錯誤代碼。
+    /// 將 archive 初始化例外轉換成對前端穩定的錯誤代碼。
     /// 不把底層 native library 的錯誤文字直接當成前端契約。
     /// </summary>
     private static ArchivePreviewException ClassifyException(Exception exception, string fallbackCode) {
         if (exception is ArchivePreviewException archiveException) {
             return archiveException;
-        }
-
-        string message = exception.Message ?? "";
-        bool passwordRelated = message.Contains("password", StringComparison.OrdinalIgnoreCase)
-            || message.Contains("encrypted", StringComparison.OrdinalIgnoreCase)
-            || message.Contains("密碼", StringComparison.OrdinalIgnoreCase);
-        if (passwordRelated) {
-            return new ArchivePreviewException("passwordRequired", "壓縮檔需要密碼或密碼錯誤。", 401, exception);
         }
 
         return new ArchivePreviewException(fallbackCode, "壓縮檔處理失敗。", 500, exception);
@@ -527,12 +516,16 @@ public sealed class ArchivePreviewService : IDisposable {
 
 internal sealed class ArchivePreviewSession : IDisposable {
 
-    /// <summary> 原始壓縮檔大小上限，避免大型來源檔案占用過多 native 資源。 </summary>
-    public const long MaxArchiveBytes = 100L * 1024 * 1024;
+    /// <summary> 固實壓縮檔的原始檔案大小上限；超過後不建立預覽 session。 </summary>
+    private const long MaxSolidArchiveBytes = 100L * 1024 * 1024;
+    /// <summary> 固實壓縮檔超過此大小後，第一次讀取 entry 會完整解壓。 </summary>
+    private const long SolidFullExtractionThresholdBytes = 10L * 1024 * 1024;
     /// <summary> 所有非資料夾 entry 的未壓縮大小總上限。 </summary>
     private const long MaxTotalUnpackedBytes = 10L * 1024 * 1024 * 1024;
-    /// <summary> 單一 entry 的未壓縮大小上限。 </summary>
-    private const long MaxEntryUnpackedBytes = 2L * 1024 * 1024 * 1024;
+    /// <summary> 單一 entry 的未壓縮大小上限；達到 1 GB 時禁止解壓。 </summary>
+    private const long MaxEntryUnpackedBytes = 1L * 1024 * 1024 * 1024;
+    /// <summary> 單次批次解壓的未壓縮大小上限，避免 staging 一次占用整個 session 配額。 </summary>
+    private const long MaxBatchUnpackedBytes = 1L * 1024 * 1024 * 1024;
     /// <summary> 壓縮檔目錄 entry 數量上限，避免初始化 metadata 過大。 </summary>
     private const int MaxEntryCount = 100_000;
     /// <summary> 單一 session 可以實際寫入暫存資料夾的大小上限。 </summary>
@@ -636,6 +629,21 @@ internal sealed class ArchivePreviewSession : IDisposable {
     /// <summary> 是否為固實壓縮檔。 </summary>
     public bool IsSolid { get; private set; }
 
+    /// <summary>
+    /// SharpSevenZip 回報的固實 block 數量；無法取得時為 0。
+    /// </summary>
+    public int SolidBlockCount { get; private set; }
+
+    /// <summary>
+    /// SharpSevenZip 回報的壓縮方法描述，例如 LZMA2:48m。
+    /// </summary>
+    public string CompressionMethod { get; private set; } = "";
+
+    /// <summary>
+    /// 初始化時由 entry metadata 加總出的未壓縮檔案大小。
+    /// </summary>
+    public long TotalUnpackedBytes { get; private set; }
+
     /// <summary> 是否包含至少一個加密 entry。 </summary>
     public bool HasEncryptedEntries { get; private set; }
 
@@ -676,9 +684,9 @@ internal sealed class ArchivePreviewSession : IDisposable {
     }
 
     /// <summary>
-    /// 建立 session、初始化 native extractor、讀取 entry metadata 並執行所有
-    /// 初始化階段的安全與效能限制檢查。此處只讀取壓縮檔目錄，不會把所有 entry
-    /// 解壓到暫存資料夾。
+    /// 建立 session、初始化 native extractor、讀取 entry metadata 並執行
+    /// 初始化階段的安全與效能限制檢查。單一 entry 的解壓大小限制會在
+    /// entry 真正排程時檢查；此處只讀取壓縮檔目錄，不會解壓 entry。
     /// </summary>
     /// <param name="sessionId">服務層產生的 10 碼 sessionId。</param>
     /// <param name="archivePath">正規化後的壓縮檔完整路徑。</param>
@@ -696,8 +704,25 @@ internal sealed class ArchivePreviewSession : IDisposable {
         Directory.CreateDirectory(_tempDirectory);
 
         try {
-            CreateExtractor();
-            ArchiveFileInfo[] archiveFiles = _extractor.ArchiveFileData.ToArray();
+            bool archiveSignatureValidated = CreateExtractor();
+            // 7z 啟用加密檔頭時，SharpSevenZip 會在讀取 metadata 時拋出例外，
+            // 這和真正的空壓縮檔不同，空壓縮檔會回傳非 null 的空集合。
+            // 因此要在讀取 metadata 前要求密碼，否則後續無法知道 entry 清單。
+            ArchiveFileInfo[] archiveFiles;
+            try {
+                IReadOnlyList<ArchiveFileInfo> archiveFileData = _extractor.ArchiveFileData;
+                if (archiveFileData == null) {
+                    throw CreatePasswordException();
+                }
+                archiveFiles = archiveFileData.ToArray();
+            }
+            catch (SharpSevenZip.Exceptions.SharpSevenZipArchiveException ex) when (archiveSignatureValidated) {
+                // 加密檔頭的 7z 會在讀取 metadata 時由 native library 拋出
+                // SharpSevenZipArchiveException；這不是依賴例外文字判斷，而是
+                // 由前面的實際檔案簽章檢查確認為 archive 後，依 library 的例外型別
+                // 轉成前端可處理的密碼狀態。
+                throw CreatePasswordException(ex);
+            }
             if (archiveFiles.Length > MaxEntryCount) {
                 throw new ArchivePreviewException("entryCountLimitExceeded", "壓縮檔內的 entry 數量超過限制。", 413);
             }
@@ -712,9 +737,6 @@ internal sealed class ArchivePreviewSession : IDisposable {
                 _entriesById.Add(entry.EntryId, entry);
                 if (entry.IsDirectory == false) {
                     _fileEntries.Add(entry);
-                    if (entry.Size > MaxEntryUnpackedBytes) {
-                        throw new ArchivePreviewException("entrySizeLimitExceeded", "壓縮檔內單一檔案超過限制。", 413);
-                    }
                     checked { totalSize += entry.Size; }
                 }
             }
@@ -723,10 +745,18 @@ internal sealed class ArchivePreviewSession : IDisposable {
                 throw new ArchivePreviewException("unpackedSizeLimitExceeded", "壓縮檔解壓後總大小超過限制。", 413);
             }
 
+            // 完全空的 archive 沒有可供 SharpSevenZip 判定的 solid metadata，
+            // 此時直接讀取 IsSolid 會拋出 Nullable object must have a value。
+            IsSolid = archiveFiles.Length > 0 && _extractor.IsSolid;
+            Format = _extractor.Format.ToString();
+            CompressionMethod = GetArchivePropertyString("Method");
+            SolidBlockCount = GetArchivePropertyInt("Number of blocks", "NumBlocks");
+            TotalUnpackedBytes = totalSize;
+            if (IsSolid && _sourceSnapshot.Length > MaxSolidArchiveBytes) {
+                throw new ArchivePreviewException("solidArchiveSizeLimitExceeded", "固實壓縮檔超過 100 MB 限制。", 413);
+            }
             HasEncryptedEntries = _fileEntries.Any(entry => entry.IsEncrypted);
             _passwordVerified = HasEncryptedEntries == false;
-            IsSolid = _extractor.IsSolid;
-            Format = _extractor.Format.ToString();
         }
         catch (ArchivePreviewException) {
             TryDeleteDirectory(_tempDirectory);
@@ -739,7 +769,9 @@ internal sealed class ArchivePreviewSession : IDisposable {
             throw new ArchivePreviewException("unpackedSizeLimitExceeded", "壓縮檔解壓後總大小超過限制。", 413, ex);
         }
         catch (Exception ex) {
-            ArchivePreviewException classified = ClassifySessionException(ex);
+            ArchivePreviewException classified = ex is ArchivePreviewException archiveException
+                ? archiveException
+                : new ArchivePreviewException("archiveOpenFailed", "無法開啟壓縮檔。", 500, ex);
             TryDeleteDirectory(_tempDirectory);
             Dispose();
             throw classified;
@@ -887,7 +919,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
             }
         }
         catch (Exception ex) {
-            ArchivePreviewException error = ClassifySessionException(ex);
+            ArchivePreviewException error = ClassifySessionException(ex, true);
             lock (_gate) {
                 _passwordVerified = false;
             }
@@ -933,6 +965,9 @@ internal sealed class ArchivePreviewSession : IDisposable {
             archivePath = _archivePath,
             format = Format,
             isSolid = IsSolid,
+            solidBlockCount = SolidBlockCount,
+            compressionMethod = CompressionMethod,
+            totalUnpackedBytes = TotalUnpackedBytes,
             hasEncryptedEntries = HasEncryptedEntries,
             isPasswordVerified = IsPasswordVerified,
             tempDirectory = _tempDirectory,
@@ -965,6 +1000,34 @@ internal sealed class ArchivePreviewSession : IDisposable {
     }
 
     /// <summary>
+    /// 從 SharpSevenZip 的 archive-level properties 取得字串特徵。
+    /// 不同格式或不同 7z.dll 版本可能沒有該 property，因此缺少時回傳空字串。
+    /// </summary>
+    private string GetArchivePropertyString(params string[] names) {
+        var archiveProperties = _extractor.ArchiveProperties;
+        if (archiveProperties is null) {
+            return "";
+        }
+
+        foreach (ArchiveProperty property in archiveProperties) {
+            if (names.Any(name => string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))) {
+                return property.Value?.ToString() ?? "";
+            }
+        }
+        return "";
+    }
+
+    /// <summary>
+    /// 從 archive-level properties 取得整數特徵，例如固實 block 數量。
+    /// property 的實際型別可能依 native provider 回傳為不同整數型別或字串，
+    /// 所以統一轉成 Int32；無法解析時回傳 0，避免把未知誤判成單一 block。
+    /// </summary>
+    private int GetArchivePropertyInt(params string[] names) {
+        string value = GetArchivePropertyString(names);
+        return int.TryParse(value, out int result) && result >= 0 ? result : 0;
+    }
+
+    /// <summary>
     /// 將單一 entry 加入解壓排程，並回傳完成後的暫存檔路徑。
     ///
     /// 已存在的完整檔案會立即命中 cache；同一 entry 的並行請求會共用
@@ -982,6 +1045,9 @@ internal sealed class ArchivePreviewSession : IDisposable {
             }
             if (entry.IsDirectory) {
                 throw new ArchivePreviewException("entryIsDirectory", "指定的 entry 是資料夾。", 400);
+            }
+            if (entry.Size >= MaxEntryUnpackedBytes) {
+                throw new ArchivePreviewException("entrySizeLimitExceeded", "壓縮檔內單一檔案超過 1 GB 限制。", 413);
             }
             if (entry.IsEncrypted && _passwordVerified == false) {
                 throw new ArchivePreviewException(
@@ -1017,10 +1083,50 @@ internal sealed class ArchivePreviewSession : IDisposable {
         }
     }
 
-    private void CreateExtractor() {
+    private bool CreateExtractor() {
+        // 使用 stream overload 檢查實際檔案簽章，避免 path overload 依副檔名
+        // 將改名的非壓縮檔誤判成 archive。
+        bool archiveSignatureValidated = false;
+        try {
+            using FileStream signatureStream = new(
+                _archivePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            _ = SharpSevenZipArchiveFormat.CheckFormat(signatureStream);
+            archiveSignatureValidated = true;
+        }
+        catch (Exception ex) {
+            if (HasSplitZipVolume() == false) {
+                throw new ArchivePreviewException("archiveOpenFailed", "無法開啟壓縮檔。", 500, ex);
+            }
+        }
+
         _extractor = string.IsNullOrEmpty(_password)
             ? new SharpSevenZipExtractor(_archivePath)
             : new SharpSevenZipExtractor(_archivePath, _password);
+        return archiveSignatureValidated;
+    }
+
+    /// <summary>
+    /// 分割 ZIP 的最後一段通常是 .zip，本身不一定以 ZIP signature 開頭；
+    /// 前面的 .z01 才是第一個 volume。這種情況交由 SharpSevenZip 依分卷檔案
+    /// 自動組合與開啟，不能只檢查目前 .zip 檔案的 stream signature。
+    /// </summary>
+    private bool HasSplitZipVolume() {
+        if (string.Equals(Path.GetExtension(_archivePath), ".zip", StringComparison.OrdinalIgnoreCase) == false) {
+            return false;
+        }
+        return File.Exists(Path.ChangeExtension(_archivePath, ".z01"));
+    }
+
+    private ArchivePreviewException CreatePasswordException(Exception innerException = null) {
+        bool hasPassword = string.IsNullOrEmpty(_password) == false;
+        return new ArchivePreviewException(
+            hasPassword ? "passwordIncorrect" : "passwordRequired",
+            hasPassword ? "壓縮檔密碼錯誤。" : "壓縮檔需要密碼。",
+            401,
+            innerException);
     }
 
     private static void ValidateEntry(ArchiveFileEntry entry, HashSet<string> logicalNames) {
@@ -1113,11 +1219,26 @@ internal sealed class ArchivePreviewSession : IDisposable {
         int end = Math.Min(_fileEntries.Count, currentPosition + BulkPrefetchCount);
         for (int i = currentPosition; i < end; i++) {
             ArchiveFileEntry entry = _fileEntries[i];
-            if (File.Exists(GetFinalPath(entry)) == false && _inflight.ContainsKey(entry.EntryId) == false) {
+            if (entry.Size < MaxEntryUnpackedBytes
+                && File.Exists(GetFinalPath(entry)) == false
+                && _inflight.ContainsKey(entry.EntryId) == false) {
                 _inflight.Add(entry.EntryId, new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously));
                 _pending.Add(entry.EntryId);
             }
         }
+    }
+
+    /// <summary>
+    /// 取得目前尚未完成 materialize 的所有檔案 entry。
+    /// 固實壓縮檔超過 10 MB 時，第一次請求會使用這份清單一次完整解壓，
+    /// 避免使用者逐一開啟檔案時，每個 entry 都從 solid block 起點重新解碼。
+    /// 此方法由 ProcessPendingAsync 持有 _gate 時呼叫。
+    /// </summary>
+    private List<int> GetUnmaterializedEntryIds() {
+        return _fileEntries
+            .Where(entry => entry.Size < MaxEntryUnpackedBytes && File.Exists(GetFinalPath(entry)) == false)
+            .Select(entry => entry.EntryId)
+            .ToList();
     }
 
     private void Schedule(TimeSpan dueTime) {
@@ -1137,8 +1258,16 @@ internal sealed class ArchivePreviewSession : IDisposable {
         }
 
         try {
-            if (IsSolid && work.Count > 1) {
-                await ExtractBatchAsync(work);
+            if (IsSolid && _sourceSnapshot.Length > SolidFullExtractionThresholdBytes) {
+                lock (_gate) {
+                    work = GetUnmaterializedEntryIds();
+                }
+                if (work.Count > 0) {
+                    await ExtractBatchesAsync(work);
+                }
+            }
+            else if (IsSolid && work.Count > 1) {
+                await ExtractBatchesAsync(work);
             }
             else {
                 foreach (int entryId in work) {
@@ -1153,6 +1282,32 @@ internal sealed class ArchivePreviewSession : IDisposable {
                     Schedule(Debounce);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// 將固實壓縮檔的批次工作依未壓縮大小切成數批，避免一次建立過大的 staging 目錄。
+    /// 每個 entry 都已在 QueueEntryAsync 或 metadata 階段通過單一檔案限制，因此
+    /// 不會出現單一 entry 無法放入批次的情況。
+    /// </summary>
+    private async Task ExtractBatchesAsync(List<int> entryIds) {
+        List<int> batch = new();
+        long batchSize = 0;
+
+        foreach (int entryId in entryIds) {
+            long entrySize = _entriesById[entryId].Size;
+            if (batch.Count > 0 && batchSize + entrySize > MaxBatchUnpackedBytes) {
+                await ExtractBatchAsync(batch).ConfigureAwait(false);
+                batch = new List<int>();
+                batchSize = 0;
+            }
+
+            batch.Add(entryId);
+            batchSize += entrySize;
+        }
+
+        if (batch.Count > 0) {
+            await ExtractBatchAsync(batch).ConfigureAwait(false);
         }
     }
 
@@ -1265,15 +1420,12 @@ internal sealed class ArchivePreviewSession : IDisposable {
         }
     }
 
-    private ArchivePreviewException ClassifySessionException(Exception exception) {
+    private ArchivePreviewException ClassifySessionException(Exception exception, bool isPasswordVerification = false) {
         if (exception is ArchivePreviewException archiveException) {
             return archiveException;
         }
-        string message = exception.InnerException?.Message ?? exception.Message ?? "";
-        bool passwordRelated = message.Contains("password", StringComparison.OrdinalIgnoreCase)
-            || message.Contains("encrypted", StringComparison.OrdinalIgnoreCase)
-            || message.Contains("密碼", StringComparison.OrdinalIgnoreCase);
-        if (passwordRelated) {
+
+        if (isPasswordVerification) {
             return new ArchivePreviewException(
                 string.IsNullOrEmpty(_password) ? "passwordRequired" : "passwordIncorrect",
                 string.IsNullOrEmpty(_password) ? "壓縮檔需要密碼。" : "壓縮檔密碼錯誤。",
@@ -1363,6 +1515,11 @@ internal sealed class ArchiveFileEntry {
     /// <summary> entry 的未壓縮大小，單位為 bytes。 </summary>
     public long Size { get; private set; }
 
+    /// <summary>
+    /// entry 的最後修改時間，使用 Unix milliseconds UTC；來源沒有提供時間時為 0。
+    /// </summary>
+    public long LastWriteTimeUtc { get; private set; }
+
     /// <summary> 是否為資料夾 entry。 </summary>
     public bool IsDirectory { get; private set; }
 
@@ -1391,10 +1548,25 @@ internal sealed class ArchiveFileEntry {
             EntryId = file.Index,
             Name = file.FileName ?? "",
             Size = file.Size > (ulong)long.MaxValue ? long.MaxValue : (long)file.Size,
+            LastWriteTimeUtc = ToUnixMilliseconds(file.LastWriteTime),
             IsDirectory = file.IsDirectory,
             IsEncrypted = file.Encrypted,
             Extension = extension
         };
+    }
+
+    /// <summary>
+    /// 將 SharpSevenZip 的 entry 時間轉成前端既有的 Unix milliseconds UTC 格式。
+    /// SharpSevenZip 對沒有時間的 entry 會回傳 default DateTime，統一以 0 表示。
+    /// </summary>
+    private static long ToUnixMilliseconds(DateTime time) {
+        if (time == default) {
+            return 0;
+        }
+
+        DateTime utcTime = time.Kind == DateTimeKind.Utc ? time : time.ToUniversalTime();
+        long unixMilliseconds = new DateTimeOffset(utcTime).ToUnixTimeMilliseconds();
+        return unixMilliseconds > 0 ? unixMilliseconds : 0;
     }
 
     /// <summary>
@@ -1408,6 +1580,7 @@ internal sealed class ArchiveFileEntry {
             entryId = EntryId,
             name = Name,
             size = Size,
+            lastWriteTimeUtc = LastWriteTimeUtc,
             isDirectory = IsDirectory
         };
     }

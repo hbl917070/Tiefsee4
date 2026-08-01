@@ -361,7 +361,7 @@ export class Lib {
         if (tag === "TEXTAREA") {
             return true;
         }
-        if (tag === "INPUT" && dom.getAttribute("type") == "text") {
+        if (tag === "INPUT" && ["text", "password"].includes(dom.getAttribute("type") ?? "")) {
             return true;
         }
         return false;

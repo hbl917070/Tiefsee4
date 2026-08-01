@@ -9,6 +9,8 @@ import { VideoToolbar } from "./VideoToolbar";
 export class FileShow {
 
     public openImage;
+    /** 直接顯示固定錯誤圖片，不經過檔案類型與檔案 icon 判斷。 */
+    public openErrorImage;
     public openVideo;
     public openPdf;
     public openTxt;
@@ -35,6 +37,7 @@ export class FileShow {
         var _groupType = GroupType.none;
 
         this.openImage = openImage;
+        this.openErrorImage = openErrorImage;
         this.openVideo = openVideo;
         this.openPdf = openPdf;
         this.openTxt = openTxt;
@@ -54,6 +57,14 @@ export class FileShow {
          * 取得 目前顯示的類型
          */
         function getGroupType() { return _groupType }
+
+        /** 將缺少修改時間的 archive entry 顯示為固定的空日期。 */
+        function formatLastWriteTime(timeUtc: number): string {
+            if (Number.isFinite(timeUtc) === false || timeUtc <= 0) {
+                return "0000-00-00<br>00:00:00";
+            }
+            return new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
+        }
 
         /**
          * 
@@ -257,6 +268,30 @@ export class FileShow {
         }
 
         /**
+         * 顯示 archive 載入失敗時使用的固定錯誤圖片。
+         *
+         * 這裡不能呼叫 openImage，因為 openImage 會依傳入的 FileInfo2
+         * 取得原始壓縮檔的 icon；錯誤 fallback 必須直接載入前端資源，
+         * 才能確保畫面顯示 ./img/error.svg。
+         */
+        async function openErrorImage(displayFileInfo2?: FileInfo2) {
+            _isLoaded = false;
+            setShowType(GroupType.img);
+            _tiefseeview.setLoading(true, 200);
+            await _tiefseeview.loadImg("./img/error.svg");
+            await initTiefseeview(displayFileInfo2 ?? {
+                Type: "file",
+                Path: "./img/error.svg",
+                Lenght: 0,
+                CreationTimeUtc: 0,
+                LastWriteTimeUtc: 0,
+                HexValue: "",
+                FullPath: "./img/error.svg",
+            });
+            _isLoaded = true;
+        }
+
+        /**
          * 載入影片
          */
         async function openVideo(fileInfo2: FileInfo2) {
@@ -325,7 +360,7 @@ export class FileShow {
             const dom_writeTime = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
                 let timeUtc = fileInfo2.LastWriteTimeUtc;
-                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                let time = formatLastWriteTime(timeUtc);
                 dom_writeTime.innerHTML = time;
             }
         }
@@ -367,7 +402,7 @@ export class FileShow {
             const domWriteTime = getToolbarDom(GroupType.pdf)?.querySelector(`[data-name="infoWriteTime"]`);
             if (domWriteTime != null) {
                 const timeUtc = fileInfo2.LastWriteTimeUtc;
-                const time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                const time = formatLastWriteTime(timeUtc);
                 domWriteTime.innerHTML = time;
             }
         }
@@ -427,7 +462,7 @@ export class FileShow {
             const domWriteTime = getToolbarDom(GroupType.txt)?.querySelector(`[data-name="infoWriteTime"]`);
             if (domWriteTime != null) {
                 const timeUtc = fileInfo2.LastWriteTimeUtc;
-                const time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                const time = formatLastWriteTime(timeUtc);
                 domWriteTime.innerHTML = time;
             }
 
@@ -468,13 +503,18 @@ export class FileShow {
 
             setShowType(GroupType.bulkView); // 改變顯示類型
 
-            // 資料夾修改時間
-            let dir = M.fileLoad.getDirPath();
-            let fileInfo2 = await WebAPI.getFileInfo2(dir);
+            // archive mode 顯示目前預覽 entry 的日期；一般模式顯示目前資料夾日期。
+            let timeUtc = 0;
+            if (M.fileLoad.getIsArchiveMode()) {
+                timeUtc = await M.fileLoad.getArchiveLastWriteTimeUtc();
+            } else {
+                let dir = M.fileLoad.getDirPath();
+                let fileInfo2 = await WebAPI.getFileInfo2(dir);
+                timeUtc = fileInfo2.LastWriteTimeUtc;
+            }
             let dom_writeTime = getToolbarDom(GroupType.bulkView)?.querySelector(`[data-name="infoWriteTime"]`);
             if (dom_writeTime != null) {
-                let timeUtc = fileInfo2.LastWriteTimeUtc;
-                let time = new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss")
+                let time = formatLastWriteTime(timeUtc);
                 dom_writeTime.innerHTML = time;
             }
             await M.bulkView.load2();

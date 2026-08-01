@@ -209,7 +209,7 @@ export class MainExif {
 		 * 設定是否顯示 相關檔案
 		 */
 		function setRelatedFilesEnabled(val: boolean) {
-			if (val) {
+			if (val && M.fileLoad.getIsArchiveMode() === false) {
 				_domTabBtns.setAttribute("active", "true");
 			} else {
 				_domTabBtns.setAttribute("active", "false");
@@ -246,6 +246,16 @@ export class MainExif {
 		 */
 		function init(fileInfo2: FileInfo2, noCheckPath = false) {
 			_fileInfo2 = fileInfo2;
+			// archive entry 沒有實體同層資料夾，相關檔案 tab 不應把 logical path
+			// 當成 Windows 路徑送給 getRelatedFileList；資訊 tab 仍可讀取 materialized entry。
+			if (M.fileLoad.getIsArchiveMode()) {
+				_domTabBtnRelated.style.display = "none";
+				if (_tabType === TabType.related) {
+					setTab(TabType.info);
+				}
+			} else {
+				_domTabBtnRelated.style.display = "";
+			}
 			loadInfo(noCheckPath);
 			loadRelated(noCheckPath);
 		}
@@ -941,6 +951,7 @@ export class MainExif {
 
 			if (_isEnabled === false) { return; }
 			if (_tabType !== TabType.related) { return; }
+			if (M.fileLoad.getIsArchiveMode()) { return; }
 
 			_domTabContentRelated.innerHTML = "";
 

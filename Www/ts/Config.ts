@@ -403,6 +403,8 @@ export class Config {
             checkerboardBackground: false,
             /** 開啟 RAW 圖片時，顯示內嵌的預覽圖 */
             rawImageThumbnail: true,
+            /** 載入壓縮檔時。 [imageOnly, allFiles] */
+            archiveLoadMode: "imageOnly",
             /** 刪除前顯示詢問視窗 */
             fileDeletingShowCheckMsg: true,
             /** 偵測到檔案新增時，插入於。 [auto, start, end] */

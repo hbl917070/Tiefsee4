@@ -1,7 +1,6 @@
 import { MainWindow } from "./MainWindow";
 import { Dragbar } from "./Dragbar";
 import { TiefseeScroll } from "../TiefseeScroll";
-import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
 
 /**
@@ -223,7 +222,7 @@ export class MainFileList {
             // 取得單個項目的高度
             let fileListItem = _domFileListData.querySelector(".fileList-item");
             if (fileListItem === null) {
-                newItem(-1, "");
+                newItem(-1, { key: "", displayName: "", iconUrl: "" });
                 fileListItem = _domFileListData.querySelector(".fileList-item");
             }
 
@@ -233,7 +232,7 @@ export class MainFileList {
 
             // 重新計算整體的高度
             if (_tempItemHeight !== _itemHeight) {
-                let arWaitingFile = M.fileLoad.getWaitingFile();
+                const arWaitingFile = M.fileLoad.getFileListItems();
                 _domFileListBody.style.height = (arWaitingFile.length * _itemHeight) + 4 + "px";
             }
             _tempItemHeight = _itemHeight;
@@ -250,13 +249,13 @@ export class MainFileList {
 
             _domFileListData.innerHTML = ""; // 移除之前的所有物件
             _domFileListData.style.marginTop = (start * _itemHeight) + "px";
-            let arWaitingFile = M.fileLoad.getWaitingFile();
+            const arWaitingFile = M.fileLoad.getFileListItems();
 
             let end = start + count;
             if (end > arWaitingFile.length) { end = arWaitingFile.length; }
             for (let i = start; i < end; i++) {
-                const path = arWaitingFile[i];
-                newItem(i, path, noDelay);
+                const item = arWaitingFile[i];
+                newItem(i, item, noDelay);
             }
 
             select();
@@ -265,31 +264,34 @@ export class MainFileList {
         /**
          * 產生一個新項目
          * @param i 
-         * @param path 
+         * @param item 檔案列表項目；一般檔案與 archive entry 都由 FileLoad 統一轉換
          * @returns 
          */
-        function newItem(i: number, path: string, noDelay = false) {
+        function newItem(
+            i: number,
+            item: { key: string, displayName: string, iconUrl: string, path?: string, canDrag?: boolean },
+            noDelay = false,
+        ) {
 
-            const name = Lib.getFileName(path); // 檔名
+            const name = item.displayName;
 
             let htmlImg = "";
 
             if (_tempLoaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
-                if (path !== "") {
+                if (item.key !== "") {
                     setTimeout(() => {
                         if (_domFileListData.contains(div) === false) { return; } // 如果物件不在網頁上，就不載入圖片
 
                         _tempLoaded.push(i); // 加到全域變數，表示已經載入過
-                        const url = getImgUrl(path);
                         const domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
-                        domImg.innerHTML = `<img src="${url}" fetchpriority="low"/>`;
+                        domImg.innerHTML = `<img src="${item.iconUrl}" fetchpriority="low"/>`;
+                        setImageErrorFallback(domImg.querySelector("img"));
                     }, 30);
                 }
             } else {
 
                 // 圖片已經載入過了，直接顯示
-                const imgUrl = getImgUrl(path);
-                htmlImg = `<img src="${imgUrl}" fetchpriority="low">`;
+                htmlImg = `<img src="${item.iconUrl}" fetchpriority="low">`;
             }
 
             let htmlNo = ``;
@@ -309,7 +311,11 @@ export class MainFileList {
                     <div class="fileList-img"> ${htmlImg} </div>                                                            
                 </div>`);
             _domFileListData.append(div);
-            div.setAttribute("data-path", path);
+            setImageErrorFallback(div.querySelector(".fileList-img img"));
+            div.setAttribute("data-key", item.key);
+            if (item.path !== undefined) {
+                div.setAttribute("data-path", item.path);
+            }
 
             // click 載入圖片
             div.addEventListener("click", () => {
@@ -317,21 +323,26 @@ export class MainFileList {
             })
 
             // 快速拖曳
-            Lib.addDragThresholdListener(div, 5, () => {
-                M.script.file.dragDropFile(path);
-            })
+            if (item.path !== undefined && item.canDrag !== false) {
+                Lib.addDragThresholdListener(div, 5, () => {
+                    M.script.file.dragDropFile(item.path as string);
+                })
+            }
 
             return div;
         }
 
         /**
-         * 
+         * 檔案列表縮圖載入失敗時顯示固定錯誤圖片。
+         * archive entry 的 entry-thumbnail 可能因單檔大小限制回傳 413，
+         * 此時必須保留列表項目，只替換該項目的圖片來源。
          */
-        function getImgUrl(path: string) {
-            if (Lib.getExtension(path) === ".svg") {
-                return WebAPI.getFile(path);
-            }
-            return WebAPI.Img.fileIcon(path);
+        function setImageErrorFallback(domImg: Element | null): void {
+            if (!(domImg instanceof HTMLImageElement)) { return; }
+            domImg.addEventListener("error", () => {
+                domImg.onerror = null;
+                domImg.src = "./img/error.svg";
+            }, { once: true });
         }
 
         /**

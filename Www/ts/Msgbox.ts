@@ -40,6 +40,7 @@ export class Msgbox {
         txt?: string,
         type?: ("txt" | "text" | "radio"),
         inputTxt?: string,
+        inputType?: ("text" | "password"),
         isAllowClose?: boolean,
         isShowBtn?: boolean,
         arRadio?: { value: string, name: string }[],
@@ -53,6 +54,7 @@ export class Msgbox {
         let txt = ""; // 內容文字
         let type: ("txt" | "text" | "radio") = "txt"; // 類型
         let inputTxt = ""; // 預設的輸入框內容
+        let inputType: ("text" | "password") = "text"; // 輸入框顯示型別
         let isAllowClose = true; // 是否允許關閉
         let isShowBtn = true; // 是否顯示按鈕
         let arRadio: { value: string; name: string; }[] = []; // radio選項
@@ -63,6 +65,7 @@ export class Msgbox {
         if (json.txt !== undefined) { txt = json.txt }
         if (json.type !== undefined) { type = json.type }
         if (json.inputTxt !== undefined) { inputTxt = json.inputTxt }
+        if (json.inputType !== undefined) { inputType = json.inputType }
         if (json.isAllowClose !== undefined) { isAllowClose = json.isAllowClose }
         if (json.isShowBtn !== undefined) { isShowBtn = json.isShowBtn }
         if (json.arRadio !== undefined) { arRadio = json.arRadio }
@@ -129,6 +132,7 @@ export class Msgbox {
         }
 
         donInput.value = inputTxt;
+        donInput.type = inputType;
 
         donBtnClose.addEventListener("click", () => { funcClose(dom) })
         donBtnNo.addEventListener("click", () => { funcClose(dom) })

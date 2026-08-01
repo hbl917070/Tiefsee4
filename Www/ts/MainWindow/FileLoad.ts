@@ -3,6 +3,9 @@ import { Lib } from "../Lib";
 import { Throttle } from "../Throttle";
 import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
+import { ArchiveApiError, ArchiveEntryItem, ArchiveSessionResponse, FileRef, getArchiveFileName, getArchiveLogicalPath, isSupportedArchivePath } from "../Archive/ArchiveTypes";
+import { ArchiveSourceManager } from "../Archive/ArchiveSource";
+import { ArchiveResolver } from "../Archive/ArchiveResolver";
 import { MainWindow } from "./MainWindow";
 
 /**
@@ -12,6 +15,26 @@ export class FileLoad {
 
     public getWaitingFile: () => string[];
     public setWaitingFile: (ar: string[]) => void;
+    /** 取得目前列表 UI 使用的統一 item，隔離一般路徑與 archive entry 差異。 */
+    public getFileListItems;
+    /** 取得目前項目的 filesystem 或 archive FileRef。 */
+    public getCurrentFileRef;
+    /** 判斷目前來源是否已進入 archive mode。 */
+    public getIsArchiveMode;
+    /** 依 entry metadata 排序 archive 清單，不保存一般檔案排序設定。 */
+    public sortArchiveItems;
+    /** 取得目前 archive entry 的 metadata 清單，供 BulkView 使用。 */
+    public getArchiveEntryItems;
+    /** 取得 archive entry thumbnail URL，不 materialize 實體暫存檔。 */
+    public getArchiveEntryThumbnailUrl;
+    /** 取得可交給既有 BulkView/newItem 流程的 archive FileInfo2。 */
+    public resolveArchiveEntryFileInfo;
+    /** 取得 archive entry 對應的實體暫存路徑；不接受未識別的 logical path。 */
+    public resolveArchiveEntryPhysicalPath;
+    /** 判斷指定路徑是否為目前 archive source 的 entry logical path。 */
+    public isArchiveEntryPath;
+    /** 取得目前預覽中的 archive entry 修改日期；沒有時間時回傳 0。 */
+    public getArchiveLastWriteTimeUtc;
     public getFlagFile: () => number;
     public setFlagFile: (n: number) => void;
 
@@ -62,6 +85,14 @@ export class FileLoad {
         var _fileLoadType: FileLoadType;
         /** 檔案列表(待載入檔案名單) */
         var _arFile: string[] = [];
+        /** archive mode 的扁平 entry 列表；一般檔案模式不使用此欄位。 */
+        var _arArchiveItem: ArchiveEntryItem[] = [];
+        /** 是否已通過整組來源判斷並進入壓縮檔預覽模式。 */
+        var _isArchiveMode = false;
+        /** 管理目前視窗持有的一個或多個 archive session。 */
+        var _archiveSource = new ArchiveSourceManager(WebAPI.Archive);
+        /** 將 archive entry 解析成既有 viewer 可讀取的實體暫存檔。 */
+        var _archiveResolver = new ArchiveResolver(_archiveSource, WebAPI.Archive, WebAPI.getFileInfo2);
         /** 目前在檔案列表的編號 */
         var _flagFile: number;
         /** loadFile是否正在處理中 */
@@ -72,6 +103,8 @@ export class FileLoad {
         var _isBulkViewSub = false;
         /** 如果使用者關閉「重新載入檔案的對話方塊」，則同一個檔案不再次詢問*/
         var _tempReloadFilePath = "";
+        /** 目前正在顯示 archive 密碼輸入框時，供拖曳開檔取消等待中的輸入流程。 */
+        var _cancelArchivePasswordInput: (() => void) | undefined;
 
         /** 目前的資料夾路徑 */
         var _dirPathNow: string = "";
@@ -89,6 +122,18 @@ export class FileLoad {
 
         this.getWaitingFile = () => { return _arFile; };
         this.setWaitingFile = (ar: string[]) => { _arFile = ar; };
+        this.getFileListItems = getFileListItems;
+        this.getCurrentFileRef = getCurrentFileRef;
+        this.getIsArchiveMode = () => _isArchiveMode;
+        this.sortArchiveItems = sortArchiveItems;
+        this.getArchiveEntryItems = () => Array.from(_arArchiveItem);
+        this.getArchiveEntryThumbnailUrl = (item: ArchiveEntryItem, size = 256) =>
+            _archiveResolver.getThumbnailUrl(item, size);
+        this.resolveArchiveEntryFileInfo = async (item: ArchiveEntryItem) =>
+            (await _archiveResolver.resolvePreviewFile(item)).fileInfo;
+        this.resolveArchiveEntryPhysicalPath = resolveArchiveEntryPhysicalPath;
+        this.isArchiveEntryPath = isArchiveEntryPath;
+        this.getArchiveLastWriteTimeUtc = getArchiveLastWriteTimeUtc;
         this.getFlagFile = () => { return _flagFile; };
         this.setFlagFile = (n: number) => { _flagFile = n; };
 
@@ -140,7 +185,11 @@ export class FileLoad {
          */
         function reloadDirPanel() {
             _atLoadingDirParent = "";
-            loadDir(getDirPath()); // 處理資料夾預覽視窗
+            if (_isArchiveMode) {
+                loadArchiveParentDir(getDirPath());
+            } else {
+                loadDir(getDirPath()); // 處理資料夾預覽視窗
+            }
         }
 
         /**
@@ -148,6 +197,11 @@ export class FileLoad {
          */
         function getDirPath() {
             return _dirPathNow;
+        }
+
+        /** 取得目前預覽中的 archive entry 修改日期。 */
+        async function getArchiveLastWriteTimeUtc(): Promise<number> {
+            return _arArchiveItem[_flagFile]?.lastWriteTimeUtc ?? 0;
         }
 
         /**
@@ -261,6 +315,15 @@ export class FileLoad {
             }
 
             let path = _arDirKey[_flagDir];
+
+            // archive mode 的資料夾面板只代表原始壓縮檔的上一層實體資料夾；
+            // 點擊唯一項目不能把目前來源切換成一般資料夾，否則 session 與 entry identity 會失效。
+            if (_isArchiveMode && _arDirKey.length === 1 && path === _dirPathNow) {
+                await updateFlagDir(path);
+                M.mainDirList.select();
+                M.mainDirList.updateLocation();
+                return;
+            }
 
             if (await WV_Directory.Exists(path) === false) { // 如果資料夾不存在
                 delete _arDir[path]; // 刪除此筆
@@ -400,6 +463,51 @@ export class FileLoad {
 
         }
 
+        /**
+         * archive mode 的資料夾面板只顯示壓縮檔上一層實體資料夾。
+         *
+         * MainDirList 仍沿用原本的縮圖元件，因此這裡只準備實體資料夾內的
+         * 圖片檔名，不把 archive entry 混入 `_arDir`，也不啟動一般資料夾 watcher。
+         */
+        async function loadArchiveParentDir(dirPath: string) {
+            _dirPathNow = dirPath;
+
+            const arExt = M.config.allowFileType(GroupType.img).map(item => item["ext"]);
+            const maxCount = M.config.settings.advanced.dirListMaxCount;
+            let arPath: string[] = [];
+
+            try {
+                const json = await WebAPI.Directory.getSiblingDir(dirPath, arExt, maxCount);
+                if (_isArchiveMode === false || _dirPathNow !== dirPath) { return; }
+                arPath = json[dirPath] ?? [];
+            }
+            catch (error) {
+                // sibling directory 失敗時仍嘗試直接讀取目前資料夾，避免面板整個消失。
+                console.warn("[Archive] 讀取上一層資料夾縮圖清單失敗。", error);
+            }
+
+            if (arPath.length === 0) {
+                try {
+                    const files = await WebAPI.Directory.getFiles(dirPath, "*.*");
+                    const extensionSet = new Set(arExt.map(ext => ext.toLocaleLowerCase().replace(/^\./, "")));
+                    arPath = files
+                        .filter(path => extensionSet.has(Lib.getExtension(path).replace(/^\./, "").toLocaleLowerCase()))
+                        .slice(0, maxCount)
+                        .map(path => Lib.getFileName(path));
+                }
+                catch (error) {
+                    console.warn("[Archive] 讀取上一層資料夾檔案清單失敗。", error);
+                }
+            }
+
+            if (_isArchiveMode === false || _dirPathNow !== dirPath) { return; }
+            _arDir = { [dirPath]: arPath };
+            _arDirKey = [dirPath];
+            _flagDir = 0;
+            M.mainDirList.init();
+            M.mainDirList.setStartLocation();
+        }
+
         //#endregion ---------------------
 
         /**
@@ -407,6 +515,15 @@ export class FileLoad {
          * @param files 檔名陣列
          */
         async function loadDropFile(files: string[]) {
+
+            // archive 載入可能正等待密碼輸入。拖曳新檔案進來時，先取消該等待，
+            // 再等原本的載入流程完成清理，避免 _isLoadFileFinish 一直維持 false。
+            if (_isLoadFileFinish === false && _cancelArchivePasswordInput !== undefined) {
+                _cancelArchivePasswordInput();
+                while (_isLoadFileFinish === false) {
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            }
 
             M.msgbox.closeAll(); // 關閉所有訊息視窗
             M.menu.close();
@@ -420,13 +537,20 @@ export class FileLoad {
         }
 
         /**
-         * 載入檔案陣列
-         * @param dirPath 
-         * @param arName 
+         * 載入檔案陣列。
+         * 多檔案永遠維持一般檔案模式；archive mode 僅由單一檔案入口建立。
          */
         async function loadFiles(ar: string[] = []) {
 
+            if (ar.length === 0) { return; }
+            if (_isLoadFileFinish === false) {
+                console.log("loadFiles處理中");
+                return;
+            }
+
             await WV_System.NewFileWatcher("fileList", ""); // 取消偵測檔案變化
+
+            await leaveArchiveMode();
 
             _arFile = ar;
             let dirPath = Lib.getDirectoryName(_arFile[0]);
@@ -456,6 +580,218 @@ export class FileLoad {
         }
 
         /**
+         * 開啟一組壓縮檔並建立扁平 entry 清單。
+         *
+         * 這個函數只負責來源 session 與列表，不會在列表初始化時解壓 entry；
+         * entry 只有在 showArchiveEntry 真正切換到該項目時，才交給 resolver
+         * materialize，再沿用既有圖片、影片、PDF 或文字 viewer。
+         */
+        async function loadArchiveFiles(archivePaths: string[]) {
+
+            const uniquePaths = Array.from(new Set(archivePaths));
+            if (uniquePaths.length === 0) { return; }
+
+            _isLoadFileFinish = false;
+            M.script.window.enabledLoading(true);
+
+            try {
+                let sessions: ArchiveSessionResponse[];
+                let password: string | undefined;
+
+                // 密碼錯誤時保持在同一個載入流程中重試；取消輸入則走一般失敗 fallback。
+                while (true) {
+                    try {
+                        sessions = await _archiveSource.openMany(uniquePaths, password);
+
+                        // ZIP 等格式可能先完成目錄讀取，再以 response 欄位表示密碼尚未驗證；
+                        // 此時若直接建立列表，使用者會看到列表卻沒有輸入密碼的機會。
+                        const unverifiedSession = sessions.find(session =>
+                            session.hasEncryptedEntries && session.isPasswordVerified !== true);
+                        if (unverifiedSession !== undefined) {
+                            const errorCode = password === undefined
+                                ? "passwordRequired"
+                                : "passwordIncorrect";
+                            console.info("[Archive] sessions/open 需要密碼驗證", {
+                                archivePath: unverifiedSession.archivePath,
+                                errorCode,
+                                sessionId: unverifiedSession.sessionId,
+                            });
+
+                            // openMany 已完成整組 session 建立；重試前先釋放這一代，
+                            // 避免同一個視窗留下未驗證 session 或累積持有次數。
+                            await _archiveSource.close().catch(closeError => {
+                                console.warn("[Archive] 釋放未驗證 session 失敗。", closeError);
+                            });
+                            throw new ArchiveApiError(
+                                errorCode,
+                                errorCode === "passwordRequired"
+                                    ? M.i18n.t("msg.archivePasswordRequired")
+                                    : M.i18n.t("msg.archivePasswordIncorrect"),
+                                401,
+                                unverifiedSession.archivePath,
+                            );
+                        }
+                        break;
+                    }
+                    catch (error) {
+                        if (error instanceof ArchiveApiError
+                            && (error.errorCode === "passwordRequired" || error.errorCode === "passwordIncorrect")) {
+                            console.info("[Archive] 顯示密碼輸入框", {
+                                archivePath: error.archivePath ?? uniquePaths[0],
+                                reason: error.errorCode,
+                            });
+                            const nextPassword = await requestArchivePassword(error.errorCode === "passwordIncorrect");
+                            if (nextPassword === null) {
+                                throw new ArchiveApiError(
+                                    "passwordCancelled",
+                                    M.i18n.t("msg.archiveLoadCancelled"),
+                                    0,
+                                    error.archivePath,
+                                );
+                            }
+                            password = nextPassword;
+                            continue;
+                        }
+                        throw error;
+                    }
+                }
+
+                let archiveItems = _archiveSource
+                    .getEntryItems(sessions)
+                    .filter(item => item.isDirectory === false);
+                if (M.config.settings.other.archiveLoadMode === "imageOnly") {
+                    const imageExtensions = new Set(
+                        M.config.allowFileType(GroupType.img)
+                            .map(item => item.ext.toLocaleLowerCase().replace(/^\./, "")),
+                    );
+                    archiveItems = archiveItems.filter(item => imageExtensions.has(item.extension));
+                }
+                if (archiveItems.length === 0) {
+                    await leaveArchiveMode();
+                    await M.fileShow.openWelcome();
+                    Toast.show(M.i18n.t("msg.archiveEmpty"), 1000 * 3);
+                    return;
+                }
+
+                _isArchiveMode = true;
+                _arArchiveItem = archiveItems;
+                _arFile = _arArchiveItem.map(item => getArchiveLogicalPath(item));
+                _fileLoadType = FileLoadType.userDefined;
+                _groupType = GroupType.unknown;
+                _atLoadingGroupType = _groupType;
+                _atLoadingExt = undefined;
+                _dirPathNow = Lib.getDirectoryName(uniquePaths[0]) ?? "";
+                _flagFile = 0;
+
+                // archive entry 不使用原始檔案 watcher；原始壓縮檔在開啟期間視為固定來源。
+                await WV_System.NewFileWatcher("fileList", "");
+                await WV_System.NewFileWatcher("dirList", "");
+                // 只讀取一般模式的既有預設，後續 archive 點選排序不會回寫此設定。
+                M.fileSort.readSortType(_dirPathNow);
+                M.fileSort.updateMenu();
+                // updateMenu 可能已將不可用的舊設定 fallback 成 name，必須同步重排清單。
+                // 初次建立列表不保留排序前的 entry 身份，固定選取排序後第一筆。
+                sortArchiveItems(M.fileSort.getSortType(), false);
+
+                console.debug("[Archive] entry list ready", {
+                    archiveCount: sessions.length,
+                    entryCount: _arArchiveItem.length,
+                    flagFile: _flagFile,
+                    currentPath: _arArchiveItem[_flagFile]?.logicalPath,
+                });
+
+                M.mainFileList.setHide(false);
+                M.mainFileList.init();
+                M.mainFileList.setStartLocation();
+
+                await showFile();
+
+                await loadArchiveParentDir(_dirPathNow);
+            }
+            catch (error) {
+                await showArchiveLoadFailure(uniquePaths, error);
+            }
+            finally {
+                _isLoadFileFinish = true;
+                M.script.window.enabledLoading(false);
+            }
+        }
+
+        /**
+         * 顯示密碼輸入框並等待使用者決定。
+         * 回傳 null 代表取消；空白密碼仍照原值送給後端，讓後端統一判斷。
+         */
+        function requestArchivePassword(isRetry: boolean): Promise<string | null> {
+            return new Promise(resolve => {
+                let isResolved = false;
+                let cancelInput: () => void;
+                const resolveOnce = (value: string | null) => {
+                    if (isResolved) { return; }
+                    isResolved = true;
+                    if (_cancelArchivePasswordInput === cancelInput) {
+                        _cancelArchivePasswordInput = undefined;
+                    }
+                    resolve(value);
+                };
+                cancelInput = () => resolveOnce(null);
+                _cancelArchivePasswordInput = cancelInput;
+
+                M.msgbox.show({
+                    type: "text",
+                    inputType: "password",
+                    txt: isRetry
+                        ? M.i18n.t("msg.archivePasswordIncorrect")
+                        : M.i18n.t("msg.archivePasswordRequired"),
+                    funcYes: (dom: HTMLElement, inputTxt: string) => {
+                        M.msgbox.close(dom);
+                        resolveOnce(inputTxt);
+                    },
+                    funcClose: (dom: HTMLElement) => {
+                        M.msgbox.close(dom);
+                        resolveOnce(null);
+                    },
+                });
+            });
+        }
+
+        /**
+         * archive 初始化失敗時回到一般檔案模式。
+         *
+         * 這裡不把失敗候選檔案塞回 archive list，因為 session 並未建立成功；
+         * 回到歡迎畫面，並以穩定 errorCode 轉成 Toast。
+         */
+        async function showArchiveLoadFailure(archivePaths: string[], error: unknown) {
+            await leaveArchiveMode().catch(closeError => {
+                console.warn("清理失敗的 archive session 時發生錯誤。", closeError);
+            });
+
+            const archiveError = error instanceof ArchiveApiError ? error : undefined;
+            const failedPath = archiveError?.archivePath ?? archivePaths[0];
+            _isArchiveMode = false;
+            _arArchiveItem = [];
+            await M.fileShow.openWelcome();
+
+            const errorText = getArchiveLoadErrorText(archiveError);
+            Toast.show(M.i18n.t("msg.archiveLoadFailed", {
+                name: getArchiveFileName(failedPath),
+                reason: errorText,
+            }), 1000 * 4);
+        }
+
+        /** 將 API 錯誤代碼轉成不依賴後端 message 的使用者提示。 */
+        function getArchiveLoadErrorText(error: ArchiveApiError | undefined): string {
+            if (error === undefined) { return ""; }
+            if (error.errorCode === "passwordCancelled") { return M.i18n.t("msg.archiveLoadCancelled"); }
+            if (error.errorCode === "passwordIncorrect") { return M.i18n.t("msg.archivePasswordError"); }
+            if (error.errorCode === "archiveNotFound") { return M.i18n.t("msg.archiveNotFound"); }
+            if (error.errorCode === "archiveOpenFailed") { return M.i18n.t("msg.archiveOpenFailed"); }
+            if (error.errorCode === "solidArchiveSizeLimitExceeded") {
+                return M.i18n.t("msg.archiveSolidSizeLimitExceeded");
+            }
+            return "";
+        }
+
+        /**
          * 載入單一檔案
          * @param path 
          * @param dirGroupType 
@@ -470,7 +806,15 @@ export class FileLoad {
             }
             _isLoadFileFinish = false;
 
+            // 單一支援格式檔案直接進入 archive mode；後端會再驗證檔案內容是否真的是壓縮檔。
+            if (isSupportedArchivePath(path)) {
+                await loadArchiveFiles([path]);
+                return;
+            }
+
             _fileLoadType = FileLoadType.dir; // 名單類型，資料夾內的檔案
+
+            await leaveArchiveMode();
 
             const fileInfo2 = await WebAPI.getFileInfo2(path);
             path = fileInfo2.Path; // 避免長路經被轉成虛擬路徑
@@ -579,15 +923,179 @@ export class FileLoad {
         /**
          * 取得目前檔案的路徑
          */
-        function getFilePath() {
+        function getFilePath(): string {
+            if (_isArchiveMode) {
+                return getCurrentArchiveLogicalPath();
+            }
             let p = _arFile[_flagFile];
             return p;
+        }
+
+        /**
+         * 將目前 archive entry 組成顯示與識別用的完整 logical path。
+         * 這不是 Windows 實體檔案；需要實體檔案的功能要等後續 resolver 接入。
+         */
+        function getCurrentArchiveLogicalPath(): string {
+            return getArchiveLogicalPath(_arArchiveItem[_flagFile]);
+        }
+
+        /**
+         * 判斷 path 是否是目前清單中的 archive entry logical path。
+         *
+         * archive 的 logical path 可能看起來像 Windows 路徑，但不能因為
+         * 找不到 entry 就把它交給 Windows API；外部操作必須先通過這個
+         * 明確的身份判斷，再呼叫 entry-path。
+         */
+        function isArchiveEntryPath(path: string | undefined): boolean {
+            if (_isArchiveMode === false || path === undefined) { return false; }
+            return _arArchiveItem.some(item => getArchiveLogicalPath(item) === path);
+        }
+
+        /**
+         * 取得指定 archive entry 的實體暫存路徑。
+         * path 未指定時使用目前選取的 entry；指定但不屬於目前 source 時
+         * 回傳 undefined，避免把 logical path 誤當成實體檔案交給 Windows。
+         */
+        async function resolveArchiveEntryPhysicalPath(path?: string): Promise<string | undefined> {
+            if (_isArchiveMode === false) { return undefined; }
+
+            const item = path === undefined
+                ? _arArchiveItem[_flagFile]
+                : _arArchiveItem.find(entry => getArchiveLogicalPath(entry) === path);
+            if (item === undefined) { return undefined; }
+
+            return await _archiveResolver.resolvePhysicalPath(item);
+        }
+
+        /** 取得目前檔案的來源身份，供後續 preview/resolver 階段使用。 */
+        function getCurrentFileRef(): FileRef | undefined {
+            if (_isArchiveMode) {
+                return _arArchiveItem[_flagFile]?.ref;
+            }
+            const path = _arFile[_flagFile];
+            return path === undefined ? undefined : { kind: "filesystem", path };
+        }
+
+        /**
+         * 產生檔案列表 UI 使用的資料。
+         * archive entry 只請求後端縮圖 URL，不取得 entry-path，避免列表初始化
+         * 把每一筆 entry 都解壓成實體暫存檔；真正開啟項目時才由 resolver materialize。
+         */
+        function getFileListItems() {
+            if (_isArchiveMode) {
+                return _arArchiveItem.map(item => ({
+                    key: `${item.ref.sessionId}:${item.ref.entryId}`,
+                    displayName: item.displayName,
+                    iconUrl: _archiveResolver.getThumbnailUrl(item),
+                    // 這是 UI logical path；拖曳時由 ScriptFile 透過 entry-path 解析。
+                    path: getArchiveLogicalPath(item),
+                    canDrag: true,
+                }));
+            }
+
+            return _arFile.map(path => ({
+                key: path,
+                displayName: Lib.getFileName(path),
+                iconUrl: Lib.getExtension(path).toLocaleLowerCase() === ".svg"
+                    ? WebAPI.getFile(path)
+                    : WebAPI.Img.fileIcon(path),
+                path,
+                canDrag: true,
+            }));
+        }
+
+        /**
+         * 在 archive entry metadata 上執行本地排序。
+         *
+         * archive logical path 不是真實 Windows 目錄，不能使用 WebAPI.sort2；
+         * 這裡只使用已由後端回傳的名稱、大小與修改時間，並且不寫入一般檔案排序設定。
+         */
+        function sortArchiveItems(sortType: string, preserveCurrent = true) {
+            if (_isArchiveMode === false) { return; }
+
+            // 先保存目前 entry 的穩定身份，再排序；不能用列表 index 找回選取項目。
+            const currentKey = preserveCurrent ? _arArchiveItem[_flagFile]?.ref : undefined;
+            const isDesc = sortType.endsWith("Desc");
+            const baseType = isDesc ? sortType.substring(0, sortType.length - 4) : sortType;
+
+            if (baseType === "random") {
+                // Fisher-Yates 產生真正的隨機排列，避免依賴後端理解 logical path。
+                for (let i = _arArchiveItem.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [_arArchiveItem[i], _arArchiveItem[j]] = [_arArchiveItem[j], _arArchiveItem[i]];
+                }
+            }
+            else {
+                _arArchiveItem.sort((left, right) => {
+                    let result = 0;
+                    if (baseType === "length") {
+                        result = left.size - right.size;
+                    }
+                    else if (baseType === "lastWriteTime") {
+                        result = left.lastWriteTimeUtc - right.lastWriteTimeUtc;
+                        if (result === 0) {
+                            result = left.displayName.localeCompare(right.displayName, undefined, {
+                                numeric: true,
+                                sensitivity: "base",
+                            });
+                            if (result === 0) {
+                                result = left.logicalPath.localeCompare(right.logicalPath, undefined, {
+                                    numeric: true,
+                                    sensitivity: "base",
+                                });
+                            }
+                        }
+                    }
+                    else {
+                        result = left.displayName.localeCompare(right.displayName, undefined, {
+                            numeric: true,
+                            sensitivity: "base",
+                        });
+                        if (result === 0) {
+                            result = left.logicalPath.localeCompare(right.logicalPath, undefined, {
+                                numeric: true,
+                                sensitivity: "base",
+                            });
+                        }
+                    }
+                    return isDesc ? -result : result;
+                });
+            }
+
+            _arFile = _arArchiveItem.map(item => getArchiveLogicalPath(item));
+            _flagFile = currentKey === undefined
+                ? 0
+                : Math.max(0, _arArchiveItem.findIndex(item =>
+                    item.ref.sessionId === currentKey.sessionId && item.ref.entryId === currentKey.entryId));
+
+            M.mainFileList.init();
+            M.mainFileList.updateLocation();
+            updateTitle();
+        }
+
+        /**
+         * 結束 archive mode 並釋放目前視窗對所有 session 的持有。
+         * generation 會在 close 中遞增，使尚未完成的 archive open 回應失效。
+         */
+        async function leaveArchiveMode() {
+            const sourceState = _archiveSource.getState();
+            if (_isArchiveMode || sourceState.status !== "closed" || sourceState.sessions.length > 0) {
+                await _archiveSource.close();
+            }
+            _isArchiveMode = false;
+            _arArchiveItem = [];
         }
 
         /** 
          * 重新載入檔案預覽面板
          */
         function reloadFilePanel() {
+            if (_isArchiveMode) {
+                // archive entry 清單由 session metadata 維持，不能把 logical path 當成一般檔案重載。
+                M.mainFileList.init();
+                M.mainFileList.setStartLocation();
+                return;
+            }
             if (_fileLoadType === FileLoadType.dir) {
                 loadFile(getFilePath(), _atLoadingExt, true);
             } else {
@@ -602,6 +1110,11 @@ export class FileLoad {
         async function getFileShortPath(path?: string) {
             if (path === undefined) {
                 path = getFilePath();
+            }
+            if (path === undefined) { return path; }
+            if (_isArchiveMode) {
+                // logical path 不是實體路徑，不能交給 Windows 的短路徑 API 處理。
+                return path;
             }
             // 把長路經轉回虛擬路徑
             if (path.length > 255) {
@@ -649,7 +1162,7 @@ export class FileLoad {
             }
             _isBulkViewSub = false;
 
-            if (_isLoadFileFinish === false) {
+            if (_isLoadFileFinish === false && _isArchiveMode === false) {
                 console.log("loadFile處理中");
                 return;
             }
@@ -668,6 +1181,11 @@ export class FileLoad {
             if (_flagFile < 0) { _flagFile = 0; }
             if (_flagFile >= _arFile.length) { _flagFile = _arFile.length - 1; }
 
+            if (_isArchiveMode) {
+                await showArchiveEntry();
+                return;
+            }
+
             let path = getFilePath();
             let fileInfo2 = await WebAPI.getFileInfo2(path);
             if (fileInfo2.Type !== "none") {
@@ -675,6 +1193,77 @@ export class FileLoad {
                 await showFileUpdataUI();
             }
             await showFileUpdataImg(fileInfo2);
+        }
+
+        /**
+         * 解析並顯示目前的 archive entry。
+         *
+         * 先更新列表與標題，再由 resolver 取得 materialized entry；解析完成後
+         * 仍沿用既有 showFileUpdataImg，因此圖片、影片、PDF 與文字各自的 viewer
+         * 不需要知道來源是否為 archive。若 entry 在載入過程中被切換，resolver
+         * 會以 staleRequest 中止，避免舊檔案覆蓋目前畫面。
+         */
+        async function showArchiveEntry() {
+            const item = _arArchiveItem[_flagFile];
+            if (item === undefined) { return; }
+
+            await showFileUpdataUI();
+            try {
+                const resolved = await _archiveResolver.resolvePreviewFile(item);
+                if (isCurrentArchiveItem(item) === false) {
+                    return;
+                }
+
+                // archive mode 的列表是 userDefined；在真正取得 entry 類型後，
+                // 讓影片/PDF/文字走原本的 dispatch，而不是沿用 archive 的 unknown。
+                _groupType = fileToGroupType(resolved.fileInfo);
+                M.mainExif.init(resolved.fileInfo);
+                await showFileUpdataImg(resolved.fileInfo);
+            }
+            catch (error) {
+                if (error instanceof ArchiveApiError && error.errorCode === "staleRequest") {
+                    return;
+                }
+                await showArchiveEntryFailure(item, error);
+            }
+        }
+
+        /** 判斷非同步預覽完成時，列表目前是否仍選取同一個 entry。 */
+        function isCurrentArchiveItem(item: ArchiveEntryItem): boolean {
+            const current = _arArchiveItem[_flagFile];
+            return current?.ref.sessionId === item.ref.sessionId
+                && current?.ref.entryId === item.ref.entryId;
+        }
+
+        /**
+         * entry materialize 或暫存檔讀取失敗時，顯示固定錯誤圖片並提示使用者。
+         * 這裡不移除 entry，因為後端下次 entry-path 可能可以重新復原暫存檔。
+         */
+        async function showArchiveEntryFailure(item: ArchiveEntryItem, error: unknown) {
+            if (isCurrentArchiveItem(item) === false) {
+                return;
+            }
+            console.warn("[Archive] entry preview failed", {
+                archivePath: item.ref.archivePath,
+                entryPath: item.logicalPath,
+                sessionId: item.ref.sessionId,
+                entryId: item.ref.entryId,
+                error,
+            });
+
+            _groupType = GroupType.unknown;
+            try {
+                if (isCurrentArchiveItem(item)) {
+                    const archiveInfo = await WebAPI.getFileInfo2(item.ref.archivePath);
+                    await M.fileShow.openErrorImage(archiveInfo.Type === "none" ? undefined : archiveInfo);
+                }
+            }
+            catch (iconError) {
+                console.warn("[Archive] fallback icon 載入失敗。", iconError);
+            }
+            if (isCurrentArchiveItem(item)) {
+                Toast.show(M.i18n.t("msg.archiveEntryLoadFailed", { name: item.displayName }), 1000 * 4);
+            }
         }
         /** 更新 檔案預覽視窗 */
         async function showFileUpdataUI() {
@@ -856,6 +1445,14 @@ export class FileLoad {
           * 更新視窗標題
           */
         function updateTitle() {
+            if (_isArchiveMode) {
+                const item = _arArchiveItem[_flagFile];
+                if (item === undefined) { return; }
+                const archiveName = getArchiveFileName(item.ref.archivePath);
+                const logicalPath = getArchiveLogicalPath(item);
+                baseWindow.setTitle(`${archiveName} / ${item.displayName}`, logicalPath);
+                return;
+            }
             if (_isBulkView) {
                 const filePath = getFilePath();
                 if (filePath === undefined) { return; }
@@ -988,11 +1585,21 @@ export class FileLoad {
 
         }
 
+        /** 顯示 archive preview mode 不支援檔案系統修改操作的提示。 */
+        function showArchiveUnsupportedOperationToast() {
+            Toast.show(M.i18n.t("msg.archiveOperationNotSupported"), 1000 * 3);
+        }
+
         /**
          * 顯示 刪除檔案 的對話方塊
          */
         async function showDeleteFileMsg(type?: undefined | "delete" | "moveToRecycle", path?: string) {
 
+            // archive entry 的 getFilePath 是 logical path，不能交給 Windows 刪除 API。
+            if (_isArchiveMode) {
+                showArchiveUnsupportedOperationToast();
+                return;
+            }
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }
@@ -1083,6 +1690,11 @@ export class FileLoad {
          */
         async function showDeleteDirMsg(type?: undefined | "delete" | "moveToRecycle", path?: string) {
 
+            // archive mode 的資料夾面板不代表可修改的 archive 內部資料夾。
+            if (_isArchiveMode) {
+                showArchiveUnsupportedOperationToast();
+                return;
+            }
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }
@@ -1170,6 +1782,11 @@ export class FileLoad {
          */
         async function showRenameFileMsg(path?: string) {
 
+            // archive entry 是唯讀來源，且目前 path 為 logical path。
+            if (_isArchiveMode) {
+                showArchiveUnsupportedOperationToast();
+                return;
+            }
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }
@@ -1244,6 +1861,11 @@ export class FileLoad {
           */
         async function showRenameDirMsg(path?: string) {
 
+            // archive mode 的資料夾不應被誤當成 Windows 實體資料夾。
+            if (_isArchiveMode) {
+                showArchiveUnsupportedOperationToast();
+                return;
+            }
             if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
                 return;
             }

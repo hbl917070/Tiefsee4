@@ -23,9 +23,15 @@ public sealed class ArchiveEntryInfoResult {
 
     /// <summary>
     /// entry 解壓後的大小，單位為 bytes。
-    /// 這是未壓縮大小，初始化時會用它檢查單一檔案與整個壓縮檔的大小限制。
+    /// 這是未壓縮大小，初始化時會用它計算整個壓縮檔的總大小；實際解壓該 entry
+    /// 前，服務也會用它檢查單一檔案大小限制。
     /// </summary>
     public long size { get; set; }
+
+    /// <summary>
+    /// entry 的最後修改時間，使用 Unix milliseconds UTC；壓縮檔沒有提供時間時為 0。
+    /// </summary>
+    public long lastWriteTimeUtc { get; set; }
 
     /// <summary>
     /// 是否為資料夾。資料夾可以出現在 metadata 中，但不能作為 entry 解壓縮目標。
@@ -66,6 +72,24 @@ public sealed class ArchiveSessionResult {
     /// 是否為固實壓縮檔。固實壓縮檔的多檔請求會由 session scheduler 優先合併處理。
     /// </summary>
     public bool isSolid { get; set; }
+
+    /// <summary>
+    /// 固實壓縮檔的 block 數量；SharpSevenZip 無法提供時為 0。
+    /// 固實且只有一個 block 時，後段 entry 可能需要從 block 起點重新解碼，
+    /// 是後續判斷初始化後預覽成本的重要特徵。
+    /// </summary>
+    public int solidBlockCount { get; set; }
+
+    /// <summary>
+    /// 壓縮檔使用的壓縮方法描述，例如 LZMA2:48m。
+    /// 此值只作為診斷與風險判斷資料，不由前端自行解析成解壓流程。
+    /// </summary>
+    public string compressionMethod { get; set; } = "";
+
+    /// <summary>
+    /// 所有檔案 entry 的未壓縮大小總和；資料夾不計入。
+    /// </summary>
+    public long totalUnpackedBytes { get; set; }
 
     /// <summary>
     /// 壓縮檔是否包含至少一個加密 entry。

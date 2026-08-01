@@ -457,6 +457,25 @@ var langData = {
                 "ja": "RAW 画像を開くときに埋め込みプレビューを表示する",
             },
 
+            archiveLoadMode: {
+                "zh-TW": "載入壓縮檔時",
+                "zh-CN": "加载压缩文件时",
+                "en": "When loading an archive",
+                "ja": "圧縮ファイルを読み込むとき",
+            },
+            archiveLoadModeImageOnly: {
+                "zh-TW": "僅瀏覽圖片",
+                "zh-CN": "仅浏览图片",
+                "en": "Browse images only",
+                "ja": "画像のみ閲覧する",
+            },
+            archiveLoadModeAllFiles: {
+                "zh-TW": "瀏覽所有檔案",
+                "zh-CN": "浏览所有文件",
+                "en": "Browse all files",
+                "ja": "すべてのファイルを閲覧する",
+            },
+
 
             displayDeleteConfirmationDialog: {
                 "zh-TW": "檔案刪除前顯示確認視窗",
@@ -2419,6 +2438,88 @@ var langData = {
             "en": `"Prompt" not found`,
             "ja": `"Prompt" が見つかりません`,
         },
+
+        //#region 壓縮檔
+        archiveEmpty: {
+            "zh-TW": "壓縮檔內沒有可瀏覽的檔案",
+            "zh-CN": "压缩文件内没有可浏览的文件",
+            "en": "The archive contains no browsable files",
+            "ja": "圧縮ファイル内に閲覧できるファイルがありません",
+        },
+        archivePasswordRequired: {
+            "zh-TW": "此壓縮檔需要密碼：",
+            "zh-CN": "此压缩文件需要密码：",
+            "en": "This archive requires a password:",
+            "ja": "この圧縮ファイルにはパスワードが必要です：",
+        },
+        archivePasswordIncorrect: {
+            "zh-TW": "壓縮檔密碼錯誤，請重新輸入：",
+            "zh-CN": "压缩文件密码错误，请重新输入：",
+            "en": "The archive password is incorrect. Please try again:",
+            "ja": "圧縮ファイルのパスワードが正しくありません。再入力してください：",
+        },
+        archiveLoadCancelled: {
+            "zh-TW": "（已取消）",
+            "zh-CN": "（已取消）",
+            "en": " (Cancelled)",
+            "ja": "（キャンセル）",
+        },
+        archivePasswordError: {
+            "zh-TW": "（密碼錯誤）",
+            "zh-CN": "（密码错误）",
+            "en": " (Incorrect password)",
+            "ja": "（パスワードが正しくありません）",
+        },
+        archiveNotFound: {
+            "zh-TW": "（找不到檔案）",
+            "zh-CN": "（找不到文件）",
+            "en": " (File not found)",
+            "ja": "（ファイルが見つかりません）",
+        },
+        archiveOpenFailed: {
+            "zh-TW": "（無法開啟壓縮檔）",
+            "zh-CN": "（无法打开压缩文件）",
+            "en": " (Cannot open archive)",
+            "ja": "（圧縮ファイルを開けません）",
+        },
+        archiveSolidSizeLimitExceeded: {
+            "zh-TW": "（無法瀏覽超過 100 MB 的固實壓縮檔）",
+            "zh-CN": "（无法浏览超过 100 MB 的固实压缩文件）",
+            "en": " (Solid archives over 100 MB cannot be browsed)",
+            "ja": "（100 MB を超えるソリッド圧縮ファイルは閲覧できません）",
+        },
+        archiveLoadFailed: {
+            "zh-TW": "壓縮檔載入失敗：{name}{reason}",
+            "zh-CN": "压缩文件加载失败：{name}{reason}",
+            "en": "Failed to load archive: {name}{reason}",
+            "ja": "圧縮ファイルの読み込みに失敗しました：{name}{reason}",
+        },
+        archiveEntryLoadFailed: {
+            "zh-TW": "壓縮檔內檔案載入失敗：{name}",
+            "zh-CN": "压缩文件内文件加载失败：{name}",
+            "en": "Failed to load archive file: {name}",
+            "ja": "圧縮ファイル内のファイルの読み込みに失敗しました：{name}",
+        },
+        archiveFileNotReady: {
+            "zh-TW": "壓縮檔檔案已不存在或尚未準備好。",
+            "zh-CN": "压缩文件文件已不存在或尚未准备好。",
+            "en": "The archive file no longer exists or is not ready.",
+            "ja": "圧縮ファイルが存在しないか、まだ準備できていません。",
+        },
+        archiveFilePrepareFailed: {
+            "zh-TW": "無法準備壓縮檔檔案。",
+            "zh-CN": "无法准备压缩文件文件。",
+            "en": "Unable to prepare the archive file.",
+            "ja": "圧縮ファイルを準備できません。",
+        },
+        archiveOperationNotSupported: {
+            "zh-TW": "壓縮檔預覽模式不支援此操作",
+            "zh-CN": "压缩文件预览模式不支持此操作",
+            "en": "This operation is not supported in archive preview mode",
+            "ja": "圧縮ファイルのプレビューモードではこの操作はサポートされていません",
+        },
+
+        //#endregion
 
         //#region download
         fileDownloadFailed: {
