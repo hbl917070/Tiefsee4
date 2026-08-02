@@ -25,8 +25,8 @@ export class FileLoad {
     public sortArchiveItems;
     /** 取得目前 archive entry 的 metadata 清單，供 BulkView 使用。 */
     public getArchiveEntryItems;
-    /** 取得 archive entry thumbnail URL，不 materialize 實體暫存檔。 */
-    public getArchiveEntryThumbnailUrl;
+    /** 取得 archive entry thumbnail/icon URL；禁止 materialize 的 entry 不建立實體暫存檔。 */
+    public getArchiveEntryImageUrl;
     /** 取得可交給既有 BulkView/newItem 流程的 archive FileInfo2。 */
     public resolveArchiveEntryFileInfo;
     /** 取得 archive entry 對應的實體暫存路徑；不接受未識別的 logical path。 */
@@ -127,7 +127,7 @@ export class FileLoad {
         this.getIsArchiveMode = () => _isArchiveMode;
         this.sortArchiveItems = sortArchiveItems;
         this.getArchiveEntryItems = () => Array.from(_arArchiveItem);
-        this.getArchiveEntryThumbnailUrl = (item: ArchiveEntryItem, size = 256) =>
+        this.getArchiveEntryImageUrl = (item: ArchiveEntryItem, size = 256) =>
             _archiveResolver.getThumbnailUrl(item, size);
         this.resolveArchiveEntryFileInfo = async (item: ArchiveEntryItem) =>
             (await _archiveResolver.resolvePreviewFile(item)).fileInfo;
@@ -664,7 +664,8 @@ export class FileLoad {
                         M.config.allowFileType(GroupType.img)
                             .map(item => item.ext.toLocaleLowerCase().replace(/^\./, "")),
                     );
-                    archiveItems = archiveItems.filter(item => imageExtensions.has(item.extension));
+                    archiveItems = archiveItems.filter(item =>
+                        imageExtensions.has(Lib.getExtension(item.displayName).replace(/^\./, "")));
                 }
                 if (archiveItems.length === 0) {
                     await leaveArchiveMode();
@@ -989,6 +990,8 @@ export class FileLoad {
                     iconUrl: _archiveResolver.getThumbnailUrl(item),
                     // 這是 UI logical path；拖曳時由 ScriptFile 透過 entry-path 解析。
                     path: getArchiveLogicalPath(item),
+                    // 仍允許觸發拖曳流程，讓 ScriptOpen.resolvePhysicalPath 顯示
+                    // 「此類型的檔案不支援此操作」，而不是讓拖曳看起來沒有反應。
                     canDrag: true,
                 }));
             }
@@ -1209,6 +1212,30 @@ export class FileLoad {
 
             await showFileUpdataUI();
             try {
+                if (item.isHighRisk) {
+                    const fileInfo: FileInfo2 = {
+                        Type: "file",
+                        Path: _archiveResolver.getThumbnailUrl(item),
+                        FullPath: getArchiveLogicalPath(item),
+                        Lenght: item.size,
+                        CreationTimeUtc: 0,
+                        LastWriteTimeUtc: item.lastWriteTimeUtc,
+                        HexValue: "",
+                    };
+                    _groupType = GroupType.img;
+                    // 高風險 entry 不會經過一般 materialize preview 流程，
+                    // 仍需初始化 MainExif，讓 archive mode 隱藏「相關檔案」頁籤。
+                    M.mainExif.init(fileInfo, true);
+                    if (_isBulkView) {
+                        // 高風險 entry 不能直接進入圖片 viewer，否則會繞過
+                        // showFileUpdataImg 的大量瀏覽分流，造成工具列與內容不同步。
+                        await M.fileShow.openBulkView();
+                        return;
+                    }
+                    await M.fileShow.openIconImage(fileInfo.Path, fileInfo, () => isCurrentArchiveItem(item));
+                    return;
+                }
+
                 const resolved = await _archiveResolver.resolvePreviewFile(item);
                 if (isCurrentArchiveItem(item) === false) {
                     return;
@@ -1262,7 +1289,8 @@ export class FileLoad {
                 console.warn("[Archive] fallback icon 載入失敗。", iconError);
             }
             if (isCurrentArchiveItem(item)) {
-                Toast.show(M.i18n.t("msg.archiveEntryLoadFailed", { name: item.displayName }), 1000 * 4);
+                const message = M.i18n.t("msg.archiveEntryLoadFailed", { name: item.displayName });
+                Toast.show(message, 1000 * 4);
             }
         }
         /** 更新 檔案預覽視窗 */

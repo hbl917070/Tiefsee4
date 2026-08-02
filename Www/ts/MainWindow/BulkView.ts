@@ -824,6 +824,14 @@ export class BulkView {
                         for (const logicalPath of newArr) {
                             const archiveItem = archiveItems.find(item => getArchiveLogicalPath(item) === logicalPath);
                             if (archiveItem === undefined) { continue; }
+                            if (archiveItem.isHighRisk) {
+                                // 已由 metadata 判定不需 materialize；直接使用通用 icon，
+                                // 不呼叫 entry-path，也不製造 highRiskEntryBlocked 例外。
+                                const blockedInfo = await createArchiveFallbackItemInfo(archiveItem);
+                                const domItem = newItem(blockedInfo.displayFileInfo, blockedInfo.imageFileInfo, true, true);
+                                _domBulkViewContent.appendChild(domItem);
+                                continue;
+                            }
                             try {
                                 const fileInfo2 = await M.fileLoad.resolveArchiveEntryFileInfo(archiveItem);
                                 if (temp !== _pageNow + getDirPath()) {
@@ -836,7 +844,7 @@ export class BulkView {
                                 }
                             }
                             catch (error) {
-                                // entry-path 失敗不應中斷同一頁其他 entry；保留 item 並使用錯誤圖片。
+                                // entry-path 失敗不應中斷同一頁其他 entry；一般失敗項目使用錯誤圖片。
                                 console.warn("[Archive] BulkView entry 載入失敗。", {
                                     entryPath: archiveItem.logicalPath,
                                     entryId: archiveItem.ref.entryId,
@@ -845,8 +853,8 @@ export class BulkView {
                                 if (temp !== _pageNow + getDirPath()) {
                                     return;
                                 }
-                                const errorInfo = await createArchiveErrorItemInfo(archiveItem);
-                                const domItem = newItem(errorInfo.displayFileInfo, errorInfo.imageFileInfo, false);
+                                const errorInfo = await createArchiveFallbackItemInfo(archiveItem);
+                                const domItem = newItem(errorInfo.displayFileInfo, errorInfo.imageFileInfo, false, false);
                                 _domBulkViewContent.appendChild(domItem);
                             }
                         }
@@ -1299,12 +1307,12 @@ export class BulkView {
         }
 
         /**
-         * 建立 archive entry 解壓失敗時的 BulkView item 資訊。
+         * 建立 archive entry 無法 materialize 時的 BulkView item 資訊。
          * displayFileInfo 保留 entry 的 logical path、大小與 entry 日期，
-         * imageFileInfo 則改用前端固定的 ./img/error.svg，讓既有 newItem
-         * 仍負責產生相同 HTML 與點擊流程，但不再嘗試讀取失敗的 entry。
+         * imageFileInfo 對禁止 materialize 的 entry 使用 Shell 通用 icon，
+         * 其他失敗項目使用前端固定的 ./img/error.svg。
          */
-        async function createArchiveErrorItemInfo(archiveItem: ArchiveEntryItem): Promise<{
+        async function createArchiveFallbackItemInfo(archiveItem: ArchiveEntryItem): Promise<{
             displayFileInfo: FileInfo2,
             imageFileInfo: FileInfo2,
         }> {
@@ -1321,7 +1329,9 @@ export class BulkView {
             };
             const imageFileInfo: FileInfo2 = {
                 Type: "file",
-                Path: "./img/error.svg",
+                Path: archiveItem.isHighRisk
+                    ? M.fileLoad.getArchiveEntryImageUrl(archiveItem)
+                    : "./img/error.svg",
                 FullPath: "./img/error.svg",
                 Lenght: 0,
                 CreationTimeUtc: 0,
@@ -1385,7 +1395,12 @@ export class BulkView {
         /**
          * 
          */
-        function newItem(fileInfo2: FileInfo2, imageFileInfo2: FileInfo2 = fileInfo2, canDrag = true) {
+        function newItem(
+            fileInfo2: FileInfo2,
+            imageFileInfo2: FileInfo2 = fileInfo2,
+            canDrag = true,
+            isDirectImage = false,
+        ) {
 
             // 一般檔案的 Path 與 FullPath 通常相同；archive entry 則是
             // Path=實體暫存檔、FullPath=logical path，列表身份必須使用後者。
@@ -1414,20 +1429,21 @@ export class BulkView {
             setTimeout(async () => {
 
                 // 把長路經轉回虛擬路徑，避免瀏覽器無法載入圖片
-                if (imageFileInfo2.Path.length > 255) {
+                const directImage = isDirectImage;
+                if (directImage === false && imageFileInfo2.Path.length > 255) {
                     imageFileInfo2.Path = await WV_Path.GetShortPath(imageFileInfo2.Path);
                 }
 
-                // 錯誤 item 已經指定固定圖片，不再對失敗的 archive entry
+                // archive fallback 已經指定固定圖片或通用 icon，不再對失敗的 entry
                 // 執行圖片辨識或 vips 初始化，避免 placeholder 又變成死圖。
                 const isErrorImage = imageFileInfo2.Path === "./img/error.svg";
                 let width = 256;
                 let height = 256;
                 let arUrl: { scale: number, url: string }[] = [{
                     scale: 1,
-                    url: "./img/error.svg",
+                    url: directImage ? imageFileInfo2.Path : "./img/error.svg",
                 }];
-                if (isErrorImage === false) {
+                if (isErrorImage === false && directImage === false) {
                     const imgData = await M.script.img.getImgData(imageFileInfo2);
                     width = imgData.width;
                     height = imgData.height;

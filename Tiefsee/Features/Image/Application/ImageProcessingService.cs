@@ -59,6 +59,29 @@ public sealed class ImageProcessingService {
     }
 
     /// <summary>
+    /// 依副檔名取得 Windows Shell 通用 icon，不需要檔案實際存在。
+    /// 此方法與 GetFileIcon 分開，避免改變既有實體檔案縮圖流程。
+    /// </summary>
+    public Bitmap GetFileIconByExtension(string extension, int size, double waitSec = 1.5) {
+        Bitmap icon = null;
+
+        try {
+            AppScheduler.RunWithTimeout(waitSec, () => {
+                try {
+                    icon = WindowsThumbnailProvider.GetIconByExtension(extension, size);
+                }
+                catch {
+                    // 沒有副檔名關聯時，改用 Windows 的一般檔案 icon。
+                    icon = WindowsThumbnailProvider.GetIconByExtension(".bin", size);
+                }
+            });
+        }
+        catch { }
+
+        return icon;
+    }
+
+    /// <summary>
     ///
     /// </summary>
     public void PathToBitmapSource(string path, Action<BitmapSource> func) {

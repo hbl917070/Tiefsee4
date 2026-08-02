@@ -2500,6 +2500,12 @@ var langData = {
             "en": "Failed to load archive file: {name}",
             "ja": "圧縮ファイル内のファイルの読み込みに失敗しました：{name}",
         },
+        archiveHighRiskOperationNotSupported: {
+            "zh-TW": "此類型的檔案不支援此操作",
+            "zh-CN": "此类型的文件不支持此操作",
+            "en": "This file type does not support this operation",
+            "ja": "この種類のファイルではこの操作をサポートしていません",
+        },
         archiveFileNotReady: {
             "zh-TW": "壓縮檔檔案已不存在或尚未準備好。",
             "zh-CN": "压缩文件文件已不存在或尚未准备好。",

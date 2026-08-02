@@ -2,9 +2,11 @@
 // https://stackoverflow.com/questions/21751747/extract-thumbnail-for-any-file-in-windows
 //
 
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using ComTypes = System.Runtime.InteropServices.ComTypes;
 
 namespace Tiefsee;
 
@@ -17,14 +19,66 @@ public class WindowsThumbnailProvider {
     [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern int SHCreateItemFromParsingName(
         [MarshalAs(UnmanagedType.LPWStr)] string path,
-        // The following parameter is not used - binding context.
-        IntPtr pbc,
+        // Optional bind context; used for virtual archive entry Shell items.
+        ComTypes.IBindCtx pbc,
         ref Guid riid,
         [MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
+
+    [DllImport("ole32.dll")]
+    private static extern int CreateBindCtx(
+        uint reserved,
+        [MarshalAs(UnmanagedType.Interface)] out ComTypes.IBindCtx bindCtx);
 
     [DllImport("gdi32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool DeleteObject(IntPtr hObject);
+
+    private const uint FileAttributeNormal = 0x00000080;
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct Win32FindData {
+        public uint dwFileAttributes;
+        public ComTypes.FILETIME ftCreationTime;
+        public ComTypes.FILETIME ftLastAccessTime;
+        public ComTypes.FILETIME ftLastWriteTime;
+        public uint nFileSizeHigh;
+        public uint nFileSizeLow;
+        public uint dwReserved0;
+        public uint dwReserved1;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string cFileName;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
+        public string cAlternateFileName;
+    }
+
+    [ComVisible(true)]
+    [Guid("01E18D10-4D8D-11D2-855D-006008059367")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IFileSystemBindData {
+        [PreserveSig]
+        int SetFindData(ref Win32FindData findData);
+
+        [PreserveSig]
+        int GetFindData(out Win32FindData findData);
+    }
+
+    [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.None)]
+    private sealed class FileSystemBindData : IFileSystemBindData {
+        private Win32FindData _findData;
+
+        public int SetFindData(ref Win32FindData findData) {
+            _findData = findData;
+            return 0;
+        }
+
+        public int GetFindData(out Win32FindData findData) {
+            findData = _findData;
+            return 0;
+        }
+    }
 
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -109,6 +163,94 @@ public class WindowsThumbnailProvider {
         }
     }
 
+    /// <summary>
+    /// 依副檔名取得 Windows Shell 通用檔案 icon，不要求該檔案實際存在。
+    /// 透過 virtual Shell item 與 FILE_ATTRIBUTE_NORMAL 判斷關聯圖示，
+    /// 因此 archive entry 不需要先解壓到暫存資料夾。
+    /// </summary>
+    public static Bitmap GetIconByExtension(string extension, int size) {
+        if (string.IsNullOrWhiteSpace(extension)) {
+            extension = ".bin";
+        }
+        if (extension.StartsWith('.') == false) {
+            extension = "." + extension;
+        }
+        if (extension.Length > 20 || extension.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) {
+            throw new ArgumentException("無效的副檔名。", nameof(extension));
+        }
+
+        return GetIconByVirtualShellItem(extension, size);
+    }
+
+    /// <summary>
+    /// 建立只有檔名與基本 attributes 的 virtual Shell item，讓原本的
+    /// IShellItemImageFactory 依 size 與 ScaleUp 產生 icon；不建立實體檔案。
+    /// </summary>
+    private static Bitmap GetIconByVirtualShellItem(string extension, int size) {
+        string virtualPath = Path.Combine(Environment.SystemDirectory, "TiefseeArchiveEntry" + extension);
+        ComTypes.IBindCtx bindCtx = null;
+        try {
+            int bindCtxResult = CreateBindCtx(0, out bindCtx);
+            if (bindCtxResult != 0) {
+                throw Marshal.GetExceptionForHR(bindCtxResult);
+            }
+
+            ComTypes.BIND_OPTS bindOptions = new() {
+                cbStruct = Marshal.SizeOf<ComTypes.BIND_OPTS>(),
+                grfMode = 0x1000, // STGM_CREATE
+            };
+            bindCtx.SetBindOptions(ref bindOptions);
+
+            Win32FindData findData = new() {
+                dwFileAttributes = FileAttributeNormal,
+                cFileName = Path.GetFileName(virtualPath),
+                cAlternateFileName = "",
+            };
+            FileSystemBindData fileSystemBindData = new();
+            fileSystemBindData.SetFindData(ref findData);
+            bindCtx.RegisterObjectParam("File System Bind Data", fileSystemBindData);
+
+            Guid shellItem2Guid = new(IShellItem2Guid);
+            int retCode = SHCreateItemFromParsingName(
+                virtualPath,
+                bindCtx,
+                ref shellItem2Guid,
+                out IShellItem nativeShellItem);
+            if (retCode != 0) {
+                throw Marshal.GetExceptionForHR(retCode);
+            }
+
+            try {
+                NativeSize nativeSize = new() {
+                    Width = size,
+                    Height = size,
+                };
+                HResult hr = ((IShellItemImageFactory)nativeShellItem).GetImage(
+                    nativeSize,
+                    ThumbnailOptions.ScaleUp,
+                    out IntPtr hBitmap);
+                if (hr != HResult.Ok) {
+                    throw Marshal.GetExceptionForHR((int)hr);
+                }
+
+                try {
+                    return GetBitmapFromHBitmap(hBitmap);
+                }
+                finally {
+                    DeleteObject(hBitmap);
+                }
+            }
+            finally {
+                Marshal.ReleaseComObject(nativeShellItem);
+            }
+        }
+        finally {
+            if (bindCtx != null) {
+                Marshal.ReleaseComObject(bindCtx);
+            }
+        }
+    }
+
     public static Bitmap GetBitmapFromHBitmap(IntPtr nativeHBitmap) {
         Bitmap bmp = Bitmap.FromHbitmap(nativeHBitmap);
 
@@ -156,7 +298,7 @@ public class WindowsThumbnailProvider {
     private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options) {
         IShellItem nativeShellItem;
         Guid shellItem2Guid = new Guid(IShellItem2Guid);
-        int retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out nativeShellItem);
+        int retCode = SHCreateItemFromParsingName(fileName, null, ref shellItem2Guid, out nativeShellItem);
 
         if (retCode != 0)
             throw Marshal.GetExceptionForHR(retCode);

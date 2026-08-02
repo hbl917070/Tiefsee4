@@ -43,6 +43,8 @@ export interface ArchiveEntryMetadata {
     lastWriteTimeUtc: number;
     /** 是否為資料夾；資料夾只保留在 metadata，不加入預覽列表。 */
     isDirectory: boolean;
+    /** 是否禁止由 Tiefsee 主動 materialize；包含高風險、不可預覽與超大 entry。 */
+    isHighRisk: boolean;
 }
 
 /** 後端建立 archive session 後回傳的完整來源快照。 */
@@ -95,8 +97,8 @@ export interface ArchiveEntryItem {
     logicalPath: string;
     /** UI 列表顯示的 basename。 */
     displayName: string;
-    /** 由 displayName 推導的無點副檔名。 */
-    extension: string;
+    /** 是否禁止由 Tiefsee 主動 materialize；包含高風險、不可預覽與超大 entry。 */
+    isHighRisk: boolean;
     /** entry 解壓後大小。 */
     size: number;
     /** entry 最後修改時間的 Unix milliseconds UTC；壓縮檔沒有提供時間時為 0。 */
@@ -150,6 +152,7 @@ export type ArchiveErrorCode =
     | "sessionNotFound"
     | "entryNotFound"
     | "entryIsDirectory"
+    | "highRiskEntryBlocked"
     | "staleRequest"
     | (string & {});
 
@@ -203,7 +206,6 @@ export function createArchiveEntryItem(
 ): ArchiveEntryItem {
     const logicalPath = entry.name.replace(/\\/g, "/");
     const displayName = getArchiveEntryDisplayName(logicalPath);
-    const dotIndex = displayName.lastIndexOf(".");
 
     return {
         ref: {
@@ -215,7 +217,7 @@ export function createArchiveEntryItem(
         },
         logicalPath,
         displayName,
-        extension: dotIndex >= 0 ? displayName.substring(dotIndex + 1).toLocaleLowerCase() : "",
+        isHighRisk: entry.isHighRisk,
         size: entry.size,
         lastWriteTimeUtc: entry.lastWriteTimeUtc,
         isDirectory: entry.isDirectory,

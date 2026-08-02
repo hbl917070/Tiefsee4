@@ -23,6 +23,7 @@ public sealed class ArchiveHttpEndpoints : HttpEndpointModuleBase {
         HttpEndpointRegistrar.Map(WebServer, "/api/archives/entry", d => Execute(d, () => GetEntry(d)));
         HttpEndpointRegistrar.Map(WebServer, "/api/archives/entry-path", d => Execute(d, () => GetEntryPath(d)));
         HttpEndpointRegistrar.Map(WebServer, "/api/archives/entry-thumbnail", d => Execute(d, () => GetEntryThumbnail(d)));
+        HttpEndpointRegistrar.Map(WebServer, "/api/archives/entry-icon", d => Execute(d, () => GetEntryIcon(d)));
     }
 
     private async Task Execute(RequestData d, Func<Task> handler) {
@@ -119,6 +120,14 @@ public sealed class ArchiveHttpEndpoints : HttpEndpointModuleBase {
             throw new ArchivePreviewException("invalidParameter", "size 必須介於 16 到 1024 之間。", 400);
         }
 
+        ArchiveEntryInfoResult entry = _archiveService.GetEntry(sessionId, entryId);
+        if (entry.isHighRisk) {
+            throw new ArchivePreviewException(
+                "highRiskEntryBlocked",
+                "此高風險壓縮檔 entry 不允許解壓縮。",
+                403);
+        }
+
         string path = await _archiveService.GetEntryPathAsync(sessionId, entryId);
         if (HeadersAdd304(d, path)) { return; }
 
@@ -130,6 +139,34 @@ public sealed class ArchiveHttpEndpoints : HttpEndpointModuleBase {
 
         using MemoryStream output = new();
         thumbnail.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+        output.Position = 0;
+        d.context.Response.ContentType = "image/png";
+        await WriteStream(d, output);
+    }
+
+    /// <summary>
+    /// 依 archive entry 的副檔名取得 Windows Shell 通用 icon。
+    /// 此 API 不會呼叫 entry-path，也不會讀取或落地 entry 內容。
+    /// </summary>
+    private async Task GetEntryIcon(RequestData d) {
+        EnsureMethod(d, "GET");
+        string sessionId = GetRequiredArg(d, "sessionId");
+        int entryId = GetRequiredEntryId(d);
+        int size = GetOptionalIntArg(d, "size", 256);
+        if (size < 16 || size > 1024) {
+            throw new ArchivePreviewException("invalidParameter", "size 必須介於 16 到 1024 之間。", 400);
+        }
+
+        string extension = _archiveService.GetBlockedEntryExtension(sessionId, entryId);
+
+        using Bitmap icon = _imageProcessingService.GetFileIconByExtension(extension, size, 3);
+        if (icon == null) {
+            await WriteError(d, 500, "圖示取得失敗");
+            return;
+        }
+
+        using MemoryStream output = new();
+        icon.Save(output, System.Drawing.Imaging.ImageFormat.Png);
         output.Position = 0;
         d.context.Response.ContentType = "image/png";
         await WriteStream(d, output);

@@ -4,6 +4,7 @@ import { Lib } from "../Lib";
 import { TiefseeviewAlignType, TiefseeviewZoomType } from "../Tiefseeview";
 import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
+import { ArchiveApiError } from "../Archive/ArchiveTypes";
 import { MainWindow } from "./MainWindow";
 
 export class Script {
@@ -1296,7 +1297,10 @@ export class ScriptOpen {
             }
             catch (error) {
                 console.warn("[Archive] 取得外部操作實體路徑失敗。", error);
-                Toast.show(this.M.i18n.t("msg.archiveFilePrepareFailed"), 1000 * 3);
+                const message = error instanceof ArchiveApiError && error.errorCode === "highRiskEntryBlocked"
+                    ? this.M.i18n.t("msg.archiveHighRiskOperationNotSupported")
+                    : this.M.i18n.t("msg.archiveFilePrepareFailed");
+                Toast.show(message, 1000 * 3);
                 return undefined;
             }
         }

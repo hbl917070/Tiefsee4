@@ -80,9 +80,15 @@ export class ArchiveApiClient {
         );
     }
 
-    /** 建立 entry-thumbnail URL；目前由後續列表階段按需使用。 */
+    /** 建立一般 archive entry 的縮圖 URL；請求時才會進入 materialize。 */
     public getEntryThumbnailUrl(sessionId: string, entryId: number, size = 256): string {
         return this.getBaseUrl() + this.getEndpoint("/api/archives/entry-thumbnail", sessionId, entryId)
+            + `&size=${encodeURIComponent(String(size))}`;
+    }
+
+    /** 建立不需解壓高風險 entry 的 Windows Shell 通用 icon URL。 */
+    public getEntryIconUrl(sessionId: string, entryId: number, size = 256): string {
+        return this.getBaseUrl() + this.getEndpoint("/api/archives/entry-icon", sessionId, entryId)
             + `&size=${encodeURIComponent(String(size))}`;
     }
 

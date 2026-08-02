@@ -49,8 +49,14 @@ export class ArchiveResolver {
         return this.api.getEntryUrl(item.ref.sessionId, item.ref.entryId);
     }
 
-    /** 取得 entry 的縮圖 URL；此階段先保留給後續列表與大量瀏覽流程。 */
+    /**
+     * 取得 entry 的縮圖 URL。禁止 materialize 的 entry 改用不需實體檔案的通用 icon，
+     * 其他 entry 才使用會進入 materialize 邊界的縮圖 API。
+     */
     public getThumbnailUrl(item: ArchiveEntryItem, size = 256): string {
+        if (item.isHighRisk) {
+            return this.api.getEntryIconUrl(item.ref.sessionId, item.ref.entryId, size);
+        }
         return this.api.getEntryThumbnailUrl(item.ref.sessionId, item.ref.entryId, size);
     }
 

@@ -37,6 +37,12 @@ public sealed class ArchiveEntryInfoResult {
     /// 是否為資料夾。資料夾可以出現在 metadata 中，但不能作為 entry 解壓縮目標。
     /// </summary>
     public bool isDirectory { get; set; }
+
+    /// <summary>
+    /// 是否禁止由 Tiefsee 主動 materialize；包含高風險類型、無需預覽的封裝檔
+    /// 與超過單一 entry 大小上限的檔案。
+    /// </summary>
+    public bool isHighRisk { get; set; }
 }
 
 /// <summary>

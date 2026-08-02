@@ -77,6 +77,42 @@ public sealed class ArchivePreviewService : IDisposable {
     private static bool NativeLibraryConfigured;
 
     /// <summary>
+    /// 集中管理 archive entry 的高風險副檔名，避免前端或單一 viewer 成為
+    /// 可以繞過 materialize 阻擋的唯一防線。
+    /// </summary>
+    internal static class ArchiveRiskPolicy {
+        private static readonly HashSet<string> HighRiskExtensions = new(StringComparer.OrdinalIgnoreCase) {
+            // 可能觸發防毒警告的高危檔案
+            ".exe", ".dll", ".sys", ".scr", ".cpl", ".ocx",
+            ".msi", ".msix", ".appx",
+            ".bat", ".cmd", ".ps1", ".vbs",
+            ".lnk", ".url",
+            // 壓縮檔、磁碟映像
+            ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz", ".tgz",
+            ".cab", ".iso", ".img", ".wim", ".vhd", ".vhdx", ".dmg",   
+            // AI 模型權重與大型二進位資料
+            ".safetensors", ".ckpt", ".pt", ".pth", ".onnx", ".gguf", ".ggml",
+            ".tflite", ".pb", ".h5", ".hdf5",
+            // 資料庫、資料集
+            ".db", ".sqlite", ".sqlite3", ".mdb", ".accdb", ".parquet", ".arrow", ".feather",
+            // 已編譯的執行環境檔案
+            ".class", ".pyc", ".pyd", ".so", ".dylib", ".elf", ".wasm",
+            // 應用程式封裝
+            ".msixbundle", ".appxbundle", ".appinstaller",
+            ".jar", ".war", ".ear", ".aar", ".apk", ".aab", ".ipa",
+            ".xpi", ".crx", ".vsix", ".whl", ".nupkg", ".deb", ".rpm",
+        };
+
+        public static bool IsHighRiskExtension(string extension) {
+            if (string.IsNullOrWhiteSpace(extension)) {
+                return false;
+            }
+            string normalized = extension.StartsWith('.') ? extension : "." + extension;
+            return HighRiskExtensions.Contains(normalized);
+        }
+    }
+
+    /// <summary>
     /// 建立壓縮檔預覽服務並設定 SharpSevenZip 使用的 native library。
     /// </summary>
     public ArchivePreviewService(string archiveTempRoot) {
@@ -262,6 +298,20 @@ public sealed class ArchivePreviewService : IDisposable {
         ArchivePreviewSession session = GetRequiredSession(sessionId);
         try {
             return session.GetEntry(entryId);
+        }
+        finally {
+            ReleaseSessionOperation(session);
+        }
+    }
+
+    /// <summary>
+    /// 取得禁止 materialize entry 的原始副檔名，供不落地的 Shell 通用 icon API 使用。
+    /// 此方法只讀取 metadata，不會進入 materialize queue。
+    /// </summary>
+    public string GetBlockedEntryExtension(string sessionId, int entryId) {
+        ArchivePreviewSession session = GetRequiredSession(sessionId);
+        try {
+            return session.GetBlockedEntryExtension(entryId);
         }
         finally {
             ReleaseSessionOperation(session);
@@ -524,6 +574,14 @@ internal sealed class ArchivePreviewSession : IDisposable {
     private const long MaxTotalUnpackedBytes = 10L * 1024 * 1024 * 1024;
     /// <summary> 單一 entry 的未壓縮大小上限；達到 1 GB 時禁止解壓。 </summary>
     private const long MaxEntryUnpackedBytes = 1L * 1024 * 1024 * 1024;
+
+    /// <summary>
+    /// 判斷 entry 是否因大小而列入高風險。此規則會併入 isHighRisk，
+    /// 讓超大 entry 與其他高風險 entry 統一走不落地流程。
+    /// </summary>
+    internal static bool IsEntryTooLarge(long size) {
+        return size >= MaxEntryUnpackedBytes;
+    }
     /// <summary> 單次批次解壓的未壓縮大小上限，避免 staging 一次占用整個 session 配額。 </summary>
     private const long MaxBatchUnpackedBytes = 1L * 1024 * 1024 * 1024;
     /// <summary> 壓縮檔目錄 entry 數量上限，避免初始化 metadata 過大。 </summary>
@@ -1000,6 +1058,19 @@ internal sealed class ArchivePreviewSession : IDisposable {
     }
 
     /// <summary>
+    /// 取得禁止 materialize entry 的副檔名；其他 entry 不可使用通用 icon 路徑。
+    /// </summary>
+    public string GetBlockedEntryExtension(int entryId) {
+        if (_entriesById.TryGetValue(entryId, out ArchiveFileEntry entry) == false) {
+            throw new ArchivePreviewException("entryNotFound", "找不到壓縮檔 entry。", 404);
+        }
+        if (entry.IsHighRisk == false) {
+            throw new ArchivePreviewException("invalidParameter", "只有禁止 materialize 的 entry 可以使用此 icon API。", 400);
+        }
+        return ArchiveFileEntry.GetSafeExtension(entry.Name);
+    }
+
+    /// <summary>
     /// 從 SharpSevenZip 的 archive-level properties 取得字串特徵。
     /// 不同格式或不同 7z.dll 版本可能沒有該 property，因此缺少時回傳空字串。
     /// </summary>
@@ -1046,8 +1117,11 @@ internal sealed class ArchivePreviewSession : IDisposable {
             if (entry.IsDirectory) {
                 throw new ArchivePreviewException("entryIsDirectory", "指定的 entry 是資料夾。", 400);
             }
-            if (entry.Size >= MaxEntryUnpackedBytes) {
-                throw new ArchivePreviewException("entrySizeLimitExceeded", "壓縮檔內單一檔案超過 1 GB 限制。", 413);
+            if (entry.IsHighRisk) {
+                throw new ArchivePreviewException(
+                    "highRiskEntryBlocked",
+                    "此高風險壓縮檔 entry 不允許解壓縮。",
+                    403);
             }
             if (entry.IsEncrypted && _passwordVerified == false) {
                 throw new ArchivePreviewException(
@@ -1219,7 +1293,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
         int end = Math.Min(_fileEntries.Count, currentPosition + BulkPrefetchCount);
         for (int i = currentPosition; i < end; i++) {
             ArchiveFileEntry entry = _fileEntries[i];
-            if (entry.Size < MaxEntryUnpackedBytes
+            if (entry.IsHighRisk == false
                 && File.Exists(GetFinalPath(entry)) == false
                 && _inflight.ContainsKey(entry.EntryId) == false) {
                 _inflight.Add(entry.EntryId, new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously));
@@ -1236,7 +1310,8 @@ internal sealed class ArchivePreviewSession : IDisposable {
     /// </summary>
     private List<int> GetUnmaterializedEntryIds() {
         return _fileEntries
-            .Where(entry => entry.Size < MaxEntryUnpackedBytes && File.Exists(GetFinalPath(entry)) == false)
+            .Where(entry => entry.IsHighRisk == false
+                && File.Exists(GetFinalPath(entry)) == false)
             .Select(entry => entry.EntryId)
             .ToList();
     }
@@ -1396,7 +1471,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
     }
 
     private string GetFinalPath(ArchiveFileEntry entry) {
-        string extension = entry.Extension;
+        string extension = ArchiveFileEntry.GetSafeExtension(entry.Name);
         return Path.Combine(_tempDirectory, entry.EntryId.ToString() + extension);
     }
 
@@ -1526,11 +1601,8 @@ internal sealed class ArchiveFileEntry {
     /// <summary> 是否為加密 entry。 </summary>
     public bool IsEncrypted { get; private set; }
 
-    /// <summary>
-    /// 後端產生暫存檔時使用的副檔名。此欄位不再傳給前端，
-    /// 但仍需保留，讓 Windows 與外部程式可以依副檔名判斷檔案類型。
-    /// </summary>
-    public string Extension { get; private set; } = "";
+    /// <summary> 是否禁止由 Tiefsee 主動 materialize；包含高風險、不可預覽與超大 entry。 </summary>
+    public bool IsHighRisk { get; private set; }
 
     /// <summary>
     /// 將 SharpSevenZip 的 entry metadata 轉成服務內部模型。
@@ -1540,19 +1612,29 @@ internal sealed class ArchiveFileEntry {
     /// <param name="file">SharpSevenZip 回傳的 entry metadata。</param>
     /// <returns>服務內部使用的 entry 模型。</returns>
     public static ArchiveFileEntry Create(ArchiveFileInfo file) {
-        string extension = Path.GetExtension(file.FileName ?? "");
-        if (extension.Length > 20 || extension.Contains('/') || extension.Contains('\\')) {
-            extension = ".bin";
-        }
+        string extension = GetSafeExtension(file.FileName);
+        long size = file.Size > (ulong)long.MaxValue ? long.MaxValue : (long)file.Size;
         return new ArchiveFileEntry {
             EntryId = file.Index,
             Name = file.FileName ?? "",
-            Size = file.Size > (ulong)long.MaxValue ? long.MaxValue : (long)file.Size,
+            Size = size,
             LastWriteTimeUtc = ToUnixMilliseconds(file.LastWriteTime),
             IsDirectory = file.IsDirectory,
             IsEncrypted = file.Encrypted,
-            Extension = extension
+            IsHighRisk = ArchivePreviewService.ArchiveRiskPolicy.IsHighRiskExtension(extension)
+                || ArchivePreviewSession.IsEntryTooLarge(size)
         };
+    }
+
+    /// <summary>
+    /// 取得 entry 暫存檔使用的安全副檔名；不保存成欄位，使用時直接由 entry 名稱推導。
+    /// </summary>
+    internal static string GetSafeExtension(string fileName) {
+        string extension = Path.GetExtension(fileName ?? "");
+        if (extension.Length > 20 || extension.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) {
+            return ".bin";
+        }
+        return extension;
     }
 
     /// <summary>
@@ -1570,8 +1652,7 @@ internal sealed class ArchiveFileEntry {
     }
 
     /// <summary>
-    /// 轉成公開 API 使用的 metadata。
-    /// 內部 Extension 不回傳，前端取得實體路徑時應使用 entry-path，
+    /// 轉成公開 API 使用的 metadata；前端取得實體路徑時應使用 entry-path，
     /// 避免自行猜測後端實際產生的暫存檔名稱。
     /// </summary>
     /// <returns>不含內部暫存檔命名細節的 entry metadata。</returns>
@@ -1581,7 +1662,8 @@ internal sealed class ArchiveFileEntry {
             name = Name,
             size = Size,
             lastWriteTimeUtc = LastWriteTimeUtc,
-            isDirectory = IsDirectory
+            isDirectory = IsDirectory,
+            isHighRisk = IsHighRisk
         };
     }
 }

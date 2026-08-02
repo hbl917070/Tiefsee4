@@ -9,6 +9,8 @@ import { VideoToolbar } from "./VideoToolbar";
 export class FileShow {
 
     public openImage;
+    /** 直接顯示不需 materialize 的 archive 通用 icon，但沿用 entry metadata。 */
+    public openIconImage;
     /** 直接顯示固定錯誤圖片，不經過檔案類型與檔案 icon 判斷。 */
     public openErrorImage;
     public openVideo;
@@ -37,6 +39,7 @@ export class FileShow {
         var _groupType = GroupType.none;
 
         this.openImage = openImage;
+        this.openIconImage = openIconImage;
         this.openErrorImage = openErrorImage;
         this.openVideo = openVideo;
         this.openPdf = openPdf;
@@ -264,6 +267,27 @@ export class FileShow {
             }
 
             initTiefseeview(fileInfo2);
+            _isLoaded = true;
+        }
+
+        /**
+         * 顯示 archive 高風險 entry 的通用 icon。
+         * icon URL 不代表已解壓的 entry；工具列與其他 metadata 仍使用原始 entry 的 FileInfo2。
+         */
+        async function openIconImage(
+            iconUrl: string,
+            fileInfo2: FileInfo2,
+            isCurrent?: () => boolean,
+        ) {
+            _isLoaded = false;
+            setShowType(GroupType.img);
+            _tiefseeview.setLoading(true, 200);
+            await _tiefseeview.loadImg(iconUrl);
+            if (isCurrent !== undefined && isCurrent() === false) {
+                _isLoaded = true;
+                return;
+            }
+            await initTiefseeview(fileInfo2);
             _isLoaded = true;
         }
 
