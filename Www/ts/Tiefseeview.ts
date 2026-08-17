@@ -127,6 +127,8 @@ export class Tiefseeview {
         /** 圖片當前被設定寬度 (含小數點，避免計算縮放時失去精度。還必須乘 _dpiZoom 才是當前實際的像素) */
         var _nowWidth = 1;
         var _nowHeight = 1;
+        /** 是否已經完成第一次顯示尺寸初始化 */
+        var _isDisplaySizeInitialized = false;
 
         var _dpiZoom = 1;
         var _isDpizoomAUto = true;
@@ -1325,6 +1327,7 @@ export class Tiefseeview {
 
             // setLoading(true);
             _url = url;
+            _isDisplaySizeInitialized = false;
             const p = await preloadImg(url);
             // setLoading(false);
             setDataType("bigimg");
@@ -1369,6 +1372,7 @@ export class Tiefseeview {
             _arBigimgscale = arUrl;
 
             _url = _arBigimgscale[0].url;
+            _isDisplaySizeInitialized = false;
 
             let scale = getZoomFull_scale(zoomType, zoomVal);
             let bigimgscaleItem = getBigimgscaleItem(scale);
@@ -2689,6 +2693,9 @@ export class Tiefseeview {
 
             if (_dataType !== "bigimg" && _dataType !== "bigimgscale") { return; }
 
+            // loadBigimg 完成後，要等 setDataSize 設定顯示尺寸才能開始渲染。
+            if (_isDisplaySizeInitialized === false) { return; }
+
             if (getOriginalWidth() === 0) { return; } // 避免圖片尚未載入完成就渲染
 
             if (isImmediatelyRun === true) {
@@ -3062,6 +3069,9 @@ export class Tiefseeview {
 
             _nowWidth = width;
             _nowHeight = width * ratio;
+            // 圖片載入完成只代表原始尺寸與來源資料已準備好；此時 _nowWidth/_nowHeight
+            // 仍可能是上一個內容或預設值。setDataSize() 完成顯示尺寸設定後，才允許 bigimgDraw() 渲染。
+            _isDisplaySizeInitialized = true;
 
             if (_dataType === "img") {
                 _domData.style.width = Math.floor(width) + "px";
