@@ -1374,8 +1374,9 @@ export class Tiefseeview {
             _url = _arBigimgscale[0].url;
             _isDisplaySizeInitialized = false;
 
-            let scale = getZoomFull_scale(zoomType, zoomVal);
-            let bigimgscaleItem = getBigimgscaleItem(scale);
+            const zoomWidth = getZoomFull_width(zoomType, zoomVal);
+            const scale = getRenderScale(zoomWidth);
+            const bigimgscaleItem = getBigimgscaleItem(scale);
 
             setDataType("bigimgscale");
             // setLoading(true);
@@ -1393,7 +1394,7 @@ export class Tiefseeview {
             _tempBigimgscaleKey = [];
             _tempBigimgscaleKey.push(bigimgscaleItem.scale)
 
-            setDataSize(getZoomFull_width(zoomType, zoomVal))
+            setDataSize(zoomWidth)
             _tempDrawImage = {
                 scale: -1,
                 sx: 0, sy: 0,
@@ -2086,7 +2087,33 @@ export class Tiefseeview {
          * 目前的 圖片縮放比例
          */
         function getScale() {
-            return _nowWidth / getOriginalWidth() * _dpiZoom;
+            return getRenderScale();
+        }
+
+        /**
+         * 取得圖片實際渲染時使用的 DPI 縮放比例。
+         * 初次選擇 bigimgscale 與後續 bigimgDraw 必須使用同一套規則，
+         * 否則在網頁或 Windows 螢幕縮放不是 100% 時會先顯示一張縮圖，
+         * worker 載入另一張縮圖後再次繪製，造成畫面短暫位移。
+         */
+        function getRenderDpiZoom(width: number) {
+            let dpiZoom = _dpiZoom;
+            // 低於 1 倍時圖片會變得模糊
+            if (dpiZoom < 1) { dpiZoom = 1; }
+
+            // 「呈現像素」模式在實際顯示比例大於 100% 時不再使用額外 DPI
+            if (_rendering === TiefseeviewImageRendering.autoOrPixelated &&
+                width / getOriginalWidth() * dpiZoom > 1) {
+                dpiZoom = 1;
+            }
+            return dpiZoom;
+        }
+
+        /**
+         * 取得圖片實際渲染比例，包含 DPI 與渲染模式的限制。
+         */
+        function getRenderScale(width: number = _nowWidth) {
+            return width / getOriginalWidth() * getRenderDpiZoom(width);
         }
 
         /**
@@ -2434,8 +2461,6 @@ export class Tiefseeview {
         function getBigimgscaleItem(scale?: number) {
 
             if (scale === undefined) { scale = getScale(); }
-            let dpiZoom = _dpiZoom;
-            if (dpiZoom < 1) { dpiZoom = 1; }
             let ret = _arBigimgscale[0];
 
             for (let i = _arBigimgscale.length - 1; i >= 0; i--) {
@@ -2712,13 +2737,7 @@ export class Tiefseeview {
             const w = _nowWidth;
             const h = _nowHeight;
 
-            let dpiZoom = _dpiZoom;
-            // 低於 1 倍時圖片會變得模糊
-            if (dpiZoom < 1) { dpiZoom = 1; }
-
-            // 如果啟用「呈現像素」，那麼圖片縮放比例大於100%後，就沒有必要用 dpiZoom 渲染更多的像素
-            if (_rendering === TiefseeviewImageRendering.autoOrPixelated)
-                if (w / getOriginalWidth() * dpiZoom > 1) { dpiZoom = 1; }
+            const dpiZoom = getRenderDpiZoom(w);
 
             const bigimgTemp = getBigimgTemp(); // 判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return; }
