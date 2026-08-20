@@ -1167,8 +1167,13 @@ class SettingWindow {
                 { dom: getDom("#select-scrollDownAlt") as HTMLSelectElement, config: "scrollDownAlt" },
             ] as const;
 
-            const bulkViewMouseButtonItems = [
+            const bulkViewScrollWheelButtonItems = [
                 { dom: getDom("#select-bulkViewScrollWheelButton") as HTMLSelectElement, config: "bulkViewScrollWheelButton" },
+            ] as const;
+
+            const bulkViewMouseButtonItems = [
+                { dom: getDom("#select-bulkViewMouseButton4") as HTMLSelectElement, config: "bulkViewMouseButton4" },
+                { dom: getDom("#select-bulkViewMouseButton5") as HTMLSelectElement, config: "bulkViewMouseButton5" },
             ] as const;
 
             const bulkViewMouseItems = [
@@ -1248,34 +1253,36 @@ class SettingWindow {
                 ],
             };
 
+            const bulkViewActions = [
+                hotkeyActionKeys.prevRow,
+                hotkeyActionKeys.nextRow,
+                hotkeyActionKeys.prevPage,
+                hotkeyActionKeys.nextPage,
+                hotkeyActionKeys.firstPage,
+                hotkeyActionKeys.lastPage,
+                hotkeyActionKeys.incrColumns,
+                hotkeyActionKeys.decColumns,
+                hotkeyActionKeys.incrFixedWidth,
+                hotkeyActionKeys.decFixedWidth,
+            ];
+
             const bulkViewMouseData: { [key: string]: string[] } = {
-                "bulkView": [
-                    hotkeyActionKeys.prevPage,
-                    hotkeyActionKeys.nextPage,
-                    hotkeyActionKeys.firstPage,
-                    hotkeyActionKeys.lastPage,
-                    hotkeyActionKeys.incrColumns,
-                    hotkeyActionKeys.decColumns,
-                    hotkeyActionKeys.incrFixedWidth,
-                    hotkeyActionKeys.decFixedWidth,
-                ],
+                "bulkView": bulkViewActions,
             };
 
             const bulkViewMouseButtonData: { [key: string]: string[] } = {
-                "bulkView": [
-                    hotkeyActionKeys.prevPage,
-                    hotkeyActionKeys.nextPage,
-                    hotkeyActionKeys.firstPage,
-                    hotkeyActionKeys.lastPage,
-                    hotkeyActionKeys.incrColumns,
-                    hotkeyActionKeys.decColumns,
-                    hotkeyActionKeys.incrFixedWidth,
-                    hotkeyActionKeys.decFixedWidth,
-                ],
+                "bulkView": bulkViewActions,
                 "other": [
-                    hotkeyActionKeys.movePage,
                     hotkeyActionKeys.closeBulkView,
                     hotkeyActionKeys.closeWindow,
+                ],
+            };
+
+            const bulkViewScrollWheelButtonData: { [key: string]: string[] } = {
+                "bulkView": bulkViewMouseButtonData["bulkView"],
+                "other": [
+                    hotkeyActionKeys.movePage,
+                    ...bulkViewMouseButtonData["other"],
                 ],
             };
 
@@ -1307,6 +1314,13 @@ class SettingWindow {
                     item.dom.value = _config.settings.mouse[item.config];
                 });
 
+                const bulkViewScrollWheelButtonHtml = buildOptionHtml(bulkViewScrollWheelButtonData, false);
+                bulkViewScrollWheelButtonItems.forEach((item) => {
+                    item.dom.innerHTML = bulkViewScrollWheelButtonHtml;
+                    // @ts-ignore
+                    item.dom.value = _config.settings.mouse[item.config];
+                });
+
                 const bulkViewMouseButtonHtml = buildOptionHtml(bulkViewMouseButtonData, false);
                 bulkViewMouseButtonItems.forEach((item) => {
                     item.dom.innerHTML = bulkViewMouseButtonHtml;
@@ -1324,7 +1338,7 @@ class SettingWindow {
                 _i18n.setAll();
             }
 
-            [...normalMouseItems, ...bulkViewMouseButtonItems, ...bulkViewMouseItems].forEach((item) => {
+            [...normalMouseItems, ...bulkViewScrollWheelButtonItems, ...bulkViewMouseButtonItems, ...bulkViewMouseItems].forEach((item) => {
                 item.dom.addEventListener("change", () => {
                     // @ts-ignore
                     _config.settings.mouse[item.config] = item.dom.value;

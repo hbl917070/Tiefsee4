@@ -449,6 +449,8 @@ export class Config {
 
             // 大量瀏覽模式 - 滑鼠按鍵
             bulkViewScrollWheelButton: hotkeyActionKeys.movePage,
+            bulkViewMouseButton4: hotkeyActionKeys.prevRow,
+            bulkViewMouseButton5: hotkeyActionKeys.nextRow,
         },
 
         /** 預設快速鍵 */
@@ -483,6 +485,8 @@ export class Config {
             { "key": hotkeyActionKeys.confirm, "hotkey": "Enter" },
             { "key": hotkeyActionKeys.saveTextEditor, "hotkey": "Ctrl + S" },
             { "key": hotkeyActionKeys.bulkView, "hotkey": "B" },
+            { "key": hotkeyActionKeys.prevRow, "hotkey": "PageUp" },
+            { "key": hotkeyActionKeys.nextRow, "hotkey": "PageDown" },
             { "key": hotkeyActionKeys.prevPage, "hotkey": "ArrowLeft" },
             { "key": hotkeyActionKeys.nextPage, "hotkey": "ArrowRight" },
             { "key": hotkeyActionKeys.setBulkViewColumns, "hotkey": "Numpad1", "subOptions": ["1"] },

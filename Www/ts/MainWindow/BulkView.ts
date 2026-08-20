@@ -19,6 +19,8 @@ export class BulkView {
     public pagePrev;
     public pageFirst;
     public pageLast;
+    public rowNext;
+    public rowPrev;
     public setColumns;
     public setFocus;
     public saveCurrentState;
@@ -54,6 +56,8 @@ export class BulkView {
         const _domBoxFixedWidth = _domMenu.querySelector(".js-box-fixedWidth") as HTMLDivElement;
         const _domBoxWaterfall = _domMenu.querySelector(".js-box-waterfall") as HTMLDivElement;
         const _domBoxAlign = _domMenu.querySelector(".js-box-align") as HTMLDivElement;
+
+        const scrollBar = new TiefseeScroll();
 
         /** 名單列表 */
         var _arFile: string[] = [];
@@ -96,6 +100,27 @@ export class BulkView {
         let _isUserScrollActive = false;
         /** 切換欄時，記錄上一次的值。用於辨識是否使用首圖縮排 */
         let _tempColumns = -1;
+        /** 上一行／下一行最小移動距離 */
+        const _rowScrollThreshold = 80;
+        /** 捲動位置比較時忽略的像素誤差 */
+        const _scrollPositionEpsilon = 1;
+        /** 上一行／下一行動畫持續時間 */
+        const _rowScrollAnimationDuration = 300;
+        /** 目前上一行／下一行動畫的邏輯目標；連續按鍵時用來累計下一個目標 */
+        let _rowScrollAnimationState: {
+            direction: "prev" | "next",
+            target: number,
+            startedAt: number,
+            duration: number,
+        } | undefined;
+        /** 使用者捲動後延後清除動畫狀態，讓同一個事件中的快速鍵仍能延續動畫目標 */
+        let _rowScrollAnimationClearTimer = 0;
+        /** 上一行／下一行 requestAnimationFrame 動畫的 frame id */
+        let _rowScrollAnimationFrame = 0;
+        /** 上一行切換到上一頁後，持續維持在該頁底端，直到使用者再次捲動 */
+        let _keepScrollAtBottom = false;
+        /** 頁面重建／使用者捲動的版本，用來避免過期的底端定位覆寫新狀態 */
+        let _scrollPositionRequestVersion = 0;
 
         /** 請求限制器 */
         const _limiter = new RequestLimiter(3);
@@ -107,6 +132,8 @@ export class BulkView {
         this.pagePrev = pagePrev;
         this.pageFirst = pageFirst;
         this.pageLast = pageLast;
+        this.rowNext = rowNext;
+        this.rowPrev = rowPrev;
         this.load = load;
         this.load2 = load2;
         this.setColumns = setColumns;
@@ -134,17 +161,25 @@ export class BulkView {
                 updateSize();
             }, 30)).observe(_domBulkView);
 
-            new TiefseeScroll().initGeneral(_domBulkView, "y"); // 滾動條元件
+            scrollBar.initGeneral(_domBulkView, "y"); // 滾動條元件
 
             //判斷是否有捲動
             _domBulkView.addEventListener("wheel", () => {
                 startUserScroll();
             });
             _domBulkView.addEventListener("mousedown", (e: MouseEvent) => {
-                if (e.button !== 1) { return; } // 滾輪鍵
+                let sc: HotkeyAction | "none" = "none";
+                if (e.button === 1) { // 滾輪鍵
+                    sc = M.config.settings.mouse.bulkViewScrollWheelButton;
+                } else if (e.button === 3) { // 滑鼠按鍵 4
+                    sc = M.config.settings.mouse.bulkViewMouseButton4;
+                } else if (e.button === 4) { // 滑鼠按鍵 5
+                    sc = M.config.settings.mouse.bulkViewMouseButton5;
+                } else {
+                    return;
+                }
 
-                const sc = M.config.settings.mouse.bulkViewScrollWheelButton;
-                if (sc === hotkeyActionKeys.movePage) { return; } // 「移動頁面」為瀏覽器預設功能，無需自定義動作
+                if (sc === hotkeyActionKeys.movePage) { return; } // 保留瀏覽器預設功能
 
                 M.script.run(sc);
                 e.preventDefault(); // 執行自定義動作時禁止瀏覽器預設功能
@@ -301,6 +336,7 @@ export class BulkView {
          * 套用設定
          */
         function apply() {
+            stopRowScrollAnimation();
             const columns = M.config.settings.bulkView.columns = Number.parseInt(getGroupRadioVal(_domColumns));
             const gaplessMode = M.config.settings.bulkView.gaplessMode = _domGaplessMode.value;
             const fixedWidth = M.config.settings.bulkView.fixedWidth = _domFixedWidth.value;
@@ -611,6 +647,9 @@ export class BulkView {
                     _currentImageScrollCorrection?.();
                 }
                 restoreViewportAnchor();
+                if (_keepScrollAtBottom) {
+                    _domBulkView.scrollTop = _domBulkView.scrollHeight;
+                }
             }
         }
 
@@ -619,6 +658,9 @@ export class BulkView {
          */
         function visible(val: boolean) {
             _isVisible = val;
+            if (val === false) {
+                stopRowScrollAnimation();
+            }
             if (val === true) {
                 initSetting();
                 _domBulkView.style.display = "flex";
@@ -631,6 +673,7 @@ export class BulkView {
          * 記錄當前狀態(結束大量瀏覽模式前呼叫)
          */
         function saveCurrentState() {
+            stopRowScrollAnimation();
             _isVisible = false;
             stopAutomaticScrollCorrection();
             _tempCurrentFilePath = _pendingCurrentFilePath || M.fileLoad.getFilePath();
@@ -781,9 +824,18 @@ export class BulkView {
          * @param currentFilePath 要捲動到可見範圍的當前圖片
          * @param targetTop 當前圖片相對容器頂端的目標位置
          * @param scrollTop 重建列表後要保留的捲動位置
+         * @param scrollToBottom 重建列表後是否維持在內容底端
          */
-        async function showPage(page?: number, currentFilePath?: string, targetTop = 0, scrollTop?: number) {
+        async function showPage(
+            page?: number,
+            currentFilePath?: string,
+            targetTop = 0,
+            scrollTop?: number,
+            scrollToBottom = false,
+        ) {
 
+            stopRowScrollAnimation();
+            const scrollPositionRequestVersion = ++_scrollPositionRequestVersion;
             stopCurrentImageScrollObserver();
             if (page === undefined) { page = _pageNow; }
             if (page !== undefined) { _pageNow = page; }
@@ -878,6 +930,8 @@ export class BulkView {
                     start += n;
                 }
 
+                _keepScrollAtBottom = scrollToBottom
+                    && scrollPositionRequestVersion === _scrollPositionRequestVersion;
                 updateSize();
                 if (scrollTop !== undefined) {
                     _domBulkViewContent.style.minHeight = "";
@@ -950,7 +1004,85 @@ export class BulkView {
         /** 標記接下來的 scroll event 可更新視口錨點 */
         function startUserScroll() {
             _isUserScrollActive = true;
+            _keepScrollAtBottom = false;
+            _scrollPositionRequestVersion++;
+
+            // 停止目前動畫，但先保留邏輯目標；如果這次事件接著觸發上一行／下一行，
+            // moveRow() 可以從上一個目標繼續計算，而不是因動畫被中斷就退回目前位置。
+            const animationState = _rowScrollAnimationState;
+            stopRowScrollAnimation(false);
+            if (animationState !== undefined) {
+                _rowScrollAnimationClearTimer = window.setTimeout(() => {
+                    if (_rowScrollAnimationState === animationState) {
+                        _rowScrollAnimationState = undefined;
+                    }
+                    _rowScrollAnimationClearTimer = 0;
+                }, 0);
+            }
             stopAutomaticScrollCorrection();
+        }
+
+        /** 停止上一行／下一行動畫 */
+        function stopRowScrollAnimation(clearState = true) {
+            clearTimeout(_rowScrollAnimationClearTimer);
+            _rowScrollAnimationClearTimer = 0;
+            cancelAnimationFrame(_rowScrollAnimationFrame);
+            _rowScrollAnimationFrame = 0;
+            if (clearState) {
+                _rowScrollAnimationState = undefined;
+            }
+        }
+
+        /** easeOutExpo，維持原本 jQuery 動畫的加速曲線 */
+        function easeOutExpo(progress: number) {
+            return progress >= 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        }
+
+        /** 以目前位置為起點平滑捲動；新的目標會中斷舊動畫且不會排隊 */
+        function animateRowScroll(target: number, direction: "prev" | "next") {
+            const previousState = _rowScrollAnimationState;
+            const now = performance.now();
+            const isContinuingSameTarget = previousState !== undefined
+                && previousState.direction === direction
+                && previousState.target === target;
+            const duration = isContinuingSameTarget
+                ? Math.max(0, previousState.startedAt + previousState.duration - now)
+                : _rowScrollAnimationDuration;
+
+            stopRowScrollAnimation();
+            if (duration <= 0) {
+                scrollBar.syncGeneralPosition(target);
+                _domBulkView.scrollTop = target;
+                return;
+            }
+
+            const animationState = { direction, target, startedAt: now, duration };
+            _rowScrollAnimationState = animationState;
+            const startScrollTop = _domBulkView.scrollTop;
+
+            const animate = (timestamp: number) => {
+                if (_rowScrollAnimationState !== animationState) { return; }
+
+                const progress = Math.min(1, Math.max(0, (timestamp - now) / duration));
+                const value = startScrollTop + (target - startScrollTop) * easeOutExpo(progress);
+
+                // 先抵銷 scroll container 的自然位移，再寫入 scrollTop，
+                // 讓兩個視覺位置在同一個 frame 內完成更新。
+                scrollBar.syncGeneralPosition(value);
+                _domBulkView.scrollTop = value;
+
+                if (progress >= 1) {
+                    _rowScrollAnimationFrame = 0;
+                    if (_rowScrollAnimationState === animationState) {
+                        _rowScrollAnimationState = undefined;
+                    }
+                    return;
+                }
+
+                _rowScrollAnimationFrame = requestAnimationFrame(animate);
+            };
+
+            _rowScrollAnimationFrame = requestAnimationFrame(animate);
         }
 
         /** 停止追蹤圖片尺寸與取消尚未執行的位置修正 */
@@ -1608,9 +1740,98 @@ export class BulkView {
         }
 
         /**
+         * 取得目前頁面所有項目的垂直捲動位置。
+         * 使用實際 DOM 位置而不是陣列索引，才能支援垂直瀑布流。
+         */
+        function getRowScrollPositions() {
+            const panelRect = _domBulkView.getBoundingClientRect();
+            const scrollTop = _domBulkView.scrollTop;
+            const positions = Array.from(_domBulkViewContent.querySelectorAll(".bulkView-item"))
+                .map(dom => dom.getBoundingClientRect().top - panelRect.top + scrollTop)
+                .filter(position => Number.isFinite(position))
+                .sort((a, b) => a - b);
+
+            const uniquePositions: number[] = [];
+            for (const position of positions) {
+                const lastPosition = uniquePositions[uniquePositions.length - 1];
+                if (lastPosition === undefined || Math.abs(position - lastPosition) > _scrollPositionEpsilon) {
+                    uniquePositions.push(position);
+                }
+            }
+            return uniquePositions;
+        }
+
+        /** 上一行／下一行；到達頁面邊界時切換頁面 */
+        function moveRow(direction: "prev" | "next") {
+            if (_isVisible === false) { return; }
+
+            startUserScroll();
+            const positions = getRowScrollPositions();
+            if (positions.length === 0) { return; }
+
+            const maxScrollTop = Math.max(0, _domBulkView.scrollHeight - _domBulkView.clientHeight);
+            const currentScrollTop = Math.max(0, Math.min(_domBulkView.scrollTop, maxScrollTop));
+            const rowNavigationBase = _rowScrollAnimationState?.direction === direction
+                ? Math.max(0, Math.min(_rowScrollAnimationState.target, maxScrollTop))
+                : currentScrollTop;
+
+            if (direction === "next") {
+                if (currentScrollTop >= maxScrollTop - _scrollPositionEpsilon) {
+                    pageNext();
+                    return;
+                }
+
+                // 頁面頂端可能有分頁控制列；若目前捲動位置還在第一列之前，
+                // 第一個圖片位置仍視為目前列，下一次應跳到第二個位置。
+                let nextRowStartIndex = positions.findIndex(position =>
+                    position > rowNavigationBase + _scrollPositionEpsilon
+                );
+                if (nextRowStartIndex === 0) {
+                    nextRowStartIndex = 1;
+                }
+
+                const nextRows = positions.slice(Math.max(0, nextRowStartIndex));
+                const target = nextRows.find(position =>
+                    position > rowNavigationBase + _scrollPositionEpsilon
+                    && position - rowNavigationBase >= _rowScrollThreshold
+                );
+                // 沒有足夠距離的下一列時，直接移至頁面底端，避免逐列移動。
+                const targetScrollTop = Math.min(target ?? maxScrollTop, maxScrollTop);
+                animateRowScroll(targetScrollTop, direction);
+                return;
+            }
+
+            if (currentScrollTop <= _scrollPositionEpsilon) {
+                pagePrevToBottom();
+                return;
+            }
+
+            const previousRows = [...positions].reverse();
+            const target = previousRows.find(position =>
+                position < rowNavigationBase - _scrollPositionEpsilon
+                && rowNavigationBase - position >= _rowScrollThreshold
+            );
+            // 沒有足夠距離的上一列時，直接移至頁面頂端，避免逐列移動。
+            const targetScrollTop = Math.max(0, target ?? 0);
+            animateRowScroll(targetScrollTop, direction);
+        }
+
+        /** 下一行 */
+        function rowNext() {
+            moveRow("next");
+        }
+
+        /** 上一行 */
+        function rowPrev() {
+            moveRow("prev");
+        }
+
+        /**
          * 下一頁
          */
         function pageNext() {
+            stopRowScrollAnimation();
+            _keepScrollAtBottom = false;
             let page = _pageNow;
             page += 1;
             const pageMax = Math.ceil(_arFile.length / _imgMaxCount);
@@ -1625,6 +1846,8 @@ export class BulkView {
          * 上一頁
          */
         function pagePrev() {
+            stopRowScrollAnimation();
+            _keepScrollAtBottom = false;
             let page = _pageNow;
             page -= 1;
             if (page <= 1) { page = 1; }
@@ -1634,10 +1857,22 @@ export class BulkView {
             }
         }
 
+        /** 上一行從頁首切換頁面時，讓上一頁停在頁尾 */
+        function pagePrevToBottom() {
+            stopRowScrollAnimation();
+            let page = _pageNow - 1;
+            if (page <= 0) { page = 1; }
+            if (page === _pageNow) { return; }
+
+            _pageNow = page;
+            showPage(undefined, undefined, 0, undefined, true);
+        }
+
         /**
          * 第一頁
          */
         function pageFirst() {
+            stopRowScrollAnimation();
             if (_pageNow === 1) { return; }
             _pageNow = 1;
             showPage();
@@ -1647,6 +1882,7 @@ export class BulkView {
          * 最後一頁
          */
         function pageLast() {
+            stopRowScrollAnimation();
             const pageMax = Math.max(1, Math.ceil(_arFile.length / _imgMaxCount));
             if (_pageNow === pageMax) { return; }
             _pageNow = pageMax;

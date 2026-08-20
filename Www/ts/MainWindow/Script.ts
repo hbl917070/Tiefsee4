@@ -301,6 +301,12 @@ export class Script {
                 await this.M.script.bulkView.close();
             }
         }
+        else if (s === hotkeyActionKeys.prevRow) { // 上一行
+            this.bulkView.rowPrev();
+        }
+        else if (s === hotkeyActionKeys.nextRow) { // 下一行
+            this.bulkView.rowNext();
+        }
         else if (s === hotkeyActionKeys.prevPage) { // 上一頁
             this.bulkView.pagePrev();
         }
@@ -1971,6 +1977,18 @@ export class ScriptBulkView {
     public pagePrev() {
         if (this.M.fileLoad.getIsBulkView() === false) { return; }
         this.M.bulkView.pagePrev();
+    }
+
+    /** 下一行 */
+    public rowNext() {
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
+        this.M.bulkView.rowNext();
+    }
+
+    /** 上一行 */
+    public rowPrev() {
+        if (this.M.fileLoad.getIsBulkView() === false) { return; }
+        this.M.bulkView.rowPrev();
     }
 
     /** 第一頁 */

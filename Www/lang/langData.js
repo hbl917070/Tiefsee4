@@ -3650,6 +3650,18 @@ var langData = {
             "en": "Exit Bulk View",
             "ja": "バルクビューを終了",
         },
+        prevRow: {
+            "zh-TW": "上一行",
+            "zh-CN": "上一行",
+            "en": "Previous Row",
+            "ja": "前の行",
+        },
+        nextRow: {
+            "zh-TW": "下一行",
+            "zh-CN": "下一行",
+            "en": "Next Row",
+            "ja": "次の行",
+        },
         prevPage: {
             "zh-TW": "上一頁",
             "zh-CN": "上一页",

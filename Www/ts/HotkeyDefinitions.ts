@@ -1,5 +1,5 @@
 export type HotkeySubOption = "distancePx" | "path" | "folderPath" | "filePath" | "numberValue";
-export type ActionInput = "hotkey" | "mouse";
+export type ActionInput = "hotkey" | "mouse" | "scrollWheelButton";
 
 export type HotkeyCategoryKey = "image" | "file" | "copy" | "layout" | "interaction" | "bulkView";
 
@@ -113,7 +113,9 @@ export const hotkeyDefinitions = [
         content: [
             { key: "bulkView", inputs: ["hotkey", "mouse"] }, // 切換大量瀏覽模式
             { key: "closeBulkView", inputs: ["mouse"] }, // 退出大量瀏覽模式
-            { key: "movePage", inputs: ["mouse"] }, // 移動頁面 (瀏覽器預設功能，實則不做任何事情)
+            { key: "movePage", inputs: ["scrollWheelButton"] }, // 移動頁面 (瀏覽器預設功能，實則不做任何事情)
+            { key: "prevRow", inputs: ["hotkey", "mouse"] }, // 上一行
+            { key: "nextRow", inputs: ["hotkey", "mouse"] }, // 下一行
             { key: "prevPage", inputs: ["hotkey", "mouse"] }, // 上一頁
             { key: "nextPage", inputs: ["hotkey", "mouse"] }, // 下一頁
             { key: "firstPage", inputs: ["hotkey", "mouse"] }, // 移至第一頁

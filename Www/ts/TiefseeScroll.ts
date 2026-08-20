@@ -10,6 +10,7 @@ export class TiefseeScroll {
     public getTop;
     public setTop;
     public setValue;
+    public syncGeneralPosition;
     public update;
     public initGeneral;
     public initTiefseeScroll;
@@ -32,6 +33,7 @@ export class TiefseeScroll {
         this.setTop = setTop;
         this.getTop = getTop;
         this.setValue = setValue;
+        this.syncGeneralPosition = syncGeneralPosition;
         this.update = update;
         this.initGeneral = initGeneral;
         this.initTiefseeScroll = initTiefseeScroll;
@@ -114,15 +116,13 @@ export class TiefseeScroll {
                         domPanel.scrollTop = domContent.clientHeight - domPanel.clientHeight;
                     }
                     val = domPanel.scrollTop;
-                    _domScroll.style.top = val + "px"; // 坐標定位
                 } else {
                     if (domPanel.scrollLeft > domContent.clientWidth - domPanel.clientWidth) {
                         domPanel.scrollLeft = domContent.clientWidth - domPanel.clientWidth;
                     }
                     val = domPanel.scrollLeft;
-                    _domScroll.style.left = val + "px"; // 坐標定位
                 }
-                setValue(val);
+                syncGeneralPosition(val);
             })
 
             // 區塊或body改變大小時，更新拖曳條的坐標
@@ -268,6 +268,23 @@ export class TiefseeScroll {
             }
 
             setTop(val, "set");
+        }
+
+        /**
+         * 同步一般滾動條的位置與滑塊。
+         *
+         * 一般滾動條是可捲動容器的子元素，容器捲動時需要同步抵銷
+         * .scroll-y/.scroll-x 的自然位移。提供給平滑捲動動畫在同一個
+         * 動畫步驟內更新，避免只等待 scroll event 才進行補償。
+         * @param val 內容容器目前的 scrollTop 或 scrollLeft
+         */
+        function syncGeneralPosition(val: number) {
+            if (_type === "y") {
+                _domScroll.style.top = val + "px";
+            } else {
+                _domScroll.style.left = val + "px";
+            }
+            setValue(val);
         }
 
         /**
