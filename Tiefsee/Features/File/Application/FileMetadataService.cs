@@ -53,6 +53,7 @@ public class FileMetadataService {
         // ifd0W , ifd0H 儲存 IFD0 的 Image Width/Height 作為沒有其它 Image Width/Height 時的備用
         string ifd0W = "";
         string ifd0H = "";
+        bool hasNovelAiPrompt = false;
         IEnumerable<MetadataExtractor.Directory> directories;
 
         try {
@@ -72,6 +73,9 @@ public class FileMetadataService {
 
                 if (name == "Red TRC" || name == "Green TRC" || name == "Blue TRC") {
                     continue;
+                }
+                if (value.Length <= maxLength && NovelAiStealthMetadataReader.ContainsNovelAiPrompt(value)) {
+                    hasNovelAiPrompt = true;
                 }
                 if (value.Length > maxLength) { // 某些圖片可能把二進制資訊封裝進去
                     continue;
@@ -206,6 +210,17 @@ public class FileMetadataService {
                     });
                 }
             }
+        }
+
+        // 一般 PNG metadata 沒有 prompt 時，才檢查 NovelAI 的 alpha channel stealth metadata。
+        // 此 fallback 保留在 metadata service 內，避免讓 FileInfo2、HeaderHex 與前端模型產生耦合。
+        if (!hasNovelAiPrompt
+            && NovelAiStealthMetadataReader.TryReadComment(path, maxLength, out string stealthComment)) {
+            metadata.data.Add(new FileMetadataItem {
+                group = "PNG-stealth",
+                name = "Textual Data",
+                value = "Comment: " + stealthComment
+            });
         }
 
         // 如果不存在 IFD0 外的 Image Width/Height，則使用 IFD0 的值
