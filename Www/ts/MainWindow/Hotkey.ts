@@ -34,6 +34,11 @@ export class Hotkey {
             const hotkey = Lib.keyboardEventToHotkeyString(e);
             if (hotkey === "") { return; }
 
+            // 快速預覽時，避免長按空白鍵觸發 WebView 預設的向下捲動
+            if (M.getIsQuickLook() && e.code === "Space") {
+                e.preventDefault();
+            }
+
             // 最高優先級：在訊息視窗開啟時，Enter 和 Escape 直接對應到確認和取消
             if (M.msgbox.isShow()) {
                 if ((e.code === "Enter" || e.code === "NumpadEnter")) {
