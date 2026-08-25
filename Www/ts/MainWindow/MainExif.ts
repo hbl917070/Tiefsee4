@@ -436,6 +436,14 @@ export class MainExif {
 							value: "parameters: " + value
 						});
 					}
+					// StableSwarmUI 輸出的 jpg
+					else if (value.includes(`"sui_image_params":`)) {
+						ar.push({
+							group: "PNG-tEXt",
+							name: "Textual Data",
+							value: "parameters: " + value
+						});
+					}
 					else {
 
 						const jsonF = Lib.jsonStrFormat(value);
@@ -635,7 +643,7 @@ export class MainExif {
 			// 解析 ComfyUI 
 			if (comfyuiPrompt !== undefined) {
 				let jsonF = Lib.jsonStrFormat(comfyuiPrompt);
-				if (jsonF.ok) { // 解析欄位		
+				if (jsonF.ok) { // 解析欄位
 					let cdata = AiParsingUtility.getComfyui(comfyuiPrompt);
 					for (let i = 0; i < cdata.length; i++) {
 						const node = cdata[i].nodeTitle;
