@@ -23,8 +23,8 @@ export function getComfyui(jsonStr: string) {
         try {
             // 將 NaN 轉成 null
             jsonStr = jsonStr
-                .replace(/": NaN/g, `": null`)
-                .replace(/": \[NaN/g, `": [null`);
+                .replace(/":[ ]?NaN/g, `": null`)
+                .replace(/":[ ]?\[NaN/g, `": [null`);
             _json = JSON.parse(jsonStr);
         } catch (e) {
             return [];

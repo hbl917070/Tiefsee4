@@ -645,8 +645,9 @@ export class Lib {
         ) {
             try {
                 // 將 NaN 轉成 null
-                str = str.replace(/": NaN/g, `": null`)
-                    .replace(/": \[NaN/g, `": [null`);
+                str = str
+                    .replace(/":[ ]?NaN/g, `": null`)
+                    .replace(/":[ ]?\[NaN/g, `": [null`);
                 json = JSON.parse(str);
                 jsonFormat = JSON.stringify(json, null, space);
                 ok = true;
