@@ -5,8 +5,8 @@ import { Lib } from "../../Lib";
  */
 export function getComfyui(jsonStr: string) {
 
-    const _promptBaseKeys = ["positive", "text_positive", "populated_text", "text", "text_g", "conditioning", "prompt", "string", "t5xxl", "text_b", "base_ctx", "text_pos_g", "file_path", "any",];
-    const _negativePromptBaseKeys = ["negative", "text_negative", "populated_text", "text", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path", "any",];
+    const _promptBaseKeys = ["positive", "text_positive", "CLIPTextEncode", "populated_text", "text", "text_g", "conditioning", "prompt", "string", "t5xxl", "Prompt T5 XXL", "text_b", "base_ctx", "text_pos_g", "file_path", "any"];
+    const _negativePromptBaseKeys = ["negative", "text_negative", "CLIPTextEncode", "populated_text", "text", "conditioning", "prompt", "string", "t5xxl", "n_prompt", "base_ctx", "text_neg_g", "file_path", "any",];
     const _stepsBaseKeys = ["steps"];
     const _samplerBaseKeys = ["sampler_name", "sampler"];
     const _schedulerBaseKeys = ["scheduler"];
@@ -93,6 +93,26 @@ export function getComfyui(jsonStr: string) {
     }
 
     /**
+     * 取得布林值輸入。ComfySwitchNode 的 switch 通常會連到 PrimitiveBoolean 的 value。
+     */
+    function getBooleanValue(value: any): boolean | undefined {
+        if (typeof value === "boolean") { return value; }
+
+        if (typeof value === "string") {
+            const normalized = value.trim().toLowerCase();
+            if (normalized === "true") { return true; }
+            if (normalized === "false") { return false; }
+            return undefined;
+        }
+
+        const key = getItemKey(value);
+        if (key === undefined) { return undefined; }
+
+        const obj = _json[key];
+        return getBooleanValue(obj?.inputs?.value);
+    }
+
+    /**
      * 檢查值是否為字串或數字 (用於避免回傳 array 或 object)
      */
     function getStringValue(value: any) {
@@ -176,6 +196,15 @@ export function getComfyui(jsonStr: string) {
         const inputs = obj.inputs;
         if (inputs === undefined) { return undefined; }
 
+        // PrimitiveStringMultiline 的文字直接存放在 value；其他節點不可一律套用此規則。
+        if (obj.class_type === "PrimitiveStringMultiline") {
+            if (typeof inputs.value === "string") { return inputs.value; }
+
+            const valueKey = getItemKey(inputs.value);
+            if (valueKey === undefined || valueKey === key) { return undefined; }
+            return getPrompt(valueKey, [...searchKeys, "value"], allowNumber);
+        }
+
         // 處理需要串接字串的節點
         if (obj.class_type === "Text Concatenate (JPS)") {
             return getConcatenatedPrompts("text", key, searchKeys);
@@ -185,6 +214,9 @@ export function getComfyui(jsonStr: string) {
         }
         else if (obj.class_type === "JoinStrings") {
             return getConcatenatedPrompts("string", key, searchKeys);
+        }
+        else if (obj.class_type === "CR Text Concatenate") {
+            return getConcatenatedPrompts("text", key, searchKeys);
         }
         else if (obj.class_type === "Text Concatenate") {
             return getConcatenatedPrompts(
@@ -202,6 +234,30 @@ export function getComfyui(jsonStr: string) {
         }
         else if (obj.class_type === "StringConcatenate") {
             return getConcatenatedPrompts(["string_a", "string_b"], key, searchKeys);
+        }
+
+        // switch 節點
+        else if (obj.class_type === "ComfySwitchNode") {
+            const switchValue = getBooleanValue(inputs.switch);
+            if (switchValue === undefined) { return undefined; }
+
+            const selectedInput = switchValue ? inputs.on_true : inputs.on_false;
+            const targetKey = getItemKey(selectedInput);
+            if (targetKey !== undefined) {
+                return getPrompt(targetKey, searchKeys, allowNumber);
+            }
+
+            // 未連接節點時，分支值可能直接存在輸入中。
+            if (typeof selectedInput === "string") { return selectedInput; }
+            if (allowNumber && typeof selectedInput === "number") {
+                return toFixedPrecision(selectedInput).toString();
+            }
+            return undefined;
+        }
+
+        // 通常用於將 負面提示詞 清空
+        else if (obj.class_type === "ConditioningZeroOut") {
+            return "";
         }
 
         // 需要單獨處理的節點
@@ -428,7 +484,8 @@ export function getComfyui(jsonStr: string) {
     // SamplerCustomAdvanced
     foreachNode((item, inputs, classType) => {
         if (classType === "SamplerCustomAdvanced") {
-            const prompt = getPrompt(getItemKey(inputs.guider), [..._promptBaseKeys, "Prompt T5 XXL"]);
+            const prompt = getPrompt(getItemKey(inputs.guider), _promptBaseKeys);
+            const negative = getPrompt(getItemKey(inputs.guider), _negativePromptBaseKeys);
             const steps = getPrompt(getItemKey(inputs.sigmas), _stepsBaseKeys, true);
             const sampler = getPrompt(getItemKey(inputs.sampler), _samplerBaseKeys);
             const scheduler = getPrompt(getItemKey(inputs.sigmas), _schedulerBaseKeys);
@@ -438,6 +495,7 @@ export function getComfyui(jsonStr: string) {
 
             retPush(classType, [
                 { title: "Prompt", text: prompt },
+                { title: "Negative prompt", text: negative },
                 { title: "Steps", text: steps },
                 { title: "Sampler", text: sampler },
                 { title: "Scheduler", text: scheduler },
