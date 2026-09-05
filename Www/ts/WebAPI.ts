@@ -1,4 +1,5 @@
 import { Lib } from "./Lib";
+import { parseApiResponseJson, unwrapApiResponse, WebApiError } from "./ApiResponse";
 
 import { ArchiveApiClient } from "./Archive/ArchiveApi";
 
@@ -20,7 +21,7 @@ export class WebAPI {
         static async getSiblingDir(path: string, arExt: string[], maxCount: number) {
             let url = APIURL + "/api/directory/getSiblingDir";
             let postData = { path: path, arExt: arExt, maxCount: maxCount };
-            let retJson = await WebAPI.sendPost(url, postData);
+            let retJson: Record<string, string[]> = await WebAPI.sendApiPost(url, postData);
 
             let parentPath = Lib.getDirectoryName(path) ?? path;
 
@@ -51,7 +52,7 @@ export class WebAPI {
 
             let url = APIURL + "/api/directory/getFiles2";
             let postData = { dirPath: dirPath, arName: arName };
-            let retAr: string[] = await WebAPI.sendPost(url, postData);
+            let retAr: string[] = await WebAPI.sendApiPost(url, postData);
             for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = dirPath + retAr[i];
             }
@@ -64,7 +65,7 @@ export class WebAPI {
         static async getFiles(path: string, searchPattern: string) {
             let url = APIURL + "/api/directory/getFiles";
             let postData = { path: path, searchPattern: searchPattern };
-            let retAr: string[] = await WebAPI.sendPost(url, postData);
+            let retAr: string[] = await WebAPI.sendApiPost(url, postData);
             for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
@@ -77,7 +78,7 @@ export class WebAPI {
         static async getDirectories(path: string, searchPattern: string) {
             let url = APIURL + "/api/directory/getDirectories";
             let postData = { path: path, searchPattern: searchPattern };
-            let retAr: string[] = await WebAPI.sendPost(url, postData);
+            let retAr: string[] = await WebAPI.sendApiPost(url, postData);
             for (let i = 0; i < retAr.length; i++) { // 把檔名轉成完整路徑
                 retAr[i] = path + retAr[i];
             }
@@ -238,12 +239,45 @@ export class WebAPI {
     }
 
     /**
+     * 呼叫使用 ApiResponse envelope 的 POST API。
+     * 這個 wrapper 只處理回應格式與 API 例外，不決定畫面上的錯誤行為。
+     */
+    static async sendApiPost<T>(url: string, postData: any): Promise<T> {
+        let response: Response;
+        try {
+            response = await fetch(url, {
+                body: JSON.stringify(postData),
+                method: "POST",
+                priority: "high", // 高優先權
+            });
+        }
+        catch (error) {
+            // 網路層失敗不在 API wrapper 內吞掉，轉成統一例外交給載入流程處理。
+            console.error("sendApiPost Error: ", error);
+            const message = error instanceof Error ? error.message : "網路請求失敗。";
+            throw new WebApiError("networkError", message, 0);
+        }
+
+        let body: unknown;
+        try {
+            body = await response.json();
+        }
+        catch {
+            // 非 JSON 回應視為 API 格式錯誤，交給上層顯示適當的載入失敗行為。
+            console.error("sendApiPost Invalid JSON: ", response.status);
+            throw new WebApiError("invalidJson", "API 回應不是有效的 JSON。", response.status);
+        }
+
+        return unwrapApiResponse<T>(body, response.status);
+    }
+
+    /**
      * 排序
      */
     static async sort(ar: string[], type: string) {
         const url = APIURL + "/api/sort";
         const postData = { ar: ar, type: type };
-        return WebAPI.sendPost(url, postData);
+        return WebAPI.sendApiPost<string[]>(url, postData);
     }
 
     /**
@@ -264,7 +298,7 @@ export class WebAPI {
             }
         }
 
-        let retAr = [];
+        let retAr: string[] = [];
         // 把每一筆資料都剪成只有結尾的部分(通常是檔名)
         let dirPathLen = dirPath.length;
         for (let i = 0; i < ar.length; i++) {
@@ -276,7 +310,7 @@ export class WebAPI {
         } else {
             let url = APIURL + "/api/sort2";
             let postData = { dir: dirPath, ar: retAr, type: type };
-            retAr = await WebAPI.sendPost(url, postData);
+            retAr = await WebAPI.sendApiPost<string[]>(url, postData);
         }
 
         // 把排序後的資料恢復到完整路徑
@@ -361,7 +395,7 @@ export class WebAPI {
      */
     static async getFileInfo2(path: string) {
         const s = await WV_File.GetFileInfo2(path);
-        const json: FileInfo2 = JSON.parse(s);
+        const json = parseApiResponseJson<FileInfo2>(s);
         json.FullPath = json.Path;
         return json;
         /*let encodePath = encodeURIComponent(path);
@@ -376,7 +410,7 @@ export class WebAPI {
     static async getFileInfo2List(arPath: string[]) {
         const url = APIURL + "/api/getFileInfo2List";
         const postData = { ar: arPath };
-        const retAr = await WebAPI.sendPost(url, postData);
+        const retAr = await WebAPI.sendApiPost<FileInfo2[]>(url, postData);
         for (let i = 0; i < retAr.length; i++) {
             retAr[i].FullPath = retAr[i].Path;
         }

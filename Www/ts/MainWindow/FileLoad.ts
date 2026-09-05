@@ -1,4 +1,5 @@
 import { GroupType } from "../Config";
+import { getExceptionMessage } from "../ApiResponse";
 import { Lib } from "../Lib";
 import { Throttle } from "../Throttle";
 import { Toast } from "../Toast";
@@ -223,7 +224,7 @@ export class FileLoad {
             if (_arDirKey.length === 0) { return; }
 
             // 如果找不到資料夾，就重新讀取名單
-            await initDirList(_dirPathNow); // 取得資料夾名單
+            if (await initDirList(_dirPathNow) === false) { return; } // 取得資料夾名單
             await M.dirSort.sort();
             M.mainDirList.init();
 
@@ -255,7 +256,7 @@ export class FileLoad {
         /**
          * 資料夾預覽視窗初始化 (重新讀取列表
          */
-        async function initDirList(dirPath: string) {
+        async function initDirList(dirPath: string): Promise<boolean> {
 
             const arExt: string[] = [];
             // let ar = M.config.allowFileType(GroupType.img);
@@ -274,12 +275,25 @@ export class FileLoad {
             }
 
             const maxCount = M.config.settings.advanced.dirListMaxCount;
-            const json = await WebAPI.Directory.getSiblingDir(_dirPathNow, arExt, maxCount);
+            let json: { [key: string]: string[] };
+            try {
+                json = await WebAPI.Directory.getSiblingDir(_dirPathNow, arExt, maxCount);
+            }
+            catch (error) {
+                // 資料夾面板清單 API 失敗時清空面板、提示使用者，主 viewer 不變。
+                console.error("[FileLoad] 資料夾預覽清單載入失敗。", error);
+                _showDirThrottle.run = undefined;
+                _atLoadingDirParent = "";
+                M.mainDirList.init();
+                Toast.show(M.i18n.t("msg.directoryPanelReadFailed", { message: getExceptionMessage(error) }), 1000 * 3);
+                return false;
+            }
 
-            if (_dirPathNow !== dirPath) { return; }
+            if (_dirPathNow !== dirPath) { return true; }
 
             _arDir = json;
             _arDirKey = Object.keys(_arDir);
+            return true;
         }
 
         /**
@@ -339,7 +353,7 @@ export class FileLoad {
             }
 
             // 更新 UI
-            await updateFlagDir(path); // 重新計算 flagDir
+            await updateFlagDir(path);
             M.mainDirList.select();
             M.mainDirList.updateLocation();
 
@@ -430,6 +444,8 @@ export class FileLoad {
 
         /**
          * 處理資料夾預覽視窗
+         * 清單 API 的例外由 initDirList 處理，排序 API 的例外由 DirSort.sort
+         * 降級處理；這裡只保留資料夾面板的正常流程。
          * @param dirPath 
          */
         async function loadDir(dirPath: string) {
@@ -438,7 +454,8 @@ export class FileLoad {
 
             if (await isUpdateDirList(dirPath)) { // 載入不同資料夾，需要重新讀取
 
-                await initDirList(dirPath); // 取得資料夾名單
+                // initDirList 失敗時已清理面板並回傳 false，主 viewer 不變。
+                if (await initDirList(dirPath) === false) { return; }
 
                 let dirParentPath = Lib.getDirectoryName(dirPath); // 使用 父親資料夾 當做key來取得排序
                 if (dirParentPath === null) {
@@ -449,6 +466,7 @@ export class FileLoad {
 
                 M.dirSort.readSortType(dirParentPath); // 取得該資料夾設定的檔案排序方式
                 M.dirSort.updateMenu(); // 更新menu選單
+                // DirSort.sort 失敗時會改用檔名排序，因此這裡仍可完成面板更新。
                 await M.dirSort.sort(dirPath);
 
                 await updateFlagDir(dirPath); // 重新計算 flagDir
@@ -529,11 +547,9 @@ export class FileLoad {
             M.menu.close();
             M.textEditor.close();
 
-            if (files.length > 1) {
-                await loadFiles(files);
-            } else {
-                await loadFile(files[0]);
-            }
+            // 拖曳入口的必要載入 API 失敗時，清理狀態並返回歡迎頁。
+            await (files.length > 1 ? loadFiles(files) : loadFile(files[0]))
+                .catch(error => showFileLoadFailure(error, "msg.fileReadFailed"));
         }
 
         /**
@@ -816,8 +832,12 @@ export class FileLoad {
             _fileLoadType = FileLoadType.dir; // 名單類型，資料夾內的檔案
 
             await leaveArchiveMode();
-
-            const fileInfo2 = await WebAPI.getFileInfo2(path);
+            // 尚未建立可用清單時，檔案資訊失敗只能清理狀態並返回歡迎頁。
+            let fileInfo2: FileInfo2 | undefined = await WebAPI.getFileInfo2(path)
+                .catch(error => showFileLoadFailure(error, "msg.fileReadFailed").then(() => undefined));
+            if (fileInfo2 === undefined) {
+                return;
+            }
             path = fileInfo2.Path; // 避免長路經被轉成虛擬路徑
 
             //let dirPath = "";
@@ -830,12 +850,20 @@ export class FileLoad {
                 isFile = false;
 
                 _dirPathNow = path;
-                _arFile = await WebAPI.Directory.getFiles(path, "*.*"); // 取得資料夾內所有檔案
+                try {
+                    _arFile = await WebAPI.Directory.getFiles(path, "*.*"); // 取得資料夾內所有檔案
 
-                await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
+                    await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
+                }
+                catch (error) {
+                    // 直接開啟資料夾時清單 API 失敗，沒有可保留的目標檔案，返回歡迎頁。
+                    await showFileLoadFailure(error, "msg.directoryReadFailed");
+                    return;
+                }
 
                 M.fileSort.readSortType(path); // 取得該資料夾設定的檔案排序方式
                 M.fileSort.updateMenu(); // 更新menu選單
+                // 排序 API 失敗時由 FileSort 改用檔名排序，這裡維持資料夾正常載入流程。
                 _arFile = await M.fileSort.sort(_arFile);
 
                 if (dirGroupType === undefined) {
@@ -866,7 +894,7 @@ export class FileLoad {
 
                 let dirPath = Lib.getDirectoryName(path); // 取得檔案所在的資料夾路徑
                 if (dirPath === null) {
-                    _isLoadFileFinish = true;
+                    await showFileLoadFailure(new Error("檔案沒有所在的資料夾。"), "msg.fileReadFailed");
                     return;
                 }
                 _dirPathNow = dirPath;
@@ -874,16 +902,23 @@ export class FileLoad {
                 _atLoadingGroupType = _groupType;
                 _atLoadingExt = Lib.getExtension(path);
 
-                await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
-
                 _arFile = [path];
                 _flagFile = 0;
-                //M.mainFileList.init(); // 檔案預覽視窗 初始化 
+                //M.mainFileList.init(); // 檔案預覽視窗 初始化
                 if (_isBulkView === false && noLoad === false) { // 在讀取完資料夾名單前，先顯示圖片
                     await showFileUpdataImg(fileInfo2);
                     M.mainExif.init(fileInfo2, true); // 初始化exif
                 }
-                _arFile = await WebAPI.Directory.getFiles(_dirPathNow, "*.*");
+
+                try {
+                    await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
+                    _arFile = await WebAPI.Directory.getFiles(_dirPathNow, "*.*");
+                }
+                catch (error) {
+                    // 目標檔案已取得資訊；同層清單失敗時改成只保留目標檔案。
+                    await showSingleFileFallback(path, fileInfo2, error, "msg.fileListReadFailed", noLoad);
+                    return;
+                }
                 _arFile = await filter(Lib.getExtension(path));
                 if (_arFile.indexOf(path) === -1) {
                     _arFile.splice(0, 0, path);
@@ -891,14 +926,14 @@ export class FileLoad {
 
                 M.fileSort.readSortType(_dirPathNow); // 取得該資料夾設定的檔案排序方式
                 M.fileSort.updateMenu(); // 更新menu選單
+                // 排序 API 失敗時由 FileSort 改用檔名排序，保留完整的已讀取清單。
                 _arFile = await M.fileSort.sort(_arFile);
 
                 _flagFile = _arFile.indexOf(path);
 
             } else { // 不存在
 
-                M.fileShow.openWelcome();
-                _isLoadFileFinish = true;
+                await showFileLoadFailure(new Error("檔案資訊沒有回傳有效的檔案類型。"), "msg.fileReadFailed");
                 return;
             }
 
@@ -1089,6 +1124,85 @@ export class FileLoad {
             _arArchiveItem = [];
         }
 
+        /**
+         * 必要的檔案載入流程失敗時清理狀態並返回歡迎頁面。
+         * API layer 只會拋出例外，這裡才決定清單／入口失敗的 UI 行為。
+         */
+        async function showFileLoadFailure(error: unknown, messageKey: string) {
+            console.error("[FileLoad] 檔案載入失敗。", error);
+            _showFileThrottle.run = undefined;
+            _showDirThrottle.run = undefined;
+            _arFile = [];
+            _arArchiveItem = [];
+            _flagFile = 0;
+            _dirPathNow = "";
+            _atLoadingDirParent = "";
+            clearDir();
+            _flagDir = 0;
+
+            // watcher 停止失敗時只記錄，仍繼續回到歡迎頁。
+            await stopFileWatcher().catch(cleanupError =>
+                console.warn("[FileLoad] 停止檔案監控失敗。", cleanupError));
+
+            M.mainFileList.init();
+            await M.fileShow.openWelcome();
+            _isLoadFileFinish = true;
+            Toast.show(M.i18n.t(messageKey, { message: getExceptionMessage(error) }), 1000 * 3);
+        }
+
+        /**
+         * 清單已存在但目前檔案的資訊或內容載入失敗時，保留清單並顯示 error.svg。
+         * 這裡只處理 viewer fallback，不清空檔案狀態；API 例外仍由呼叫端決定是否要回歡迎頁。
+         */
+        async function showFileLoadErrorImage(error: unknown, fileInfo2?: FileInfo2, failurePath?: string) {
+            if (failurePath !== undefined && _arFile.length > 0 && getFilePath() !== failurePath) {
+                return;
+            }
+
+            console.error("[FileLoad] 目前檔案內容載入失敗，顯示錯誤圖片。", error);
+            // 錯誤圖片本身載入失敗時只記錄，仍要完成 Toast，避免產生未處理的 Promise rejection。
+            await M.fileShow.openErrorImage(fileInfo2).catch(fallbackError =>
+                console.warn("[FileLoad] 載入錯誤圖片失敗。", fallbackError));
+            Toast.show(M.i18n.t("msg.fileReadFailed", { message: getExceptionMessage(error) }), 1000 * 3);
+        }
+
+        /**
+         * 目標檔案已經可以顯示，但同層清單讀取失敗時，保留單檔清單。
+         */
+        async function showSingleFileFallback(
+            path: string,
+            fileInfo2: FileInfo2,
+            error: unknown,
+            messageKey: string,
+            noLoad: boolean,
+        ) {
+            console.error("[FileLoad] 檔案清單處理失敗，降級為單檔。", error);
+            _fileLoadType = FileLoadType.userDefined;
+            _arFile = [path];
+            _flagFile = 0;
+            _showDirThrottle.run = undefined;
+            _atLoadingDirParent = "";
+            clearDir();
+            _flagDir = 0;
+
+            // 單檔降級時兩個 watcher 停止失敗只記錄，不影響目前檔案的保留與顯示。
+            await stopFileWatcher().catch(cleanupError =>
+                console.warn("[FileLoad] 停止檔案監控失敗。", cleanupError));
+
+            M.mainFileList.setHide(false);
+            M.mainFileList.init();
+            M.mainFileList.setStartLocation();
+            updateTitle();
+
+            if (noLoad === false) {
+                M.mainExif.init(fileInfo2, true);
+                await showFileUpdataImg(fileInfo2);
+            }
+
+            _isLoadFileFinish = true;
+            Toast.show(M.i18n.t(messageKey, { message: getExceptionMessage(error) }), 1000 * 3);
+        }
+
         /** 
          * 重新載入檔案預覽面板
          */
@@ -1170,7 +1284,7 @@ export class FileLoad {
                 return;
             }
             if (_arFile.length === 0) { // 如果資料夾裡面沒有圖片
-                Toast.show(M.i18n.t("msg.imageNotFound"), 1000 * 3); // 未檢測到圖片     
+                Toast.show(M.i18n.t("msg.imageNotFound"), 1000 * 3); // 未檢測到圖片
                 M.fileShow.openWelcome();
                 _showFileThrottle.run = async () => {
                     _atLoadingDirParent = "";
@@ -1189,12 +1303,28 @@ export class FileLoad {
                 return;
             }
 
-            let path = getFilePath();
-            let fileInfo2 = await WebAPI.getFileInfo2(path);
+            const loadingPath = getFilePath();
+            // 清單已建立時，當前檔案資訊失敗只顯示 error.svg，不清空清單。
+            let fileInfo2: FileInfo2 | undefined = await WebAPI.getFileInfo2(loadingPath)
+                .catch(async error => {
+                    // 例外不應跳過檔案列表焦點與 title 更新；這些狀態不依賴檔案資訊內容。
+                    await showFileUpdataUI();
+                    await showFileLoadErrorImage(error, undefined, loadingPath);
+                    return undefined;
+                });
+            if (fileInfo2 === undefined) {
+                if (_isBulkView) {
+                    // 大量瀏覽已先切換狀態；目前檔案資訊失敗時仍完成列表初始化，避免只切換一半。
+                    await M.fileShow.openBulkView().catch(error =>
+                        showFileLoadErrorImage(error, undefined, loadingPath));
+                }
+                return;
+            }
             if (fileInfo2.Type !== "none") {
                 M.mainExif.init(fileInfo2); // 初始化exif
                 await showFileUpdataUI();
             }
+
             await showFileUpdataImg(fileInfo2);
         }
 
@@ -1316,35 +1446,51 @@ export class FileLoad {
                 _groupType = fileToGroupType(fileInfo2); // 從檔案類型判斷，要使用什麼用什麼類型來顯示
             }
 
+            const loadingPath = _isArchiveMode ? undefined : getFilePath();
             _showFileThrottle.run = async () => {
+                const handleLoadError = async (error: unknown) => {
+                    if (_isArchiveMode) {
+                        // archive entry 維持既有處理方式，只記錄失敗，避免清掉整個 archive session。
+                        console.error("[Archive] 檔案內容載入失敗。", error);
+                        return;
+                    }
+                    // 一般檔案 viewer 失敗時保留清單，顯示 error.svg 並提示使用者。
+                    await showFileLoadErrorImage(error, fileInfo2, loadingPath);
+                };
+                const loadViewer = (viewer: Promise<void>) => viewer.catch(handleLoadError);
 
                 if (_isBulkView) {
-                    await M.fileShow.openBulkView();
+                    await loadViewer(M.fileShow.openBulkView());
 
                 } else {
 
                     // 把長路經轉回虛擬路徑，避免瀏覽器無法載入圖片
                     if (fileInfo2.Path.length > 255) {
-                        fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
+                        try {
+                            fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
+                        }
+                        catch (error) {
+                            await handleLoadError(error);
+                            return;
+                        }
                     }
 
                     if (_groupType === GroupType.img || _groupType === GroupType.unknown) {
-                        await M.fileShow.openImage(fileInfo2);
+                        await loadViewer(M.fileShow.openImage(fileInfo2));
                     }
                     if (_groupType === GroupType.video) {
-                        await M.fileShow.openVideo(fileInfo2);
+                        await loadViewer(M.fileShow.openVideo(fileInfo2));
                     }
                     if (_groupType === GroupType.pdf) {
-                        await M.fileShow.openPdf(fileInfo2);
+                        await loadViewer(M.fileShow.openPdf(fileInfo2));
                     }
                     if (_groupType === GroupType.txt) {
-                        await M.fileShow.openTxt(fileInfo2);
+                        await loadViewer(M.fileShow.openTxt(fileInfo2));
                     }
                     /*if (path !== getFilePath()) {
                         console.error(`${path}  ${getFilePath()}`);
                     }*/
                 }
-
             }
         }
 

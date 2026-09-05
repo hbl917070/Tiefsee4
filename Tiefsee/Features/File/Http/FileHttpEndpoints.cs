@@ -111,12 +111,19 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// 取得文字檔
     /// </summary>
     private async Task GetText(RequestData d) {
-        string path = Uri.UnescapeDataString(d.args["path"]);
+        try {
+            string path = Uri.UnescapeDataString(d.args["path"]);
 
-        if (await CheckFileExist(d, path) == false) { return; }
-        if (HeadersAdd304(d, path)) { return; }
-
-        await WriteString(d, FileInfoHelper.GetText(path));
+            if (await CheckFileExist(d, path) == false) { return; }
+            if (HeadersAdd304(d, path)) { return; }
+            await WriteString(d, FileInfoHelper.GetText(path));
+        }
+        catch (Exception exception) {
+            // 文字內容成功時維持純文字回應；只有失敗時回傳安全訊息，避免前端把例外內容當成檔案文字。
+            Console.Error.WriteLine($"[API] {exception}");
+            var error = ApiErrorMapper.Map(exception);
+            await WriteError(d, error.StatusCode, error.Message);
+        }
     }
 
     /// <summary>
@@ -240,22 +247,30 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// 取得單一檔案的詳細資訊
     /// </summary>
     private async Task GetFileInfo(RequestData d) {
-        string path = Uri.UnescapeDataString(d.args["path"]);
+        try {
+            string path = Uri.UnescapeDataString(d.args["path"]);
 
-        if (await CheckFileExist(d, path) == false) { return; }
-        if (HeadersAdd304(d, path)) { return; }
+            EnsureFileExistsApi(path);
+            if (HeadersAdd304(d, path)) { return; }
 
-        await WriteJson(d, FileInfoHelper.GetFileInfo2(path));
+            await WriteApiSuccess(d, FileInfoHelper.GetFileInfo2(path));
+        }
+        catch (Exception exception) {
+            // 檔案資訊讀取失敗時仍回傳固定 envelope，讓前端以 errorCode 處理，不暴露 stack trace。
+            await WriteApiException(d, exception);
+        }
     }
 
     /// <summary>
     /// 批次取得多個檔案的詳細資訊
     /// </summary>
-    private async Task GetFileInfoList(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string[] ar = json.GetStringArray("ar");
+    private Task GetFileInfoList(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string[] ar = json.GetStringArray("ar");
 
-        await WriteJson(d, FileInfoHelper.GetFileInfo2List(ar));
+            return Task.FromResult(FileInfoHelper.GetFileInfo2List(ar).ToArray());
+        });
     }
 
     /// <summary>

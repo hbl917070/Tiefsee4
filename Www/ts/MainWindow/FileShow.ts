@@ -292,10 +292,10 @@ export class FileShow {
         }
 
         /**
-         * 顯示 archive 載入失敗時使用的固定錯誤圖片。
+         * 顯示檔案載入失敗時使用的固定錯誤圖片，可供一般檔案與 archive entry 共用。
          *
          * 這裡不能呼叫 openImage，因為 openImage 會依傳入的 FileInfo2
-         * 取得原始壓縮檔的 icon；錯誤 fallback 必須直接載入前端資源，
+         * 取得原始檔案的內容或 icon；錯誤 fallback 必須直接載入前端資源，
          * 才能確保畫面顯示 ./img/error.svg。
          */
         async function openErrorImage(displayFileInfo2?: FileInfo2) {

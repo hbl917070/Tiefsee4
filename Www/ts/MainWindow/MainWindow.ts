@@ -1,4 +1,5 @@
 import { BaseWindow } from "../BaseWindow";
+import { getExceptionMessage } from "../ApiResponse";
 import { IndexedDBManager } from "./IndexedDBManager";
 import { MainToolbar } from "./MainToolbar";
 import { FileLoad } from "./FileLoad";
@@ -781,8 +782,16 @@ export class MainWindow {
 
             } else {
 
-                const arPath = await WebAPI.Directory.getFiles2(args);
-                await _fileLoad.loadFiles(arPath); // 載入多張圖片
+                try {
+                    const arPath = await WebAPI.Directory.getFiles2(args);
+                    await _fileLoad.loadFiles(arPath); // 載入多張圖片
+                }
+                catch (error) {
+                    // 多檔案來源解析失敗時不進入部分載入狀態，直接回到歡迎頁並提示使用者。
+                    console.error("[MainWindow] 多檔案載入失敗。", error);
+                    await _fileShow.openWelcome();
+                    Toast.show(_i18n.t("msg.fileReadFailed", { message: getExceptionMessage(error) }), 1000 * 3);
+                }
 
             }
 

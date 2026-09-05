@@ -70,6 +70,67 @@ public abstract class HttpEndpointModuleBase {
     }
 
     /// <summary>
+    /// 回傳固定格式的 API response。
+    /// </summary>
+    protected async Task WriteApiResponse<T>(RequestData d, ApiResponse<T> response, int statusCode = 200) {
+        d.context.Response.StatusCode = statusCode;
+        await WriteJson(d, response);
+    }
+
+    /// <summary>
+    /// 回傳固定格式的成功 API response。
+    /// </summary>
+    protected Task WriteApiSuccess<T>(RequestData d, T data) {
+        return WriteApiResponse(d, ApiResponse<T>.Success(data));
+    }
+
+    /// <summary>
+    /// 回傳固定格式的失敗 API response。
+    /// </summary>
+    protected Task WriteApiError(RequestData d, int statusCode, string errorCode, string message) {
+        return WriteApiResponse(d, ApiResponse<object>.Failure(errorCode, message), statusCode);
+    }
+
+    /// <summary>
+    /// 將例外記錄在 server console，並回傳不含內部細節的固定錯誤格式。
+    /// </summary>
+    protected async Task WriteApiException(RequestData d, Exception exception) {
+        Console.Error.WriteLine($"[API] {exception}");
+        var error = ApiErrorMapper.Map(exception);
+        await WriteApiError(d, error.StatusCode, error.ErrorCode, error.Message);
+    }
+
+    /// <summary>
+    /// 執行使用固定 response 格式的 endpoint。
+    /// </summary>
+    protected async Task ExecuteApi<T>(RequestData d, Func<Task<T>> handler) {
+        try {
+            await WriteApiSuccess(d, await handler());
+        }
+        catch (Exception exception) {
+            await WriteApiException(d, exception);
+        }
+    }
+
+    /// <summary>
+    /// 確保檔案存在；不存在時交由共用 API 錯誤處理回傳。
+    /// </summary>
+    protected static void EnsureFileExistsApi(string path) {
+        if (File.Exists(path) == false) {
+            throw new ApiResponseException(ApiErrorCode.PathNotFound, "找不到指定檔案。", 404);
+        }
+    }
+
+    /// <summary>
+    /// 確保資料夾存在；不存在時交由共用 API 錯誤處理回傳。
+    /// </summary>
+    protected static void EnsureDirectoryExistsApi(string path) {
+        if (Directory.Exists(path) == false) {
+            throw new ApiResponseException(ApiErrorCode.PathNotFound, "找不到指定資料夾。", 404);
+        }
+    }
+
+    /// <summary>
     /// 以 Brotli 壓縮回傳 JSON
     /// </summary>
     protected async Task WriteJson(RequestData d, object obj) {

@@ -429,6 +429,11 @@ export class Lib {
                 signal: controller.signal, // 用於取消請求
                 priority: "high", // 高優先權
             }).then((response) => {
+                if (response.ok === false) {
+                    return response.text().then(message => {
+                        throw new Error(message || `HTTP ${response.status}`);
+                    });
+                }
                 return response.text();
             }).then((html) => {
                 txt = html;

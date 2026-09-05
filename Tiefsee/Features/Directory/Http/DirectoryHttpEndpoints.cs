@@ -26,90 +26,103 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
     /// <summary>
     /// 取得同層資料夾中的代表檔案資料，用於鄰近資料夾預覽
     /// </summary>
-    private async Task GetSiblingDir(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string path = json.GetString("path");
-        string[] arExt = json.GetStringArray("arExt");
-        int maxCount = json.GetInt32("maxCount");
+    private Task GetSiblingDir(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string path = json.GetString("path");
+            string[] arExt = json.GetStringArray("arExt");
+            int maxCount = json.GetInt32("maxCount");
 
-        if (await CheckDirExist(d, path) == false) { return; }
-
-        await WriteJson(d, new DirectoryHelper().GetSiblingDir(path, arExt, maxCount));
+            EnsureDirectoryExistsApi(path);
+            return Task.FromResult(new DirectoryHelper().GetSiblingDir(path, arExt, maxCount));
+        });
     }
 
     /// <summary>
     /// 將檔名陣列轉成完整路徑陣列，再裁切回相對名稱
     /// </summary>
-    private async Task GetFiles2(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string dirPath = json.GetString("dirPath");
-        string[] arName = json.GetStringArray("arName");
+    private Task GetFiles2(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string dirPath = json.GetString("dirPath");
+            string[] arName = json.GetStringArray("arName");
 
-        // 底層仍使用既有 bridge 邏輯，這裡只負責轉成較省流量的回傳格式
-        int pathLen = dirPath.Length;
-        var ret = new DirectoryHelper().GetFiles2(dirPath, arName)
-            .Select(filePath => filePath.Substring(pathLen))
-            .ToArray();
+            EnsureDirectoryExistsApi(dirPath);
 
-        await WriteJson(d, ret);
+            // 底層仍使用既有 bridge 邏輯，這裡只負責轉成較省流量的回傳格式
+            int pathLen = dirPath.Length;
+            var ret = new DirectoryHelper().GetFiles2(dirPath, arName)
+                .Select(filePath => filePath.Substring(pathLen))
+                .ToArray();
+
+            return Task.FromResult(ret);
+        });
     }
 
     /// <summary>
     /// 回傳資料夾內符合搜尋條件的檔案名稱
     /// </summary>
-    private async Task GetFiles(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string path = json.GetString("path");
-        string searchPattern = json.GetString("searchPattern");
+    private Task GetFiles(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string path = json.GetString("path");
+            string searchPattern = json.GetString("searchPattern");
 
-        if (await CheckDirExist(d, path) == false) { return; }
+            EnsureDirectoryExistsApi(path);
 
-        int pathLen = path.Length;
-        var ret = Directory.EnumerateFiles(path, searchPattern)
-            .Select(filePath => filePath.Substring(pathLen))
-            .ToArray();
+            int pathLen = path.Length;
+            var ret = Directory.EnumerateFiles(path, searchPattern)
+                .Select(filePath => filePath.Substring(pathLen))
+                .ToArray();
 
-        await WriteJson(d, ret);
+            return Task.FromResult(ret);
+        });
     }
 
     /// <summary>
     /// 回傳資料夾內符合搜尋條件的子資料夾名稱
     /// </summary>
-    private async Task GetDirectories(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string path = json.GetString("path");
-        string searchPattern = json.GetString("searchPattern");
+    private Task GetDirectories(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string path = json.GetString("path");
+            string searchPattern = json.GetString("searchPattern");
 
-        if (await CheckDirExist(d, path) == false) { return; }
+            EnsureDirectoryExistsApi(path);
 
-        int pathLen = path.Length;
-        var ret = Directory.GetDirectories(path, searchPattern)
-            .Select(dirPath => dirPath.Substring(pathLen))
-            .ToArray();
+            int pathLen = path.Length;
+            var ret = Directory.GetDirectories(path, searchPattern)
+                .Select(dirPath => dirPath.Substring(pathLen))
+                .ToArray();
 
-        await WriteJson(d, ret);
+            return Task.FromResult(ret);
+        });
     }
 
     /// <summary>
     /// 依指定排序規則排序字串陣列
     /// </summary>
-    private async Task GetSort(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string[] ar = json.GetStringArray("ar");
-        string type = json.GetString("type");
+    private Task GetSort(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string[] ar = json.GetStringArray("ar");
+            string type = json.GetString("type");
 
-        await WriteJson(d, new FileSortHelper().Sort(ar, type));
+            return Task.FromResult(new FileSortHelper().Sort(ar, type));
+        });
     }
 
     /// <summary>
     /// 依指定資料夾上下文排序檔名陣列
     /// </summary>
-    private async Task GetSort2(RequestData d) {
-        var json = JsonDocument.Parse(d.postData);
-        string dir = json.GetString("dir");
-        string[] ar = json.GetStringArray("ar");
-        string type = json.GetString("type");
+    private Task GetSort2(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string dir = json.GetString("dir");
+            string[] ar = json.GetStringArray("ar");
+            string type = json.GetString("type");
 
-        await WriteJson(d, new FileSortHelper().Sort2(dir, ar, type));
+            return Task.FromResult(new FileSortHelper().Sort2(dir, ar, type));
+        });
     }
 }

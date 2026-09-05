@@ -42,8 +42,16 @@ public class FileWebViewBridge {
     /// 取得基本檔案資訊
     /// </summary>
     public string GetFileInfo2(string path) {
-        FileInfo2 info = FileInfoHelper.GetFileInfo2(path);
-        return JsonSerializer.Serialize(info);
+        try {
+            FileInfo2 info = FileInfoHelper.GetFileInfo2(path);
+            return JsonSerializer.Serialize(ApiResponse<FileInfo2>.Success(info));
+        }
+        catch (Exception exception) {
+            // bridge 沒有 HTTP status，改以 failed envelope 傳遞錯誤，讓前端 parser 統一拋出例外。
+            Console.Error.WriteLine($"[WebView API] {exception}");
+            var error = ApiErrorMapper.Map(exception);
+            return JsonSerializer.Serialize(ApiResponse<FileInfo2>.Failure(error.ErrorCode, error.Message));
+        }
     }
 
     /// <summary>

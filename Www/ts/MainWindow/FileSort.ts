@@ -1,4 +1,6 @@
+import { getExceptionMessage } from "../ApiResponse";
 import { Lib } from "../Lib";
+import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
 import { MainWindow } from "./MainWindow";
 
@@ -99,9 +101,10 @@ export class FileSort {
             const path = M.fileLoad.getFilePath();
             const dirPath = Lib.getDirectoryName(path);
             if (dirPath === null) { return; }
-            setFileSortType(dirPath);
 
-            const ar = await sort(M.fileLoad.getWaitingFile())
+            const ar = await sort(M.fileLoad.getWaitingFile());
+
+            setFileSortType(dirPath);
             // 目前檔案位置
             M.fileLoad.setFlagFile(0);
             for (let i = 0; i < ar.length; i++) {
@@ -198,8 +201,19 @@ export class FileSort {
          * @returns 排序後的陣列
          */
         async function sort(arWaitingFile: string[]) {
-            arWaitingFile = await WebAPI.sort2(arWaitingFile, _sortType);
-            return arWaitingFile;
+            try {
+                return await WebAPI.sort2(arWaitingFile, _sortType);
+            }
+            catch (error) {
+                // 排序 API 失敗時改用檔名遞增排序，讓初次載入與手動排序都能繼續使用目前清單。
+                console.warn("[FileSort] 排序 API 失敗，改用檔名排序。", error);
+                Toast.show(M.i18n.t("msg.fileSortFailed", { message: getExceptionMessage(error) }), 1000 * 3);
+                _sortType = FileSortType.name;
+                _orderbyType = FileOrderbyType.asc;
+                return arWaitingFile.slice().sort((left, right) =>
+                    Lib.getFileName(left).localeCompare(Lib.getFileName(right))
+                );
+            }
         }
 
         /**

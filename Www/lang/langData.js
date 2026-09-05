@@ -2404,6 +2404,43 @@ var langData = {
             "ja": "画像が検出されない",
         },
 
+        fileReadFailed: {
+            "zh-TW": "檔案讀取失敗：{message}",
+            "zh-CN": "文件读取失败：{message}",
+            "en": "Failed to read the file: {message}",
+            "ja": "ファイルの読み込みに失敗しました：{message}",
+        },
+        directoryReadFailed: {
+            "zh-TW": "資料夾清單讀取失敗：{message}",
+            "zh-CN": "文件夹列表读取失败：{message}",
+            "en": "Failed to read the folder list: {message}",
+            "ja": "フォルダ一覧の読み込みに失敗しました：{message}",
+        },
+        fileListReadFailed: {
+            "zh-TW": "檔案清單讀取失敗，僅顯示目前檔案：{message}",
+            "zh-CN": "文件列表读取失败，仅显示当前文件：{message}",
+            "en": "Failed to read the file list. Showing only the current file: {message}",
+            "ja": "ファイル一覧の読み込みに失敗したため、現在のファイルのみ表示します：{message}",
+        },
+        fileSortFailed: {
+            "zh-TW": "檔案排序失敗，改用檔名排序：{message}",
+            "zh-CN": "文件排序失败，改用文件名排序：{message}",
+            "en": "File sorting failed. Falling back to name sorting: {message}",
+            "ja": "ファイルの並べ替えに失敗したため、名前順に切り替えます：{message}",
+        },
+        directorySortFallback: {
+            "zh-TW": "資料夾排序失敗，改用檔名排序：{message}",
+            "zh-CN": "文件夹排序失败，改用文件名排序：{message}",
+            "en": "Folder sorting failed. Falling back to name sorting: {message}",
+            "ja": "フォルダの並べ替えに失敗したため、名前順に切り替えます：{message}",
+        },
+        directoryPanelReadFailed: {
+            "zh-TW": "資料夾預覽清單讀取失敗：{message}",
+            "zh-CN": "文件夹预览列表读取失败：{message}",
+            "en": "Failed to read the folder preview list: {message}",
+            "ja": "フォルダプレビュー一覧の読み込みに失敗しました：{message}",
+        },
+
         notFound: {
             "zh-TW": "未找到",
             "zh-CN": "未找到",

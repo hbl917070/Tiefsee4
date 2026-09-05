@@ -1,8 +1,10 @@
 import { HotkeyAction, hotkeyActionKeys } from "../HotkeyDefinitions";
+import { getExceptionMessage } from "../ApiResponse";
 import { Lib } from "../Lib";
 import { RequestLimiter } from "../RequestLimiter";
 import { Throttle } from "../Throttle";
 import { TiefseeScroll } from "../TiefseeScroll";
+import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
 import { ArchiveEntryItem, getArchiveLogicalPath } from "../Archive/ArchiveTypes";
 import { MainWindow } from "./MainWindow";
@@ -914,7 +916,17 @@ export class BulkView {
                         continue;
                     }
 
-                    let retAr = await WebAPI.getFileInfo2List(newArr);
+                    let retAr: FileInfo2[];
+                    try {
+                        retAr = await WebAPI.getFileInfo2List(newArr);
+                    }
+                    catch (error) {
+                        // 批次檔案資訊失敗時停止這次頁面載入，不建立部分結果，並提示使用者。
+                        // 原始檔案列表仍保留在 _arFile，不因單一檔案失敗而靜默移除檔案。
+                        console.error("[BulkView] 檔案資訊讀取失敗。", error);
+                        Toast.show(M.i18n.t("msg.fileReadFailed", { message: getExceptionMessage(error) }), 1000 * 3);
+                        return;
+                    }
                     if (temp !== _pageNow + getDirPath()) { //已經載入其他資料夾，或是切換到其他頁
                         return;
                     }
@@ -1429,6 +1441,11 @@ export class BulkView {
 
                 updateSize();
 
+            }).catch(error => {
+                // 檔案變化期間可能已經無法取得資訊；保留目前可見項目，
+                // 同時讓後續 watcher 事件仍可繼續進入佇列。
+                console.error("[BulkView] 檔案變化後更新項目失敗。", error);
+                Toast.show(M.i18n.t("msg.fileReadFailed", { message: getExceptionMessage(error) }), 1000 * 3);
             });
         }
         // 傳入檔案路徑，回傳item

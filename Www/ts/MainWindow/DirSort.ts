@@ -1,4 +1,6 @@
+import { getExceptionMessage } from "../ApiResponse";
 import { Lib } from "../Lib";
+import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
 import { MainWindow } from "./MainWindow";
 
@@ -154,7 +156,17 @@ export class DirSort {
 
             if (arKey.length <= 1) { return; } // 只有1筆資料就不需要排序
 
-            arKey = await WebAPI.sort2(arKey, _sortType);
+            try {
+                arKey = await WebAPI.sort2(arKey, _sortType);
+            }
+            catch (error) {
+                // 排序 API 失敗時不讓面板載入中斷，直接改用檔名遞增排序。
+                console.warn("[DirSort] 排序 API 失敗，改用檔名排序。", error);
+                Toast.show(M.i18n.t("msg.directorySortFallback", { message: getExceptionMessage(error) }), 1000 * 3);
+                arKey.sort((left, right) =>
+                    Lib.getFileName(left).localeCompare(Lib.getFileName(right))
+                );
+            }
 
             // 排序後把資料放回 WaitingDir
             let ar: { [key: string]: string[] } = {}
