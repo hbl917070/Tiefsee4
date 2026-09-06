@@ -118,6 +118,8 @@ session 會記錄使用它的 `windowId`。同一 session 可能被多個視窗�
 
 視窗關閉時由 `WebWindow.FormClosed` 直接呼叫 `CloseWindow(windowId)`，不可只依賴前端頁面是否仍在運作。前端切換來源時則呼叫 close/release，並清除目前的 archive state。
 
+QuickLook 是重用同一個 WebWindow，結束時只會隱藏視窗，不會觸發 `FormClosed`；因此 `MainWindow.quickLookUp` 必須先取消等待中的 archive 密碼輸入，等待原本的載入流程完成 `finally` 清理，再呼叫 `FileLoad.leaveArchiveMode` 釋放目前視窗持有的所有 archive session，最後清除 viewer 並隱藏視窗。不能只用 `Msgbox.closeAll` 移除密碼對話框 DOM，否則密碼 Promise 會保持 pending，`_isLoadFileFinish` 與 loading 狀態也不會恢復。對 QuickLook 而言，隱藏視窗等同於關閉預覽，不能保留壓縮檔的 provider 或 7z 檔案鎖定。
+
 ### 5.3 防止過期開啟結果覆蓋新來源
 
 `ArchiveSourceManager` 使用 generation 管理非同步開啟流程。每次來源變更都會產生新的世代；舊世代的 API 回應即使較晚返回，也不能覆蓋目前清單或 session。
@@ -306,4 +308,3 @@ Windows 是否安裝能識別該副檔名的第三方程式，會影響 Shell �
 - `Tiefsee/Features/Archive/Http/ArchiveHttpEndpoints.cs`：壓縮檔 HTTP API。
 - `Tiefsee/Features/Image/Application/ImageProcessingService.cs`：依副檔名取得 Windows 圖示的服務邊界。
 - `Tiefsee/Infrastructure/Vendor/WindowsThumbnailProvider.cs`：Windows Shell 虛擬項目與圖示取得。
-

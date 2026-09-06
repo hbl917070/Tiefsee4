@@ -677,6 +677,10 @@ export class MainWindow {
         async function quickLookUp() {
             // 如果是單一執行個體，就不關閉視窗
             if (_startType === 2 || _startType === 3) {
+                // 密碼視窗可能正等待 Promise；先取消並等待 archive 載入流程清理，避免下一次開啟永遠卡在 loading。
+                await _fileLoad.cancelArchivePasswordInput();
+                // QuickLook 只是隱藏視窗，不會觸發 FormClosed；隱藏前要先釋放 archive session，避免 7z 持續鎖住來源檔。
+                await _fileLoad.leaveArchiveMode();
                 _fileShow.openNone();
                 await WV_Window.Hide();
             }

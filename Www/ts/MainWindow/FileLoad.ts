@@ -22,6 +22,10 @@ export class FileLoad {
     public getCurrentFileRef;
     /** 判斷目前來源是否已進入 archive mode。 */
     public getIsArchiveMode;
+    /** 結束目前 archive mode，供 QuickLook 隱藏時釋放 session。 */
+    public leaveArchiveMode: () => Promise<void>;
+    /** 取消等待中的 archive 密碼輸入，並等待載入流程完成清理。 */
+    public cancelArchivePasswordInput: () => Promise<void>;
     /** 依 entry metadata 排序 archive 清單，不保存一般檔案排序設定。 */
     public sortArchiveItems;
     /** 取得目前 archive entry 的 metadata 清單，供 BulkView 使用。 */
@@ -126,6 +130,8 @@ export class FileLoad {
         this.getFileListItems = getFileListItems;
         this.getCurrentFileRef = getCurrentFileRef;
         this.getIsArchiveMode = () => _isArchiveMode;
+        this.leaveArchiveMode = leaveArchiveMode;
+        this.cancelArchivePasswordInput = cancelArchivePasswordInput;
         this.sortArchiveItems = sortArchiveItems;
         this.getArchiveEntryItems = () => Array.from(_arArchiveItem);
         this.getArchiveEntryImageUrl = (item: ArchiveEntryItem, size = 256) =>
@@ -769,6 +775,20 @@ export class FileLoad {
                     },
                 });
             });
+        }
+
+        /**
+         * 取消等待中的 archive 密碼輸入，並等待原本的載入流程進入 finally。
+         * QuickLook 隱藏不會觸發頁面關閉事件，不能只移除密碼對話框 DOM，
+         * 否則 requestArchivePassword 的 Promise 會一直 pending，loading 也不會關閉。
+         */
+        async function cancelArchivePasswordInput() {
+            if (_isLoadFileFinish === false && _cancelArchivePasswordInput !== undefined) {
+                _cancelArchivePasswordInput();
+                while (_isLoadFileFinish === false) {
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            }
         }
 
         /**
