@@ -195,7 +195,7 @@ class LibIframe {
      * 取得 Plugin 的路徑
      */
     public getPluginPath() {
-        return this.APIURL + "/Plugin";
+        return this.APIURL + "/assets/plugins";
     }
 
     /**
@@ -306,9 +306,9 @@ class LibIframe {
      */
     public pathToUrl(path: string, encode = true): string {
         if (encode) {
-            return this.APIURL + `/api/getFile?path=${encodeURIComponent(path)}`;
+            return this.APIURL + `/api/files/content?path=${encodeURIComponent(path)}`;
         }
-        return this.APIURL + `/file/${path.replace(/\\/g, "/")}`;
+        return this.APIURL + `/assets/files/${path.replace(/\\/g, "/")}`;
 
         /*return "file:///" + encodeURIComponent(path)
             .replace(/[%]3A/g, ":")

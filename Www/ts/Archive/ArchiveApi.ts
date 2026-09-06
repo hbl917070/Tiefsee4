@@ -94,7 +94,7 @@ export class ArchiveApiClient {
 
     /** 載入候選壓縮檔失敗時，FileLoad 用此 URL 顯示原始檔案圖示。 */
     public getArchiveIconUrl(archivePath: string, size = 256): string {
-        return this.getBaseUrl() + `/api/getFileIcon?size=${encodeURIComponent(String(size))}`
+        return this.getBaseUrl() + `/api/files/icon?size=${encodeURIComponent(String(size))}`
             + `&path=${encodeURIComponent(archivePath)}`;
     }
 

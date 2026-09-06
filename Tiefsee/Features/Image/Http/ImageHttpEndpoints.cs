@@ -19,16 +19,16 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/frames", ExtractFrames, "/api/extractFrames");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/magick", ImgMagick, "/api/img/magick");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/raw", ImgRawThumbnail, "/api/img/rawThumbnail");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/wpf", ImgWpf, "/api/img/wpf");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/web-icc", ImgWebIcc, "/api/img/webIcc");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/nconvert", ImgNconvert, "/api/img/nconvert");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/init", ImgVipsInit, "/api/img/vipsInit");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/resize", ImgVipsResize, "/api/img/vipsResize");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/clip/preview", ImgClip, "/api/img/clip");
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/extract-png", ImgExtractPng, "/api/img/extractPng");
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/frames", ExtractFrames);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/magick", ImgMagick);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/raw", ImgRawThumbnail);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/wpf", ImgWpf);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/web-icc", ImgWebIcc);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/nconvert", ImgNconvert);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/init", ImgVipsInit);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/resize", ImgVipsResize);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/clip/preview", ImgClip);
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/extract-png", ImgExtractPng);
     }
 
     /// <summary>

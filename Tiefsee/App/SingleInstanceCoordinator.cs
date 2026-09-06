@@ -96,7 +96,7 @@ public class SingleInstanceCoordinator {
         }
 
         int port = GetPort();
-        string uri = $"http://127.0.0.1:{port}/api/closeAllWindow";
+        string uri = $"http://127.0.0.1:{port}/api/windows/close-all";
         SendRequest(uri);
     }
 
@@ -120,7 +120,7 @@ public class SingleInstanceCoordinator {
             try {
                 string port = Path.GetFileName(filePort);
                 // 偵測是否可用
-                string uri = $"http://127.0.0.1:{port}/api/check";
+                string uri = $"http://127.0.0.1:{port}/api/app/ping";
                 SendRequest(uri);
 
                 return Int32.Parse(port);
@@ -139,7 +139,7 @@ public class SingleInstanceCoordinator {
     /// </summary>
     private static void NewWindow(string[] args, int port) {
         string base64 = Uri.EscapeDataString(string.Join("\n", args));
-        string uri = $"http://127.0.0.1:{port}/api/newWindow?path=" + base64;
+        string uri = $"http://127.0.0.1:{port}/api/windows/open?path=" + base64;
         SendRequest(uri);
     }
 

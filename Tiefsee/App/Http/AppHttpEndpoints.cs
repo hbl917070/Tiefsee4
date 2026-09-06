@@ -12,7 +12,7 @@ public sealed class AppHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊 app 層級相關路由。
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/app/ping", Check, "/api/check");
+        HttpEndpointRegistrar.Map(WebServer, "/api/app/ping", Check);
     }
 
     /// <summary>

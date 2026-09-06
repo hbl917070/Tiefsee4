@@ -12,8 +12,8 @@ public sealed class WindowHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/windows/open", NewWindow, "/api/newWindow");
-        HttpEndpointRegistrar.Map(WebServer, "/api/windows/close-all", CloseAllWindow, "/api/closeAllWindow");
+        HttpEndpointRegistrar.Map(WebServer, "/api/windows/open", NewWindow);
+        HttpEndpointRegistrar.Map(WebServer, "/api/windows/close-all", CloseAllWindow);
     }
 
     /// <summary>

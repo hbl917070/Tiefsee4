@@ -15,12 +15,12 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/siblings", GetSiblingDir, "/api/directory/getSiblingDir");
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/files2", GetFiles2, "/api/directory/getFiles2");
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/files", GetFiles, "/api/directory/getFiles");
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/children", GetDirectories, "/api/directory/getDirectories");
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort", GetSort, "/api/sort");
-        HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort2", GetSort2, "/api/sort2");
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/siblings", GetSiblingDir);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/files2", GetFiles2);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/files", GetFiles);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/children", GetDirectories);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort", GetSort);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort2", GetSort2);
     }
 
     /// <summary>

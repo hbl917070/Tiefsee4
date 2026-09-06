@@ -14,9 +14,9 @@ public sealed class StaticAssetHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/assets/plugins/{*}", GetPlugin, "/plugin/{*}");
-        HttpEndpointRegistrar.Map(WebServer, "/assets/files/{*}", GetFile, "/file/{*}");
-        HttpEndpointRegistrar.Map(WebServer, "/assets/www/{*}", GetWww, "/www/{*}", "/{*}"); // /{*} 必須在最後，否則會與其他 endpoint 路由衝突
+        HttpEndpointRegistrar.Map(WebServer, "/assets/plugins/{*}", GetPlugin);
+        HttpEndpointRegistrar.Map(WebServer, "/assets/files/{*}", GetFile);
+        HttpEndpointRegistrar.Map(WebServer, "/assets/www/{*}", GetWww);
     }
 
     /// <summary>

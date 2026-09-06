@@ -217,7 +217,7 @@ public class WebWindow : FormNone {
            Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Www", fileName) +
            "#" + Program.webServer.port; // port 用於讓 js 識別 webAPI 的網址 */
         // return $"http://app.example/{fileName}#{Program.webServer.port}";
-        return $"http:127.0.0.1:{Program.webServer.port}/www/{fileName}#{Program.webServer.port}";
+        return $"http:127.0.0.1:{Program.webServer.port}/assets/www/{fileName}#{Program.webServer.port}";
     }
 
     /// <summary>

@@ -28,18 +28,18 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/metadata/exif", GetMetadata, "/api/getExif");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/icon", GetFileIcon, "/api/getFileIcon");
-        HttpEndpointRegistrar.Map(WebServer, "/api/web/icon", GetWebIcon, "/api/getWebIcon");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/info", GetFileInfo, "/api/getFileInfo2");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/info-list", GetFileInfoList, "/api/getFileInfo2List");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/related", GetRelatedFileList, "/api/getRelatedFileList");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/binary-check", IsBinary, "/api/isBinary");
+        HttpEndpointRegistrar.Map(WebServer, "/api/images/metadata/exif", GetMetadata);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/icon", GetFileIcon);
+        HttpEndpointRegistrar.Map(WebServer, "/api/web/icon", GetWebIcon);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/info", GetFileInfo);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/info-list", GetFileInfoList);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/related", GetRelatedFileList);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/binary-check", IsBinary);
 
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/video", GetVideo, "/api/getVideo");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/content", GetFile, "/api/getFile");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/pdf", GetPdf, "/api/getPdf");
-        HttpEndpointRegistrar.Map(WebServer, "/api/files/text", GetText, "/api/getText");
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/video", GetVideo);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/content", GetFile);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/pdf", GetPdf);
+        HttpEndpointRegistrar.Map(WebServer, "/api/files/text", GetText);
     }
 
     /// <summary>

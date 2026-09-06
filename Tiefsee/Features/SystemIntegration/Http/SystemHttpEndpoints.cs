@@ -15,10 +15,10 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
     /// 註冊路由
     /// </summary>
     public void RegisterRoutes() {
-        HttpEndpointRegistrar.Map(WebServer, "/api/system/uwp-apps", GetUwpList, "/api/getUwpList");
-        HttpEndpointRegistrar.Map(WebServer, "/api/system/clipboard", GetClipboardContent, "/api/getClipboardContent");
-        HttpEndpointRegistrar.Map(WebServer, "/api/system/forward-request", ForwardRequest, "/api/forwardRequest");
-        HttpEndpointRegistrar.Map(WebServer, "/api/system/a1111/lora-resource", GetA1111LoraResource, "/api/getA1111LoraResource");
+        HttpEndpointRegistrar.Map(WebServer, "/api/system/uwp-apps", GetUwpList);
+        HttpEndpointRegistrar.Map(WebServer, "/api/system/clipboard", GetClipboardContent);
+        HttpEndpointRegistrar.Map(WebServer, "/api/system/forward-request", ForwardRequest);
+        HttpEndpointRegistrar.Map(WebServer, "/api/system/a1111/lora-resource", GetA1111LoraResource);
     }
 
     /// <summary>
