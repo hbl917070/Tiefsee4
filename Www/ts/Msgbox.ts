@@ -1,13 +1,20 @@
 import { I18n } from "./I18n";
 import { Lib } from "./Lib";
 
+type MsgboxItem = {
+    dom: HTMLElement;
+    confirm: () => void;
+    cancel: () => void;
+};
+
 /**
  * 訊息方塊
  */
 export class Msgbox {
 
-    private _isShow = false;
     private _i18n: I18n;
+    /** 目前由此 Msgbox 管理的訊息框，最後一筆是目前最上層的訊息框。 */
+    private _items: MsgboxItem[] = [];
 
     constructor(i18n: I18n | undefined) {
 
@@ -29,7 +36,7 @@ export class Msgbox {
      * 判斷目前是否有任何顯示中的訊息方塊
      */
     public isShow(): boolean {
-        return this._isShow;
+        return this._items.length > 0;
     }
 
     /**
@@ -48,8 +55,6 @@ export class Msgbox {
         funcYes?: (dom: HTMLElement, inputTxt: string) => void,
         funcClose?: (dom: HTMLElement) => void,
     }) {
-
-        this._isShow = true;
 
         let txt = ""; // 內容文字
         let type: ("txt" | "text" | "radio") = "txt"; // 類型
@@ -134,20 +139,35 @@ export class Msgbox {
         donInput.value = inputTxt;
         donInput.type = inputType;
 
-        donBtnClose.addEventListener("click", () => { funcClose(dom) })
-        donBtnNo.addEventListener("click", () => { funcClose(dom) })
-        donBtnYes.addEventListener("click", () => { // 按下確認時
-            let value: string = "";
-            if (type === "txt") { }
+        const getInputValue = () => {
+            let value = "";
             if (type === "text") {
                 value = donInput.value;
             }
             if (type === "radio") {
-                let radioChecked = dom.querySelector(".msgbox-radio :checked") as HTMLInputElement;
-                if (radioChecked != null) { value = radioChecked.value }
+                const radioChecked = dom.querySelector(".msgbox-radio :checked") as HTMLInputElement;
+                if (radioChecked != null) { value = radioChecked.value; }
             }
-            funcYes(dom, value);
-        })
+            return value;
+        };
+
+        const item: MsgboxItem = {
+            dom: dom,
+            confirm: () => {
+                funcYes(dom, getInputValue());
+            },
+            cancel: () => {
+                // 先移除 item 與 DOM，再執行外部回呼；即使回呼發生錯誤，
+                // 訊息框狀態也已經完成清理，錯誤仍會自然往外拋出。
+                if (this.removeItem(item) === false) { return; }
+                funcClose(dom);
+            },
+        };
+        this._items.push(item);
+
+        donBtnClose.addEventListener("click", item.cancel)
+        donBtnNo.addEventListener("click", item.cancel)
+        donBtnYes.addEventListener("click", item.confirm)
 
         document.body.appendChild(dom);
 
@@ -168,58 +188,53 @@ export class Msgbox {
      * @param dom 
      */
     public close(dom: HTMLElement) {
-        dom.parentNode?.removeChild(dom); // 移除dom
-
-        // 判斷是否還有其他的 訊息方塊
-        const arMsgbox = document.querySelectorAll(".msgbox-box");
-        for (let i = 0; i < arMsgbox.length; i++) {
-            const item = arMsgbox[i];
-            if (item.getAttribute("active") == "true") {
-                this._isShow = true;
-                return;
-            }
+        const item = this._items.find(item => item.dom === dom);
+        if (item !== undefined) {
+            this.removeItem(item);
+            return;
         }
-        this._isShow = false;
+
+        // 相容於不是由此 Msgbox 管理的既有 DOM。
+        dom.parentNode?.removeChild(dom);
     }
 
     /**
      * 關閉全部
      */
     public closeAll() {
-        const arMsgbox = document.querySelectorAll(".msgbox");
-        for (let i = 0; i < arMsgbox.length; i++) {
-            const dom = arMsgbox[i];
-            dom.parentNode?.removeChild(dom);
+        // 使用快照，避免關閉回呼建立的新訊息框被同一輪誤關閉。
+        const items = [...this._items];
+        for (const item of items) {
+            item.cancel();
         }
-        this._isShow = false;
     }
 
     /**
     * 當前的Msg 關閉
     */
     public closeNow() {
+        const item = this._items[this._items.length - 1];
+        if (item === undefined) { return; }
+        item.cancel();
+    }
 
-        const arMsgbox = document.querySelectorAll(".msgbox");
+    /** 從管理清單移除訊息框並移除 DOM，不執行取消回呼。 */
+    private removeItem(item: MsgboxItem): boolean {
+        const index = this._items.indexOf(item);
+        if (index === -1) { return false; }
 
-        if (arMsgbox.length === 0) { return; }
-        if (arMsgbox.length === 1) { this._isShow = false; }
-
-        const dom = arMsgbox[arMsgbox.length - 1];
-        dom.parentNode?.removeChild(dom);
+        this._items.splice(index, 1);
+        item.dom.parentNode?.removeChild(item.dom);
+        return true;
     }
 
     /**
      * 當前的Msg 按下
      */
     public clickYes() {
-
-        const arMsgbox = document.querySelectorAll(".msgbox");
-
-        if (arMsgbox.length === 0) { return; }
-
-        const dom = arMsgbox[arMsgbox.length - 1];
-        const btnYes = dom.querySelector(".msgbox-btn__yes") as HTMLElement;
-        btnYes.click();
+        const item = this._items[this._items.length - 1];
+        if (item === undefined) { return; }
+        item.confirm();
     }
 
 }
