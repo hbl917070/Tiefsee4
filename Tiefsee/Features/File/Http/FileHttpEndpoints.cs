@@ -2,12 +2,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 
 namespace Tiefsee;
 
 public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
+
+    /// <summary> 網路圖示最大允許下載的檔案大小 100 MiB </summary>
+    private const long MaxWebIconDownloadBytes = 100L * 1024 * 1024;
+    /// <summary> 網路圖示最大允許重新導向的次數 </summary>
+    private const int MaxWebIconRedirectCount = 5;
 
     private readonly ImageProcessingService _imageProcessingService;
     private readonly FileMetadataService _fileMetadataService;
@@ -187,6 +193,8 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         }
     }
 
+#region Web icon download and validation
+
     /// <summary>
     /// 下載網路圖片到暫存資料夾後，再以系統縮圖方式回傳 icon
     /// </summary>
@@ -200,19 +208,90 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
             return;
         }
 
-        string tempDir = Path.GetDirectoryName(tempPath);
-        // 先確保暫存資料夾存在，避免下載完成後無法落檔
-        if (Directory.Exists(tempDir) == false) {
-            Directory.CreateDirectory(tempDir);
+        if (TryGetSafeWebIconUri(url, out Uri sourceUri) == false) {
+            await WriteError(d, 400, "只允許從安全的 HTTPS 圖片或影片網址下載");
+            return;
         }
 
         // 若本地尚未快取，先下載圖片到指定暫存位置
         if (File.Exists(tempPath) == false) {
             try {
-                using HttpClient webClient = new();
-                webClient.Timeout = TimeSpan.FromSeconds(10);
-                byte[] data = webClient.GetByteArrayAsync(url).Result;
-                File.WriteAllBytes(tempPath, data);
+                IPAddress[] addresses = await ResolveSafeWebIconAddresses(sourceUri);
+                if (addresses.Length == 0) {
+                    await WriteError(d, 400, "禁止連線至 localhost、區域網路或本機名稱");
+                    return;
+                }
+
+                string tempDir = Path.GetDirectoryName(tempPath);
+                // 通過 URL 與 IP 檢查後才建立暫存資料夾，避免拒絕請求留下目錄。
+                if (Directory.Exists(tempDir) == false) {
+                    Directory.CreateDirectory(tempDir);
+                }
+
+                using HttpClientHandler handler = new() {
+                    AllowAutoRedirect = false
+                };
+                using HttpClient webClient = new(handler) {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                Uri downloadUri = sourceUri;
+                HttpResponseMessage response = null;
+                for (int redirectCount = 0; ; redirectCount++) {
+                    using HttpRequestMessage request = new(HttpMethod.Get, downloadUri);
+                    response = await webClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                    if (IsWebIconRedirect(response.StatusCode) == false) {
+                        break;
+                    }
+
+                    if (redirectCount >= MaxWebIconRedirectCount
+                        || response.Headers.Location == null) {
+                        response.Dispose();
+                        await WriteError(d, 400, "網路圖示重新導向次數過多或缺少目標");
+                        return;
+                    }
+
+                    Uri redirectLocation = response.Headers.Location;
+                    response.Dispose();
+                    if (Uri.TryCreate(downloadUri, redirectLocation, out Uri redirectUri) == false
+                        || TryGetSafeWebIconUri(redirectUri, out downloadUri) == false
+                        || (await ResolveSafeWebIconAddresses(downloadUri)).Length == 0) {
+                        await WriteError(d, 400, "不允許重新導向到不安全來源");
+                        return;
+                    }
+                }
+
+                using (response) {
+                    if (response.IsSuccessStatusCode == false) {
+                        await WriteError(d, 502, "圖片下載來源回應失敗");
+                        return;
+                    }
+
+                    if (IsAllowedWebIconContentType(response.Content.Headers.ContentType?.MediaType) == false) {
+                        await WriteError(d, 415, "下載來源不是圖片或影片");
+                        return;
+                    }
+
+                    if (response.Content.Headers.ContentLength > MaxWebIconDownloadBytes) {
+                        await WriteError(d, 413, "下載來源超過大小限制");
+                        return;
+                    }
+
+                    using Stream responseStream = await response.Content.ReadAsStreamAsync();
+                    using MemoryStream dataStream = new();
+                    byte[] buffer = new byte[64 * 1024];
+                    long totalBytes = 0;
+                    int bytesRead;
+                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                        totalBytes += bytesRead;
+                        if (totalBytes > MaxWebIconDownloadBytes) {
+                            await WriteError(d, 413, "下載來源超過大小限制");
+                            return;
+                        }
+                        await dataStream.WriteAsync(buffer, 0, bytesRead);
+                    }
+
+                    File.WriteAllBytes(tempPath, dataStream.ToArray());
+                }
             }
             catch (Exception ex) {
                 Debug.WriteLine("GetWebIcon fail " + ex.Message);
@@ -245,6 +324,161 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
             await WriteError(d, 500, "圖示解析失敗");
         }
     }
+
+    /// <summary>
+    /// 解析網路圖示的來源網址，僅接受 HTTPS 且不直接指向本機名稱。
+    /// </summary>
+    private static bool TryGetSafeWebIconUri(string url, out Uri sourceUri) {
+        sourceUri = null;
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri) == false) {
+            return false;
+        }
+
+        return TryGetSafeWebIconUri(uri, out sourceUri);
+    }
+
+    /// <summary>
+    /// 驗證已解析的 redirect URI 必須仍然是 HTTPS 且不能指向本機名稱。
+    /// </summary>
+    private static bool TryGetSafeWebIconUri(Uri uri, out Uri sourceUri) {
+        sourceUri = null;
+
+        if (uri.IsAbsoluteUri == false
+            || uri.Scheme != Uri.UriSchemeHttps
+            || string.IsNullOrWhiteSpace(uri.Host)
+            || IsForbiddenWebIconHost(uri.DnsSafeHost)) {
+            return false;
+        }
+
+        sourceUri = uri;
+        return true;
+    }
+
+    /// <summary>
+    /// 解析來源網域的所有 IP，若任何結果指向本機或內部網段則整個來源拒絕。
+    /// </summary>
+    private static async Task<IPAddress[]> ResolveSafeWebIconAddresses(Uri sourceUri) {
+        IPAddress[] addresses;
+        try {
+            addresses = await Dns.GetHostAddressesAsync(sourceUri.DnsSafeHost);
+        }
+        catch (SocketException) {
+            return Array.Empty<IPAddress>();
+        }
+        catch (ArgumentException) {
+            return Array.Empty<IPAddress>();
+        }
+
+        if (addresses.Length == 0 || addresses.Any(IsForbiddenWebIconAddress)) {
+            return Array.Empty<IPAddress>();
+        }
+
+        return addresses;
+    }
+
+    /// <summary>
+    /// 確認下載來源的 Content-Type 是圖片或影片，避免把任意回應寫入快取。
+    /// </summary>
+    private static bool IsAllowedWebIconContentType(string contentType) {
+        return contentType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true
+            || contentType?.StartsWith("video/", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    /// <summary>
+    /// 判斷 HTTP 狀態碼是否代表需要處理 Location 的重新導向回應。
+    /// </summary>
+    private static bool IsWebIconRedirect(HttpStatusCode statusCode) {
+        return statusCode is HttpStatusCode.Moved
+            or HttpStatusCode.Redirect
+            or HttpStatusCode.SeeOther
+            or HttpStatusCode.TemporaryRedirect
+            or HttpStatusCode.PermanentRedirect;
+    }
+
+    /// <summary>
+    /// 判斷網址主機名稱是否是 localhost 或目前電腦名稱。
+    /// </summary>
+    private static bool IsForbiddenWebIconHost(string host) {
+        string normalizedHost = host.TrimEnd('.');
+        string machineName = Environment.MachineName;
+        string localHostName = Dns.GetHostName();
+
+        return normalizedHost.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+            || normalizedHost.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase)
+            || normalizedHost.Equals(machineName, StringComparison.OrdinalIgnoreCase)
+            || normalizedHost.Equals(localHostName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// 判斷 IP 是否屬於 loopback、未指定、私有、link-local 或其他禁止連線的網段。
+    /// </summary>
+    private static bool IsForbiddenWebIconAddress(IPAddress address) {
+        if (IPAddress.IsLoopback(address)) {
+            return true;
+        }
+
+        if (address.IsIPv4MappedToIPv6) {
+            address = address.MapToIPv4();
+        }
+
+        return address.AddressFamily switch {
+            AddressFamily.InterNetwork => IsForbiddenWebIconIpv4Address(address),
+            AddressFamily.InterNetworkV6 => IsForbiddenWebIconIpv6Address(address),
+            _ => true
+        };
+    }
+
+    /// <summary>
+    /// 判斷 IPv4 是否落在未指定、私有、link-local、測試保留或 multicast 網段。
+    /// </summary>
+    private static bool IsForbiddenWebIconIpv4Address(IPAddress address) {
+        byte[] bytes = address.GetAddressBytes();
+
+        return IsIpv4InCidr(bytes, 0, 0, 0, 0, 8) // 0.0.0.0/8
+            || IsIpv4InCidr(bytes, 10, 0, 0, 0, 8) // 10.0.0.0/8
+            || IsIpv4InCidr(bytes, 100, 64, 0, 0, 10) // 100.64.0.0/10
+            || IsIpv4InCidr(bytes, 169, 254, 0, 0, 16) // 169.254.0.0/16
+            || IsIpv4InCidr(bytes, 172, 16, 0, 0, 12) // 172.16.0.0/12
+            || IsIpv4InCidr(bytes, 192, 0, 0, 0, 24) // 192.0.0.0/24
+            || IsIpv4InCidr(bytes, 192, 168, 0, 0, 16) // 192.168.0.0/16
+            || IsIpv4InCidr(bytes, 198, 18, 0, 0, 15) // 198.18.0.0/15
+            || bytes[0] >= 224; // multicast 與保留範圍
+    }
+
+    /// <summary>
+    /// 判斷 IPv6 是否為未指定、link-local、site-local、multicast 或 unique-local 位址。
+    /// </summary>
+    private static bool IsForbiddenWebIconIpv6Address(IPAddress address) {
+        byte[] bytes = address.GetAddressBytes();
+
+        return address.Equals(IPAddress.IPv6Any)
+            || address.IsIPv6LinkLocal
+            || address.IsIPv6SiteLocal
+            || address.IsIPv6Multicast
+            || (bytes[0] & 0xFE) == 0xFC; // fc00::/7
+    }
+
+    /// <summary>
+    /// 判斷 IPv4 位址是否符合指定的 CIDR 網段。
+    /// </summary>
+    private static bool IsIpv4InCidr(byte[] address, byte network0, byte network1, byte network2, byte network3, int prefixLength) {
+        uint addressValue = ((uint)address[0] << 24)
+            | ((uint)address[1] << 16)
+            | ((uint)address[2] << 8)
+            | address[3];
+        uint networkValue = ((uint)network0 << 24)
+            | ((uint)network1 << 16)
+            | ((uint)network2 << 8)
+            | network3;
+        uint mask = prefixLength == 0 ? 0 : uint.MaxValue << (32 - prefixLength);
+
+        return (addressValue & mask) == (networkValue & mask);
+    }
+
+#endregion
+
+#region Web icon cache path validation
 
     /// <summary>
     /// 驗證網路圖片快取路徑只能位於暫存資料夾內。
@@ -295,12 +529,17 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         }
     }
 
+    /// <summary>
+    /// 判斷檔名是否為 Windows 保留名稱，例如 CON、PRN、COM1 或 LPT1。
+    /// </summary>
     private static bool IsReservedWindowsFileName(string segment) {
         string name = Path.GetFileNameWithoutExtension(segment).ToUpperInvariant();
         return name is "CON" or "PRN" or "AUX" or "NUL"
             || (name.Length == 4 && (name.StartsWith("COM") || name.StartsWith("LPT"))
                 && name[3] is >= '1' and <= '9');
     }
+
+#endregion
 
     /// <summary>
     /// 取得單一檔案的詳細資訊
