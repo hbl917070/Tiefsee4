@@ -195,7 +195,10 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         string path = Uri.UnescapeDataString(d.args["path"]);
         string url = Uri.UnescapeDataString(d.args["url"]);
 
-        string tempPath = Path.Combine(Program.runtimeContext.TempDirWebFile, path);
+        if (TryGetSafeWebIconPath(path, out string tempPath) == false) {
+            await WriteError(d, 400, "無效的圖片快取路徑");
+            return;
+        }
 
         string tempDir = Path.GetDirectoryName(tempPath);
         // 先確保暫存資料夾存在，避免下載完成後無法落檔
@@ -224,7 +227,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         }
 
         d.context.Response.ContentType = "image/png";
-        if (HeadersAdd304(d, path)) { return; }
+        if (HeadersAdd304(d, tempPath)) { return; }
 
         using Bitmap icon = _imageProcessingService.GetFileIcon(tempPath, size, 3);
         if (icon == null) {
@@ -241,6 +244,62 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         catch {
             await WriteError(d, 500, "圖示解析失敗");
         }
+    }
+
+    /// <summary>
+    /// 驗證網路圖片快取路徑只能位於暫存資料夾內。
+    /// </summary>
+    private static bool TryGetSafeWebIconPath(string relativePath, out string fullPath) {
+        fullPath = "";
+
+        if (string.IsNullOrWhiteSpace(relativePath) || Path.IsPathRooted(relativePath)) {
+            return false;
+        }
+
+        try {
+            string normalizedPath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            string[] segments = normalizedPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.None);
+
+            foreach (string segment in segments) {
+                if (segment.Length == 0
+                    || segment == "."
+                    || segment == ".."
+                    || segment.EndsWith('.')
+                    || segment.EndsWith(' ')
+                    || segment.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+                    || IsReservedWindowsFileName(segment)) {
+                    return false;
+                }
+            }
+
+            string root = Path.GetFullPath(Program.runtimeContext.TempDirWebFile)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+            string candidate = Path.GetFullPath(Path.Combine(root, normalizedPath));
+
+            if (candidate.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) {
+                return false;
+            }
+
+            fullPath = candidate;
+            return true;
+        }
+        catch (ArgumentException) {
+            return false;
+        }
+        catch (IOException) {
+            return false;
+        }
+        catch (NotSupportedException) {
+            return false;
+        }
+    }
+
+    private static bool IsReservedWindowsFileName(string segment) {
+        string name = Path.GetFileNameWithoutExtension(segment).ToUpperInvariant();
+        return name is "CON" or "PRN" or "AUX" or "NUL"
+            || (name.Length == 4 && (name.StartsWith("COM") || name.StartsWith("LPT"))
+                && name[3] is >= '1' and <= '9');
     }
 
     /// <summary>
