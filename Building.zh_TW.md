@@ -2,17 +2,11 @@
 
 # Tiefsee 專案說明
 
-Tiefsee4 包含以下 5 個子專案
+Tiefsee4 包含以下 4 個子專案
 
 ## Tiefsee
 程式的本體，以 WinForm 來承載 WebView2。<br>
 並透過 HttpListener 提供 視窗管理、檔案操作、圖片處理 等功能的 Web API。
-
-<br>
-
-## TiefseeLauncher
-Tiefsee 的啟動器。<br>
-由於 .NET 專案匯入函式庫後即使沒有寫任何程式碼也會拖慢啟動速度，所以使用另一個乾淨的專案作為程式入口。啟動器會檢查程式本體是否正在運行，如果已在運行狀態，則使用 Pipe 通知程式本體新建一個視窗，從而實現快速啟動。
 
 <br>
 
@@ -22,7 +16,40 @@ Tiefsee 的啟動器。<br>
 <br>
 
 ## BuildAll
-用於編譯 Tiefsee 和 TiefseeLauncher，並將輸出結果打包成 ZIP 文件。
+用於編譯 Tiefsee 與 native host，並將輸出結果打包成 ZIP 文件。
+
+<br>
+
+## 編譯環境
+
+### Native Host（C++）
+
+`TiefseeNativeHost` 是 Windows 原生啟動器，負責在載入 .NET CLR 前處理啟動模式與 instance 間的快速轉交。
+
+編譯此專案需要：
+
+- Visual Studio 的「使用 C++ 的桌面開發」工作負載
+- MSVC v143 Platform Toolset
+- Windows 10 SDK
+- MSBuild
+- x64 編譯環境
+
+若使用 Visual Studio 18，還需要安裝 MSVC v143 的 14.44.35207 工具版本；Visual Studio 17 會使用 v143 的預設工具版本。
+
+專案使用 `/MT` 靜態連結 C/C++ Runtime，因此使用者電腦不需要另外安裝 Visual C++ Redistributable。原始碼使用 UTF-8，C++ 專案已設定 `/utf-8`。
+
+### 完整 Tiefsee 專案
+
+除了上述 C++ 編譯工具，完整編譯還需要：
+
+- .NET 8 SDK
+- NuGet 還原所需的網路連線與套件來源
+- WebView2 SDK（由 NuGet 套件提供）
+- Node.js、Gulp、Rust、`wasm32-unknown-unknown` 與 `wasm-pack`（請參考下方 Www 初始安裝）
+
+目前專案以 x64 為主要編譯目標。MSIX 打包還需要 Visual Studio 的 Windows App Packaging 工具與套件簽章環境。
+
+執行已打包的 MSIX 時，.NET runtime 會隨套件提供；免安裝版則需要電腦已安裝 .NET 8 Desktop Runtime。程式建立 WebView2 視窗時，仍需要系統已安裝 WebView2 Runtime。
 
 <br>
 

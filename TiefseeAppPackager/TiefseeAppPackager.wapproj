@@ -32,7 +32,7 @@
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <PackageCertificateThumbprint>497EA22FF6A242826D50999677B106348B025A5C</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <EntryPointProjectUniqueName>..\TiefseeLauncher\TiefseeLauncher.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\TiefseeNativeHost\TiefseeNativeHost.vcxproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AppxBundle>Always</AppxBundle>
@@ -46,6 +46,10 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <!-- C# 程式以自身的 BaseDirectory\Www 讀取前端靜態資源。 -->
+    <Content Include="..\Output\Www\**\*">
+      <Link>Tiefsee\Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
     <Content Include="Images\BadgeLogo.scale-100.png" />
     <Content Include="Images\BadgeLogo.scale-125.png" />
     <Content Include="Images\BadgeLogo.scale-150.png" />
@@ -104,13 +108,19 @@
     <Content Include="Images\Wide310x150Logo.scale-400.png" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
+
+  <Target Name="ValidateWwwAssets" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\..\Output\Www\MainWindow.html')" Text="找不到 Output\Www\MainWindow.html，請先在 Www 目錄執行 gulp build。" />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\..\Output\Www\js\MainWindow.js')" Text="找不到 Output\Www\js\MainWindow.js，請先在 Www 目錄執行 gulp build。" />
+  </Target>
+
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" PrivateAssets="all" />
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TiefseeLauncher\TiefseeLauncher.csproj" />
     <ProjectReference Include="..\Tiefsee\Tiefsee.csproj" />
+    <ProjectReference Include="..\TiefseeNativeHost\TiefseeNativeHost.vcxproj" />
   </ItemGroup>
 </Project>

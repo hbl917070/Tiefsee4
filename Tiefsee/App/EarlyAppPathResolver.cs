@@ -11,7 +11,10 @@ public static class EarlyAppPathResolver {
     /// 只解析啟動最早期就能便宜取得的路徑，避免太早碰到成本較高的 store path API
     /// </summary>
     public static EarlyAppPaths Resolve() {
-        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string baseDirectory = AppContext.BaseDirectory;
+        if (string.IsNullOrEmpty(baseDirectory)) {
+            baseDirectory = Environment.CurrentDirectory;
+        }
         string portableMode = Path.Combine(baseDirectory, "PortableMode");
         bool isPortableMode = Directory.Exists(portableMode);
 

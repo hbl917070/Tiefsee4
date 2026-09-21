@@ -1,10 +1,12 @@
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 
 namespace Tiefsee;
 
-static class Program {
+public static class Program {
 
     /// <summary> 程式開始的 port </summary>
     public static int startPort;
@@ -26,9 +28,26 @@ static class Program {
     /// </summary>
     [STAThread]
     static void Main(string[] args) {
+        Run(args);
+    }
+
+    /// <summary>
+    /// 由 native host 載入 CLR 後呼叫的入口。
+    /// </summary>
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvStdcall) })]
+    public static int RunFromNativeHost() {
+        Run(Environment.GetCommandLineArgs().Skip(1).ToArray());
+        return 0;
+    }
+
+    private static void Run(string[] args) {
 
         // 修改 工作目錄 為程式資料夾 (如果有傳入 args 的話，工作目錄會被修改，所以需要改回來
-        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+        string baseDirectory = AppContext.BaseDirectory;
+        if (string.IsNullOrEmpty(baseDirectory)) {
+            baseDirectory = Environment.CurrentDirectory;
+        }
+        Directory.SetCurrentDirectory(baseDirectory);
 
         // 啟動流程分成：早期路徑 -> ini 設定 -> 執行期環境 -> 共享服務
         var earlyPaths = EarlyAppPathResolver.Resolve();

@@ -114,7 +114,7 @@ interface WV_Window {
     /** 取得執行檔目錄 */
     GetAppDirPath(): string;
 
-    /** 取得執行檔路徑 (TiefseeCore.exe 的路徑) */
+    /** 取得執行檔路徑 (Tiefsee.exe 的路徑) */
     GetAppPath(): string;
 
     /** 取得 Tiefsee.exe 的路徑 */

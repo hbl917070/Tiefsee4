@@ -23,13 +23,13 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 
 		<!-- 編譯這些專案 -->
-		<MSBuild Projects="../TiefseeLauncher/TiefseeLauncher.csproj" Properties="Configuration=Release"/>
 		<MSBuild Projects="../Tiefsee/Tiefsee.csproj" Properties="Configuration=Release"/>
 		
 		<!-- 刪除無用檔案 -->
 		<Delete Files="$(MSBuildProjectDirectory)/../Output/Tiefsee.pdb" />
-		<Delete Files="$(MSBuildProjectDirectory)/../Output/TiefseeCore.pdb" />
-		<Delete Files="$(MSBuildProjectDirectory)/../Output/Tiefsee.exe.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/TiefseeNativeHost.pdb" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/TiefseeNativeHost.lib" />
+		<Delete Files="$(MSBuildProjectDirectory)/../Output/Tiefsee.exe.config" />
 
 		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.pdb" />
 		<Delete Files="$(MSBuildProjectDirectory)/../Output/BuildAll.dll" />

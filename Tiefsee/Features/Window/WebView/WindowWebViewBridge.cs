@@ -258,7 +258,7 @@ public class WindowWebViewBridge {
     }
 
     /// <summary>
-    /// 取得執行檔路徑 (TiefseeCore.exe 的路徑)
+    /// 取得執行檔路徑 (Tiefsee.exe 的路徑)
     /// </summary>
     /// <returns></returns>
     public string GetAppPath() {
@@ -270,14 +270,6 @@ public class WindowWebViewBridge {
     /// </summary>
     /// <returns></returns>
     public string GetTiefseePath() {
-        var dir = GetAppDirPath();
-
-        var path = Path.Combine(dir, "Tiefsee.exe");
-        if (File.Exists(path)) { return path; }
-
-        path = Path.Combine(dir, "../TiefseeLauncher/Tiefsee.exe");
-        if (File.Exists(path)) { return Path.GetFullPath(path); }
-
         return GetAppPath();
     }
 

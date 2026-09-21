@@ -1,15 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
+		<OutputType Condition="'$(RuntimeIdentifier)' == ''">WinExe</OutputType>
+		<!-- MSIX 的入口是 native host；發布 managed 專案時只需要 DLL，不要再產生第二個 apphost。 -->
+		<OutputType Condition="'$(RuntimeIdentifier)' != ''">Library</OutputType>
 		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
+		<UseAppHost Condition="'$(RuntimeIdentifier)' == ''">false</UseAppHost>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PlatformTarget>x64</PlatformTarget>
 		<Platforms>x64</Platforms>
 		<UseWPF>True</UseWPF>
-		<StartupObject>Tiefsee.Program</StartupObject>
+		<StartupObject Condition="'$(RuntimeIdentifier)' == ''">Tiefsee.Program</StartupObject>
+		<!-- MSIX 由 native host 載入 managed assembly，仍需要 runtimeconfig 提供 hostfxr 設定。 -->
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<Copyright>Copyright © 2021-2026 hbl917070</Copyright>
 		<PackageProjectUrl>https://github.com/hbl917070/Tiefsee4</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/hbl917070/Tiefsee4</RepositoryUrl>
@@ -24,7 +29,10 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
-		<AssemblyName>TiefseeCore</AssemblyName>
+		<AssemblyName>Tiefsee</AssemblyName>
+		<BuildNativeHost Condition="'$(BuildNativeHost)' == ''">true</BuildNativeHost>
+		<!-- C# 專案還需要同步產生 native host，不能被 Visual Studio 的快速最新檢查跳過 -->
+		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 
 	</PropertyGroup>
 
@@ -50,22 +58,13 @@
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.18.6" />
 		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.7" />
 		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
-		<PackageReference Include="SharpSevenZip" Version="2.0.124" />
+		<PackageReference Include="SharpSevenZip" Version="2.0.128" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="ReadMe.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-
-	<!-- 編譯時複製這些資料夾 -->
-	<!-- 注意：編譯前必須先執行 gulp build，產生到靜態資源到 Output/Www -->
-	<ItemGroup>
-		<Content Include="..\Output\Www\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
-		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -88,6 +87,21 @@
 		<!-- SharpSevenZip 會同時複製 x86/x64 native DLL；Tiefsee 固定以 x64 執行，刪除不需要的 x86 版本 -->
 		<Delete Files="$(OutputPath)\x86\7z.dll" />
 		<RemoveDir Directories="$(OutputPath)\x86" />
+	</Target>
+
+	<!-- C# 編譯完成後，以相同組態重新產生 native host，讓直接建置本專案也能更新 Tiefsee.exe -->
+	<Target Name="BuildNativeHostAfterTiefsee" AfterTargets="Build"
+		Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
+		<MSBuild
+			Projects="$(MSBuildThisFileDirectory)..\TiefseeNativeHost\TiefseeNativeHost.vcxproj"
+			Targets="Build"
+			BuildInParallel="false"
+			Properties="Configuration=$(Configuration);Platform=x64;BuildingNativeHost=true;VCTargetsPath=$(VCTargetsPath)" />
+	</Target>
+
+	<Target Name="ReportNativeHostBuildSkipped" AfterTargets="Build"
+		Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and !Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
+		<Message Importance="High" Text="NativeHost 未重新編譯；請使用 Visual Studio MSBuild 或 BuildAll/InvokeMsBuild.ps1 產生 Tiefsee.exe。" />
 	</Target>
 
 </Project>

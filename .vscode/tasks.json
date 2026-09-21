@@ -3,27 +3,35 @@
   "tasks": [
     {
       "label": "build",
-      "command": "dotnet",
+      "command": "pwsh",
       "type": "process",
       "args": [
-        "build",
-        "${workspaceFolder}/Tiefsee/Tiefsee.csproj", // 指定要編譯的專案檔案
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary;ForceNoAlign",
-        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/BuildAll/InvokeMsBuild.ps1",
+        "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
+        "-OutputPath",
+        "${workspaceFolder}/Output/"
       ],
       "problemMatcher": "$msCompile"
     },
     {
       "label": "publish",
-      "command": "dotnet",
+      "command": "pwsh",
       "type": "process",
       "args": [
-        "publish",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/BuildAll/InvokeMsBuild.ps1",
         "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary;ForceNoAlign",
-        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+        "-Target",
+        "Publish",
+        "-OutputPath",
+        "${workspaceFolder}/Output/"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -36,7 +44,8 @@
         "run",
         "--project",
         "${workspaceFolder}/Tiefsee/Tiefsee.csproj",
-        "/p:OutputPath=${workspaceFolder}/Output/" // 指定輸出路徑
+        "/p:OutputPath=${workspaceFolder}/Output/", // 指定輸出路徑
+        "/p:BuildNativeHost=false"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -46,14 +55,17 @@
     // 編譯全部專案
     {
       "label": "buildAll",
-      "command": "dotnet",
+      "command": "pwsh",
       "type": "process",
       "args": [
-        "build",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/BuildAll/InvokeMsBuild.ps1",
         "${workspaceFolder}/BuildAll/BuildAll.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary;ForceNoAlign",
-        "/p:OutputPath=${workspaceFolder}/Output/"
+        "-OutputPath",
+        "${workspaceFolder}/Output/"
       ],
       "problemMatcher": "$msCompile"
     },

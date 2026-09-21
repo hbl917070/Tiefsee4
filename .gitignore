@@ -1,8 +1,4 @@
-﻿################################################################################
-# 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
-################################################################################
-
-/.vs
+﻿/.vs
 /Tiefsee/obj
 /Tiefsee/bin
 
@@ -32,5 +28,7 @@
 TiefseeLauncher/obj
 TiefseeLauncher/bin
 TiefseeLauncher/.vs
+
+TiefseeNativeHost/obj
 
 Tiefsee.zip

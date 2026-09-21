@@ -8,13 +8,17 @@ EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "TiefseeAppPackager", "TiefseeAppPackager\TiefseeAppPackager.wapproj", "{8CE18D69-92D5-4FE1-9666-23E4C8DD9B61}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BC091E06-4906-4B69-8CBA-D1DA4998E8DB} = {BC091E06-4906-4B69-8CBA-D1DA4998E8DB}
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2} = {BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}
 	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Www", "Www\Www.esproj", "{9F81FCAE-DD1C-4D46-9EB4-208AA6C999F4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildAll", "BuildAll\BuildAll.csproj", "{4BECA59E-706E-492E-A26D-A8B362A5F496}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiefseeLauncher", "TiefseeLauncher\TiefseeLauncher.csproj", "{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TiefseeNativeHost", "TiefseeNativeHost\TiefseeNativeHost.vcxproj", "{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BC091E06-4906-4B69-8CBA-D1DA4998E8DB} = {BC091E06-4906-4B69-8CBA-D1DA4998E8DB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,12 +64,14 @@ Global
 		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Release|x64.Build.0 = Release|x64
 		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Release|x86.ActiveCfg = Release|x64
 		{4BECA59E-706E-492E-A26D-A8B362A5F496}.Release|x86.Build.0 = Release|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Debug|x64.ActiveCfg = Debug|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Debug|x64.Build.0 = Debug|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Debug|x86.ActiveCfg = Debug|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Release|x64.ActiveCfg = Release|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Release|x64.Build.0 = Release|x64
-		{9FCDFBB9-8636-4506-8AAC-7DEEBE27F0A2}.Release|x86.ActiveCfg = Release|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Debug|x64.ActiveCfg = Debug|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Debug|x64.Build.0 = Debug|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Debug|x86.ActiveCfg = Debug|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Debug|x86.Build.0 = Debug|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Release|x64.ActiveCfg = Release|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Release|x64.Build.0 = Release|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Release|x86.ActiveCfg = Release|x64
+		{BDB755C5-03FE-4C54-B21D-1A84D3A4F7E2}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,7 +31,7 @@
 
 	<Applications>
 		<Application Id="App"
-			Executable="$targetnametoken$.exe"
+			Executable="TiefseeNativeHost\Tiefsee.exe"
 			EntryPoint="$targetentrypoint$">
 			<uap:VisualElements
 				DisplayName="Tiefsee"
@@ -50,7 +50,7 @@
 				<!-- 開機自動啟動 -->
 				<desktop:Extension
 					Category="windows.startupTask"
-					Executable="Tiefsee\TiefseeCore.exe"
+					Executable="TiefseeNativeHost\Tiefsee.exe"
 					EntryPoint="Windows.FullTrustApplication">
 					<desktop:StartupTask
 						TaskId="TiefseeTask"

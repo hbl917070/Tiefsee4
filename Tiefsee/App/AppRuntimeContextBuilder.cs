@@ -20,9 +20,6 @@ public sealed class AppRuntimeContextBuilder {
         if (earlyPaths.IsPortableMode) {
             isStoreApp = false;
         }
-        else if (File.Exists(Path.Combine(earlyPaths.BaseDirectory, "../TiefseeLauncher/Tiefsee.exe")) == false) {
-            isStoreApp = false;
-        }
         else if (startupConfig.IniAppData != "") {
             // 已有上次寫回的 appData，就直接使用，避免重新探測 store path
             appData = startupConfig.IniAppData;
