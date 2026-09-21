@@ -33,8 +33,6 @@ public sealed class ServiceRegistry {
     }
 
     public void RegisterHttpRoutes() {
-        new AppHttpEndpoints(WebServer).RegisterRoutes();
-        new WindowHttpEndpoints(WebServer).RegisterRoutes();
         new FileHttpEndpoints(WebServer).RegisterRoutes();
         new DirectoryHttpEndpoints(WebServer).RegisterRoutes();
         new ImageHttpEndpoints(WebServer).RegisterRoutes();

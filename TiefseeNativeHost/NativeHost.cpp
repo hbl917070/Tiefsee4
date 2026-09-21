@@ -39,6 +39,8 @@ using managed_entry_point_fn = int(__stdcall*)();
 
 constexpr const wchar_t* kManagedTypeName = L"Tiefsee.Program, Tiefsee";
 constexpr const wchar_t* kManagedMethodName = L"RunFromNativeHost";
+// 必須與 Tiefsee/App/InstancePipeProtocol.cs 的 MaxMessageBytes 保持一致。
+constexpr size_t kMaxPipeMessageBytes = 1024 * 1024;
 // load_assembly_and_get_function_pointer 以這個特殊型別名稱表示目標方法具有 UnmanagedCallersOnly。
 const wchar_t* const kUnmanagedCallerOnlyMethod = reinterpret_cast<const wchar_t*>(-1);
 
@@ -222,18 +224,6 @@ bool EndsWith(const std::wstring& value, const std::wstring& suffix) {
         value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-// 將參數串成 port pipe 使用的訊息格式。每個參數一行，managed 端會再還原成參數陣列。
-std::wstring JoinArguments(const std::vector<std::wstring>& arguments) {
-    std::wstring result;
-    for (size_t i = 0; i < arguments.size(); i++) {
-        if (i != 0) {
-            result += L'\n';
-        }
-        result += arguments[i];
-    }
-    return result;
-}
-
 std::string ToUtf8(const std::wstring& value) {
     if (value.empty()) {
         return {};
@@ -249,18 +239,66 @@ std::string ToUtf8(const std::wstring& value) {
     return result;
 }
 
+// 將 JSON 字串中的特殊字元跳脫；非 ASCII UTF-8 bytes 可以直接保留。
+std::string EscapeJson(const std::string& value) {
+    static constexpr char hex[] = "0123456789abcdef";
+    std::string result;
+    result.reserve(value.size());
+
+    for (unsigned char ch : value) {
+        switch (ch) {
+        case '"': result += "\\\""; break;
+        case '\\': result += "\\\\"; break;
+        case '\b': result += "\\b"; break;
+        case '\f': result += "\\f"; break;
+        case '\n': result += "\\n"; break;
+        case '\r': result += "\\r"; break;
+        case '\t': result += "\\t"; break;
+        default:
+            if (ch < 0x20) {
+                result += "\\u00";
+                result += hex[(ch >> 4) & 0x0f];
+                result += hex[ch & 0x0f];
+            }
+            else {
+                result += static_cast<char>(ch);
+            }
+            break;
+        }
+    }
+    return result;
+}
+
+// 建立與 InstancePipeProtocol 相同格式的 JSON 命令。
+std::string BuildPipeMessage(const std::string& command, const std::vector<std::wstring>& arguments) {
+    std::string result = "{\"Command\":\"" + EscapeJson(command) + "\",\"Args\":[";
+    for (size_t i = 0; i < arguments.size(); i++) {
+        if (i != 0) {
+            result += ',';
+        }
+        result += "\"" + EscapeJson(ToUtf8(arguments[i])) + "\"";
+    }
+    result += "]}";
+    return result;
+}
+
 // 嘗試把這次啟動要求轉交給已經執行中的 Tiefsee。
 // Port 資料夾中的檔名同時是 instance 的識別碼；鎖定檔案可避免在 instance 正建立 pipe
 // 時誤判，Named Pipe 則負責真正傳送命令列參數。
-bool TryForwardToRunningInstance(const std::wstring& appData, const std::vector<std::wstring>& arguments) {
+bool TryForwardToRunningInstance(
+    const std::wstring& appData,
+    const std::string& command,
+    const std::vector<std::wstring>& arguments) {
     const std::filesystem::path portDirectory = std::filesystem::path(appData) / L"Port";
     std::error_code error;
     if (!std::filesystem::is_directory(portDirectory, error)) {
         return false;
     }
 
-    const std::wstring messageText = JoinArguments(arguments);
-    const std::string message = ToUtf8(messageText);
+    const std::string message = BuildPipeMessage(command, arguments);
+    if (message.size() > kMaxPipeMessageBytes) {
+        return false;
+    }
     const std::wstring searchPattern = (portDirectory / L"*").wstring();
 
     WIN32_FIND_DATAW findData{};
@@ -288,16 +326,14 @@ bool TryForwardToRunningInstance(const std::wstring& appData, const std::vector<
 
         const std::wstring pipeName = L"\\\\.\\pipe\\tiefsee-" + fileName;
         if (!WaitNamedPipeW(pipeName.c_str(), 3000)) {
-            // 等待逾時通常表示 Port 檔案已經過期，避免下次啟動再次等待同一個無效 Port。
-            DeleteFileW(portFile.c_str());
+            // 不刪除仍可能屬於有效 instance 的 Port 檔案；下一次掃描會重新判斷鎖定狀態。
             continue;
         }
 
         HANDLE pipe = CreateFileW(
             pipeName.c_str(), GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
         if (!IsValidHandle(pipe)) {
-            // Pipe 在等待後仍無法開啟，這個 Port 已不能使用，清除它再繼續尋找其他執行個體。
-            DeleteFileW(portFile.c_str());
+            // Pipe 在等待後仍無法開啟，不能據此判定 Port lock 已失效。
             continue;
         }
 
@@ -309,8 +345,7 @@ bool TryForwardToRunningInstance(const std::wstring& appData, const std::vector<
             break;
         }
 
-        // 傳送失敗時不要保留可能已失效的 Port 檔案，否則後續啟動會重複浪費等待時間。
-        DeleteFileW(portFile.c_str());
+        // 傳送失敗時保留 Port lock，避免把仍在啟動或重建 Pipe 的 instance 誤判成失效。
     } while (FindNextFileW(findHandle, &findData));
 
     FindClose(findHandle);
@@ -457,11 +492,16 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     std::wstring appData;
     const int startType = ReadStartType(managedDirectory, appData);
     if (arguments.size() == 1 && arguments[0] == L"closeAll") {
-        // closeAll 是關閉既有視窗的特殊命令，必須載入 managed 程式才能執行原本的關閉邏輯。
+        // 非 Normal 模式直接透過 Pipe 傳送 closeAll，無需載入 managed runtime。
+        if (startType != 1 && TryForwardToRunningInstance(appData, "closeAll", {})) {
+            return 0;
+        }
+
+        // 沒有可轉交的 instance，才載入 managed 程式處理 Normal 模式的關閉邏輯。
         return RunManagedApplication(managedDirectory, arguments);
     }
 
-    if (startType != 1 && TryForwardToRunningInstance(appData, arguments)) {
+    if (startType != 1 && TryForwardToRunningInstance(appData, "open", arguments)) {
         // 已有 instance 且啟動模式允許快速啟動：參數已轉交，新的 process 立即結束。
         return 0;
     }

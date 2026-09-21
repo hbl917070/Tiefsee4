@@ -1,6 +1,4 @@
 using System.IO;
-using System.IO.Pipes;
-using System.Text;
 using System.Windows.Input;
 using Windows.UI.StartScreen;
 
@@ -15,6 +13,8 @@ public class StartWindow : Form {
     private FileStream fsPort;
     /// <summary> 桌面的路徑 </summary>
     private string desktopDir;
+    /// <summary> 接收 Native host 啟動命令的 Pipe server </summary>
+    private InstancePipeServer instancePipeServer;
 
     public StartWindow() {
 
@@ -23,10 +23,10 @@ public class StartWindow : Form {
         AppScheduler.Initialize();
         PluginRegistry.Init();
 
+        InitInstancePipeServer();
         PortLock(); // 寫入檔案，表示此 port 已經被佔用
         CheckWebView2(); // 檢查是否有 webview2 執行環境
         InitJumpTask(); // 初始化 JumpTask
-        InitNamedPipeServer();
 
         NetVips.Cache.MaxFiles = 0; // 避免 NetVips 主動暫存檔案，不這麼做的話，同路徑的檔案被修改後，將無法讀取到新的檔案
         // NetVips.Cache.Max = 0;
@@ -57,6 +57,12 @@ public class StartWindow : Form {
         }, true);
 
         InitQuickLook(); // 快速預覽
+
+        this.FormClosed += async (sender, e) => {
+            if (instancePipeServer != null) {
+                await instancePipeServer.DisposeAsync();
+            }
+        };
     }
 
     /// <summary>
@@ -279,49 +285,29 @@ public class StartWindow : Form {
     }
 
     /// <summary>
-    /// 初始化 NamedPipeServerStream
+    /// 初始化 instance Pipe，並分派 Native host 傳入的命令。
     /// </summary>
-    private async void InitNamedPipeServer() {
+    private void InitInstancePipeServer() {
+        if (Program.startType == StartMode.Normal) {
+            return;
+        }
 
-        if (Program.startType == StartMode.Normal) { return; }
+        instancePipeServer = new InstancePipeServer(Program.webServer.port, HandleInstancePipeMessage);
+        instancePipeServer.Start();
+    }
 
-        await Task.Factory.StartNew(async () => {
+    /// <summary>
+    /// 在 UI thread 執行 instance 命令。
+    /// </summary>
+    private static void HandleInstancePipeMessage(InstancePipeMessage message) {
+        AppScheduler.UIThread(() => {
+            if (message.Command == InstancePipeProtocol.CloseAllCommand) {
+                WebWindow.CloseAllWindow();
+                return;
+            }
 
-            using var server = new NamedPipeServerStream(
-                $"tiefsee-{Program.webServer.port}",
-                PipeDirection.InOut,
-                NamedPipeServerStream.MaxAllowedServerInstances,
-                PipeTransmissionMode.Message);
-
-            // 等待客戶端連接
-            while (AppScheduler.isRuning) {
-                server.WaitForConnection();
-
-                // 客戶端已連接
-                while (AppScheduler.isRuning) {
-
-                    // 讀取客戶端發送的訊息
-                    var buffer = new byte[1024];
-                    var ms = new MemoryStream();
-                    int readBytes;
-                    do {
-                        readBytes = server.Read(buffer, 0, buffer.Length);
-                        ms.Write(buffer, 0, readBytes);
-                    } while (!server.IsMessageComplete);
-                    var allData = ms.ToArray();
-                    var message = Encoding.UTF8.GetString(allData, 0, allData.Length);
-
-                    // 將字串剖析回命令列參數
-                    string[] args = message.Split('\n');
-                    AppScheduler.UIThread(() => {
-                        WebWindow.Create("MainWindow.html", args, null);
-                    });
-
-                    break;
-                }
-
-                // 客戶端已斷開連接
-                server.Disconnect();
+            if (message.Command == InstancePipeProtocol.OpenCommand) {
+                WebWindow.Create("MainWindow.html", message.Args ?? [], null);
             }
         });
     }

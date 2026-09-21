@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 
 namespace Tiefsee;
 
@@ -41,22 +40,10 @@ public class SingleInstanceCoordinator {
             return false;
         }
 
-        string appDataPort = Program.runtimeContext.AppDataPort;
-
-        // 找不到記錄 port 的資料夾
-        if (Directory.Exists(appDataPort) == false) {
-            return false;
-        }
-
-        int port = GetPort();
-
-        // 沒有可以正常請求的 port
-        if (port == -1) {
-            return false;
-        }
-
-        NewWindow(args, port);
-        return true;
+        return InstancePipeClient.TrySend(
+            Program.runtimeContext.AppDataPort,
+            InstancePipeProtocol.OpenCommand,
+            args);
     }
 
     /// <summary>
@@ -95,64 +82,10 @@ public class SingleInstanceCoordinator {
             return;
         }
 
-        int port = GetPort();
-        string uri = $"http://127.0.0.1:{port}/api/windows/close-all";
-        SendRequest(uri);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private static int GetPort() {
-        string appDataPort = Program.runtimeContext.AppDataPort;
-
-        foreach (string filePort in Directory.GetFiles(appDataPort, "*")) { // 判斷目前已經開啟的視窗
-
-            try {
-                using (FileStream flagFile = File.Open(filePort, FileMode.Open)) { }
-                File.Delete(filePort); // 如果 port 沒有被鎖定，就刪除檔案
-                continue;
-            }
-            catch {
-                // 檔案被鎖定，表示此 port 還有在作用
-            }
-
-            try {
-                string port = Path.GetFileName(filePort);
-                // 偵測是否可用
-                string uri = $"http://127.0.0.1:{port}/api/app/ping";
-                SendRequest(uri);
-
-                return Int32.Parse(port);
-            }
-            catch { }
-            try {
-                File.Delete(filePort); // 如果這個 port 超過時間沒有回應，就當做無法使用，將檔案刪除
-            }
-            catch { }
-        }
-        return -1;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private static void NewWindow(string[] args, int port) {
-        string base64 = Uri.EscapeDataString(string.Join("\n", args));
-        string uri = $"http://127.0.0.1:{port}/api/windows/open?path=" + base64;
-        SendRequest(uri);
-    }
-
-    /// <summary>
-    /// 發送 http 請求
-    /// </summary>
-    private static Task<string> SendRequest(string uri) {
-        using (HttpClient client = new()) {
-            client.Timeout = TimeSpan.FromSeconds(5); // 逾時
-            client.DefaultRequestHeaders.Add("User-Agent", Program.webvviewUserAgent);
-            HttpResponseMessage response = client.GetAsync(uri).Result;
-            return response.Content.ReadAsStringAsync();
-        }
+        InstancePipeClient.TrySend(
+            Program.runtimeContext.AppDataPort,
+            InstancePipeProtocol.CloseAllCommand,
+            []);
     }
 
 }
