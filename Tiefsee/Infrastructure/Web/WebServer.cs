@@ -111,10 +111,20 @@ public class WebServer {
         };
 
         try {
+            bool routeMatched = false;
             for (int i = 0; i < arRoute.Count; i++) { // 嘗試匹配每一個有註冊的路由 
                 if (await arRoute[i](requestData) == true) { // 如果匹配網址成功，就離開
+                    routeMatched = true;
                     break;
                 }
+            }
+
+            if (routeMatched == false) {
+                // 未註冊的路由不可默認回傳空的 200，避免呼叫端誤判請求成功。
+                context.Response.StatusCode = 404;
+                context.Response.ContentType = "text/plain; charset=utf-8";
+                byte[] responseArray = Encoding.UTF8.GetBytes("404");
+                await context.Response.OutputStream.WriteAsync(responseArray, 0, responseArray.Length);
             }
         }
         catch (Exception e) {
