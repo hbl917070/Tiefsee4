@@ -134,6 +134,9 @@ public class WebServer {
 
     /// <summary>
     /// 驗證受保護的 API 或靜態資源請求是否帶有目前執行個體的 capability token。
+    /// /assets/files 是 Markdown 使用的任意本機檔案資源，因此需要 token；
+    /// /assets/www 與 /assets/plugins 則是 WebView bootstrap／Plugin 的固定根目錄靜態資源，
+    /// 保持不需 token，並由 StaticAssetHttpEndpoints 各自執行 containment。
     /// GET/HEAD 支援 query token，保留直接瀏覽器資源 caller 的相容性；
     /// WebView2 的受保護資源由 host 補上自訂 header。
     /// 其他方法也使用自訂 header，避免把 token 放進 POST body 或一般 URL。
