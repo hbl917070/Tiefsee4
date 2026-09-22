@@ -378,8 +378,30 @@ public class WebWindow : FormNone {
         // 避免被 adguard 影響載入速度
         _wv2.CoreWebView2.AddWebResourceRequestedFilter("http://local.adguard.org/*", CoreWebView2WebResourceContext.All);
         _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
+            if (args.Request.Uri.StartsWith("http://local.adguard.org/", StringComparison.OrdinalIgnoreCase) == false) {
+                return;
+            }
             args.Response = _wv2.CoreWebView2.Environment
                 .CreateWebResourceResponse(null, 200, "OK", "");
+        };
+
+        // localhost API 與 /assets/files 都保持不含 token 的穩定 URL，讓瀏覽器可以使用快取；
+        // capability token 統一由 host 在請求送出前補到 header。
+        string protectedResourceOrigin = Program.webServer.origin.TrimEnd('/');
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter(
+            protectedResourceOrigin + "/api/*",
+            CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter(
+            protectedResourceOrigin + "/assets/files/*",
+            CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
+            bool isProtectedResource = args.Request.Uri.StartsWith(protectedResourceOrigin + "/api/", StringComparison.OrdinalIgnoreCase)
+                || args.Request.Uri.StartsWith(protectedResourceOrigin + "/assets/files/", StringComparison.OrdinalIgnoreCase);
+            if (isProtectedResource == false) {
+                return;
+            }
+
+            args.Request.Headers.SetHeader("X-Tiefsee-Token", Program.webApiToken);
         };
 
         WindowBridge = new WindowWebViewBridge(this);

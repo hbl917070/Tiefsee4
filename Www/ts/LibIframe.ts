@@ -307,13 +307,10 @@ class LibIframe {
      */
     public pathToUrl(path: string, encode = true): string {
         if (encode) {
-            return Lib.addApiToken(
-                this.APIURL + `/api/files/content?path=${encodeURIComponent(path)}`,
-                this.APIURL,
-                this.appInfo.webApiToken,
-            );
+            return this.APIURL + `/api/files/content?path=${encodeURIComponent(path)}`;
         }
-        return this.APIURL + `/assets/files/${path.replace(/\\/g, "/")}`;
+        const normalizedPath = path.replace(/\\/g, "/");
+        return this.APIURL + `/assets/files/${normalizedPath}`;
 
         /*return "file:///" + encodeURIComponent(path)
             .replace(/[%]3A/g, ":")

@@ -70,7 +70,7 @@ export class ArchiveApiClient {
 
     /** 取得可直接給既有圖片/影片/文字 API 使用的內容 URL；呼叫時後端才會 materialize entry。 */
     public getEntryUrl(sessionId: string, entryId: number): string {
-        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry", sessionId, entryId));
+        return this.getResourceUrl(this.getEndpoint("/api/archives/entry", sessionId, entryId));
     }
 
     /** 取得 entry 解壓後的實體暫存路徑，供後續 Windows/外部操作使用。 */
@@ -83,19 +83,19 @@ export class ArchiveApiClient {
 
     /** 建立一般 archive entry 的縮圖 URL；請求時才會進入 materialize。 */
     public getEntryThumbnailUrl(sessionId: string, entryId: number, size = 256): string {
-        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry-thumbnail", sessionId, entryId)
+        return this.getResourceUrl(this.getEndpoint("/api/archives/entry-thumbnail", sessionId, entryId)
             + `&size=${encodeURIComponent(String(size))}`);
     }
 
     /** 建立不需解壓高風險 entry 的 Windows Shell 通用 icon URL。 */
     public getEntryIconUrl(sessionId: string, entryId: number, size = 256): string {
-        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry-icon", sessionId, entryId)
+        return this.getResourceUrl(this.getEndpoint("/api/archives/entry-icon", sessionId, entryId)
             + `&size=${encodeURIComponent(String(size))}`);
     }
 
     /** 載入候選壓縮檔失敗時，FileLoad 用此 URL 顯示原始檔案圖示。 */
     public getArchiveIconUrl(archivePath: string, size = 256): string {
-        return this.getAuthorizedUrl(`/api/files/icon?size=${encodeURIComponent(String(size))}`
+        return this.getResourceUrl(`/api/files/icon?size=${encodeURIComponent(String(size))}`
             + `&path=${encodeURIComponent(archivePath)}`);
     }
 
@@ -107,10 +107,9 @@ export class ArchiveApiClient {
             + `&entryId=${encodeURIComponent(String(entryId))}`;
     }
 
-    /** 建立帶有 capability token、可直接交給瀏覽器元件使用的完整 URL。 */
-    private getAuthorizedUrl(endpoint: string): string {
-        const baseUrl = this.getBaseUrl();
-        return Lib.addApiToken(baseUrl + endpoint, baseUrl);
+    /** 建立可直接交給瀏覽器元件使用的完整 URL；認證由 WebView2 host 攔截器補上。 */
+    private getResourceUrl(endpoint: string): string {
+        return this.getBaseUrl() + endpoint;
     }
 
     /** 取得 API host；延遲讀取全域 APIURL 以避開 module 初始化順序問題。 */
@@ -124,17 +123,15 @@ export class ArchiveApiClient {
         let response: Response;
         try {
             const headers = new Headers(init.headers);
-            const tokenHeaders = Lib.getApiTokenHeaders();
-            for (const [name, value] of Object.entries(tokenHeaders)) {
-                headers.set(name, value);
+            const method = (init.method ?? "GET").toUpperCase();
+            if (method !== "GET" && method !== "HEAD") {
+                for (const [name, value] of Object.entries(Lib.getApiTokenHeaders())) {
+                    headers.set(name, value);
+                }
             }
             const baseUrl = this.getBaseUrl() + endpoint;
-            const method = (init.method ?? "GET").toUpperCase();
-            const requestUrl = method === "GET" || method === "HEAD"
-                ? Lib.addApiToken(baseUrl)
-                : baseUrl;
             response = await this.fetchFunction(
-                requestUrl,
+                baseUrl,
                 { ...init, headers },
             );
         }

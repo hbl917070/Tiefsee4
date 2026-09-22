@@ -9,6 +9,7 @@ namespace Tiefsee;
 public class WebServer {
 
     private const string ApiPathPrefix = "/api/";
+    private const string FileAssetPathPrefix = "/assets/files/";
     private const string ApiTokenHeader = "X-Tiefsee-Token";
     private const string ApiTokenQuery = "tiefseeToken";
 
@@ -65,8 +66,8 @@ public class WebServer {
         string url = request.Url.ToString();
         url = url.Substring(baseUrl.Length);
 
-        if (url.StartsWith(ApiPathPrefix, StringComparison.OrdinalIgnoreCase)
-            && IsApiRequestAuthorized(request) == false) {
+        if (IsProtectedRequestPath(url)
+            && IsProtectedRequestAuthorized(request) == false) {
             context.Response.StatusCode = 403;
             context.Response.ContentType = "text/plain; charset=utf-8";
             byte[] responseArray = Encoding.UTF8.GetBytes("403");
@@ -132,11 +133,17 @@ public class WebServer {
     }
 
     /// <summary>
-    /// 驗證 API 請求是否帶有目前執行個體的 capability token。
-    /// GET/HEAD 支援 query token，讓 img、video、iframe 等瀏覽器資源請求可以使用；
-    /// 其他方法使用自訂 header，避免把 token 放進 POST body 或一般 URL。
+    /// 驗證受保護的 API 或靜態資源請求是否帶有目前執行個體的 capability token。
+    /// GET/HEAD 支援 query token，保留直接瀏覽器資源 caller 的相容性；
+    /// WebView2 的受保護資源由 host 補上自訂 header。
+    /// 其他方法也使用自訂 header，避免把 token 放進 POST body 或一般 URL。
     /// </summary>
-    private static bool IsApiRequestAuthorized(HttpListenerRequest request) {
+    private static bool IsProtectedRequestPath(string url) {
+        return url.StartsWith(ApiPathPrefix, StringComparison.OrdinalIgnoreCase)
+            || url.StartsWith(FileAssetPathPrefix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsProtectedRequestAuthorized(HttpListenerRequest request) {
         string token = request.Headers[ApiTokenHeader];
         if (string.IsNullOrEmpty(token)
             && (request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)

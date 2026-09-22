@@ -92,7 +92,7 @@ export class WebAPI {
          * 取得檔案圖示的網址
          */
         static fileIcon(path: string) {
-            return Lib.addApiToken(APIURL + "/api/files/icon?size=256&path=" + encodeURIComponent(path));
+            return APIURL + "/api/files/icon?size=256&path=" + encodeURIComponent(path);
         }
 
         /**
@@ -102,7 +102,7 @@ export class WebAPI {
             const encodePath = encodeURIComponent(path);
             const encodeUrl = encodeURIComponent(url);
             const r = 0; // Math.random(); // 避免快取
-            return Lib.addApiToken(APIURL + `/api/web/icon?size=256&url=${encodeUrl}&path=${encodePath}&r=${r}`);
+            return APIURL + `/api/web/icon?size=256&url=${encodeUrl}&path=${encodePath}&r=${r}`;
         }
 
         /**
@@ -117,22 +117,22 @@ export class WebAPI {
                 return WebAPI.getFile(fileInfo2);
             }
             if (type === "webIcc") {
-                return Lib.addApiToken(APIURL + `/api/images/thumbnail/web-icc?path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/images/thumbnail/web-icc?path=${encodePath}&${fileTime}`;
             }
             if (type === "icon") {
                 return this.fileIcon(path);
             }
             if (type === "uwp") {
-                return Lib.addApiToken(APIURL + `/api/images/thumbnail/uwp?path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/images/thumbnail/uwp?path=${encodePath}&${fileTime}`;
             }
             if (type === "magick" || type === "magickBmp") {
-                return Lib.addApiToken(APIURL + `/api/images/thumbnail/magick?type=bmp&path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/images/thumbnail/magick?type=bmp&path=${encodePath}&${fileTime}`;
             }
             if (type === "magickPng") {
-                return Lib.addApiToken(APIURL + `/api/images/thumbnail/magick?type=png&path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/images/thumbnail/magick?type=png&path=${encodePath}&${fileTime}`;
             }
             if (type === "rawThumbnail") {
-                return Lib.addApiToken(APIURL + `/api/images/thumbnail/raw?path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/images/thumbnail/raw?path=${encodePath}&${fileTime}`;
             }
             if (type === "nconvert" || type === "nconvertBmp") {
                 let url = APIURL + `/api/images/thumbnail/nconvert?type=bmp&path=${encodePath}&${fileTime}`;
@@ -144,7 +144,7 @@ export class WebAPI {
                 url = Lib.pathToUrl(await Lib.sendApiGet("text", url));
                 return url;
             }
-            return Lib.addApiToken(APIURL + `/api/images/thumbnail/magick?path=${encodePath}&${fileTime}`);
+            return APIURL + `/api/images/thumbnail/magick?path=${encodePath}&${fileTime}`;
         }
 
         /**
@@ -172,7 +172,7 @@ export class WebAPI {
             const path = fileInfo2.Path;
             const encodePath = encodeURIComponent(path);
             const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            const imgU = Lib.addApiToken(APIURL + `/api/images/vips/resize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`);
+            const imgU = APIURL + `/api/images/vips/resize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`;
             return imgU;
         }
 
@@ -220,7 +220,7 @@ export class WebAPI {
     }
 
     /**
-     * 實際送出 JSON POST 請求；是否附加 capability token 由外層函數決定。
+     * 實際送出 JSON POST 請求；由前端明確帶上 capability token。
      */
     private static async sendPostCore(url: string, postData: any, headers?: Record<string, string>) {
         let json: any;
@@ -240,7 +240,8 @@ export class WebAPI {
     }
 
     /**
-     * 送出不帶 Tiefsee capability token 的基底 POST 請求。
+     * 送出不帶 Tiefsee capability token 的一般／外部 POST 請求；
+     * localhost API 必須使用 sendApiPost 或 sendApiResponsePost。
      */
     static async sendPost(url: string, postData: any) {
         return WebAPI.sendPostCore(url, postData);
@@ -254,7 +255,7 @@ export class WebAPI {
     }
 
     /**
-     * 送出帶有 Tiefsee capability token、使用 ApiResponse envelope 的內部 API POST 請求。
+     * 送出使用 ApiResponse envelope 的內部 API POST 請求。
      * 這個 wrapper 只處理回應格式與 API 例外，不決定畫面上的錯誤行為。
      */
     static async sendApiResponsePost<T>(url: string, postData: any): Promise<T> {
@@ -354,7 +355,7 @@ export class WebAPI {
         const path = fileInfo2.Path;
         const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         const encodePath = encodeURIComponent(path);
-        const url = Lib.addApiToken(`${APIURL}/api/files/pdf?path=${encodePath}&${fileTime}`)
+        const url = `${APIURL}/api/files/pdf?path=${encodePath}&${fileTime}`
         return url;
     }
 
@@ -367,16 +368,16 @@ export class WebAPI {
             const encodePath = encodeURIComponent(file);
             if (lastWriteTimeUtc) {
                 const fileTime = `LastWriteTimeUtc=${lastWriteTimeUtc}`;
-                return Lib.addApiToken(APIURL + `/api/files/content?path=${encodePath}&${fileTime}`);
+                return APIURL + `/api/files/content?path=${encodePath}&${fileTime}`;
             }
-            return Lib.addApiToken(APIURL + `/api/files/content?path=${encodePath}`);
+            return APIURL + `/api/files/content?path=${encodePath}`;
         }
 
         const fileInfo2 = file;
         const path = fileInfo2.Path;
         const encodePath = encodeURIComponent(path);
         const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-        return Lib.addApiToken(APIURL + `/api/files/content?path=${encodePath}&${fileTime}`);
+        return APIURL + `/api/files/content?path=${encodePath}&${fileTime}`;
     }
 
     /**
@@ -384,7 +385,7 @@ export class WebAPI {
      */
     static getVideo(path: string) {
         const encodePath = encodeURIComponent(path);
-        return Lib.addApiToken(APIURL + `/api/files/video?path=${encodePath}&windowId=${encodeURIComponent(baseWindow.windowId)}`);
+        return APIURL + `/api/files/video?path=${encodePath}&windowId=${encodeURIComponent(baseWindow.windowId)}`;
     }
 
     /**
@@ -541,6 +542,6 @@ export class WebAPI {
      * 轉送 get
      */
     static forwardGet(url: string) {
-        return Lib.addApiToken(APIURL + "/api/system/forward-request?targetUrl=" + encodeURIComponent(url));
+        return APIURL + "/api/system/forward-request?targetUrl=" + encodeURIComponent(url);
     }
 }
