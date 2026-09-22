@@ -587,6 +587,9 @@ interface AppInfo {
     /** 目前使用的 port */
     mainPort: number;
 
+    /** 呼叫 localhost API 所需的 capability token */
+    webApiToken: string;
+
     /** setting.js 的路徑 */
     settingPath: string;
 

@@ -17,6 +17,8 @@ public class AppInfo {
     public string tempDirWebFile { get; set; }
     /// <summary> 目前使用的 port </summary>
     public int mainPort { get; set; }
+    /// <summary> 呼叫 localhost API 所需的 capability token </summary>
+    public string webApiToken { get; set; }
     /// <summary> setting.js 的路徑 </summary>
     public string settingPath { get; set; }
     /// <summary> setting.js 的文字 </summary>
@@ -30,4 +32,3 @@ public class AppInfo {
     /// <summary> 哪些擴充是有啟用的 </summary>
     public PluginAvailability plugin { get; set; } = PluginRegistry.pluginAvailability;
 }
-

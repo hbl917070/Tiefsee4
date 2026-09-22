@@ -1,4 +1,5 @@
 import { hotkeyActionKeys } from "./HotkeyDefinitions";
+import { Lib } from "./Lib";
 
 declare global {
     interface Window {
@@ -306,7 +307,11 @@ class LibIframe {
      */
     public pathToUrl(path: string, encode = true): string {
         if (encode) {
-            return this.APIURL + `/api/files/content?path=${encodeURIComponent(path)}`;
+            return Lib.addApiToken(
+                this.APIURL + `/api/files/content?path=${encodeURIComponent(path)}`,
+                this.APIURL,
+                this.appInfo.webApiToken,
+            );
         }
         return this.APIURL + `/assets/files/${path.replace(/\\/g, "/")}`;
 

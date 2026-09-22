@@ -414,7 +414,7 @@ export class Lib {
     }
 
     /**
-     * 送出 GET 的 http 請求
+     * 送出不帶 Tiefsee capability token 的基底 GET 請求。
      */
     public static async sendGet(type: ("text" | "json" | "base64"), url: string, timeout = 30000) {
 
@@ -482,6 +482,44 @@ export class Lib {
             });
             return base64;
         }
+    }
+
+    /**
+     * 送出 Tiefsee localhost API 的 GET 請求。
+     * 與 sendGet 分開，避免外部網址意外帶出 capability token。
+     */
+    public static async sendApiGet(type: ("text" | "json" | "base64"), url: string, timeout = 30000) {
+        return Lib.sendGet(type, Lib.addApiToken(url), timeout);
+    }
+
+    /**
+     * 為 Tiefsee localhost API GET URL 附加 capability token。
+     * 外部網址與非 API 資源保持原樣，避免把 token 傳給第三方服務。
+     */
+    public static addApiToken(url: string, apiBaseUrl?: string, apiToken?: string): string {
+        const globalWindow = globalThis as typeof globalThis & {
+            APIURL?: string,
+            baseWindow?: { appInfo?: { webApiToken?: string } },
+        };
+        const token = apiToken ?? globalWindow.baseWindow?.appInfo?.webApiToken;
+        const baseUrl = apiBaseUrl ?? globalWindow.APIURL;
+        if (!token || !baseUrl || !url.startsWith(baseUrl + "/api/") || url.includes("tiefseeToken=")) {
+            return url;
+        }
+
+        const separator = url.includes("?") ? "&" : "?";
+        return url + separator + "tiefseeToken=" + encodeURIComponent(token);
+    }
+
+    /**
+     * 取得呼叫 Tiefsee localhost API 的 header。
+     */
+    public static getApiTokenHeaders(): Record<string, string> {
+        const globalWindow = globalThis as typeof globalThis & {
+            baseWindow?: { appInfo?: { webApiToken?: string } },
+        };
+        const token = globalWindow.baseWindow?.appInfo?.webApiToken;
+        return token ? { "X-Tiefsee-Token": token } : {};
     }
 
     /**

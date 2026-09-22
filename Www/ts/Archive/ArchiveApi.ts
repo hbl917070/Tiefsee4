@@ -4,6 +4,7 @@ import {
     ArchivePhysicalPathResponse,
     ArchiveSessionResponse,
 } from "./ArchiveTypes";
+import { Lib } from "../Lib";
 
 type FetchFunction = typeof fetch;
 
@@ -69,7 +70,7 @@ export class ArchiveApiClient {
 
     /** 取得可直接給既有圖片/影片/文字 API 使用的內容 URL；呼叫時後端才會 materialize entry。 */
     public getEntryUrl(sessionId: string, entryId: number): string {
-        return this.getUrl("/api/archives/entry", sessionId, entryId);
+        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry", sessionId, entryId));
     }
 
     /** 取得 entry 解壓後的實體暫存路徑，供後續 Windows/外部操作使用。 */
@@ -82,20 +83,20 @@ export class ArchiveApiClient {
 
     /** 建立一般 archive entry 的縮圖 URL；請求時才會進入 materialize。 */
     public getEntryThumbnailUrl(sessionId: string, entryId: number, size = 256): string {
-        return this.getBaseUrl() + this.getEndpoint("/api/archives/entry-thumbnail", sessionId, entryId)
-            + `&size=${encodeURIComponent(String(size))}`;
+        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry-thumbnail", sessionId, entryId)
+            + `&size=${encodeURIComponent(String(size))}`);
     }
 
     /** 建立不需解壓高風險 entry 的 Windows Shell 通用 icon URL。 */
     public getEntryIconUrl(sessionId: string, entryId: number, size = 256): string {
-        return this.getBaseUrl() + this.getEndpoint("/api/archives/entry-icon", sessionId, entryId)
-            + `&size=${encodeURIComponent(String(size))}`;
+        return this.getAuthorizedUrl(this.getEndpoint("/api/archives/entry-icon", sessionId, entryId)
+            + `&size=${encodeURIComponent(String(size))}`);
     }
 
     /** 載入候選壓縮檔失敗時，FileLoad 用此 URL 顯示原始檔案圖示。 */
     public getArchiveIconUrl(archivePath: string, size = 256): string {
-        return this.getBaseUrl() + `/api/files/icon?size=${encodeURIComponent(String(size))}`
-            + `&path=${encodeURIComponent(archivePath)}`;
+        return this.getAuthorizedUrl(`/api/files/icon?size=${encodeURIComponent(String(size))}`
+            + `&path=${encodeURIComponent(archivePath)}`);
     }
 
     /** 統一組合需要 sessionId 與 entryId 的 archive endpoint URL。 */
@@ -106,9 +107,10 @@ export class ArchiveApiClient {
             + `&entryId=${encodeURIComponent(String(entryId))}`;
     }
 
-    /** 建立可直接交給瀏覽器元件使用的完整 archive URL。 */
-    private getUrl(endpoint: string, sessionId: string, entryId: number): string {
-        return this.getBaseUrl() + this.getEndpoint(endpoint, sessionId, entryId);
+    /** 建立帶有 capability token、可直接交給瀏覽器元件使用的完整 URL。 */
+    private getAuthorizedUrl(endpoint: string): string {
+        const baseUrl = this.getBaseUrl();
+        return Lib.addApiToken(baseUrl + endpoint, baseUrl);
     }
 
     /** 取得 API host；延遲讀取全域 APIURL 以避開 module 初始化順序問題。 */
@@ -121,7 +123,20 @@ export class ArchiveApiClient {
     private async requestJson<T>(endpoint: string, init: RequestInit): Promise<T> {
         let response: Response;
         try {
-            response = await this.fetchFunction(this.getBaseUrl() + endpoint, init);
+            const headers = new Headers(init.headers);
+            const tokenHeaders = Lib.getApiTokenHeaders();
+            for (const [name, value] of Object.entries(tokenHeaders)) {
+                headers.set(name, value);
+            }
+            const baseUrl = this.getBaseUrl() + endpoint;
+            const method = (init.method ?? "GET").toUpperCase();
+            const requestUrl = method === "GET" || method === "HEAD"
+                ? Lib.addApiToken(baseUrl)
+                : baseUrl;
+            response = await this.fetchFunction(
+                requestUrl,
+                { ...init, headers },
+            );
         }
         catch (error) {
             const message = error instanceof Error ? error.message : "網路請求失敗。";

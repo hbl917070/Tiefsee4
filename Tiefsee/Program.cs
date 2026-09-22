@@ -1,6 +1,7 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 
@@ -20,8 +21,8 @@ public static class Program {
     public static AppRuntimeContext runtimeContext;
     /// <summary> 起始視窗，關閉此視窗就會結束程式 </summary>
     public static StartWindow startWindow;
-    /// <summary> 透過 UserAgent 來驗證是否有權限請求 localhost server API </summary>
-    public static string webvviewUserAgent = "Tiefsee";
+    /// <summary> 目前執行個體的 localhost API capability token </summary>
+    public static readonly string webApiToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
 
     /// <summary>
     /// 應用程式的主要進入點

@@ -257,6 +257,7 @@ public class WebWindow : FormNone {
             appDataPath = Program.runtimeContext.AppData,
             tempDirWebFile = Program.runtimeContext.TempDirWebFile,
             mainPort = Program.webServer.port,
+            webApiToken = Program.webApiToken,
             settingPath = Program.runtimeContext.AppDataSetting,
             quickLookRunType = quickLookRunType,
             isWin11 = _systemEnvironmentHelper.IsWindows11(),
@@ -365,8 +366,8 @@ public class WebWindow : FormNone {
         _wv2.CoreWebView2.Settings.IsZoomControlEnabled = false;
         // 是否顯示左下角的網址狀態
         _wv2.CoreWebView2.Settings.IsStatusBarEnabled = false;
-        // 覆寫 userAgent。用於在請求 API 時，辨識身份是否合法
-        _wv2.CoreWebView2.Settings.UserAgent = _wv2.CoreWebView2.Settings.UserAgent + " " + Program.webvviewUserAgent;
+        // 某些外部圖片暫存伺服器以 User-Agent 中的 Tiefsee 標記辨識應用程式；localhost API 身份驗證改由 capability token 處理。
+        _wv2.CoreWebView2.Settings.UserAgent = _wv2.CoreWebView2.Settings.UserAgent + " Tiefsee";
         // 讓 webview2 支援 css「app - region:drag」
         // _wv2.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
         // 觸摸輸入的設備上使用捏合運動在 WebView2 中縮放 Web 內容

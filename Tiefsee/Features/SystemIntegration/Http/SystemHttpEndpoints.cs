@@ -5,6 +5,9 @@ namespace Tiefsee;
 
 public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
 
+    private const string TargetUrlHeader = "targetUrl";
+    private const string TiefseeTokenHeader = "X-Tiefsee-Token";
+
     /// <summary>
     /// 建立系統整合相關的 HTTP endpoints
     /// </summary>
@@ -48,7 +51,7 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
     /// </summary>
     private async Task ForwardRequest(RequestData d) {
         var context = d.context;
-        string targetUrl = d.context.Request.Headers["targetUrl"];
+        string targetUrl = d.context.Request.Headers[TargetUrlHeader];
 
         if (string.IsNullOrEmpty(targetUrl)) {
             targetUrl = Uri.UnescapeDataString(d.args.GetValueOrDefault("targetUrl"));
@@ -69,7 +72,8 @@ public sealed class SystemHttpEndpoints : HttpEndpointModuleBase {
 
             // 將原始 request header 盡量原樣轉送，但跳過會影響代理行為的欄位
             foreach (string headerName in context.Request.Headers.AllKeys) {
-                if (headerName.Equals("url", StringComparison.OrdinalIgnoreCase)) { continue; }
+                if (headerName.Equals(TargetUrlHeader, StringComparison.OrdinalIgnoreCase)) { continue; }
+                if (headerName.Equals(TiefseeTokenHeader, StringComparison.OrdinalIgnoreCase)) { continue; }
                 if (headerName.Equals("host", StringComparison.OrdinalIgnoreCase)) { continue; }
                 if (headerName.Equals("referer", StringComparison.OrdinalIgnoreCase)) { continue; }
 

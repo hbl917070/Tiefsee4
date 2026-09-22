@@ -8,6 +8,10 @@ namespace Tiefsee;
 
 public class WebServer {
 
+    private const string ApiPathPrefix = "/api/";
+    private const string ApiTokenHeader = "X-Tiefsee-Token";
+    private const string ApiTokenQuery = "tiefseeToken";
+
     public int port; // 當前掛載的 port
     public string origin;
     private HttpListener httpListener;
@@ -61,17 +65,15 @@ public class WebServer {
         string url = request.Url.ToString();
         url = url.Substring(baseUrl.Length);
 
-        /* var origin = request.Headers.Get("origin");
-
-        // UserAgent 裡面不包含 "Tiefsee"，就回傳 403
-        if (request?.UserAgent.Contains(Program.webvviewUserAgent) == false) {
+        if (url.StartsWith(ApiPathPrefix, StringComparison.OrdinalIgnoreCase)
+            && IsApiRequestAuthorized(request) == false) {
             context.Response.StatusCode = 403;
-            context.Response.AddHeader("Content-Type", "text/text; charset=utf-8"); // 設定編碼
-            byte[] _responseArray = Encoding.UTF8.GetBytes("403");
-            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length);
+            context.Response.ContentType = "text/plain; charset=utf-8";
+            byte[] responseArray = Encoding.UTF8.GetBytes("403");
+            await context.Response.OutputStream.WriteAsync(responseArray, 0, responseArray.Length);
             context.Response.Close();
             return;
-        } */
+        }
 
         // 允許任何來自任何網域的請求
         // context.Response.AddHeader("Access-Control-Allow-Origin", "*");
@@ -127,6 +129,22 @@ public class WebServer {
             context.Response.Close(); // close the connection
         }
         catch { }
+    }
+
+    /// <summary>
+    /// 驗證 API 請求是否帶有目前執行個體的 capability token。
+    /// GET/HEAD 支援 query token，讓 img、video、iframe 等瀏覽器資源請求可以使用；
+    /// 其他方法使用自訂 header，避免把 token 放進 POST body 或一般 URL。
+    /// </summary>
+    private static bool IsApiRequestAuthorized(HttpListenerRequest request) {
+        string token = request.Headers[ApiTokenHeader];
+        if (string.IsNullOrEmpty(token)
+            && (request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
+                || request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase))) {
+            token = request.QueryString[ApiTokenQuery];
+        }
+
+        return string.Equals(token, Program.webApiToken, StringComparison.Ordinal);
     }
 
     /// <summary>
