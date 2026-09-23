@@ -289,7 +289,16 @@ class LibIframe {
      * 開啟網址或檔案
      */
     public openUrl(url: string) {
-        if (url.startsWith("http:") || url.startsWith("https:")) { // 開啟網址    
+        let isLocalFileUrl = false;
+        try {
+            const targetUrl = new URL(url, location.href);
+            // pathToUrl() 產生的本機檔案網址交回 Tiefsee；外部 HTTP(S) 才交給瀏覽器。
+            isLocalFileUrl = Lib.isTiefseeLocalFileUrl(targetUrl, this.APIURL);
+        } catch {
+            // 非 URL 格式時沿用檔案連結處理。
+        }
+
+        if ((url.startsWith("http:") || url.startsWith("https:")) && isLocalFileUrl === false) { // 開啟外部網址
             this.postMsg({
                 type: "openUrl",
                 data: url,

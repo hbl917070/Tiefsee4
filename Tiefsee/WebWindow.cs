@@ -425,6 +425,21 @@ public class WebWindow : FormNone {
         _wv2.CoreWebView2.AddHostObjectToScript("WV_System", SystemBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", RunAppBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("WV_Image", ImageBridge);
+
+        // CoreWebView2.NavigationStarting 只涵蓋主 frame：允許 Tiefsee www 頁面，
+        // 外部網址交給系統瀏覽器，其餘頂層導覽阻擋；iframe 導覽不受此規則影響。
+        _wv2.CoreWebView2.NavigationStarting += (sender, e) => {
+            if (TryGetExternalHttpUri(e.Uri, out Uri externalUri)) {
+                e.Cancel = true;
+                RunAppBridge.OpenUrl(externalUri.AbsoluteUri);
+                return;
+            }
+
+            if (IsWwwNavigation(e.Uri) == false) {
+                e.Cancel = true;
+            }
+        };
+
         // 按下右鍵時
         SetOnRightClick((Point p) => {
             // 最大化時，視窗內縮
@@ -446,8 +461,14 @@ public class WebWindow : FormNone {
             string fileurl = e2.Uri.ToString();
             e2.Handled = true;
 
+            if (TryGetExternalHttpUri(fileurl, out Uri externalUri)) {
+                RunAppBridge.OpenUrl(externalUri.AbsoluteUri);
+                return;
+            }
+
+            string fileurlJson = JsonSerializer.Serialize(fileurl);
             RunJs($@"
-                if(window.baseWindow !== undefined) baseWindow.onNewWindowRequested(""{fileurl}"");
+                if(window.baseWindow !== undefined) baseWindow.onNewWindowRequested({fileurlJson});
             ");
         };
 
@@ -530,6 +551,34 @@ public class WebWindow : FormNone {
             Program.services?.ArchivePreview?.CloseWindow(WindowId);
             SingleInstanceCoordinator.WindowFreed();
         };
+    }
+
+    private static bool TryGetExternalHttpUri(string value, out Uri externalUri) {
+        externalUri = null;
+        if (Uri.TryCreate(value, UriKind.Absolute, out Uri uri) == false
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)) {
+            return false;
+        }
+
+        if (Uri.TryCreate(Program.webServer.origin, UriKind.Absolute, out Uri appOrigin)
+            && Uri.Compare(uri, appOrigin, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped,
+                StringComparison.OrdinalIgnoreCase) == 0) {
+            return false;
+        }
+
+        externalUri = uri;
+        return true;
+    }
+
+    /// <summary>
+    /// 只允許主視窗導覽到目前 Tiefsee 伺服器的內建 www 資源。
+    /// </summary>
+    private static bool IsWwwNavigation(string value) {
+        return Uri.TryCreate(value, UriKind.Absolute, out Uri uri)
+            && Uri.TryCreate(Program.webServer.origin, UriKind.Absolute, out Uri appOrigin)
+            && Uri.Compare(uri, appOrigin, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped,
+                StringComparison.OrdinalIgnoreCase) == 0
+            && uri.AbsolutePath.StartsWith("/assets/www/", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

@@ -298,6 +298,22 @@ export class Lib {
      */
     public static urlToPath(path: string): string {
 
+        try {
+            const url = new URL(path);
+            if (this.isTiefseeLocalFileUrl(url, APIURL)) {
+                if (url.pathname.startsWith("/assets/files/")) {
+                    return decodeURIComponent(url.pathname.substring("/assets/files/".length))
+                        .replace(/[/]/g, "\\");
+                }
+                const filePath = url.searchParams.get("path");
+                if (filePath !== null) {
+                    return filePath;
+                }
+            }
+        } catch {
+            // 不是絕對 URL 時繼續沿用既有 file:// 路徑處理。
+        }
+
         path = path.split("?")[0]; // 刪除 URL 中的查詢參數
 
         if (path.indexOf("file:///") === 0) { // 一般檔案
@@ -308,6 +324,18 @@ export class Lib {
         }
         path = decodeURIComponent(path).replace(/[/]/g, "\\");
         return path;
+    }
+
+    /**
+     * 判斷 URL 是否為 LibIframe.pathToUrl 產生的本機檔案網址。
+     * 只接受 API 同源的 /assets/files/ 與帶 path 參數的 /api/files/content，
+     * 其他同源頁面和外部網址都不能當成本機檔案。
+     */
+    public static isTiefseeLocalFileUrl(url: URL, apiUrl: string): boolean {
+        if (url.origin !== new URL(apiUrl).origin) { return false; }
+
+        return url.pathname.startsWith("/assets/files/")
+            || (url.pathname === "/api/files/content" && url.searchParams.has("path"));
     }
 
     /**
