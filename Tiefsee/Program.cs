@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -57,7 +58,6 @@ public static class Program {
 
         startPort = runtimeContext.StartPort;
         startType = runtimeContext.StartType;
-        services = AppBootstrapper.Bootstrap(runtimeContext);
 
         // 如果是商店 APP 版，且是來自「開機自動啟動」
         if (runtimeContext.IsStoreApp) {
@@ -80,7 +80,8 @@ public static class Program {
 
         bool argsIsNone = (args.Length == 1 && args[0] == "none"); // 啟動參數是 none
 
-        if (args.Length >= 1 && args[0] == "restart") { // 啟動參數是 restart
+        bool isRestart = args.Length >= 1 && args[0] == "restart";
+        if (isRestart) { // 啟動參數是 restart
             args = args.Skip(1).ToArray(); // 刪除陣列的第一筆
         }
         else {
@@ -96,29 +97,41 @@ public static class Program {
             if (SingleInstanceCoordinator.Check(args)) { return; }
         }
 
-        // 「直接啟動」之外的，都要避免連續啟動
-        if (startType != StartMode.Normal) {
-            if (AppLock(true)) { return; }
+        FileStream startupLock = null;
+        try {
+            if (startType != StartMode.Normal) {
+                // 冷啟動時，等第一個程序建立 Pipe 與 Port 後再轉送開檔命令。
+                startupLock = WaitForStartupLock();
+                if (startupLock == null) {
+                    MessageBox.Show("Tiefsee is still starting. Please try opening the file again.");
+                    return;
+                }
+                if (isRestart == false && SingleInstanceCoordinator.Check(args)) { return; }
+            }
+
+            services = AppBootstrapper.Bootstrap(runtimeContext);
+
+            // 在本地建立 server
+            webServer = new WebServer();
+            bool webServerState = webServer.Init();
+            if (webServerState == false) {
+                System.Windows.Forms.MessageBox.Show("Tiefsee localhost server error");
+                return;
+            }
+            services.SetWebServer(webServer);
+            services.RegisterHttpRoutes();
+            // 程式結束時釋放 native archive instance 與記憶體中的密碼快取。
+            Application.ApplicationExit += (_, _) => services?.ArchivePreview?.Dispose();
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // 高 DPI 模式
+
+            startWindow = new StartWindow();
         }
-
-        // 在本地建立 server
-        webServer = new WebServer();
-        bool webServerState = webServer.Init();
-        if (webServerState == false) {
-            System.Windows.Forms.MessageBox.Show("Tiefsee localhost server error");
-            return;
+        finally {
+            startupLock?.Dispose();
         }
-        services.SetWebServer(webServer);
-        services.RegisterHttpRoutes();
-        // 程式結束時釋放 native archive instance 與記憶體中的密碼快取。
-        Application.ApplicationExit += (_, _) => services?.ArchivePreview?.Dispose();
-
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // 高 DPI 模式
-
-        if (startType != StartMode.Normal) { AppLock(false); } // 解除鎖定
-        startWindow = new StartWindow();
 
         if (argsIsNone == false) {
             WebWindow.Create("MainWindow.html", args, null); // 顯示初始視窗
@@ -131,48 +144,19 @@ public static class Program {
     }
 
     /// <summary>
-    /// 在程式完全啟動前，禁止再次啟動
+    /// 等待其他程序完成冷啟動；鎖定由作業系統在程序結束時自動釋放。
     /// </summary>
-    /// <param name="val"> true=鎖定，false=解除鎖定 </param>
-    /// <returns> 回傳true表示程式目前鎖定中，不要啟動程式 </returns>
-    private static bool AppLock(bool val) {
-        if (val) {
-
-            if (File.Exists(runtimeContext.AppDataLock)) {
-                try {
-                    long ticks = 0;
-                    using (StreamReader sr = new StreamReader(runtimeContext.AppDataLock, System.Text.Encoding.UTF8)) {
-                        ticks = long.Parse(sr.ReadToEnd());
-                    }
-
-                    if (DateTime.Now.Ticks - ticks < 5 * 10000000) { // 在5秒內連續啟動，就禁止啟動
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                catch {
-                    return false;
-                }
+    private static FileStream WaitForStartupLock() {
+        var timer = Stopwatch.StartNew();
+        while (timer.Elapsed < TimeSpan.FromSeconds(30)) {
+            try {
+                return new FileStream(runtimeContext.AppDataLock, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             }
-            else {
-                //using (File.Create(lockPath)) { }
-                using (FileStream fs = new FileStream(runtimeContext.AppDataLock, FileMode.Create)) {
-                    using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8)) {
-                        sw.Write(DateTime.Now.Ticks.ToString());
-                    }
-                }
-                return false;
-            }
-
-        }
-        else {
-            if (File.Exists(runtimeContext.AppDataLock)) {
-                File.Delete(runtimeContext.AppDataLock);
+            catch (IOException) {
+                Thread.Sleep(50);
             }
         }
-        return false;
+        return null;
     }
 
 }

@@ -20,6 +20,8 @@ public class WebWindow : FormNone {
     private string[] _args;
     /// <summary> 用於快速啟動的暫存視窗 </summary>
     private static WebWindow _tempWindow;
+    /// <summary> 暫存視窗正在初始化，避免連續開啟時重複預建 </summary>
+    private static bool _isCreatingTempWindow;
     /// <summary> 是否已經顯式過視窗(用於單一啟動 </summary>
     private bool _isShow = false;
     /// <summary> 是否延遲初始化(暫存視窗必須設定成 true </summary>
@@ -58,7 +60,7 @@ public class WebWindow : FormNone {
     public WebWindow() {
         WebWindowList.Add(this);
 
-        this.FormClosed += (sender, e) => {
+        this.Disposed += (sender, e) => {
             WebWindowList.Remove(this);
         };
     }
@@ -178,34 +180,39 @@ public class WebWindow : FormNone {
     /// </summary>
     public static void NewTempWindow(string url) {
 
-        if (_tempWindow != null) { return; }
+        if (_tempWindow != null || _isCreatingTempWindow) { return; }
 
         url = GetHtmlFilePath(url);
+        _isCreatingTempWindow = true;
 
         AppScheduler.DelayRun(10, async () => {
-            if (_tempWindow != null) { return; }
-            WebWindow temp3 = new();
-            temp3._isDelayInit = true;
-            await temp3.Init();
-            temp3._args = [];
-            temp3._wv2.CoreWebView2.Navigate(url);
-            // 如果視窗載入完成時，tempWindow 已經被暫用，則釋放這個 window
-            void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
-                AppScheduler.DelayRun(100, () => {
-                    if (_tempWindow == null) {
-                        _tempWindow = temp3;
-                    }
-                    else {
-                        AppScheduler.DelayRun(5000, () => {
-                            Console.WriteLine("釋放");
-                            SingleInstanceCoordinator.WindowCreate(); // 避免釋放後，window 數量對不起來
-                            temp3.Close();
-                        });
-                    }
-                });
-                temp3._wv2.NavigationCompleted -= Wv2_NavigationCompleted;
+            WebWindow temp3 = null;
+            try {
+                temp3 = new();
+                temp3._isDelayInit = true;
+                await temp3.Init();
+                temp3._args = [];
+                // 導覽完成前持續保留初始化狀態，避免其他開啟要求再建立一個暫存視窗。
+                void Wv2_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
+                    temp3._wv2.NavigationCompleted -= Wv2_NavigationCompleted;
+                    AppScheduler.DelayRun(100, () => {
+                        _isCreatingTempWindow = false;
+                        if (_tempWindow == null) {
+                            _tempWindow = temp3;
+                        }
+                        else {
+                            temp3.Dispose();
+                        }
+                    });
+                }
+                temp3._wv2.NavigationCompleted += Wv2_NavigationCompleted;
+                temp3._wv2.CoreWebView2.Navigate(url);
             }
-            temp3._wv2.NavigationCompleted += Wv2_NavigationCompleted; // 網頁載入完成時
+            catch {
+                _isCreatingTempWindow = false;
+                temp3?.Dispose();
+                throw;
+            }
         });
     }
 
@@ -544,12 +551,15 @@ public class WebWindow : FormNone {
         //this.GotFocus += (sender, e) => { runScript("baseWindow.GotFocus()"); };
         //this.LostFocus += (sender, e) => { runScript("baseWindow.LostFocus()"); };
 
-        this.FormClosed += (sender, e) => {
-            SystemBridge.FileWatcherDispose(); // 停止偵測檔案變化
+        this.Disposed += (sender, e) => {
+            SystemBridge?.FileWatcherDispose(); // 停止偵測檔案變化
             // 視窗關閉時由 WinForm 直接釋放此 windowId 的全部 archive session，
             // 不經過前端 HTTP API，作為前端未逐一釋放時的最後一道防線。
             Program.services?.ArchivePreview?.CloseWindow(WindowId);
-            SingleInstanceCoordinator.WindowFreed();
+            if (_isShow) {
+                _isShow = false;
+                SingleInstanceCoordinator.WindowFreed();
+            }
         };
     }
 
@@ -713,9 +723,9 @@ public class WebWindow : FormNone {
     /// </summary>
     public void HideWindow() {
         if (_isShow) {
-            SingleInstanceCoordinator.WindowFreed();
             _isShow = false;
             this.Hide();
+            SingleInstanceCoordinator.WindowFreed();
         }
     }
 
