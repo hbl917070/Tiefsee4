@@ -20,7 +20,7 @@ jobs:
         uses: lukecarr/nightly-check@v0.3.0
   nightly-release:
     needs: check
-    if: ${{ needs.check.outputs.changes == 'true' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'master' && needs.check.outputs.changes == 'true' }}
     permissions:
       id-token: write
       contents: write
@@ -33,9 +33,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
-          workflow: build.yml
-          workflow_conclusion: success
-          branch: master
+          run_id: ${{ github.event.workflow_run.id }}
 
       - name: Update Nightly Release
         uses: andelf/nightly-release@main

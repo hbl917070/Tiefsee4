@@ -8,7 +8,8 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    # NativeHost uses the VS 2022 v143 toolset; avoid windows-latest moving to VS 2026.
+    runs-on: windows-2022
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -50,8 +51,28 @@ jobs:
       - name: Restore NuGet Packages
         run: nuget restore Tiefsee4.sln
 
+      - name: Build native host
+        run: msbuild TiefseeNativeHost/TiefseeNativeHost.vcxproj /t:Build /p:Configuration=Release /p:Platform=x64
+
       - name: Build Solution and archive artifacts
         run: msbuild Tiefsee4.sln /t:BuildAll /p:Configuration=Release /p:Platform="x64" /p:DeleteExistingFiles=True
+
+      - name: Verify portable archive
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression
+          $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path 'Tiefsee.zip'))
+          try {
+            $entries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
+            foreach ($required in @('Tiefsee.exe', 'Tiefsee.dll', 'Tiefsee.runtimeconfig.json', 'Www/MainWindow.html', 'Www/js/MainWindow.js')) {
+              if ($entries -notcontains $required) {
+                throw "Missing $required in Tiefsee.zip"
+              }
+            }
+          }
+          finally {
+            $archive.Dispose()
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
