@@ -31,6 +31,8 @@
 
 		<AssemblyName>Tiefsee</AssemblyName>
 		<BuildNativeHost Condition="'$(BuildNativeHost)' == ''">true</BuildNativeHost>
+		<!-- 停用 SharpSevenZip 套件編譯時自動複製 7z.dll。 -->
+		<ExcludeSevenZipAssemblies>true</ExcludeSevenZipAssemblies>
 		<!-- C# 專案還需要同步產生 native host，不能被 Visual Studio 的快速最新檢查跳過 -->
 		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 
@@ -58,7 +60,12 @@
 		<PackageReference Include="NetVips.Native.win-x64" Version="8.18.6" />
 		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.7" />
 		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
-		<PackageReference Include="SharpSevenZip" Version="2.0.128" />
+		<PackageReference Include="SharpSevenZip" Version="2.0.128" GeneratePathProperty="true" />
+	</ItemGroup>
+
+	<!-- 手動複製 x64 7z.dll 到輸出目錄 -->
+	<ItemGroup>
+		<None Include="$(PkgSharpSevenZip)\build\x64\7z.dll" Link="x64\7z.dll" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -84,7 +91,7 @@
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-arm64" />
 		<RemoveDir Directories="$(OutputPath)\runtimes\win-x86" />
 
-		<!-- SharpSevenZip 會同時複製 x86/x64 native DLL；Tiefsee 固定以 x64 執行，刪除不需要的 x86 版本 -->
+		<!-- 清除舊版建置可能留在 Output 的 x86 7z.dll。 -->
 		<Delete Files="$(OutputPath)\x86\7z.dll" />
 		<RemoveDir Directories="$(OutputPath)\x86" />
 	</Target>
