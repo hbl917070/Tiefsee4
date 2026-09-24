@@ -69,6 +69,11 @@
 							<uap:FileType>.markdown</uap:FileType>
 							<uap:FileType>.md</uap:FileType>
 
+							<uap:FileType ContentType="video/mp4">.mp4</uap:FileType>
+							<uap:FileType ContentType="video/webm">.webm</uap:FileType>
+							<uap:FileType ContentType="video/ogg">.ogv</uap:FileType>
+							<uap:FileType ContentType="video/matroska">.mkv</uap:FileType>
+
 							<uap:FileType ContentType="image/jpeg">.jpg</uap:FileType>
 							<uap:FileType ContentType="image/jpeg">.jpeg</uap:FileType>
 							<uap:FileType ContentType="image/jpeg">.jfif</uap:FileType>
