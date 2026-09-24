@@ -45,6 +45,8 @@ export class Msgbox {
      */
     public show(json: {
         txt?: string,
+        /** 只有內文刻意包含可信任的 HTML 時才設為 true；預設以純文字顯示。 */
+        allowHtml?: boolean,
         type?: ("txt" | "text" | "radio"),
         inputTxt?: string,
         inputType?: ("text" | "password"),
@@ -78,14 +80,18 @@ export class Msgbox {
         if (json.funcYes !== undefined) { funcYes = json.funcYes; }
         if (json.funcClose !== undefined) { funcClose = json.funcClose; }
 
+        if (json.allowHtml !== true) {
+            txt = Lib.escape(txt).replace(/\r\n|\r|\n/g, "<br>");
+        }
+
         let htmlRadio = "";
         for (let i = 0; i < arRadio.length; i++) {
             const item = arRadio[i];
             const checked = (item.value == radioValue) ? "checked" : ""; //是否選取
             htmlRadio += `
             <label class="msgbox-radio" allowSelection>
-                <input class="base-radio" type="radio" name="msgbox-radio" value="${item.value}" ${checked}>
-                <span allowSelection>${item.name}</span>
+                <input class="base-radio" type="radio" name="msgbox-radio" value="${Lib.escape(item.value)}" ${checked}>
+                <span allowSelection>${Lib.escape(item.name)}</span>
             </label>`;
         }
         if (arRadio.length > 0) {

@@ -1821,7 +1821,7 @@ export class FileLoad {
                 }
 
                 if (err !== "") {
-                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); // 檔案刪除失敗
+                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "\n" + err }); // 檔案刪除失敗
                 } else {
 
                     if (path === getFilePath() && _isBulkView === false) {
@@ -1857,9 +1857,10 @@ export class FileLoad {
             if (M.config.settings.other.fileDeletingShowCheckMsg) {
                 M.msgbox.show({
                     type: "radio",
+                    allowHtml: true,
                     txt: `
-                        <div class="msgbox-title">${M.i18n.t("msg.deleteFile")}</div>
-                        <div style="word-break:break-all;">${Lib.getFileName(path)}</div>
+                        <div class="msgbox-title">${Lib.escape(M.i18n.t("msg.deleteFile"))}</div>
+                        <div style="word-break:break-all;">${Lib.escape(Lib.getFileName(path))}</div>
                     `, // 刪除檔案
                     arRadio: [
                         { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, // 移至資源回收桶
@@ -1917,7 +1918,7 @@ export class FileLoad {
                 }
 
                 if (err !== "") {
-                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "<br>" + err }); // 檔案刪除失敗
+                    M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "\n" + err }); // 檔案刪除失敗
                 } else {
                     if (path === getDirPath()) {
                         await showDir();
@@ -1948,9 +1949,10 @@ export class FileLoad {
             if (M.config.settings.other.fileDeletingShowCheckMsg) {
                 M.msgbox.show({
                     type: "radio",
+                    allowHtml: true,
                     txt: `
-                        <div class="msgbox-title">${M.i18n.t("msg.deleteDir")}</div>
-                        <div style="word-break:break-all;">${Lib.getFileName(path)}</div>
+                        <div class="msgbox-title">${Lib.escape(M.i18n.t("msg.deleteDir"))}</div>
+                        <div style="word-break:break-all;">${Lib.escape(Lib.getFileName(path))}</div>
                     `, // 刪除資料夾
                     arRadio: [
                         { value: "1", name: M.i18n.t("msg.fileToRecycleBin") }, // 移至資源回收桶
@@ -1991,7 +1993,8 @@ export class FileLoad {
             let fileName = Lib.getFileName(path);
 
             let msg = M.msgbox.show({
-                txt: `<div class="msgbox-title">${M.i18n.t("msg.renameFile")}</div>`, // 重新命名檔案
+                txt: `<div class="msgbox-title">${Lib.escape(M.i18n.t("msg.renameFile"))}</div>`, // 重新命名檔案
+                allowHtml: true,
                 type: "text",
                 inputTxt: fileName,
                 funcYes: async (dom: HTMLElement, inputTxt: string) => {
@@ -2002,7 +2005,7 @@ export class FileLoad {
                         return;
                     }
                     if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) !== -1) {
-                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "<br>" + "\\ / : * ? \" < > |" }); //檔案名稱不可以包含下列任意字元
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "\n" + "\\ / : * ? \" < > |" }); //檔案名稱不可以包含下列任意字元
                         return;
                     }
                     if (fileName === inputTxt) {
@@ -2018,7 +2021,7 @@ export class FileLoad {
                     const newName = Lib.combine([dirPath, inputTxt]);
                     const err = await WV_File.Move(path, newName);
                     if (err != "") {
-                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "<br>" + err }); // 重新命名失敗：
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "\n" + err }); // 重新命名失敗：
                         return;
                     }
 
@@ -2070,7 +2073,8 @@ export class FileLoad {
             const fileName = Lib.getFileName(path);
 
             const msg = M.msgbox.show({
-                txt: `<div class="msgbox-title">${M.i18n.t("msg.renameDir")}</div>`, // 重新命名資料夾
+                txt: `<div class="msgbox-title">${Lib.escape(M.i18n.t("msg.renameDir"))}</div>`, // 重新命名資料夾
+                allowHtml: true,
                 type: "text",
                 inputTxt: fileName,
                 funcYes: async (dom: HTMLElement, inputTxt: string) => {
@@ -2081,7 +2085,7 @@ export class FileLoad {
                         return;
                     }
                     if (inputTxt.search(/[\\]|[/]|[:]|[*]|[?]|["]|[<]|[>]|[|]/) !== -1) {
-                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "<br>" + "\\ / : * ? \" < > |" }); // 檔案名稱不可以包含下列任意字元
+                        M.msgbox.show({ txt: M.i18n.t("msg.nameContainsUnavailableChar") + "\n" + "\\ / : * ? \" < > |" }); // 檔案名稱不可以包含下列任意字元
                         return;
                     }
                     if (fileName == inputTxt) {
@@ -2097,7 +2101,7 @@ export class FileLoad {
                     const newName = Lib.combine([dirPath, inputTxt]);
                     const err = await WV_Directory.Move(path, newName);
                     if (err !== "") {
-                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "<br>" + err }); // 重新命名失敗：
+                        M.msgbox.show({ txt: M.i18n.t("msg.renamingFailure") + "\n" + err }); // 重新命名失敗：
                         return;
                     }
 

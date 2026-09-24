@@ -907,7 +907,7 @@ class SettingWindow {
                 }
 
                 _msgbox.show({
-                    txt: _i18n.t("msg.associationExtension") + "<br>" // 確定用Tiefsee來開啟這些檔案嗎？
+                    txt: _i18n.t("msg.associationExtension") + "\n" // 確定用Tiefsee來開啟這些檔案嗎？
                         + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         _msgbox.close(dom);
@@ -930,7 +930,7 @@ class SettingWindow {
                 }
 
                 _msgbox.show({
-                    txt: _i18n.t("msg.removeAssociationExtension") + "<br>" // 確定要解除這些檔案與Tiefsee的關聯嗎？
+                    txt: _i18n.t("msg.removeAssociationExtension") + "\n" // 確定要解除這些檔案與Tiefsee的關聯嗎？
                         + ar.join(", "),
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         _msgbox.close(dom);
@@ -1762,7 +1762,7 @@ class SettingWindow {
             btn_resetSettings.addEventListener("click", async (e) => {
 
                 _msgbox.show({
-                    txt: _i18n.t("msg.resetSettings"),  // 確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)
+                    txt: _i18n.t("msg.resetSettings"),  // 確定要將 Tiefsee 的所有設定恢復成預設值嗎？\n(不會影響擴充套件與檔案排序)
 
                     funcYes: async (dom: HTMLElement, inputTxt: string) => {
                         _msgbox.close(dom);

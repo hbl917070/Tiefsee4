@@ -2844,22 +2844,22 @@ var langData = {
         },
 
         resetSettings: {
-            "zh-TW": "確定要將 Tiefsee 的所有設定恢復成預設值嗎？<br>(不會影響擴充套件與檔案排序)",
-            "zh-CN": "确定要将 Tiefsee 的所有设置恢复成默认值吗？<br>(不会影响扩展插件与文件排序)",
-            "en": "Are you sure you want to restore all Tiefsee settings to their default values? <br>(This will not affect Plugin and File Sorting)",
-            "ja": "Tiefsee のすべての設定をデフォルト値に戻してもよろしいですか？<br>（プラグインやファイルソートには影響しません）",
+            "zh-TW": "確定要將 Tiefsee 的所有設定恢復成預設值嗎？\n(不會影響擴充套件與檔案排序)",
+            "zh-CN": "确定要将 Tiefsee 的所有设置恢复成默认值吗？\n(不会影响扩展插件与文件排序)",
+            "en": "Are you sure you want to restore all Tiefsee settings to their default values? \n(This will not affect Plugin and File Sorting)",
+            "ja": "Tiefsee のすべての設定をデフォルト値に戻してもよろしいですか？\n（プラグインやファイルソートには影響しません）",
         },
         hotkeyResetAll: {
-            "zh-TW": "確定要將所有快速鍵恢復成初始設定嗎？<br>(只會影響快速鍵，不會變更其他設定)",
-            "zh-CN": "确定要将所有快捷键恢复成初始设置吗？<br>(只会影响快捷键，不会变更其他设置)",
-            "en": "Are you sure you want to restore all hotkeys to their default settings?<br>(Only hotkeys will be changed.)",
-            "ja": "すべてのホットキーを初期設定に戻してもよろしいですか？<br>（変更されるのはホットキーのみです）",
+            "zh-TW": "確定要將所有快速鍵恢復成初始設定嗎？\n(只會影響快速鍵，不會變更其他設定)",
+            "zh-CN": "确定要将所有快捷键恢复成初始设置吗？\n(只会影响快捷键，不会变更其他设置)",
+            "en": "Are you sure you want to restore all hotkeys to their default settings?\n(Only hotkeys will be changed.)",
+            "ja": "すべてのホットキーを初期設定に戻してもよろしいですか？\n（変更されるのはホットキーのみです）",
         },
         mouseResetAll: {
-            "zh-TW": "確定要將所有滑鼠設定恢復成初始設定嗎？<br>(只會影響滑鼠設定，不會變更其他設定)",
-            "zh-CN": "确定要将所有鼠标设置恢复成初始设置吗？<br>(只会影响鼠标设置，不会变更其他设置)",
-            "en": "Are you sure you want to restore all mouse settings to their default settings?<br>(Only mouse settings will be changed.)",
-            "ja": "すべてのマウス設定を初期設定に戻してもよろしいですか？<br>（変更されるのはマウス設定のみです）",
+            "zh-TW": "確定要將所有滑鼠設定恢復成初始設定嗎？\n(只會影響滑鼠設定，不會變更其他設定)",
+            "zh-CN": "确定要将所有鼠标设置恢复成初始设置吗？\n(只会影响鼠标设置，不会变更其他设置)",
+            "en": "Are you sure you want to restore all mouse settings to their default settings?\n(Only mouse settings will be changed.)",
+            "ja": "すべてのマウス設定を初期設定に戻してもよろしいですか？\n（変更されるのはマウス設定のみです）",
         },
         //#endregion
 

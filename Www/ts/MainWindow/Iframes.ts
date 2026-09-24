@@ -76,7 +76,7 @@ export class Iframes {
                 }
 
                 M.msgbox.show({
-                    txt: M.i18n.t("msg.notFound") + "<br>" + arMsg.join("<br>")
+                    txt: M.i18n.t("msg.notFound") + "\n" + arMsg.join("\n")
                 });
             }
             if (type === "loadDropFile") {
