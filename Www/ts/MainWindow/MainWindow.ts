@@ -568,6 +568,7 @@ export class MainWindow {
          */
         async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
             const timeout = 20 * 1000; // 逾時
+            const maxFileSize = 50 * 1000 * 1000;
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -578,13 +579,15 @@ export class MainWindow {
 
                 // 判斷請求是否成功
                 if (response.status !== 200) {
+                    controller.abort();
                     Toast.show(_i18n.t("msg.fileDownloadFailed") + ` (code:${response.status})`, 1000 * 3); // 檔案下載失敗
                     return null;
                 }
 
                 // 判斷檔案大小
                 const contentLength = response.headers.get("content-length");
-                if (contentLength && parseInt(contentLength, 10) > 50 * 1000 * 1000) { // 50m
+                if (contentLength && parseInt(contentLength, 10) > maxFileSize) {
+                    controller.abort();
                     Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); // 檔案大小超過限制
                     return null;
                 }
@@ -593,13 +596,33 @@ export class MainWindow {
                 const contentType = response.headers.get("content-type");
                 // console.log(contentType)
                 if (!contentType || !contentType.startsWith("image/")) {
+                    controller.abort();
                     Toast.show(_i18n.t("msg.unsupportedFileTypes"), 1000 * 3); // 不支援的檔案類型
                     return null;
                 }
 
-                const blob = await response.blob();
+                const chunks: ArrayBuffer[] = [];
+                let receivedBytes = 0;
+                if (response.body === null) {
+                    throw new Error("Response body is unavailable");
+                }
+                const reader = response.body.getReader();
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) { break; }
+                    if (value.byteLength > maxFileSize - receivedBytes) {
+                        controller.abort();
+                        Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3);
+                        return null;
+                    }
+                    receivedBytes += value.byteLength;
+                    const chunk = new ArrayBuffer(value.byteLength);
+                    new Uint8Array(chunk).set(value);
+                    chunks.push(chunk);
+                }
+
                 const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-                return new File([blob], fileName, { type: response.headers.get("content-type") ?? "application/octet-stream" });
+                return new File(chunks, fileName, { type: contentType });
             } catch (error) {
                 Toast.show(_i18n.t("msg.fileDownloadFailed"), 1000 * 3); // 檔案下載失敗
                 console.error(error);
