@@ -66,8 +66,13 @@ public class WebServer {
         string url = request.Url.ToString();
         url = url.Substring(baseUrl.Length);
 
-        if (IsProtectedRequestPath(url)
-            && IsProtectedRequestAuthorized(request) == false) {
+        // same-site 不比較 port；其他 localhost port 的網頁對 Tiefsee 仍是跨來源。
+        // 此標頭可能不存在；敏感路由仍由下方的 capability token 驗證保護。
+        string fetchSite = request.Headers["Sec-Fetch-Site"];
+        bool isCrossOriginBrowserRequest = string.Equals(fetchSite, "cross-site", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(fetchSite, "same-site", StringComparison.OrdinalIgnoreCase);
+        if (isCrossOriginBrowserRequest
+            || (IsProtectedRequestPath(url) && IsProtectedRequestAuthorized(request) == false)) {
             context.Response.StatusCode = 403;
             context.Response.ContentType = "text/plain; charset=utf-8";
             byte[] responseArray = Encoding.UTF8.GetBytes("403");
@@ -75,9 +80,6 @@ public class WebServer {
             context.Response.Close();
             return;
         }
-
-        // 允許任何來自任何網域的請求
-        // context.Response.AddHeader("Access-Control-Allow-Origin", "*");
 
         Dictionary<string, string> dirArgs = new Dictionary<string, string>();
         int argStart = url.IndexOf("?");
