@@ -91,6 +91,8 @@ export class MainWindow {
 
         /** 是否為快速預覽 */
         var _isQuickLook = false;
+        // 網址下載與瀏覽器拖曳的圖片共用相同的 50 MB 上限（十進位 bytes）
+        const maxImageFileSize = 50 * 1000 * 1000;
 
         this.domToolbar = _domToolbar;
         this.domMainL = _domMainL;
@@ -467,6 +469,12 @@ export class MainWindow {
 
                     e.preventDefault();
 
+                    // 瀏覽器提供 File 時會直接轉成 data URL，不會經過下方的網址下載檢查
+                    if (files[0].size > maxImageFileSize) {
+                        Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3);
+                        return;
+                    }
+
                     const base64 = await Lib.readFileAsDataURL(files[0]);
                     const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
 
@@ -499,6 +507,17 @@ export class MainWindow {
                     e.preventDefault();
 
                     const base64 = text;
+                    const base64Index = base64.indexOf("base64,");
+                    if (base64Index !== -1) {
+                        // 在交給 C# 解碼落地前，由 base64 長度與結尾填充估算原始位元組數
+                        const encodedLength = base64.length - base64Index - 7;
+                        const padding = base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0;
+                        const decodedSize = Math.floor(encodedLength * 3 / 4) - padding;
+                        if (decodedSize > maxImageFileSize) {
+                            Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3);
+                            return;
+                        }
+                    }
                     const extension = await Lib.getExtensionFromBase64(base64); // 取得副檔名
                     if (extension !== "") {
                         let path = await WV_File.Base64ToTempFile(base64, extension);
@@ -563,12 +582,10 @@ export class MainWindow {
 
         })();
 
-        /**
-         * 下載檔案
-         */
+        /** 從網址下載圖片；即使回應沒有 Content-Length，也依實際接收量套用大小上限 */
         async function downloadFileFromUrl(imageUrl: string): Promise<File | null> {
             const timeout = 20 * 1000; // 逾時
-            const maxFileSize = 50 * 1000 * 1000;
+            // 判定不接受回應時要求中止 fetch，減少後續不必要的傳輸
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -584,9 +601,9 @@ export class MainWindow {
                     return null;
                 }
 
-                // 判斷檔案大小
+                // 有長度標頭時先拒絕；代理或分塊回應可能不提供 Content-Length
                 const contentLength = response.headers.get("content-length");
-                if (contentLength && parseInt(contentLength, 10) > maxFileSize) {
+                if (contentLength && parseInt(contentLength, 10) > maxImageFileSize) {
                     controller.abort();
                     Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3); // 檔案大小超過限制
                     return null;
@@ -607,15 +624,17 @@ export class MainWindow {
                     throw new Error("Response body is unavailable");
                 }
                 const reader = response.body.getReader();
+                // 逐塊計數，避免缺失或不實的 Content-Length 讓超限內容完整進入記憶體
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) { break; }
-                    if (value.byteLength > maxFileSize - receivedBytes) {
+                    if (value.byteLength > maxImageFileSize - receivedBytes) {
                         controller.abort();
                         Toast.show(_i18n.t("msg.fileSizeExceededLimit"), 1000 * 3);
                         return null;
                     }
                     receivedBytes += value.byteLength;
+                    // 保留此 chunk 的精確範圍，並符合 File 建構子要求的 BlobPart 型別
                     const chunk = new ArrayBuffer(value.byteLength);
                     new Uint8Array(chunk).set(value);
                     chunks.push(chunk);
