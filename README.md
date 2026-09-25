@@ -29,7 +29,7 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
 
 > System requirements: 64-bit Windows 10 or Windows 11
 
-### Current version：Tiefsee 4.3.1
+### Current version：Tiefsee 4.3.2
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
@@ -41,12 +41,14 @@ Website：<a href="https://hbl917070.github.io/aeropic/en/">hbl917070.github.io/
 
 ## Introduction
 
+ - Support for many image formats: SVG, WebP, WebM, PSD, CLIP, HEIC, AVIF, QOI, and more.
+ - Archive preview: View images inside compressed archives without extracting them.
  - Quick start: Tiefsee can be opened quickly as long as Tiefsee is not completely closed.
  - Quick Drag File: Drag and drop pictures directly to other programs for opening or uploading.
- - Open Web Image: You can drag and drop images from your browser directly into Tiefsee to open it.
- - Online image search: support sauceNAO, Yandex, Ascii2d, Google, Bing.
+ - Open Web Image: You can drag and drop images from your browser or Discord directly into Tiefsee to open them.
+ - Image Search: support sauceNAO, Yandex, Ascii2d, Google, Bing.
  - File Panel: Preview the pictures in the same folder.
- - Directory Panel: Show the list of folders and preview the pictures in the folders.
+ - Folder Panel: Show the list of folders and preview the pictures in the folders.
  - Information Panel: EXIF information, location where the picture was taken, AI drawing prompt (A1111, NovelAI, ComfyUI, InvokeAI).
  - Bulk View：Load multiple pictures at once and view them in a vertical scrolling manner.
  - QuickLook: Long press on the spacebar to preview the file selected on the desktop or in the folder.

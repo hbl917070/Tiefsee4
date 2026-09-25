@@ -29,7 +29,7 @@ Tiefsee
 
 > 運行需求：64位元的 Windows 10 或 Windows 11
 
-### 當前版本 Tiefsee 4.3.1
+### 當前版本 Tiefsee 4.3.2
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
@@ -40,6 +40,7 @@ Tiefsee
 
 ## 介紹
 - 支援多種特殊圖片格式：svg、webp、webm、psd、clip、heic、avif、qoi ...
+- 壓縮檔預覽：不必解壓縮即可查看壓縮檔內的圖片
 - 快速啟動：只要 Tiefsee 尚未完全關閉，就能快速開啟 Tiefsee
 - 快速拖曳：可直接將圖片拖曳到其他程式進行開啟或上傳
 - 開啟網頁圖片：可將 瀏覽器 或 Discord 的圖片直接拖曳進 Tiefsee 來進行開啟
