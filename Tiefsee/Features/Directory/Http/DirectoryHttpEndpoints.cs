@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Enumeration;
 using System.Text.Json;
 
 namespace Tiefsee;
@@ -71,7 +72,13 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
             EnsureDirectoryExistsApi(path);
 
             int pathLen = path.Length;
-            var ret = Directory.EnumerateFiles(path, searchPattern)
+            // 避免把帶有 System 屬性的檔案（如 desktop.ini）列入
+            var enumerationOptions = new EnumerationOptions {
+                AttributesToSkip = FileAttributes.System,
+                IgnoreInaccessible = false,
+                MatchType = MatchType.Win32,
+            };
+            var ret = Directory.EnumerateFiles(path, searchPattern, enumerationOptions)
                 .Select(filePath => filePath.Substring(pathLen))
                 .ToArray();
 
