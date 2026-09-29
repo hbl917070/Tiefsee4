@@ -92,10 +92,18 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         fileStream.Seek(start, SeekOrigin.Begin);
         var buffer = new byte[64 * 1024];
+        // Range 的 end 是包含端點；只讀取指定範圍內剩餘的位元組，避免多讀後續影片資料。
+        long remainingBytes = end - start + 1;
         int bytesRead;
-        while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0 && response.OutputStream.CanWrite) {
+        while (remainingBytes > 0 && response.OutputStream.CanWrite) {
             if (nowKey != _streamingRequests[key]) { break; }
+
+            int readLength = (int)Math.Min(buffer.Length, remainingBytes);
+            bytesRead = await fileStream.ReadAsync(buffer, 0, readLength);
+            if (bytesRead == 0) { break; }
+
             await response.OutputStream.WriteAsync(buffer, 0, bytesRead);
+            remainingBytes -= bytesRead;
         }
         response.SendChunked = false;
     }
