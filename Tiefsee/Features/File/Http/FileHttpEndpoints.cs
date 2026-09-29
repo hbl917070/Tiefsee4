@@ -89,7 +89,7 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         var nowKey = _streamingRequests[key];
 
         response.ContentLength64 = end - start + 1;
-        using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         fileStream.Seek(start, SeekOrigin.Begin);
         var buffer = new byte[64 * 1024];
         int bytesRead;
