@@ -32,3 +32,4 @@ TiefseeLauncher/.vs
 TiefseeNativeHost/obj
 
 Tiefsee.zip
+*.user
