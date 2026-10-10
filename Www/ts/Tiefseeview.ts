@@ -10,6 +10,7 @@ import { TiefseeviewPositionController } from "./Tiefseeview/TiefseeviewPosition
 import { TiefseeviewZoomController } from "./Tiefseeview/TiefseeviewZoomController";
 import { TiefseeviewTransformController } from "./Tiefseeview/TiefseeviewTransformController";
 import { TiefseeviewCanvasCache } from "./Tiefseeview/TiefseeviewCanvasCache";
+import type { TiefseeviewAffineTransform, TiefseeviewViewState } from "./Tiefseeview/TiefseeviewTypes";
 
 /**
  * 圖片瀏覽器
@@ -44,6 +45,8 @@ export class Tiefseeview {
     public getOriginalHeight; // 取得圖片原始高度
     public getZoomRatio; // 取得縮放比例。原始 1.00
     public getDisplayZoomRatio; // 取得實際顯示縮放比例。原始 1.00
+    public getViewState: () => TiefseeviewViewState;
+    public setEventChangeViewState: (func: (state: TiefseeviewViewState) => void) => void;
     public zoomFull; // 圖片全滿
     public zoomIn; // 圖片放大
     public zoomOut; // 圖片縮小
@@ -179,6 +182,8 @@ export class Tiefseeview {
         var _eventChangeDeg = (deg: number): void => { }
         var _eventChangeMirror = (isMirrorHorizontal: boolean, isMirrorVertica: boolean): void => { }
         var _eventChangeXY = (x: number, y: number): void => { };
+        var _eventChangeViewState = (state: TiefseeviewViewState): void => { }
+        var _viewStateRevision = 0;
         var _eventLimitMax = (): boolean => { return eventLimitMax(); } // 超出縮放上限，return true表示超過限制    
         var _eventLimitMin = (): boolean => { return eventLimitMin(); } // 超出縮放下限，return true表示超過限制
         var _eventHighQualityLimit = (): number => { return 7000 * 7000; } // 圖片面積大於這個數值，就禁用高品質縮放
@@ -392,6 +397,8 @@ export class Tiefseeview {
         this.getOriginalHeight = getOriginalHeight;
         this.getZoomRatio = getZoomRatio;
         this.getDisplayZoomRatio = getDisplayZoomRatio;
+        this.getViewState = getViewState;
+        this.setEventChangeViewState = setEventChangeViewState;
         this.setMargin = setMargin;
         this.getMargin = getMargin;
         this.getOverflowDistance = getOverflowDistance;
@@ -615,6 +622,70 @@ export class Tiefseeview {
          * 取得實際顯示縮放比例。原始1.00
          */
         function getDisplayZoomRatio(): number { return getZoomRatio() * _dpiZoom; }
+
+        /** 取得 Renderer 共用的圖片座標、viewport 與目前 DOM 變換快照。 */
+        function getViewState(): TiefseeviewViewState {
+            const imageWidth = getOriginalWidth();
+            const imageHeight = getOriginalHeight();
+            const displayWidthCss = _nowWidth;
+            const displayHeightCss = _nowHeight;
+            const layoutWidth = _domData.offsetWidth;
+            const layoutHeight = _domData.offsetHeight;
+            const computedTransform = getComputedStyle(_domData).transform;
+            const transform = computedTransform === "none"
+                ? new DOMMatrixReadOnly()
+                : new DOMMatrixReadOnly(computedTransform);
+            const originParts = getComputedStyle(_domData).transformOrigin.trim().split(/\s+/);
+            const toOrigin = (value: string, size: number) => value.endsWith("%")
+                ? parseFloat(value) / 100 * size
+                : parseFloat(value);
+            const originX = toOrigin(originParts[0] ?? "50%", layoutWidth);
+            const originY = toOrigin(originParts[1] ?? "50%", layoutHeight);
+            const scaleX = imageWidth > 0 ? layoutWidth / imageWidth : 0;
+            const scaleY = imageHeight > 0 ? layoutHeight / imageHeight : 0;
+            // data 由 flex 置中在 container；container 的 left/top 是圖片旋轉後外框左上角。
+            const layoutLeft = (_domCon.clientWidth - layoutWidth) / 2;
+            const layoutTop = (_domCon.clientHeight - layoutHeight) / 2;
+            const imageToViewport: TiefseeviewAffineTransform = {
+                a: transform.a * scaleX,
+                b: transform.b * scaleX,
+                c: transform.c * scaleY,
+                d: transform.d * scaleY,
+                e: toNumber(_domCon.style.left) + layoutLeft + transform.e + originX - transform.a * originX - transform.c * originY,
+                f: toNumber(_domCon.style.top) + layoutTop + transform.f + originY - transform.b * originX - transform.d * originY
+            };
+
+            return {
+                revision: ++_viewStateRevision,
+                image: {
+                    width: imageWidth,
+                    height: imageHeight,
+                    displayWidthCss,
+                    displayHeightCss,
+                    isReady: _isDisplaySizeInitialized
+                },
+                viewport: {
+                    widthCss: _domDpiZoom.offsetWidth,
+                    heightCss: _domDpiZoom.offsetHeight,
+                    devicePixelRatio: window.devicePixelRatio,
+                    renderDpiZoom: getRenderDpiZoom(displayWidthCss)
+                },
+                container: {
+                    leftCss: toNumber(_domCon.style.left),
+                    topCss: toNumber(_domCon.style.top)
+                },
+                transform: {
+                    rotationDeg: _nowDeg,
+                    mirrorHorizontal: _mirrorHorizontal,
+                    mirrorVertical: _mirrorVertical
+                },
+                imageToViewport
+            };
+        }
+
+        function setEventChangeViewState(func: (state: TiefseeviewViewState) => void): void {
+            _eventChangeViewState = func;
+        }
 
         /**
          * 取得 是否圖片隨視窗縮放
@@ -977,7 +1048,12 @@ export class Tiefseeview {
          * [private] bigimg 或 bigimgscale 渲染圖片
          * @param isImmediatelyRun 是否立即執行
          */
-        async function bigimgDraw(isImmediatelyRun?: boolean) { await canvasRenderer.draw(isImmediatelyRun); }
+        async function bigimgDraw(isImmediatelyRun?: boolean) {
+            const viewState = getViewState();
+            _eventChangeViewState(viewState);
+            canvasRenderer.setViewState(viewState);
+            await canvasRenderer.render(isImmediatelyRun);
+        }
 
         /** 銳化值 */
         let _sharpenValue = 0;
@@ -1159,3 +1235,18 @@ export enum TiefseeviewImageRendering {
     /** 圖片大於100%時呈現方塊 */
     "autoOrPixelated" = 2,
 }
+
+export { TiefseeviewUrlImageSource } from "./Tiefseeview/TiefseeviewImageSource";
+export type {
+    TiefseeviewImageLevel,
+    TiefseeviewImageRegionRequest,
+    TiefseeviewImageSource,
+    TiefseeviewImageSourceRegion
+} from "./Tiefseeview/TiefseeviewImageSource";
+export type {
+    TiefseeviewAffineTransform,
+    TiefseeviewImageRect,
+    TiefseeviewImageRenderer,
+    TiefseeviewRenderer,
+    TiefseeviewViewState
+} from "./Tiefseeview/TiefseeviewTypes";

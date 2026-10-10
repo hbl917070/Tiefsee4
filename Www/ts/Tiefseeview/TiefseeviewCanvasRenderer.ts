@@ -1,5 +1,6 @@
 import type { TiefseeviewMediaType } from "./TiefseeviewDomMediaRenderer";
 import { getOrigPoint } from "./TiefseeviewGeometry";
+import type { TiefseeviewRenderer, TiefseeviewViewState } from "./TiefseeviewTypes";
 
 export interface TiefseeviewCanvasDrawInfo {
     scale: number;
@@ -47,8 +48,23 @@ export interface TiefseeviewCanvasRendererOptions {
 }
 
 /** 舊 Canvas 大圖路徑的可視區計算與繪製。 */
-export class TiefseeviewCanvasRenderer {
+export class TiefseeviewCanvasRenderer implements TiefseeviewRenderer {
+    private viewState: TiefseeviewViewState | null = null;
+
     constructor(private readonly options: TiefseeviewCanvasRendererOptions) { }
+
+    public setViewState(state: TiefseeviewViewState): void {
+        this.viewState = state;
+    }
+
+    /** Renderer 合約入口；舊 Canvas 繼續使用既有 DOM 與繪製演算法。 */
+    public async render(isImmediatelyRun?: boolean): Promise<void> {
+        await this.draw(isImmediatelyRun);
+    }
+
+    /** 此相容 Renderer 不持有獨立資源；快取與 Worker 仍由 CanvasCache 管理。 */
+    public dispose(): void { }
+
     public async draw(isImmediatelyRun?: boolean) {
 
             this.options.updateClip(); // 更新裁切
@@ -56,9 +72,23 @@ export class TiefseeviewCanvasRenderer {
             if (this.options.dataType !== "bigimg" && this.options.dataType !== "bigimgscale") { return; }
 
             // loadBigimg 完成後，要等 setDataSize 設定顯示尺寸才能開始渲染。
-            if (this.options.isDisplaySizeInitialized === false) { return; }
+            const state = this.viewState;
+            if ((state?.image.isReady ?? this.options.isDisplaySizeInitialized) === false) { return; }
 
-            if (this.options.getOriginalWidth() === 0) { return; } // 避免圖片尚未載入完成就渲染
+            const originalWidth = state?.image.width ?? this.options.getOriginalWidth();
+            const originalHeight = state?.image.height ?? this.options.getOriginalHeight();
+            const nowWidth = state?.image.displayWidthCss ?? this.options.nowWidth;
+            const nowHeight = state?.image.displayHeightCss ?? this.options.nowHeight;
+            const deg = state?.transform.rotationDeg ?? this.options.deg;
+            const mirrorHorizontal = state?.transform.mirrorHorizontal ?? this.options.mirrorHorizontal;
+            const mirrorVertical = state?.transform.mirrorVertical ?? this.options.mirrorVertical;
+            const renderDpiZoom = state?.viewport.renderDpiZoom ?? this.options.getRenderDpiZoom(nowWidth);
+            const viewportWidth = state?.viewport.widthCss ?? this.options.viewport.offsetWidth;
+            const viewportHeight = state?.viewport.heightCss ?? this.options.viewport.offsetHeight;
+            const containerLeft = state?.container.leftCss ?? this.options.toNumber(this.options.domCon.style.left);
+            const containerTop = state?.container.topCss ?? this.options.toNumber(this.options.domCon.style.top);
+
+            if (originalWidth === 0) { return; } // 避免圖片尚未載入完成就渲染
 
             if (isImmediatelyRun === true) {
                 this.options.tempDrawImage = {
@@ -71,10 +101,10 @@ export class TiefseeviewCanvasRenderer {
                     url: ""
                 }
             }
-            const w = this.options.nowWidth;
-            const h = this.options.nowHeight;
+            const w = nowWidth;
+            const h = nowHeight;
 
-            const dpiZoom = this.options.getRenderDpiZoom(w);
+            const dpiZoom = renderDpiZoom;
 
             const bigimgTemp = this.options.getBigimgTemp(); // 判斷要使用原圖或是縮小後的圖片
             if (bigimgTemp === null) { return; }
@@ -86,32 +116,32 @@ export class TiefseeviewCanvasRenderer {
 
             if (w === 0 || h === 0) { return; }
             const margin = 35 * dpiZoom; // 多繪製的區域
-            const scale = w / this.options.getOriginalWidth() * dpiZoom; // 目前的 圖片縮放比例
+            const scale = w / originalWidth * dpiZoom; // 目前的 圖片縮放比例
             let radio_can = 1;
-            if (w > this.options.getOriginalWidth()) { // 如果圖片大於 1 倍，則用用原始大小
-                radio_can = w / this.options.getOriginalWidth()
+            if (w > originalWidth) { // 如果圖片大於 1 倍，則用用原始大小
+                radio_can = w / originalWidth
             }
 
             this.options.domBigimg.style.width = w + "px";
             this.options.domBigimg.style.height = h + "px";
 
             // 取得顯示範圍左上角的坐標
-            let imgLeft = -this.options.toNumber(this.options.domCon.style.left);
-            let imgTop = -this.options.toNumber(this.options.domCon.style.top);
+            let imgLeft = -containerLeft;
+            let imgTop = -containerTop;
 
             // 計算顯示範圍的四個角落在圖片旋轉前的位置
-            let origPoint1 = getOrigPoint(imgLeft, imgTop, w, h, this.options.deg);
-            let origPoint2 = getOrigPoint(imgLeft + this.options.viewport.offsetWidth, imgTop, w, h, this.options.deg);
-            let origPoint3 = getOrigPoint(imgLeft + this.options.viewport.offsetWidth, imgTop + this.options.viewport.offsetHeight, w, h, this.options.deg);
-            let origPoint4 = getOrigPoint(imgLeft, imgTop + this.options.viewport.offsetHeight, w, h, this.options.deg);
+            let origPoint1 = getOrigPoint(imgLeft, imgTop, w, h, deg);
+            let origPoint2 = getOrigPoint(imgLeft + viewportWidth, imgTop, w, h, deg);
+            let origPoint3 = getOrigPoint(imgLeft + viewportWidth, imgTop + viewportHeight, w, h, deg);
+            let origPoint4 = getOrigPoint(imgLeft, imgTop + viewportHeight, w, h, deg);
 
             // 轉換鏡像前的坐標
             const calc = (p: { x: number, y: number }) => {
-                if (this.options.mirrorVertical) {
-                    p.y = this.options.nowHeight - p.y;
+                if (mirrorVertical) {
+                    p.y = nowHeight - p.y;
                 }
-                if (this.options.mirrorHorizontal) {
-                    p.x = this.options.nowWidth - p.x;
+                if (mirrorHorizontal) {
+                    p.x = nowWidth - p.x;
                 }
                 return p;
             }
@@ -203,7 +233,7 @@ export class TiefseeviewCanvasRenderer {
                     this.options.setDataType("img");
                     await this.options.loadImg(this.options.url);
                     // 載入圖片後必須重新設定大小
-                    this.options.setDataSize(this.options.nowWidth);
+                    this.options.setDataSize(nowWidth);
                     return;
                 }
 
@@ -318,7 +348,7 @@ export class TiefseeviewCanvasRenderer {
                     sx = sx * bigimgTemp.scale
                     sy = dy * -1
                     dWidth = dWidth / bigimgTemp.scale
-                    dHeight = this.options.getOriginalHeight() * scale
+                    dHeight = originalHeight * scale
                     toFloor();
                     await createImageBitmap(can, sx, 0, sWidth, sHeight,
                         { resizeWidth: dWidth, resizeHeight: dHeight, resizeQuality: resizeQuality })
@@ -337,7 +367,7 @@ export class TiefseeviewCanvasRenderer {
                     // sHeight = this.options.getOriginalHeight();
                     sx = dx * -1
                     sy = sy * bigimgTemp.scale
-                    dWidth = this.options.getOriginalWidth() * scale
+                    dWidth = originalWidth * scale
                     dHeight = dHeight / bigimgTemp.scale
                     toFloor();
                     await createImageBitmap(can, 0, sy, sWidth, sHeight,
