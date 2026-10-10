@@ -2,7 +2,7 @@
 
 (async () => {
 
-    const wasm = await import("./../wasm/tiefsee_wasm.js") ;
+    const wasm = await import("./../../wasm/tiefsee_wasm.js") ;
     // WASM 與 worker 都位於 /assets/www 底下，依 worker URL 解析可避免受部署根路徑影響
     const wasmPath = new URL("../wasm/tiefsee_wasm_bg.wasm", self.location.href);
     await wasm.default({ module_or_path: wasmPath });
