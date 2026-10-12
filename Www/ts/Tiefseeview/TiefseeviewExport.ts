@@ -1,9 +1,11 @@
+import type { TiefseeviewMediaType } from "./TiefseeviewDomMediaRenderer";
+
 export type TiefseeviewExportQuality = "high" | "low" | "medium";
 
 export interface TiefseeviewExportOptions {
     getCanvas: () => Promise<HTMLCanvasElement | null>;
     getCanvasZoom: (image: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: TiefseeviewExportQuality) => HTMLCanvasElement;
-    getDataType: () => "img" | "video" | "imgs" | "bigimg" | "bigimgscale";
+    getDataType: () => TiefseeviewMediaType;
 }
 
 /** 保留 Tiefseeview 原有的 Canvas 匯出行為。 */

@@ -10,6 +10,8 @@ import { TiefseeviewPositionController } from "./Tiefseeview/TiefseeviewPosition
 import { TiefseeviewZoomController } from "./Tiefseeview/TiefseeviewZoomController";
 import { TiefseeviewTransformController } from "./Tiefseeview/TiefseeviewTransformController";
 import { TiefseeviewCanvasCache } from "./Tiefseeview/TiefseeviewCanvasCache";
+import { TiefseeviewWebGLRenderer } from "./Tiefseeview/TiefseeviewWebGLRenderer";
+import type { TiefseeviewImageSource } from "./Tiefseeview/TiefseeviewImageSource";
 import type { TiefseeviewAffineTransform, TiefseeviewViewState } from "./Tiefseeview/TiefseeviewTypes";
 
 /**
@@ -28,6 +30,7 @@ export class Tiefseeview {
     public loadImg; // 載入圖片
     public loadBigimg;
     public loadBigimgscale;
+    public loadWebGLImage;
     public loadVideo;
     public loadNone; // 載入空白圖片
     public setLoading; // 顯示或隱藏 loading
@@ -110,6 +113,8 @@ export class Tiefseeview {
                     </div>
                 </div>
             </div>
+            <canvas class="tiefseeview-webgl-canvas" aria-hidden="true"></canvas>
+            <canvas class="tiefseeview-lanczos-canvas" aria-hidden="true"></canvas>
             <div class="scroll-y">
                 <div class="scroll-bg"></div>
                 <div class="scroll-box"></div>
@@ -121,6 +126,8 @@ export class Tiefseeview {
 
         const _domTiefseeview = _dom;
         const _domDpiZoom = _domTiefseeview.querySelector(".tiefseeview-dpizoom") as HTMLDivElement;
+        const _domWebGLCanvas = _domTiefseeview.querySelector(".tiefseeview-webgl-canvas") as HTMLCanvasElement;
+        const _domLanczosCanvas = _domTiefseeview.querySelector(".tiefseeview-lanczos-canvas") as HTMLCanvasElement;
         const _domCon = _domTiefseeview.querySelector(".tiefseeview-container") as HTMLDivElement;
         const _domData = _domTiefseeview.querySelector(".tiefseeview-data") as HTMLDivElement;
         const _domImg = _domTiefseeview.querySelector(".view-img") as HTMLImageElement;
@@ -139,6 +146,9 @@ export class Tiefseeview {
         var _nowHeight = 1;
         /** 是否已經完成第一次顯示尺寸初始化 */
         var _isDisplaySizeInitialized = false;
+        let webglRenderer: TiefseeviewWebGLRenderer | null = null;
+        let webglSource: TiefseeviewImageSource | null = null;
+        let webglLoadRevision = 0;
 
         var _dpiZoom = 1;
         var _isDpizoomAUto = true;
@@ -354,6 +364,7 @@ export class Tiefseeview {
         this.loadImg = loadImg;
         this.loadBigimg = loadBigimg;
         this.loadBigimgscale = loadBigimgscale;
+        this.loadWebGLImage = loadWebGLImage;
         this.loadVideo = loadVideo;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
@@ -429,6 +440,7 @@ export class Tiefseeview {
         // 顯示圖片的區塊改變大小時
         new ResizeObserver(() => {
             requestAnimationFrame(() => {
+                webglRenderer?.resize(_domDpiZoom.offsetWidth, _domDpiZoom.offsetHeight, window.devicePixelRatio);
                 initPoint(false); // 重新定位圖片
                 _eventChangeZoom(getZoomRatio() * _dpiZoom);
 
@@ -602,14 +614,61 @@ export class Tiefseeview {
         //#region 載入圖片(入口)
 
         function preloadImg(url: string, isInitSize: undefined | boolean = true) { return mediaLoader.preloadImg(url, isInitSize); }
-        function loadNone() { return mediaLoader.loadNone(); }
-        function loadVideo(url: string) { return mediaLoader.loadVideo(url); }
-        function loadImg(url: string) { return mediaLoader.loadImg(url); }
-        function loadBigimg(url: string) { return mediaLoader.loadBigimg(url); }
+        function clearWebGLSource() {
+            webglLoadRevision++;
+            webglSource?.dispose();
+            webglSource = null;
+            if (webglRenderer !== null) void webglRenderer.setSource(null);
+        }
+        function loadNone() { clearWebGLSource(); return mediaLoader.loadNone(); }
+        function loadVideo(url: string) { clearWebGLSource(); return mediaLoader.loadVideo(url); }
+        function loadImg(url: string) { clearWebGLSource(); return mediaLoader.loadImg(url); }
+        function loadBigimg(url: string) { clearWebGLSource(); return mediaLoader.loadBigimg(url); }
         function loadBigimgscale(images: { scale: number, url: string }[], width: number, height: number, zoomType: TiefseeviewZoomType, zoomValue: number) {
+            clearWebGLSource();
             return mediaLoader.loadBigimgscale(images, width, height, zoomType, zoomValue);
         }
-        function setDataType(type: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale")) { domMediaRenderer.setDataType(type); }
+        async function loadWebGLImage(source: TiefseeviewImageSource, zoomType: TiefseeviewZoomType, zoomValue: number): Promise<void> {
+            const keepCurrentFrame = webglRenderer?.beginSourceReplacement() === true;
+            webglLoadRevision++;
+            webglSource?.dispose();
+            webglSource = null;
+            const revision = webglLoadRevision;
+            canvasCache.resetBigimgCache();
+            canvasCache.resetScaleImageCache(1);
+            if (_tempCan !== undefined) {
+                _tempCan.width = 1;
+                _tempCan.height = 1;
+            }
+            if (webglRenderer === null) {
+                webglRenderer = new TiefseeviewWebGLRenderer(_domWebGLCanvas, _domLanczosCanvas, () => _rendering, () => _sharpenValue);
+            }
+            webglRenderer.resize(_domDpiZoom.offsetWidth, _domDpiZoom.offsetHeight, window.devicePixelRatio);
+            _tempOriginalWidth = source.width;
+            _tempOriginalHeight = source.height;
+            _url = source.levels.find(level => level.scale === 1)?.url ?? "";
+            _isDisplaySizeInitialized = false;
+            webglSource = source;
+            try {
+                domMediaRenderer.setDataType("webgl");
+                setDataSize(getZoomFull_width(zoomType, zoomValue));
+                clipController.clipFull();
+                webglRenderer.setViewState(getViewState());
+                await webglRenderer.setSource(source, keepCurrentFrame);
+                if (revision !== webglLoadRevision) throw new DOMException("WebGL 圖片載入已取代", "AbortError");
+            } catch (error) {
+                if (revision === webglLoadRevision) {
+                    if (webglSource === source) {
+                        source.dispose();
+                        webglSource = null;
+                    }
+                    await webglRenderer.setSource(null);
+                    domMediaRenderer.setDataType("img");
+                }
+                throw error;
+            }
+        }
+        function setDataType(type: ("img" | "video" | "imgs" | "bigimg" | "bigimgscale" | "webgl")) { domMediaRenderer.setDataType(type); }
 
         //#endregion
 
@@ -629,30 +688,26 @@ export class Tiefseeview {
             const imageHeight = getOriginalHeight();
             const displayWidthCss = _nowWidth;
             const displayHeightCss = _nowHeight;
-            const layoutWidth = _domData.offsetWidth;
-            const layoutHeight = _domData.offsetHeight;
+            const scaleX = imageWidth > 0 ? displayWidthCss / imageWidth : 0;
+            const scaleY = imageHeight > 0 ? displayHeightCss / imageHeight : 0;
             const computedTransform = getComputedStyle(_domData).transform;
             const transform = computedTransform === "none"
                 ? new DOMMatrixReadOnly()
                 : new DOMMatrixReadOnly(computedTransform);
-            const originParts = getComputedStyle(_domData).transformOrigin.trim().split(/\s+/);
-            const toOrigin = (value: string, size: number) => value.endsWith("%")
-                ? parseFloat(value) / 100 * size
-                : parseFloat(value);
-            const originX = toOrigin(originParts[0] ?? "50%", layoutWidth);
-            const originY = toOrigin(originParts[1] ?? "50%", layoutHeight);
-            const scaleX = imageWidth > 0 ? layoutWidth / imageWidth : 0;
-            const scaleY = imageHeight > 0 ? layoutHeight / imageHeight : 0;
-            // data 由 flex 置中在 container；container 的 left/top 是圖片旋轉後外框左上角。
-            const layoutLeft = (_domCon.clientWidth - layoutWidth) / 2;
-            const layoutTop = (_domCon.clientHeight - layoutHeight) / 2;
+            // 只讀取舊互動控制器目前套用的旋轉／鏡像，不使用 DOM 排版尺寸推導圖片比例。
+            const a = transform.a * scaleX;
+            const b = transform.b * scaleX;
+            const c = transform.c * scaleY;
+            const d = transform.d * scaleY;
+            const rotatedWidthCss = Math.abs(a * imageWidth) + Math.abs(c * imageHeight);
+            const rotatedHeightCss = Math.abs(b * imageWidth) + Math.abs(d * imageHeight);
             const imageToViewport: TiefseeviewAffineTransform = {
-                a: transform.a * scaleX,
-                b: transform.b * scaleX,
-                c: transform.c * scaleY,
-                d: transform.d * scaleY,
-                e: toNumber(_domCon.style.left) + layoutLeft + transform.e + originX - transform.a * originX - transform.c * originY,
-                f: toNumber(_domCon.style.top) + layoutTop + transform.f + originY - transform.b * originX - transform.d * originY
+                a,
+                b,
+                c,
+                d,
+                e: toNumber(_domCon.style.left) + rotatedWidthCss / 2 - (a * imageWidth + c * imageHeight) / 2,
+                f: toNumber(_domCon.style.top) + rotatedHeightCss / 2 - (b * imageWidth + d * imageHeight) / 2
             };
 
             return {
@@ -814,6 +869,7 @@ export class Tiefseeview {
                     _domData.style.imageRendering = "auto";
                 }
             }
+            if (domMediaRenderer.getDataType() === "webgl") webglRenderer?.setViewState(getViewState());
         }
 
         /**
@@ -975,6 +1031,27 @@ export class Tiefseeview {
                 return _tempCan;
             }
 
+            if (domMediaRenderer.getDataType() === "webgl" && webglSource !== null) {
+                // 匯出仍需要完整 Canvas；避免在主畫面改為 tile 後，匯出意外解碼超大原圖。
+                if (webglSource.width * webglSource.height > 16 * 1024 * 1024) return null;
+                const level = webglSource.levels.find(item => item.scale === 1);
+                if (level === undefined) return null;
+                const region = await webglSource.requestRegion({
+                    rect: { x: 0, y: 0, width: webglSource.width, height: webglSource.height },
+                    scale: level.scale
+                });
+                _tempCan = document.createElement("canvas");
+                _tempCan.width = getOriginalWidth();
+                _tempCan.height = getOriginalHeight();
+                const ctx = _tempCan.getContext("2d") as CanvasRenderingContext2D;
+                try {
+                    ctx.drawImage(region.source, 0, 0, getOriginalWidth(), getOriginalHeight());
+                } finally {
+                    if (region.source instanceof ImageBitmap) region.source.close();
+                }
+                return _tempCan;
+            }
+
             if (domMediaRenderer.getDataType() === "bigimgscale") { // 未測試
 
                 if (canvasCache.getScaleImageCanvas(1) !== undefined) {
@@ -1051,6 +1128,11 @@ export class Tiefseeview {
         async function bigimgDraw(isImmediatelyRun?: boolean) {
             const viewState = getViewState();
             _eventChangeViewState(viewState);
+            if (domMediaRenderer.getDataType() === "webgl") {
+                webglRenderer?.setViewState(viewState);
+                clipController.update();
+                return;
+            }
             canvasRenderer.setViewState(viewState);
             await canvasRenderer.render(isImmediatelyRun);
         }
@@ -1087,7 +1169,7 @@ export class Tiefseeview {
                 _domImg.style.width = Math.floor(width) + "px";
                 _domImg.style.height = Math.floor(width * ratio) + "px";
             }
-            if (domMediaRenderer.getDataType() === "bigimg" || domMediaRenderer.getDataType() === "bigimgscale") {
+            if (domMediaRenderer.getDataType() === "bigimg" || domMediaRenderer.getDataType() === "bigimgscale" || domMediaRenderer.getDataType() === "webgl") {
                 const w = width;
                 const h = width * ratio;
                 _domData.style.width = Math.floor(w) + "px";
@@ -1111,6 +1193,7 @@ export class Tiefseeview {
         eventChangePixelRatio(() => {
             if (_isDpizoomAUto === true) {
                 setDpizoom(window.devicePixelRatio, true);
+                webglRenderer?.resize(_domDpiZoom.offsetWidth, _domDpiZoom.offsetHeight, window.devicePixelRatio);
             }
         })
 

@@ -1645,6 +1645,16 @@ class SettingWindow {
             });
         })
 
+        // 靜態圖片 Renderer 選擇；獨立於畫質插值設定，於下一張圖片載入時生效。
+        addLoadEvent(() => {
+            const switch_webglRenderer = getDom("#switch-webglRenderer") as HTMLInputElement;
+            switch_webglRenderer.checked = _config.settings.image.tiefseeviewRenderer === "webgl";
+            switch_webglRenderer.addEventListener("change", () => {
+                _config.settings.image.tiefseeviewRenderer = switch_webglRenderer.checked ? "webgl" : "canvas";
+                appleSettingOfMain();
+            });
+        });
+
         // 相關路徑
         addLoadEvent(() => {
             const btn_openAppData = getDom("#btn-openAppData") as HTMLElement;

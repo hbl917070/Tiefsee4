@@ -41,6 +41,7 @@
     // 放圖片的容器，用於套用旋轉
     .tiefseeview-data {
         // 縮放是以圖片寬度為基準
+        flex: 0 0 auto;
         // width: 100%;
     }
 
@@ -59,6 +60,25 @@
         position: absolute;
         left: 0;
         top: 0;
+    }
+
+    // WebGL 靜態圖片畫布固定覆蓋 viewport，不參與圖片 DOM 變形或輸入事件。
+    .tiefseeview-webgl-canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        visibility: hidden;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .tiefseeview-lanczos-canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        visibility: hidden;
+        z-index: 2;
+        pointer-events: none;
     }
 
     .tiefseeview-loading {

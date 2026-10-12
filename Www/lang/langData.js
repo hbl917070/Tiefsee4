@@ -117,6 +117,13 @@ var langData = {
                 "ja": "画像の拡大率が 100% 以上の場合、画素を表示します",
             },
 
+            webglRenderer: {
+                "zh-TW": "新開啟的靜態圖片使用 WebGL 2 Renderer（實驗）",
+                "zh-CN": "新打开的静态图片使用 WebGL 2 Renderer（实验）",
+                "en": "Use the experimental WebGL 2 renderer for newly opened still images",
+                "ja": "新しく開く静止画像に実験的な WebGL 2 Renderer を使用",
+            },
+
             imageSharpen: {
                 "zh-TW": "圖片銳化",
                 "zh-CN": "图片锐化",

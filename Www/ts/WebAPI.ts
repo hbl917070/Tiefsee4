@@ -176,6 +176,20 @@ export class WebAPI {
             return imgU;
         }
 
+        /** 取得原圖指定區域的 vips 縮放圖片。 */
+        static vipsRegion(rect: { x: number; y: number; width: number; height: number }, scale: number, fileInfo2: FileInfo2, fileType: string, vipsType: string) {
+            const path = encodeURIComponent(fileInfo2.Path);
+            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            return APIURL + `/api/images/vips/region?path=${path}&x=${Math.floor(rect.x)}&y=${Math.floor(rect.y)}&width=${Math.ceil(rect.width)}&height=${Math.ceil(rect.height)}&scale=${scale}&fileType=${encodeURIComponent(fileType)}&vipsType=${encodeURIComponent(vipsType)}&${fileTime}`;
+        }
+
+        /** 取得 vips 縮放層中的快取圖片格子，座標以輸出層像素格為單位。 */
+        static vipsTile(tile: { tileX: number; tileY: number; scale: number; tileSize: number; gutter: number }, fileInfo2: FileInfo2, fileType: string, vipsType: string) {
+            const path = encodeURIComponent(fileInfo2.Path);
+            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
+            return APIURL + `/api/images/vips/tile?path=${path}&tileX=${tile.tileX}&tileY=${tile.tileY}&scale=${tile.scale}&tileSize=${tile.tileSize}&gutter=${tile.gutter}&fileType=${encodeURIComponent(fileType)}&vipsType=${encodeURIComponent(vipsType)}&${fileTime}`;
+        }
+
         /**
          * 載入圖片，並取得圖片的 size
          */

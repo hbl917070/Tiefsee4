@@ -468,6 +468,7 @@ export class ScriptImg {
         let arUrl: { scale: number, url: string }[] = [];
         let width = -1;
         let height = -1;
+        let imageVipsType: string | undefined;
         let isAnimation = Lib.isAnimation(fileInfo2); // 判斷是否為動圖
         let isFail = false; // true表示圖片載入失敗，回傳 icon
         let path = fileInfo2.Path;
@@ -477,6 +478,7 @@ export class ScriptImg {
             if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
                 height = imgInitInfo.height;
+                imageVipsType = imgInitInfo.vipsType;
                 arUrl.push({ scale: 1, url: imgInitInfo.path });
             }
         }
@@ -524,6 +526,8 @@ export class ScriptImg {
             if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
                 height = imgInitInfo.height;
+                // 後續的 WebGL ImageSource 需要同一個解碼來源來請求 vips tile。
+                imageVipsType = imgInitInfo.vipsType;
 
                 let ratio = Number(this.M.config.settings.image.tiefseeviewBigimgscaleRatio);
                 if (isNaN(ratio)) { ratio = 0.8; }
@@ -570,6 +574,7 @@ export class ScriptImg {
             width: width,
             height: height,
             configItem: configItem,
+            vipsType: imageVipsType,
             arUrl: arUrl,
             isFail: isFail
         }

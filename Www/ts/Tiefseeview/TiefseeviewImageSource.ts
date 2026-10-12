@@ -5,58 +5,72 @@ export interface TiefseeviewImageLevel {
     scale: number;
     url: string;
 }
-
 export interface TiefseeviewImageRegionRequest {
-    /** 以原圖像素表示的請求區域。整圖來源可回傳整張影像。 */
+    /** 以原圖像素表示的請求區域。 */
     rect: TiefseeviewImageRect;
     /** 要求的來源層級比例。 */
     scale: number;
 }
 
+export interface TiefseeviewImageTileRequest {
+    tileX: number;
+    tileY: number;
+    scale: number;
+    tileSize: number;
+    gutter: number;
+}
+
 export interface TiefseeviewImageSourceRegion {
-    /** 可供 Canvas 或 WebGL 上傳的影像；其生命週期由 ImageSource 管理。 */
+    /** ImageSource 將影像所有權交給呼叫端；完成上傳後呼叫端必須 close ImageBitmap。 */
     source: CanvasImageSource;
     /** 回傳影像在原圖座標中實際涵蓋的範圍。 */
     imageRect: TiefseeviewImageRect;
     pixelWidth: number;
     pixelHeight: number;
     scale: number;
+    /** source 內實際代表 imageRect 的像素範圍；完整層級預覽通常涵蓋整張 source。 */
+    contentRect?: { x: number; y: number; width: number; height: number };
 }
 
 /**
- * 靜態圖片來源合約。來源負責解碼、取消請求及管理回傳影像的生命週期；
- * Renderer 不可自行關閉來源持有的 ImageBitmap 或清除來源 URL。
+ * 靜態圖片來源合約。來源負責解碼與取消請求；交付的 ImageBitmap 所有權轉移給 Renderer，後者上傳後負責關閉。
  */
 export interface TiefseeviewImageSource {
     readonly width: number;
     readonly height: number;
     readonly levels: readonly TiefseeviewImageLevel[];
+    readonly supportsRegionalRequests?: boolean;
     requestRegion(
         request: TiefseeviewImageRegionRequest,
         signal?: AbortSignal
     ): Promise<TiefseeviewImageSourceRegion>;
+    requestTile?(request: TiefseeviewImageTileRequest, signal?: AbortSignal): Promise<TiefseeviewImageSourceRegion>;
+    /** Renderer 完成上傳後可釋放不再顯示的解碼層級快取。 */
+    releaseLevel?(scale: number): void;
     dispose(): void;
 }
 
 /**
- * 將現有完整圖片 URL 或 arUrl 多解析度 URL 包成 ImageSource。
- * 本適配器回傳整個解析度層級；後端按區域取圖留給後續的來源實作。
+ * 將現有完整圖片 URL 或 arUrl 多解析度 URL 包成 ImageSource；可選擇提供後端來源格子 URL。
  */
 export class TiefseeviewUrlImageSource implements TiefseeviewImageSource {
     public readonly levels: readonly TiefseeviewImageLevel[];
-    private readonly loadedImages = new Map<number, HTMLImageElement>();
-    private readonly pendingLoads = new Map<number, {
-        promise: Promise<HTMLImageElement>;
-        cancel: () => void;
-        waiters: number;
-    }>();
+    public readonly supportsRegionalRequests: boolean;
+    private readonly worker: Worker;
+    private readonly pending = new Map<number, { resolve: (bitmap: ImageBitmap) => void; reject: (error: Error) => void; signal?: AbortSignal; abort?: () => void }>();
+    private nextRequestId = 0;
     private disposed = false;
 
     constructor(
         public readonly width: number,
         public readonly height: number,
-        levels: readonly TiefseeviewImageLevel[]
+        levels: readonly TiefseeviewImageLevel[],
+        private readonly getTileUrl?: (request: TiefseeviewImageTileRequest) => string
     ) {
+        this.supportsRegionalRequests = getTileUrl !== undefined;
+        this.worker = new Worker("./js/TiefseeviewImageWorker.js");
+        this.worker.addEventListener("message", this.onWorkerMessage);
+        this.worker.addEventListener("error", this.onWorkerError);
         if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) {
             throw new RangeError("ImageSource 的原圖尺寸必須是正數");
         }
@@ -93,121 +107,138 @@ export class TiefseeviewUrlImageSource implements TiefseeviewImageSource {
             throw new RangeError(`找不到圖片層級：${request.scale}`);
         }
 
-        const image = await this.loadLevel(level, signal);
-        this.throwIfUnavailable(signal);
+        const bitmap = await this.decodeUrl(level.url, signal);
+        try {
+            this.throwIfUnavailable(signal);
+        } catch (error) {
+            bitmap.close();
+            throw error;
+        }
         return {
-            source: image,
+            source: bitmap,
             imageRect: { x: 0, y: 0, width: this.width, height: this.height },
-            pixelWidth: image.naturalWidth,
-            pixelHeight: image.naturalHeight,
+            pixelWidth: bitmap.width,
+            pixelHeight: bitmap.height,
             scale: level.scale
+        };
+    }
+
+    public async requestTile(
+        request: TiefseeviewImageTileRequest,
+        signal?: AbortSignal
+    ): Promise<TiefseeviewImageSourceRegion> {
+        this.throwIfUnavailable(signal);
+        if (this.getTileUrl === undefined) throw new Error("ImageSource 不支援來源格子請求");
+        if (![request.tileX, request.tileY, request.scale, request.tileSize, request.gutter].every(Number.isFinite) ||
+            !Number.isInteger(request.tileX) || !Number.isInteger(request.tileY) ||
+            !Number.isInteger(request.tileSize) || !Number.isInteger(request.gutter) ||
+            request.tileX < 0 || request.tileY < 0 || request.tileSize <= 0 || request.tileSize > 2048 || request.gutter < 0 || request.gutter > 16) {
+            throw new RangeError("圖片格子參數無效");
+        }
+        if (!this.levels.some(level => level.scale === request.scale)) {
+            throw new RangeError(`找不到圖片層級：${request.scale}`);
+        }
+        const levelWidth = Math.max(1, Math.round(this.width * request.scale));
+        const levelHeight = Math.max(1, Math.round(this.height * request.scale));
+        const levelX = request.tileX * request.tileSize;
+        const levelY = request.tileY * request.tileSize;
+        if (levelX >= levelWidth || levelY >= levelHeight) throw new RangeError("圖片格子超出來源範圍");
+        const bitmap = await this.decodeUrl(this.getTileUrl(request), signal);
+        try {
+            this.throwIfUnavailable(signal);
+        } catch (error) {
+            bitmap.close();
+            throw error;
+        }
+        const leftGutter = request.tileX === 0 ? 0 : request.gutter;
+        const topGutter = request.tileY === 0 ? 0 : request.gutter;
+        const expectedWidth = request.tileSize + leftGutter + request.gutter;
+        const expectedHeight = request.tileSize + topGutter + request.gutter;
+        const rightGutter = bitmap.width < expectedWidth ? 0 : request.gutter;
+        const bottomGutter = bitmap.height < expectedHeight ? 0 : request.gutter;
+        const contentWidth = bitmap.width - leftGutter - rightGutter;
+        const contentHeight = bitmap.height - topGutter - bottomGutter;
+        const sourceX = levelX / request.scale;
+        const sourceY = levelY / request.scale;
+        return {
+            source: bitmap,
+            imageRect: {
+                x: sourceX,
+                y: sourceY,
+                width: Math.min(contentWidth / request.scale, this.width - sourceX),
+                height: Math.min(contentHeight / request.scale, this.height - sourceY)
+            },
+            pixelWidth: bitmap.width,
+            pixelHeight: bitmap.height,
+            contentRect: {
+                x: leftGutter,
+                y: topGutter,
+                width: contentWidth,
+                height: contentHeight
+            },
+            scale: request.scale
         };
     }
 
     public dispose(): void {
         if (this.disposed) return;
         this.disposed = true;
-        for (const pending of this.pendingLoads.values()) pending.cancel();
-        this.pendingLoads.clear();
-        for (const image of this.loadedImages.values()) image.removeAttribute("src");
-        this.loadedImages.clear();
+        this.worker.removeEventListener("message", this.onWorkerMessage);
+        this.worker.removeEventListener("error", this.onWorkerError);
+        try { this.worker.postMessage({ type: "dispose" }); } catch { }
+        this.worker.terminate();
+        for (const [id, pending] of this.pending) {
+            pending.signal?.removeEventListener("abort", pending.abort!);
+            pending.reject(this.createAbortError("ImageSource 已釋放"));
+            this.pending.delete(id);
+        }
     }
 
-    private loadLevel(level: TiefseeviewImageLevel, signal?: AbortSignal): Promise<HTMLImageElement> {
-        const loaded = this.loadedImages.get(level.scale);
-        if (loaded !== undefined) {
-            return signal?.aborted ? Promise.reject(this.createAbortError()) : Promise.resolve(loaded);
-        }
-
-        if (this.pendingLoads.has(level.scale) === false) {
-            const image = new Image();
-            let resolveLoad!: (image: HTMLImageElement) => void;
-            let rejectLoad!: (error: Error) => void;
-            const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-                resolveLoad = resolve;
-                rejectLoad = reject;
-            });
-            const cleanup = () => {
-                image.removeEventListener("load", onLoad);
-                image.removeEventListener("error", onError);
-            };
-            const onLoad = () => {
-                cleanup();
-                this.pendingLoads.delete(level.scale);
-                if (this.disposed) {
-                    image.removeAttribute("src");
-                    rejectLoad(this.createAbortError("ImageSource 已釋放"));
-                    return;
-                }
-                this.loadedImages.set(level.scale, image);
-                resolveLoad(image);
-            };
-            const onError = () => {
-                cleanup();
-                this.pendingLoads.delete(level.scale);
-                rejectLoad(new Error("圖片來源載入失敗"));
-            };
-            let pending!: { promise: Promise<HTMLImageElement>; cancel: () => void; waiters: number };
-            const cancel = () => {
-                cleanup();
-                image.removeAttribute("src");
-                if (this.pendingLoads.get(level.scale) === pending) {
-                    this.pendingLoads.delete(level.scale);
-                }
-                rejectLoad(this.createAbortError("ImageSource 已釋放"));
-            };
-            pending = { promise, cancel, waiters: 0 };
-            this.pendingLoads.set(level.scale, pending);
-            image.addEventListener("load", onLoad, { once: true });
-            image.addEventListener("error", onError, { once: true });
-            image.src = level.url;
-        }
-
-        const current = this.pendingLoads.get(level.scale);
-        if (current === undefined) {
-            return promiseFor(this.loadedImages.get(level.scale));
-        }
-        return this.waitForPending(level.scale, current, signal);
+    public releaseLevel(scale: number): void {
+        // ImageBitmap 會在 Renderer 上傳後立即釋放，ImageSource 不保留解碼層級。
     }
 
-    private waitForPending(
-        scale: number,
-        pending: { promise: Promise<HTMLImageElement>; cancel: () => void; waiters: number },
-        signal?: AbortSignal
-    ): Promise<HTMLImageElement> {
-        if (signal?.aborted) return Promise.reject(this.createAbortError());
-        pending.waiters++;
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-            let settled = false;
-            const cleanup = () => signal?.removeEventListener("abort", onAbort);
-            const release = () => {
-                pending.waiters--;
-                if (pending.waiters === 0 && this.pendingLoads.get(scale) === pending) {
-                    pending.cancel();
-                }
-            };
-            const onAbort = () => {
-                if (settled) return;
-                settled = true;
-                cleanup();
-                release();
+    private decodeUrl(url: string, signal?: AbortSignal): Promise<ImageBitmap> {
+        this.throwIfUnavailable(signal);
+        const id = ++this.nextRequestId;
+        return new Promise<ImageBitmap>((resolve, reject) => {
+            const pending = { resolve, reject, signal, abort: undefined as (() => void) | undefined };
+            pending.abort = () => {
+                this.pending.delete(id);
                 reject(this.createAbortError());
+                try { this.worker.postMessage({ type: "abort", id }); } catch { }
             };
-            signal?.addEventListener("abort", onAbort, { once: true });
-            pending.promise.then(value => {
-                if (settled) return;
-                settled = true;
-                cleanup();
-                release();
-                resolve(value);
-            }, error => {
-                if (settled) return;
-                settled = true;
-                cleanup();
-                release();
-                reject(error);
-            });
+            signal?.addEventListener("abort", pending.abort, { once: true });
+            this.pending.set(id, pending);
+            try {
+                this.worker.postMessage({ type: "decode", id, url });
+            } catch (error) {
+                this.pending.delete(id);
+                signal?.removeEventListener("abort", pending.abort);
+                reject(error instanceof Error ? error : new Error(String(error)));
+            }
         });
+    }
+
+    private onWorkerMessage = (event: MessageEvent): void => {
+        const data = event.data as { id: number; bitmap?: ImageBitmap; error?: string };
+        const pending = this.pending.get(data.id);
+        if (pending === undefined) {
+            data.bitmap?.close();
+            return;
+        }
+        this.pending.delete(data.id);
+        pending.signal?.removeEventListener("abort", pending.abort!);
+        if (data.bitmap !== undefined) pending.resolve(data.bitmap);
+        else pending.reject(new Error(data.error || "圖片 Worker 解碼失敗"));
+    };
+
+    private onWorkerError = (event: ErrorEvent): void => {
+        for (const pending of this.pending.values()) {
+            pending.signal?.removeEventListener("abort", pending.abort!);
+            pending.reject(new Error(event.message || "圖片 Worker 無法使用"));
+        }
+        this.pending.clear();
     }
 
     private throwIfUnavailable(signal?: AbortSignal): void {
@@ -218,9 +249,5 @@ export class TiefseeviewUrlImageSource implements TiefseeviewImageSource {
     private createAbortError(message = "圖片來源請求已取消"): Error {
         return new DOMException(message, "AbortError");
     }
-}
-
-function promiseFor<T>(value: T | undefined): Promise<T> {
-    return value === undefined ? Promise.reject(new Error("圖片來源載入失敗")) : Promise.resolve(value);
 }
 

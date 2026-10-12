@@ -6,9 +6,13 @@ using Sdcb.LibRaw;
 using Sdcb.LibRaw.Natives;
 using SQLite;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Globalization;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows.Media.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -24,6 +28,7 @@ public sealed class ImageProcessingService {
     private readonly string _tempDirImgZoom;
     private readonly Dictionary<string, int[]> _imgSizeCache = new();
     private readonly List<CachedVipsImage> _vipsCache = new();
+    private readonly ConcurrentDictionary<string, Lazy<byte[]>> _vipsTileInFlight = new();
 
     public ImageProcessingService(string tempDirImgProcessed, string tempDirImgZoom) {
         _tempDirImgProcessed = tempDirImgProcessed;
@@ -905,6 +910,102 @@ public sealed class ImageProcessingService {
         StartWindow.isRunGC = true;
 
         return filePath;
+    }
+
+    /// <summary>
+    /// 取得原圖指定區域的 vips 縮放結果，避免為高解析度檢視載入整張大圖。
+    /// </summary>
+    public Stream VipsRegion(string path, int x, int y, int width, int height, double scale, string fileType, string vipsType) {
+        if (!double.IsFinite(scale) || scale <= 0 || scale > 1) throw new ArgumentOutOfRangeException(nameof(scale));
+        if (x < 0 || y < 0 || width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+
+        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
+        if (File.Exists(imgProcessed) == false) {
+            imgProcessed = PathToImgProcessed(path, vipsType, "png");
+            if (File.Exists(imgProcessed) == false) imgProcessed = path;
+        }
+
+        NetVips.Image image = GetNetVips(imgProcessed, fileType);
+        if ((long)x + width > image.Width || (long)y + height > image.Height) {
+            throw new ArgumentOutOfRangeException(nameof(width), "圖片區域超出原圖範圍");
+        }
+
+        using NetVips.Image crop = image.Crop(x, y, width, height);
+        using NetVips.Image resized = crop.Resize(scale, kernel: Enums.Kernel.Lanczos3);
+        var stream = new MemoryStream(resized.PngsaveBuffer());
+        stream.Position = 0;
+        return stream;
+    }
+
+    /// <summary>
+    /// 依來源層的格子座標產生並快取圖片區塊；先建立 vips 縮放管線，再只輸出要求的格子與濾鏡邊界。
+    /// </summary>
+    public Stream VipsTile(string path, int tileX, int tileY, double scale, int tileSize, int gutter, string fileType, string vipsType) {
+        if (!double.IsFinite(scale) || scale <= 0 || scale > 1) throw new ArgumentOutOfRangeException(nameof(scale));
+        if (tileX < 0 || tileY < 0 || tileSize < 64 || tileSize > 2048 || gutter < 0 || gutter > 16) {
+            throw new ArgumentOutOfRangeException(nameof(tileSize));
+        }
+
+        string decoderKey = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{vipsType}\n{fileType}")));
+        string cacheName = $"{FileTypeHelper.FileToHash(path)}_{decoderKey}_{scale.ToString("R", CultureInfo.InvariantCulture)}_{tileSize}_{gutter}_{tileX}_{tileY}.png";
+        string cachePath = Path.Combine(_tempDirImgZoom, cacheName);
+        if (File.Exists(cachePath)) {
+            File.SetLastAccessTimeUtc(cachePath, DateTime.UtcNow);
+            return new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        }
+
+        Lazy<byte[]> inFlight = _vipsTileInFlight.GetOrAdd(cachePath, _ => new Lazy<byte[]>(
+            () => GenerateVipsTile(path, tileX, tileY, scale, tileSize, gutter, fileType, vipsType, cachePath),
+            LazyThreadSafetyMode.ExecutionAndPublication));
+        try {
+            _ = inFlight.Value;
+            File.SetLastAccessTimeUtc(cachePath, DateTime.UtcNow);
+            return new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        }
+        finally {
+            if (_vipsTileInFlight.TryGetValue(cachePath, out Lazy<byte[]> current) && ReferenceEquals(current, inFlight)) {
+                _vipsTileInFlight.TryRemove(cachePath, out _);
+            }
+        }
+    }
+
+    private byte[] GenerateVipsTile(string path, int tileX, int tileY, double scale, int tileSize, int gutter, string fileType, string vipsType, string cachePath) {
+        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
+        if (File.Exists(imgProcessed) == false) {
+            imgProcessed = PathToImgProcessed(path, vipsType, "png");
+            if (File.Exists(imgProcessed) == false) imgProcessed = path;
+        }
+
+        NetVips.Image image = GetNetVips(imgProcessed, fileType);
+        using NetVips.Image resized = image.Resize(scale, kernel: Enums.Kernel.Lanczos3, gap: 4);
+        long left = (long)tileX * tileSize;
+        long top = (long)tileY * tileSize;
+        if (left >= resized.Width || top >= resized.Height) throw new ArgumentOutOfRangeException(nameof(tileX), "圖片格子超出來源範圍");
+        int contentWidth = (int)Math.Min(tileSize, resized.Width - left);
+        int contentHeight = (int)Math.Min(tileSize, resized.Height - top);
+        int cropLeft = (int)Math.Max(0, left - gutter);
+        int cropTop = (int)Math.Max(0, top - gutter);
+        int cropRight = (int)Math.Min(resized.Width, left + contentWidth + gutter);
+        int cropBottom = (int)Math.Min(resized.Height, top + contentHeight + gutter);
+        using NetVips.Image crop = resized.Crop(cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop);
+        byte[] png = crop.PngsaveBuffer();
+
+        Directory.CreateDirectory(_tempDirImgZoom);
+        string temporaryPath = cachePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try {
+            File.WriteAllBytes(temporaryPath, png);
+            try {
+                File.Move(temporaryPath, cachePath);
+            }
+            catch (IOException) when (File.Exists(cachePath)) {
+                File.Delete(temporaryPath);
+            }
+            File.SetLastAccessTimeUtc(cachePath, DateTime.UtcNow);
+            return png;
+        }
+        finally {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
     }
 
     /// <summary>

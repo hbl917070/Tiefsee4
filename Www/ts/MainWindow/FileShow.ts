@@ -1,6 +1,6 @@
 import { MainWindow } from "./MainWindow";
 import { Iframes } from "./Iframes";
-import { Tiefseeview, TiefseeviewAlignType, TiefseeviewZoomType } from "../Tiefseeview";
+import { Tiefseeview, TiefseeviewAlignType, TiefseeviewUrlImageSource, TiefseeviewZoomType } from "../Tiefseeview";
 import { GroupType } from "../Config";
 import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
@@ -35,6 +35,7 @@ export class FileShow {
         const _videoToolbar = new VideoToolbar(M);
         const _iframes = new Iframes(M);
         var _isLoaded = true;
+        let viewLoadRevision = 0;
         /** 目前顯示的類型 */
         var _groupType = GroupType.none;
 
@@ -76,6 +77,7 @@ export class FileShow {
          */
         function setShowType(groupType: string) {
 
+            viewLoadRevision++;
             const previousGroupType = _groupType;
             _groupType = groupType;
 
@@ -221,11 +223,13 @@ export class FileShow {
 
             _isLoaded = false;
             setShowType(GroupType.img); // 改變顯示類型
+            const requestRevision = viewLoadRevision;
             let imgurl = fileInfo2.Path; // 圖片網址
 
             _tiefseeview.setLoading(true, 200);
 
             const imgData = await M.script.img.getImgData(fileInfo2);
+            if (requestRevision !== viewLoadRevision) return;
             const width = imgData.width;
             const height = imgData.height;
             const arUrl = imgData.arUrl;
@@ -252,20 +256,44 @@ export class FileShow {
                 let zoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                 if (zoomType === undefined) { zoomType = TiefseeviewZoomType.fitWindowOrImageOriginal; }
 
-                if (arUrl.length === 1) {
-                    await _tiefseeview.loadBigimg(
-                        arUrl[0].url
-                    );
+                const loadCanvasImage = async () => {
+                    if (arUrl.length === 1) {
+                        await _tiefseeview.loadBigimg(arUrl[0].url);
+                    } else {
+                        await _tiefseeview.loadBigimgscale(arUrl, width, height, zoomType, zoomVal);
+                    }
+                };
 
+                if (M.config.settings.image.tiefseeviewRenderer === "webgl") {
+                    const getTileUrl = imgData.vipsType === undefined
+                        ? undefined
+                        : tile => WebAPI.Img.vipsTile(tile, fileInfo2, imgData.fileType, imgData.vipsType);
+                    const imageSource = new TiefseeviewUrlImageSource(width, height, arUrl, getTileUrl);
+                    console.info("[Tiefseeview Renderer] 使用 WebGL", {
+                        width,
+                        height,
+                        levelScales: arUrl.map(item => item.scale),
+                        supportsRegionalRequests: imageSource.supportsRegionalRequests
+                    });
+                    try {
+                        await _tiefseeview.loadWebGLImage(imageSource, zoomType, zoomVal);
+                    } catch (error) {
+                        imageSource.dispose();
+                        if (requestRevision !== viewLoadRevision) return;
+                        console.warn("WebGL 靜態圖片 Renderer 初始化失敗，改用 Canvas。", error);
+                        await loadCanvasImage();
+                    }
                 } else {
-                    await _tiefseeview.loadBigimgscale(
-                        arUrl,
-                        width, height,
-                        zoomType, zoomVal
-                    );
+                    console.info("[Tiefseeview Renderer] 使用 Canvas", {
+                        width,
+                        height,
+                        levelScales: arUrl.map(item => item.scale)
+                    });
+                    await loadCanvasImage();
                 }
             }
 
+            if (requestRevision !== viewLoadRevision) return;
             initTiefseeview(fileInfo2);
             _isLoaded = true;
         }

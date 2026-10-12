@@ -1,6 +1,6 @@
-export type TiefseeviewMediaType = "img" | "video" | "imgs" | "bigimg" | "bigimgscale";
+export type TiefseeviewMediaType = "img" | "video" | "imgs" | "bigimg" | "bigimgscale" | "webgl";
 
-/** 切換原生 img／video 與舊 Canvas 圖層的可見狀態。 */
+/** 切換原生 img／video 與 DOM Canvas／固定 viewport WebGL 圖層的可見狀態。 */
 export class TiefseeviewDomMediaRenderer {
     private dataType: TiefseeviewMediaType = "img";
 
@@ -27,6 +27,14 @@ export class TiefseeviewDomMediaRenderer {
         if (type === "bigimg" || type === "bigimgscale") {
             this.domImg.style.display = "none";
             this.domBigimg.style.display = "";
+            this.domVideo.style.display = "none";
+            this.domImg.src = "";
+            this.domVideo.src = "";
+            return;
+        }
+        if (type === "webgl") {
+            this.domImg.style.display = "none";
+            this.domBigimg.style.display = "none";
             this.domVideo.style.display = "none";
             this.domImg.src = "";
             this.domVideo.src = "";
