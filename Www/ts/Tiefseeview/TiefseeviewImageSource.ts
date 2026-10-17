@@ -3,7 +3,8 @@ import type { TiefseeviewImageRect } from "./TiefseeviewTypes";
 export interface TiefseeviewImageLevel {
     /** 此層影像相對於原圖的寬高比例；原始解析度為 1。 */
     scale: number;
-    url: string;
+    /** 空值代表這層只可由後端 tile API 取得，不能交給瀏覽器解碼完整圖片。 */
+    url?: string;
 }
 export interface TiefseeviewImageRegionRequest {
     /** 以原圖像素表示的請求區域。 */
@@ -81,8 +82,10 @@ export class TiefseeviewUrlImageSource implements TiefseeviewImageSource {
         const normalized = [...levels].sort((a, b) => b.scale - a.scale);
         const seenScales = new Set<number>();
         for (const level of normalized) {
-            if (!Number.isFinite(level.scale) || level.scale <= 0 || level.url.length === 0) {
-                throw new RangeError("ImageSource 的圖片層級必須有正比例與 URL");
+            if (!Number.isFinite(level.scale) || level.scale <= 0 ||
+                (level.url !== undefined && level.url.length === 0) ||
+                (level.url === undefined && getTileUrl === undefined)) {
+                throw new RangeError("ImageSource 的層級必須有正比例，以及圖片 URL 或 tile API");
             }
             if (seenScales.has(level.scale)) {
                 throw new RangeError(`ImageSource 的圖片層級比例重複：${level.scale}`);
@@ -103,7 +106,7 @@ export class TiefseeviewUrlImageSource implements TiefseeviewImageSource {
             throw new RangeError("圖片區域必須是有效的原圖像素範圍");
         }
         const level = this.levels.find(item => item.scale === request.scale);
-        if (level === undefined) {
+        if (level === undefined || level.url === undefined) {
             throw new RangeError(`找不到圖片層級：${request.scale}`);
         }
 

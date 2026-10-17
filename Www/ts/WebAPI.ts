@@ -150,11 +150,12 @@ export class WebAPI {
         /**
          * 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
          */
-        static async vipsInit(vipsType: string, fileInfo2: FileInfo2) {
+        static async vipsInit(vipsType: string, fileInfo2: FileInfo2, useRegionalTiles = false) {
             const path = fileInfo2.Path;
             const encodePath = encodeURIComponent(path);
             const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            const u = APIURL + `/api/images/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}`;
+            const tileMode = useRegionalTiles ? "&tileMode=webgl" : "";
+            const u = APIURL + `/api/images/vips/init?path=${encodePath}&type=${vipsType}&${fileTime}${tileMode}`;
             const imgInitInfo = await Lib.sendApiGet("json", u);
             return imgInitInfo as {
                 code: string, // 1=成功 -1=失敗
@@ -162,6 +163,8 @@ export class WebAPI {
                 width: number,
                 height: number,
                 vipsType: string,
+                previewScale: number,
+                tileOnlyOriginal: boolean,
             };
         }
 
@@ -174,13 +177,6 @@ export class WebAPI {
             const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
             const imgU = APIURL + `/api/images/vips/resize?path=${encodePath}&scale=${scale}&fileType=${fileType}&vipsType=${vipsType}&${fileTime}`;
             return imgU;
-        }
-
-        /** 取得原圖指定區域的 vips 縮放圖片。 */
-        static vipsRegion(rect: { x: number; y: number; width: number; height: number }, scale: number, fileInfo2: FileInfo2, fileType: string, vipsType: string) {
-            const path = encodeURIComponent(fileInfo2.Path);
-            const fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
-            return APIURL + `/api/images/vips/region?path=${path}&x=${Math.floor(rect.x)}&y=${Math.floor(rect.y)}&width=${Math.ceil(rect.width)}&height=${Math.ceil(rect.height)}&scale=${scale}&fileType=${encodeURIComponent(fileType)}&vipsType=${encodeURIComponent(vipsType)}&${fileTime}`;
         }
 
         /** 取得 vips 縮放層中的快取圖片格子，座標以輸出層像素格為單位。 */

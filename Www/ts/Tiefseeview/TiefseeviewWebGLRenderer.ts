@@ -13,6 +13,7 @@ interface WebGLTile {
     uvRight: number;
     uvBottom: number;
     cacheKey?: string;
+    scale?: number;
     lastUsed?: number;
 }
 
@@ -30,12 +31,14 @@ interface PendingTextureUpload {
 
 /** 固定 viewport 的 WebGL 2 靜態圖片 Renderer；不操作 Tiefseeview 的 DOM 變形層。 */
 export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
+    private readonly idleQualityDelayMs = 100;
     private readonly gl: WebGL2RenderingContext;
     private readonly program: WebGLProgram;
     private readonly buffer: WebGLBuffer;
     private readonly positionLocation: number;
     private readonly uvLocation: number;
     private readonly samplerLocation: WebGLUniformLocation;
+    private readonly premultiplyAlphaLocation: WebGLUniformLocation;
     private readonly textureLimit: number;
     private readonly lanczosCanvas: HTMLCanvasElement;
     /** 固定 viewport 的預覽只保留有限來源像素，避免大圖把整張原圖及 mipmap 塞進 GPU。 */
@@ -57,6 +60,10 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private activeLevelScale: number | null = null;
     private activeQualityScale: number | null = null;
     private qualityRegionKey = "";
+    private qualityLanczosBitmap: ImageBitmap | null = null;
+    private qualityLanczosOrigin: { x: number; y: number } | null = null;
+    private qualityLanczosScale: number | null = null;
+    private qualityLanczosRegionKey = "";
     private qualityTimer = 0;
     private isReplacingSource = false;
     private pixelatedFilter: boolean | null = null;
@@ -67,6 +74,8 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private previewBitmap: ImageBitmap | null = null;
     private lanczosRenderer: TiefseeviewLanczosRenderer | null = null;
     private lanczosRendererPromise: Promise<TiefseeviewLanczosRenderer | null> | null = null;
+    private pixelatedDiagnosticAt = 0;
+    private pixelatedDecisionKey = "";
 
     constructor(
         private readonly canvas: HTMLCanvasElement,
@@ -97,9 +106,13 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, `#version 300 es
             precision highp float;
             uniform sampler2D u_image;
+            uniform bool u_premultiplyAlpha;
             in vec2 v_uv;
             out vec4 outColor;
-            void main() { outColor = texture(u_image, v_uv); }
+            void main() {
+                outColor = texture(u_image, v_uv);
+                if (u_premultiplyAlpha) outColor.rgb *= outColor.a;
+            }
         `);
         const program = gl.createProgram();
         if (program === null) throw new Error("無法建立 WebGL program");
@@ -127,6 +140,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         this.positionLocation = gl.getAttribLocation(program, "a_position");
         this.uvLocation = gl.getAttribLocation(program, "a_uv");
         this.samplerLocation = this.requireUniform(program, "u_image");
+        this.premultiplyAlphaLocation = this.requireUniform(program, "u_premultiplyAlpha");
         gl.enableVertexAttribArray(this.positionLocation);
         gl.enableVertexAttribArray(this.uvLocation);
         gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 0);
@@ -149,23 +163,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     public setViewState(state: TiefseeviewViewState): void {
         this.viewState = state;
         if (this.isReplacingSource) return;
+        this.cancelPendingQualityRequest();
         this.lanczosRenderer?.hide();
         if (this.source !== null && this.tiles.length > 0) {
             this.canvas.style.display = "";
             this.canvas.style.visibility = "visible";
         }
         this.scheduleRender();
-        if (this.source !== null) {
-            window.clearTimeout(this.qualityTimer);
-            this.qualityTimer = window.setTimeout(() => {
-                console.info("[Tiefseeview WebGL] 停止操作 180 ms，開始檢查高畫質層");
-                void this.loadIdleQuality().catch(error => {
-                    if (!(error instanceof DOMException && error.name === "AbortError")) {
-                        console.warn("WebGL 停止操作後更新圖片層級失敗。", error);
-                    }
-                });
-            }, 180);
-        }
+        if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
     }
 
     public render(_isImmediatelyRun?: boolean): Promise<void> {
@@ -183,12 +188,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         this.canvasSizeDirty = true;
         this.updateCanvasCssSize();
         if (this.isReplacingSource) return;
+        this.cancelPendingQualityRequest();
         this.lanczosRenderer?.hide();
         if (this.source !== null && this.tiles.length > 0) {
             this.canvas.style.display = "";
             this.canvas.style.visibility = "visible";
         }
         this.scheduleRender();
+        if (this.source !== null) this.scheduleIdleQualityUpdate("視窗尺寸更新後");
     }
 
     /** 新圖片載入期間凍結目前已呈現的畫面，待新預覽可繪製時再交換。 */
@@ -329,7 +336,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     private selectPreviewLevel(source: TiefseeviewImageSource): TiefseeviewImageSource["levels"][number] {
-        const eligibleLevels = source.levels.filter(level =>
+        const eligibleLevels = source.levels.filter(level => level.url !== undefined &&
             Math.round(source.width * level.scale) * Math.round(source.height * level.scale) <= this.maxSourcePixels
         );
         if (eligibleLevels.length === 0) {
@@ -341,12 +348,18 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         );
         const previewLevels = textureEligibleLevels.length > 0 ? textureEligibleLevels : eligibleLevels;
         const targetScale = this.getTargetScale();
-        const level = [...previewLevels]
-            .filter(item => item.scale >= targetScale)
-            .sort((a, b) => a.scale - b.scale)[0]
-            ?? [...previewLevels].sort((a, b) => b.scale - a.scale)[0];
+        const level = this.selectSourceLevel(previewLevels, targetScale);
         if (level === undefined) throw new Error("ImageSource 沒有可用的圖片層級");
         return level;
+    }
+
+    /** 取足以覆蓋目標倍率的最低來源層；沒有更高層時使用最高可用層。 */
+    private selectSourceLevel(
+        levels: readonly TiefseeviewImageSource["levels"][number][],
+        targetScale: number
+    ): TiefseeviewImageSource["levels"][number] | undefined {
+        const sortedLevels = [...levels].sort((a, b) => a.scale - b.scale);
+        return sortedLevels.find(level => level.scale >= targetScale) ?? sortedLevels[sortedLevels.length - 1];
     }
 
     private async loadBestLevel(): Promise<void> {
@@ -355,16 +368,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有圖片來源");
             return;
         }
-        if (source.supportsRegionalRequests !== true) {
-            console.info("[Tiefseeview WebGL] 略過高畫質更新：來源不支援區域請求");
+        // 預覽尚未上傳時不能啟動高品質請求，否則它可能中止唯一的完整圖片載入。
+        if (this.activeLevelScale === null || this.tiles.length === 0) {
+            console.info("[Tiefseeview WebGL] 略過高畫質更新：完整預覽尚未就緒");
             return;
         }
         const targetScale = this.getTargetScale();
         // 選足以覆蓋螢幕倍率的最小來源層；nearest 會在原圖層存在時仍選到模糊的低解析縮圖。
-        const level = [...source.levels]
-            .filter(item => item.scale >= targetScale)
-            .sort((a, b) => a.scale - b.scale)[0]
-            ?? [...source.levels].sort((a, b) => b.scale - a.scale)[0];
+        const level = this.selectSourceLevel(source.levels, targetScale);
         if (level === undefined) {
             console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有可用層級");
             return;
@@ -375,14 +386,46 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             qualityScale: level.scale,
             scaleDiagnostics: this.getScaleDiagnostics()
         });
-        if (level.scale <= (this.activeLevelScale ?? 0)) {
+        // 保留目前畫面作為載入期間的備援，但閒置時必須收斂到當前倍率所選的最低足夠層。
+        if (this.activeLevelScale === level.scale) {
+            this.clearQualityLanczosSource();
             for (const tile of this.qualityTiles) this.gl.deleteTexture(tile.texture);
             this.qualityTiles.length = 0;
             this.qualityRegionKey = "";
             if (this.activeQualityScale !== null) source.releaseLevel?.(this.activeQualityScale);
             this.activeQualityScale = null;
             this.scheduleRender();
-            console.info("[Tiefseeview WebGL] 略過 tile：預覽層已足夠");
+            console.info("[Tiefseeview WebGL] 目前來源層已符合目標倍率", {
+                sourceScale: this.activeLevelScale,
+                targetScale
+            });
+            return;
+        }
+        const levelWidth = Math.max(1, Math.round(source.width * level.scale));
+        const levelHeight = Math.max(1, Math.round(source.height * level.scale));
+        const levelPixels = levelWidth * levelHeight;
+        const canLoadCompleteLevel = level.url !== undefined && levelWidth <= this.textureLimit &&
+            levelHeight <= this.textureLimit && levelPixels <= this.maxSourcePixels;
+        if (canLoadCompleteLevel) {
+            console.info("[Tiefseeview WebGL] 使用符合預算的完整來源層", {
+                scale: level.scale,
+                width: levelWidth,
+                height: levelHeight,
+                pixels: levelPixels
+            });
+            const revision = ++this.sourceRevision;
+            this.requestController?.abort();
+            await this.loadLevel(source, level, revision, true);
+            return;
+        }
+        if (source.supportsRegionalRequests !== true || source.requestTile === undefined) {
+            console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有符合資源限制的完整層或 tile 來源", {
+                scale: level.scale,
+                width: levelWidth,
+                height: levelHeight,
+                pixels: levelPixels,
+                supportsRegionalRequests: source.supportsRegionalRequests === true
+            });
             return;
         }
         const rect = this.getVisibleImageRect(source);
@@ -394,12 +437,6 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             });
             return;
         }
-        if (source.requestTile === undefined) {
-            console.info("[Tiefseeview WebGL] 略過 tile：來源沒有 requestTile");
-            return;
-        }
-        const levelWidth = Math.max(1, Math.round(source.width * level.scale));
-        const levelHeight = Math.max(1, Math.round(source.height * level.scale));
         const firstTileX = Math.floor(rect.x * level.scale / this.sourceTileSize);
         const firstTileY = Math.floor(rect.y * level.scale / this.sourceTileSize);
         const lastTileX = Math.floor(Math.max(0, Math.min(levelWidth - 1, (rect.x + rect.width) * level.scale - 1)) / this.sourceTileSize);
@@ -424,10 +461,23 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             return;
         }
         const regionKey = `${level.scale}:${tileRequests.map(tile => `${tile.tileX},${tile.tileY}`).join(";")}`;
-        if (regionKey === this.qualityRegionKey) {
+        if (regionKey === this.qualityRegionKey &&
+            (this.isPixelatedRendering(this.viewState) || this.qualityLanczosRegionKey === regionKey)) {
             console.info("[Tiefseeview WebGL] 略過 tile：可見區域與上次相同", { regionKey });
             return;
         }
+        this.clearQualityLanczosSource();
+        const atlasBounds = this.getTileAtlasBounds(tileRequests, levelWidth, levelHeight);
+        const canBuildLanczosAtlas = !this.isPixelatedRendering(this.viewState) &&
+            atlasBounds.width > 0 && atlasBounds.height > 0 &&
+            atlasBounds.width <= this.textureLimit && atlasBounds.height <= this.textureLimit &&
+            atlasBounds.width * atlasBounds.height <= this.maxSourcePixels;
+        const atlasCanvas = canBuildLanczosAtlas ? document.createElement("canvas") : null;
+        if (atlasCanvas !== null) {
+            atlasCanvas.width = atlasBounds.width;
+            atlasCanvas.height = atlasBounds.height;
+        }
+        const atlasContext = atlasCanvas?.getContext("2d") ?? null;
         const missingRequests = tileRequests.filter(request => {
             const cacheKey = `${request.scale}:${request.tileX},${request.tileY}`;
             const cached = this.qualityTiles.find(tile => tile.cacheKey === cacheKey);
@@ -436,6 +486,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             return false;
         });
         const requestedKeys = new Set(tileRequests.map(tile => `${tile.scale}:${tile.tileX},${tile.tileY}`));
+        const workRequests = atlasContext === null ? missingRequests : tileRequests;
         const excessBeforeLoad = this.qualityTiles.length + missingRequests.length - 32;
         if (excessBeforeLoad > 0) {
             const evictions = this.qualityTiles
@@ -447,9 +498,10 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                 this.qualityTiles.splice(this.qualityTiles.indexOf(tile), 1);
             }
         }
-        if (missingRequests.length === 0) {
+        if (missingRequests.length === 0 && atlasContext === null) {
             this.activeQualityScale = level.scale;
             this.qualityRegionKey = regionKey;
+            this.qualityLanczosRegionKey = !this.isPixelatedRendering(this.viewState) ? regionKey : "";
             this.scheduleRender();
             console.info("[Tiefseeview WebGL] 可見高畫質 tile 已在快取", { regionKey });
             return;
@@ -457,35 +509,60 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         console.info("[Tiefseeview WebGL] 請求高畫質 tile", {
             scale: level.scale,
             rect,
-            tileCount: missingRequests.length,
-            tiles: missingRequests.map(item => `${item.tileX},${item.tileY}`)
+            requestCount: workRequests.length,
+            uploadTileCount: missingRequests.length,
+            tiles: workRequests.map(item => `${item.tileX},${item.tileY}`)
         });
         const revision = ++this.sourceRevision;
         this.requestController?.abort();
         const controller = new AbortController();
         this.requestController = controller;
         const nextTiles: WebGLTile[] = [];
+        const uploadKeys = new Set(missingRequests.map(request => `${request.scale}:${request.tileX},${request.tileY}`));
         try {
             let nextIndex = 0;
             const uploadNext = async (): Promise<void> => {
-                while (nextIndex < missingRequests.length) {
+                while (nextIndex < workRequests.length) {
                     this.assertSourceRevision(revision, controller.signal);
-                    const request = missingRequests[nextIndex++];
+                    const request = workRequests[nextIndex++];
                     const region = await source.requestTile!(request, controller.signal);
                     try {
                         this.assertSourceRevision(revision, controller.signal);
                         this.validateRegion(source, region, level.scale);
-                        const tile = await this.uploadSourceTile(region, revision, controller.signal);
-                        tile.cacheKey = `${request.scale}:${request.tileX},${request.tileY}`;
-                        tile.lastUsed = performance.now();
-                        nextTiles.push(tile);
+                        if (atlasContext !== null && region.source instanceof ImageBitmap && region.contentRect !== undefined) {
+                            // Atlas 只拼 tile 的內容核心，避免 gutter 重疊時把半透明像素做 source-over。
+                            const destinationX = Math.round(region.imageRect.x * level.scale) - atlasBounds.left;
+                            const destinationY = Math.round(region.imageRect.y * level.scale) - atlasBounds.top;
+                            atlasContext.drawImage(
+                                region.source,
+                                region.contentRect.x,
+                                region.contentRect.y,
+                                region.contentRect.width,
+                                region.contentRect.height,
+                                destinationX,
+                                destinationY,
+                                region.contentRect.width,
+                                region.contentRect.height
+                            );
+                        }
+                        const cacheKey = `${request.scale}:${request.tileX},${request.tileY}`;
+                        if (uploadKeys.has(cacheKey)) {
+                            const tile = await this.uploadSourceTile(region, revision, controller.signal);
+                            tile.cacheKey = cacheKey;
+                            tile.scale = request.scale;
+                            tile.lastUsed = performance.now();
+                            nextTiles.push(tile);
+                        } else {
+                            const cached = this.qualityTiles.find(tile => tile.cacheKey === cacheKey);
+                            if (cached !== undefined) cached.lastUsed = performance.now();
+                        }
                     } finally {
                         if (region.source instanceof ImageBitmap) region.source.close();
                     }
                 }
             };
             const results = await Promise.allSettled(
-                Array.from({ length: Math.min(4, missingRequests.length) }, () => uploadNext())
+                Array.from({ length: Math.min(4, workRequests.length) }, () => uploadNext())
             );
             const failure = results.find(result => result.status === "rejected");
             if (failure?.status === "rejected") throw failure.reason;
@@ -502,12 +579,35 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                 this.gl.deleteTexture(evicted.texture);
                 this.qualityTiles.splice(this.qualityTiles.indexOf(evicted), 1);
             }
+            if (atlasContext !== null && atlasCanvas !== null) {
+                try {
+                    const atlasBitmap = await createImageBitmap(atlasCanvas);
+                    try {
+                        this.assertSourceRevision(revision, controller.signal);
+                        this.qualityLanczosBitmap = atlasBitmap;
+                    } catch (error) {
+                        atlasBitmap.close();
+                        throw error;
+                    }
+                    this.qualityLanczosOrigin = { x: atlasBounds.left / level.scale, y: atlasBounds.top / level.scale };
+                    this.qualityLanczosScale = level.scale;
+                } catch (error) {
+                    if (error instanceof DOMException && error.name === "AbortError") throw error;
+                    console.warn("無法建立 tile Lanczos 來源圖，保留後端 Lanczos tile。", error);
+                }
+            }
+            this.assertSourceRevision(revision, controller.signal);
+            this.qualityLanczosRegionKey = !this.isPixelatedRendering(this.viewState) ? regionKey : "";
             this.activeQualityScale = level.scale;
             this.qualityRegionKey = regionKey;
             this.scheduleRender();
             console.info("[Tiefseeview WebGL] 高畫質 tile 已載入", {
                 scale: level.scale,
-                tileCount: loadedTileCount
+                tileCount: loadedTileCount,
+                lanczosAtlas: this.qualityLanczosBitmap === null ? "unavailable" : {
+                    width: this.qualityLanczosBitmap.width,
+                    height: this.qualityLanczosBitmap.height
+                }
             });
         } catch (error) {
             for (const tile of nextTiles) this.gl.deleteTexture(tile.texture);
@@ -515,6 +615,38 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         } finally {
             if (this.requestController === controller) this.requestController = null;
         }
+    }
+
+    private getTileAtlasBounds(
+        requests: readonly { tileX: number; tileY: number; tileSize: number }[],
+        levelWidth: number,
+        levelHeight: number
+    ): { left: number; top: number; width: number; height: number } {
+        const firstTileX = Math.min(...requests.map(tile => tile.tileX));
+        const firstTileY = Math.min(...requests.map(tile => tile.tileY));
+        const lastTileX = Math.max(...requests.map(tile => tile.tileX));
+        const lastTileY = Math.max(...requests.map(tile => tile.tileY));
+        const tileSize = requests[0].tileSize;
+        const left = firstTileX * tileSize;
+        const top = firstTileY * tileSize;
+        const right = Math.min(levelWidth, (lastTileX + 1) * tileSize);
+        const bottom = Math.min(levelHeight, (lastTileY + 1) * tileSize);
+        return { left, top, width: right - left, height: bottom - top };
+    }
+
+    private clearQualityLanczosSource(): void {
+        this.qualityLanczosBitmap?.close();
+        this.qualityLanczosBitmap = null;
+        this.qualityLanczosOrigin = null;
+        this.qualityLanczosScale = null;
+        this.qualityLanczosRegionKey = "";
+    }
+
+    private cancelPendingQualityRequest(): void {
+        if (this.tiles.length === 0 || this.requestController === null) return;
+        this.sourceRevision++;
+        this.requestController.abort();
+        this.requestController = null;
     }
 
     private getVisibleImageRect(source: TiefseeviewImageSource): { x: number; y: number; width: number; height: number } | null {
@@ -531,8 +663,10 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         let top = Math.min(...points.map(point => point[1]));
         let right = Math.max(...points.map(point => point[0]));
         let bottom = Math.max(...points.map(point => point[1]));
-        const marginX = (right - left) * 0.08;
-        const marginY = (bottom - top) * 0.08;
+        // 除既有 viewport 餘量外，至少包含 Lanczos3 在原圖座標中的取樣半徑。
+        const filterMargin = Math.ceil(3 / this.getTargetScale()) + 1;
+        const marginX = Math.max((right - left) * 0.08, filterMargin);
+        const marginY = Math.max((bottom - top) * 0.08, filterMargin);
         left = Math.max(0, Math.floor(left - marginX));
         top = Math.max(0, Math.floor(top - marginY));
         right = Math.min(source.width, Math.ceil(right + marginX));
@@ -594,13 +728,13 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private scheduleIdleQualityUpdate(reason: string): void {
         window.clearTimeout(this.qualityTimer);
         this.qualityTimer = window.setTimeout(() => {
-            console.info(`[Tiefseeview WebGL] ${reason} 180 ms，開始檢查高畫質層`);
+            console.info(`[Tiefseeview WebGL] 閒置 ${this.idleQualityDelayMs} ms 後開始高品質更新`, { reason });
             void this.loadIdleQuality().catch(error => {
                 if (!(error instanceof DOMException && error.name === "AbortError")) {
                     console.warn("WebGL 停止操作後更新圖片品質失敗。", error);
                 }
             });
-        }, 180);
+        }, this.idleQualityDelayMs);
     }
 
     private async loadIdleQuality(): Promise<void> {
@@ -614,20 +748,47 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if (source === null || state === null || sourceScale === null) return;
         // 「呈現像素」生效時，Lanczos3 會把最近點取樣的像素重新平滑，閒置更新需保留 WebGL 畫面。
         const pixelated = this.isPixelatedRendering(state);
-        const canUseLanczos = !pixelated && bitmap !== null && qualityScale === null && sourceScale >= this.getTargetScale();
-        if (!canUseLanczos && sharpenValue <= 0) return;
+        const targetScale = this.getTargetScale();
+        const tileBitmap = this.qualityLanczosBitmap;
+        const tileSourceScale = this.qualityLanczosScale;
+        const tileSourceOrigin = this.qualityLanczosOrigin;
+        const lanczosSourceOrigin = bitmap !== null && sourceScale >= targetScale
+            ? { x: 0, y: 0 }
+            : tileSourceOrigin;
+        const lanczosBitmap = !pixelated && bitmap !== null && sourceScale >= targetScale
+            ? bitmap
+            : !pixelated && tileBitmap !== null && tileSourceScale !== null && tileSourceScale >= targetScale
+                ? tileBitmap
+                : null;
+        const lanczosSourceScale = lanczosBitmap === bitmap && bitmap !== null
+            ? sourceScale
+            : lanczosBitmap === tileBitmap ? tileSourceScale : null;
+        const hasLanczosTiles = !pixelated && qualityScale !== null && qualityScale >= targetScale && this.qualityTiles.length > 0;
+
+        if (lanczosBitmap === null && sharpenValue <= 0) {
+            console.info("[Tiefseeview WebGL] 閒置品質來源已就緒", {
+                qualityPath: hasLanczosTiles ? "後端 Lanczos3 tile" : "保留 WebGL 即時畫面",
+                rendering: this.getImageRendering(),
+                pixelated,
+                previewScale: sourceScale,
+                qualityScale,
+                targetScale,
+                sharpenValue
+            });
+            return;
+        }
 
         const renderer = await this.getLanczosRenderer();
         if (renderer === null || this.source !== source || this.viewState !== state || this.previewBitmap !== bitmap ||
-            this.activeLevelScale !== sourceScale || this.activeQualityScale !== qualityScale) return;
+            this.activeLevelScale !== sourceScale || this.activeQualityScale !== qualityScale || this.qualityLanczosBitmap !== tileBitmap) {
+            return;
+        }
 
         let rendered: boolean;
-        let usedLanczos = canUseLanczos;
-        if (canUseLanczos && bitmap !== null) {
-            rendered = await renderer.render(bitmap, sourceScale, state, sharpenValue);
-        } else {
-            rendered = false;
-        }
+        let usedLanczos = lanczosBitmap !== null && lanczosSourceScale !== null;
+        rendered = lanczosBitmap !== null && lanczosSourceScale !== null
+            ? await renderer.render(lanczosBitmap, lanczosSourceScale, state, sharpenValue, lanczosSourceOrigin ?? { x: 0, y: 0 })
+            : false;
         if (!rendered && sharpenValue > 0) {
             // Lanczos 不適用或跳過時，先等 WebGL 完成預覽／tile 合成，再銳化最終 viewport。
             await this.render();
@@ -637,26 +798,37 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             rendered = await renderer.renderSharpenedCanvas(this.canvas, this.getSharpenValue());
         }
         if (rendered && this.source === source && this.viewState === state && this.previewBitmap === bitmap &&
-            this.activeLevelScale === sourceScale && this.activeQualityScale === qualityScale) {
+            this.activeLevelScale === sourceScale && this.activeQualityScale === qualityScale && this.qualityLanczosBitmap === tileBitmap) {
             // 高品質畫面準備完成後，在同一個 JS 工作內切換圖層，避免透明像素重複合成。
             this.canvas.style.visibility = "hidden";
             renderer.show();
             if (usedLanczos) {
                 console.info("[Tiefseeview WebGL] 閒置後完成 Lanczos3 viewport 重採樣", {
-                    sourceScale,
+                    rendering: this.getImageRendering(),
+                    pixelated,
+                    previewScale: sourceScale,
+                    sourceScale: lanczosSourceScale,
                     targetScale: this.getTargetScale(),
                     sharpenValue,
                     outputWidth: this.lanczosCanvas.width,
                     outputHeight: this.lanczosCanvas.height,
-                    viewportCss: { width: state.viewport.widthCss, height: state.viewport.heightCss }
+                    viewportCss: { width: state.viewport.widthCss, height: state.viewport.heightCss },
+                    lanczosSourceOrigin,
+                    lanczosSourceSize: lanczosBitmap === null ? null : { width: lanczosBitmap.width, height: lanczosBitmap.height },
+                    displayedCanvas: "lanczos",
+                    lanczosCanvasVisibility: this.lanczosCanvas.style.visibility
                 });
             } else {
                 console.info("[Tiefseeview WebGL] 閒置後完成 viewport 銳化", {
+                    rendering: this.getImageRendering(),
+                    pixelated,
                     sourceScale,
                     qualityScale,
                     sharpenValue,
                     outputWidth: this.lanczosCanvas.width,
-                    outputHeight: this.lanczosCanvas.height
+                    outputHeight: this.lanczosCanvas.height,
+                    displayedCanvas: "sharpened-webgpu",
+                    lanczosCanvasVisibility: this.lanczosCanvas.style.visibility
                 });
             }
         }
@@ -816,8 +988,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        this.setTextureSampling(texture, this.isPixelatedRendering(this.viewState));
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
         gl.generateMipmap(gl.TEXTURE_2D);
         const glError = gl.getError();
@@ -845,12 +1016,30 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         signal: AbortSignal
     ): Promise<WebGLTile[]> {
         const gutter = Math.min(32, Math.max(1, Math.floor((this.textureLimit - 64) / 2)));
-        const tileSize = Math.min(2048, Math.max(1, this.textureLimit - gutter * 2));
+        // 完整來源已通過像素預算；只有超出 GPU 貼圖上限時才需要再切分。
+        const tileSize = Math.max(1, this.textureLimit - gutter * 2);
         const gl = this.gl;
         const nextTiles: WebGLTile[] = [];
         const regionScaleX = region.pixelWidth / region.imageRect.width;
         const regionScaleY = region.pixelHeight / region.imageRect.height;
         try {
+            if (region.pixelWidth <= this.textureLimit && region.pixelHeight <= this.textureLimit) {
+                // 完整來源可放進單張 GPU 貼圖時直接上傳，避免人為切縫及分開建立 mipmap。
+                const bitmap = await createImageBitmap(region.source);
+                try {
+                    this.assertSourceRevision(revision, signal);
+                    nextTiles.push(await this.enqueueTextureUpload(bitmap, bitmap.width, bitmap.height, region.imageRect, {
+                        x: 0,
+                        y: 0,
+                        width: region.pixelWidth,
+                        height: region.pixelHeight
+                    }, revision, signal));
+                } catch (error) {
+                    bitmap.close();
+                    throw error;
+                }
+                return nextTiles;
+            }
             for (let y = 0; y < region.pixelHeight; y += tileSize) {
                 for (let x = 0; x < region.pixelWidth; x += tileSize) {
                     this.assertSourceRevision(revision, signal);
@@ -895,6 +1084,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     private clearTextures(): void {
+        this.clearQualityLanczosSource();
         for (const tile of this.tiles) this.gl.deleteTexture(tile.texture);
         this.tiles.length = 0;
         for (const tile of this.qualityTiles) this.gl.deleteTexture(tile.texture);
@@ -949,6 +1139,38 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         return state.image.displayWidthCss / state.image.width * state.viewport.devicePixelRatio > 1;
     }
 
+    private setTextureSampling(texture: WebGLTexture, pixelated: boolean): void {
+        const gl = this.gl;
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, pixelated ? gl.NEAREST_MIPMAP_NEAREST : gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, pixelated ? gl.NEAREST : gl.LINEAR);
+    }
+
+    private getTileClipBounds(tile: WebGLTile, state: TiefseeviewViewState): { left: number; right: number; top: number; bottom: number } {
+        const { a, b, c, d, e, f } = state.imageToViewport;
+        const corners = [
+            [tile.x, tile.y],
+            [tile.x + tile.width, tile.y],
+            [tile.x, tile.y + tile.height],
+            [tile.x + tile.width, tile.y + tile.height]
+        ].map(([x, y]) => {
+            const viewportX = a * x + c * y + e;
+            const viewportY = b * x + d * y + f;
+            return [viewportX / this.widthCss * 2 - 1, 1 - viewportY / this.heightCss * 2];
+        });
+        return {
+            left: Math.min(...corners.map(point => point[0])),
+            right: Math.max(...corners.map(point => point[0])),
+            top: Math.min(...corners.map(point => point[1])),
+            bottom: Math.max(...corners.map(point => point[1]))
+        };
+    }
+
+    private isTileVisible(tile: WebGLTile, state: TiefseeviewViewState): boolean {
+        const bounds = this.getTileClipBounds(tile, state);
+        return bounds.right >= -1 && bounds.left <= 1 && bounds.bottom >= -1 && bounds.top <= 1;
+    }
+
     private draw(): void {
         const gl = this.gl;
         gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -958,6 +1180,25 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
 
         const { a, b, c, d, e, f } = state.imageToViewport;
         const pixelated = this.isPixelatedRendering(state);
+        const rendering = this.getImageRendering();
+        const displayScaleCss = state.image.displayWidthCss / state.image.width;
+        const effectiveDisplayScale = displayScaleCss * state.viewport.devicePixelRatio;
+        const decisionKey = String(rendering) + ":" + String(pixelated);
+        if (decisionKey !== this.pixelatedDecisionKey) {
+            this.pixelatedDecisionKey = decisionKey;
+            console.info("[Tiefseeview WebGL] 像素模式判定切換", {
+                rendering,
+                displayScaleCss,
+                devicePixelRatio: state.viewport.devicePixelRatio,
+                effectiveDisplayScale,
+                pixelated,
+                reason: rendering === 1
+                    ? "固定像素模式"
+                    : rendering === 2
+                        ? "實際倍率 " + (effectiveDisplayScale > 1 ? ">" : "<=") + " 100%"
+                        : "一般平滑模式"
+            });
+        }
         const filterChanged = pixelated !== this.pixelatedFilter;
         this.pixelatedFilter = pixelated;
         gl.useProgram(this.program);
@@ -969,27 +1210,69 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         gl.activeTexture(gl.TEXTURE0);
         if (filterChanged) {
             for (const tile of [...this.tiles, ...this.qualityTiles]) {
-                gl.bindTexture(gl.TEXTURE_2D, tile.texture);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, pixelated ? gl.NEAREST_MIPMAP_NEAREST : gl.LINEAR_MIPMAP_LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, pixelated ? gl.NEAREST : gl.LINEAR);
+                this.setTextureSampling(tile.texture, pixelated);
             }
         }
-        for (const tile of [...this.tiles, ...this.qualityTiles]) {
-            const left = tile.x;
-            const top = tile.y;
-            const right = left + tile.width;
-            const bottom = top + tile.height;
+        const now = performance.now();
+        if (pixelated && now - this.pixelatedDiagnosticAt >= 1000) {
+            this.pixelatedDiagnosticAt = now;
+            const textureFilterCounts = { nearest: 0, linear: 0, other: 0 };
+            for (const tile of [...this.tiles, ...this.qualityTiles]) {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, tile.texture);
+                const min = Number(gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER));
+                const mag = Number(gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER));
+                if (min === gl.NEAREST_MIPMAP_NEAREST && mag === gl.NEAREST) textureFilterCounts.nearest++;
+                else if (min === gl.LINEAR_MIPMAP_LINEAR && mag === gl.LINEAR) textureFilterCounts.linear++;
+                else textureFilterCounts.other++;
+            }
+            console.info("[Tiefseeview WebGL] 像素模式取樣診斷", {
+                rendering: this.getImageRendering(),
+                displayScaleCss: state.image.displayWidthCss / state.image.width,
+                devicePixelRatio: state.viewport.devicePixelRatio,
+                imageToViewport: { ...state.imageToViewport },
+                canvasBackingScale: {
+                    x: this.widthCss > 0 ? this.canvas.width / this.widthCss : null,
+                    y: this.heightCss > 0 ? this.canvas.height / this.heightCss : null
+                },
+                imageOriginPixelOffset: {
+                    x: ((state.imageToViewport.e * (this.widthCss > 0 ? this.canvas.width / this.widthCss : 1)) % 1 + 1) % 1,
+                    y: ((state.imageToViewport.f * (this.heightCss > 0 ? this.canvas.height / this.heightCss : 1)) % 1 + 1) % 1
+                },
+                pixelated,
+                pixelatedFilter: this.pixelatedFilter,
+                textureFilterCounts,
+                previewScale: this.activeLevelScale,
+                qualityScale: this.activeQualityScale,
+                previewTileCount: this.tiles.length,
+                qualityTileCount: this.qualityTiles.length,
+                cachedQualityScales: [...new Set(this.qualityTiles.map(tile => tile.scale))],
+                visibleQualityTileCount: this.qualityTiles
+                    .filter(tile => tile.scale === this.activeQualityScale && this.isTileVisible(tile, state)).length,
+                visibleQualityTileKeys: this.qualityTiles
+                    .filter(tile => tile.scale === this.activeQualityScale && this.isTileVisible(tile, state))
+                    .map(tile => tile.cacheKey),
+                sharpenValue: this.getSharpenValue(),
+                lanczosCanvasDisplay: this.lanczosCanvas.style.display,
+                lanczosCanvasVisibility: this.lanczosCanvas.style.visibility
+            });
+        }
+        const drawTile = (tile: WebGLTile): void => {
             const toClip = (x: number, y: number): [number, number] => {
                 const viewportX = a * x + c * y + e;
                 const viewportY = b * x + d * y + f;
                 return [viewportX / this.widthCss * 2 - 1, 1 - viewportY / this.heightCss * 2];
             };
+            const left = tile.x;
+            const top = tile.y;
+            const right = left + tile.width;
+            const bottom = top + tile.height;
+            const bounds = this.getTileClipBounds(tile, state);
+            if (bounds.right < -1 || bounds.left > 1 || bounds.bottom < -1 || bounds.top > 1) return;
             const tl = toClip(left, top);
             const tr = toClip(right, top);
             const bl = toClip(left, bottom);
             const br = toClip(right, bottom);
-            if (Math.max(tl[0], tr[0], bl[0], br[0]) < -1 || Math.min(tl[0], tr[0], bl[0], br[0]) > 1 ||
-                Math.max(tl[1], tr[1], bl[1], br[1]) < -1 || Math.min(tl[1], tr[1], bl[1], br[1]) > 1) continue;
             this.vertexData.set([
                 tl[0], tl[1], tile.uvLeft, tile.uvTop,
                 tr[0], tr[1], tile.uvRight, tile.uvTop,
@@ -999,6 +1282,17 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertexData);
             gl.bindTexture(gl.TEXTURE_2D, tile.texture);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+
+        // 預覽以 source-over 混合；高解析 tile 則以預乘 alpha 覆寫其區域，避免半透明 tile 與預覽底圖疊色。
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.uniform1i(this.premultiplyAlphaLocation, 0);
+        for (const tile of this.tiles) drawTile(tile);
+
+        gl.blendFuncSeparate(gl.ONE, gl.ZERO, gl.ONE, gl.ZERO);
+        gl.uniform1i(this.premultiplyAlphaLocation, 1);
+        for (const tile of this.qualityTiles) {
+            if (tile.scale === this.activeQualityScale) drawTile(tile);
         }
     }
 }

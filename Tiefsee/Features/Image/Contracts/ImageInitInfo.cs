@@ -24,4 +24,8 @@ public class ImageInitInfo {
     /// 初始化時使用的解碼方式，用於後續的 vips 縮放處理
     /// </summary>
     public string vipsType { get; set; } = "";
+    /// <summary>初始化路徑回傳的瀏覽器預覽圖比例；1 表示原始尺寸。</summary>
+    public double previewScale { get; set; } = 1;
+    /// <summary>原始尺寸只由 Vips tile API 提供，不能當成瀏覽器圖片 URL 解碼。</summary>
+    public bool tileOnlyOriginal { get; set; } = false;
 }

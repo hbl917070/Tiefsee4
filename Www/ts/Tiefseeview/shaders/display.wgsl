@@ -22,6 +22,7 @@ fn blurWeight(x: i32, y: i32) -> f32 {
     let coord = clamp(vec2<i32>(pos.xy), vec2<i32>(0), dims - vec2<i32>(1));
     let center = textureLoad(image, coord, 0);
     if (p.sharpen <= 0.0 || center.a <= 0.000001) { return center; }
+    let centerRgb = center.rgb / center.a;
 
     // WebGPU 的 Lanczos 輸出較銳，閒置銳化前使用約 0.55px 柔化，再套用十字形銳化核。
     var rgb = vec3<f32>(0.0);
@@ -34,7 +35,9 @@ fn blurWeight(x: i32, y: i32) -> f32 {
             if (weight != 0.0) {
                 let sampleCoord = clamp(coord + vec2<i32>(x, y), vec2<i32>(0), dims - vec2<i32>(1));
                 let sampleColor = textureLoad(image, sampleCoord, 0);
-                rgb += sampleColor.rgb / max(sampleColor.a, 0.000001) * weight;
+                // 完全透明的圖片外像素以中心色延伸，避免透明黑色讓外框邊緣變亮。
+                let sampleRgb = select(centerRgb, sampleColor.rgb / max(sampleColor.a, 0.000001), sampleColor.a > 0.000001);
+                rgb += sampleRgb * weight;
             }
         }
     }

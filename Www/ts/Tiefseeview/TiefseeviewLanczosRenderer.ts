@@ -78,7 +78,13 @@ export class TiefseeviewLanczosRenderer {
         this.canvas.style.visibility = "hidden";
     }
 
-    public async render(bitmap: ImageBitmap, sourceScale: number, state: TiefseeviewViewState, sharpenValue = 0): Promise<boolean> {
+    public async render(
+        bitmap: ImageBitmap,
+        sourceScale: number,
+        state: TiefseeviewViewState,
+        sharpenValue = 0,
+        sourceOrigin = { x: 0, y: 0 }
+    ): Promise<boolean> {
         const revision = ++this.frameRevision;
         const width = this.canvas.width;
         const height = this.canvas.height;
@@ -117,8 +123,10 @@ export class TiefseeviewLanczosRenderer {
             data.setFloat32(44, matrix.d, true);
             data.setFloat32(48, matrix.e, true);
             data.setFloat32(52, matrix.f, true);
-            data.setFloat32(56, bitmap.width / state.image.width, true);
-            data.setFloat32(60, bitmap.height / state.image.height, true);
+            data.setFloat32(24, sourceOrigin.x, true);
+            data.setFloat32(28, sourceOrigin.y, true);
+            data.setFloat32(56, sourceScale, true);
+            data.setFloat32(60, sourceScale, true);
             data.setFloat32(64, pixelToCssX, true);
             data.setFloat32(68, pixelToCssY, true);
             data.setFloat32(72, Math.min(1, effectiveScale), true);

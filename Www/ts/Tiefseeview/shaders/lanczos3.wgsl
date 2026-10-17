@@ -1,5 +1,5 @@
 struct Params {
-    sourceSize: vec2<u32>, outputSize: vec2<u32>, imageSize: vec2<u32>, _pad0: vec2<u32>,
+    sourceSize: vec2<u32>, outputSize: vec2<u32>, imageSize: vec2<u32>, sourceOrigin: vec2<f32>,
     matrix0: vec4<f32>, matrix1: vec2<f32>, sourceScale: vec2<f32>, pixelToCss: vec2<f32>, filterScale: f32,
 };
 @group(0) @binding(0) var src: texture_2d<f32>;
@@ -33,7 +33,7 @@ fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
         textureStore(dst, vec2<i32>(gid.xy), vec4<f32>(0.0));
         return;
     }
-    let center = vec2<f32>(imageX * p.sourceScale.x - 0.5, imageY * p.sourceScale.y - 0.5);
+    let center = (vec2<f32>(imageX, imageY) - p.sourceOrigin) * p.sourceScale - vec2<f32>(0.5);
     let support = 3.0 / p.filterScale;
     let firstX = i32(ceil(center.x - support));
     let lastX = i32(floor(center.x + support));

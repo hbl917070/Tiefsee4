@@ -76,6 +76,10 @@ public class FileTypeHelper {
                 }
                 return "png";
             }
+            else if (hex.StartsWith("49 49 2A 00") || hex.StartsWith("4D 4D 00 2A") ||
+                hex.StartsWith("49 49 2B 00") || hex.StartsWith("4D 4D 00 2B")) { // TIFF / BigTIFF
+                return "tif";
+            }
             else if (hex.Contains("57 45 42 50 56 50 38")) { // WEBPVP8
                 if (hex.Contains("41 4E 49 4D")) { // ANIM
                     return "webps";

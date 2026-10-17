@@ -1,5 +1,7 @@
 using ImageMagick;
 using ImageMagick.Formats;
+using MetadataExtractor.Formats.Exif;
+using MetadataExtractor.Formats.Tiff;
 using NetVips;
 using NetVips.Extensions;
 using Sdcb.LibRaw;
@@ -23,10 +25,15 @@ namespace Tiefsee;
 /// 管理圖片轉檔、Vips cache 與暫存檔路徑
 /// </summary>
 public sealed class ImageProcessingService {
+    private const int JpegMaxDimension = 65500;
+    private const long WebGLPreviewMaxPixels = 8L * 1024 * 1024;
+    private const long VipsStreamThresholdBytes = 256L * 1024 * 1024;
+    private const string VipsTileAlgorithmVersion = "source-region-v5";
 
     private readonly string _tempDirImgProcessed;
     private readonly string _tempDirImgZoom;
     private readonly Dictionary<string, int[]> _imgSizeCache = new();
+    private readonly Dictionary<string, int> _imgExifOrientationCache = new();
     private readonly List<CachedVipsImage> _vipsCache = new();
     private readonly ConcurrentDictionary<string, Lazy<byte[]>> _vipsTileInFlight = new();
 
@@ -38,6 +45,26 @@ public sealed class ImageProcessingService {
     private sealed class CachedVipsImage {
         public string key;
         public NetVips.Image vips;
+        public Stream stream;
+        public int leaseCount;
+        public bool retired;
+    }
+
+    private sealed class VipsImageLease : IDisposable {
+        private readonly ImageProcessingService _owner;
+        private CachedVipsImage _entry;
+
+        public NetVips.Image Image => _entry?.vips ?? throw new ObjectDisposedException(nameof(VipsImageLease));
+
+        public VipsImageLease(ImageProcessingService owner, CachedVipsImage entry) {
+            _owner = owner;
+            _entry = entry;
+        }
+
+        public void Dispose() {
+            CachedVipsImage entry = Interlocked.Exchange(ref _entry, null);
+            if (entry != null) _owner.ReleaseVipsImage(entry);
+        }
     }
 
     /// <summary>
@@ -613,35 +640,76 @@ public sealed class ImageProcessingService {
     }
 
     /// <summary>
-    /// 取得一個 NetVips.Image 物件，此物件會自動回收，不需要 using
+    /// 取得一個在租用期間不會被 cache 淘汰的 NetVips.Image。
     /// </summary>
-    public NetVips.Image GetNetVips(string path, string type) {
+    private VipsImageLease AcquireNetVips(string path, string type) {
 
         lock (_vipsCache) {
 
-            string key = FileTypeHelper.FileToHash(path);
+            FileInfo sourceInfo = new(path);
+            string key = $"{GetFileVersionCacheKey(path, sourceInfo)}_{type}";
             for (int i = 0; i < _vipsCache.Count; i++) {
                 if (_vipsCache[i].key == key) {
-                    return _vipsCache[i].vips;
+                    CachedVipsImage cached = _vipsCache[i];
+                    cached.leaseCount++;
+                    _vipsCache.RemoveAt(i);
+                    _vipsCache.Add(cached);
+                    return new VipsImageLease(this, cached);
                 }
             }
 
-            var buffer = File.ReadAllBytes(path);
-            var img = NetVips.Image.NewFromBuffer(buffer, access: NetVips.Enums.Access.Random);
-
-            _vipsCache.Add(new CachedVipsImage {
-                key = key,
-                vips = img
-            });
-
-            // 最多保留5個檔案
-            if (_vipsCache.Count > 5) {
-                using (_vipsCache[0].vips) { }
-                _vipsCache[0].vips = null;
-                _vipsCache.RemoveAt(0);
+            Stream stream = null;
+            NetVips.Image img;
+            if (sourceInfo.Length >= VipsStreamThresholdBytes) {
+                // Keep large inputs file-backed; FileShare.Delete avoids holding a delete-blocking handle.
+                stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 4096, FileOptions.RandomAccess);
+                try {
+                    img = NetVips.Image.NewFromStream(stream, access: NetVips.Enums.Access.Random);
+                }
+                catch {
+                    stream.Dispose();
+                    throw;
+                }
+            } else {
+                var buffer = File.ReadAllBytes(path);
+                img = NetVips.Image.NewFromBuffer(buffer, access: NetVips.Enums.Access.Random);
             }
-            return img;
+
+            CachedVipsImage entry = new() {
+                key = key,
+                vips = img,
+                stream = stream,
+                leaseCount = 1
+            };
+            _vipsCache.Add(entry);
+
+            // 快取最多保留 5 個未淘汰項目；仍有工作使用的項目會在最後一個 lease 釋放時才關閉。
+            if (_vipsCache.Count > 5) {
+                CachedVipsImage oldest = _vipsCache[0];
+                _vipsCache.RemoveAt(0);
+                RetireVipsImage(oldest);
+            }
+            return new VipsImageLease(this, entry);
         }
+    }
+
+    private void ReleaseVipsImage(CachedVipsImage entry) {
+        lock (_vipsCache) {
+            entry.leaseCount--;
+            if (entry.leaseCount == 0 && entry.retired) DisposeVipsImage(entry);
+        }
+    }
+
+    private void RetireVipsImage(CachedVipsImage entry) {
+        entry.retired = true;
+        if (entry.leaseCount == 0) DisposeVipsImage(entry);
+    }
+
+    private static void DisposeVipsImage(CachedVipsImage entry) {
+        entry.vips?.Dispose();
+        entry.vips = null;
+        entry.stream?.Dispose();
+        entry.stream = null;
     }
 
     /// <summary>
@@ -651,12 +719,13 @@ public sealed class ImageProcessingService {
     /// <param name="autoOrientation"> 如果圖片有旋轉90°或270°，就長寬對調 </param>
     public int[] GetImgSize(string path, bool autoOrientation) {
 
-        string hash = FileTypeHelper.FileToHash(path);
+        FileInfo fileInfo = new(path);
+        string cacheKey = GetFileVersionCacheKey(path, fileInfo);
 
         // 先檢查 cache 裡面有沒有
         lock (_imgSizeCache) {
-            if (_imgSizeCache.ContainsKey(hash)) {
-                return _imgSizeCache[hash];
+            if (_imgSizeCache.TryGetValue(cacheKey, out int[] cachedSize)) {
+                return GetOrientedSize(cachedSize, autoOrientation, GetImgExifOrientation(path));
             }
         }
 
@@ -665,51 +734,146 @@ public sealed class ImageProcessingService {
         PathToBitmapSource(path, (BitmapSource img) => {
             w = img.PixelWidth;
             h = img.PixelHeight;
-
-            //如果圖片有旋轉90°或270°，就長寬對調
-            if (autoOrientation) {
-                var bmData = (BitmapMetadata)img.Metadata;
-                if (bmData != null) {
-                    try {
-                        object val = bmData.GetQuery("/app1/ifd/exif:{uint=274}");
-                        if (val != null) {
-                            string orientation = val.ToString();
-                            if (orientation == "5" || orientation == "6" || orientation == "7" || orientation == "8") {
-                                w = img.PixelHeight;
-                                h = img.PixelWidth;
-                            }
-                        }
-                    }
-                    catch { }
-                }
-            }
         });
 
         int[] ret = new int[] { w, h };
         lock (_imgSizeCache) {
-            _imgSizeCache[hash] = ret;
+            _imgSizeCache[cacheKey] = ret;
         }
 
-        return ret;
+        return GetOrientedSize(ret, autoOrientation, GetImgExifOrientation(path));
+    }
+
+    private static int[] GetOrientedSize(int[] size, bool autoOrientation, int orientation) =>
+        autoOrientation && orientation >= 5 && orientation <= 8
+            ? new[] { size[1], size[0] }
+            : size;
+
+    private int GetImgExifOrientation(string path) {
+        FileInfo fileInfo = new(path);
+        string cacheKey = GetFileVersionCacheKey(path, fileInfo);
+        lock (_imgExifOrientationCache) {
+            if (_imgExifOrientationCache.TryGetValue(cacheKey, out int orientation)) return orientation;
+        }
+
+        string fileType = FileTypeHelper.GetFileType(path);
+        bool usesContainerExif = fileType is "png" or "apng" or "webp" or "webps" or "tif" or "tiff";
+        int? fileOrientation = usesContainerExif ? ReadExifOrientationFromFile(path, fileType) : null;
+        int result = fileOrientation ?? 1;
+
+        // JPEG 沿用快速 WPF 查詢；容器 metadata 未讀到方向時，只讓 WPF 補讀已知支援的格式。
+        if (!fileOrientation.HasValue && SupportsWpfMetadata(fileType)) {
+            try {
+                PathToBitmapSource(path, img => {
+                    int wpfOrientation = GetExifOrientation(img.Metadata as BitmapMetadata);
+                    if (wpfOrientation != 1) result = wpfOrientation;
+                });
+            }
+            catch {
+                // 部分 VIPS 支援的格式無法由 WPF 解碼；方向預設為未旋轉。
+            }
+        }
+
+        CacheImgExifOrientation(path, result, fileInfo);
+        return result;
+    }
+
+    private static bool SupportsWpfMetadata(string fileType) => fileType is
+        "jpg" or "jpeg" or "png" or "apng" or "tif" or "tiff" or "wdp" or "wmp" or "jxr";
+
+    private static int? ReadExifOrientationFromFile(string path, string fileType) {
+        try {
+            var directories = fileType is "tif" or "tiff"
+                ? TiffMetadataReader.ReadMetadata(path)
+                : MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
+            foreach (var directory in directories) {
+                if (directory is ExifIfd0Directory) {
+                    MetadataExtractor.Directory metadataDirectory = directory;
+                    if (MetadataExtractor.DirectoryExtensions.TryGetInt32(metadataDirectory, ExifDirectoryBase.TagOrientation, out int orientation) &&
+                        orientation >= 1 && orientation <= 8) {
+                        return orientation;
+                    }
+                }
+            }
+        }
+        catch {
+            // 交由 WPF fallback 嘗試讀取。
+        }
+
+        return null;
+    }
+
+    private void CacheImgExifOrientation(string path, int orientation, FileInfo fileInfo = null) {
+        fileInfo ??= new FileInfo(path);
+        string cacheKey = GetFileVersionCacheKey(path, fileInfo);
+        lock (_imgExifOrientationCache) {
+            _imgExifOrientationCache[cacheKey] = orientation;
+        }
+    }
+
+    private static string GetFileVersionCacheKey(string path, FileInfo fileInfo) =>
+        $"{FileTypeHelper.FileToHash(path)}_{fileInfo.Length}_{fileInfo.LastWriteTimeUtc.Ticks}";
+
+    private static int GetExifOrientation(BitmapMetadata metadata) {
+        if (metadata == null) return 1;
+        try {
+            object value = metadata.GetQuery("/app1/ifd/exif:{uint=274}");
+            return value != null && int.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int orientation)
+                && orientation >= 1 && orientation <= 8
+                ? orientation
+                : 1;
+        }
+        catch {
+            return 1;
+        }
     }
 
     /// <summary>
     /// 取得圖片的 size，然後把檔案處理成 vips 可以載入的格式，寫入到暫存資料夾
     /// </summary>
-    public ImageInitInfo GetImgInitInfo(string path, string type, string vipsType) {
+    public ImageInitInfo GetImgInitInfo(string path, string type, string vipsType, bool useRegionalTiles = false) {
 
         ImageInitInfo imgInfo = new();
+
+        using VipsImageLease sourceLease = type == "tif" || type == "tiff" ? AcquireNetVips(path, "tif") : null;
+        NetVips.Image sourceImage = sourceLease?.Image;
+        if (type == "tif" || type == "tiff") {
+            // 超過 JPEG 尺寸上限的 TIFF 原本就使用預覽；保留 Canvas 的既有預覽降級行為。
+            int maxDimension = useRegionalTiles ? int.MaxValue : JpegMaxDimension;
+            if (TryCreateLargeImageInitInfo(path, type, vipsType, sourceImage, maxDimension, out imgInfo,
+                WebGLPreviewMaxPixels, limitByPixels: useRegionalTiles)) return imgInfo;
+        }
 
         string path100 = PathToImgProcessed(path, vipsType);
 
         if (File.Exists(path100)) {
             // 調整最後存取時間，延後暫存被清理
             File.SetLastAccessTime(path100, DateTime.Now);
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "vips") {
             int[] wh = GetImgSize(path, true);
+            if (useRegionalTiles && RequiresWebGLRegionalTiles(wh[0], wh[1])) {
+                using VipsImageLease regionalSourceLease = AcquireNetVips(path, type);
+                sourceImage = regionalSourceLease.Image;
+                if (TryCreateLargeImageInitInfo(path, type, vipsType, sourceImage, int.MaxValue, out imgInfo,
+                    WebGLPreviewMaxPixels, limitByPixels: true)) return imgInfo;
+            }
+
+            // 瀏覽器不一定會依 WebP/PNG 等格式的 EXIF Orientation 轉向；提供原尺寸來源前先固定像素方向。
+            string orientedPath = GetOrientationNormalizedPath(path, vipsType);
+            if (orientedPath != path) {
+                using VipsImageLease orientedLease = AcquireNetVips(orientedPath, "vips");
+                NetVips.Image orientedImage = orientedLease.Image;
+                imgInfo.width = orientedImage.Width;
+                imgInfo.height = orientedImage.Height;
+                imgInfo.code = "1";
+                imgInfo.path = orientedPath;
+                imgInfo.vipsType = vipsType;
+                return imgInfo;
+            }
+
             imgInfo.width = wh[0];
             imgInfo.height = wh[1];
             imgInfo.code = "1";
@@ -722,14 +886,17 @@ public sealed class ImageProcessingService {
         }
 
         if (type == "tif" || type == "tiff") {
-            NetVips.Image vImg = GetNetVips(path, "tif");
+            NetVips.Image vImg = sourceImage;
             VipsSave(vImg, path100, "auto");
 
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "avif") {
-            NetVips.Image vImg = GetNetVips(path, "avif");
+            using VipsImageLease imageLease = AcquireNetVips(path, "avif");
+            NetVips.Image vImg = imageLease.Image;
+            if (useRegionalTiles && TryCreateLargeImageInitInfo(path, type, vipsType, vImg, int.MaxValue, out ImageInitInfo largeImageInfo,
+                WebGLPreviewMaxPixels, limitByPixels: true)) return largeImageInfo;
             VipsSave(vImg, path100, "auto");
             imgInfo.width = vImg.Width;
             imgInfo.height = vImg.Height;
@@ -742,14 +909,15 @@ public sealed class ImageProcessingService {
         if (type == "jpg") {
             if (IsCMYK(path)) {
                 // 如果是 CMYK，就先套用顏色
-                NetVips.Image vImg = GetNetVips(path, "jpg");
+                using VipsImageLease imageLease = AcquireNetVips(path, "jpg");
+                NetVips.Image vImg = imageLease.Image;
                 using (var vImg2 = vImg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) {
                     vImg2.Jpegsave(path100);
                 }
-                return GetImgInitInfo(path100, "vips", vipsType);
+                return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
             }
             else {
-                return GetImgInitInfo(path, "vips", vipsType);
+                return GetImgInitInfo(path, "vips", vipsType, useRegionalTiles);
             }
         }
 
@@ -759,7 +927,7 @@ public sealed class ImageProcessingService {
                     VipsSave(vImg, path100, "auto");
                 }
             }
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "wpf") {
@@ -770,19 +938,19 @@ public sealed class ImageProcessingService {
                     }
                 }
             });
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "uwp") {
             using var ms = Uwp_PathToStream(path, Windows.Graphics.Imaging.BitmapEncoder.TiffEncoderId).Result;
             using var vImg = NetVips.Image.NewFromStream(ms);
             VipsSave(vImg, path100, "png");
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "hdrfix") {
             var pngPath = Jxr_PathToPath(path);
-            return GetImgInitInfo(pngPath, "vips", vipsType);
+            return GetImgInitInfo(pngPath, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "magick") {
@@ -803,7 +971,7 @@ public sealed class ImageProcessingService {
                 image.Dispose();
             }
 
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "rawFull" || type == "rawThumbnail") {
@@ -817,7 +985,7 @@ public sealed class ImageProcessingService {
                         stream.CopyTo(fileStream);
                     }
                     Debug.WriteLine("Raw to vips: " + path100);
-                    return GetImgInitInfo(path100, "vips", vipsType);
+                    return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
                 }
             }
             catch {
@@ -825,7 +993,7 @@ public sealed class ImageProcessingService {
                 using (var image = new MagickImage(path)) {
                     image.Write(path100, MagickFormat.Jpeg);
                     Debug.WriteLine("Magick ok: " + path);
-                    return GetImgInitInfo(path100, "vips", vipsType);
+                    return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
                 }
             }
         }
@@ -837,7 +1005,7 @@ public sealed class ImageProcessingService {
                     stream.CopyTo(fileStream);
                 }
             }
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "extractPng") {
@@ -847,7 +1015,7 @@ public sealed class ImageProcessingService {
                     stream.CopyTo(fileStream);
                 }
             }
-            return GetImgInitInfo(path100, "vips", vipsType);
+            return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
         }
 
         if (type == "nconvert" || type == "nconvertPng" || type == "nconvertJpg") {
@@ -858,7 +1026,7 @@ public sealed class ImageProcessingService {
             else {
                 nconvertPath = Nconvert_PathToPath(path, false, "jpg");
             }
-            return GetImgInitInfo(nconvertPath, "vips", vipsType);
+            return GetImgInitInfo(nconvertPath, "vips", vipsType, useRegionalTiles);
         }
 
         return imgInfo;
@@ -869,7 +1037,9 @@ public sealed class ImageProcessingService {
     /// </summary>
     public string VipsResize(string path, double scale, string fileType, string vipsType) {
 
-        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}_{scale}.jpg"; // 暫存檔案名稱
+        int sourceOrientation = GetImgExifOrientation(path);
+        string orientationSuffix = sourceOrientation == 1 ? "" : $"_o{sourceOrientation}";
+        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}{orientationSuffix}_{scale}.jpg"; // 暫存檔案名稱
         string filePath = Path.Combine(_tempDirImgZoom, hashName); // 暫存檔案的路徑
 
         // 如果檔案已經存在，就直接回傳
@@ -883,28 +1053,20 @@ public sealed class ImageProcessingService {
             Directory.CreateDirectory(_tempDirImgZoom);
         }
 
-        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
-        if (File.Exists(imgProcessed)) {
-            File.SetLastAccessTime(imgProcessed, DateTime.Now);
-        }
-        else {
-            imgProcessed = PathToImgProcessed(path, vipsType, "png");
-            if (File.Exists(imgProcessed)) {
-                File.SetLastAccessTime(imgProcessed, DateTime.Now);
-            }
-            else {
-                imgProcessed = path;
-            }
-        }
+        string imgProcessed = GetVipsInputPath(path, vipsType);
 
-        NetVips.Image im = GetNetVips(imgProcessed, fileType);
+        int exifOrientation = GetImgExifOrientation(imgProcessed);
+        using VipsImageLease imageLease = AcquireNetVips(imgProcessed, fileType);
+        NetVips.Image im = imageLease.Image;
+        using NetVips.Image orientedImage = exifOrientation == 1 ? null : im.Autorot();
+        NetVips.Image resizeSource = orientedImage ?? im;
         Enums.Kernel? kernel = Enums.Kernel.Lanczos3;
         double? gap = 4;
-        if (im.Width > 30000 || im.Height > 30000) {
+        if (resizeSource.Width > 30000 || resizeSource.Height > 30000) {
             kernel = Enums.Kernel.Nearest;
             gap = null;
         }
-        using NetVips.Image imR = im.Resize(scale: scale, kernel: kernel, gap: gap);
+        using NetVips.Image imR = resizeSource.Resize(scale: scale, kernel: kernel, gap: gap);
         VipsSave(imR, filePath, "auto");
 
         StartWindow.isRunGC = true;
@@ -913,32 +1075,7 @@ public sealed class ImageProcessingService {
     }
 
     /// <summary>
-    /// 取得原圖指定區域的 vips 縮放結果，避免為高解析度檢視載入整張大圖。
-    /// </summary>
-    public Stream VipsRegion(string path, int x, int y, int width, int height, double scale, string fileType, string vipsType) {
-        if (!double.IsFinite(scale) || scale <= 0 || scale > 1) throw new ArgumentOutOfRangeException(nameof(scale));
-        if (x < 0 || y < 0 || width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
-
-        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
-        if (File.Exists(imgProcessed) == false) {
-            imgProcessed = PathToImgProcessed(path, vipsType, "png");
-            if (File.Exists(imgProcessed) == false) imgProcessed = path;
-        }
-
-        NetVips.Image image = GetNetVips(imgProcessed, fileType);
-        if ((long)x + width > image.Width || (long)y + height > image.Height) {
-            throw new ArgumentOutOfRangeException(nameof(width), "圖片區域超出原圖範圍");
-        }
-
-        using NetVips.Image crop = image.Crop(x, y, width, height);
-        using NetVips.Image resized = crop.Resize(scale, kernel: Enums.Kernel.Lanczos3);
-        var stream = new MemoryStream(resized.PngsaveBuffer());
-        stream.Position = 0;
-        return stream;
-    }
-
-    /// <summary>
-    /// 依來源層的格子座標產生並快取圖片區塊；先建立 vips 縮放管線，再只輸出要求的格子與濾鏡邊界。
+    /// 依來源層的格子座標產生並快取圖片區塊；先裁出來源範圍及濾波邊界，再縮放成要求的格子。
     /// </summary>
     public Stream VipsTile(string path, int tileX, int tileY, double scale, int tileSize, int gutter, string fileType, string vipsType) {
         if (!double.IsFinite(scale) || scale <= 0 || scale > 1) throw new ArgumentOutOfRangeException(nameof(scale));
@@ -947,7 +1084,9 @@ public sealed class ImageProcessingService {
         }
 
         string decoderKey = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{vipsType}\n{fileType}")));
-        string cacheName = $"{FileTypeHelper.FileToHash(path)}_{decoderKey}_{scale.ToString("R", CultureInfo.InvariantCulture)}_{tileSize}_{gutter}_{tileX}_{tileY}.png";
+        FileInfo sourceInfo = new(path);
+        string sourceVersion = $"{sourceInfo.Length}_{sourceInfo.LastWriteTimeUtc.Ticks}";
+        string cacheName = $"{FileTypeHelper.FileToHash(path)}_{sourceVersion}_{decoderKey}_{VipsTileAlgorithmVersion}_{scale.ToString("R", CultureInfo.InvariantCulture)}_{tileSize}_{gutter}_{tileX}_{tileY}.png";
         string cachePath = Path.Combine(_tempDirImgZoom, cacheName);
         if (File.Exists(cachePath)) {
             File.SetLastAccessTimeUtc(cachePath, DateTime.UtcNow);
@@ -969,15 +1108,119 @@ public sealed class ImageProcessingService {
         }
     }
 
-    private byte[] GenerateVipsTile(string path, int tileX, int tileY, double scale, int tileSize, int gutter, string fileType, string vipsType, string cachePath) {
-        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
-        if (File.Exists(imgProcessed) == false) {
-            imgProcessed = PathToImgProcessed(path, vipsType, "png");
-            if (File.Exists(imgProcessed) == false) imgProcessed = path;
+    private double GetWebGLPreviewScale(int width, int height, int maxDimension) {
+        double pixelScale = Math.Sqrt((double)WebGLPreviewMaxPixels / ((long)width * height));
+        double dimensionScale = (double)maxDimension / Math.Max(width, height);
+        return Math.Min(1, Math.Min(pixelScale, dimensionScale));
+    }
+
+    private bool RequiresWebGLRegionalTiles(int width, int height) => (long)width * height > WebGLPreviewMaxPixels;
+
+    private bool TryCreateLargeImageInitInfo(string path, string type, string vipsType, NetVips.Image sourceImage,
+        int maxDimension, out ImageInitInfo imgInfo, long maxPixels = WebGLPreviewMaxPixels, bool limitByPixels = false) {
+        imgInfo = null;
+        int orientation = GetImgExifOrientation(path);
+        using NetVips.Image orientedSource = orientation == 1 ? null : sourceImage.Autorot();
+        NetVips.Image previewSource = orientedSource ?? sourceImage;
+        bool exceedsDimension = Math.Max(previewSource.Width, previewSource.Height) > maxDimension;
+        bool exceedsPixelBudget = limitByPixels && (long)previewSource.Width * previewSource.Height > maxPixels;
+        if (!exceedsDimension && !exceedsPixelBudget) return false;
+
+        double previewScale = GetWebGLPreviewScale(previewSource.Width, previewSource.Height, maxDimension);
+        imgInfo = new ImageInitInfo {
+            width = previewSource.Width,
+            height = previewSource.Height,
+            code = "1",
+            path = VipsResize(path, previewScale, type, vipsType),
+            previewScale = previewScale,
+            tileOnlyOriginal = true,
+            vipsType = vipsType
+        };
+        return true;
+    }
+
+    private string GetVipsInputPath(string path, string vipsType) {
+        // 超過 JPEG 尺寸上限的 TIFF 直接從來源讀取，縮圖與 tile 分別輸出成瀏覽器支援的格式。
+        if (vipsType == "tif") {
+            using VipsImageLease imageLease = AcquireNetVips(path, "tif");
+            NetVips.Image image = imageLease.Image;
+            if (image.Width > JpegMaxDimension || image.Height > JpegMaxDimension) return path;
         }
 
-        NetVips.Image image = GetNetVips(imgProcessed, fileType);
-        using NetVips.Image resized = image.Resize(scale, kernel: Enums.Kernel.Lanczos3, gap: 4);
+        string orientedPath = PathToImgProcessed(path, $"{vipsType}_autorot", "png");
+        if (File.Exists(orientedPath)) {
+            File.SetLastAccessTime(orientedPath, DateTime.Now);
+            return orientedPath;
+        }
+
+        string imgProcessed = PathToImgProcessed(path, vipsType, "jpg");
+        if (File.Exists(imgProcessed)) {
+            File.SetLastAccessTime(imgProcessed, DateTime.Now);
+            return imgProcessed;
+        }
+
+        imgProcessed = PathToImgProcessed(path, vipsType, "png");
+        if (File.Exists(imgProcessed)) {
+            File.SetLastAccessTime(imgProcessed, DateTime.Now);
+            return imgProcessed;
+        }
+
+        return path;
+    }
+
+    private string GetOrientationNormalizedPath(string path, string vipsType) {
+        if (GetImgExifOrientation(path) == 1) return path;
+
+        string normalizedPath = PathToImgProcessed(path, $"{vipsType}_autorot", "png");
+        if (File.Exists(normalizedPath)) {
+            File.SetLastAccessTime(normalizedPath, DateTime.Now);
+            return normalizedPath;
+        }
+
+        using VipsImageLease imageLease = AcquireNetVips(path, vipsType);
+        NetVips.Image image = imageLease.Image;
+        using NetVips.Image orientedImage = image.Autorot();
+        string temporaryPath = normalizedPath + "." + Guid.NewGuid().ToString("N") + ".tmp.png";
+        try {
+            VipsSave(orientedImage, temporaryPath, "png");
+            try {
+                File.Move(temporaryPath, normalizedPath);
+            }
+            catch (IOException) when (File.Exists(normalizedPath)) {
+                File.Delete(temporaryPath);
+            }
+            File.SetLastAccessTime(normalizedPath, DateTime.Now);
+            return normalizedPath;
+        }
+        finally {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
+    }
+
+    private byte[] GenerateVipsTile(string path, int tileX, int tileY, double scale, int tileSize, int gutter, string fileType, string vipsType, string cachePath) {
+        bool diagnoseLargeTiff = vipsType == "tif" && new FileInfo(path).Length >= VipsStreamThresholdBytes;
+        Stopwatch total = Stopwatch.StartNew();
+        Stopwatch phase = Stopwatch.StartNew();
+        if (diagnoseLargeTiff) {
+            Console.WriteLine($"[Tiefsee vips tile] 開始：{tileX},{tileY} scale={scale.ToString("R", CultureInfo.InvariantCulture)}");
+        }
+
+        string imgProcessed = GetVipsInputPath(path, vipsType);
+        if (diagnoseLargeTiff) {
+            Console.WriteLine($"[Tiefsee vips tile] 來源就緒：{phase.ElapsedMilliseconds} ms，{Path.GetFileName(imgProcessed)}");
+            phase.Restart();
+        }
+
+        using VipsImageLease imageLease = AcquireNetVips(imgProcessed, fileType);
+        NetVips.Image image = imageLease.Image;
+        int exifOrientation = GetImgExifOrientation(imgProcessed);
+        using NetVips.Image orientedImage = exifOrientation == 1 ? null : image.Autorot();
+        NetVips.Image tileSource = orientedImage ?? image;
+        if (diagnoseLargeTiff) {
+            Console.WriteLine($"[Tiefsee vips tile] 開啟來源：{phase.ElapsedMilliseconds} ms，{tileSource.Width} x {tileSource.Height}，EXIF orientation={exifOrientation}");
+            phase.Restart();
+        }
+        using NetVips.Image resized = tileSource.Resize(scale, kernel: Enums.Kernel.Lanczos3, gap: 4);
         long left = (long)tileX * tileSize;
         long top = (long)tileY * tileSize;
         if (left >= resized.Width || top >= resized.Height) throw new ArgumentOutOfRangeException(nameof(tileX), "圖片格子超出來源範圍");
@@ -987,8 +1230,46 @@ public sealed class ImageProcessingService {
         int cropTop = (int)Math.Max(0, top - gutter);
         int cropRight = (int)Math.Min(resized.Width, left + contentWidth + gutter);
         int cropBottom = (int)Math.Min(resized.Height, top + contentHeight + gutter);
-        using NetVips.Image crop = resized.Crop(cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop);
+        // 固定各 tile 的來源 ROI 尺寸，避免 VIPS gap 預縮小因 ROI 尺寸不同而產生不同取樣結果。
+        int sourceHalo = (int)Math.Min(Math.Max(tileSource.Width, tileSource.Height), Math.Ceiling(16.0 / scale));
+        int sourceGridPeriod = GetTileSourceGridPeriod(scale);
+        int sourceWidth = checked((int)Math.Ceiling((tileSize + 2d * gutter) / scale) + 2 * sourceHalo + sourceGridPeriod + 4);
+        int sourceHeight = sourceWidth;
+        int sourcePadding = Math.Max(sourceWidth, sourceHeight);
+        using NetVips.Image extendedImage = tileSource.Embed(
+            sourcePadding,
+            sourcePadding,
+            checked(tileSource.Width + sourcePadding * 2),
+            checked(tileSource.Height + sourcePadding * 2),
+            extend: Enums.Extend.Copy);
+
+        int sourceLeft = AlignTileSourceOrigin((int)Math.Floor(cropLeft / scale) - sourceHalo, sourceGridPeriod);
+        int sourceTop = AlignTileSourceOrigin((int)Math.Floor(cropTop / scale) - sourceHalo, sourceGridPeriod);
+        using NetVips.Image sourceRegion = extendedImage.Crop(sourceLeft + sourcePadding, sourceTop + sourcePadding, sourceWidth, sourceHeight);
+        using NetVips.Image resizedRegion = sourceRegion.Resize(scale, kernel: Enums.Kernel.Lanczos3, gap: 4);
+
+        // ROI 起點已對齊全圖輸出格點，因此這兩個偏移應為整數像素。
+        int localLeft = (int)Math.Round(cropLeft - sourceLeft * scale, MidpointRounding.AwayFromZero);
+        int localTop = (int)Math.Round(cropTop - sourceTop * scale, MidpointRounding.AwayFromZero);
+        int cropWidth = cropRight - cropLeft;
+        int cropHeight = cropBottom - cropTop;
+        // Region Resize rounds its output dimensions independently; at the far edge this can leave a one-pixel overrun.
+        int maxLocalLeft = resizedRegion.Width - cropWidth;
+        int maxLocalTop = resizedRegion.Height - cropHeight;
+        if (maxLocalLeft >= 0 && localLeft > maxLocalLeft && localLeft - maxLocalLeft == 1) localLeft = maxLocalLeft;
+        if (maxLocalTop >= 0 && localTop > maxLocalTop && localTop - maxLocalTop == 1) localTop = maxLocalTop;
+        if (localLeft < 0 || localTop < 0 || localLeft + cropWidth > resizedRegion.Width || localTop + cropHeight > resizedRegion.Height) {
+            throw new InvalidOperationException($"局部縮放結果不足以輸出 tile：{resizedRegion.Width} x {resizedRegion.Height}，偏移 {localLeft},{localTop}，要求 {cropWidth} x {cropHeight}");
+        }
+        using NetVips.Image crop = resizedRegion.Crop(localLeft, localTop, cropWidth, cropHeight);
+        if (diagnoseLargeTiff) {
+            Console.WriteLine($"[Tiefsee vips tile] 來源裁切 ({sourceLeft},{sourceTop}) {sourceRegion.Width} x {sourceRegion.Height}；開始縮放與編碼：輸出區域 {crop.Width} x {crop.Height}");
+            phase.Restart();
+        }
         byte[] png = crop.PngsaveBuffer();
+        if (diagnoseLargeTiff) {
+            Console.WriteLine($"[Tiefsee vips tile] 完成輸出：{phase.ElapsedMilliseconds} ms，{png.Length} bytes；總計 {total.ElapsedMilliseconds} ms");
+        }
 
         Directory.CreateDirectory(_tempDirImgZoom);
         string temporaryPath = cachePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
@@ -1006,6 +1287,29 @@ public sealed class ImageProcessingService {
         finally {
             if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
         }
+    }
+
+    private static int GetTileSourceGridPeriod(double scale) {
+        const int scaleDenominator = 1000;
+        int scaleNumerator = (int)Math.Round(scale * scaleDenominator, MidpointRounding.AwayFromZero);
+        if (scaleNumerator <= 0 || Math.Abs(scaleNumerator / (double)scaleDenominator - scale) > 1e-12) {
+            // 預覽比例等非金字塔級距不使用過大的精確對齊週期。
+            return 1;
+        }
+
+        int gcd = GreatestCommonDivisor(scaleNumerator, scaleDenominator);
+        return scaleDenominator / gcd;
+    }
+
+    private static int AlignTileSourceOrigin(int sourceOrigin, int sourceGridPeriod) {
+        int remainder = sourceOrigin % sourceGridPeriod;
+        if (remainder < 0) remainder += sourceGridPeriod;
+        return sourceOrigin - remainder;
+    }
+
+    private static int GreatestCommonDivisor(int a, int b) {
+        while (b != 0) (a, b) = (b, a % b);
+        return Math.Abs(a);
     }
 
     /// <summary>

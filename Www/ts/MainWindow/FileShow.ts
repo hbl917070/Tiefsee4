@@ -228,7 +228,8 @@ export class FileShow {
 
             _tiefseeview.setLoading(true, 200);
 
-            const imgData = await M.script.img.getImgData(fileInfo2);
+            const renderer = M.config.settings.image.tiefseeviewRenderer;
+            const imgData = await M.script.img.getImgData(fileInfo2, renderer === "webgl" ? "webgl" : "canvas");
             if (requestRevision !== viewLoadRevision) return;
             const width = imgData.width;
             const height = imgData.height;
@@ -256,23 +257,27 @@ export class FileShow {
                 let zoomType = (<any>TiefseeviewZoomType)[M.config.settings.image.tiefseeviewZoomType];
                 if (zoomType === undefined) { zoomType = TiefseeviewZoomType.fitWindowOrImageOriginal; }
 
-                const loadCanvasImage = async () => {
-                    if (arUrl.length === 1) {
-                        await _tiefseeview.loadBigimg(arUrl[0].url);
+                const loadCanvasImage = async (canvasData = imgData) => {
+                    if (canvasData.arUrl.length === 1) {
+                        await _tiefseeview.loadBigimg(canvasData.arUrl[0].url);
                     } else {
-                        await _tiefseeview.loadBigimgscale(arUrl, width, height, zoomType, zoomVal);
+                        await _tiefseeview.loadBigimgscale(canvasData.arUrl, canvasData.width, canvasData.height, zoomType, zoomVal);
                     }
                 };
 
-                if (M.config.settings.image.tiefseeviewRenderer === "webgl") {
+                if (renderer === "webgl") {
                     const getTileUrl = imgData.vipsType === undefined
                         ? undefined
                         : tile => WebAPI.Img.vipsTile(tile, fileInfo2, imgData.fileType, imgData.vipsType);
-                    const imageSource = new TiefseeviewUrlImageSource(width, height, arUrl, getTileUrl);
+                    const sourceLevels = [
+                        ...arUrl,
+                        ...imgData.tileOnlyScales.map(scale => ({ scale }))
+                    ];
+                    const imageSource = new TiefseeviewUrlImageSource(width, height, sourceLevels, getTileUrl);
                     console.info("[Tiefseeview Renderer] 使用 WebGL", {
                         width,
                         height,
-                        levelScales: arUrl.map(item => item.scale),
+                        levelScales: sourceLevels.map(item => item.scale),
                         supportsRegionalRequests: imageSource.supportsRegionalRequests
                     });
                     try {
@@ -281,7 +286,7 @@ export class FileShow {
                         imageSource.dispose();
                         if (requestRevision !== viewLoadRevision) return;
                         console.warn("WebGL 靜態圖片 Renderer 初始化失敗，改用 Canvas。", error);
-                        await loadCanvasImage();
+                        await loadCanvasImage(await M.script.img.getImgData(fileInfo2, "canvas"));
                     }
                 } else {
                     console.info("[Tiefseeview Renderer] 使用 Canvas", {

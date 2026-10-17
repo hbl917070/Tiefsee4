@@ -27,7 +27,6 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         HttpEndpointRegistrar.Map(WebServer, "/api/images/thumbnail/nconvert", ImgNconvert);
         HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/init", ImgVipsInit);
         HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/resize", ImgVipsResize);
-        HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/region", ImgVipsRegion);
         HttpEndpointRegistrar.Map(WebServer, "/api/images/vips/tile", ImgVipsTile);
         HttpEndpointRegistrar.Map(WebServer, "/api/images/clip/preview", ImgClip);
         HttpEndpointRegistrar.Map(WebServer, "/api/images/extract-png", ImgExtractPng);
@@ -39,6 +38,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
     private async Task ImgVipsInit(RequestData d) {
         string path = Uri.UnescapeDataString(d.args["path"]);
         string[] arType = d.args["type"].Split(',');
+        bool useRegionalTiles = d.args.TryGetValue("tileMode", out string tileMode) && tileMode == "webgl";
 
         if (File.Exists(path) == false) {
             await WriteJson(d, new ImageInitInfo());
@@ -53,7 +53,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
             for (int i = 0; i < arType.Length; i++) {
                 string type = arType[i];
                 try {
-                    imgInfo = _imageProcessingService.GetImgInitInfo(path, type, type);
+                    imgInfo = _imageProcessingService.GetImgInitInfo(path, type, type, useRegionalTiles);
                 }
                 catch { }
 
@@ -93,37 +93,6 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
     }
 
     /// <summary>
-    /// 擷取原圖指定區域並縮放，供 WebGL 停止操作後載入可視區高解析度內容。
-    /// </summary>
-    private async Task ImgVipsRegion(RequestData d) {
-        string path = Uri.UnescapeDataString(d.args["path"]);
-        int x = int.Parse(d.args["x"], CultureInfo.InvariantCulture);
-        int y = int.Parse(d.args["y"], CultureInfo.InvariantCulture);
-        int width = int.Parse(d.args["width"], CultureInfo.InvariantCulture);
-        int height = int.Parse(d.args["height"], CultureInfo.InvariantCulture);
-        double scale = double.Parse(d.args["scale"], CultureInfo.InvariantCulture);
-        string fileType = d.args["fileType"];
-        string vipsType = d.args["vipsType"];
-
-        if (width <= 0 || height <= 0 || (long)width * height > 16 * 1024 * 1024) {
-            await WriteError(d, 400, "Invalid image region size");
-            return;
-        }
-        if (await CheckFileExist(d, path) == false) { return; }
-
-        Stream imageStream = null;
-        AppScheduler.RunWithTimeout(60, () => {
-            imageStream = _imageProcessingService.VipsRegion(path, x, y, width, height, scale, fileType, vipsType);
-        });
-        if (imageStream == null) {
-            await WriteError(d, 500, "Timeout");
-            return;
-        }
-        d.context.Response.ContentType = "image/png";
-        await WriteStream(d, imageStream);
-    }
-
-    /// <summary>
     /// 取得 vips 縮放層中的單一格子；格子快取在圖片縮放暫存目錄。
     /// </summary>
     private async Task ImgVipsTile(RequestData d) {
@@ -144,7 +113,7 @@ public sealed class ImageHttpEndpoints : HttpEndpointModuleBase {
         if (await CheckFileExist(d, path) == false) { return; }
 
         Stream imageStream = null;
-        AppScheduler.RunWithTimeout(60, () => {
+        AppScheduler.RunWithTimeout(300, () => {
             imageStream = _imageProcessingService.VipsTile(path, tileX, tileY, scale, tileSize, gutter, fileType, vipsType);
         });
         if (imageStream == null) {

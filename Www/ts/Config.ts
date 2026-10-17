@@ -180,8 +180,8 @@ export class Config {
 
         /** 圖片 */
         image: {
-            /** 靜態圖片 Renderer；WebGL 為實驗性選項，預設沿用 Canvas。 */
-            tiefseeviewRenderer: "canvas",
+            /** 靜態圖片 Renderer。 */
+            tiefseeviewRenderer: "webgl",
             /** 圖片渲染模式 */
             "tiefseeviewImageRendering": "0",
             /** 圖片預設縮放模式 */

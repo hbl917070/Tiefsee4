@@ -454,7 +454,7 @@ export class ScriptImg {
     }
 
 
-    public async getImgData(fileInfo2: FileInfo2) {
+    public async getImgData(fileInfo2: FileInfo2, renderer: "canvas" | "webgl" = "canvas") {
 
         let fileTime = `LastWriteTimeUtc=${fileInfo2.LastWriteTimeUtc}`;
         let fileType = Lib.getFileType(fileInfo2); // 取得檔案類型
@@ -466,6 +466,7 @@ export class ScriptImg {
 
         let vipsType = configItem.vipsType as string;
         let arUrl: { scale: number, url: string }[] = [];
+        let tileOnlyScales: number[] = [];
         let width = -1;
         let height = -1;
         let imageVipsType: string | undefined;
@@ -498,7 +499,7 @@ export class ScriptImg {
             }
             vipsType = arVipsType.join(",");
 
-            let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2);
+            let imgInitInfo = await WebAPI.Img.vipsInit(vipsType, fileInfo2, renderer === "webgl");
 
             // 如果處理失敗，且 vipsType2 = base64，則先用 canvas 處理成 base64 再上傳到暫存資料夾
             if (imgInitInfo.code != "1" && configItem.vipsType2 === "base64") {
@@ -514,7 +515,7 @@ export class ScriptImg {
                     const base64 = await this.blobToBase64(blob);
                     if (base64 !== null) {
                         await WV_Image.Base64ToTempImg(path, base64 as string);
-                        imgInitInfo = await WebAPI.Img.vipsInit("base64", fileInfo2);
+                        imgInitInfo = await WebAPI.Img.vipsInit("base64", fileInfo2, renderer === "webgl");
                     } else {
                         isFail = true;
                     }
@@ -534,14 +535,24 @@ export class ScriptImg {
                 if (ratio > 0.95) { ratio = 0.95; }
                 if (ratio < 0.5) { ratio = 0.5; }
 
-                // 設定縮放的比例
-                arUrl.push({ scale: 1, url: await WebAPI.getFile(imgInitInfo.path, fileInfo2.LastWriteTimeUtc) });
+                const previewScale = imgInitInfo.previewScale || 1;
+                // 超大 TIFF 只把後端產生的瀏覽器預覽圖交給前端，原始解析度由 tile API 提供。
+                arUrl.push({ scale: previewScale, url: await WebAPI.getFile(imgInitInfo.path, fileInfo2.LastWriteTimeUtc) });
+
+                if (imgInitInfo.tileOnlyOriginal) {
+                    tileOnlyScales.push(1);
+                }
 
                 for (let i = 1; i <= 30; i++) {
                     let scale = Number(Math.pow(ratio, i).toFixed(3));
                     if (imgInitInfo.width * scale < 200 || imgInitInfo.height * scale < 200) { // 如果圖片太小就不處理
                         break;
                     }
+                    if (imgInitInfo.tileOnlyOriginal && scale > previewScale) {
+                        tileOnlyScales.push(scale);
+                        continue;
+                    }
+                    if (scale >= previewScale) { continue; }
                     let imgU = WebAPI.Img.vipsResize(scale, fileInfo2, fileType, imgInitInfo.vipsType);
                     arUrl.push({ scale: scale, url: imgU })
                 }
@@ -576,6 +587,7 @@ export class ScriptImg {
             configItem: configItem,
             vipsType: imageVipsType,
             arUrl: arUrl,
+            tileOnlyScales: tileOnlyScales,
             isFail: isFail
         }
     }
