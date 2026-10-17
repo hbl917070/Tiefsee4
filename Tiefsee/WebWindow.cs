@@ -363,6 +363,21 @@ public class WebWindow : FormNone {
         // 等待初始化完成
         await _wv2.EnsureCoreWebView2Async(await GetCoreWebView2Environment());
 
+        // WebResourceRequested 偶爾未涵蓋的請求改由 WebView2 自動附帶 session cookie 驗證；
+        // CookieManager 屬於共用 profile，重設為本次執行個體的 token。
+        foreach (string cookiePath in new[] { "/api/", "/assets/files/" }) {
+            var apiTokenCookie = _wv2.CoreWebView2.CookieManager.CreateCookie(
+                Program.webServer.ApiTokenCookieName,
+                Program.webApiToken,
+                "127.0.0.1",
+                cookiePath);
+            apiTokenCookie.IsHttpOnly = true;
+            apiTokenCookie.IsSecure = false;
+            apiTokenCookie.SameSite = CoreWebView2CookieSameSiteKind.Strict;
+            apiTokenCookie.Expires = DateTime.MinValue;
+            _wv2.CoreWebView2.CookieManager.AddOrUpdateCookie(apiTokenCookie);
+        }
+
         // 指定為深色主題
         _wv2.CoreWebView2.Profile.PreferredColorScheme = CoreWebView2PreferredColorScheme.Dark;
         // 是否在啟用了觸摸輸入的設備上使用輕掃手勢在 WebView2 中導航
@@ -392,15 +407,10 @@ public class WebWindow : FormNone {
                 .CreateWebResourceResponse(null, 200, "OK", "");
         };
 
-        // localhost API 與 /assets/files 都保持不含 token 的穩定 URL，讓瀏覽器可以使用快取；
-        // capability token 統一由 host 在請求送出前補到 header。
+        // localhost API 與 /assets/files 都保持穩定 URL，host 以 header 注入 token，並預先設定 session cookie 備援。
         string protectedResourceOrigin = Program.webServer.origin.TrimEnd('/');
-        _wv2.CoreWebView2.AddWebResourceRequestedFilter(
-            protectedResourceOrigin + "/api/*",
-            CoreWebView2WebResourceContext.All);
-        _wv2.CoreWebView2.AddWebResourceRequestedFilter(
-            protectedResourceOrigin + "/assets/files/*",
-            CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter(protectedResourceOrigin + "/api/*", CoreWebView2WebResourceContext.All);
+        _wv2.CoreWebView2.AddWebResourceRequestedFilter(protectedResourceOrigin + "/assets/files/*", CoreWebView2WebResourceContext.All);
         _wv2.CoreWebView2.WebResourceRequested += delegate (object sender, CoreWebView2WebResourceRequestedEventArgs args) {
             bool isProtectedResource = args.Request.Uri.StartsWith(protectedResourceOrigin + "/api/", StringComparison.OrdinalIgnoreCase)
                 || args.Request.Uri.StartsWith(protectedResourceOrigin + "/assets/files/", StringComparison.OrdinalIgnoreCase);
