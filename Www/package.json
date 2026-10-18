@@ -23,8 +23,10 @@
   "devDependencies": {
     "@types/jquery": "^4.0.0",
     "@types/sortablejs": "^1.15.9",
+    "@webgpu/types": "^0.1.74",
     "eslint": "^10.0.3",
     "gulp-sass": "^6.0.1",
-    "sass": "^1.98.0"
+    "sass": "^1.98.0",
+    "typescript": "^7.0.2"
   }
 }
