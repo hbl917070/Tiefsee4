@@ -190,7 +190,7 @@ public class StartWindow : Form {
 
         System.Windows.Forms.NotifyIcon nIcon = new();
         nIcon.Icon = new System.Drawing.Icon(Program.runtimeContext.LogoIcon);
-        nIcon.Text = "TiefSee";
+        nIcon.Text = "Tiefsee";
         nIcon.Visible = true;
         nIcon.DoubleClick += (sender, e) => {
             WebWindow.Create("MainWindow.html", [], null);
