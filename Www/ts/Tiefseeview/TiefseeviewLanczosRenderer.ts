@@ -2,8 +2,17 @@ import type { TiefseeviewViewState } from "./TiefseeviewTypes";
 import lanczosShader from "./shaders/lanczos3.wgsl";
 import displayShader from "./shaders/display.wgsl";
 
+/** WebGPU API 或裝置無法使用，呼叫端可據此回退至 Canvas 並更新設定。 */
+export class TiefseeviewWebGPUUnsupportedError extends Error {
+    public constructor(message = "此 WebView 不支援 WebGPU") {
+        super(message);
+        this.name = "TiefseeviewWebGPUUnsupportedError";
+    }
+}
+
 /** 停止操作後，以 WebGPU 對圖片來源執行 Lanczos3 viewport 重採樣。 */
 export class TiefseeviewLanczosRenderer {
+    private static supportCheck: Promise<boolean> | null = null;
     private readonly gpu: any;
     private readonly canvasContext: any;
     private readonly device: any;
@@ -28,37 +37,66 @@ export class TiefseeviewLanczosRenderer {
         context.configure({ device, format, alphaMode: "premultiplied" });
     }
 
-    public static async create(canvas: HTMLCanvasElement): Promise<TiefseeviewLanczosRenderer | null> {
+    public static async create(canvas: HTMLCanvasElement): Promise<TiefseeviewLanczosRenderer> {
         const gpu = (navigator as any).gpu;
-        if (gpu === undefined) return null;
-        const adapter = await gpu.requestAdapter();
-        if (adapter === null) return null;
-        const device = await adapter.requestDevice();
+        if (gpu === undefined) throw new TiefseeviewWebGPUUnsupportedError();
+        let adapter: any;
+        try {
+            adapter = await gpu.requestAdapter();
+        } catch (error) {
+            throw new TiefseeviewWebGPUUnsupportedError(`無法取得 WebGPU adapter：${String(error)}`);
+        }
+        if (adapter === null) throw new TiefseeviewWebGPUUnsupportedError("此 WebView 沒有可用的 WebGPU adapter");
+        let device: any;
+        try {
+            device = await adapter.requestDevice();
+        } catch (error) {
+            throw new TiefseeviewWebGPUUnsupportedError(`無法建立 WebGPU device：${String(error)}`);
+        }
         const format = gpu.getPreferredCanvasFormat();
         const context = canvas.getContext("webgpu") as any;
         if (context === null) {
             device.destroy();
-            return null;
+            throw new TiefseeviewWebGPUUnsupportedError("此 WebView 無法建立 WebGPU canvas context");
         }
-        const shaderModule = device.createShaderModule({ code: lanczosShader });
-        const compilation = await shaderModule.getCompilationInfo();
-        const compileErrors = compilation.messages.filter((item: any) => item.type === "error");
-        if (compileErrors.length > 0) {
+        try {
+            const shaderModule = device.createShaderModule({ code: lanczosShader });
+            const compilation = await shaderModule.getCompilationInfo();
+            const compileErrors = compilation.messages.filter((item: any) => item.type === "error");
+            if (compileErrors.length > 0) throw new Error(compileErrors.map((item: any) => item.message).join("; "));
+            const pipeline = await device.createComputePipelineAsync({
+                layout: "auto",
+                compute: { module: shaderModule, entryPoint: "main" }
+            });
+            const displayModule = device.createShaderModule({ code: displayShader });
+            const displayPipeline = await device.createRenderPipelineAsync({
+                layout: "auto",
+                vertex: { module: displayModule, entryPoint: "vertex" },
+                fragment: { module: displayModule, entryPoint: "fragment", targets: [{ format }] },
+                primitive: { topology: "triangle-list" }
+            });
+            return new TiefseeviewLanczosRenderer(canvas, device, context, format, device.limits.maxTextureDimension2D, pipeline, displayPipeline);
+        } catch (error) {
             device.destroy();
-            throw new Error(compileErrors.map((item: any) => item.message).join("; "));
+            throw error;
         }
-        const pipeline = await device.createComputePipelineAsync({
-            layout: "auto",
-            compute: { module: shaderModule, entryPoint: "main" }
-        });
-        const displayModule = device.createShaderModule({ code: displayShader });
-        const displayPipeline = await device.createRenderPipelineAsync({
-            layout: "auto",
-            vertex: { module: displayModule, entryPoint: "vertex" },
-            fragment: { module: displayModule, entryPoint: "fragment", targets: [{ format }] },
-            primitive: { topology: "triangle-list" }
-        });
-        return new TiefseeviewLanczosRenderer(canvas, device, context, format, device.limits.maxTextureDimension2D, pipeline, displayPipeline);
+    }
+
+    /** 設定開啟 WebGL Renderer 前驗證完整高品質處理管線；同一視窗只檢查一次。 */
+    public static checkSupport(): Promise<boolean> {
+        if (this.supportCheck !== null) return this.supportCheck;
+        this.supportCheck = (async () => {
+            const canvas = document.createElement("canvas");
+            try {
+                const renderer = await this.create(canvas);
+                renderer.dispose();
+                return true;
+            } catch (error) {
+                console.warn("WebGPU Lanczos3 支援檢查失敗。", error);
+                return false;
+            }
+        })();
+        return this.supportCheck;
     }
 
     public hide(): void {

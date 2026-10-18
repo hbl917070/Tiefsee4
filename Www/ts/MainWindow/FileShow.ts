@@ -5,6 +5,7 @@ import { GroupType } from "../Config";
 import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
 import { VideoToolbar } from "./VideoToolbar";
+import { TiefseeviewWebGPUUnsupportedError } from "../Tiefseeview/TiefseeviewLanczosRenderer";
 
 export class FileShow {
 
@@ -286,7 +287,21 @@ export class FileShow {
                         imageSource.dispose();
                         if (requestRevision !== viewLoadRevision) return;
                         console.warn("WebGL 靜態圖片 Renderer 初始化失敗，改用 Canvas。", error);
-                        await loadCanvasImage(await M.script.img.getImgData(fileInfo2, "canvas"));
+                        const webgpuUnsupported = error instanceof TiefseeviewWebGPUUnsupportedError;
+                        if (webgpuUnsupported) {
+                            M.config.settings.image.tiefseeviewRenderer = "canvas";
+                            try {
+                                await M.saveSetting();
+                            } catch (saveError) {
+                                console.warn("無法儲存 WebGL 自動回退設定。", saveError);
+                            }
+                        }
+                        const canvasData = await M.script.img.getImgData(fileInfo2, "canvas");
+                        if (requestRevision !== viewLoadRevision) return;
+                        await loadCanvasImage(canvasData);
+                        if (webgpuUnsupported) {
+                            M.msgbox.show({ txt: M.i18n.t("sw.performance.webglRendererFallback") });
+                        }
                     }
                 } else {
                     console.info("[Tiefseeview Renderer] 使用 Canvas", {

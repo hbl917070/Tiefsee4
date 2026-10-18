@@ -5,6 +5,7 @@ import { Lib } from "../Lib";
 import { MainToolbar } from "../MainWindow/MainToolbar";
 import { Msgbox } from "../Msgbox";
 import { SelectionManager } from "../SelectionManager";
+import { TiefseeviewLanczosRenderer } from "../Tiefseeview/TiefseeviewLanczosRenderer";
 import { hasActionInput, hotkeyActionKeys, hotkeyDefinitions } from "../HotkeyDefinitions";
 import tippy from "tippy.js";
 import Sortable from "sortablejs";
@@ -1649,9 +1650,38 @@ class SettingWindow {
         addLoadEvent(() => {
             const switch_webglRenderer = getDom("#switch-webglRenderer") as HTMLInputElement;
             switch_webglRenderer.checked = _config.settings.image.tiefseeviewRenderer === "webgl";
-            switch_webglRenderer.addEventListener("change", () => {
-                _config.settings.image.tiefseeviewRenderer = switch_webglRenderer.checked ? "webgl" : "canvas";
-                appleSettingOfMain();
+            let supportCheck: Promise<boolean> | null = null;
+            switch_webglRenderer.addEventListener("change", async () => {
+                if (!switch_webglRenderer.checked) {
+                    _config.settings.image.tiefseeviewRenderer = "canvas";
+                    appleSettingOfMain();
+                    return;
+                }
+
+                // 驗證 WebGL 2 預覽與 WebGPU Lanczos/銳化管線，通過後才套用設定。
+                switch_webglRenderer.checked = false;
+                switch_webglRenderer.disabled = true;
+                try {
+                    if (supportCheck === null) {
+                        supportCheck = (async () => {
+                            const webglCanvas = document.createElement("canvas");
+                            const gl = webglCanvas.getContext("webgl2");
+                            if (gl === null) return false;
+                            gl.getExtension("WEBGL_lose_context")?.loseContext();
+                            return TiefseeviewLanczosRenderer.checkSupport();
+                        })();
+                    }
+
+                    if (await supportCheck) {
+                        switch_webglRenderer.checked = true;
+                        _config.settings.image.tiefseeviewRenderer = "webgl";
+                        appleSettingOfMain();
+                    } else {
+                        _msgbox.show({ txt: _i18n.t("sw.performance.webglRendererUnsupported") });
+                    }
+                } finally {
+                    switch_webglRenderer.disabled = false;
+                }
             });
         });
 

@@ -1341,6 +1341,18 @@ var langData = {
                 "en": "Render images with WebGL",
                 "ja": "WebGL で画像を描画",
             },
+            webglRendererUnsupported: {
+                "zh-TW": "此電腦不支援 WebGL 2 或 WebGPU，無法啟用此功能",
+                "zh-CN": "此电脑不支持 WebGL 2 或 WebGPU，无法启用此功能",
+                "en": "This computer does not support WebGL 2 or WebGPU, so this feature cannot be enabled",
+                "ja": "このコンピューターは WebGL 2 または WebGPU をサポートしていないため、この機能を有効にできません",
+            },
+            webglRendererFallback: {
+                "zh-TW": "此電腦不支援 WebGPU，已將圖片渲染設定切換為 Canvas",
+                "zh-CN": "此电脑不支持 WebGPU，已将图片渲染设置切换为 Canvas",
+                "en": "This computer does not support WebGPU. Image rendering has been switched to Canvas",
+                "ja": "このコンピューターは WebGPU をサポートしていないため、画像の描画設定を Canvas に切り替えました",
+            },
 
             disabledDirectoryPanel: {
                 "zh-TW": "資料夾數量太多時，停用「資料夾預覽面板」",

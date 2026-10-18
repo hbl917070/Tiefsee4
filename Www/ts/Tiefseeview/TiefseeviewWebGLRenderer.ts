@@ -1,6 +1,6 @@
 import type { TiefseeviewImageSource, TiefseeviewImageSourceRegion } from "./TiefseeviewImageSource";
 import type { TiefseeviewImageRenderer, TiefseeviewViewState } from "./TiefseeviewTypes";
-import { TiefseeviewLanczosRenderer } from "./TiefseeviewLanczosRenderer";
+import { TiefseeviewLanczosRenderer, TiefseeviewWebGPUUnsupportedError } from "./TiefseeviewLanczosRenderer";
 
 interface WebGLTile {
     texture: WebGLTexture;
@@ -74,6 +74,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private previewBitmap: ImageBitmap | null = null;
     private lanczosRenderer: TiefseeviewLanczosRenderer | null = null;
     private lanczosRendererPromise: Promise<TiefseeviewLanczosRenderer | null> | null = null;
+    private lanczosRendererInitError: unknown = null;
     private pixelatedDiagnosticAt = 0;
     private pixelatedDecisionKey = "";
 
@@ -265,7 +266,15 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             scaleDiagnostics: this.getScaleDiagnostics(),
             supportsRegionalRequests: source.supportsRegionalRequests === true
         });
+        // 預覽仍先照常載入；同時初始化閒置時會用到的 WebGPU 管線，以便及早確認裝置支援。
+        const lanczosRendererPromise = this.getLanczosRenderer();
         await this.loadLevel(source, level, revision, keepCurrentFrame);
+        const lanczosRenderer = await lanczosRendererPromise;
+        if (revision !== this.sourceRevision || this.source !== source) return;
+        if (lanczosRenderer === null) {
+            if (this.lanczosRendererInitError !== null) throw this.lanczosRendererInitError;
+            throw new Error("WebGPU Lanczos3 Renderer 初始化後不可用");
+        }
         this.scheduleIdleQualityUpdate("預覽載入後");
     }
 
@@ -848,7 +857,12 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                 return renderer;
             })
             .catch(error => {
-                console.warn("WebGPU Lanczos3 初始化失敗，保留 WebGL 預覽。", error);
+                this.lanczosRendererInitError = error;
+                if (error instanceof TiefseeviewWebGPUUnsupportedError) {
+                    console.info("[Tiefseeview WebGL] 此 WebView 不支援 WebGPU", error);
+                } else {
+                    console.warn("WebGPU Lanczos3 初始化失敗。", error);
+                }
                 return null;
             });
         return this.lanczosRendererPromise;
