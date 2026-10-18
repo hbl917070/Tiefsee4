@@ -18,7 +18,7 @@ interface WebGLTile {
 }
 
 interface PendingTextureUpload {
-    source: CanvasImageSource;
+    source: ImageBitmap;
     pixelWidth: number;
     pixelHeight: number;
     imageRect: { x: number; y: number; width: number; height: number };
@@ -956,7 +956,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     private enqueueTextureUpload(
-        source: CanvasImageSource,
+        source: ImageBitmap,
         pixelWidth: number,
         pixelHeight: number,
         imageRect: { x: number; y: number; width: number; height: number },
@@ -990,7 +990,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     private uploadBitmapTile(
-        source: CanvasImageSource,
+        source: ImageBitmap,
         pixelWidth: number,
         pixelHeight: number,
         imageRect: { x: number; y: number; width: number; height: number },

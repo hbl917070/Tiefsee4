@@ -23,7 +23,7 @@ export interface TiefseeviewImageTileRequest {
 
 export interface TiefseeviewImageSourceRegion {
     /** ImageSource 將影像所有權交給呼叫端；完成上傳後呼叫端必須 close ImageBitmap。 */
-    source: CanvasImageSource;
+    source: ImageBitmap;
     /** 回傳影像在原圖座標中實際涵蓋的範圍。 */
     imageRect: TiefseeviewImageRect;
     pixelWidth: number;

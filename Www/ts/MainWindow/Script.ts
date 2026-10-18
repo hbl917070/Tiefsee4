@@ -479,7 +479,6 @@ export class ScriptImg {
             if (imgInitInfo.code == "1") {
                 width = imgInitInfo.width;
                 height = imgInitInfo.height;
-                imageVipsType = imgInitInfo.vipsType;
                 arUrl.push({ scale: 1, url: imgInitInfo.path });
             }
         }

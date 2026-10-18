@@ -267,9 +267,10 @@ export class FileShow {
                 };
 
                 if (renderer === "webgl") {
-                    const getTileUrl = imgData.vipsType === undefined
+                    const vipsType = imgData.vipsType;
+                    const getTileUrl = vipsType === undefined
                         ? undefined
-                        : tile => WebAPI.Img.vipsTile(tile, fileInfo2, imgData.fileType, imgData.vipsType);
+                        : (tile: Parameters<typeof WebAPI.Img.vipsTile>[0]) => WebAPI.Img.vipsTile(tile, fileInfo2, imgData.fileType, vipsType);
                     const sourceLevels = [
                         ...arUrl,
                         ...imgData.tileOnlyScales.map(scale => ({ scale }))

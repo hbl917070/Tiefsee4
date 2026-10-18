@@ -506,14 +506,10 @@ export class WebAPI {
     /**
     * 取得 lora 相關資源
     */
-    static async getA1111LoraResource(searchDirs: string[], loraNames: string[], excludeDirs: string[]) {
+    static async getA1111LoraResource(searchDirs: string[], loraNames: string[], excludeDirs: string[]): Promise<Record<string, string[]>> {
         const url = APIURL + "/api/system/a1111/lora-resource";
         const postData = { searchDirs, loraNames, excludeDirs };
-        const retAr = await WebAPI.sendApiPost<any[]>(url, postData);
-        for (let i = 0; i < retAr.length; i++) {
-            retAr[i].FullPath = retAr[i].Path;
-        }
-        return retAr;
+        return WebAPI.sendApiPost<Record<string, string[]>>(url, postData);
     }
 
     /**

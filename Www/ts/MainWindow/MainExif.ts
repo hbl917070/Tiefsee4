@@ -810,7 +810,7 @@ export class MainExif {
 						"outputs",
 					];
 					const loraResource = await WebAPI.getA1111LoraResource(a1111Models.split("\n"), [name], excludeDirs);
-					const files = loraResource[name].sort() as string[];
+					const files = loraResource[name].sort();
 
 					// 找不到檔案
 					if (files.length === 0) {
