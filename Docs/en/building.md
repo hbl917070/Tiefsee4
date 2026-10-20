@@ -1,4 +1,4 @@
-English | [中文](Building.zh_TW.md)
+English | [中文](../zh-TW/building.md)
 
 # Tiefsee Project Description
 

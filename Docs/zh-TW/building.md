@@ -1,4 +1,4 @@
-[English](Building.md) | 中文
+[English](../en/building.md) | 中文
 
 # Tiefsee 專案說明
 

@@ -14,6 +14,10 @@ public sealed class AppRuntimeContextBuilder {
     /// </summary>
     public AppRuntimeContext Build(EarlyAppPaths earlyPaths, StartupConfig startupConfig) {
         string appData = earlyPaths.InitialAppData;
+        string tempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed");
+        string tempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom");
+        string tempDirWebFile = Path.Combine(KnownFolders.GetPath(KnownFolder.Downloads), "Tiefsee");
+        string tempDirArchive = Path.Combine(Path.GetTempPath(), "Tiefsee\\Archives");
         bool isStoreApp = false;
         bool needReloadRuntimeStartIni = false;
 
@@ -39,6 +43,24 @@ public sealed class AppRuntimeContextBuilder {
             }
         }
 
+#if DEBUG
+        // CDP 測試使用獨立資料目錄，避免讀寫一般使用者的設定與 WebView2 狀態。
+        if (Environment.GetEnvironmentVariable("TIEFSEE_ENABLE_TEST_CDP") == "1") {
+            appData = Path.Combine(earlyPaths.BaseDirectory, "WebView2TestProfile");
+            var testStartupConfig = _startupConfigLoader.Load(Path.Combine(appData, "Start.ini"));
+            startupConfig.StartPort = testStartupConfig.StartPort;
+            startupConfig.StartType = testStartupConfig.StartType;
+            // 測試啟動時的暫存清理不可刪到一般使用者執行個體的檔案。
+            string testTempDir = Path.Combine(appData, "Temp");
+            tempDirImgProcessed = Path.Combine(testTempDir, "ImgProcessed");
+            tempDirImgZoom = Path.Combine(testTempDir, "ImgZoom");
+            tempDirWebFile = Path.Combine(testTempDir, "WebFile");
+            tempDirArchive = Path.Combine(testTempDir, "Archives");
+            isStoreApp = false;
+            needReloadRuntimeStartIni = false;
+        }
+#endif
+
         var runtimeContext = new AppRuntimeContext {
             BaseDirectory = earlyPaths.BaseDirectory,
             AppData = appData,
@@ -49,10 +71,10 @@ public sealed class AppRuntimeContextBuilder {
             AppDataSetting = Path.Combine(appData, "Setting.json"),
             AppDataUwpList = Path.Combine(appData, "UwpList.json"),
             AppDataA1111ModelList = Path.Combine(appData, "A1111ModelList.json"),
-            TempDirImgProcessed = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgProcessed"),
-            TempDirImgZoom = Path.Combine(Path.GetTempPath(), "Tiefsee\\ImgZoom"),
-            TempDirWebFile = Path.Combine(KnownFolders.GetPath(KnownFolder.Downloads), "Tiefsee"),
-            TempDirArchive = Path.Combine(Path.GetTempPath(), "Tiefsee\\Archives"),
+            TempDirImgProcessed = tempDirImgProcessed,
+            TempDirImgZoom = tempDirImgZoom,
+            TempDirWebFile = tempDirWebFile,
+            TempDirArchive = tempDirArchive,
             LogoIcon = Path.Combine(earlyPaths.BaseDirectory, "Www\\img\\logo.ico"),
             IsStoreApp = isStoreApp,
             IsPortableMode = earlyPaths.IsPortableMode,

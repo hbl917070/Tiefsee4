@@ -1,0 +1,801 @@
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { createInterface } from "node:readline";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const activePortPath = resolve(
+  repoRoot,
+  "Tiefsee",
+  "bin",
+  "Debug",
+  "WebView2TestProfile",
+  "EBWebView",
+  "DevToolsActivePort",
+);
+
+async function getPageTargets() {
+  const deadline = Date.now() + 15000;
+  let lastError = "DevToolsActivePort has not been created.";
+  let activePort = "unknown";
+
+  // The port file can be left behind after Tiefsee exits. Poll the actual
+  // endpoint until WebView2 has started and is listening on the current port.
+  while (Date.now() < deadline) {
+    try {
+      activePort = (await readFile(activePortPath, "utf8")).split(/\r?\n/, 1)[0];
+      if (!/^\d+$/.test(activePort)) {
+        throw new Error(`Invalid DevTools port: ${activePort}`);
+      }
+
+      const baseUrl = `http://127.0.0.1:${activePort}`;
+      const versionResponse = await fetch(`${baseUrl}/json/version`, {
+        signal: AbortSignal.timeout(1000),
+      });
+      if (!versionResponse.ok) {
+        throw new Error(`CDP version check failed: HTTP ${versionResponse.status}`);
+      }
+      const version = await versionResponse.json();
+      if (typeof version.Browser !== "string" || !version.Browser.startsWith("Edg/")) {
+        throw new Error(`CDP endpoint is not Edge WebView2: ${version.Browser ?? "unknown browser"}`);
+      }
+
+      const response = await fetch(`${baseUrl}/json/list`, {
+        signal: AbortSignal.timeout(1000),
+      });
+      if (!response.ok) {
+        throw new Error(`CDP target listing failed: HTTP ${response.status}`);
+      }
+
+      const targets = (await response.json()).filter(target =>
+        target.type === "page" && target.webSocketDebuggerUrl,
+      );
+      if (!targets.some(target => target.url?.includes("/assets/www/MainWindow.html"))) {
+        throw new Error("CDP endpoint does not contain a Tiefsee MainWindow page.");
+      }
+      return targets;
+    } catch (error) {
+      lastError = error.message;
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+  }
+
+  throw new Error(
+    `CDP did not become ready within 15 seconds (port ${activePort}; ${lastError}). `
+      + "Confirm the Debug test process is still running and TIEFSEE_ENABLE_TEST_CDP=1 was set.",
+  );
+}
+
+async function connect(target) {
+  const socketUrl = new URL(target.webSocketDebuggerUrl);
+  if (socketUrl.protocol !== "ws:" || !["127.0.0.1", "localhost"].includes(socketUrl.hostname)) {
+    throw new Error("Refusing a non-local CDP WebSocket URL.");
+  }
+
+  const socket = new WebSocket(socketUrl);
+  await new Promise((resolve, reject) => {
+    socket.addEventListener("open", resolve, { once: true });
+    socket.addEventListener("error", reject, { once: true });
+  });
+
+  let nextId = 0;
+  const pending = new Map();
+  socket.addEventListener("message", event => {
+    const message = JSON.parse(event.data);
+    const waiter = pending.get(message.id);
+    if (!waiter) return;
+    pending.delete(message.id);
+    clearTimeout(waiter.timeout);
+    if (message.error) {
+      waiter.reject(new Error(message.error.message));
+    } else {
+      waiter.resolve(message.result);
+    }
+  });
+  socket.addEventListener("close", () => {
+    for (const waiter of pending.values()) {
+      clearTimeout(waiter.timeout);
+      waiter.reject(new Error("CDP WebSocket closed."));
+    }
+    pending.clear();
+  });
+
+  return {
+    call(method, params = {}) {
+      const id = ++nextId;
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          pending.delete(id);
+          reject(new Error(`CDP ${method} timed out.`));
+        }, 5000);
+        pending.set(id, { resolve, reject, timeout });
+        socket.send(JSON.stringify({ id, method, params }));
+      });
+    },
+    close() {
+      socket.close();
+    },
+  };
+}
+
+async function readState(target, existingConnection = null) {
+  const cdp = existingConnection ?? await connect(target);
+  try {
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `({
+        windowId: window.baseWindow?.appInfo?.windowId ?? null,
+        args: window.baseWindow?.appInfo?.args ?? null,
+        title: document.title,
+        url: location.href,
+        ready: document.readyState,
+        bodyText: document.body?.innerText?.slice(0, 500) ?? ""
+      })`,
+      returnByValue: true,
+      awaitPromise: true,
+    });
+    return result.result?.value ?? null;
+  } finally {
+    if (!existingConnection) cdp.close();
+  }
+}
+
+async function listWindows() {
+  const targets = await getPageTargets();
+  const windows = [];
+  for (const target of targets) {
+    try {
+      windows.push({ targetId: target.id, ...(await readState(target)) });
+    } catch (error) {
+      windows.push({ targetId: target.id, error: error.message });
+    }
+  }
+  return windows;
+}
+
+const modifiers = {
+  ctrl: { key: "Control", code: "ControlLeft", vk: 17, mask: 2 },
+  control: { key: "Control", code: "ControlLeft", vk: 17, mask: 2 },
+  shift: { key: "Shift", code: "ShiftLeft", vk: 16, mask: 8 },
+  alt: { key: "Alt", code: "AltLeft", vk: 18, mask: 1 },
+  meta: { key: "Meta", code: "MetaLeft", vk: 91, mask: 4 },
+};
+
+const namedKeys = {
+  enter: ["Enter", "Enter", 13],
+  escape: ["Escape", "Escape", 27],
+  tab: ["Tab", "Tab", 9],
+  space: [" ", "Space", 32],
+  backspace: ["Backspace", "Backspace", 8],
+  delete: ["Delete", "Delete", 46],
+  arrowup: ["ArrowUp", "ArrowUp", 38],
+  arrowdown: ["ArrowDown", "ArrowDown", 40],
+  arrowleft: ["ArrowLeft", "ArrowLeft", 37],
+  arrowright: ["ArrowRight", "ArrowRight", 39],
+  home: ["Home", "Home", 36],
+  end: ["End", "End", 35],
+  pageup: ["PageUp", "PageUp", 33],
+  pagedown: ["PageDown", "PageDown", 34],
+};
+
+function parseShortcut(value) {
+  const parts = value.split("+").map(part => part.trim()).filter(Boolean);
+  if (parts.length === 0) throw new Error("A key combination is required.");
+
+  const heldModifiers = [];
+  while (parts.length > 1) {
+    const modifier = modifiers[parts[0].toLowerCase()];
+    if (!modifier) throw new Error(`Unsupported modifier: ${parts[0]}`);
+    heldModifiers.push(modifier);
+    parts.shift();
+  }
+
+  const rawKey = parts[0];
+  const lowered = rawKey.toLowerCase();
+  let keyInfo = namedKeys[lowered];
+  if (!keyInfo && /^[a-z]$/i.test(rawKey)) {
+    keyInfo = [rawKey.toLowerCase(), `Key${rawKey.toUpperCase()}`, rawKey.toUpperCase().charCodeAt(0)];
+  }
+  if (!keyInfo && /^\d$/.test(rawKey)) {
+    keyInfo = [rawKey, `Digit${rawKey}`, rawKey.charCodeAt(0)];
+  }
+  if (!keyInfo && /^f(?:[1-9]|1[0-2])$/i.test(rawKey)) {
+    const number = Number(rawKey.slice(1));
+    keyInfo = [`F${number}`, `F${number}`, 111 + number];
+  }
+  if (!keyInfo) throw new Error(`Unsupported key: ${rawKey}`);
+
+  return { heldModifiers, key: keyInfo[0], code: keyInfo[1], vk: keyInfo[2] };
+}
+
+async function pressForWindow(windowId, shortcutText, waitMs) {
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const before = await readState(target, cdp);
+    if (before?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
+    }
+
+    const shortcut = parseShortcut(shortcutText);
+    let modifierMask = 0;
+    for (const modifier of shortcut.heldModifiers) {
+      modifierMask |= modifier.mask;
+      await cdp.call("Input.dispatchKeyEvent", {
+        type: "keyDown", key: modifier.key, code: modifier.code,
+        windowsVirtualKeyCode: modifier.vk, nativeVirtualKeyCode: modifier.vk,
+        modifiers: modifierMask,
+      });
+    }
+
+    await cdp.call("Input.dispatchKeyEvent", {
+      type: "keyDown", key: shortcut.key, code: shortcut.code,
+      windowsVirtualKeyCode: shortcut.vk, nativeVirtualKeyCode: shortcut.vk,
+      modifiers: modifierMask,
+    });
+    await cdp.call("Input.dispatchKeyEvent", {
+      type: "keyUp", key: shortcut.key, code: shortcut.code,
+      windowsVirtualKeyCode: shortcut.vk, nativeVirtualKeyCode: shortcut.vk,
+      modifiers: modifierMask,
+    });
+
+    for (const modifier of [...shortcut.heldModifiers].reverse()) {
+      modifierMask &= ~modifier.mask;
+      await cdp.call("Input.dispatchKeyEvent", {
+        type: "keyUp", key: modifier.key, code: modifier.code,
+        windowsVirtualKeyCode: modifier.vk, nativeVirtualKeyCode: modifier.vk,
+        modifiers: modifierMask,
+      });
+    }
+
+    let after;
+    let changed = false;
+    const isPaste = shortcut.heldModifiers.some(modifier => modifier.mask === 2)
+      && shortcut.key.toLowerCase() === "v";
+    const settleMs = waitMs ?? (isPaste ? 8000 : 1500);
+    if (isPaste) {
+      const deadline = Date.now() + settleMs;
+      do {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        after = await readState(target, cdp);
+        changed = after?.bodyText !== before?.bodyText;
+      } while (!changed && Date.now() < deadline);
+    } else {
+      await new Promise(resolve => setTimeout(resolve, settleMs));
+      after = await readState(target, cdp);
+      changed = after?.bodyText !== before?.bodyText;
+    }
+
+    if (after?.windowId !== windowId) {
+      throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
+    }
+    return { windowId, targetId: target.id, shortcut: shortcutText, pageChanged: changed, state: after };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function clickForWindow(windowId, selector, button = "left", includeSnapshot = false) {
+  const buttonMask = { left: 1, right: 2, middle: 4 }[button];
+  if (!buttonMask) throw new Error("button must be left, right or middle.");
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(() => {
+        const selector = ${JSON.stringify(selector)};
+        const elements = [...document.querySelectorAll(selector)];
+        const visible = elements.map(element => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return { element, rect, visible: rect.width > 0 && rect.height > 0
+            && style.display !== "none" && style.visibility !== "hidden"
+            && style.pointerEvents !== "none" };
+        }).filter(item => item.visible);
+        if (visible.length !== 1) {
+          return { error: \`selector matched \${elements.length} element(s), \${visible.length} visible\` };
+        }
+        const { rect } = visible[0];
+        return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+      })()`,
+      returnByValue: true,
+    });
+    const point = result.result?.value;
+    if (!point || point.error) throw new Error(point?.error ?? "Could not locate the click target.");
+
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+      await cdp.call("Input.dispatchMouseEvent", {
+        type, x: point.x, y: point.y, button,
+        buttons: type === "mousePressed" ? buttonMask : 0,
+        clickCount: 1,
+      });
+    }
+    return { windowId, targetId: target.id, selector, button, x: point.x, y: point.y,
+      ...(includeSnapshot ? { snapshot: (await snapshotForWindow(windowId)).snapshot } : {}) };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function clickAtForWindow(windowId, x, y, button = "left") {
+  const buttonMask = { left: 1, right: 2, middle: 4 }[button];
+  if (!buttonMask) throw new Error("button must be left, right or middle.");
+  if (![x, y].every(Number.isFinite)) throw new Error("x and y must be finite numbers.");
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    const viewport = await cdp.call("Runtime.evaluate", {
+      expression: "({width: innerWidth, height: innerHeight})",
+      returnByValue: true,
+    });
+    const { width, height } = viewport.result?.value ?? {};
+    if (!Number.isFinite(width) || !Number.isFinite(height) || x < 0 || y < 0 || x >= width || y >= height) {
+      throw new Error(`Coordinates (${x}, ${y}) are outside the ${width}x${height} viewport.`);
+    }
+    for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+      await cdp.call("Input.dispatchMouseEvent", {
+        type, x, y, button,
+        buttons: type === "mousePressed" ? buttonMask : 0,
+        clickCount: 1,
+      });
+    }
+    return { windowId, targetId: target.id, x, y, button, viewport: { width, height } };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function clickTextForWindow(windowId, text, includeSnapshot = false) {
+  if (typeof text !== "string" || !text.trim() || text.length > 500) {
+    throw new Error("text must contain 1–500 characters.");
+  }
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(() => {
+        const text = ${JSON.stringify(text.trim())};
+        const candidates = [...document.querySelectorAll('button,a,[role],[tabindex],[onclick],[title],[aria-label],[class*="js-"],[class*="menu-item"],[class*="menu-hor-item"]')]
+          .filter(element => {
+            const rect = element.getBoundingClientRect(), style = getComputedStyle(element);
+            return rect.width > 0 && rect.height > 0 && style.display !== "none"
+              && style.visibility !== "hidden" && style.pointerEvents !== "none"
+              && (element.innerText || element.getAttribute("aria-label") || element.title || "").trim() === text;
+          });
+        if (candidates.length !== 1) {
+          return { error: "exact text matched " + candidates.length + " visible interactive element(s)" };
+        }
+        const element = candidates[0], rect = element.getBoundingClientRect();
+        return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2,
+          tag: element.tagName.toLowerCase(), className: String(element.className) };
+      })()` ,
+      returnByValue: true,
+    });
+    const point = result.result?.value;
+    if (!point || point.error) throw new Error(point?.error ?? "Could not locate the text target.");
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+      await cdp.call("Input.dispatchMouseEvent", {
+        type, x: point.x, y: point.y, button: "left",
+        buttons: type === "mousePressed" ? 1 : 0, clickCount: 1,
+      });
+    }
+    return { windowId, targetId: target.id, text: text.trim(), ...point,
+      ...(includeSnapshot ? { snapshot: (await snapshotForWindow(windowId)).snapshot } : {}) };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function inspectForWindow(windowId, selector = "button,[title],[aria-label],[role=button]") {
+  const windows = await listWindows();
+  const match = windows.find(window => window.windowId === windowId);
+  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === match.targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+  const cdp = await connect(target);
+  try {
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(() => [...document.querySelectorAll(${JSON.stringify(selector)})].map(element => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return { tag: element.tagName, text: (element.innerText || "").trim().slice(0, 80),
+          title: element.title, ariaLabel: element.getAttribute("aria-label"), className: String(element.className),
+          value: "value" in element ? element.value : undefined,
+          visible: rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden",
+          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
+      }))()`,
+      returnByValue: true,
+    });
+    return result.result?.value ?? [];
+  } finally {
+    cdp.close();
+  }
+}
+
+async function moveForWindow(windowId, x, y) {
+  const windows = await listWindows();
+  const match = windows.find(window => window.windowId === windowId);
+  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === match.targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+  const cdp = await connect(target);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+    return { windowId, targetId: target.id, x, y };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0) {
+  if (![x, y, deltaX, deltaY].every(Number.isFinite) || deltaX === 0 && deltaY === 0) {
+    throw new Error("x, y, deltaX and deltaY must be finite numbers, with a non-zero delta.");
+  }
+
+  const windows = await listWindows();
+  const match = windows.find(window => window.windowId === windowId);
+  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === match.targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const before = await readState(target, cdp);
+    if (before?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
+    }
+    await cdp.call("Input.dispatchMouseEvent", {
+      type: "mouseWheel", x, y, deltaX, deltaY,
+    });
+    const after = await readState(target, cdp);
+    if (after?.windowId !== windowId) {
+      throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
+    }
+    return { windowId, targetId: target.id, x, y, deltaX, deltaY, state: after };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function dragForWindow(windowId, x1, y1, x2, y2) {
+  if (![x1, y1, x2, y2].every(Number.isFinite)) {
+    throw new Error("Drag coordinates must be finite numbers.");
+  }
+
+  const windows = await listWindows();
+  const match = windows.find(window => window.windowId === windowId);
+  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === match.targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+
+  const cdp = await connect(target);
+  try {
+    const before = await readState(target, cdp);
+    if (before?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
+    }
+    await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: x1, y: y1 });
+    await cdp.call("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1 });
+    await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: x2, y: y2, button: "left", buttons: 1 });
+    await cdp.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
+    const after = await readState(target, cdp);
+    if (after?.windowId !== windowId) {
+      throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
+    }
+    return { windowId, targetId: target.id, x1, y1, x2, y2, state: after };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function typeForWindow(windowId, text) {
+  if (typeof text !== "string" || text.length > 10000) {
+    throw new Error("Text must be a string no longer than 10000 characters.");
+  }
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+  const cdp = await connect(target);
+  try {
+    const before = await readState(target, cdp);
+    if (before?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
+    }
+    await cdp.call("Input.insertText", { text });
+    const after = await readState(target, cdp);
+    if (after?.windowId !== windowId) {
+      throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
+    }
+    return { windowId, targetId: target.id, state: after };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function snapshotForWindow(windowId) {
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+  const cdp = await connect(target);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before reading; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(() => {
+        const visible = element => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return rect.width > 0 && rect.height > 0 && style.display !== "none"
+            && style.visibility !== "hidden" && style.pointerEvents !== "none";
+        };
+        const selectorFor = element => {
+          if (element.id) return "#" + CSS.escape(element.id);
+          for (const name of ["data-testid", "title", "aria-label"]) {
+            const value = element.getAttribute(name);
+            if (value) return element.tagName.toLowerCase() + "[" + name + '=\"' + CSS.escape(value) + '\"]';
+          }
+          return null;
+        };
+        const elements = [...document.querySelectorAll("button,a,input,select,textarea,[role],[title],[aria-label],[tabindex]")]
+          .filter(visible).slice(0, 120).map(element => {
+            const rect = element.getBoundingClientRect();
+            return { tag: element.tagName.toLowerCase(), role: element.getAttribute("role"),
+              text: (element.innerText || element.value || "").trim().slice(0, 100),
+              title: element.getAttribute("title"), ariaLabel: element.getAttribute("aria-label"),
+              id: element.id || null, selector: selectorFor(element),
+              rect: { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) } };
+          });
+        return { title: document.title, url: location.href, ready: document.readyState,
+          bodyText: (document.body?.innerText || "").slice(0, 2500), elements };
+      })()`,
+      returnByValue: true,
+    });
+    return { ...state, snapshot: result.result?.value ?? null };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function waitForWindow(windowId, { selector, text, state = "visible", timeoutMs = 5000 }) {
+  if ((!selector && !text) || !["visible", "hidden"].includes(state)
+    || !Number.isInteger(timeoutMs) || timeoutMs < 0 || timeoutMs > 30000) {
+    throw new Error("Provide selector or text; state must be visible or hidden; timeoutMs must be 0–30000.");
+  }
+  const windows = await listWindows();
+  const matches = windows.filter(window => window.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
+  }
+  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
+  const cdp = await connect(target);
+  const expression = `(() => {
+    const selector = ${JSON.stringify(selector ?? null)};
+    const text = ${JSON.stringify(text ?? null)};
+    const state = ${JSON.stringify(state)};
+    const found = !selector || [...document.querySelectorAll(selector)].some(element => {
+      const rect = element.getBoundingClientRect(), style = getComputedStyle(element);
+      return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+    });
+    const hasText = !text || (document.body?.innerText || "").includes(text);
+    return { windowId: window.baseWindow?.appInfo?.windowId ?? null,
+      matched: (state === "visible" ? found : !found) && hasText,
+      bodyText: (document.body?.innerText || "").slice(0, 500) };
+  })()`;
+  const deadline = Date.now() + timeoutMs;
+  try {
+    while (true) {
+      const result = await cdp.call("Runtime.evaluate", { expression, returnByValue: true });
+      const current = result.result?.value;
+      if (current?.windowId !== windowId) {
+        throw new Error(`Target identity changed while waiting; expected ${windowId}, found ${current?.windowId ?? "none"}.`);
+      }
+      if (current.matched) return { windowId, selector: selector ?? null, text: text ?? null, state, bodyText: current.bodyText };
+      if (Date.now() >= deadline) throw new Error(`Timed out waiting for ${selector ? `selector ${selector} to be ${state}` : "text condition"}.`);
+      await new Promise(resolve => setTimeout(resolve, Math.min(100, deadline - Date.now())));
+    }
+  } finally {
+    cdp.close();
+  }
+}
+
+const mcpTools = [
+  { name: "tiefsee_pages", description: "列出目前 Debug 測試版的 WebView 視窗。以 windowId 區分視窗；null 是尚未初始化的預載頁。", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
+  { name: "tiefsee_state", description: "讀取指定 windowId 的標題、啟動參數與頁面文字。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
+  { name: "tiefsee_snapshot", description: "讀取指定視窗的可見互動 DOM、文字和座標；不執行網頁程式碼。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
+  { name: "tiefsee_inspect", description: "以 CSS selector 檢查指定視窗中的元素可見性、值和座標。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
+  { name: "tiefsee_click", description: "找出唯一可見的 CSS selector，並向指定視窗送出 CDP 滑鼠點擊事件。button 可選 left、right、middle，預設 left；includeSnapshot 可在同一回覆附上操作後 DOM 快照。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, button: { type: "string", enum: ["left", "right", "middle"] }, includeSnapshot: { type: "boolean" } }, required: ["windowId", "selector"], additionalProperties: false } },
+  { name: "tiefsee_click_at", description: "依指定視窗 viewport CSS 座標送出真實 CDP 滑鼠點擊；適合由截圖辨識控件位置。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, button: { type: "string", enum: ["left", "right", "middle"] } }, required: ["windowId", "x", "y"], additionalProperties: false } },
+  { name: "tiefsee_click_text", description: "找出唯一可見且互動的精確文字項目，向指定視窗送出真實 CDP 左鍵點擊；適合快照已看到文字但沒有 CSS selector 的選單。includeSnapshot 可在同一回覆附上操作後 DOM 快照。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, text: { type: "string", minLength: 1, maxLength: 500 }, includeSnapshot: { type: "boolean" } }, required: ["windowId", "text"], additionalProperties: false } },
+  { name: "tiefsee_press", description: "向指定視窗送出鍵盤快捷鍵；例：Ctrl+C、Ctrl+V、F2、Escape。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, keys: { type: "string" }, waitMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId", "keys"], additionalProperties: false } },
+  { name: "tiefsee_type", description: "向指定視窗目前焦點輸入文字；先用實際點擊或鍵盤操作聚焦輸入框。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, text: { type: "string", maxLength: 10000 } }, required: ["windowId", "text"], additionalProperties: false } },
+  { name: "tiefsee_move", description: "向指定視窗送出滑鼠移動事件。座標是 viewport CSS pixels。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" } }, required: ["windowId", "x", "y"], additionalProperties: false } },
+  { name: "tiefsee_wheel", description: "向指定視窗送出滑鼠滾輪事件。deltaY 負值通常代表向上滾。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, deltaY: { type: "number" }, deltaX: { type: "number" } }, required: ["windowId", "x", "y", "deltaY"], additionalProperties: false } },
+  { name: "tiefsee_drag", description: "在指定視窗內由起點拖曳至終點，送出滑鼠按下、移動和放開事件。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
+  { name: "tiefsee_wait", description: "等待指定視窗的 selector 可見／隱藏或文字出現；以狀態輪詢取代固定長時間 sleep。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, text: { type: "string" }, state: { type: "string", enum: ["visible", "hidden"] }, timeoutMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId"], additionalProperties: false } },
+  { name: "tiefsee_screenshot", description: "擷取指定 WebView 視窗畫面；只在需要確認視覺結果時使用。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
+];
+
+async function callMcpTool(name, args) {
+  switch (name) {
+    case "tiefsee_pages": return await listWindows();
+    case "tiefsee_state": {
+      const windows = await listWindows();
+      const matches = windows.filter(window => window.windowId === args.windowId);
+      if (matches.length !== 1) throw new Error(`Expected one page for windowId ${args.windowId}, found ${matches.length}.`);
+      return matches[0];
+    }
+    case "tiefsee_snapshot": return await snapshotForWindow(args.windowId);
+    case "tiefsee_inspect": return await inspectForWindow(args.windowId, args.selector);
+    case "tiefsee_click": return await clickForWindow(args.windowId, args.selector, args.button ?? "left", args.includeSnapshot === true);
+    case "tiefsee_click_at": return await clickAtForWindow(args.windowId, args.x, args.y, args.button ?? "left");
+    case "tiefsee_click_text": return await clickTextForWindow(args.windowId, args.text, args.includeSnapshot === true);
+    case "tiefsee_press": return await pressForWindow(args.windowId, args.keys, args.waitMs);
+    case "tiefsee_type": return await typeForWindow(args.windowId, args.text);
+    case "tiefsee_move": return await moveForWindow(args.windowId, args.x, args.y);
+    case "tiefsee_wheel": return await wheelForWindow(args.windowId, args.x, args.y, args.deltaY, args.deltaX ?? 0);
+    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2);
+    case "tiefsee_wait": return await waitForWindow(args.windowId, args);
+    case "tiefsee_screenshot": {
+      const windows = await listWindows();
+      const matches = windows.filter(window => window.windowId === args.windowId);
+      if (matches.length !== 1) throw new Error(`Expected one page for windowId ${args.windowId}, found ${matches.length}.`);
+      const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
+      if (!target) throw new Error(`CDP target for windowId ${args.windowId} disappeared.`);
+      const cdp = await connect(target);
+      try {
+        const state = await readState(target, cdp);
+        if (state?.windowId !== args.windowId) throw new Error("Target identity changed before screenshot.");
+        const image = await cdp.call("Page.captureScreenshot", { format: "png", fromSurface: true });
+        return { image: image.data, state };
+      } finally { cdp.close(); }
+    }
+    default: throw new Error(`Unknown tool: ${name}`);
+  }
+}
+
+async function runMcpServer() {
+  const input = createInterface({ input: process.stdin, crlfDelay: Infinity });
+  const send = message => process.stdout.write(`${JSON.stringify(message)}\n`);
+  for await (const line of input) {
+    let message;
+    try { message = JSON.parse(line); }
+    catch { continue; }
+    if (message.method === "notifications/exit") process.exit(0);
+    if (message.method === "notifications/initialized" || message.method === "notifications/cancelled") continue;
+    if (message.method === "initialize") {
+      send({ jsonrpc: "2.0", id: message.id, result: {
+        protocolVersion: message.params?.protocolVersion ?? "2025-03-26",
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: { name: "tiefsee-webview", version: "1.0.0" },
+      } });
+      continue;
+    }
+    if (message.method === "ping") {
+      send({ jsonrpc: "2.0", id: message.id, result: {} });
+      continue;
+    }
+    if (message.method === "tools/list") {
+      send({ jsonrpc: "2.0", id: message.id, result: { tools: mcpTools } });
+      continue;
+    }
+    if (message.method === "tools/call") {
+      try {
+        const result = await callMcpTool(message.params?.name, message.params?.arguments ?? {});
+        if (result?.image) {
+          send({ jsonrpc: "2.0", id: message.id, result: { content: [
+            { type: "image", data: result.image, mimeType: "image/png" },
+            { type: "text", text: JSON.stringify(result.state) },
+          ] } });
+        } else {
+          send({ jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: JSON.stringify(result) }] } });
+        }
+      } catch (error) {
+        send({ jsonrpc: "2.0", id: message.id, result: { isError: true, content: [{ type: "text", text: error.message }] } });
+      }
+      continue;
+    }
+    if (message.id !== undefined) {
+      send({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Method not found: ${message.method}` } });
+    }
+  }
+}
+
+try {
+  const [command, ...args] = process.argv.slice(2);
+  if (command === "mcp" && args.length === 0) {
+    await runMcpServer();
+  } else if (command === "pages" && args.length === 0) {
+    console.log(JSON.stringify(await listWindows()));
+  } else if (command === "state" && args.length === 1) {
+    const windows = await listWindows();
+    const matches = windows.filter(window => window.windowId === args[0]);
+    if (matches.length !== 1) {
+      throw new Error(`Expected one page for windowId ${args[0]}, found ${matches.length}.`);
+    }
+    console.log(JSON.stringify(matches[0]));
+  } else if (command === "press" && (args.length === 2 || args.length === 3)) {
+    const waitMs = args[2] === undefined ? undefined : Number(args[2]);
+    if (waitMs !== undefined && (!Number.isInteger(waitMs) || waitMs < 0 || waitMs > 30000)) {
+      throw new Error("waitMs must be an integer from 0 to 30000.");
+    }
+    console.log(JSON.stringify(await pressForWindow(args[0], args[1], waitMs)));
+  } else if (command === "click" && args.length >= 2) {
+    console.log(JSON.stringify(await clickForWindow(args[0], args.slice(1).join(" "))));
+  } else if (command === "inspect" && (args.length === 1 || args.length >= 2)) {
+    console.log(JSON.stringify(await inspectForWindow(args[0], args.slice(1).join(" ") || undefined)));
+  } else if (command === "move" && args.length === 3) {
+    console.log(JSON.stringify(await moveForWindow(args[0], Number(args[1]), Number(args[2]))));
+  } else if (command === "wheel" && (args.length === 4 || args.length === 5)) {
+    console.log(JSON.stringify(await wheelForWindow(args[0], Number(args[1]), Number(args[2]), Number(args[3]), args[4] === undefined ? 0 : Number(args[4]))));
+  } else {
+    throw new Error("Usage: node CdpTest.mjs pages | state <windowId> | press <windowId> <shortcut> [waitMs] | click <windowId> <cssSelector> | inspect <windowId> [cssSelector] | move <windowId> <x> <y> | wheel <windowId> <x> <y> <deltaY> [deltaX]");
+  }
+} catch (error) {
+  console.error(error.message);
+  process.exitCode = 1;
+}

@@ -287,7 +287,7 @@ public class WebWindow : FormNone {
     /// </summary>
     public static async Task<CoreWebView2Environment> GetCoreWebView2Environment() {
         if (_webView2Environment == null) {
-            var arguments = new[] {
+            var arguments = new List<string> {
                 "--enable-features=msWebView2EnableDraggableRegions", // 讓 webview2 支援 css「app-region:drag」
                 // "--disable-web-security", // 允許跨域請求
                 // $"--user-agent {}", // 覆寫 userAgent
@@ -307,6 +307,14 @@ public class WebWindow : FormNone {
                 "--dns-prefetch-disable", // 停用 DNS 預取，減少初始網路活動
                 "--msWebView2CancelInitialNavigation", // 取消 webview2 預設的導航行為
             };
+
+#if DEBUG
+            // 僅供明確啟用的測試版連接 CDP；正式版不會編譯進遠端偵錯入口。
+            if (Environment.GetEnvironmentVariable("TIEFSEE_ENABLE_TEST_CDP") == "1") {
+                arguments.Add("--remote-debugging-port=0");
+            }
+#endif
+
             var opts = new CoreWebView2EnvironmentOptions { AdditionalBrowserArguments = string.Join(" ", arguments) };
             _webView2Environment = await CoreWebView2Environment.CreateAsync(null, Program.runtimeContext.AppData, opts);
         }

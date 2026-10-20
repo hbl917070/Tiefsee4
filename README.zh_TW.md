@@ -94,7 +94,7 @@ Tiefsee
 ## 專案說明
 - 專案類型：C# WinForm (.NET 8)
 - 開發語言：C#、TypeScript
-- [專案建立步驟](/Building.zh_TW.md)
+- [專案建立步驟](Docs/zh-TW/building.md)
 
 <br>
 

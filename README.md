@@ -94,7 +94,7 @@ Possible reasons are:
 ## Project Description
 - Project Type: C# WinForm (.NET 8)
 - Development Language：C#、TypeScript
-- [Project Build Steps](Building.md)
+- [Project Build Steps](Docs/en/building.md)
 
 <br>
 
