@@ -24,6 +24,7 @@ export class Msgbox {
                 msg: {
                     yes: { "en": "Yes", },
                     no: { "en": "No", },
+                    close: { "en": "Close", },
                 }
             });
         } else {
@@ -104,15 +105,15 @@ export class Msgbox {
         const dom = Lib.newDom(
             `<div class="msgbox">
                 <div class="msgbox-box" active="false">
-                    <div class="msgbox-close"></div>
+                    <div class="msgbox-close" role="button" aria-label="${this._i18n.t("msg.close")}"></div>
                     <div class="msgbox-txt base-scrollbar">${txt}</div>
                     <input class="msgbox-input" type="text">
                    
                     ${htmlRadio}
                 
                     <div class="msgbox-bottom">
-                        <div class="msgbox-btn msgbox-btn__yes" i18n="msg.yes">${this._i18n.t("msg.yes")}</div>
-                        <div class="msgbox-btn msgbox-btn__no" i18n="msg.no">${this._i18n.t("msg.no")}</div>
+                        <div class="msgbox-btn msgbox-btn__yes" role="button" i18n="msg.yes">${this._i18n.t("msg.yes")}</div>
+                        <div class="msgbox-btn msgbox-btn__no" role="button" i18n="msg.no">${this._i18n.t("msg.no")}</div>
                     </div>
                 </div>
             </div>`)

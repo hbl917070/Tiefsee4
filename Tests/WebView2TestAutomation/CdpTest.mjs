@@ -13,6 +13,8 @@ const activePortPath = resolve(
   "EBWebView",
   "DevToolsActivePort",
 );
+const cdpConnections = new Map();
+let keepCdpConnections = false;
 
 async function getPageTargets() {
   const deadline = Date.now() + 15000;
@@ -72,6 +74,10 @@ async function connect(target) {
     throw new Error("Refusing a non-local CDP WebSocket URL.");
   }
 
+  const connectionKey = socketUrl.href;
+  const existing = cdpConnections.get(connectionKey);
+  if (existing?.isOpen()) return existing;
+
   const socket = new WebSocket(socketUrl);
   await new Promise((resolve, reject) => {
     socket.addEventListener("open", resolve, { once: true });
@@ -100,7 +106,8 @@ async function connect(target) {
     pending.clear();
   });
 
-  return {
+  const connection = {
+    isOpen: () => socket.readyState === WebSocket.OPEN,
     call(method, params = {}) {
       const id = ++nextId;
       return new Promise((resolve, reject) => {
@@ -112,10 +119,22 @@ async function connect(target) {
         socket.send(JSON.stringify({ id, method, params }));
       });
     },
-    close() {
-      socket.close();
+    close(force = false) {
+      if (force || !keepCdpConnections) socket.close();
     },
   };
+  cdpConnections.set(connectionKey, connection);
+  socket.addEventListener("close", () => {
+    if (cdpConnections.get(connectionKey) === connection) cdpConnections.delete(connectionKey);
+  });
+  return connection;
+}
+
+function closeCdpConnections() {
+  for (const connection of cdpConnections.values()) {
+    if (connection.isOpen()) connection.close(true);
+  }
+  cdpConnections.clear();
 }
 
 async function readState(target, existingConnection = null) {
@@ -141,15 +160,31 @@ async function readState(target, existingConnection = null) {
 
 async function listWindows() {
   const targets = await getPageTargets();
-  const windows = [];
-  for (const target of targets) {
+  return await Promise.all(targets.map(async target => {
     try {
-      windows.push({ targetId: target.id, ...(await readState(target)) });
+      return { targetId: target.id, ...(await readState(target)) };
     } catch (error) {
-      windows.push({ targetId: target.id, error: error.message });
+      return { targetId: target.id, error: error.message };
     }
+  }));
+}
+
+async function findWindowTarget(windowId) {
+  const targets = await getPageTargets();
+  const inspected = await Promise.all(targets.map(async target => {
+    try {
+      const cdp = await connect(target);
+      const state = await readState(target, cdp);
+      return { target, cdp, state };
+    } catch (error) {
+      return { target, error };
+    }
+  }));
+  const matches = inspected.filter(item => item.state?.windowId === windowId);
+  if (matches.length !== 1) {
+    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
   }
-  return windows;
+  return matches[0];
 }
 
 const modifiers = {
@@ -208,16 +243,7 @@ function parseShortcut(value) {
 }
 
 async function pressForWindow(windowId, shortcutText, waitMs) {
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const before = await readState(target, cdp);
     if (before?.windowId !== windowId) {
@@ -282,19 +308,11 @@ async function pressForWindow(windowId, shortcutText, waitMs) {
   }
 }
 
-async function clickForWindow(windowId, selector, button = "left", includeSnapshot = false) {
+async function clickForWindow(windowId, selector, button = "left", includeSnapshot = false, clickCount = 1) {
   const buttonMask = { left: 1, right: 2, middle: 4 }[button];
   if (!buttonMask) throw new Error("button must be left, right or middle.");
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-
-  const cdp = await connect(target);
+  if (![1, 2].includes(clickCount)) throw new Error("clickCount must be 1 or 2.");
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const result = await cdp.call("Runtime.evaluate", {
       expression: `(() => {
@@ -310,7 +328,20 @@ async function clickForWindow(windowId, selector, button = "left", includeSnapsh
         if (visible.length !== 1) {
           return { error: \`selector matched \${elements.length} element(s), \${visible.length} visible\` };
         }
-        const { rect } = visible[0];
+        // Inline elements can wrap across multiple lines. Their bounding
+        // rectangle includes the empty space between fragments, so its center
+        // may not hit the element. Use the largest rendered fragment instead.
+        const rects = [...visible[0].element.getClientRects()]
+          .filter(rect => {
+            const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+            return rect.width > 0 && rect.height > 0
+              && x >= 0 && y >= 0 && x < innerWidth && y < innerHeight;
+          })
+          .sort((a, b) => (b.width * b.height) - (a.width * a.height));
+        if (rects.length === 0) {
+          return { error: "target is outside the visible viewport; scroll it into view before clicking" };
+        }
+        const rect = rects[0];
         return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
       })()`,
       returnByValue: true,
@@ -322,14 +353,18 @@ async function clickForWindow(windowId, selector, button = "left", includeSnapsh
     if (state?.windowId !== windowId) {
       throw new Error(`Target identity changed before input; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
     }
-    for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) {
+    await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: point.x, y: point.y, button });
+    for (let count = 1; count <= clickCount; count++) {
       await cdp.call("Input.dispatchMouseEvent", {
-        type, x: point.x, y: point.y, button,
-        buttons: type === "mousePressed" ? buttonMask : 0,
-        clickCount: 1,
+        type: "mousePressed", x: point.x, y: point.y, button,
+        buttons: buttonMask, clickCount: count,
+      });
+      await cdp.call("Input.dispatchMouseEvent", {
+        type: "mouseReleased", x: point.x, y: point.y, button,
+        buttons: 0, clickCount: count,
       });
     }
-    return { windowId, targetId: target.id, selector, button, x: point.x, y: point.y,
+    return { windowId, targetId: target.id, selector, button, clickCount, x: point.x, y: point.y,
       ...(includeSnapshot ? { snapshot: (await snapshotForWindow(windowId)).snapshot } : {}) };
   } finally {
     cdp.close();
@@ -340,16 +375,7 @@ async function clickAtForWindow(windowId, x, y, button = "left") {
   const buttonMask = { left: 1, right: 2, middle: 4 }[button];
   if (!buttonMask) throw new Error("button must be left, right or middle.");
   if (![x, y].every(Number.isFinite)) throw new Error("x and y must be finite numbers.");
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const state = await readState(target, cdp);
     if (state?.windowId !== windowId) {
@@ -380,15 +406,7 @@ async function clickTextForWindow(windowId, text, includeSnapshot = false) {
   if (typeof text !== "string" || !text.trim() || text.length > 500) {
     throw new Error("text must contain 1–500 characters.");
   }
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const result = await cdp.call("Runtime.evaluate", {
       expression: `(() => {
@@ -403,7 +421,20 @@ async function clickTextForWindow(windowId, text, includeSnapshot = false) {
         if (candidates.length !== 1) {
           return { error: "exact text matched " + candidates.length + " visible interactive element(s)" };
         }
-        const element = candidates[0], rect = element.getBoundingClientRect();
+        const element = candidates[0];
+        // Use a real rendered fragment for wrapped inline text rather than
+        // the union rectangle, whose center can fall between text lines.
+        const rects = [...element.getClientRects()]
+          .filter(rect => {
+            const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+            return rect.width > 0 && rect.height > 0
+              && x >= 0 && y >= 0 && x < innerWidth && y < innerHeight;
+          })
+          .sort((a, b) => (b.width * b.height) - (a.width * a.height));
+        if (rects.length === 0) {
+          return { error: "target is outside the visible viewport; scroll it into view before clicking" };
+        }
+        const rect = rects[0];
         return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2,
           tag: element.tagName.toLowerCase(), className: String(element.className) };
       })()` ,
@@ -429,23 +460,64 @@ async function clickTextForWindow(windowId, text, includeSnapshot = false) {
 }
 
 async function inspectForWindow(windowId, selector = "button,[title],[aria-label],[role=button]") {
-  const windows = await listWindows();
-  const match = windows.find(window => window.windowId === windowId);
-  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === match.targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const result = await cdp.call("Runtime.evaluate", {
       expression: `(() => [...document.querySelectorAll(${JSON.stringify(selector)})].map(element => {
-        const rect = element.getBoundingClientRect();
+        const roleFor = element => {
+          const explicitRole = element.getAttribute("role");
+          if (explicitRole) return explicitRole;
+          const tag = element.tagName.toLowerCase();
+          if (tag === "button" || tag === "summary") return "button";
+          if ((tag === "a" || tag === "area") && element.hasAttribute("href")) return "link";
+          if (tag === "select") return element.multiple || element.size > 1 ? "listbox" : "combobox";
+          if (tag === "textarea") return "textbox";
+          if (tag === "input") {
+            const type = (element.getAttribute("type") || "text").toLowerCase();
+            if (type === "checkbox" || type === "radio" || type === "range" || type === "number") {
+              return { checkbox: "checkbox", radio: "radio", range: "slider", number: "spinbutton" }[type];
+            }
+            if (type === "search") return "searchbox";
+            if (["button", "submit", "reset", "image"].includes(type)) return "button";
+            if (type !== "hidden") return "textbox";
+          }
+          if (tag === "progress") return "progressbar";
+          if (tag === "meter") return "meter";
+          return null;
+        };
+        const label = element.labels?.[0] || null;
+        const ownRect = element.getBoundingClientRect();
+        const labelRect = label?.getBoundingClientRect();
+        const rect = ownRect.width > 0 && ownRect.height > 0 ? ownRect : labelRect || ownRect;
         const style = getComputedStyle(element);
-        return { tag: element.tagName, text: (element.innerText || "").trim().slice(0, 80),
+        const labels = element.labels ? [...element.labels].map(label => label.innerText || label.textContent || "").join(" ").trim() : "";
+        const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\\s+/)
+          .map(id => document.getElementById(id)?.innerText || document.getElementById(id)?.textContent || "").join(" ").trim();
+        const nearbyLabel = element.closest(".text-content")?.previousElementSibling;
+        const nearbyName = nearbyLabel?.classList.contains("text-title") ? (nearbyLabel.innerText || nearbyLabel.textContent || "").trim() : "";
+        const labelSelector = label ? label.id ? "#" + CSS.escape(label.id)
+          : element.id ? "label:has(#" + CSS.escape(element.id) + ")" : null : null;
+        return { tag: element.tagName, role: roleFor(element),
+          text: (element.innerText || "").trim().slice(0, 80),
+          name: (element.getAttribute("aria-label") || labelledBy || labels || nearbyName || element.innerText || element.title || element.value || "").trim().slice(0, 100),
+          labelSelector,
+          ariaChecked: element.getAttribute("aria-checked"),
+          ariaDisabled: element.getAttribute("aria-disabled"),
+          ariaLabelledBy: element.getAttribute("aria-labelledby"),
+          ariaSelected: element.getAttribute("aria-selected"),
+          ariaExpanded: element.getAttribute("aria-expanded"),
+          ariaControls: element.getAttribute("aria-controls"),
           title: element.title, ariaLabel: element.getAttribute("aria-label"), className: String(element.className),
           value: "value" in element ? element.value : undefined,
-          visible: rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden",
+          selectionStart: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement ? element.selectionStart : undefined,
+          selectionEnd: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement ? element.selectionEnd : undefined,
+          selectedText: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+            ? element.value.slice(element.selectionStart ?? 0, element.selectionEnd ?? 0) : undefined,
+          pageSelection: window.getSelection()?.toString() || "",
+          checked: element instanceof HTMLInputElement && ["checkbox", "radio"].includes(element.type) ? element.checked : undefined,
+          focused: element === document.activeElement,
+          visible: (ownRect.width > 0 && ownRect.height > 0 && style.display !== "none" && style.visibility !== "hidden")
+            || Boolean(label && labelRect.width > 0 && labelRect.height > 0 && getComputedStyle(label).display !== "none" && getComputedStyle(label).visibility !== "hidden"),
           rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height } };
       }))()`,
       returnByValue: true,
@@ -457,14 +529,7 @@ async function inspectForWindow(windowId, selector = "button,[title],[aria-label
 }
 
 async function moveForWindow(windowId, x, y) {
-  const windows = await listWindows();
-  const match = windows.find(window => window.windowId === windowId);
-  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === match.targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const state = await readState(target, cdp);
     if (state?.windowId !== windowId) {
@@ -482,15 +547,7 @@ async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0) {
     throw new Error("x, y, deltaX and deltaY must be finite numbers, with a non-zero delta.");
   }
 
-  const windows = await listWindows();
-  const match = windows.find(window => window.windowId === windowId);
-  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === match.targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const before = await readState(target, cdp);
     if (before?.windowId !== windowId) {
@@ -509,20 +566,74 @@ async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0) {
   }
 }
 
-async function dragForWindow(windowId, x1, y1, x2, y2) {
+async function touchGestureForWindow(windowId, kind, x, y, radius, value, steps = 12, durationMs = 300) {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(radius) || radius < 20 || radius > 300
+    || !Number.isFinite(value) || !Number.isInteger(steps) || steps < 2 || steps > 60
+    || !Number.isFinite(durationMs) || durationMs < 0 || durationMs > 5000) {
+    throw new Error("Touch gesture requires finite coordinates, radius 20–300, 2–60 steps, and durationMs 0–5000.");
+  }
+  if (kind !== "pinch" && kind !== "rotate") throw new Error("Touch gesture kind must be pinch or rotate.");
+  if (kind === "pinch" && (value < 0.5 || value > 2)) throw new Error("Pinch scale must be 0.5–2.");
+  if (kind === "rotate" && (Math.abs(value) < 5 || Math.abs(value) > 180)) throw new Error("Rotation angle must be 5–180 degrees in either direction.");
+
+  const { target, cdp } = await findWindowTarget(windowId);
+  try {
+    const before = await readState(target, cdp);
+    if (before?.windowId !== windowId) {
+      throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
+    }
+
+    const pointFor = (angle, distance, id) => ({
+      x: x + Math.cos(angle) * distance,
+      y: y + Math.sin(angle) * distance,
+      id,
+      radiusX: 1,
+      radiusY: 1,
+      force: 1,
+    });
+    const startAngle = kind === "pinch" ? 0 : -Math.PI / 2;
+    const touchPoints = (progress) => {
+      const angle = startAngle + (kind === "rotate" ? value * Math.PI / 180 * progress : 0);
+      const distance = radius * (kind === "pinch" ? 1 + (value - 1) * progress : 1);
+      return [pointFor(angle, distance, 1), pointFor(angle + Math.PI, distance, 2)];
+    };
+
+    await cdp.call("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 2 });
+    let touchEnded = false;
+    try {
+      await cdp.call("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: touchPoints(0) });
+      for (let i = 1; i <= steps; i++) {
+        if (durationMs > 0) await new Promise(resolve => setTimeout(resolve, durationMs / steps));
+        await cdp.call("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: touchPoints(i / steps) });
+      }
+      await cdp.call("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      touchEnded = true;
+    } finally {
+      if (!touchEnded) {
+        await cdp.call("Input.dispatchTouchEvent", { type: "touchCancel", touchPoints: [] }).catch(() => {});
+      }
+      await cdp.call("Emulation.setTouchEmulationEnabled", { enabled: false });
+    }
+
+    const after = await readState(target, cdp);
+    if (after?.windowId !== windowId) {
+      throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
+    }
+    return { windowId, targetId: target.id, kind, x, y, radius, value, steps, durationMs, state: after };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0) {
   if (![x1, y1, x2, y2].every(Number.isFinite)) {
     throw new Error("Drag coordinates must be finite numbers.");
   }
-
-  const windows = await listWindows();
-  const match = windows.find(window => window.windowId === windowId);
-  if (!match || windows.filter(window => window.windowId === windowId).length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}. Refresh the page list and retry.`);
+  if (!Number.isInteger(steps) || steps < 1 || steps > 60 || !Number.isFinite(durationMs) || durationMs < 0 || durationMs > 5000) {
+    throw new Error("Drag steps must be 1–60 and durationMs must be 0–5000.");
   }
-  const target = (await getPageTargets()).find(page => page.id === match.targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
 
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const before = await readState(target, cdp);
     if (before?.windowId !== windowId) {
@@ -530,7 +641,17 @@ async function dragForWindow(windowId, x1, y1, x2, y2) {
     }
     await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: x1, y: y1 });
     await cdp.call("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1 });
-    await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: x2, y: y2, button: "left", buttons: 1 });
+    for (let i = 1; i <= steps; i++) {
+      const progress = i / steps;
+      await cdp.call("Input.dispatchMouseEvent", {
+        type: "mouseMoved",
+        x: x1 + (x2 - x1) * progress,
+        y: y1 + (y2 - y1) * progress,
+        button: "left",
+        buttons: 1,
+      });
+      if (durationMs > 0) await new Promise(resolve => setTimeout(resolve, durationMs / steps));
+    }
     await cdp.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
     const after = await readState(target, cdp);
     if (after?.windowId !== windowId) {
@@ -546,14 +667,7 @@ async function typeForWindow(windowId, text) {
   if (typeof text !== "string" || text.length > 10000) {
     throw new Error("Text must be a string no longer than 10000 characters.");
   }
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const before = await readState(target, cdp);
     if (before?.windowId !== windowId) {
@@ -571,14 +685,7 @@ async function typeForWindow(windowId, text) {
 }
 
 async function snapshotForWindow(windowId) {
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   try {
     const state = await readState(target, cdp);
     if (state?.windowId !== windowId) {
@@ -586,31 +693,95 @@ async function snapshotForWindow(windowId) {
     }
     const result = await cdp.call("Runtime.evaluate", {
       expression: `(() => {
-        const visible = element => {
+        const ownVisible = element => {
           const rect = element.getBoundingClientRect();
-          const style = getComputedStyle(element);
-          return rect.width > 0 && rect.height > 0 && style.display !== "none"
-            && style.visibility !== "hidden" && style.pointerEvents !== "none";
+          for (let current = element; current; current = current.parentElement) {
+            const style = getComputedStyle(current);
+            if (style.display === "none" || style.visibility === "hidden" || style.pointerEvents === "none") return false;
+            if (current !== element && style.maxHeight === "0px" && style.overflowY === "hidden") return false;
+          }
+          return rect.width > 0 && rect.height > 0;
+        };
+        const associatedLabel = element => element.labels?.[0] || null;
+        const visible = element => ownVisible(element) || Boolean(associatedLabel(element) && ownVisible(associatedLabel(element)));
+        const rectFor = element => {
+          const ownRect = element.getBoundingClientRect();
+          return ownRect.width > 0 && ownRect.height > 0 ? ownRect : associatedLabel(element)?.getBoundingClientRect() || ownRect;
+        };
+        const labelSelectorFor = element => {
+          const label = associatedLabel(element);
+          return label ? label.id ? "#" + CSS.escape(label.id)
+            : element.id ? "label:has(#" + CSS.escape(element.id) + ")" : null : null;
         };
         const selectorFor = element => {
           if (element.id) return "#" + CSS.escape(element.id);
-          for (const name of ["data-testid", "title", "aria-label"]) {
+          for (const name of ["data-testid", "aria-label", "title"]) {
             const value = element.getAttribute(name);
             if (value) return element.tagName.toLowerCase() + "[" + name + '=\"' + CSS.escape(value) + '\"]';
           }
           return null;
         };
-        const elements = [...document.querySelectorAll("button,a,input,select,textarea,[role],[title],[aria-label],[tabindex]")]
-          .filter(visible).slice(0, 120).map(element => {
-            const rect = element.getBoundingClientRect();
-            return { tag: element.tagName.toLowerCase(), role: element.getAttribute("role"),
+        const roleFor = element => {
+          const explicitRole = element.getAttribute("role");
+          if (explicitRole) return explicitRole;
+          const tag = element.tagName.toLowerCase();
+          if (tag === "button" || tag === "summary") return "button";
+          if ((tag === "a" || tag === "area") && element.hasAttribute("href")) return "link";
+          if (tag === "select") return element.multiple || element.size > 1 ? "listbox" : "combobox";
+          if (tag === "textarea") return "textbox";
+          if (tag === "input") {
+            const type = (element.getAttribute("type") || "text").toLowerCase();
+            if (type === "checkbox" || type === "radio" || type === "range" || type === "number") {
+              return { checkbox: "checkbox", radio: "radio", range: "slider", number: "spinbutton" }[type];
+            }
+            if (type === "search") return "searchbox";
+            if (["button", "submit", "reset", "image"].includes(type)) return "button";
+            if (type !== "hidden") return "textbox";
+          }
+          if (tag === "progress") return "progressbar";
+          if (tag === "meter") return "meter";
+          return null;
+        };
+        const nameFor = element => {
+          const ariaLabel = element.getAttribute("aria-label");
+          if (ariaLabel) return ariaLabel;
+          const labelledBy = (element.getAttribute("aria-labelledby") || "").split(/\\s+/)
+            .map(id => document.getElementById(id)?.innerText || document.getElementById(id)?.textContent || "").join(" ").trim();
+          if (labelledBy) return labelledBy;
+          const labels = element.labels ? [...element.labels].map(label => label.innerText || label.textContent || "").join(" ").trim() : "";
+          if (labels) return labels;
+          const nearbyLabel = element.closest(".text-content")?.previousElementSibling;
+          const nearbyName = nearbyLabel?.classList.contains("text-title")
+            ? (nearbyLabel.innerText || nearbyLabel.textContent || "").trim()
+            : "";
+          if (nearbyName) return nearbyName;
+          return (element.innerText || element.title || element.value || "").trim();
+        };
+        const candidates = [...document.querySelectorAll("button,a,input,select,textarea,[role],[title],[aria-label],[tabindex]")]
+          .filter(visible);
+        const elements = candidates
+          .sort((a, b) => Number(roleFor(b) !== null) - Number(roleFor(a) !== null))
+          .slice(0, 120).map(element => {
+            const rect = rectFor(element);
+            return { tag: element.tagName.toLowerCase(), role: roleFor(element),
               text: (element.innerText || element.value || "").trim().slice(0, 100),
+              name: nameFor(element).slice(0, 100),
               title: element.getAttribute("title"), ariaLabel: element.getAttribute("aria-label"),
+              labelSelector: labelSelectorFor(element),
+              ariaChecked: element.getAttribute("aria-checked"),
+              ariaDisabled: element.getAttribute("aria-disabled"),
+              ariaLabelledBy: element.getAttribute("aria-labelledby"),
+              ariaSelected: element.getAttribute("aria-selected"),
+              ariaExpanded: element.getAttribute("aria-expanded"),
+              ariaControls: element.getAttribute("aria-controls"),
+              checked: element instanceof HTMLInputElement && ["checkbox", "radio"].includes(element.type) ? element.checked : undefined,
+              testId: element.getAttribute("data-testid"),
               id: element.id || null, selector: selectorFor(element),
               rect: { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) } };
           });
         return { title: document.title, url: location.href, ready: document.readyState,
-          bodyText: (document.body?.innerText || "").slice(0, 2500), elements };
+          bodyText: (document.body?.innerText || "").slice(0, 2500), elements,
+          totalInteractiveElements: candidates.length, elementsTruncated: candidates.length > elements.length };
       })()`,
       returnByValue: true,
     });
@@ -625,14 +796,7 @@ async function waitForWindow(windowId, { selector, text, state = "visible", time
     || !Number.isInteger(timeoutMs) || timeoutMs < 0 || timeoutMs > 30000) {
     throw new Error("Provide selector or text; state must be visible or hidden; timeoutMs must be 0–30000.");
   }
-  const windows = await listWindows();
-  const matches = windows.filter(window => window.windowId === windowId);
-  if (matches.length !== 1) {
-    throw new Error(`Expected one page for windowId ${windowId}, found ${matches.length}. Refresh the page list and retry.`);
-  }
-  const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-  if (!target) throw new Error(`CDP target for windowId ${windowId} disappeared. Refresh the page list and retry.`);
-  const cdp = await connect(target);
+  const { target, cdp } = await findWindowTarget(windowId);
   const expression = `(() => {
     const selector = ${JSON.stringify(selector ?? null)};
     const text = ${JSON.stringify(text ?? null)};
@@ -667,20 +831,59 @@ const mcpTools = [
   { name: "tiefsee_pages", description: "列出目前 Debug 測試版的 WebView 視窗。以 windowId 區分視窗；null 是尚未初始化的預載頁。", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "tiefsee_state", description: "讀取指定 windowId 的標題、啟動參數與頁面文字。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_snapshot", description: "讀取指定視窗的可見互動 DOM、文字和座標；不執行網頁程式碼。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
-  { name: "tiefsee_inspect", description: "以 CSS selector 檢查指定視窗中的元素可見性、值和座標。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
-  { name: "tiefsee_click", description: "找出唯一可見的 CSS selector，並向指定視窗送出 CDP 滑鼠點擊事件。button 可選 left、right、middle，預設 left；includeSnapshot 可在同一回覆附上操作後 DOM 快照。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, button: { type: "string", enum: ["left", "right", "middle"] }, includeSnapshot: { type: "boolean" } }, required: ["windowId", "selector"], additionalProperties: false } },
-  { name: "tiefsee_click_at", description: "依指定視窗 viewport CSS 座標送出真實 CDP 滑鼠點擊；適合由截圖辨識控件位置。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, button: { type: "string", enum: ["left", "right", "middle"] } }, required: ["windowId", "x", "y"], additionalProperties: false } },
+  { name: "tiefsee_inspect", description: "以 CSS selector 檢查指定視窗中的元素名稱、可見性、值、checkbox 狀態和座標；隱藏 input 會回報可見關聯標籤 selector。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
+  { name: "tiefsee_click", description: "找出唯一可見的 CSS selector，並向指定視窗送出 CDP 滑鼠點擊事件。button 可選 left、right、middle，預設 left；clickCount 可設為 2 送出雙擊，預設 1；includeSnapshot 可在同一回覆附上操作後 DOM 快照。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, button: { type: "string", enum: ["left", "right", "middle"] }, clickCount: { type: "integer", enum: [1, 2] }, includeSnapshot: { type: "boolean" } }, required: ["windowId", "selector"], additionalProperties: false } },
+  { name: "tiefsee_click_at", description: "依指定視窗 viewport CSS 座標送出真實 CDP 滑鼠點擊；座標應先由 DOM inspect/snapshot 確認。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, button: { type: "string", enum: ["left", "right", "middle"] } }, required: ["windowId", "x", "y"], additionalProperties: false } },
   { name: "tiefsee_click_text", description: "找出唯一可見且互動的精確文字項目，向指定視窗送出真實 CDP 左鍵點擊；適合快照已看到文字但沒有 CSS selector 的選單。includeSnapshot 可在同一回覆附上操作後 DOM 快照。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, text: { type: "string", minLength: 1, maxLength: 500 }, includeSnapshot: { type: "boolean" } }, required: ["windowId", "text"], additionalProperties: false } },
   { name: "tiefsee_press", description: "向指定視窗送出鍵盤快捷鍵；例：Ctrl+C、Ctrl+V、F2、Escape。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, keys: { type: "string" }, waitMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId", "keys"], additionalProperties: false } },
   { name: "tiefsee_type", description: "向指定視窗目前焦點輸入文字；先用實際點擊或鍵盤操作聚焦輸入框。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, text: { type: "string", maxLength: 10000 } }, required: ["windowId", "text"], additionalProperties: false } },
   { name: "tiefsee_move", description: "向指定視窗送出滑鼠移動事件。座標是 viewport CSS pixels。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" } }, required: ["windowId", "x", "y"], additionalProperties: false } },
   { name: "tiefsee_wheel", description: "向指定視窗送出滑鼠滾輪事件。deltaY 負值通常代表向上滾。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, deltaY: { type: "number" }, deltaX: { type: "number" } }, required: ["windowId", "x", "y", "deltaY"], additionalProperties: false } },
-  { name: "tiefsee_drag", description: "在指定視窗內由起點拖曳至終點，送出滑鼠按下、移動和放開事件。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
+  { name: "tiefsee_touch_gesture", description: "透過 CDP 真實多點觸控事件，在指定 WebView 視窗執行受限的雙指縮放或旋轉手勢。kind=pinch 時 value 是倍率；kind=rotate 時 value 是角度。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, kind: { type: "string", enum: ["pinch", "rotate"] }, x: { type: "number" }, y: { type: "number" }, radius: { type: "number", minimum: 20, maximum: 300 }, value: { type: "number" }, steps: { type: "integer", minimum: 2, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 } }, required: ["windowId", "kind", "x", "y", "radius", "value"], additionalProperties: false } },
+  { name: "tiefsee_drag", description: "在指定視窗內送出拖曳輸入。steps 與 durationMs 可控制移動點數和耗時，用於驗證快速手勢或慣性；預設維持單段立即拖曳。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" }, steps: { type: "integer", minimum: 1, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
   { name: "tiefsee_wait", description: "等待指定視窗的 selector 可見／隱藏或文字出現；以狀態輪詢取代固定長時間 sleep。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, text: { type: "string" }, state: { type: "string", enum: ["visible", "hidden"] }, timeoutMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_screenshot", description: "擷取指定 WebView 視窗畫面；只在需要確認視覺結果時使用。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
 ];
 
 async function callMcpTool(name, args) {
+  const definition = mcpTools.find(tool => tool.name === name);
+  if (!definition) throw new Error(`Unknown tool: ${name}`);
+  if (!args || typeof args !== "object" || Array.isArray(args)) {
+    throw new Error("Tool arguments must be a JSON object.");
+  }
+  const schema = definition.inputSchema;
+  for (const key of schema.required ?? []) {
+    if (!(key in args)) throw new Error(`Missing required argument: ${key}`);
+  }
+  for (const [key, value] of Object.entries(args)) {
+    const property = schema.properties[key];
+    if (!property && schema.additionalProperties === false) {
+      throw new Error(`Unknown argument for ${name}: ${key}`);
+    }
+    if (!property) continue;
+    const typeMatches = property.type === "integer"
+      ? Number.isInteger(value)
+      : property.type === "number"
+        ? typeof value === "number" && Number.isFinite(value)
+        : typeof value === property.type;
+    if (!typeMatches) throw new Error(`Argument ${key} must be ${property.type}.`);
+    if (property.enum && !property.enum.includes(value)) {
+      throw new Error(`Argument ${key} must be one of: ${property.enum.join(", ")}.`);
+    }
+    if (typeof value === "string" && property.minLength !== undefined && value.length < property.minLength) {
+      throw new Error(`Argument ${key} must contain at least ${property.minLength} characters.`);
+    }
+    if (typeof value === "string" && property.maxLength !== undefined && value.length > property.maxLength) {
+      throw new Error(`Argument ${key} must contain at most ${property.maxLength} characters.`);
+    }
+    if (typeof value === "number" && property.minimum !== undefined && value < property.minimum) {
+      throw new Error(`Argument ${key} must be at least ${property.minimum}.`);
+    }
+    if (typeof value === "number" && property.maximum !== undefined && value > property.maximum) {
+      throw new Error(`Argument ${key} must be at most ${property.maximum}.`);
+    }
+  }
+
   switch (name) {
     case "tiefsee_pages": return await listWindows();
     case "tiefsee_state": {
@@ -691,22 +894,18 @@ async function callMcpTool(name, args) {
     }
     case "tiefsee_snapshot": return await snapshotForWindow(args.windowId);
     case "tiefsee_inspect": return await inspectForWindow(args.windowId, args.selector);
-    case "tiefsee_click": return await clickForWindow(args.windowId, args.selector, args.button ?? "left", args.includeSnapshot === true);
+    case "tiefsee_click": return await clickForWindow(args.windowId, args.selector, args.button ?? "left", args.includeSnapshot === true, args.clickCount ?? 1);
     case "tiefsee_click_at": return await clickAtForWindow(args.windowId, args.x, args.y, args.button ?? "left");
     case "tiefsee_click_text": return await clickTextForWindow(args.windowId, args.text, args.includeSnapshot === true);
     case "tiefsee_press": return await pressForWindow(args.windowId, args.keys, args.waitMs);
     case "tiefsee_type": return await typeForWindow(args.windowId, args.text);
     case "tiefsee_move": return await moveForWindow(args.windowId, args.x, args.y);
     case "tiefsee_wheel": return await wheelForWindow(args.windowId, args.x, args.y, args.deltaY, args.deltaX ?? 0);
-    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2);
+    case "tiefsee_touch_gesture": return await touchGestureForWindow(args.windowId, args.kind, args.x, args.y, args.radius, args.value, args.steps ?? 12, args.durationMs ?? 300);
+    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2, args.steps ?? 1, args.durationMs ?? 0);
     case "tiefsee_wait": return await waitForWindow(args.windowId, args);
     case "tiefsee_screenshot": {
-      const windows = await listWindows();
-      const matches = windows.filter(window => window.windowId === args.windowId);
-      if (matches.length !== 1) throw new Error(`Expected one page for windowId ${args.windowId}, found ${matches.length}.`);
-      const target = (await getPageTargets()).find(page => page.id === matches[0].targetId);
-      if (!target) throw new Error(`CDP target for windowId ${args.windowId} disappeared.`);
-      const cdp = await connect(target);
+      const { target, cdp } = await findWindowTarget(args.windowId);
       try {
         const state = await readState(target, cdp);
         if (state?.windowId !== args.windowId) throw new Error("Target identity changed before screenshot.");
@@ -719,56 +918,72 @@ async function callMcpTool(name, args) {
 }
 
 async function runMcpServer() {
+  keepCdpConnections = true;
   const input = createInterface({ input: process.stdin, crlfDelay: Infinity });
   const send = message => process.stdout.write(`${JSON.stringify(message)}\n`);
-  for await (const line of input) {
-    let message;
-    try { message = JSON.parse(line); }
-    catch { continue; }
-    if (message.method === "notifications/exit") process.exit(0);
-    if (message.method === "notifications/initialized" || message.method === "notifications/cancelled") continue;
-    if (message.method === "initialize") {
-      send({ jsonrpc: "2.0", id: message.id, result: {
-        protocolVersion: message.params?.protocolVersion ?? "2025-03-26",
-        capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "tiefsee-webview", version: "1.0.0" },
-      } });
-      continue;
-    }
-    if (message.method === "ping") {
-      send({ jsonrpc: "2.0", id: message.id, result: {} });
-      continue;
-    }
-    if (message.method === "tools/list") {
-      send({ jsonrpc: "2.0", id: message.id, result: { tools: mcpTools } });
-      continue;
-    }
-    if (message.method === "tools/call") {
-      try {
-        const result = await callMcpTool(message.params?.name, message.params?.arguments ?? {});
-        if (result?.image) {
-          send({ jsonrpc: "2.0", id: message.id, result: { content: [
-            { type: "image", data: result.image, mimeType: "image/png" },
-            { type: "text", text: JSON.stringify(result.state) },
-          ] } });
-        } else {
-          send({ jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: JSON.stringify(result) }] } });
-        }
-      } catch (error) {
-        send({ jsonrpc: "2.0", id: message.id, result: { isError: true, content: [{ type: "text", text: error.message }] } });
+  try {
+    for await (const line of input) {
+      let message;
+      try { message = JSON.parse(line); }
+      catch { continue; }
+      if (message.method === "notifications/exit") {
+        closeCdpConnections();
+        process.exit(0);
       }
-      continue;
+      if (message.method === "notifications/initialized" || message.method === "notifications/cancelled") continue;
+      if (message.method === "initialize") {
+        send({ jsonrpc: "2.0", id: message.id, result: {
+          protocolVersion: message.params?.protocolVersion ?? "2025-03-26",
+          capabilities: { tools: { listChanged: false } },
+          serverInfo: { name: "tiefsee-webview", version: "1.0.0" },
+        } });
+        continue;
+      }
+      if (message.method === "ping") {
+        send({ jsonrpc: "2.0", id: message.id, result: {} });
+        continue;
+      }
+      if (message.method === "tools/list") {
+        send({ jsonrpc: "2.0", id: message.id, result: { tools: mcpTools } });
+        continue;
+      }
+      if (message.method === "tools/call") {
+        try {
+          const result = await callMcpTool(message.params?.name, message.params?.arguments ?? {});
+          if (result?.image) {
+            send({ jsonrpc: "2.0", id: message.id, result: { content: [
+              { type: "image", data: result.image, mimeType: "image/png" },
+              { type: "text", text: JSON.stringify(result.state) },
+            ] } });
+          } else {
+            send({ jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: JSON.stringify(result) }] } });
+          }
+        } catch (error) {
+          send({ jsonrpc: "2.0", id: message.id, result: { isError: true, content: [{ type: "text", text: error.message }] } });
+        }
+        continue;
+      }
+      if (message.id !== undefined) {
+        send({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Method not found: ${message.method}` } });
+      }
     }
-    if (message.id !== undefined) {
-      send({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Method not found: ${message.method}` } });
-    }
+  } finally {
+    closeCdpConnections();
   }
 }
 
+const [command, ...args] = process.argv.slice(2);
 try {
-  const [command, ...args] = process.argv.slice(2);
   if (command === "mcp" && args.length === 0) {
     await runMcpServer();
+  } else if (command === "call" && args.length === 2) {
+    let toolArgs;
+    try { toolArgs = JSON.parse(args[1]); }
+    catch { throw new Error("Tool arguments must be valid JSON."); }
+    if (!toolArgs || typeof toolArgs !== "object" || Array.isArray(toolArgs)) {
+      throw new Error("Tool arguments must be a JSON object.");
+    }
+    console.log(JSON.stringify(await callMcpTool(args[0], toolArgs)));
   } else if (command === "pages" && args.length === 0) {
     console.log(JSON.stringify(await listWindows()));
   } else if (command === "state" && args.length === 1) {
@@ -793,9 +1008,11 @@ try {
   } else if (command === "wheel" && (args.length === 4 || args.length === 5)) {
     console.log(JSON.stringify(await wheelForWindow(args[0], Number(args[1]), Number(args[2]), Number(args[3]), args[4] === undefined ? 0 : Number(args[4]))));
   } else {
-    throw new Error("Usage: node CdpTest.mjs pages | state <windowId> | press <windowId> <shortcut> [waitMs] | click <windowId> <cssSelector> | inspect <windowId> [cssSelector] | move <windowId> <x> <y> | wheel <windowId> <x> <y> <deltaY> [deltaX]");
+    throw new Error("Usage: node CdpTest.mjs call <toolName> <jsonArgs> | pages | state <windowId> | press <windowId> <shortcut> [waitMs] | click <windowId> <cssSelector> | inspect <windowId> [cssSelector] | move <windowId> <x> <y> | wheel <windowId> <x> <y> <deltaY> [deltaX]");
   }
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;
+} finally {
+  if (command !== "mcp") closeCdpConnections();
 }

@@ -311,7 +311,7 @@ export class MainMenu {
                     if (imgBase64 === "") { continue; } // 如果沒有圖示，表示檔案不存在
 
                     const dom = Lib.newDom(`
-                        <div class="menu-hor-item">
+                        <div class="menu-hor-item" role="button">
                             <div class="menu-hor-icon">
                                 <img>
                             </div>
@@ -361,7 +361,7 @@ export class MainMenu {
                     const name = uwpItem.name; // 顯示的名稱
                     const logo = WebAPI.getFile(Lib.urlToPath(uwpItem.path));
                     const dom = Lib.newDom(`
-                        <div class="menu-hor-item">
+                        <div class="menu-hor-item" role="button">
                             <div class="menu-hor-icon">
                                 <img>
                             </div>

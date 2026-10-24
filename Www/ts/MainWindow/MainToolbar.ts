@@ -306,7 +306,7 @@ export class MainToolbar {
             _ar.push({
                 type: "html",
                 html: `
-                    <div class="main-toolbar-btn js-noDrag">
+                    <div class="main-toolbar-btn js-noDrag" role="button">
                         <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
@@ -1023,7 +1023,7 @@ export class MainToolbar {
 
             // 產生按鈕
             const div = Lib.newDom(`
-                <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}">
+                <div class="main-toolbar-btn js-noDrag" data-name="${item.name}" title="${item.i18n}" i18n="${item.i18n}" role="button">
                     ${SvgList[item.icon]}
                 </div>`);
             div.style.order = "888"; // 未定義順序的按鈕就放在最後面

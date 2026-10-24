@@ -23,7 +23,7 @@ export class Toast {
         let domItem: HTMLElement | undefined = Lib.newDom(`
             <div class="toastItem">
                 <div class="toastText" allowSelection>${text}</div>
-                <div class="toastClose"></div>
+                <div class="toastClose" role="button" data-testid="toast-close">
             </div>
         `);
 

@@ -51,6 +51,7 @@ class SettingWindow {
             return document.querySelector(selectors) as HTMLElement;
         }
 
+        let settingsGroupContentId = 0;
         function initSettingsGroups(root: ParentNode) {
             const domGroups = root.querySelectorAll(".js-settingsGroup");
             domGroups.forEach((domGroup) => {
@@ -62,8 +63,17 @@ class SettingWindow {
                 if (domTitle === null) { return; }
 
                 Lib.collapse(domBox, "init-true");
+                domTitle.setAttribute("role", "button");
+                domTitle.setAttribute("aria-expanded", "true");
+                const domContent = domBox.querySelector<HTMLElement>(".collapse-content");
+                if (domContent !== null) {
+                    domContent.id ||= `settings-group-content-${++settingsGroupContentId}`;
+                    domTitle.setAttribute("aria-controls", domContent.id);
+                }
                 domTitle.addEventListener("click", () => {
-                    Lib.collapse(domBox, "toggle");
+                    Lib.collapse(domBox, "toggle", isOpen => {
+                        domTitle.setAttribute("aria-expanded", String(isOpen));
+                    });
                 });
             });
         }
@@ -212,8 +222,8 @@ class SettingWindow {
 
                     if (item.type !== "button") { continue; }
                     const h = `
-                        <div class="toolbarList-item" data-name="${item.name}">
-                            <input class="toolbarList-checkbox base-checkbox" type="checkbox" data-name="${item.name}" checked>
+                        <div class="toolbarList-item" data-name="${item.name}" role="listitem">
+                            <input class="toolbarList-checkbox base-checkbox" type="checkbox" data-name="${item.name}" aria-label="${Lib.escape(_i18n.t(item.i18n))}" i18n="${item.i18n}" checked>
                             ${SvgList[item.icon]}
                             ${_i18n.tSpan(item.i18n)}
                         </div>`;
@@ -380,14 +390,13 @@ class SettingWindow {
                         const titleI18n = "script." + content.key;
                         const resetTitle = Lib.escape(_i18n.t("sw.hotkey.restoreDefaultValue"));
                         const addTitle = Lib.escape(_i18n.t("sw.hotkey.add"));
-                        const deleteTitle = Lib.escape(_i18n.t("sw.hotkey.delete"));
                         const domContent = Lib.newDom(
                             `<div class="hotkey" data-key="${content.key}">
                                 <div class="hotkey-title">
                                     <span class="hotkey-name" i18n="${titleI18n}"></span>
                                     <div class="btns">
-                                        <div class="btn hotkey-iconBtn js-reset" title="${resetTitle}" i18n="sw.hotkey.restoreDefaultValue">${SvgList["tool-rotateCw.svg"]}</div>
-                                        <div class="btn hotkey-iconBtn js-add" title="${addTitle}" i18n="sw.hotkey.add">${SvgList["tool-zoomIn.svg"]}</div>
+                                        <div class="btn hotkey-iconBtn js-reset" role="button" title="${resetTitle}" i18n="sw.hotkey.restoreDefaultValue" aria-label="${resetTitle}">${SvgList["tool-rotateCw.svg"]}</div>
+                                        <div class="btn hotkey-iconBtn js-add" role="button" title="${addTitle}" i18n="sw.hotkey.add" aria-label="${addTitle}">${SvgList["tool-zoomIn.svg"]}</div>
                                     </div>
                                 </div>
                                 <div class="js-list">
@@ -397,7 +406,10 @@ class SettingWindow {
                         const btnAdd = domContent.querySelector(".js-add") as HTMLElement;
                         const btnReset = domContent.querySelector(".js-reset") as HTMLElement;
                         const divList = domContent.querySelector(".js-list") as HTMLElement;
+                        const actionLabelId = `hotkey-action-${content.key}`;
+                        (domContent.querySelector(".hotkey-name") as HTMLElement).id = actionLabelId;
                         const contentSubOptions = "subOptions" in content ? content.subOptions : undefined;
+                        let nextHotkeyRowId = 0;
 
                         // 按鈕：新增
                         btnAdd.addEventListener("click", () => {
@@ -427,23 +439,32 @@ class SettingWindow {
                          * 新增單一快速鍵項目
                          */
                         function createHotkeyItem(divList: HTMLElement, subOptions?: readonly string[], item?: HotkeyItem) {
-                            const subHtml = getSubHtml(subOptions);
+                            const rowId = ++nextHotkeyRowId;
+                            const deleteTitle = Lib.escape(_i18n.t("sw.hotkey.delete"));
+                            const keyBindingId = `${actionLabelId}-binding-${rowId}`;
+                            const subHtml = getSubHtml(subOptions, actionLabelId, keyBindingId, rowId);
+                            const keyBindingHtml = subOptions === undefined
+                                ? ""
+                                : `<span id="${keyBindingId}" style="display:none">${Lib.escape(item?.hotkey ?? "")}</span>`;
                             const hotkeyDom = Lib.newDom(
                                 `<div class="hotkey-content">
-                                    <input class="text-input hotkey-input js-text">
+                                    <input class="text-input hotkey-input js-text" aria-label="${Lib.escape(_i18n.t(titleI18n))}" i18n="${titleI18n}">
                                     ${subHtml}
-                                    <div class="btn hotkey-iconBtn hotkey-deleteBtn js-delete" title="${deleteTitle}" i18n="sw.hotkey.delete">
+                                    ${keyBindingHtml}
+                                    <div class="btn hotkey-iconBtn hotkey-deleteBtn js-delete" role="button" title="${deleteTitle}" i18n="sw.hotkey.delete" aria-label="${deleteTitle}">
                                         ${SvgList["no.svg"]}
                                     </div>
                                 </div>`);
 
                             const domText = hotkeyDom.querySelector(".js-text") as HTMLInputElement;
                             domText.value = item?.hotkey ?? "";
+                            const domKeyBinding = keyBindingHtml === "" ? null : hotkeyDom.querySelector(`#${CSS.escape(keyBindingId)}`) as HTMLElement | null;
                             domText.addEventListener("keydown", (e) => {
                                 e.preventDefault();
                                 const text = Lib.keyboardEventToHotkeyString(e);
                                 if (text === "") { return; }
                                 domText.value = text;
+                                if (domKeyBinding !== null) { domKeyBinding.textContent = text; }
                                 hotkeyToConfig();
                             });
                             // 唯讀
@@ -475,17 +496,18 @@ class SettingWindow {
                             btnReset.style.display = isSame ? "none" : "";
                         }
 
-                        function getSubHtml(subOptions?: readonly string[]) {
+                        function getSubHtml(subOptions: readonly string[] | undefined, actionId: string, bindingId: string, rowIndex: number) {
                             if (subOptions === undefined) { return ""; }
 
                             let html = "";
-                            subOptions.forEach((sub) => {
+                            subOptions.forEach((sub, index) => {
                                 const subI18n = "script." + sub;
                                 const subText = Lib.escape(_i18n.t(subI18n));
+                                const subLabelId = `${actionId}-row-${rowIndex}-sub-${index}`;
                                 html +=
                                     `<label class="hotkey-subField">
-                                        <span class="hotkey-subLabel" i18n="${subI18n}">${subText}</span>
-                                        <input class="text-input hotkey-subInput js-subText">
+                                        <span class="hotkey-subLabel" id="${subLabelId}" i18n="${subI18n}">${subText}</span>
+                                        <input class="text-input hotkey-subInput js-subText" aria-labelledby="${actionId} ${subLabelId} ${bindingId}">
                                     </label>`;
                             });
                             return html;
@@ -714,7 +736,7 @@ class SettingWindow {
 
             // 初始化主題按鈕
             applyThemeAddBtn( // 深色主題
-                `<div class="btn js-btn-darkTheme" i18n="sw.theme.darkTheme">${_i18n.t("sw.theme.darkTheme")}</div>`,
+                `<div class="btn js-btn-darkTheme" role="button" i18n="sw.theme.darkTheme">${_i18n.t("sw.theme.darkTheme")}</div>`,
                 { r: 31, g: 39, b: 43, a: 0.97 },
                 { r: 255, g: 255, b: 255, a: 0.25 },
                 { r: 255, g: 255, b: 255, },
@@ -722,7 +744,7 @@ class SettingWindow {
                 { r: 0, g: 200, b: 255, },
             )
             applyThemeAddBtn( // 淺色主題
-                `<div class="btn js-btn-lightTheme" i18n="sw.theme.lightTheme">${_i18n.t("sw.theme.lightTheme")}</div>`,
+                `<div class="btn js-btn-lightTheme" role="button" i18n="sw.theme.lightTheme">${_i18n.t("sw.theme.lightTheme")}</div>`,
                 { r: 255, g: 255, b: 255, a: 0.97 },
                 { r: 112, g: 112, b: 112, a: 0.25 },
                 { r: 0, g: 0, b: 0, },
@@ -1307,6 +1329,23 @@ class SettingWindow {
                 return htmlString;
             }
 
+            function setMouseOptionAccessibleNames() {
+                const items = [...normalMouseItems, ...bulkViewScrollWheelButtonItems, ...bulkViewMouseButtonItems, ...bulkViewMouseItems];
+                items.forEach(item => {
+                    const optionTitle = item.dom.closest(".settings-option")?.querySelector(".settings-optionTitle") as HTMLElement | null;
+                    const groupTitle = item.dom.closest(".js-settingsGroup")?.querySelector(".settings-groupTitle") as HTMLElement | null;
+                    if (optionTitle === null) { return; }
+
+                    optionTitle.id ||= `${item.dom.id}-label`;
+                    const labelIds = [optionTitle.id];
+                    if (groupTitle !== null) {
+                        groupTitle.id ||= `${item.dom.id}-group-label`;
+                        labelIds.unshift(groupTitle.id);
+                    }
+                    item.dom.setAttribute("aria-labelledby", labelIds.join(" "));
+                });
+            }
+
             function applyMouseConfigToDom() {
                 const normalHtml = buildOptionHtml(normalMouseData, true);
                 normalMouseItems.forEach((item) => {
@@ -1337,6 +1376,7 @@ class SettingWindow {
                 });
 
                 _i18n.setAll();
+                setMouseOptionAccessibleNames();
             }
 
             [...normalMouseItems, ...bulkViewScrollWheelButtonItems, ...bulkViewMouseButtonItems, ...bulkViewMouseItems].forEach((item) => {
@@ -2229,9 +2269,11 @@ class Tabs {
         for (let i = 0; i < this.ar.length; i++) {
             const item = this.ar[i];
             item.btn?.setAttribute("active", "");
+            item.btn?.setAttribute("aria-selected", "false");
             item.page?.setAttribute("active", "");
         }
         btn?.setAttribute("active", "true");
+        btn?.setAttribute("aria-selected", "true");
         page?.setAttribute("active", "true");
         func();
     }

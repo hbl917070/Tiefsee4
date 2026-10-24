@@ -15,6 +15,7 @@ var langData = {
             "en": "None",
             "ja": "なし",
         },
+
         default: {
             "zh-TW": "預設",
             "zh-CN": "默认",
@@ -803,6 +804,12 @@ var langData = {
                 "en": "File Panel",
                 "ja": "ファイルパネル",
             },
+            resizeWidth: {
+                "zh-TW": "調整檔案預覽面板寬度",
+                "zh-CN": "调整文件预览面板宽度",
+                "en": "Resize file preview panel width",
+                "ja": "ファイルパネルの幅を調整",
+            },
             displayPanel: {
                 "zh-TW": "顯示檔案預覽面板",
                 "zh-CN": "显示文件预览面板",
@@ -830,6 +837,12 @@ var langData = {
                 "zh-CN": "文件夹预览面板",
                 "en": "Folder Panel",
                 "ja": "フォルダパネル",
+            },
+            resizeWidth: {
+                "zh-TW": "調整資料夾預覽面板寬度",
+                "zh-CN": "调整文件夹预览面板宽度",
+                "en": "Resize folder preview panel width",
+                "ja": "フォルダパネルの幅を調整",
             },
             displayPanel: {
                 "zh-TW": "顯示資料夾預覽面板",
@@ -864,6 +877,12 @@ var langData = {
                 "zh-CN": "详细信息面板",
                 "en": "Information Panel",
                 "ja": "情報パネル",
+            },
+            resizeWidth: {
+                "zh-TW": "調整詳細資料面板寬度",
+                "zh-CN": "调整详细信息面板宽度",
+                "en": "Resize information panel width",
+                "ja": "情報パネルの幅を調整",
             },
             displayPanel: {
                 "zh-TW": "顯示詳細資料面板",
@@ -1274,6 +1293,18 @@ var langData = {
                 "zh-CN": "应用",
                 "en": "Apply",
                 "ja": "適用",
+            },
+            applyFileTypeAssociation: {
+                "zh-TW": "套用副檔名關聯設定",
+                "zh-CN": "应用扩展名关联设置",
+                "en": "Apply file type associations",
+                "ja": "拡張子の関連付けを適用",
+            },
+            applyRemovalOfFileTypeAssociation: {
+                "zh-TW": "套用解除副檔名關聯",
+                "zh-CN": "应用解除扩展名关联",
+                "en": "Apply removal of file type associations",
+                "ja": "拡張子の関連付け解除を適用",
             },
             step2: {
                 "zh-TW": "步驟2、選擇預設應用程式",
@@ -1721,6 +1752,12 @@ var langData = {
             "zh-CN": "结束全屏",
             "en": "Exit Full Screen",
             "ja": "全画面表示を終了する",
+        },
+        close: {
+            "zh-TW": "關閉",
+            "zh-CN": "关闭",
+            "en": "Close",
+            "ja": "閉じる",
         },
 
         prevFile: {
@@ -2414,6 +2451,12 @@ var langData = {
             "zh-CN": "否",
             "en": "No",
             "ja": "いいえ",
+        },
+        close: {
+            "zh-TW": "關閉",
+            "zh-CN": "关闭",
+            "en": "Close",
+            "ja": "閉じる",
         },
 
         imageNotFound: {
@@ -3381,6 +3424,13 @@ var langData = {
             "ja": "なし",
         },
 
+        imageViewportPan: {
+            "zh-TW": "圖片檢視區，可拖曳平移；快速放開後會繼續移動",
+            "zh-CN": "图片检视区，可拖拽平移；快速放开后会继续移动",
+            "en": "Image viewport. Drag to pan; a quick release continues the motion.",
+            "ja": "画像表示領域。ドラッグで移動し、素早く離すと慣性で動き続けます。",
+        },
+
         movePage: {
             "zh-TW": "移動頁面",
             "zh-CN": "移动页面",
@@ -3627,6 +3677,18 @@ var langData = {
             "en": "Maximize Window",
             "ja": "ウィンドウを最大化",
         },
+        minimizeWindow: {
+            "zh-TW": "最小化視窗",
+            "zh-CN": "最小化窗口",
+            "en": "Minimize Window",
+            "ja": "ウィンドウを最小化",
+        },
+        restoreWindow: {
+            "zh-TW": "還原視窗",
+            "zh-CN": "还原窗口",
+            "en": "Restore Window",
+            "ja": "ウィンドウを元に戻す",
+        },
         topmost: "menu.topmost", //視窗固定最上層
         fullScreen: "menu.fullScreen", //全螢幕
         showToolbar: "menu.showToolbar", //工具列
@@ -3695,6 +3757,12 @@ var langData = {
             "en": "Save Edited Content",
             "ja": "編集内容を保存",
         },
+        doubleClickOpenNewWindow: {
+            "zh-TW": "雙擊以在新視窗開啟 {v}",
+            "zh-CN": "双击以在新窗口中打开 {v}",
+            "en": "Double-click to open {v} in a new window",
+            "ja": "ダブルクリックして {v} を新しいウィンドウで開く",
+        },
         //#endregion
 
         //#region 大量瀏覽模式
@@ -3724,11 +3792,35 @@ var langData = {
             "en": "Previous Page",
             "ja": "前のページ",
         },
+        prevPageTop: {
+            "zh-TW": "上方上一頁",
+            "zh-CN": "上方上一页",
+            "en": "Previous Page (Top)",
+            "ja": "上部の前のページ",
+        },
+        prevPageBottom: {
+            "zh-TW": "下方上一頁",
+            "zh-CN": "下方上一页",
+            "en": "Previous Page (Bottom)",
+            "ja": "下部の前のページ",
+        },
         nextPage: {
             "zh-TW": "下一頁",
             "zh-CN": "下一页",
             "en": "Next Page",
             "ja": "次のページ",
+        },
+        nextPageTop: {
+            "zh-TW": "上方下一頁",
+            "zh-CN": "上方下一页",
+            "en": "Next Page (Top)",
+            "ja": "上部の次のページ",
+        },
+        nextPageBottom: {
+            "zh-TW": "下方下一頁",
+            "zh-CN": "下方下一页",
+            "en": "Next Page (Bottom)",
+            "ja": "下部の次のページ",
         },
         firstPage: {
             "zh-TW": "移至第一頁",
@@ -3741,6 +3833,24 @@ var langData = {
             "zh-CN": "移至最后一页",
             "en": "Go to Last Page",
             "ja": "最後のページへ移動",
+        },
+        pageNumber: {
+            "zh-TW": "頁碼",
+            "zh-CN": "页码",
+            "en": "Page number",
+            "ja": "ページ番号",
+        },
+        pageNumberTop: {
+            "zh-TW": "上方頁碼",
+            "zh-CN": "上方页码",
+            "en": "Page number (Top)",
+            "ja": "上部のページ番号",
+        },
+        pageNumberBottom: {
+            "zh-TW": "下方頁碼",
+            "zh-CN": "下方页码",
+            "en": "Page number (Bottom)",
+            "ja": "下部のページ番号",
         },
         setBulkViewColumns: {
             "zh-TW": "設定欄數為 1~8",

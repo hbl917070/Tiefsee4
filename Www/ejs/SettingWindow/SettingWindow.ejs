@@ -34,26 +34,26 @@
 
         <div class="window-left" id="window-left">
 
-            <div class="pagetab base-scrollbar">
+            <div class="pagetab base-scrollbar" role="tablist" aria-orientation="vertical">
 
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-general" i18n="sw.tabs.general" active="true"> 一般 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-appearance" i18n="sw.tabs.appearance"> 外觀 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-layout" i18n="sw.tabs.layout"> 版面 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
-                <!-- <div class="page-tabsBtn js-noDrag" id="tabsBtn-image" i18n=""> 影像處理 </div> -->
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-hotkey" i18n="sw.tabs.hotkey"> 快速鍵 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-mouse" i18n="sw.tabs.mouse"> 滑鼠 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-extension" i18n="sw.tabs.association" show-not="storeApp"> 設為預設程式 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
-
-                <div class="page-tabsHr"> </div>
-
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-plugin" i18n="sw.tabs.plugin"> 擴充套件 </div>
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-quickLook" i18n="sw.tabs.quickLook"> 快速預覽 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-general" aria-controls="tabsPage-general" i18n="sw.tabs.general" active="true"> 一般 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-appearance" aria-controls="tabsPage-appearance" i18n="sw.tabs.appearance"> 外觀 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-layout" aria-controls="tabsPage-layout" i18n="sw.tabs.layout"> 版面 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-toolbar" aria-controls="tabsPage-toolbar" i18n="sw.tabs.toolbar"> 工具列</div>
+                <!-- <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-image" aria-controls="tabsPage-image" i18n=""> 影像處理 </div> -->
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-hotkey" aria-controls="tabsPage-hotkey" i18n="sw.tabs.hotkey"> 快速鍵 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-mouse" aria-controls="tabsPage-mouse" i18n="sw.tabs.mouse"> 滑鼠 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-extension" aria-controls="tabsPage-extension" i18n="sw.tabs.association" show-not="storeApp"> 設為預設程式 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-advanced" aria-controls="tabsPage-advanced" i18n="sw.tabs.advanced"> 進階設定 </div>
 
                 <div class="page-tabsHr"> </div>
 
-                <div class="page-tabsBtn js-noDrag" id="tabsBtn-about" i18n="sw.tabs.about"> 關於 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-plugin" aria-controls="tabsPage-plugin" i18n="sw.tabs.plugin"> 擴充套件 </div>
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-quickLook" aria-controls="tabsPage-quickLook" i18n="sw.tabs.quickLook"> 快速預覽 </div>
+
+                <div class="page-tabsHr"> </div>
+
+                <div class="page-tabsBtn js-noDrag" role="tab" aria-selected="false" id="tabsBtn-about" aria-controls="tabsPage-about" i18n="sw.tabs.about"> 關於 </div>
 
             </div>
 
@@ -67,22 +67,22 @@
                 <div class="titlebar-text"></div>
 
                 <div class="titlebar-toolbar">
-                    <!-- <div class="titlebar-toolbar-btn titlebar-toolbar-menu" style="display:none;">
+                    <!-- <div class="titlebar-toolbar-btn titlebar-toolbar-menu" role="button" style="display:none;">
                         <%- await readFile("./img/default/window-menu.svg"); %>
                     </div>
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-topmost">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-topmost" role="button">
                         <%- await readFile("./img/default/window-topmost.svg"); %>
                     </div> -->
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-minimized" role="button" i18n="script.minimizeWindow" title="">
                         <%- await readFile("./img/default/window-minimized.svg"); %>
                     </div>
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-normal" style="display:none;">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-normal" role="button" i18n="script.restoreWindow" title="" style="display:none;">
                         <%- await readFile("./img/default/window-normal.svg"); %>
                     </div>
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-maximized">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-maximized" role="button" i18n="script.maximizeWindow" title="">
                         <%- await readFile("./img/default/window-maximized.svg"); %>
                     </div>
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-close">
+                    <div class="titlebar-toolbar-btn titlebar-toolbar-close" role="button" i18n="script.closeWindow" title="">
                         <%- await readFile("./img/default/window-close.svg"); %>
                     </div>
 
@@ -93,7 +93,7 @@
             <div class="window-body base-scrollbar-big" id="window-body">
 
                 <!-- 一般 -->
-                <div class="page-tabsPage" id="tabsPage-general">
+                <div class="page-tabsPage" id="tabsPage-general" role="tabpanel" aria-labelledby="tabsBtn-general">
                     <div class="page-title" i18n="sw.tabs.general"> 一般 </div>
 
                     <div class="box">
@@ -253,7 +253,7 @@
                         </div>
 
                         <div class="text-content">
-                            <div class="btn" id="btn-startupMode-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                            <div class="btn" role="button" id="btn-startupMode-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
                         </div>
                     </div>
 
@@ -272,7 +272,7 @@
                         <!-- <div class="text-title"> 相關路徑 </div> -->
                         <div style="height:10px" show-not="storeApp"></div>
                         <div class="text-content" show-not="storeApp">
-                            <div class="link" id="btn-openStartup" i18n="sw.startupRunTiefsee.openStartup">
+                            <div class="link" id="btn-openStartup" role="link" i18n="sw.startupRunTiefsee.openStartup">
                                 Windows的「啟動資料夾」
                             </div>
                         </div>
@@ -385,10 +385,10 @@
                     </div>
 
                     <div class="box">
-                        <div class="box-title"> Language </div>
+                        <div class="box-title" id="select-lang-title"> Language </div>
                         <div class="text-title"> </div>
                         <div class="text-content">
-                            <select class="text-input" id="select-lang">
+                            <select class="text-input" id="select-lang" aria-labelledby="select-lang-title" aria-label="Language">
                                 <option value="en">English</option>
                                 <option value="zh-TW">中文</option>
                                 <option value="zh-CN">简体中文</option>
@@ -400,7 +400,7 @@
                 </div>
 
                 <!-- 外觀 -->
-                <div class="page-tabsPage" id="tabsPage-appearance">
+                <div class="page-tabsPage" id="tabsPage-appearance" role="tabpanel" aria-labelledby="tabsBtn-appearance">
 
                     <div class="page-title" i18n="sw.tabs.appearance">外觀</div>
 
@@ -513,17 +513,17 @@
                             </select>
                         </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-windowStyle-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+                            <div class="btn" role="button" id="btn-windowStyle-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
                         </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-applySuggestedColor" i18n="sw.windowSetting.applySuggestedColor"> 套用建議配色 </div>
+                            <div class="btn" role="button" id="btn-applySuggestedColor" i18n="sw.windowSetting.applySuggestedColor"> 套用建議配色 </div>
                         </div>
                     </div>
 
                 </div>
 
                 <!-- 版面 -->
-                <div class="page-tabsPage" id="tabsPage-layout">
+                <div class="page-tabsPage" id="tabsPage-layout" role="tabpanel" aria-labelledby="tabsBtn-layout">
                     <div class="page-title" i18n="sw.tabs.layout"> 版面 </div>
 
                     <div class="box">
@@ -549,7 +549,7 @@
 
 
                     <div class="box" data-toDom="dirPanel">
-                        <div class="box-title" i18n="sw.directoryPanel.title"> 資料夾預覽視窗 </div>
+                        <div class="box-title" id="dirPanel-title" i18n="sw.directoryPanel.title"> 資料夾預覽視窗 </div>
                         <div class="text-title"> </div>
 
                         <div class="text-title" i18n="sw.directoryPanel.displayPanel"> 顯示資料夾預覽視窗</div>
@@ -560,10 +560,10 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.directoryPanel.displayNumber"> 顯示編號</div>
+                        <div class="text-title" id="dirPanel-displayNumber-label" i18n="sw.directoryPanel.displayNumber"> 顯示編號</div>
                         <div class="text-content">
                             <label class="switch">
-                                <input type="checkbox" id="switch-dirListShowNo">
+                                <input type="checkbox" id="switch-dirListShowNo" aria-labelledby="dirPanel-title dirPanel-displayNumber-label">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -576,9 +576,9 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.directoryPanel.numberOfImages"> 圖片數量 </div>
+                        <div class="text-title" id="dirPanel-numberImages-label" i18n="sw.directoryPanel.numberOfImages"> 圖片數量 </div>
                         <div class="text-content">
-                            <select class="text-input" id="select-dirListImgNumber">
+                            <select class="text-input" id="select-dirListImgNumber" aria-labelledby="dirPanel-title dirPanel-numberImages-label">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -590,7 +590,7 @@
 
 
                     <div class="box" data-toDom="filePanel">
-                        <div class="box-title" i18n="sw.filePanel.title"> 檔案預覽面板 </div>
+                        <div class="box-title" id="filePanel-title" i18n="sw.filePanel.title"> 檔案預覽面板 </div>
                         <div class="text-title"> </div>
 
                         <div class="text-title" i18n="sw.filePanel.displayPanel"> 顯示檔案預覽面板</div>
@@ -601,10 +601,10 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.filePanel.displayNumber"> 顯示編號 </div>
+                        <div class="text-title" id="filePanel-displayNumber-label" i18n="sw.filePanel.displayNumber"> 顯示編號 </div>
                         <div class="text-content">
                             <label class="switch">
-                                <input type="checkbox" id="switch-fileListShowNo">
+                                <input type="checkbox" id="switch-fileListShowNo" aria-labelledby="filePanel-title filePanel-displayNumber-label">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -620,7 +620,7 @@
 
 
                     <div class="box">
-                        <div class="box-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
+                        <div class="box-title" id="infoPanel-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
                         <div class="text-title"> </div>
 
                         <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板 </div>
@@ -684,9 +684,9 @@
                                 </select>
                             </div>
 
-                            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesImgNumber"> 圖片數量 </div>
+                            <div class="text-title" id="infoPanel-resourcesImgNumber-label" i18n="sw.informationPanel.civitaiResourcesImgNumber"> 圖片數量 </div>
                             <div class="text-content">
-                                <select class="text-input" id="select-civitaiResourcesImgNumber">
+                                <select class="text-input" id="select-civitaiResourcesImgNumber" aria-labelledby="infoPanel-title infoPanel-resourcesImgNumber-label">
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -758,14 +758,14 @@
                 </div>
 
                 <!-- 工具列 -->
-                <div class="page-tabsPage" id="tabsPage-toolbar">
+                <div class="page-tabsPage" id="tabsPage-toolbar" role="tabpanel" aria-labelledby="tabsBtn-toolbar">
                     <div class="page-title" i18n="sw.tabs.toolbar"> 工具列 </div>
                     <div class="box">
                         <div class="box-title" i18n="sw.customToolbar.title"> 顯示與排序 </div>
 
                         <div class="text-title"> </div>
                         <div class="text-content">
-                            <select class="text-input" id="select-toolbarListType">
+                            <select class="text-input" id="select-toolbarListType" aria-labelledby="tabsBtn-toolbar" aria-label="" i18n="sw.tabs.toolbar">
                                 <!-- <option value="welcome"></option> -->
                                 <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
                                 <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office 文件工具列</option>
@@ -775,15 +775,15 @@
                         </div>
 
                         <div class="text-title" i18n="sw.customToolbar.adjustOrderByDragging">(可拖曳調整順序) </div>
-                        <div class="toolbarList" id="toolbarList-img"> </div>
-                        <div class="toolbarList" id="toolbarList-pdf"> </div>
-                        <div class="toolbarList" id="toolbarList-txt"> </div>
-                        <div class="toolbarList" id="toolbarList-bulkView"> </div>
+                        <div class="toolbarList" id="toolbarList-img" role="list" aria-labelledby="select-toolbarListType"> </div>
+                        <div class="toolbarList" id="toolbarList-pdf" role="list" aria-labelledby="select-toolbarListType"> </div>
+                        <div class="toolbarList" id="toolbarList-txt" role="list" aria-labelledby="select-toolbarListType"> </div>
+                        <div class="toolbarList" id="toolbarList-bulkView" role="list" aria-labelledby="select-toolbarListType"> </div>
                     </div>
                 </div>
 
                 <!-- 滑鼠 -->
-                <div class="page-tabsPage" id="tabsPage-mouse">
+                <div class="page-tabsPage" id="tabsPage-mouse" role="tabpanel" aria-labelledby="tabsBtn-mouse">
                     <div class="page-title" i18n="sw.tabs.mouse"> 滑鼠 </div>
 
                     <div class="box settings-group js-settingsGroup">
@@ -949,17 +949,17 @@
 
 
                     <div class="settings-pageFooter">
-                        <div class="btn settings-resetAllBtn" id="btn-mouse-resetAll" i18n="sw.mouse.resetAll">重置所有滑鼠設定</div>
+                        <div class="btn settings-resetAllBtn" role="button" id="btn-mouse-resetAll" i18n="sw.mouse.resetAll">重置所有滑鼠設定</div>
                     </div>
                 </div>
 
                 <!-- 圖片 -->
-                <div class="page-tabsPage" id="tabsPage-image">
+                <div class="page-tabsPage" id="tabsPage-image" role="tabpanel" aria-labelledby="tabsBtn-image">
                     <div class="page-title" i18n=""> 影像處理 </div>
                 </div>
 
                 <!-- 快速鍵 -->
-                <div class="page-tabsPage" id="tabsPage-hotkey">
+                <div class="page-tabsPage" id="tabsPage-hotkey" role="tabpanel" aria-labelledby="tabsBtn-hotkey">
                     <div class="page-title" i18n="sw.tabs.hotkey"> 快速鍵 </div>
 
                     <div class="settings-pageIntro">
@@ -978,27 +978,27 @@
                     </div>
 
                     <div class="settings-pageFooter">
-                        <div class="btn settings-resetAllBtn" id="btn-hotkey-resetAll" i18n="sw.hotkey.resetAll">重置所有快速鍵</div>
+                        <div class="btn settings-resetAllBtn" role="button" id="btn-hotkey-resetAll" i18n="sw.hotkey.resetAll">重置所有快速鍵</div>
                     </div>
                 </div>
 
                 <!-- 設為預設程式 -->
-                <div class="page-tabsPage" id="tabsPage-extension">
+                <div class="page-tabsPage" id="tabsPage-extension" role="tabpanel" aria-labelledby="tabsBtn-extension">
                     <div class="page-title" i18n="sw.tabs.association"> 設為預設程式 </div>
 
                     <div class="box">
-                        <div class="box-title" i18n="sw.association.step1"> 步驟1、把Tiefsee關聯到特定副檔名 </div>
-                        <div class="text-title" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
+                        <div class="box-title" id="association-step1-title" i18n="sw.association.step1"> 步驟1、把Tiefsee關聯到特定副檔名 </div>
+                        <div class="text-title" id="association-step1-subtitle" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
                         <div class="text-content">
-                            <textarea class="text-input base-scrollbar" rows="7" id="text-extension"> </textarea>
+                            <textarea class="text-input base-scrollbar" rows="7" id="text-extension" aria-labelledby="association-step1-title association-step1-subtitle"></textarea>
                         </div>
-                        <div class="btn" id="btn-extension" i18n="sw.association.apply">套用</div>
+                        <div class="btn" role="button" id="btn-extension" aria-label="" i18n="sw.association.applyFileTypeAssociation">套用</div>
                     </div>
 
                     <div class="box">
                         <div class="box-title" i18n="sw.association.step2"> 步驟2、修改系統預設APP </div>
                         <div class="text-title" i18n="sw.association.step2Subtitle">開啟系統設定後將「相片檢視器」修改成「Tiefsee」 </div>
-                        <div class="btn" id="btn-openSystemSettings" i18n="sw.association.openSystemSettings">開啟系統設定
+                        <div class="btn" role="button" id="btn-openSystemSettings" i18n="sw.association.openSystemSettings">開啟系統設定
                         </div>
                     </div>
 
@@ -1014,17 +1014,17 @@
 
                     <!-- <div class="page-title" i18n="sw.association.removeAssociation"> 解除預設程式 </div> -->
                     <div class="box">
-                        <div class="box-title" i18n="sw.association.removeFileTypeAssociation"> 解除副檔名關聯 </div>
-                        <div class="text-title" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
+                        <div class="box-title" id="association-remove-title" i18n="sw.association.removeFileTypeAssociation"> 解除副檔名關聯 </div>
+                        <div class="text-title" id="association-remove-subtitle" i18n="sw.association.step1Subtitle"> (一行代表一種副檔名) </div>
                         <div class="text-content">
-                            <textarea class="text-input base-scrollbar" rows="7" id="text-disassociate"> </textarea>
+                            <textarea class="text-input base-scrollbar" rows="7" id="text-disassociate" aria-labelledby="association-remove-title association-remove-subtitle"></textarea>
                         </div>
-                        <div class="btn" id="btn-disassociate" i18n="sw.association.apply">套用</div>
+                        <div class="btn" role="button" id="btn-disassociate" aria-label="" i18n="sw.association.applyRemovalOfFileTypeAssociation">套用</div>
                     </div>
                 </div>
 
                 <!-- 進階設定 -->
-                <div class="page-tabsPage" id="tabsPage-advanced">
+                <div class="page-tabsPage" id="tabsPage-advanced" role="tabpanel" aria-labelledby="tabsBtn-advanced">
                     <div class="page-title" i18n="sw.tabs.advanced"> 進階設定 </div>
 
                     <div class="box">
@@ -1032,7 +1032,7 @@
 
                         <div class="text-title"> </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-clearBrowserCache" i18n="sw.clearTempData.clear">清理</div>
+                            <div class="btn" role="button" id="btn-clearBrowserCache" i18n="sw.clearTempData.clear">清理</div>
                         </div>
                     </div>
 
@@ -1117,7 +1117,7 @@
 
                         <div class="text-title" i18n="sw.reset.restoreDefaultSettings"> 將設定還原為其預設值 </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-resetSettings" i18n="sw.reset.resetSettings"> 重設設定 </div>
+                            <div class="btn" role="button" id="btn-resetSettings" i18n="sw.reset.resetSettings"> 重設設定 </div>
                         </div>
                     </div>
 
@@ -1125,17 +1125,17 @@
                         <div class="box-title" i18n="sw.relatedSettings.title"> 相關路徑 </div>
                         <div class="">
                             <div class="text-title"> </div>
-                            <div class="link" id="btn-openAppData" i18n="sw.relatedSettings.appData">AppData(使用者資料)
+                            <div class="link" id="btn-openAppData" role="link" i18n="sw.relatedSettings.appData">AppData(使用者資料)
                             </div>
-                            <div class="link" id="btn-openWww" i18n="sw.relatedSettings.www">www(原始碼)</div>
-                            <div class="link" id="btn-openTemp" i18n="sw.relatedSettings.temporaryDirectory">暫存資料夾</div>
+                            <div class="link" id="btn-openWww" role="link" i18n="sw.relatedSettings.www">www(原始碼)</div>
+                            <div class="link" id="btn-openTemp" role="link" i18n="sw.relatedSettings.temporaryDirectory">暫存資料夾</div>
                         </div>
                     </div>
 
                 </div>
 
                 <!-- 關於 -->
-                <div class="page-tabsPage" id="tabsPage-about">
+                <div class="page-tabsPage" id="tabsPage-about" role="tabpanel" aria-labelledby="tabsBtn-about">
                     <div class="page-title" i18n="sw.tabs.about"> 關於 </div>
 
                     <div class="box">
@@ -1150,7 +1150,7 @@
 
                         <div class="box-title">
                             <span i18n="sw.about.softwareUpdates">軟體更新:</span>
-                            <span class="link" onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')">
+                            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')">
                                 Microsoft Store
                             </span>
                         </div>
@@ -1159,11 +1159,11 @@
 
                         <div class="box-title">
                             <span i18n="sw.about.developer">開發者:</span>
-                            <span class="link" onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+                            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
                         </div>
                         <div class="box-title">
                             <span i18n="sw.about.repository">儲存庫:</span>
-                            <span class="link" onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
+                            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
                         </div>
 
                         <div style="margin-top: 20px;">
@@ -1181,7 +1181,7 @@
                 </div>
 
                 <!-- 擴充套件 -->
-                <div class="page-tabsPage" id="tabsPage-plugin">
+                <div class="page-tabsPage" id="tabsPage-plugin" role="tabpanel" aria-labelledby="tabsBtn-plugin">
                     <div class="page-title" i18n="sw.tabs.plugin"> 擴充套件 </div>
 
                     <div class="box">
@@ -1251,21 +1251,21 @@
                         <div class="text-title" i18n="sw.plugin.step1">
                             1、在「Tiefsee Plugin」的網頁下載擴充套件
                         </div>
-                        <div class="btn" id="btn-openPluginDownload" i18n="sw.plugin.openPluginWebpage">開啟「Tiefsee
+                        <div class="btn" role="button" id="btn-openPluginDownload" i18n="sw.plugin.openPluginWebpage">開啟「Tiefsee
                             Plugin」網頁</div>
                         <div style="height:20px"></div>
 
                         <div class="text-title" i18n="sw.plugin.step2">
                             2、把ZIP解壓縮，然後放到「Plugin」資料夾內
                         </div>
-                        <div class="btn" id="btn-openPluginDir" i18n="sw.plugin.openPluginDir">開啟「Plugin」資料夾</div>
+                        <div class="btn" role="button" id="btn-openPluginDir" i18n="sw.plugin.openPluginDir">開啟「Plugin」資料夾</div>
                         <div style="height:20px"></div>
 
                         <div class="text-title" i18n="sw.plugin.step3">
                             3、重新啟動Tiefsee
                         </div>
                         <div class="text-content">
-                            <div class="btn" id="btn-plugin-restart" i18n="sw.plugin.restartTiefsee"> 重新啟動 Tiefsee</div>
+                            <div class="btn" role="button" id="btn-plugin-restart" i18n="sw.plugin.restartTiefsee"> 重新啟動 Tiefsee</div>
                         </div>
                         <div style="height:20px"></div>
 
@@ -1277,7 +1277,7 @@
                 </div>
 
                 <!-- 快速預覽 -->
-                <div class="page-tabsPage" id="tabsPage-quickLook">
+                <div class="page-tabsPage" id="tabsPage-quickLook" role="tabpanel" aria-labelledby="tabsBtn-quickLook">
                     <div class="page-title" i18n="sw.tabs.quickLook"> 快速預覽 </div>
 
                     <div class="box">

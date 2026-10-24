@@ -294,7 +294,7 @@ export class MainDirList {
 			}
 
 			const div = Lib.newDom(`
-                <div class="dirList-item" data-id="${n}">
+                <div class="dirList-item" data-id="${n}" role="button">
                     <div class="dirList-title">
                         ${htmlNo} ${htmlName}
                     </div>
@@ -305,6 +305,7 @@ export class MainDirList {
             `);
 			_domDirListData.append(div);
 			div.setAttribute("data-path", dirPath);
+			div.setAttribute("aria-label", `${n + 1} ${name}`);
 
 			// click 載入圖片
 			div.addEventListener("click", () => {

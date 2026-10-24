@@ -1517,14 +1517,18 @@ export class BulkView {
 
             // 不能在上下一頁就禁止點擊
             (_domBulkView.querySelectorAll(".bulkView-pagination-prev") as NodeListOf<HTMLElement>).forEach(dom => {
-                if (_pageNow === 1) {
+                const isDisabled = _pageNow === 1;
+                dom.setAttribute("aria-disabled", String(isDisabled));
+                if (isDisabled) {
                     dom.setAttribute("freeze", "true");
                 } else {
                     dom.setAttribute("freeze", "");
                 }
             });
             (_domBulkView.querySelectorAll(".bulkView-pagination-next") as NodeListOf<HTMLElement>).forEach(dom => {
-                if (_pageNow === pageMax) {
+                const isDisabled = _pageNow === pageMax;
+                dom.setAttribute("aria-disabled", String(isDisabled));
+                if (isDisabled) {
                     dom.setAttribute("freeze", "true");
                 } else {
                     dom.setAttribute("freeze", "");
@@ -1562,7 +1566,7 @@ export class BulkView {
             const temp = _pageNow + getDirPath();
             const size = Math.floor(_domBulkViewContent.offsetWidth / getColumns());
             const div = Lib.newDom(/*html*/`
-                <div class="bulkView-item">
+                <div class="bulkView-item" role="button">
                     <div class="bulkView-center bulkView-loading">
                         <img class="bulkView-img">
                     </div>
@@ -1613,6 +1617,7 @@ export class BulkView {
                 //---------
 
                 const fileName = Lib.getFileName(fileInfo2.FullPath);
+                div.setAttribute("aria-label", `${n} ${fileName}`);
                 const LastWriteTimeUtc = fileInfo2.LastWriteTimeUtc;
                 const hasLastWriteTime = Number.isFinite(LastWriteTimeUtc) && LastWriteTimeUtc > 0;
                 const LastWriteTime = hasLastWriteTime
@@ -1992,9 +1997,11 @@ export class BulkView {
             let arDom = dom.querySelectorAll("div");
             for (let i = 0; i < arDom.length; i++) {
                 arDom[i].setAttribute("active", "");
+                arDom[i].setAttribute("aria-checked", "false");
             }
 
             domActive.setAttribute("active", "true");
+            domActive.setAttribute("aria-checked", "true");
         }
 
     }

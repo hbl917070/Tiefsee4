@@ -32,7 +32,7 @@ export class ImgSearch {
                 const url = item.url;
 
                 const dom = Lib.newDom(`
-                    <div class="menu-hor-item">
+                    <div class="menu-hor-item" role="button">
                         <div class="menu-hor-icon">
                             <img src="${icon}">
                         </div>

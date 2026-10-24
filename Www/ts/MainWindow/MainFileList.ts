@@ -304,7 +304,7 @@ export class MainFileList {
             }
 
             const div = Lib.newDom(
-                `<div class="fileList-item" data-id="${i}">
+                `<div class="fileList-item" data-id="${i}" role="button">
                     <div class="fileList-title">
                         ${htmlNo} ${htmlName}
                     </div>
@@ -312,6 +312,7 @@ export class MainFileList {
                 </div>`);
             _domFileListData.append(div);
             setImageErrorFallback(div.querySelector(".fileList-img img"));
+            div.setAttribute("aria-label", `${i + 1} ${name}`);
             div.setAttribute("data-key", item.key);
             if (item.path !== undefined) {
                 div.setAttribute("data-path", item.path);

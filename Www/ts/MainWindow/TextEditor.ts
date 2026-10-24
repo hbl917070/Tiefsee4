@@ -130,6 +130,7 @@ export class TextEditor {
 		
 			if (path === null) { path = "" }
 			_filePath = path;
+			_domTextarea.setAttribute("aria-label", Lib.getFileName(_filePath) || M.i18n.t("menu.edit"));
 			let t = "";
 			if (await WV_File.Exists(_filePath)) {
 				t = await WV_File.GetText(_filePath);
@@ -163,6 +164,7 @@ export class TextEditor {
 			setTimeout(() => {
 				if (_dom.getAttribute("active") == "false") {
 					_domTextarea.value = "";
+					_domTextarea.removeAttribute("aria-label");
 					_dom.style.display = "none";
 				}
 			}, 300);

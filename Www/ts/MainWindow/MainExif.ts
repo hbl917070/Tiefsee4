@@ -49,6 +49,7 @@ export class MainExif {
 		var _fileInfo2: FileInfo2;
 		let _videoDuration = 0;
 		let _domVideoDuration: HTMLElement | undefined;
+		let _collapseContentId = 0;
 
 		/**
 		 * 儲存影片長度，並更新目前已建立的詳細資料項目
@@ -129,12 +130,16 @@ export class MainExif {
 				_tabType = TabType.related;
 				_domTabBtnInfo.setAttribute("active", "");
 				_domTabBtnRelated.setAttribute("active", "true");
+				_domTabBtnInfo.setAttribute("aria-selected", "false");
+				_domTabBtnRelated.setAttribute("aria-selected", "true");
 				_domTabContentInfo.style.display = "none";
 				_domTabContentRelated.style.display = "";
 			} else {
 				_tabType = TabType.info;
 				_domTabBtnInfo.setAttribute("active", "true");
 				_domTabBtnRelated.setAttribute("active", "");
+				_domTabBtnInfo.setAttribute("aria-selected", "true");
+				_domTabBtnRelated.setAttribute("aria-selected", "false");
 				_domTabContentInfo.style.display = "";
 				_domTabContentRelated.style.display = "none";
 			}
@@ -404,7 +409,7 @@ export class MainExif {
 					const nameI18n = `exif.name.${name}`;
 					name = M.i18n.t(`exif.name.${name}`);
 
-					const domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}"> ${SvgList["tool-export.svg"]} </div><span>`);
+					const domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}" aria-label="${M.i18n.t("menu.export")}" i18n="menu.export" role="button"> ${SvgList["tool-export.svg"]} </div><span>`);
 					const domBtn = domValue.querySelector(".btnExport") as HTMLElement;
 					domBtn.addEventListener("click", () => {
 						M.script.open.showFrames(path);
@@ -772,10 +777,8 @@ export class MainExif {
 			const itemDom = getItemDom({ name: title, value: parsed, isEscape: false, copyText: input });
 			const loraDoms = itemDom.querySelectorAll(".lora");
 			loraDoms.forEach((dom: Element) => {
-				dom.addEventListener("mouseup", async (e) => {
-
-					//e.preventDefault();
-
+				dom.setAttribute("role", "button");
+				dom.addEventListener("mouseup", async () => {
 					// 如果有選取文字，就不執行
 					if (Lib.isTxtSelect()) { return; }
 
@@ -839,12 +842,18 @@ export class MainExif {
 					const imgUrl = WebAPI.Img.fileIcon(img);
 
 					// 避免重複註冊
-					if (domImg.getAttribute("data-path") === null)
+					if (domImg.getAttribute("data-path") === null) {
 						Lib.addEventDblclick(domImg, () => {
 							const p = domImg.getAttribute("data-path") as string;
 							M.script.open.openNewWindow(p);
 						});
+					}
 					domImg.setAttribute("data-path", img);
+					domImg.setAttribute("role", "button");
+					const ariaLabelValues = { v: Lib.getFileName(img) };
+					domImg.setAttribute("i18n", "script.doubleClickOpenNewWindow");
+					domImg.setAttribute("i18n-v", JSON.stringify(ariaLabelValues));
+					domImg.setAttribute("aria-label", M.i18n.t("script.doubleClickOpenNewWindow", ariaLabelValues));
 					domImg.style.backgroundImage = `url(${imgUrl.replace(/\(/g, "\\(").replace(/\)/g, "\\)")})`;
 
 					// 取得 .json
@@ -910,7 +919,7 @@ export class MainExif {
 							const text = `<spen>${M.i18n.t("menu.copyFilePath")}: </span>` +
 								"<b>" + Lib.getFileName(filePath).substring(name.length) + "</b>";
 							const dom = Lib.newDom(`
-								<div class="menu-hor-item">
+								<div class="menu-hor-item" role="button">
 									<div class="menu-hor-icon"></div>
 									<div class="menu-hor-txt">${text}</div>
 								</div>
@@ -931,7 +940,7 @@ export class MainExif {
 							const text = `<spen>${M.i18n.t("menu.revealInFileExplorer")}: </span>` +
 								"<b>" + Lib.getFileName(filePath).substring(name.length) + "</b>";
 							const dom = Lib.newDom(`
-								<div class="menu-hor-item">
+								<div class="menu-hor-item" role="button">
 									<div class="menu-hor-icon"></div>
 									<div class="menu-hor-txt">${text}</div>
 								</div>
@@ -947,7 +956,7 @@ export class MainExif {
 					}
 
 					showMenu(dom, domMenu, "main");
-				})
+				});
 			})
 			_domTabContentInfo.appendChild(itemDom);
 		}
@@ -1299,9 +1308,9 @@ export class MainExif {
 									</div>
 								</div>
 								<div class="mainExifBtns">
-									<div class="btn mainExifBtnExpand" title="${M.i18n.t("menu.expand")}">${SvgList["expand.svg"]}</div>
-									<div class="btn mainExifBtnCollapse" title="${M.i18n.t("menu.collapse")}">${SvgList["collapse.svg"]}</div>
-									<div class="btn mainExifBtnCivitai" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
+									<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["expand.svg"]}</div>
+									<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["collapse.svg"]}</div>
+									<div class="btn mainExifBtnCivitai" role="button" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
 								</div>
 							</div>`);
 						_domTabContentInfo.appendChild(newItem);
@@ -1310,6 +1319,7 @@ export class MainExif {
 						const btnCollapse = newItem.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊			
 						const btnCivitai = newItem.querySelector(".mainExifBtnCivitai") as HTMLElement;
 						const divImgList = newItem.querySelector(".mainExifImgList") as HTMLElement;
+						btnCivitai.setAttribute("aria-label", `Civitai: ${modelName}`);
 
 						// 產生預覽圖
 						let imgCount = M.config.settings.layout.civitaiResourcesImgNumber;
@@ -1330,12 +1340,16 @@ export class MainExif {
 								const imgUrl = WebAPI.Img.webIcon(item.url, name);
 
 								const imgItem = Lib.newDom(`
-									<div class="mainExifImgItem">
+								<div class="mainExifImgItem" role="button">
 										<img fetchpriority="low"/>
 									</div>
 								`);
 
 								imgItem.setAttribute("data-path", imgPath);
+								const ariaLabelValues = { v: Lib.getFileName(imgPath) };
+								imgItem.setAttribute("i18n", "script.doubleClickOpenNewWindow");
+								imgItem.setAttribute("i18n-v", JSON.stringify(ariaLabelValues));
+								imgItem.setAttribute("aria-label", M.i18n.t("script.doubleClickOpenNewWindow", ariaLabelValues));
 
 								const domImg = imgItem.querySelector("img") as HTMLImageElement;
 
@@ -1364,10 +1378,13 @@ export class MainExif {
 
 								// 雙擊左鍵
 								Lib.addEventDblclick(imgItem, async (e: MouseEvent) => { // 圖片物件
-									let imgPath = imgItem.getAttribute("data-path");
-									if (imgPath === null) { return; }
-									M.script.open.openNewWindow(imgPath);
+									openImageInNewWindow();
 								});
+								function openImageInNewWindow() {
+									const path = imgItem.getAttribute("data-path");
+									if (path === null) { return; }
+									M.script.open.openNewWindow(path);
+								}
 
 								imgCount--;
 								if (imgCount <= 0) { break; }
@@ -1442,7 +1459,7 @@ export class MainExif {
 		async function getRelatedBtnAdd() {
 			const path = _fileInfo2.FullPath;
 			const btnNew = Lib.newDom(`
-				<div class="mainExifRelatedBtnAdd" i18n="menu.new">
+				<div class="mainExifRelatedBtnAdd" i18n="menu.new" role="button">
 					${M.i18n.t("menu.new")}
 				</div>
 			`);
@@ -1520,7 +1537,7 @@ export class MainExif {
 			let title = itemName.substring(name.split(".")[0].length);
 			let domTitle = Lib.newDom(`
 				<div class="mainExifRelatedTitle collapse-title">
-					<span>${Lib.escape(title)}</span>
+					<span role="button">${Lib.escape(title)}</span>
 					<div class="mainExifRelatedTitleBtnList"></div>
 				</div>
 			`);
@@ -1567,7 +1584,7 @@ export class MainExif {
 				if (title.toLowerCase().endsWith(".civitai.info")) {
 					const civitaiUrl = await civitaiInfoToUrl(null, text);
 					if (civitaiUrl !== null) {
-						let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
+						let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
 						btnList.appendChild(btnCivitai);
 						btnCivitai.addEventListener("click", async () => {
 							WV_RunApp.OpenUrl(civitaiUrl);
@@ -1576,7 +1593,7 @@ export class MainExif {
 				}
 
 				// 按鈕 - 編輯
-				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
+				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
 				btnList.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
@@ -1588,7 +1605,7 @@ export class MainExif {
 				})
 
 				// 按鈕 - 複製
-				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>`)
+				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["tool-copy.svg"]}</div>`)
 				btnList.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
 					await WV_System.SetClipboard_Text(itemText ?? "");
@@ -1640,6 +1657,10 @@ export class MainExif {
 			let open = M.config.settings.layout.mainExifCollapse[title]; // 從設定讀取折疊狀態
 			if (open === undefined) { open = true; } // 不存在就預設為開
 			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
+			const domTitleButton = domTitle.querySelector("span") as HTMLElement;
+			domContent.id = `mainExif-collapse-content-${++_collapseContentId}`;
+			domTitleButton.setAttribute("aria-expanded", String(open));
+			domTitleButton.setAttribute("aria-controls", domContent.id);
 			domTitle.addEventListener("click", (e) => {
 
 				// 如果是右上角的按鈕，則不處理
@@ -1649,6 +1670,7 @@ export class MainExif {
 				}
 
 				Lib.collapse(domBox, "toggle", (type) => { //切換折疊狀態
+					domTitleButton.setAttribute("aria-expanded", String(type));
 
 					M.config.settings.layout.mainExifCollapse[title] = type; //更改狀態後，儲存折疊狀態
 				});
@@ -1702,7 +1724,7 @@ export class MainExif {
 			// 標題物件
 			const domTitle = Lib.newDom(`
 				<div class="mainExifRelatedTitle collapse-title">
-					<span>${Lib.escape(title)}</span>
+					<span role="button">${Lib.escape(title)}</span>
 					<div class="mainExifRelatedTitleBtnList"></div>
 				</div>
 			`);
@@ -1731,6 +1753,10 @@ export class MainExif {
 
 			// 初始化 折疊面板
 			Lib.collapse(domBox, "init-" + open); // 不使用動畫直接初始化狀態
+			const domTitleButton = domTitle.querySelector("span") as HTMLElement;
+			domContent.id = `mainExif-collapse-content-${++_collapseContentId}`;
+			domTitleButton.setAttribute("aria-expanded", String(open));
+			domTitleButton.setAttribute("aria-controls", domContent.id);
 			domTitle.addEventListener("click", (e) => {
 				// 如果是右上角的按鈕，則不處理
 				const target = e.target as HTMLElement;
@@ -1738,6 +1764,7 @@ export class MainExif {
 					return;
 				}
 				Lib.collapse(domBox, "toggle", async (type) => {
+					domTitleButton.setAttribute("aria-expanded", String(type));
 					if (key !== undefined) {
 						funcChange?.(type);
 						// 更改狀態後，儲存折疊狀態
@@ -1800,9 +1827,9 @@ export class MainExif {
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
 					<div class="mainExifBtns">
-						<div class="btn mainExifBtnExpand" title="${M.i18n.t("menu.expand")}">${SvgList["expand.svg"]}</div>
-						<div class="btn mainExifBtnCollapse" title="${M.i18n.t("menu.collapse")}">${SvgList["collapse.svg"]}</div>
-						<div class="btn mainExifBtnCopy" title="${M.i18n.t("menu.copy")}">${SvgList["tool-copy.svg"]}</div>
+						<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["expand.svg"]}</div>
+						<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["collapse.svg"]}</div>
+						<div class="btn mainExifBtnCopy" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["tool-copy.svg"]}</div>
 					</div>
 				</div>`
 			);
@@ -1811,7 +1838,6 @@ export class MainExif {
 			const btnCopy = div.querySelector(".mainExifBtnCopy") as HTMLElement; // 複製
 			const btnExpand = div.querySelector(".mainExifBtnExpand") as HTMLElement; // 折疊
 			const btnCollapse = div.querySelector(".mainExifBtnCollapse") as HTMLElement; // 折疊
-
 			btnCopy.addEventListener("click", async () => { // 複製到剪貼簿
 				await WV_System.SetClipboard_Text(copyText);
 				Toast.show(M.i18n.t("msg.copyExif", { v: name }), 1000 * 3); // 已將「exifName」複製至剪貼簿

@@ -29,35 +29,35 @@
 
     <div class="window">
 
-        <div class="dragbar-v" id="dragbar-mainFileList"> </div>
-        <div class="dragbar-v" id="dragbar-mainDirList"> </div>
-        <div class="dragbar-v" id="dragbar-mainExif"> </div>
+        <div class="dragbar-v" id="dragbar-mainFileList" role="separator" aria-orientation="vertical" aria-label="" i18n="sw.filePanel.resizeWidth"> </div>
+        <div class="dragbar-v" id="dragbar-mainDirList" role="separator" aria-orientation="vertical" aria-label="" i18n="sw.directoryPanel.resizeWidth"> </div>
+        <div class="dragbar-v" id="dragbar-mainExif" role="separator" aria-orientation="vertical" aria-label="" i18n="sw.informationPanel.resizeWidth"> </div>
 
         <!-- 標題列 -->
         <div id="window-titlebar" class="window-titlebar">
 
-            <div class="titlebar-text">
+            <div class="titlebar-text" id="window-titlebar-text">
                 <span>tiefsee 4</span>
             </div>
 
             <div class="titlebar-toolbar">
 
-                <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="佈局" i18n="menu.layout">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-layout" title="佈局" i18n="menu.layout" role="button">
                     <%- await readFile("./img/default/window-layout.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-exitFullScreen" title="結束全螢幕" i18n="menu.exitFullScreen" style="display:none;">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-exitFullScreen" title="結束全螢幕" i18n="menu.exitFullScreen" role="button" style="display:none;">
                     <%- await readFile("./img/default/window-exitFullScreen.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-minimized">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-minimized" role="button" i18n="script.minimizeWindow" title="">
                     <%- await readFile("./img/default/window-minimized.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-normal" style="display:none;">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-normal" role="button" i18n="script.restoreWindow" title="" style="display:none;">
                     <%- await readFile("./img/default/window-normal.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-maximized">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-maximized" role="button" i18n="script.maximizeWindow" title="">
                     <%- await readFile("./img/default/window-maximized.svg"); %>
                 </div>
-                <div class="titlebar-toolbar-btn titlebar-toolbar-close">
+                <div class="titlebar-toolbar-btn titlebar-toolbar-close" role="button" i18n="script.closeWindow" title="">
                     <%- await readFile("./img/default/window-close.svg"); %>
                 </div>
             </div>
@@ -79,7 +79,7 @@
 
                         <div id="toolbar-content" class="toolbar-content">
                             <!-- 共通的 返回按鈕 -->
-                            <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back" title="" i18n="menu.back">
+                            <div id="toolbar-back" class="main-toolbar-btn main-toolbar-back js-noDrag" data-name="back" title="" i18n="menu.back" role="button">
                                 <%- await readFile("./img/default/tool-back.svg"); %>
                             </div>
                         </div>
@@ -119,8 +119,8 @@
                                 <div class="mView-welcome-text">Tiefsee 4.3.2</div>
                             </div>
                         </div>
-                        <textarea id="mView-text" class="mView-text base-scrollbar" readonly2=""></textarea>
-                        <div id="mView-tiefseeview" class="mView-tiefseeview"></div>
+                        <textarea id="mView-text" class="mView-text base-scrollbar" readonly2="" aria-labelledby="window-titlebar-text"></textarea>
+                        <div id="mView-tiefseeview" class="mView-tiefseeview" role="region" aria-label="" i18n="script.imageViewportPan"></div>
                         <iframe id="mView-pdf" class="mView-iframe"></iframe>
                         <iframe id="mView-pdftronWebviewer" class="mView-iframe"></iframe>
                         <iframe id="mView-monacoEditor" class="mView-iframe"></iframe>
@@ -131,12 +131,12 @@
                             <div class="bulkView-scroll-content">
                                 <div class="bulkView-pagination">
                                     <div class="bulkView-pagination-box">
-                                        <div class="bulkView-pagination-prev svg-box" freeze="true">
+                                        <div class="bulkView-pagination-prev svg-box" role="button" aria-label="" i18n="script.prevPageTop" freeze="true" aria-disabled="true">
                                             <%- await readFile("./img/default/tool-prev.svg"); %>
                                         </div>
-                                        <select class="bulkView-pagination-select">
+                                        <select class="bulkView-pagination-select" aria-label="" i18n="script.pageNumberTop">
                                         </select>
-                                        <div class="bulkView-pagination-next svg-box">
+                                        <div class="bulkView-pagination-next svg-box" role="button" aria-label="" i18n="script.nextPageTop" aria-disabled="true">
                                             <%- await readFile("./img/default/tool-next.svg"); %>
                                         </div>
                                     </div>
@@ -144,12 +144,12 @@
                                 <div class="bulkView-content" show=""></div>
                                 <div class="bulkView-pagination">
                                     <div class="bulkView-pagination-box">
-                                        <div class="bulkView-pagination-prev svg-box">
+                                        <div class="bulkView-pagination-prev svg-box" role="button" aria-label="" i18n="script.prevPageBottom" aria-disabled="true">
                                             <%- await readFile("./img/default/tool-prev.svg"); %>
                                         </div>
-                                        <select class="bulkView-pagination-select">
+                                        <select class="bulkView-pagination-select" aria-label="" i18n="script.pageNumberBottom">
                                         </select>
-                                        <div class="bulkView-pagination-next svg-box">
+                                        <div class="bulkView-pagination-next svg-box" role="button" aria-label="" i18n="script.nextPageBottom" aria-disabled="true">
                                             <%- await readFile("./img/default/tool-next.svg"); %>
                                         </div>
                                     </div>
@@ -158,12 +158,12 @@
                         </div>
 
                         <!-- 大型切換按鈕 -->
-                        <div id="largeBtnLeft" class="largeBtn" data-style="leftRight-L">
+                        <div id="largeBtnLeft" class="largeBtn" data-style="leftRight-L" role="button" aria-label="" i18n="menu.prevFile">
                             <div class="box svg-box">
                                 <%- await readFile("./img/default/tool-prev.svg"); %>
                             </div>
                         </div>
-                        <div id="largeBtnRight" class="largeBtn" data-style="leftRight-R">
+                        <div id="largeBtnRight" class="largeBtn" data-style="leftRight-R" role="button" aria-label="" i18n="menu.nextFile">
                             <div class="box svg-box">
                                 <%- await readFile("./img/default/tool-next.svg"); %>
                             </div>
@@ -178,10 +178,10 @@
                         <div class="mainExif" id="mainExif">
 
                             <div class="mainExifTop">
-                                <div class="mainExifTabs js-tabBtns main-toolbar__scrollbar ">
+                                <div class="mainExifTabs js-tabBtns main-toolbar__scrollbar " role="tablist" aria-label="" i18n="menu.information" aria-orientation="horizontal">
                                     <div class="mainExifTabsContent">
                                         <!-- 資訊 -->
-                                        <div class="mainExifTabsItem js-tabBtn-info svg-box" mark="true" i18n="menu.information" title="">
+                                        <div class="mainExifTabsItem js-tabBtn-info svg-box" mark="true" i18n="menu.information" title="" role="tab" aria-selected="true" id="mainExif-tab-info" aria-controls="mainExif-tabpanel-info">
                                             <svg width="23px" height="23px" viewBox="0 0 23 23">
                                                 <g style="fill:var(--color-white)">
                                                     <rect x="15" y="7" width="1" height="8" />
@@ -192,7 +192,7 @@
                                             </svg>
                                         </div>
                                         <!-- 相關檔案 -->
-                                        <div class="mainExifTabsItem js-tabBtn-related svg-box" mark="true" i18n="menu.relatedFiles" title="">
+                                        <div class="mainExifTabsItem js-tabBtn-related svg-box" mark="true" i18n="menu.relatedFiles" title="" role="tab" aria-selected="false" id="mainExif-tab-related" aria-controls="mainExif-tabpanel-related">
                                             <svg width="23px" height="23px" viewBox="0 0 23 23">
                                                 <g style="fill:var(--color-white)">
                                                     <path d="M16.1,10h3.8c0.6,0,1.1-0.5,1.1-1.1V3.1C21,2.5,20.5,2,19.9,2h-3.8C15.5,2,15,2.5,15,3.1V5h-2.5C11.1,5,10,6.1,10,7.5V11H7
@@ -209,8 +209,8 @@
                                 </div>
                             </div>
 
-                            <div class="mainExifList base-scrollbar js-tabContent-info"> </div>
-                            <div class="mainExifRelated base-scrollbar js-tabContent-related"> </div>
+                            <div class="mainExifList base-scrollbar js-tabContent-info" id="mainExif-tabpanel-info" role="tabpanel" aria-labelledby="mainExif-tab-info"> </div>
+                            <div class="mainExifRelated base-scrollbar js-tabContent-related" id="mainExif-tabpanel-related" role="tabpanel" aria-labelledby="mainExif-tab-related"> </div>
                         </div>
                     </div>
 
@@ -237,13 +237,13 @@
     <div class="textEditor" id="textEditor" style="display:none;">
         <div class="textEditor-box">
             <div class="textEditor-toolbar">
-                <div class="textEditor-toolbarItem svg-box js-save" title="" i18n="menu.showSave">
+                <div class="textEditor-toolbarItem svg-box js-save" title="" i18n="menu.showSave" role="button">
                     <%- await readFile("./img/default/tool-save.svg"); %>
                 </div>
-                <div class="textEditor-toolbarItem svg-box js-pretty" title="" i18n="menu.formatJson">
+                <div class="textEditor-toolbarItem svg-box js-pretty" title="" i18n="menu.formatJson" role="button">
                     <%- await readFile("./img/default/tool-code.svg"); %>
                 </div>
-                <div class="textEditor-toolbarItem textEditor-toolbarItem__close js-close">
+                <div class="textEditor-toolbarItem textEditor-toolbarItem__close js-close" role="button" i18n="menu.close" aria-label="Close editor">
                 </div>
             </div>
             <div class="textEditor-content">

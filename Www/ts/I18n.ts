@@ -259,11 +259,12 @@ export class I18n {
             else if (dom.tagName == "OPTGROUP") { // 翻譯響應式table裡面的文字 data-th
                 dom.setAttribute("label", t);
             }
-            else if (dom.getAttribute("title") !== null) {
-                dom.setAttribute("title", t);
-            }
             else {
-                dom.innerHTML = t;
+                const hasTitle = dom.getAttribute("title") !== null;
+                const hasAriaLabel = dom.getAttribute("aria-label") !== null;
+                if (hasTitle) { dom.setAttribute("title", t); }
+                if (hasAriaLabel) { dom.setAttribute("aria-label", t); }
+                if (!hasTitle && !hasAriaLabel) { dom.innerHTML = t; }
             }
         }
 
