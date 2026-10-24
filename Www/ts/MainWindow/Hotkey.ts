@@ -41,13 +41,14 @@ export class Hotkey {
 
             // 最高優先級：在訊息視窗開啟時，Enter 和 Escape 直接對應到確認和取消
             if (M.msgbox.isShow()) {
-                if ((e.code === "Enter" || e.code === "NumpadEnter")) {
+                // 使用實際按鍵值判斷，避免輸入法處理候選字時誤觸彈窗快捷鍵
+                if (e.key === "Enter") {
                     e.preventDefault();
                     M.msgbox.clickYes();
                     return;
                 }
 
-                if (e.code === "Escape") {
+                if (e.key === "Escape") {
                     e.preventDefault();
                     M.msgbox.closeNow();
                     return;
