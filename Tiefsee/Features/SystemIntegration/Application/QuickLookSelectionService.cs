@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Automation;
 
 namespace Tiefsee;
 
@@ -9,28 +11,14 @@ namespace Tiefsee;
 /// </summary>
 public static class QuickLookSelectionService {
 
-    private static readonly SystemEnvironmentHelper _systemEnvironmentHelper = new();
     private static MethodInfo meth = null;
     private static Object obj = null;
 
     [DllImport("user32.dll")]
-    private static extern bool GetGUIThreadInfo(uint idThread, ref GUITHREADINFO lpgui);
+    private static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct GUITHREADINFO {
-        public uint cbSize;
-        public uint flags;
-        public IntPtr hwndActive;
-        public IntPtr hwndFocus;
-        public IntPtr hwndCapture;
-        public IntPtr hwndMenuOwner;
-        public IntPtr hwndMoveSize;
-        public IntPtr hwndCaret;
-        public System.Drawing.Rectangle rcCaret;
-    }
 
     /// <summary>
     /// 取得當前資料夾或桌面選取的單一檔案，如果取得失敗則返回 ""
@@ -50,7 +38,7 @@ public static class QuickLookSelectionService {
 
         string ret = (string)meth.Invoke(obj, new Object[] { }); // Invoke 調用方法
 
-        // 如果是 win11 且焦點在輸入框上面，則忽略
+        // Explorer 文字欄位有焦點時，空白鍵應留給欄位輸入。
         if (ret != "" && IsFocusOnExplorerInput()) {
             return "";
         }
@@ -59,23 +47,26 @@ public static class QuickLookSelectionService {
     }
 
     /// <summary>
-    /// 判斷當前的焦點是否在 win11 的檔案總管輸入框
+    /// 判斷目前檔案總管的文字輸入區是否有焦點
     /// </summary>
     private static bool IsFocusOnExplorerInput() {
-        if (_systemEnvironmentHelper.IsWindows11() == false) { return false; }
+        IntPtr foregroundWindow = GetForegroundWindow();
+        if (foregroundWindow == IntPtr.Zero) { return false; }
 
-        const int maxChars = 256;
-        StringBuilder className = new StringBuilder(maxChars);
-
-        GUITHREADINFO guiInfo = new GUITHREADINFO();
-        guiInfo.cbSize = (uint)Marshal.SizeOf(guiInfo);
-        GetGUIThreadInfo(0, ref guiInfo);
-
-        if (guiInfo.hwndFocus == IntPtr.Zero) {
+        StringBuilder foregroundClassName = new StringBuilder(256);
+        if (GetClassName(foregroundWindow, foregroundClassName, foregroundClassName.Capacity) == 0 ||
+            (foregroundClassName.ToString() != "CabinetWClass" &&
+             foregroundClassName.ToString() != "ExploreWClass")) {
             return false;
         }
 
-        GetClassName(guiInfo.hwndFocus, className, maxChars);
-        return className.ToString() == "Microsoft.UI.Content.DesktopChildSiteBridge";
+        try {
+            ControlType controlType = AutomationElement.FocusedElement?.Current.ControlType;
+            return controlType == ControlType.Edit || controlType == ControlType.ComboBox;
+        } catch (Exception ex) {
+            Debug.WriteLine(ex);
+            // Explorer 焦點狀態不確定時，略過本次預覽，避免攔截使用者輸入。
+            return true;
+        }
     }
 }
