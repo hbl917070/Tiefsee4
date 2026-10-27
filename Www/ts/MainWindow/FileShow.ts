@@ -315,7 +315,8 @@ export class FileShow {
             }
 
             if (requestRevision !== viewLoadRevision) return;
-            initTiefseeview(fileInfo2);
+            await initTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
+            if (requestRevision !== viewLoadRevision) return;
             _isLoaded = true;
         }
 
@@ -394,9 +395,10 @@ export class FileShow {
         /**
          * 
          */
-        async function initTiefseeview(fileInfo2: FileInfo2) {
-            _tiefseeview.setLoading(false);
+        async function initTiefseeview(fileInfo2: FileInfo2, isCurrent: () => boolean = () => true) {
             await _tiefseeview.transformRefresh(false); // 初始化 旋轉、鏡像
+            if (isCurrent() === false) return;
+            _tiefseeview.setLoading(false);
             _tiefseeview.setEventChangeZoom(((ratio: number) => {
                 const txt = (ratio * 100).toFixed(0) + "%"
 
@@ -414,6 +416,7 @@ export class FileShow {
             if (alignType === undefined) { alignType = TiefseeviewAlignType.center; }
             _tiefseeview.zoomFull(zoomType, zoomVal);
             _tiefseeview.setAlign(alignType);
+            _tiefseeview.showWebGLImage();
 
             // 圖片長寬
             const dom_size = getToolbarDom(GroupType.img)?.querySelector(`[data-name="infoSize"]`);

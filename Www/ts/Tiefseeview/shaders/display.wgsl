@@ -1,8 +1,5 @@
 @group(0) @binding(0) var image: texture_2d<f32>;
-struct Params {
-    sourceSize: vec2<u32>, outputSize: vec2<u32>, imageSize: vec2<u32>, _pad0: vec2<u32>,
-    matrix0: vec4<f32>, matrix1: vec2<f32>, sourceScale: vec2<f32>, pixelToCss: vec2<f32>, filterScale: f32, sharpen: f32,
-};
+struct Params { cropOrigin: vec2<f32>, sharpen: f32, _pad0: f32 };
 @group(0) @binding(1) var<uniform> p: Params;
 struct VOut { @builtin(position) pos: vec4<f32> };
 fn blurWeight(x: i32, y: i32) -> f32 {
@@ -19,7 +16,8 @@ fn blurWeight(x: i32, y: i32) -> f32 {
 }
 @fragment fn fragment(@builtin(position) pos: vec4<f32>) -> @location(0) vec4<f32> {
     let dims = vec2<i32>(textureDimensions(image));
-    let coord = clamp(vec2<i32>(pos.xy), vec2<i32>(0), dims - vec2<i32>(1));
+    let cropOrigin = vec2<i32>(round(p.cropOrigin));
+    let coord = clamp(vec2<i32>(pos.xy) + cropOrigin, vec2<i32>(0), dims - vec2<i32>(1));
     let center = textureLoad(image, coord, 0);
     if (p.sharpen <= 0.0 || center.a <= 0.000001) { return center; }
     let centerRgb = center.rgb / center.a;

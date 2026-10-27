@@ -1,4 +1,5 @@
 import type { TiefseeviewImageSource, TiefseeviewImageSourceRegion } from "./TiefseeviewImageSource";
+import { TiefseeviewRenderPerformanceMonitor } from "./TiefseeviewRenderPerformanceMonitor";
 import type { TiefseeviewImageRenderer, TiefseeviewViewState } from "./TiefseeviewTypes";
 import { TiefseeviewLanczosRenderer, TiefseeviewWebGPUUnsupportedError } from "./TiefseeviewLanczosRenderer";
 
@@ -29,9 +30,16 @@ interface PendingTextureUpload {
     reject: (error: unknown) => void;
 }
 
+interface WebGLDisjointTimerQueryExtension {
+    readonly GPU_DISJOINT_EXT: number;
+    readonly TIME_ELAPSED_EXT: number;
+}
+
 /** 固定 viewport 的 WebGL 2 靜態圖片 Renderer；不操作 Tiefseeview 的 DOM 變形層。 */
 export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private readonly idleQualityDelayMs = 100;
+    /** 預先多繪 viewport 周圍區域；在這個距離內平移只移動合成器圖層。 */
+    private readonly panOverscanCss = 50;
     private readonly gl: WebGL2RenderingContext;
     private readonly program: WebGLProgram;
     private readonly buffer: WebGLBuffer;
@@ -40,6 +48,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private readonly samplerLocation: WebGLUniformLocation;
     private readonly premultiplyAlphaLocation: WebGLUniformLocation;
     private readonly textureLimit: number;
+    private readonly gpuTimerExtension: WebGLDisjointTimerQueryExtension | null;
     private readonly lanczosCanvas: HTMLCanvasElement;
     /** 固定 viewport 的預覽只保留有限來源像素，避免大圖把整張原圖及 mipmap 塞進 GPU。 */
     private readonly maxSourcePixels = 8 * 1024 * 1024;
@@ -50,10 +59,12 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private readonly vertexData = new Float32Array(16);
     private source: TiefseeviewImageSource | null = null;
     private viewState: TiefseeviewViewState | null = null;
+    private cachedViewState: TiefseeviewViewState | null = null;
     private widthCss = 0;
     private heightCss = 0;
     private devicePixelRatio = 1;
     private canvasSizeDirty = true;
+    private sourceRevealPending = false;
     private renderFrame = 0;
     private requestController: AbortController | null = null;
     private sourceRevision = 0;
@@ -66,17 +77,20 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private qualityLanczosRegionKey = "";
     private qualityTimer = 0;
     private isReplacingSource = false;
+    private sourceVisible = false;
     private pixelatedFilter: boolean | null = null;
     private readonly renderWaiters: { resolve: () => void; reject: (error: unknown) => void }[] = [];
     private readonly pendingTextureUploads: PendingTextureUpload[] = [];
+    private readonly performanceMonitor = new TiefseeviewRenderPerformanceMonitor("WebGL");
+    private readonly pendingGpuTimerQueries: WebGLQuery[] = [];
+    private frameDrawCalls = 0;
+    private gpuTimerPollFrame = 0;
     private textureUploadFrame = 0;
     private disposed = false;
     private previewBitmap: ImageBitmap | null = null;
     private lanczosRenderer: TiefseeviewLanczosRenderer | null = null;
     private lanczosRendererPromise: Promise<TiefseeviewLanczosRenderer | null> | null = null;
     private lanczosRendererInitError: unknown = null;
-    private pixelatedDiagnosticAt = 0;
-    private pixelatedDecisionKey = "";
 
     constructor(
         private readonly canvas: HTMLCanvasElement,
@@ -156,6 +170,8 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.clearColor(0, 0, 0, 0);
         this.textureLimit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+        this.gpuTimerExtension = gl.getExtension("EXT_disjoint_timer_query_webgl2") as WebGLDisjointTimerQueryExtension | null;
+        this.performanceMonitor.setGpuTimerSupported(this.gpuTimerExtension !== null);
         canvas.style.pointerEvents = "none";
         canvas.style.display = "none";
         canvas.style.visibility = "hidden";
@@ -164,11 +180,22 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     public setViewState(state: TiefseeviewViewState): void {
         this.viewState = state;
         if (this.isReplacingSource) return;
+        this.performanceMonitor.setViewState(state);
         this.cancelPendingQualityRequest();
         this.lanczosRenderer?.hide();
-        if (this.source !== null && this.tiles.length > 0) {
+        if (this.sourceVisible && this.source !== null && this.tiles.length > 0) {
             this.canvas.style.display = "";
             this.canvas.style.visibility = "visible";
+        }
+        const panOffset = this.getCachedPanOffset(state);
+        if (!this.sourceRevealPending && panOffset !== null && this.renderFrame === 0 && !this.canvasSizeDirty) {
+            this.canvas.style.transform = `translate3d(${panOffset.x}px, ${panOffset.y}px, 0)`;
+            if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
+            return;
+        }
+        if (!this.hasPanOverflow(state)) {
+            // 圖片縮到可完整置中時，舊平移快取的 layer offset 不再代表控制器的位置。
+            this.canvas.style.transform = "translate3d(0px, 0px, 0)";
         }
         this.scheduleRender();
         if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
@@ -187,11 +214,12 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         this.heightCss = Math.max(0, heightCss);
         this.devicePixelRatio = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
         this.canvasSizeDirty = true;
+        this.cachedViewState = null;
         this.updateCanvasCssSize();
         if (this.isReplacingSource) return;
         this.cancelPendingQualityRequest();
         this.lanczosRenderer?.hide();
-        if (this.source !== null && this.tiles.length > 0) {
+        if (this.sourceVisible && this.source !== null && this.tiles.length > 0) {
             this.canvas.style.display = "";
             this.canvas.style.visibility = "visible";
         }
@@ -210,27 +238,106 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         return this.isReplacingSource;
     }
 
+    /** 首次載入等舊控制器完成縮放與定位後，才顯示預覽畫面。 */
+    public showSource(): void {
+        this.isReplacingSource = false;
+        const source = this.source;
+        const revision = this.sourceRevision;
+        if (source === null || this.tiles.length === 0) return;
+
+        this.sourceVisible = false;
+        // Lanczos3 首幀尚未完成前，排程中的 WebGL draw 不得先揭露低品質畫面。
+        this.sourceRevealPending = false;
+        this.canvas.style.display = "";
+        this.canvas.style.visibility = "hidden";
+        const state = this.viewState;
+        const bitmap = this.previewBitmap;
+        const sourceScale = this.activeLevelScale;
+        const useLanczos = state !== null && !this.isPixelatedRendering(state) && bitmap !== null && sourceScale !== null;
+        const rendererPromise = useLanczos ? this.getLanczosRenderer() : Promise.resolve(null);
+        const pixelated = state !== null && this.isPixelatedRendering(state);
+        const fallbackReason = state === null ? "沒有 ViewState"
+            : pixelated ? "像素呈現模式"
+                : bitmap === null ? "沒有預覽 bitmap"
+                    : sourceScale === null ? "沒有預覽倍率"
+                        : "Lanczos3 不適用或未完成";
+        console.info("[Tiefseeview WebGL] 首幀渲染策略", {
+            strategy: useLanczos ? "等待 Lanczos3" : "WebGL fallback",
+            fallbackReason: useLanczos ? null : fallbackReason,
+            sourceScale,
+            targetScale: this.getTargetScale()
+        });
+
+        // 一般模式首幀與閒置更新都用 Lanczos3；像素模式保留 WebGL 最近點取樣。
+        void rendererPromise.then(async renderer => {
+            if (!this.isCurrentSource(source, revision)) return;
+            if (renderer !== null && bitmap !== null && sourceScale !== null && state !== null && state === this.viewState) {
+                const rendered = await renderer.render(bitmap, sourceScale, state, this.getSharpenValue());
+                if (rendered && this.isCurrentSource(source, revision) && state === this.viewState) {
+                    this.canvas.style.visibility = "hidden";
+                    renderer.show();
+                    this.sourceVisible = true;
+                    this.sourceRevealPending = false;
+                    console.info("[Tiefseeview WebGL] 首幀已由 Lanczos3 顯示", { sourceScale });
+                    this.scheduleIdleQualityUpdate("預覽顯示後");
+                    return;
+                }
+            }
+
+            // 只有確認 Lanczos3 無法提供有效首幀後，才允許 WebGL render 揭露畫面。
+            console.info("[Tiefseeview WebGL] 首幀改用 WebGL fallback", { reason: fallbackReason });
+            this.sourceRevealPending = true;
+            await this.render();
+            if (!this.isCurrentSource(source, revision)) return;
+            this.lanczosRenderer?.clearSource();
+            this.sourceVisible = true;
+            this.sourceRevealPending = false;
+            this.canvas.style.visibility = "visible";
+            this.scheduleIdleQualityUpdate("預覽顯示後");
+        }).catch(error => {
+            if (!this.isCurrentSource(source, revision)) return;
+            console.error("WebGL 新來源首幀繪製失敗。", error);
+            this.lanczosRenderer?.clearSource();
+            // WebGL draw 失敗時 backing canvas 可能仍是舊圖或只繪了一部分，不可把它當成成功首幀顯示。
+            this.sourceVisible = false;
+            this.sourceRevealPending = true;
+            this.canvas.style.visibility = "hidden";
+            void this.render().catch(renderError => {
+                console.error("WebGL 新來源 fallback 首幀繪製失敗。", renderError);
+            });
+        });
+    }
+
+    private isCurrentSource(source: TiefseeviewImageSource, revision: number): boolean {
+        return !this.disposed && this.source === source && this.sourceRevision === revision;
+    }
+
     private resizeCanvases(): void {
-        const width = Math.max(1, Math.round(this.widthCss * this.devicePixelRatio));
-        const height = Math.max(1, Math.round(this.heightCss * this.devicePixelRatio));
-        if (this.canvas.width !== width) this.canvas.width = width;
-        if (this.canvas.height !== height) this.canvas.height = height;
-        if (this.lanczosCanvas.width !== width) this.lanczosCanvas.width = width;
-        if (this.lanczosCanvas.height !== height) this.lanczosCanvas.height = height;
+        const webglWidth = Math.max(1, Math.round((this.widthCss + this.panOverscanCss * 2) * this.devicePixelRatio));
+        const webglHeight = Math.max(1, Math.round((this.heightCss + this.panOverscanCss * 2) * this.devicePixelRatio));
+        const viewportWidth = Math.max(1, Math.round(this.widthCss * this.devicePixelRatio));
+        const viewportHeight = Math.max(1, Math.round(this.heightCss * this.devicePixelRatio));
+        if (this.canvas.width !== webglWidth) this.canvas.width = webglWidth;
+        if (this.canvas.height !== webglHeight) this.canvas.height = webglHeight;
+        if (this.lanczosCanvas.width !== viewportWidth) this.lanczosCanvas.width = viewportWidth;
+        if (this.lanczosCanvas.height !== viewportHeight) this.lanczosCanvas.height = viewportHeight;
         this.updateCanvasCssSize();
         this.canvasSizeDirty = false;
     }
 
     private updateCanvasCssSize(): void {
-        const width = Math.max(1, Math.round(this.widthCss * this.devicePixelRatio));
-        const height = Math.max(1, Math.round(this.heightCss * this.devicePixelRatio));
-        const cssWidth = `${width / this.devicePixelRatio}px`;
-        const cssHeight = `${height / this.devicePixelRatio}px`;
-        this.canvas.style.width = cssWidth;
-        this.canvas.style.height = cssHeight;
-        // 兩個 viewport canvas 共用由 backing pixel 與 DPR 換算出的 CSS 尺寸。
-        this.lanczosCanvas.style.width = cssWidth;
-        this.lanczosCanvas.style.height = cssHeight;
+        const canvasWidth = Math.max(1, Math.round((this.widthCss + this.panOverscanCss * 2) * this.devicePixelRatio));
+        const canvasHeight = Math.max(1, Math.round((this.heightCss + this.panOverscanCss * 2) * this.devicePixelRatio));
+        const viewportWidth = Math.max(1, Math.round(this.widthCss * this.devicePixelRatio));
+        const viewportHeight = Math.max(1, Math.round(this.heightCss * this.devicePixelRatio));
+        this.canvas.style.width = `${canvasWidth / this.devicePixelRatio}px`;
+        this.canvas.style.height = `${canvasHeight / this.devicePixelRatio}px`;
+        this.canvas.style.left = `${-this.panOverscanCss}px`;
+        this.canvas.style.top = `${-this.panOverscanCss}px`;
+        this.canvas.style.transform = "translate3d(0px, 0px, 0)";
+        // Lanczos viewport 須保留 ViewState 的小數 CSS 尺寸，backing store 才依 DPR 取整。
+        this.lanczosCanvas.style.width = `${this.widthCss}px`;
+        this.lanczosCanvas.style.height = `${this.heightCss}px`;
     }
 
     public async setSource(source: TiefseeviewImageSource | null, keepCurrentFrame = false): Promise<void> {
@@ -241,6 +348,8 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         keepCurrentFrame = keepCurrentFrame && source !== null && this.source !== null && this.tiles.length > 0;
         this.isReplacingSource = keepCurrentFrame;
         if (!keepCurrentFrame) {
+            this.sourceVisible = false;
+            this.sourceRevealPending = false;
             this.clearTextures();
             this.lanczosRenderer?.clearSource();
             this.previewBitmap?.close();
@@ -275,7 +384,6 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             if (this.lanczosRendererInitError !== null) throw this.lanczosRendererInitError;
             throw new Error("WebGPU Lanczos3 Renderer 初始化後不可用");
         }
-        this.scheduleIdleQualityUpdate("預覽載入後");
     }
 
     private getTargetScale(): number {
@@ -663,7 +771,12 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if (matrix === undefined) return null;
         const determinant = matrix.a * matrix.d - matrix.b * matrix.c;
         if (!Number.isFinite(determinant) || Math.abs(determinant) < 1e-12) return null;
-        const points = [[0, 0], [this.widthCss, 0], [0, this.heightCss], [this.widthCss, this.heightCss]].map(([vx, vy]) => {
+        const points = [
+            [-this.panOverscanCss, -this.panOverscanCss],
+            [this.widthCss + this.panOverscanCss, -this.panOverscanCss],
+            [-this.panOverscanCss, this.heightCss + this.panOverscanCss],
+            [this.widthCss + this.panOverscanCss, this.heightCss + this.panOverscanCss]
+        ].map(([vx, vy]) => {
             const px = vx - matrix.e;
             const py = vy - matrix.f;
             return [(matrix.d * px - matrix.c * py) / determinant, (-matrix.b * px + matrix.a * py) / determinant];
@@ -714,12 +827,8 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             this.qualityRegionKey = "";
             this.activeQualityScale = null;
             if (previousLevelScale !== null && previousLevelScale !== level.scale) source.releaseLevel?.(previousLevelScale);
-            if (keepCurrentFrame) {
-                await this.renderReplacementFrame();
-            } else {
+            if (!keepCurrentFrame) {
                 this.isReplacingSource = false;
-                this.canvas.style.display = "";
-                this.canvas.style.visibility = "visible";
                 this.scheduleRender();
             }
         } catch (error) {
@@ -871,6 +980,11 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     public dispose(): void {
         if (this.disposed) return;
         this.disposed = true;
+        this.performanceMonitor.dispose();
+        if (this.gpuTimerPollFrame !== 0) cancelAnimationFrame(this.gpuTimerPollFrame);
+        this.gpuTimerPollFrame = 0;
+        for (const query of this.pendingGpuTimerQueries) this.gl.deleteQuery(query);
+        this.pendingGpuTimerQueries.length = 0;
         this.sourceRevision++;
         window.clearTimeout(this.qualityTimer);
         this.requestController?.abort();
@@ -1099,6 +1213,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
 
     private clearTextures(): void {
         this.clearQualityLanczosSource();
+        this.cachedViewState = null;
         for (const tile of this.tiles) this.gl.deleteTexture(tile.texture);
         this.tiles.length = 0;
         for (const tile of this.qualityTiles) this.gl.deleteTexture(tile.texture);
@@ -1112,37 +1227,64 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if (this.disposed || this.isReplacingSource || this.renderFrame !== 0) return;
         this.renderFrame = requestAnimationFrame(() => {
             this.renderFrame = 0;
+            const startedAt = performance.now();
+            const gpuQuery = this.beginGpuTimerQuery();
             try {
                 if (this.canvasSizeDirty) this.resizeCanvases();
                 this.draw();
+                this.performanceMonitor.recordFrame(performance.now() - startedAt, this.frameDrawCalls);
+                if (this.sourceRevealPending && this.source !== null && this.viewState !== null &&
+                    (this.tiles.length > 0 || this.qualityTiles.length > 0) && this.widthCss > 0 && this.heightCss > 0) {
+                    this.sourceRevealPending = false;
+                    this.lanczosRenderer?.clearSource();
+                    this.sourceVisible = true;
+                    this.canvas.style.display = "";
+                    this.canvas.style.visibility = "visible";
+                }
                 for (const waiter of this.renderWaiters.splice(0)) waiter.resolve();
             } catch (error) {
                 const waiters = this.renderWaiters.splice(0);
                 if (waiters.length === 0) console.error("WebGL 圖片繪製失敗。", error);
                 for (const waiter of waiters) waiter.reject(error);
+            } finally {
+                this.endGpuTimerQuery(gpuQuery);
             }
         });
     }
 
-    private renderReplacementFrame(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            this.renderWaiters.push({ resolve, reject });
-            this.renderFrame = requestAnimationFrame(() => {
-                this.renderFrame = 0;
-                try {
-                    this.resizeCanvases();
-                    this.draw();
-                    this.isReplacingSource = false;
-                    this.canvas.style.display = "";
-                    this.canvas.style.visibility = "visible";
-                    this.lanczosRenderer?.clearSource();
-                    for (const waiter of this.renderWaiters.splice(0)) waiter.resolve();
-                } catch (error) {
-                    this.isReplacingSource = false;
-                    const waiters = this.renderWaiters.splice(0);
-                    for (const waiter of waiters) waiter.reject(error);
+    private beginGpuTimerQuery(): WebGLQuery | null {
+        const extension = this.gpuTimerExtension;
+        if (extension === null || !this.performanceMonitor.isPanActive) return null;
+        const query = this.gl.createQuery();
+        if (query === null) return null;
+        this.gl.beginQuery(extension.TIME_ELAPSED_EXT, query);
+        return query;
+    }
+
+    private endGpuTimerQuery(query: WebGLQuery | null): void {
+        if (query === null || this.gpuTimerExtension === null) return;
+        this.gl.endQuery(this.gpuTimerExtension.TIME_ELAPSED_EXT);
+        this.pendingGpuTimerQueries.push(query);
+        this.scheduleGpuTimerPoll();
+    }
+
+    private scheduleGpuTimerPoll(): void {
+        if (this.disposed || this.gpuTimerPollFrame !== 0 || this.pendingGpuTimerQueries.length === 0) return;
+        this.gpuTimerPollFrame = requestAnimationFrame(() => {
+            this.gpuTimerPollFrame = 0;
+            const extension = this.gpuTimerExtension;
+            if (extension === null) return;
+            for (let i = this.pendingGpuTimerQueries.length - 1; i >= 0; i--) {
+                const query = this.pendingGpuTimerQueries[i];
+                if (this.gl.getQueryParameter(query, this.gl.QUERY_RESULT_AVAILABLE) !== true) continue;
+                if (this.gl.getParameter(extension.GPU_DISJOINT_EXT) !== true) {
+                    const nanoseconds = Number(this.gl.getQueryParameter(query, this.gl.QUERY_RESULT));
+                    this.performanceMonitor.recordGpuDraw(nanoseconds / 1_000_000);
                 }
-            });
+                this.gl.deleteQuery(query);
+                this.pendingGpuTimerQueries.splice(i, 1);
+            }
+            this.scheduleGpuTimerPoll();
         });
     }
 
@@ -1160,8 +1302,54 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, pixelated ? gl.NEAREST : gl.LINEAR);
     }
 
+    private getCachedPanOffset(state: TiefseeviewViewState): { x: number; y: number } | null {
+        const cached = this.cachedViewState;
+        if (cached === null || !cached.image.isReady || !state.image.isReady) return null;
+        if (cached.image.width !== state.image.width || cached.image.height !== state.image.height ||
+            cached.image.displayWidthCss !== state.image.displayWidthCss ||
+            cached.image.displayHeightCss !== state.image.displayHeightCss ||
+            cached.viewport.widthCss !== state.viewport.widthCss || cached.viewport.heightCss !== state.viewport.heightCss ||
+            cached.viewport.devicePixelRatio !== state.viewport.devicePixelRatio ||
+            cached.viewport.renderDpiZoom !== state.viewport.renderDpiZoom ||
+            cached.transform.rotationDeg !== state.transform.rotationDeg ||
+            cached.transform.mirrorHorizontal !== state.transform.mirrorHorizontal ||
+            cached.transform.mirrorVertical !== state.transform.mirrorVertical) return null;
+
+        const before = cached.imageToViewport;
+        const after = state.imageToViewport;
+        if (Math.abs(before.a - after.a) > 1e-6 || Math.abs(before.b - after.b) > 1e-6 ||
+            Math.abs(before.c - after.c) > 1e-6 || Math.abs(before.d - after.d) > 1e-6) return null;
+        const deltaX = after.e - before.e;
+        const deltaY = after.f - before.f;
+        const overflow = this.getPanOverflow(state);
+        if (!overflow.x && !overflow.y) {
+            return Math.abs(deltaX) <= 1e-6 && Math.abs(deltaY) <= 1e-6 ? { x: 0, y: 0 } : null;
+        }
+        if ((!overflow.x && Math.abs(deltaX) > 1e-6) || (!overflow.y && Math.abs(deltaY) > 1e-6)) return null;
+        const x = overflow.x ? deltaX : 0;
+        const y = overflow.y ? deltaY : 0;
+        return Math.abs(x) <= this.panOverscanCss && Math.abs(y) <= this.panOverscanCss ? { x, y } : null;
+    }
+
+    private getPanOverflow(state: TiefseeviewViewState): { x: boolean; y: boolean } {
+        const { a, b, c, d } = state.imageToViewport;
+        const width = Math.abs(a) * state.image.width + Math.abs(c) * state.image.height;
+        const height = Math.abs(b) * state.image.width + Math.abs(d) * state.image.height;
+        return {
+            x: width > state.viewport.widthCss + 1e-6,
+            y: height > state.viewport.heightCss + 1e-6
+        };
+    }
+
+    private hasPanOverflow(state: TiefseeviewViewState): boolean {
+        const overflow = this.getPanOverflow(state);
+        return overflow.x || overflow.y;
+    }
+
     private getTileClipBounds(tile: WebGLTile, state: TiefseeviewViewState): { left: number; right: number; top: number; bottom: number } {
         const { a, b, c, d, e, f } = state.imageToViewport;
+        const canvasWidthCss = this.widthCss + this.panOverscanCss * 2;
+        const canvasHeightCss = this.heightCss + this.panOverscanCss * 2;
         const corners = [
             [tile.x, tile.y],
             [tile.x + tile.width, tile.y],
@@ -1170,7 +1358,10 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         ].map(([x, y]) => {
             const viewportX = a * x + c * y + e;
             const viewportY = b * x + d * y + f;
-            return [viewportX / this.widthCss * 2 - 1, 1 - viewportY / this.heightCss * 2];
+            return [
+                (viewportX + this.panOverscanCss) / canvasWidthCss * 2 - 1,
+                1 - (viewportY + this.panOverscanCss) / canvasHeightCss * 2
+            ];
         });
         return {
             left: Math.min(...corners.map(point => point[0])),
@@ -1186,6 +1377,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     private draw(): void {
+        this.frameDrawCalls = 0;
         const gl = this.gl;
         gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1193,26 +1385,9 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if (state === null || (this.tiles.length === 0 && this.qualityTiles.length === 0) || this.widthCss <= 0 || this.heightCss <= 0) return;
 
         const { a, b, c, d, e, f } = state.imageToViewport;
+        const canvasWidthCss = this.widthCss + this.panOverscanCss * 2;
+        const canvasHeightCss = this.heightCss + this.panOverscanCss * 2;
         const pixelated = this.isPixelatedRendering(state);
-        const rendering = this.getImageRendering();
-        const displayScaleCss = state.image.displayWidthCss / state.image.width;
-        const effectiveDisplayScale = displayScaleCss * state.viewport.devicePixelRatio;
-        const decisionKey = String(rendering) + ":" + String(pixelated);
-        if (decisionKey !== this.pixelatedDecisionKey) {
-            this.pixelatedDecisionKey = decisionKey;
-            console.info("[Tiefseeview WebGL] 像素模式判定切換", {
-                rendering,
-                displayScaleCss,
-                devicePixelRatio: state.viewport.devicePixelRatio,
-                effectiveDisplayScale,
-                pixelated,
-                reason: rendering === 1
-                    ? "固定像素模式"
-                    : rendering === 2
-                        ? "實際倍率 " + (effectiveDisplayScale > 1 ? ">" : "<=") + " 100%"
-                        : "一般平滑模式"
-            });
-        }
         const filterChanged = pixelated !== this.pixelatedFilter;
         this.pixelatedFilter = pixelated;
         gl.useProgram(this.program);
@@ -1227,55 +1402,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                 this.setTextureSampling(tile.texture, pixelated);
             }
         }
-        const now = performance.now();
-        if (pixelated && now - this.pixelatedDiagnosticAt >= 1000) {
-            this.pixelatedDiagnosticAt = now;
-            const textureFilterCounts = { nearest: 0, linear: 0, other: 0 };
-            for (const tile of [...this.tiles, ...this.qualityTiles]) {
-                gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, tile.texture);
-                const min = Number(gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER));
-                const mag = Number(gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER));
-                if (min === gl.NEAREST_MIPMAP_NEAREST && mag === gl.NEAREST) textureFilterCounts.nearest++;
-                else if (min === gl.LINEAR_MIPMAP_LINEAR && mag === gl.LINEAR) textureFilterCounts.linear++;
-                else textureFilterCounts.other++;
-            }
-            console.info("[Tiefseeview WebGL] 像素模式取樣診斷", {
-                rendering: this.getImageRendering(),
-                displayScaleCss: state.image.displayWidthCss / state.image.width,
-                devicePixelRatio: state.viewport.devicePixelRatio,
-                imageToViewport: { ...state.imageToViewport },
-                canvasBackingScale: {
-                    x: this.widthCss > 0 ? this.canvas.width / this.widthCss : null,
-                    y: this.heightCss > 0 ? this.canvas.height / this.heightCss : null
-                },
-                imageOriginPixelOffset: {
-                    x: ((state.imageToViewport.e * (this.widthCss > 0 ? this.canvas.width / this.widthCss : 1)) % 1 + 1) % 1,
-                    y: ((state.imageToViewport.f * (this.heightCss > 0 ? this.canvas.height / this.heightCss : 1)) % 1 + 1) % 1
-                },
-                pixelated,
-                pixelatedFilter: this.pixelatedFilter,
-                textureFilterCounts,
-                previewScale: this.activeLevelScale,
-                qualityScale: this.activeQualityScale,
-                previewTileCount: this.tiles.length,
-                qualityTileCount: this.qualityTiles.length,
-                cachedQualityScales: [...new Set(this.qualityTiles.map(tile => tile.scale))],
-                visibleQualityTileCount: this.qualityTiles
-                    .filter(tile => tile.scale === this.activeQualityScale && this.isTileVisible(tile, state)).length,
-                visibleQualityTileKeys: this.qualityTiles
-                    .filter(tile => tile.scale === this.activeQualityScale && this.isTileVisible(tile, state))
-                    .map(tile => tile.cacheKey),
-                sharpenValue: this.getSharpenValue(),
-                lanczosCanvasDisplay: this.lanczosCanvas.style.display,
-                lanczosCanvasVisibility: this.lanczosCanvas.style.visibility
-            });
-        }
         const drawTile = (tile: WebGLTile): void => {
             const toClip = (x: number, y: number): [number, number] => {
                 const viewportX = a * x + c * y + e;
                 const viewportY = b * x + d * y + f;
-                return [viewportX / this.widthCss * 2 - 1, 1 - viewportY / this.heightCss * 2];
+                return [
+                    (viewportX + this.panOverscanCss) / canvasWidthCss * 2 - 1,
+                    1 - (viewportY + this.panOverscanCss) / canvasHeightCss * 2
+                ];
             };
             const left = tile.x;
             const top = tile.y;
@@ -1296,6 +1430,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertexData);
             gl.bindTexture(gl.TEXTURE_2D, tile.texture);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            this.frameDrawCalls++;
         };
 
         // 預覽以 source-over 混合；高解析 tile 則以預乘 alpha 覆寫其區域，避免半透明 tile 與預覽底圖疊色。
@@ -1308,5 +1443,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         for (const tile of this.qualityTiles) {
             if (tile.scale === this.activeQualityScale) drawTile(tile);
         }
+        this.cachedViewState = state;
+        this.canvas.style.transform = "translate3d(0px, 0px, 0)";
     }
 }

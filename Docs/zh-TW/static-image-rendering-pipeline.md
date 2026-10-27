@@ -40,9 +40,21 @@ Canvas 路徑沿用原有完整圖片載入方式：前端選擇縮放層 URL，
 4. 若 tile 內容的矩形合成結果符合 8 MP 及 WebGPU 單張貼圖限制，前端按層級格點組成受限的 Lanczos 來源 bitmap，交給 WebGPU viewport Lanczos3。合成來源不重複繪製 tile gutter。
 5. 若無法形成合適的完整 Lanczos 來源，保留後端已用 Lanczos3 產生的可視 tile，以 WebGL 呈現。若設定銳化，對完成合成的 viewport 另執行 WebGPU 銳化 pass。
 
-WebGPU Lanczos3 將來源重採樣到 viewport backing-buffer 尺寸，結果與 WebGL canvas 使用相同 CSS／backing 尺寸。結果完成後，只有在來源、ViewState 和請求世代仍有效時才切換顯示 canvas；切換採互斥顯示，避免透明圖層重複合成。WebGPU 不支援、貼圖尺寸超限或處理失敗時維持 WebGL 畫面；Lanczos 不適用時仍可嘗試銳化。
+WebGPU Lanczos3 將來源重採樣到 viewport backing-buffer 尺寸，結果與 WebGL canvas 使用相同 CSS／backing 尺寸。結果完成後，只有在來源、ViewState 和請求世代仍有效時才切換顯示 canvas；切換採互斥顯示，避免透明圖層重複合成。Lanczos pass 不適用或執行失敗時，閒置更新回到 WebGL 畫面；若啟用銳化，仍可嘗試對 WebGL viewport 做銳化。WebGPU Renderer 初始化失敗則由 `FileShow` 回退至 Canvas，WebGPU 不支援時也會儲存 Canvas 作為新的 Renderer 設定。
 
 「呈現像素」模式保留 WebGL 最近點取樣，不執行會重新平滑像素的 Lanczos。WebGL 貼圖的取樣模式會依此設定切換。
+
+### 平移 overscan 快取與首次顯示
+
+WebGL backing canvas 在 viewport 四周各多繪 **50 CSS px**，CSS canvas 起點設為 `(-50, -50)`；Lanczos 輸出 canvas 仍保持 viewport 尺寸。Renderer 記錄上次完整繪製的 ViewState。圖片、顯示尺寸、viewport、DPR、render DPI、旋轉、鏡像及矩陣線性部分相同，且平移方向確實有溢位時，若相對快取基準的 x/y 位移都在 50 px 內，就以 CSS `translate3d` 移動現有 canvas，不清畫布或重送 WebGL draw。任一條件不符或超出邊界便完整重繪並建立新的快取基準；視窗 resize 和來源更換會清除基準。高畫質 tile 可視範圍也包含這 50 px overscan，讓快取移動期間有足夠解析度。
+
+首次載入來源時，`FileShow` 等待圖片 transform 初始化，再套用縮放與對齊，最後呼叫 `showWebGLImage()`。Renderer 在此之前不顯示 WebGL 預覽；一般平滑模式先以預覽 bitmap 產生 Lanczos3 首幀，等待期間排程中的 WebGL draw 不得搶先揭露。像素模式或 Lanczos3 不適用時，才以 WebGL 最近點取樣繪製首幀並顯示。新來源取代舊來源時，舊畫面會保留到新來源完成顯示切換；首幀繪製失敗時不會顯示未確認完成的 WebGL backing canvas，後續成功的 Renderer 繪製可完成顯示。
+
+圖片尺寸及 viewport 座標保留小數 CSS 像素，backing store 則依 DPR 取整。縮放器會在縮放上下限或倍率不變時略過無效更新。銳化 fallback 使用 viewport 尺寸，並從 overscan WebGL canvas 中央裁取 viewport；一般 Lanczos pass 的裁切起點為零。像素模式依倍率切換貼圖取樣方式，不使用 Lanczos3。
+
+### 平移效能診斷
+
+Canvas 與 WebGL Renderer 在偵測到純平移並停止 350 ms 後，各輸出一筆 `[Tiefsee render performance] pan` 摘要。摘要包含 ViewState 更新數、Renderer 呼叫數、Renderer 呼叫經過時間分位數、Renderer 自行取樣的 `requestAnimationFrame` 間隔，以及 Canvas 重繪數或 WebGL draw call 和可用時的 GPU timer query。Canvas 的 `drawElapsedMs` 涵蓋非同步 `createImageBitmap` 工作，不等同純 JavaScript CPU 時間；WebGL GPU query 非同步讀取，只涵蓋 GPU 命令執行時間。Renderer 的 RAF 間隔不等於螢幕實際呈現影格。
 
 ## Tile 產生與座標
 

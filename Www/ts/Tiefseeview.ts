@@ -31,6 +31,7 @@ export class Tiefseeview {
     public loadBigimg;
     public loadBigimgscale;
     public loadWebGLImage;
+    public showWebGLImage;
     public loadVideo;
     public loadNone; // 載入空白圖片
     public setLoading; // 顯示或隱藏 loading
@@ -365,6 +366,7 @@ export class Tiefseeview {
         this.loadBigimg = loadBigimg;
         this.loadBigimgscale = loadBigimgscale;
         this.loadWebGLImage = loadWebGLImage;
+        this.showWebGLImage = () => webglRenderer?.showSource();
         this.loadVideo = loadVideo;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
@@ -1172,8 +1174,10 @@ export class Tiefseeview {
             if (domMediaRenderer.getDataType() === "bigimg" || domMediaRenderer.getDataType() === "bigimgscale" || domMediaRenderer.getDataType() === "webgl") {
                 const w = width;
                 const h = width * ratio;
-                _domData.style.width = Math.floor(w) + "px";
-                _domData.style.height = Math.floor(h) + "px";
+                // WebGL ViewState 使用未取整尺寸，DOM 框也須保留小數才能維持相同的圖片邊界。
+                const useFractionalSize = domMediaRenderer.getDataType() === "webgl";
+                _domData.style.width = (useFractionalSize ? w : Math.floor(w)) + "px";
+                _domData.style.height = (useFractionalSize ? h : Math.floor(h)) + "px";
             }
             if (domMediaRenderer.getDataType() === "video") {
                 _domData.style.width = Math.floor(width) + "px";

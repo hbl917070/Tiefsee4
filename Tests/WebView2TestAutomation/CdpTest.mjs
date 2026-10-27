@@ -86,8 +86,13 @@ async function connect(target) {
 
   let nextId = 0;
   const pending = new Map();
+  const eventListeners = new Map();
   socket.addEventListener("message", event => {
     const message = JSON.parse(event.data);
+    if (typeof message.method === "string") {
+      for (const listener of eventListeners.get(message.method) ?? []) listener(message.params ?? {});
+      return;
+    }
     const waiter = pending.get(message.id);
     if (!waiter) return;
     pending.delete(message.id);
@@ -118,6 +123,15 @@ async function connect(target) {
         pending.set(id, { resolve, reject, timeout });
         socket.send(JSON.stringify({ id, method, params }));
       });
+    },
+    on(method, listener) {
+      const listeners = eventListeners.get(method) ?? new Set();
+      listeners.add(listener);
+      eventListeners.set(method, listeners);
+      return () => {
+        listeners.delete(listener);
+        if (listeners.size === 0) eventListeners.delete(method);
+      };
     },
     close(force = false) {
       if (force || !keepCdpConnections) socket.close();
@@ -542,9 +556,12 @@ async function moveForWindow(windowId, x, y) {
   }
 }
 
-async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0) {
+async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0, captureScreenshot = false, captureScreenshotDelayMs = 0) {
   if (![x, y, deltaX, deltaY].every(Number.isFinite) || deltaX === 0 && deltaY === 0) {
     throw new Error("x, y, deltaX and deltaY must be finite numbers, with a non-zero delta.");
+  }
+  if (!Number.isFinite(captureScreenshotDelayMs) || captureScreenshotDelayMs < 0 || captureScreenshotDelayMs > 250) {
+    throw new Error("captureScreenshotDelayMs must be between 0 and 250.");
   }
 
   const { target, cdp } = await findWindowTarget(windowId);
@@ -556,11 +573,40 @@ async function wheelForWindow(windowId, x, y, deltaY, deltaX = 0) {
     await cdp.call("Input.dispatchMouseEvent", {
       type: "mouseWheel", x, y, deltaX, deltaY,
     });
+    // 需要捕捉短暫視覺狀態時，先截圖再讀取頁面狀態，減少輸入後的延遲。
+    if (captureScreenshot && captureScreenshotDelayMs > 0) {
+      await new Promise(resolve => setTimeout(resolve, captureScreenshotDelayMs));
+    }
+    const image = captureScreenshot
+      ? (await cdp.call("Page.captureScreenshot", { format: "png", fromSurface: true })).data
+      : undefined;
     const after = await readState(target, cdp);
     if (after?.windowId !== windowId) {
       throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
     }
-    return { windowId, targetId: target.id, x, y, deltaX, deltaY, state: after };
+    return { windowId, targetId: target.id, x, y, deltaX, deltaY, state: after, ...(image ? { image } : {}) };
+  } finally {
+    cdp.close();
+  }
+}
+
+async function resizeWindowForWindow(windowId, width, height) {
+  if (!Number.isInteger(width) || width < 400 || width > 3840 ||
+      !Number.isInteger(height) || height < 300 || height > 2160) {
+    throw new Error("width must be 400-3840 and height must be 300-2160.");
+  }
+  const { target, cdp } = await findWindowTarget(windowId);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) {
+      throw new Error(`Target identity changed before resize; expected ${windowId}, found ${state?.windowId ?? "none"}.`);
+    }
+    const result = await cdp.call("Browser.getWindowForTarget", { targetId: target.id });
+    await cdp.call("Browser.setWindowBounds", {
+      windowId: result.windowId,
+      bounds: { width, height, windowState: "normal" },
+    });
+    return { windowId, targetId: target.id, width, height };
   } finally {
     cdp.close();
   }
@@ -625,22 +671,66 @@ async function touchGestureForWindow(windowId, kind, x, y, radius, value, steps 
   }
 }
 
-async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0) {
+async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0, captureConsoleMs = 0, captureTrace = false) {
   if (![x1, y1, x2, y2].every(Number.isFinite)) {
     throw new Error("Drag coordinates must be finite numbers.");
   }
   if (!Number.isInteger(steps) || steps < 1 || steps > 60 || !Number.isFinite(durationMs) || durationMs < 0 || durationMs > 5000) {
     throw new Error("Drag steps must be 1–60 and durationMs must be 0–5000.");
   }
+  if (!Number.isInteger(captureConsoleMs) || captureConsoleMs < 0 || captureConsoleMs > 5000) {
+    throw new Error("captureConsoleMs must be an integer from 0 to 5000.");
+  }
+  if (typeof captureTrace !== "boolean") throw new Error("captureTrace must be a boolean.");
 
   const { target, cdp } = await findWindowTarget(windowId);
+  const consoleMessages = [];
+  const traceEvents = [];
+  let removeConsoleListener = null;
+  let removeTraceDataListener = null;
+  let removeTraceCompleteListener = null;
+  let resolveTraceComplete = null;
+  let traceCompletePromise = null;
+  let tracingStarted = false;
+  let mousePressed = false;
+  const captureStartedAt = Date.now();
   try {
+    if (captureConsoleMs > 0) {
+      removeConsoleListener = cdp.on("Runtime.consoleAPICalled", message => {
+        const text = (message.args ?? []).map(argument => argument.value ?? argument.description ?? "").join(" ");
+        const eventTimeMs = message.timestamp > 1e12 ? message.timestamp : message.timestamp * 1000;
+        if (eventTimeMs >= captureStartedAt && text.includes("[Tiefsee render performance] pan")) {
+          consoleMessages.push({ type: message.type, args: message.args ?? [], timestamp: message.timestamp });
+        }
+      });
+      await cdp.call("Runtime.enable");
+    }
     const before = await readState(target, cdp);
     if (before?.windowId !== windowId) {
       throw new Error(`Target identity changed before input; expected ${windowId}, found ${before?.windowId ?? "none"}.`);
     }
+    if (captureTrace) {
+      traceCompletePromise = new Promise(resolve => { resolveTraceComplete = resolve; });
+      removeTraceDataListener = cdp.on("Tracing.dataCollected", message => traceEvents.push(...(message.value ?? [])));
+      removeTraceCompleteListener = cdp.on("Tracing.tracingComplete", message => resolveTraceComplete?.(message));
+      await cdp.call("Tracing.start", {
+        transferMode: "ReportEvents",
+        traceConfig: {
+          recordMode: "recordUntilFull",
+          includedCategories: [
+            "devtools.timeline",
+            "disabled-by-default-devtools.timeline",
+            "cc",
+            "gpu",
+            "viz",
+          ],
+        },
+      });
+      tracingStarted = true;
+    }
     await cdp.call("Input.dispatchMouseEvent", { type: "mouseMoved", x: x1, y: y1 });
     await cdp.call("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1 });
+    mousePressed = true;
     for (let i = 1; i <= steps; i++) {
       const progress = i / steps;
       await cdp.call("Input.dispatchMouseEvent", {
@@ -653,12 +743,119 @@ async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0
       if (durationMs > 0) await new Promise(resolve => setTimeout(resolve, durationMs / steps));
     }
     await cdp.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
+    mousePressed = false;
+    if (captureTrace) {
+      // Stop recording at the end of input so compositor idle frames do not pollute the pan sample.
+      await cdp.call("Tracing.end");
+      tracingStarted = false;
+    }
     const after = await readState(target, cdp);
     if (after?.windowId !== windowId) {
       throw new Error(`Target identity changed after input; expected ${windowId}, found ${after?.windowId ?? "none"}.`);
     }
-    return { windowId, targetId: target.id, x1, y1, x2, y2, state: after };
+    const readRemoteValue = async (remoteObject, depth = 0) => {
+      if (remoteObject?.value !== undefined) return remoteObject.value;
+      if (!remoteObject?.objectId) return remoteObject?.description ?? null;
+      if (depth >= 2) {
+        await cdp.call("Runtime.releaseObject", { objectId: remoteObject.objectId }).catch(() => { });
+        return remoteObject.description ?? null;
+      }
+      try {
+        const properties = await cdp.call("Runtime.getProperties", {
+          objectId: remoteObject.objectId,
+          ownProperties: true,
+        });
+        return Object.fromEntries(await Promise.all((properties.result ?? [])
+          .filter(property => property.value !== undefined)
+          .map(async property => [property.name, await readRemoteValue(property.value, depth + 1)])));
+      } finally {
+        await cdp.call("Runtime.releaseObject", { objectId: remoteObject.objectId }).catch(() => { });
+      }
+    };
+    let performanceTrace;
+    if (captureTrace) {
+      let traceTimeout;
+      try {
+        await Promise.race([
+          traceCompletePromise,
+          new Promise((_, reject) => {
+            traceTimeout = setTimeout(() => reject(new Error("Timed out waiting for the WebView2 performance trace.")), 5000);
+          }),
+        ]);
+      } finally {
+        clearTimeout(traceTimeout);
+      }
+      const selectedEvents = traceEvents.filter(event =>
+        typeof event.name === "string" && /BeginFrame|DrawFrame|SubmitCompositorFrame|FramePresented|SwapBuffers|Raster|Paint|Composite|FrameDropped|FrameSkipped/i.test(event.name),
+      );
+      const eventCounts = Object.create(null);
+      const eventDurations = new Map();
+      for (const event of selectedEvents) {
+        eventCounts[event.name] = (eventCounts[event.name] ?? 0) + 1;
+        if (Number.isFinite(event.dur) && event.dur >= 0) {
+          const durations = eventDurations.get(event.name) ?? [];
+          durations.push(event.dur / 1000);
+          eventDurations.set(event.name, durations);
+        }
+      }
+      const durationSummaries = Object.fromEntries([...eventDurations.entries()].map(([name, durations]) => {
+        durations.sort((a, b) => a - b);
+        return [name, {
+          p50Ms: Number(durations[Math.floor((durations.length - 1) * 0.5)].toFixed(3)),
+          p95Ms: Number(durations[Math.ceil(durations.length * 0.95) - 1].toFixed(3)),
+          maxMs: Number(durations[durations.length - 1].toFixed(3)),
+        }];
+      }));
+      const compositorThreads = Object.create(null);
+      const compositorEventNames = /BeginFrame|DrawFrame|SubmitCompositorFrame|FramePresented|SwapBuffers|FrameDropped|FrameSkipped/i;
+      for (const event of traceEvents) {
+        if (!compositorEventNames.test(event.name ?? "")) continue;
+        const key = `${event.pid ?? "?"}:${event.tid ?? "?"}`;
+        const summary = compositorThreads[key] ??= { events: 0, names: Object.create(null) };
+        summary.events++;
+        summary.names[event.name] = (summary.names[event.name] ?? 0) + 1;
+      }
+      const eventSamples = Object.create(null);
+      for (const event of traceEvents) {
+        if (!/DirectRenderer::DrawFrame|SubmitCompositorFrameToPresentationCompositorFrame|SwapBuffers|FramePresented/i.test(event.name ?? "")) continue;
+        const samples = eventSamples[event.name] ??= [];
+        if (samples.length < 3) {
+          samples.push({ pid: event.pid, tid: event.tid, ts: event.ts, dur: event.dur, args: event.args });
+        }
+      }
+      performanceTrace = {
+        eventCount: traceEvents.length,
+        selectedEventCounts: eventCounts,
+        selectedEventDurationsMs: durationSummaries,
+        compositorThreads,
+        eventSamples,
+      };
+    }
+    if (captureConsoleMs > 0) await new Promise(resolve => setTimeout(resolve, captureConsoleMs));
+    const renderPerformance = await Promise.all(consoleMessages.map(async message => ({
+      timestamp: message.timestamp,
+      type: message.type,
+      summary: await readRemoteValue(message.args.find(argument => argument.objectId)),
+    })));
+    return {
+      windowId, targetId: target.id, x1, y1, x2, y2, state: after,
+      ...(captureConsoleMs > 0 ? { renderPerformance } : {}),
+      ...(captureTrace ? { performanceTrace } : {}),
+    };
   } finally {
+    if (mousePressed) {
+      try {
+        await cdp.call("Input.dispatchMouseEvent", {
+          type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1,
+        });
+      } catch { /* The target may have closed; preserve the original drag error. */ }
+    }
+    if (tracingStarted) {
+      try { await cdp.call("Tracing.end"); } catch { /* Preserve the original drag or trace error. */ }
+    }
+    removeConsoleListener?.();
+    removeTraceDataListener?.();
+    removeTraceCompleteListener?.();
     cdp.close();
   }
 }
@@ -838,9 +1035,10 @@ const mcpTools = [
   { name: "tiefsee_press", description: "向指定視窗送出鍵盤快捷鍵；例：Ctrl+C、Ctrl+V、F2、Escape。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, keys: { type: "string" }, waitMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId", "keys"], additionalProperties: false } },
   { name: "tiefsee_type", description: "向指定視窗目前焦點輸入文字；先用實際點擊或鍵盤操作聚焦輸入框。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, text: { type: "string", maxLength: 10000 } }, required: ["windowId", "text"], additionalProperties: false } },
   { name: "tiefsee_move", description: "向指定視窗送出滑鼠移動事件。座標是 viewport CSS pixels。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" } }, required: ["windowId", "x", "y"], additionalProperties: false } },
-  { name: "tiefsee_wheel", description: "向指定視窗送出滑鼠滾輪事件。deltaY 負值通常代表向上滾。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, deltaY: { type: "number" }, deltaX: { type: "number" } }, required: ["windowId", "x", "y", "deltaY"], additionalProperties: false } },
+  { name: "tiefsee_resize_window", description: "將指定測試視窗調整為指定外框大小（400–3840 × 300–2160），用於重現小視窗版面。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, width: { type: "integer", minimum: 400, maximum: 3840 }, height: { type: "integer", minimum: 300, maximum: 2160 } }, required: ["windowId", "width", "height"], additionalProperties: false } },
+  { name: "tiefsee_wheel", description: "向指定視窗送出滑鼠滾輪事件。deltaY 負值通常代表向上滾；captureScreenshot 可在輸入後擷取畫面，delayMs 可等候短暫視覺更新。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, deltaY: { type: "number" }, deltaX: { type: "number" }, captureScreenshot: { type: "boolean" }, captureScreenshotDelayMs: { type: "integer", minimum: 0, maximum: 250 } }, required: ["windowId", "x", "y", "deltaY"], additionalProperties: false } },
   { name: "tiefsee_touch_gesture", description: "透過 CDP 真實多點觸控事件，在指定 WebView 視窗執行受限的雙指縮放或旋轉手勢。kind=pinch 時 value 是倍率；kind=rotate 時 value 是角度。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, kind: { type: "string", enum: ["pinch", "rotate"] }, x: { type: "number" }, y: { type: "number" }, radius: { type: "number", minimum: 20, maximum: 300 }, value: { type: "number" }, steps: { type: "integer", minimum: 2, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 } }, required: ["windowId", "kind", "x", "y", "radius", "value"], additionalProperties: false } },
-  { name: "tiefsee_drag", description: "在指定視窗內送出拖曳輸入。steps 與 durationMs 可控制移動點數和耗時，用於驗證快速手勢或慣性；預設維持單段立即拖曳。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" }, steps: { type: "integer", minimum: 1, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
+  { name: "tiefsee_drag", description: "在指定視窗內送出拖曳輸入。steps 與 durationMs 可控制移動點數和耗時；captureConsoleMs 可回傳 Renderer 摘要；captureTrace 可收集短時間 Chromium compositor／GPU trace。這些量測不執行頁面 JavaScript。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" }, steps: { type: "integer", minimum: 1, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 }, captureConsoleMs: { type: "integer", minimum: 0, maximum: 5000 }, captureTrace: { type: "boolean" } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
   { name: "tiefsee_wait", description: "等待指定視窗的 selector 可見／隱藏或文字出現；以狀態輪詢取代固定長時間 sleep。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, text: { type: "string" }, state: { type: "string", enum: ["visible", "hidden"] }, timeoutMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_screenshot", description: "擷取指定 WebView 視窗畫面；只在需要確認視覺結果時使用。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
 ];
@@ -900,9 +1098,10 @@ async function callMcpTool(name, args) {
     case "tiefsee_press": return await pressForWindow(args.windowId, args.keys, args.waitMs);
     case "tiefsee_type": return await typeForWindow(args.windowId, args.text);
     case "tiefsee_move": return await moveForWindow(args.windowId, args.x, args.y);
-    case "tiefsee_wheel": return await wheelForWindow(args.windowId, args.x, args.y, args.deltaY, args.deltaX ?? 0);
+    case "tiefsee_resize_window": return await resizeWindowForWindow(args.windowId, args.width, args.height);
+    case "tiefsee_wheel": return await wheelForWindow(args.windowId, args.x, args.y, args.deltaY, args.deltaX ?? 0, args.captureScreenshot === true, args.captureScreenshotDelayMs ?? 0);
     case "tiefsee_touch_gesture": return await touchGestureForWindow(args.windowId, args.kind, args.x, args.y, args.radius, args.value, args.steps ?? 12, args.durationMs ?? 300);
-    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2, args.steps ?? 1, args.durationMs ?? 0);
+    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2, args.steps ?? 1, args.durationMs ?? 0, args.captureConsoleMs ?? 0, args.captureTrace ?? false);
     case "tiefsee_wait": return await waitForWindow(args.windowId, args);
     case "tiefsee_screenshot": {
       const { target, cdp } = await findWindowTarget(args.windowId);

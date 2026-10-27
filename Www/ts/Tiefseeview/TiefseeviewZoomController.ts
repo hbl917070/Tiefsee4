@@ -125,11 +125,11 @@ export class TiefseeviewZoomController {
         if (y === undefined) { y = viewport.offsetHeight / 2; }
         if (zoomRatio === undefined) { zoomRatio = this.options.getZoomStep(); }
         if (rendering === undefined) { rendering = this.options.getRendering(); }
-        this.options.setRendering(rendering, true);
-
         if (zoomRatio === 1) { return; }
         if (zoomRatio > 1 && this.options.isLimitMax()) { return; }
         if (zoomRatio < 1 && this.options.isLimitMin()) { return; }
+        // 縮放被上下限擋住時不更新 Renderer，避免無效滾輪事件觸發 WebGL 快取圖層定位。
+        this.options.setRendering(rendering, true);
         this.options.setDataSize(this.options.getCurrentWidth() * zoomRatio);
 
         const xFromLeft = x - this.options.toNumber(container.style.left);

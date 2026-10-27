@@ -6,6 +6,11 @@
 - 新增一般文件時，依語言放入 `Docs/en` 或 `Docs/zh-TW`，檔名採全小寫 kebab-case，不加語言後綴；根目錄 README 與本檔除外。
 - 新增或移動 C# 類別、調整專案分層時，先閱讀 `Docs/zh-TW/csharp-architecture-conventions.md`，依責任判斷放置位置。
 
+## TypeScript 型別檢查
+
+- 修改 `Www/ts` 下的 TypeScript 後，從 `Www` 目錄執行 `.\node_modules\.bin\tsc.cmd --noEmit --pretty false`，依 `tsconfig.json` 對整個前端專案進行型別檢查；修正檢查發現的錯誤後再回報結果。
+- Gulp 的 `ts` 任務使用 esbuild 打包，不會執行 TypeScript 型別檢查；Gulp 建置成功不能取代上述檢查。`--noEmit` 不會輸出編譯檔。
+
 ## Tiefsee UI 整合測試
 
 - 依 `Docs/zh-TW/ai-automated-testing.md` 使用 `tiefsee-webview` MCP；若 MCP 未載入、工具 schema 缺少 `clickCount`，或多行 inline 點擊仍使用外框中心，改用 `CdpTest.mjs call <toolName> <jsonArgs>` 呼叫目前工作樹中的同一份 dispatcher。無須重啟 Codex 或 Debug Tiefsee，也不另建 CDP 腳本。此測試資料夾需隨專案提交。

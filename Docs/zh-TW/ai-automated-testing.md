@@ -156,14 +156,15 @@ Debug 測試版把 `AppData`、設定檔、暫存資料和 WebView2 user data �
 | `tiefsee_click_text` | 依唯一可見的精確文字定位互動項目並送出真實 CDP 左鍵點擊；適合快照能看到選單文字、但沒有 selector 的情況；可用 `includeSnapshot: true` 合併操作後驗證 |
 | `tiefsee_press` | 送出按鍵／快捷鍵，例如 `Ctrl+C`、`Ctrl+V`、`F2`、`Escape` |
 | `tiefsee_type` | 對目前焦點送出文字輸入；先用點擊或鍵盤聚焦 |
-| `tiefsee_move`、`tiefsee_wheel`、`tiefsee_drag` | 送出指定視窗內的滑鼠移動、滾輪或拖曳；拖曳可用 `steps`、`durationMs` 控制輸入點數與時間 |
+| `tiefsee_move`、`tiefsee_wheel`、`tiefsee_drag` | 送出指定視窗內的滑鼠移動、滾輪或拖曳；拖曳可用 `steps`、`durationMs` 控制輸入點數與時間。`tiefsee_wheel` 可用 `captureScreenshot` 與 `captureScreenshotDelayMs` 擷取短暫視覺狀態 |
+| `tiefsee_resize_window` | 依 `windowId` 調整測試視窗外框大小（寬 400–3840、高 300–2160），用於重現小視窗版面；調整後重新 inspect viewport 取得新座標 |
 | `tiefsee_touch_gesture` | 以 CDP 觸控模擬送出雙指縮放或旋轉；`kind` 為 `pinch` 時 `value` 是 0.5–2 倍倍率，`rotate` 時是 5–180 度角度，`x`／`y` 為 viewport CSS 座標 |
 | `tiefsee_wait` | 輪詢 selector 可見狀態或文字，避免猜固定等待時間 |
 | `tiefsee_screenshot` | 擷取指定 WebView 畫面；供像素呈現、旋轉、裁切等視覺結果檢查 |
 
 優先使用範圍明確的 `tiefsee_inspect`，避免每一步都讀完整快照；已知且唯一的 selector 用 `tiefsee_click`。只有在控件沒有可用 selector、但其 DOM 座標已由 inspect/snapshot 確認時，才用 `tiefsee_click_at`；座標是 viewport CSS pixels。兩者都會送出 CDP 滑鼠事件，不呼叫 DOM click。截圖只用來確認圖片、裁切、旋轉等視覺渲染結果，不用來定位一般按鈕。用 `tiefsee_inspect` 或快照確認操作結果；只在需要更多上下文時讀完整快照。此測試方案只涵蓋 WebView2 內的 DOM 與 CDP 輸入；不接管 Windows 全域鍵盤／滑鼠，也不操作原生檔案對話框、外部瀏覽器、Windows 系統視窗或跨出 WebView2 的 WinForms／OLE 拖曳。觸發這些外部操作的 WebView 控件仍可在其邊界內驗證角色、名稱，以及 WebView2 內可觀察到的結果；不將外部視窗互動列為測試待辦。
 
-需要驗證快速拖曳速度或慣性時，使用目前 dispatcher 的 `tiefsee_drag` `steps`、`durationMs` 參數產生連續移動輸入，例如 `{"windowId":"<windowId>","x1":280,"y1":300,"x2":520,"y2":320,"steps":12,"durationMs":0}`。預設參數仍是一段立即拖曳。若已載入的 MCP schema 尚不接受這兩個可選參數，對該次呼叫使用 `node .\Tests\WebView2TestAutomation\CdpTest.mjs call tiefsee_drag '<jsonArgs>'`，不需重新載入 Codex 或新增測試腳本。文字輸入框可用 `tiefsee_inspect` 的 `selectionStart`、`selectionEnd` 和 `selectedText` 確認局部選取；再以右鍵點擊選取範圍內的座標，驗證文字快顯選單會保留選取。
+需要驗證快速拖曳速度或慣性時，使用目前 dispatcher 的 `tiefsee_drag` `steps`、`durationMs` 參數產生連續移動輸入，例如 `{"windowId":"<windowId>","x1":280,"y1":300,"x2":520,"y2":320,"steps":12,"durationMs":0}`。預設參數仍是一段立即拖曳。`captureConsoleMs` 大於 0 時，dispatcher 會在同一 CDP 連線中暫時訂閱 Console API 訊息，拖曳後等待指定毫秒，並只回傳 `[Tiefsee render performance] pan` 訊息；`captureTrace: true` 會額外擷取短時間 Chromium compositor、GPU 和 raster trace 的摘要。這些量測不會在頁面執行 JavaScript。若已載入的 MCP schema 尚不接受可選參數，對該次呼叫使用 `node .\Tests\WebView2TestAutomation\CdpTest.mjs call tiefsee_drag '<jsonArgs>'`，不需重新載入 Codex 或新增測試腳本。文字輸入框可用 `tiefsee_inspect` 的 `selectionStart`、`selectionEnd` 和 `selectedText` 確認局部選取；再以右鍵點擊選取範圍內的座標，驗證文字快顯選單會保留選取。
 
 需要驗證多點觸控時，使用 `tiefsee_touch_gesture` 送出 CDP 雙指事件；這是 WebView2 內的觸控模擬，不代表實體觸控螢幕硬體驗收。範例：
 

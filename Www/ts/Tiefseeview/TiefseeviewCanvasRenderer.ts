@@ -1,5 +1,6 @@
 import type { TiefseeviewMediaType } from "./TiefseeviewDomMediaRenderer";
 import { getOrigPoint } from "./TiefseeviewGeometry";
+import { TiefseeviewRenderPerformanceMonitor } from "./TiefseeviewRenderPerformanceMonitor";
 import type { TiefseeviewRenderer, TiefseeviewViewState } from "./TiefseeviewTypes";
 
 export interface TiefseeviewCanvasDrawInfo {
@@ -50,20 +51,24 @@ export interface TiefseeviewCanvasRendererOptions {
 /** 舊 Canvas 大圖路徑的可視區計算與繪製。 */
 export class TiefseeviewCanvasRenderer implements TiefseeviewRenderer {
     private viewState: TiefseeviewViewState | null = null;
+    private readonly performanceMonitor = new TiefseeviewRenderPerformanceMonitor("Canvas");
 
     constructor(private readonly options: TiefseeviewCanvasRendererOptions) { }
 
     public setViewState(state: TiefseeviewViewState): void {
         this.viewState = state;
+        this.performanceMonitor.setViewState(state);
     }
 
     /** Renderer 合約入口；舊 Canvas 繼續使用既有 DOM 與繪製演算法。 */
     public async render(isImmediatelyRun?: boolean): Promise<void> {
+        const startedAt = performance.now();
         await this.draw(isImmediatelyRun);
+        this.performanceMonitor.recordFrame(performance.now() - startedAt);
     }
 
     /** 此相容 Renderer 不持有獨立資源；快取與 Worker 仍由 CanvasCache 管理。 */
-    public dispose(): void { }
+    public dispose(): void { this.performanceMonitor.dispose(); }
 
     public async draw(isImmediatelyRun?: boolean) {
 
@@ -215,6 +220,7 @@ export class TiefseeviewCanvasRenderer implements TiefseeviewRenderer {
                 || Math.abs(sWidth - this.options.tempDrawImage.sWidth) > margin / 2
                 || Math.abs(sHeight - this.options.tempDrawImage.sHeight) > margin / 2
             ) {
+                this.performanceMonitor.recordCanvasRasterization();
                 this.options.tempDrawImage = {
                     scale: scale,
                     sx: sx, sy: sy,

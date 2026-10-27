@@ -144,6 +144,7 @@ export class TiefseeviewLanczosRenderer {
             return false;
         }
         let params: any = null;
+        let displayParams: any = null;
         try {
             this.ensureSource(bitmap);
             this.ensureOutput(width, height);
@@ -178,11 +179,15 @@ export class TiefseeviewLanczosRenderer {
                     { binding: 2, resource: { buffer: params } }
                 ]
             });
+            displayParams = this.device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+            const displayData = new DataView(new ArrayBuffer(16));
+            displayData.setFloat32(8, Math.max(0, sharpenValue), true);
+            this.device.queue.writeBuffer(displayParams, 0, displayData.buffer);
             const displayBindGroup = this.device.createBindGroup({
                 layout: this.displayPipeline.getBindGroupLayout(0),
                 entries: [
                     { binding: 0, resource: this.outputTexture.createView() },
-                    { binding: 1, resource: { buffer: params } }
+                    { binding: 1, resource: { buffer: displayParams } }
                 ]
             });
             const encoder = this.device.createCommandEncoder();
@@ -205,11 +210,14 @@ export class TiefseeviewLanczosRenderer {
             await this.device.queue.onSubmittedWorkDone();
             params.destroy();
             params = null;
+            displayParams.destroy();
+            displayParams = null;
             if (revision !== this.frameRevision || this.disposed) return false;
             // 只在畫面完整且仍有效時回報成功，由 WebGL Renderer 與預覽層互斥切換。
             return true;
         } catch (error) {
             params?.destroy();
+            displayParams?.destroy();
             console.warn("WebGPU Lanczos3 閒置重採樣失敗。", error);
             this.hide();
             return false;
@@ -219,28 +227,32 @@ export class TiefseeviewLanczosRenderer {
     /** Lanczos 不適用時，對已完成 WebGL 預覽／tile 合成的 viewport 做閒置銳化。 */
     public async renderSharpenedCanvas(sourceCanvas: HTMLCanvasElement, sharpenValue: number): Promise<boolean> {
         const revision = ++this.frameRevision;
-        const width = sourceCanvas.width;
-        const height = sourceCanvas.height;
-        if (this.disposed || sharpenValue <= 0 || width <= 0 || height <= 0 ||
-            width > this.maxTextureSize || height > this.maxTextureSize) {
+        const sourceWidth = sourceCanvas.width;
+        const sourceHeight = sourceCanvas.height;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        if (this.disposed || sharpenValue <= 0 || sourceWidth <= 0 || sourceHeight <= 0 || width <= 0 || height <= 0 ||
+            sourceWidth > this.maxTextureSize || sourceHeight > this.maxTextureSize) {
             this.hide();
             return false;
         }
 
-        let params: any = null;
+        let displayParams: any = null;
         try {
             // 同一個 WebGL canvas 會持續改畫，不能依 Canvas 物件身分略過貼圖更新。
             this.ensureSource(sourceCanvas, true);
-            this.ensureOutput(width, height);
-            params = this.device.createBuffer({ size: 80, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-            const data = new DataView(new ArrayBuffer(80));
-            data.setFloat32(76, sharpenValue, true);
-            this.device.queue.writeBuffer(params, 0, data.buffer);
+            displayParams = this.device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+            const data = new DataView(new ArrayBuffer(16));
+            // WebGL viewport 周圍多畫了 overscan；銳化輸出只取中央 viewport 範圍。
+            data.setFloat32(0, (sourceWidth - width) / 2, true);
+            data.setFloat32(4, (sourceHeight - height) / 2, true);
+            data.setFloat32(8, sharpenValue, true);
+            this.device.queue.writeBuffer(displayParams, 0, data.buffer);
             const bindGroup = this.device.createBindGroup({
                 layout: this.displayPipeline.getBindGroupLayout(0),
                 entries: [
                     { binding: 0, resource: this.sourceTexture.createView() },
-                    { binding: 1, resource: { buffer: params } }
+                    { binding: 1, resource: { buffer: displayParams } }
                 ]
             });
             const encoder = this.device.createCommandEncoder();
@@ -256,11 +268,11 @@ export class TiefseeviewLanczosRenderer {
             display.end();
             this.device.queue.submit([encoder.finish()]);
             await this.device.queue.onSubmittedWorkDone();
-            params.destroy();
-            params = null;
+            displayParams.destroy();
+            displayParams = null;
             return revision === this.frameRevision && !this.disposed;
         } catch (error) {
-            params?.destroy();
+            displayParams?.destroy();
             console.warn("WebGPU viewport 銳化失敗。", error);
             this.hide();
             return false;
