@@ -28,7 +28,7 @@ public sealed class ImageProcessingService {
     private const int JpegMaxDimension = 65500;
     private const long WebGLPreviewMaxPixels = 8L * 1024 * 1024;
     private const long VipsStreamThresholdBytes = 256L * 1024 * 1024;
-    private const string VipsTileAlgorithmVersion = "source-region-v5";
+    private const string VipsTileAlgorithmVersion = "source-region-v6-jpg100";
 
     private readonly string _tempDirImgProcessed;
     private readonly string _tempDirImgZoom;
@@ -912,7 +912,7 @@ public sealed class ImageProcessingService {
                 using VipsImageLease imageLease = AcquireNetVips(path, "jpg");
                 NetVips.Image vImg = imageLease.Image;
                 using (var vImg2 = vImg.IccTransform("srgb", Enums.PCS.Lab, Enums.Intent.Perceptual)) {
-                    vImg2.Jpegsave(path100);
+                    vImg2.Jpegsave(path100, q: 100);
                 }
                 return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
             }
@@ -957,6 +957,7 @@ public sealed class ImageProcessingService {
             using (MagickImage image = GetMagickImage(path)) {
                 // 如果不透明
                 if (image.IsOpaque) {
+                    image.Quality = 100;
                     image.Write(path100, MagickFormat.Jpeg);
                 }
                 else {
@@ -991,6 +992,7 @@ public sealed class ImageProcessingService {
             catch {
                 // 如果無法取得 raw ，就改用 MagickImage
                 using (var image = new MagickImage(path)) {
+                    image.Quality = 100;
                     image.Write(path100, MagickFormat.Jpeg);
                     Debug.WriteLine("Magick ok: " + path);
                     return GetImgInitInfo(path100, "vips", vipsType, useRegionalTiles);
@@ -1039,7 +1041,7 @@ public sealed class ImageProcessingService {
 
         int sourceOrientation = GetImgExifOrientation(path);
         string orientationSuffix = sourceOrientation == 1 ? "" : $"_o{sourceOrientation}";
-        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}{orientationSuffix}_{scale}.jpg"; // 暫存檔案名稱
+        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}{orientationSuffix}_{scale}_jpg100_v1.jpg"; // 暫存檔案名稱
         string filePath = Path.Combine(_tempDirImgZoom, hashName); // 暫存檔案的路徑
 
         // 如果檔案已經存在，就直接回傳
@@ -1386,7 +1388,9 @@ public sealed class ImageProcessingService {
     /// 取得「ImgProcessed」暫存資料夾裡面的檔案名稱
     /// </summary>
     private string PathToImgProcessed(string path, string vipsType, string ext = "jpg") {
-        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}.{ext}"; // 暫存檔案名稱
+        // 更換 JPEG 預處理品質後隔離舊有損快取，避免舊檔被當成 Q100 結果重用。
+        string cacheVersion = ext.Equals("jpg", StringComparison.OrdinalIgnoreCase) ? "_jpg100_v1" : "";
+        string hashName = $"{FileTypeHelper.FileToHash(path)}_{vipsType}{cacheVersion}.{ext}"; // 暫存檔案名稱
         string filePath = Path.Combine(_tempDirImgProcessed, hashName); // 暫存檔案的路徑
         if (Directory.Exists(_tempDirImgProcessed) == false) {
             Directory.CreateDirectory(_tempDirImgProcessed);
