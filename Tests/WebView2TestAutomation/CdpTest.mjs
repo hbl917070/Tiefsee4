@@ -385,6 +385,51 @@ async function clickForWindow(windowId, selector, button = "left", includeSnapsh
   }
 }
 
+// 真實滑鼠點選後，量測工具列更新為目標圖片的尺寸；不宣稱等同螢幕合成完成。
+async function measureImageSwitch(windowId, selector, expectedPath, width, height) {
+  const { target, cdp } = await findWindowTarget(windowId);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) throw new Error("Target identity changed before input.");
+    const location = await cdp.call("Runtime.evaluate", { expression: `(() => {
+      const matches = [...document.querySelectorAll(${JSON.stringify(selector)})].filter(e => {
+        const r=e.getBoundingClientRect(), s=getComputedStyle(e);
+        return r.width>0 && r.height>0 && s.display!=='none' && s.visibility!=='hidden';
+      });
+      if (matches.length !== 1) return null;
+      const r=matches[0].getBoundingClientRect(), x=r.x+r.width/2, y=r.y+r.height/2;
+      return x>=0 && y>=0 && x<innerWidth && y<innerHeight ? {x,y} : null;
+    })()`, returnByValue: true });
+    const point = location.result?.value;
+    if (!point || point.x < 0 || point.y < 0) throw new Error("Image selector is not uniquely visible.");
+    const readReady = async () => {
+      const result = await cdp.call("Runtime.evaluate", { expression: `(() => {
+        const path=${JSON.stringify(expectedPath)};
+        const dimensions=[...document.querySelectorAll('[data-name="infoSize"]')].filter(e => e.getClientRects().length).map(e => e.innerText.trim().replace(/\\s+/g,' '));
+        const title=[...document.querySelectorAll('span[title]')].some(e => e.title===path && e.getClientRects().length);
+        return {title,dimensions};
+      })()`, returnByValue:true });
+      return result.result?.value;
+    };
+    const before = await readReady();
+    if (before?.title) throw new Error("Select a different image before measuring.");
+    await cdp.call("Input.dispatchMouseEvent", {type:"mouseMoved",x:point.x,y:point.y});
+    const start = performance.now();
+    await cdp.call("Input.dispatchMouseEvent", {type:"mousePressed",x:point.x,y:point.y,button:"left",buttons:1,clickCount:1});
+    await cdp.call("Input.dispatchMouseEvent", {type:"mouseReleased",x:point.x,y:point.y,button:"left",buttons:0,clickCount:1});
+    const expected = `${width} ${height}`;
+    while (performance.now()-start < 30000) {
+      const state = await readReady();
+      if (state?.title && state.dimensions.includes(expected)) {
+        return {windowId, path:expectedPath, width, height, readyMs:performance.now()-start,
+          note:"點擊至工具列顯示目標尺寸；不保證實際畫面合成完成"};
+      }
+      await new Promise(resolve => setTimeout(resolve, 15));
+    }
+    throw new Error("Image switch did not reach expected toolbar state.");
+  } finally { cdp.close(); }
+}
+
 async function clickAtForWindow(windowId, x, y, button = "left") {
   const buttonMask = { left: 1, right: 2, middle: 4 }[button];
   if (!buttonMask) throw new Error("button must be left, right or middle.");
@@ -1024,7 +1069,66 @@ async function waitForWindow(windowId, { selector, text, state = "visible", time
   }
 }
 
+async function benchmarkImageForWindow(windowId, path, renderer) {
+  const { target, cdp } = await findWindowTarget(windowId);
+  try {
+    const state = await readState(target, cdp);
+    if (state?.windowId !== windowId) throw new Error("Target identity changed before benchmark.");
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(async () => {
+        const path = ${JSON.stringify(path)};
+        const renderer = ${JSON.stringify(renderer)};
+        const canvas = document.createElement('canvas');
+        const gl = renderer === 'webgl' ? canvas.getContext('webgl2') : null;
+        if (renderer === 'webgl' && !gl) throw new Error('WebGL2 unavailable');
+        let program, texture;
+        if (gl) {
+          const shader = (type, text) => { const s = gl.createShader(type); gl.shaderSource(s, text); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+          program = gl.createProgram();
+          gl.attachShader(program, shader(gl.VERTEX_SHADER, '#version 300 es\\nconst vec2 p[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.)); out vec2 uv; void main(){gl_Position=vec4(p[gl_VertexID],0.,1.);uv=(p[gl_VertexID]+1.)*.5;}'));
+          gl.attachShader(program, shader(gl.FRAGMENT_SHADER, '#version 300 es\\nprecision highp float; in vec2 uv; uniform sampler2D tex; out vec4 color; void main(){color=texture(tex,vec2(uv.x,1.0-uv.y));}'));
+          gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+          gl.useProgram(program); texture = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, texture); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        }
+        const url = new URL('/api/files/content', window.APIURL);
+        url.searchParams.set('path', path);
+        url.searchParams.set('benchmark', crypto.randomUUID());
+        const t0 = performance.now();
+        const response = await fetch(url, {cache:'no-store'});
+        if (!response.ok) throw new Error('HTTP '+response.status);
+        const blob = await response.blob();
+        const t1 = performance.now();
+        const bitmap = await createImageBitmap(blob);
+        const t2 = performance.now();
+        canvas.width = bitmap.width; canvas.height = bitmap.height;
+        let upload = null, draw, ctx = null;
+        if (gl) {
+          gl.viewport(0,0,canvas.width,canvas.height); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,bitmap); gl.finish(); const t3 = performance.now();
+          gl.drawArrays(gl.TRIANGLES,0,3); gl.finish(); const t4 = performance.now(); upload=t3-t2; draw=t4-t3;
+          if (gl.getError() !== gl.NO_ERROR) throw new Error('WebGL error');
+        } else {
+          ctx=canvas.getContext('2d'); if (!ctx) throw new Error('Canvas 2D unavailable');
+          ctx.drawImage(bitmap,0,0);
+          ctx.getImageData(0,0,1,1); draw=performance.now()-t2;
+        }
+        const answer={path,renderer,status:response.status,mime:response.headers.get('content-type'),bytes:blob.size,width:bitmap.width,height:bitmap.height,transferMs:t1-t0,decodeMs:t2-t1,uploadMs:upload,drawMs:draw,totalMs:performance.now()-t0};
+        const sx = Math.floor(bitmap.width * .65), sy = Math.floor(bitmap.height * .55);
+        if (gl) { const pixel = new Uint8Array(4); gl.readPixels(sx, bitmap.height - 1 - sy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel); answer.sample=Array.from(pixel); answer.drawingBuffer=[gl.drawingBufferWidth,gl.drawingBufferHeight]; answer.maxTextureSize=gl.getParameter(gl.MAX_TEXTURE_SIZE); }
+        else answer.sample=Array.from(ctx.getImageData(sx,sy,1,1).data);
+        bitmap.close();
+        if (gl) { gl.deleteTexture(texture); gl.deleteProgram(program); gl.getExtension('WEBGL_lose_context')?.loseContext(); }
+        return answer;
+      })()`,
+      returnByValue: true, awaitPromise: true,
+    });
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description ?? result.exceptionDetails.text);
+    return result.result?.value;
+  } finally { cdp.close(); }
+}
+
 const mcpTools = [
+  { name: "tiefsee_benchmark_image", description: "針對指定圖片量測 Tiefsee 本機 API 傳輸、ImageBitmap 解碼與離畫面 Canvas 或 WebGL 繪製。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, path: { type: "string" }, renderer: { type: "string", enum: ["canvas", "webgl"] } }, required: ["windowId", "path", "renderer"], additionalProperties: false } },
+  { name: "tiefsee_measure_image_switch", description: "以真實滑鼠切圖，量測直到工具列顯示指定圖片尺寸的時間。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, path: { type: "string" }, width: { type: "integer", minimum: 1 }, height: { type: "integer", minimum: 1 } }, required: ["windowId", "selector", "path", "width", "height"], additionalProperties: false } },
   { name: "tiefsee_pages", description: "列出目前 Debug 測試版的 WebView 視窗。以 windowId 區分視窗；null 是尚未初始化的預載頁。", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "tiefsee_state", description: "讀取指定 windowId 的標題、啟動參數與頁面文字。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_snapshot", description: "讀取指定視窗的可見互動 DOM、文字和座標；不執行網頁程式碼。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
@@ -1083,6 +1187,8 @@ async function callMcpTool(name, args) {
   }
 
   switch (name) {
+    case "tiefsee_benchmark_image": return await benchmarkImageForWindow(args.windowId, args.path, args.renderer);
+    case "tiefsee_measure_image_switch": return await measureImageSwitch(args.windowId, args.selector, args.path, args.width, args.height);
     case "tiefsee_pages": return await listWindows();
     case "tiefsee_state": {
       const windows = await listWindows();

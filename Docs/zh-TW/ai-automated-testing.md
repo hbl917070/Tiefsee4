@@ -4,6 +4,12 @@
 
 使用專案內的 `tiefsee-webview` MCP server，透過 CDP 對 Debug WebView2 視窗送出真實滑鼠、滾輪及鍵盤輸入。工具依 Tiefsee 的 `windowId` 指定視窗，因此同時開多個視窗時不依賴分頁順序、桌面焦點或全局輸入。DOM 讀取只用來辨識控件和驗證狀態，不用 `element.click()`、DOM 修改或應用程式 API 代替使用者操作。
 
+有明確需求的效能微基準可在同一 dispatcher 新增固定用途、可審查的量測工具，例如讀取本機圖片 API 並在離畫面 Canvas／WebGL 解碼、繪製；不得提供執行任意程式碼的介面，也不能用量測冒充真實 UI 操作。每項量測須說明取樣、計時區間、快取、同步方式與未涵蓋的成本，避免把微基準當成完整 UI 顯示時間。
+
+`tiefsee_benchmark_image` 每次透過 `/api/files/content` 讀取指定檔案，加入隨機查詢參數並使用 `cache: no-store`；先計時 fetch 與 blob，再計時 `createImageBitmap`。Canvas 2D 繪製後讀取一個像素以同步，WebGL2 則計時紋理上傳和全畫布繪製，各以 `gl.finish()` 同步。畫布與 WebGL context 建立不在總時間內，畫布尺寸設定包含在繪製或上傳時間；WebGL 回報的總時間亦含錯誤檢查。這是離畫面微基準，不含實際 renderer 的完整排程、worker、合成或畫面呈現，也不清除 OS 檔案快取。每次請求應確認 HTTP 200、MIME、位元組數與圖片尺寸；多輪暖身後比較中位數。
+
+`tiefsee_measure_image_switch` 使用已觀察到的唯一可見縮圖 selector 送出真實 CDP 滑鼠點擊，再以唯讀 DOM 輪詢目標路徑與工具列尺寸；回報從點擊到工具列更新的時間。測試前必須選中另一張尺寸不同的圖片，並確定目標縮圖在視窗內。工具列更新代表圖片初始化已推進到該階段，不保證實際畫面合成完成，也不取代截圖、手動操作或冷磁碟量測。
+
 ## 執行環境需求
 
 - Node.js 22.4 或更新版本；`CdpTest.mjs` 使用 Node.js 全域 `WebSocket`，不需安裝 npm 套件。
@@ -147,6 +153,8 @@ Debug 測試版把 `AppData`、設定檔、暫存資料和 WebView2 user data �
 
 | 工具 | 用途 |
 | --- | --- |
+| `tiefsee_benchmark_image` | 以指定 `windowId`、絕對 `path` 與 `renderer`（`canvas` 或 `webgl`）量測本機圖片 API、ImageBitmap 解碼與離畫面繪製；每次使用隨機網址及 `no-store`，不測量完整 UI 首次顯示 |
+| `tiefsee_measure_image_switch` | 真實點擊可見縮圖，量測至工具列顯示目標路徑和尺寸；不保證畫面已合成 |
 | `tiefsee_pages` | 列出頁面及 `windowId`、啟動檔案等識別資訊；`windowId: null` 是未初始化預載頁 |
 | `tiefsee_state` | 讀取指定視窗標題、檔案參數與頁面文字 |
 | `tiefsee_snapshot` | 讀取互動 DOM、可讀名稱、文字和元素座標；回報原生 checkbox／radio 的 checked，以及自訂 ARIA 控件的 role、名稱、`aria-checked`、`aria-disabled`、`aria-labelledby`、`aria-selected`、`aria-expanded` 與 `aria-controls` 狀態；套用自訂樣式而隱藏的 input 會回報關聯標籤 selector |
@@ -186,6 +194,6 @@ node .\Tests\WebView2TestAutomation\CdpTest.mjs call tiefsee_touch_gesture '{"wi
 ## 安全界線
 
 - CDP 只由明確啟用的 Debug 測試版提供，綁定 localhost，並使用隔離的測試資料目錄。
-- MCP 只接受預先定義且有參數 schema 的視窗讀取和輸入操作。不得加入任意 JavaScript 執行工具；DOM evaluate 僅包含工具內固定的唯讀辨識程式或輸入座標查詢。
+- MCP 只接受預先定義且有參數 schema 的視窗讀取、輸入和明確需求的效能量測。不得加入任意 JavaScript 執行工具；DOM evaluate 限於工具內固定的辨識、輸入座標查詢或上述可審查的效能量測程式。
 - 建置前關閉所有 Tiefsee 執行個體；不得讓舊測試程序與新測試程序共用輸出檔或測試 WebView2 資料目錄。
 - 測試輸入必須限定在指定 WebView2 視窗的 CDP 操作；不可接管全域鍵盤／滑鼠或為了完成外部視窗流程切換到桌面自動化。
