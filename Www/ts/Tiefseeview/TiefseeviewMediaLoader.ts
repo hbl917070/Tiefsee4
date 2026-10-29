@@ -33,8 +33,10 @@ export interface TiefseeviewMediaLoaderOptions {
 
 /** 載入 DOM 圖片、舊 Canvas 大圖與原生影片，保留原有載入順序。 */
 export class TiefseeviewMediaLoader {
+    private static readonly videoLoadTimeoutMs = 15_000;
     private tempImg?: HTMLImageElement;
     private scaleImages: TiefseeviewScaleImage[] = [];
+    private pendingVideoLoadCancel: (() => void) | null = null;
 
     constructor(private readonly options: TiefseeviewMediaLoaderOptions) { }
 
@@ -72,24 +74,81 @@ export class TiefseeviewMediaLoader {
         return this.loadBigimg("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
     }
 
+    /** 換來源時取消尚未完成的影片載入，並卸載舊影片以免它稍後開始播放。 */
+    public cancelVideoLoad(): void {
+        const video = this.options.domVideo;
+        this.pendingVideoLoadCancel?.();
+        this.pendingVideoLoadCancel = null;
+        video.onloadedmetadata = null;
+        video.pause();
+        if (video.hasAttribute("src")) {
+            video.removeAttribute("src");
+            video.load();
+        }
+    }
+
     public async loadVideo(url: string): Promise<boolean | undefined> {
+        this.cancelVideoLoad();
         const video = this.options.domVideo;
         this.options.setUrl(url);
-        video.onloadedmetadata = () => { video.play(); };
+        video.onloadedmetadata = () => {
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                void video.play().catch(() => { });
+            }
+        };
 
-        const loaded = await new Promise<boolean>(resolve => {
+        const loaded = await new Promise<boolean | undefined>(resolve => {
+            let isSettled = false;
+            let timeoutId: number | null = null;
+            let cancelLoad: () => void;
             const clearEvent = () => {
-                video.removeEventListener("loadedmetadata", onLoadedMetadata);
+                video.removeEventListener("loadeddata", onLoadedData);
                 video.removeEventListener("error", onError);
+                if (timeoutId !== null) {
+                    window.clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
             };
-            const onLoadedMetadata = () => { clearEvent(); resolve(true); };
-            const onError = () => { clearEvent(); resolve(false); };
-            video.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
+            const finish = (result: boolean | undefined) => {
+                if (isSettled) return;
+                isSettled = true;
+                clearEvent();
+                if (this.pendingVideoLoadCancel === cancelLoad) {
+                    this.pendingVideoLoadCancel = null;
+                }
+                resolve(result);
+            };
+            cancelLoad = () => finish(undefined);
+            const onLoadedData = () => {
+                // 音訊軌可能可播放，但若沒有成功辨識出影像軌，影片區會是黑畫面。
+                const hasVideoFrame = video.videoWidth > 0 && video.videoHeight > 0;
+                if (hasVideoFrame === false) {
+                    const error = video.error;
+                    console.warn("Video loaded without a decoded video frame", {
+                        width: video.videoWidth,
+                        height: video.videoHeight,
+                        code: error?.code,
+                        message: error?.message,
+                    });
+                }
+                finish(hasVideoFrame);
+            };
+            const onError = () => {
+                const error = video.error;
+                console.warn("Video loading failed", { code: error?.code, message: error?.message });
+                finish(false);
+            };
+            this.pendingVideoLoadCancel = cancelLoad;
+            video.addEventListener("loadeddata", onLoadedData, { once: true });
             video.addEventListener("error", onError, { once: true });
+            timeoutId = window.setTimeout(() => {
+                console.warn("Video loading timed out");
+                finish(false);
+            }, TiefseeviewMediaLoader.videoLoadTimeoutMs);
             video.src = url;
         });
 
-        if (this.options.getUrl() !== url) return;
+        if (loaded === undefined || this.options.getUrl() !== url) return;
         if (loaded) {
             this.options.mediaRenderer.setDataType("video");
             this.options.setOriginalSize(video.videoWidth, video.videoHeight);
@@ -98,6 +157,9 @@ export class TiefseeviewMediaLoader {
             return true;
         }
 
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
         this.options.setVideoDuration(-1);
         this.options.setOriginalSize(1, 1);
         this.options.mediaRenderer.setDataType("img");
@@ -108,6 +170,7 @@ export class TiefseeviewMediaLoader {
     }
 
     public async loadImg(url: string): Promise<boolean> {
+        this.cancelVideoLoad();
         this.options.setUrl(url);
         const loaded = await this.preloadImg(url);
         this.options.mediaRenderer.setDataType("img");
@@ -126,6 +189,7 @@ export class TiefseeviewMediaLoader {
     }
 
     public async loadBigimg(url: string): Promise<boolean> {
+        this.cancelVideoLoad();
         this.options.setUrl(url);
         this.options.setDisplaySizeInitialized(false);
         const loaded = await this.preloadImg(url);
@@ -153,6 +217,7 @@ export class TiefseeviewMediaLoader {
         zoomType: TiefseeviewZoomType,
         zoomValue: number
     ): Promise<boolean> {
+        this.cancelVideoLoad();
         this.options.setOriginalSize(width, height);
         this.scaleImages = images;
         const url = images[0].url;

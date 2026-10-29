@@ -32,13 +32,54 @@ export class FileShow {
     constructor(M: MainWindow) {
 
         const _domImgview = document.querySelector("#mView-tiefseeview") as HTMLDivElement;
+        const _domMotionPhotoToggle = document.querySelector(".video-toolbar-motion-photo") as HTMLButtonElement;
+        const _domVideoToolbar = document.querySelector("#video-toolbar") as HTMLElement;
         const _tiefseeview: Tiefseeview = new Tiefseeview(_domImgview);
+        const _domVideo = _tiefseeview.domTiefseeview.querySelector(".view-video") as HTMLVideoElement;
         const _videoToolbar = new VideoToolbar(M);
         const _iframes = new Iframes(M);
         var _isLoaded = true;
         let viewLoadRevision = 0;
         /** 目前顯示的類型 */
         var _groupType = GroupType.none;
+        let _motionPhotoFileInfo: FileInfo2 | null = null;
+        let activeVideoErrorRevision: number | null = null;
+
+        _domVideo.addEventListener("error", () => {
+            if (_groupType !== GroupType.video || activeVideoErrorRevision !== viewLoadRevision) return;
+            const error = _domVideo.error;
+            console.warn("Video playback failed", { code: error?.code, message: error?.message });
+            activeVideoErrorRevision = null;
+            _isLoaded = false;
+            _videoToolbar.setVisible(false);
+            M.msgbox.show({ txt: M.i18n.t("msg.videoPlaybackFailed") });
+            if (_motionPhotoFileInfo !== null) {
+                void openImage(_motionPhotoFileInfo);
+            } else {
+                void openErrorImage();
+            }
+        });
+
+        _domMotionPhotoToggle.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (_motionPhotoFileInfo == null) return;
+            if (_groupType === GroupType.video) {
+                openImage(_motionPhotoFileInfo);
+            } else {
+                openVideo(_motionPhotoFileInfo);
+            }
+        });
+
+        function updateMotionPhotoToggle(fileInfo2: FileInfo2, isVideo: boolean) {
+            const hasMotionPhoto = fileInfo2?.IsMotionPhoto === true;
+            _domMotionPhotoToggle.setAttribute("visible", hasMotionPhoto ? "true" : "false");
+            _domMotionPhotoToggle.setAttribute("i18n", isVideo ? "motionPhoto.still" : "motionPhoto.dynamic");
+            _domMotionPhotoToggle.title = M.i18n.t(isVideo ? "motionPhoto.showImage" : "motionPhoto.showVideo");
+            _domMotionPhotoToggle.setAttribute("aria-label", _domMotionPhotoToggle.title);
+            (_domMotionPhotoToggle.querySelector(".video-toolbar-motion-photo-label") as HTMLElement).textContent = M.i18n.t(isVideo ? "motionPhoto.still" : "motionPhoto.dynamic");
+            _domMotionPhotoToggle.dataset.mode = isVideo ? "video" : "image";
+            _domVideoToolbar.setAttribute("motion-photo-only", hasMotionPhoto && !isVideo ? "true" : "false");
+        }
 
         this.openImage = openImage;
         this.openIconImage = openIconImage;
@@ -81,6 +122,14 @@ export class FileShow {
             viewLoadRevision++;
             const previousGroupType = _groupType;
             _groupType = groupType;
+
+            if (groupType !== GroupType.video) {
+                activeVideoErrorRevision = null;
+            }
+            if (groupType !== GroupType.img && groupType !== GroupType.video) {
+                _motionPhotoFileInfo = null;
+                _domMotionPhotoToggle.setAttribute("visible", "false");
+            }
 
             document.body.setAttribute("showType", groupType); // 搭配CSS，用於顯示或隱藏某些選項
 
@@ -223,6 +272,9 @@ export class FileShow {
         async function openImage(fileInfo2: FileInfo2) {
 
             _isLoaded = false;
+            _videoToolbar.setVisible(false);
+            _motionPhotoFileInfo = fileInfo2?.IsMotionPhoto === true ? fileInfo2 : null;
+            updateMotionPhotoToggle(fileInfo2, false);
             setShowType(GroupType.img); // 改變顯示類型
             const requestRevision = viewLoadRevision;
             let imgurl = fileInfo2.Path; // 圖片網址
@@ -317,6 +369,7 @@ export class FileShow {
             if (requestRevision !== viewLoadRevision) return;
             await initTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
             if (requestRevision !== viewLoadRevision) return;
+            _videoToolbar.setVisible(_motionPhotoFileInfo !== null);
             _isLoaded = true;
         }
 
@@ -371,23 +424,43 @@ export class FileShow {
         async function openVideo(fileInfo2: FileInfo2) {
 
             _isLoaded = false;
+            activeVideoErrorRevision = null;
+            _videoToolbar.setVisible(false);
+            _motionPhotoFileInfo = fileInfo2?.IsMotionPhoto === true ? fileInfo2 : null;
+            updateMotionPhotoToggle(fileInfo2, true);
             const path = fileInfo2.Path;
-            if (_groupType === GroupType.video) {
-                _videoToolbar.setVisible(false);
-            }
             setShowType(GroupType.video); // 改變顯示類型
+            const requestRevision = viewLoadRevision;
 
             let imgurl: string; // 圖片網址
             if (M.fileLoad.getGroupType() === GroupType.unknown) { // 如果是未知的類型
                 imgurl = await WV_Image.GetFileIcon(path, 256); // 取得檔案總管的圖示
+            } else if (fileInfo2.IsMotionPhoto === true) {
+                imgurl = WebAPI.getMotionPhotoVideo(path);
             } else {
                 imgurl = await WebAPI.getVideo(path);
             }
 
+            if (requestRevision !== viewLoadRevision) return;
             _tiefseeview.setLoading(true, 200);
             const isVideoLoaded = await _tiefseeview.loadVideo(imgurl);
+            if (requestRevision !== viewLoadRevision) return;
+            if (isVideoLoaded === true) {
+                activeVideoErrorRevision = requestRevision;
+            }
 
-            initTiefseeview(fileInfo2);
+            if (isVideoLoaded !== true) {
+                M.msgbox.show({ txt: M.i18n.t("msg.videoPlaybackFailed") });
+            }
+
+            if (isVideoLoaded !== true && _motionPhotoFileInfo !== null) {
+                // WebView2 不支援影片編碼時回到靜態照片，保留再次切換的入口。
+                await openImage(_motionPhotoFileInfo);
+                return;
+            }
+
+            await initTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
+            if (requestRevision !== viewLoadRevision) return;
             _videoToolbar.setVisible(isVideoLoaded === true);
             _isLoaded = true;
         }

@@ -6,6 +6,19 @@
 
         <div class="video-toolbar-controls">
             <div class="video-toolbar-left">
+                <button class="video-toolbar-button video-toolbar-motion-photo" type="button" visible="false" i18n="motionPhoto.showVideo" aria-label="" title="">
+                    <svg class="video-toolbar-motion-photo-icon video-toolbar-motion-photo-icon--dynamic" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="2.5" y="3.5" width="15" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                        <path d="m4.5 18 3.5-4.5 2.5 2.5 2-2 3 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M19.5 8c1 1 1 2 0 3m1.5-4.5c2 2 2 4 0 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                    <svg class="video-toolbar-motion-photo-icon video-toolbar-motion-photo-icon--still" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="2.5" y="3.5" width="19" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                        <circle cx="9" cy="9" r="1.7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                        <path d="m4.5 18 4.5-4.5 3 3 2.5-2.5 4.5 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="video-toolbar-motion-photo-label" i18n="motionPhoto.dynamic">動態</span>
+                </button>
                 <button class="video-toolbar-button video-toolbar-play" type="button" title="播放" i18n="videoToolbar.play">
                     <span class="video-toolbar-play-icon" style="padding-left: 3px;">
                         <%- await readFile("./img/default/icon-play.svg"); %>

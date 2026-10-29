@@ -339,6 +339,9 @@ interface FileInfo2 {
 
     /** 完整路徑 (以js回寫的欄位) */
     FullPath: string
+
+    /** 是否偵測到 Motion Photo 標記；一般檔案會省略此欄位 */
+    IsMotionPhoto?: boolean
 }
 
 interface WV_Path {

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace Tiefsee;
 
@@ -16,4 +17,7 @@ public class FileInfo2 {
     public long LastWriteTimeUtc { get; set; } = 0;
     /// <summary> 檔案的 Hex (用於辨識檔案類型) </summary>
     public string HexValue { get; set; } = "";
+    /// <summary> 是否為可辨識的 Motion Photo；一般檔案不輸出此欄位 </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsMotionPhoto { get; set; }
 }

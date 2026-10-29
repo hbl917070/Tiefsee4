@@ -617,6 +617,7 @@ export class Tiefseeview {
 
         function preloadImg(url: string, isInitSize: undefined | boolean = true) { return mediaLoader.preloadImg(url, isInitSize); }
         function clearWebGLSource() {
+            mediaLoader.cancelVideoLoad();
             webglLoadRevision++;
             webglSource?.dispose();
             webglSource = null;
@@ -631,6 +632,7 @@ export class Tiefseeview {
             return mediaLoader.loadBigimgscale(images, width, height, zoomType, zoomValue);
         }
         async function loadWebGLImage(source: TiefseeviewImageSource, zoomType: TiefseeviewZoomType, zoomValue: number): Promise<void> {
+            mediaLoader.cancelVideoLoad();
             const keepCurrentFrame = webglRenderer?.beginSourceReplacement() === true;
             webglLoadRevision++;
             webglSource?.dispose();

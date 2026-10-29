@@ -1669,6 +1669,33 @@ var langData = {
 
     },
 
+    motionPhoto: {
+        dynamic: {
+            "zh-TW": "動態",
+            "zh-CN": "动态",
+            "en": "Motion",
+            "ja": "モーション",
+        },
+        still: {
+            "zh-TW": "照片",
+            "zh-CN": "照片",
+            "en": "Photo",
+            "ja": "写真",
+        },
+        showVideo: {
+            "zh-TW": "播放動態照片",
+            "zh-CN": "播放动态照片",
+            "en": "Play motion photo",
+            "ja": "モーションフォトを再生",
+        },
+        showImage: {
+            "zh-TW": "顯示靜態照片",
+            "zh-CN": "显示静态照片",
+            "en": "Show still photo",
+            "ja": "静止画を表示",
+        },
+    },
+
     videoToolbar: {
         progress: {
             "zh-TW": "影片進度",
@@ -2471,6 +2498,12 @@ var langData = {
             "zh-CN": "文件读取失败：{message}",
             "en": "Failed to read the file: {message}",
             "ja": "ファイルの読み込みに失敗しました：{message}",
+        },
+        videoPlaybackFailed: {
+            "zh-TW": "影片無法正常顯示。可能缺少對應的影片解碼器（例如 AV1 或 HEVC 視訊延伸模組）、影片格式不支援、檔案已損毀，或讀取逾時。",
+            "zh-CN": "视频无法正常显示。可能缺少对应的视频解码器（例如 AV1 或 HEVC 视频扩展）、视频格式不受支持、文件已损坏，或读取超时。",
+            "en": "The video could not be displayed. A required video decoder (such as the AV1 or HEVC Video Extension) may be missing, or the format may be unsupported, the file may be damaged, or loading may have timed out.",
+            "ja": "動画を正常に表示できません。AV1 や HEVC のビデオ拡張機能など、必要なデコーダーがないか、形式が未対応、ファイルが破損、または読み込みがタイムアウトした可能性があります。",
         },
         directoryReadFailed: {
             "zh-TW": "資料夾清單讀取失敗：{message}",

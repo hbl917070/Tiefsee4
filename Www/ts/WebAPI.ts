@@ -398,6 +398,12 @@ export class WebAPI {
         return APIURL + `/api/files/video?path=${encodePath}&windowId=${encodeURIComponent(baseWindow.windowId)}`;
     }
 
+    /** 取得 Motion Photo 內嵌影片；後端仍以原始檔案位移支援 Range */
+    static getMotionPhotoVideo(path: string) {
+        const encodePath = encodeURIComponent(path);
+        return APIURL + `/api/files/video?path=${encodePath}&motionPhoto=1&windowId=${encodeURIComponent(baseWindow.windowId)}`;
+    }
+
     /**
      * 取得 檔案exif
      */

@@ -16,16 +16,69 @@
         // hover 或選單開啟時顯示內層，外層本身不做 transform，避免命中區域偏移
         &:hover .video-toolbar-content,
         &[menu-open="true"] .video-toolbar-content {
-            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
             transform: translateY(0);
+            transition: transform 0.15s ease, visibility 0s;
         }
     }
 }
 
 .video-toolbar-content {
-    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
     transform: translateY(-8px);
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transition: transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.video-toolbar[motion-photo-only="true"] .video-toolbar-content {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+    transition: none;
+}
+
+.video-toolbar[motion-photo-only="true"] .video-toolbar-progress,
+.video-toolbar[motion-photo-only="true"] .video-toolbar-left > :not(.video-toolbar-motion-photo),
+.video-toolbar[motion-photo-only="true"] .video-toolbar-right {
+    display: none;
+}
+
+.video-toolbar[motion-photo-only="true"] .video-toolbar-controls {
+    min-height: 44px;
+    padding-top: 8px;
+}
+
+.video-toolbar-motion-photo[visible="false"] {
+    display: none;
+}
+
+.video-toolbar-button.video-toolbar-motion-photo {
+    width: auto;
+    flex: 0 0 auto;
+    gap: 7px;
+    padding: 0 12px;
+    border-radius: 18px;
+    white-space: nowrap;
+}
+
+.video-toolbar-button.video-toolbar-motion-photo .video-toolbar-motion-photo-icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    pointer-events: none;
+}
+
+.video-toolbar-motion-photo-icon--still {
+    display: none;
+}
+
+.video-toolbar-motion-photo[data-mode="video"] .video-toolbar-motion-photo-icon--dynamic {
+    display: none;
+}
+
+.video-toolbar-motion-photo[data-mode="video"] .video-toolbar-motion-photo-icon--still {
+    display: inline;
 }
 
 .video-toolbar-progress {
@@ -114,18 +167,24 @@
     height: 36px;
     flex: 0 0 36px;
     padding: 0;
-    border: 0;
+    border: 1px solid var(--color-white20);
     border-radius: 50%;
     color: var(--color-white);
-    background: var(--color-black60);
+    background: var(--color-black40);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
     cursor: pointer;
+    transition: background-color 0.12s ease;
 
     &:hover {
-        background: var(--color-black80);
+        background: var(--color-black60);
+        // 工具列由滑鼠帶出時，避免控制項剛好移到游標下方而瞬間閃亮
+        transition-delay: 0.18s;
     }
 
     &:active {
         background: var(--color-black);
+        transition-delay: 0s;
     }
 
     &:focus-visible {
@@ -174,20 +233,28 @@
     // 音量拉條平時收合，滑鼠移入時展開
     display: flex;
     align-items: center;
-    width: 36px;
+    width: 38px;
+    height: 38px;
     flex: 0 0 auto;
     overflow: hidden;
-    border-radius: 18px;
-    background: var(--color-black60);
+    border: 1px solid var(--color-white20);
+    border-radius: 19px;
+    background: var(--color-black40);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
     transition: width 0.15s ease;
 
     &:hover {
-        width: 134px;
+        width: 136px;
     }
 }
 
 .video-toolbar-volume-group .video-toolbar-button {
+    border: 0;
+    border-radius: 50%;
     background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 .video-toolbar-volume-input {
@@ -225,9 +292,12 @@
     flex: 0 1 auto;
     overflow: hidden;
     padding: 8px 11px;
+    border: 1px solid var(--color-white20);
     border-radius: 18px;
     color: var(--color-white);
-    background: var(--color-black60);
+    background: var(--color-black40);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
     font-size: 14px;
     line-height: 20px;
     text-align: center;

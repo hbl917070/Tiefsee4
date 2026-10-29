@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
@@ -20,7 +21,15 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
     /// <summary>
     /// 記錄同一個視窗針對同一影片的最新串流請求序號
     /// </summary>
-    private readonly Dictionary<string, int> _streamingRequests = new();
+    private readonly object _streamingRequestsLock = new();
+    private readonly Dictionary<VideoStreamKey, VideoStreamRequestState> _streamingRequests = new();
+
+    private readonly record struct VideoStreamKey(string WindowId, string Path, long SourceOffset);
+
+    private sealed class VideoStreamRequestState {
+        public long Generation { get; set; }
+        public int ActiveRequests { get; set; }
+    }
 
     /// <summary>
     /// 註冊路由
@@ -57,20 +66,31 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
 
         if (await CheckFileExist(d, path) == false) { return; }
 
-        var response = d.context.Response;
-        var request = d.context.Request;
-        response.SendChunked = true;
-
+        string videoPath = path;
+        long sourceOffset = 0;
         long totalLength = new FileInfo(path).Length;
+        if (d.args.GetValueOrDefault("motionPhoto") == "1") {
+            var motionPhoto = MotionPhotoHelper.GetVideoRange(path);
+            if (motionPhoto == null) { d.context.Response.StatusCode = (int)HttpStatusCode.NotFound; return; }
+            videoPath = motionPhoto.SourcePath ?? path;
+            sourceOffset = motionPhoto.VideoStart;
+            totalLength = motionPhoto.VideoLength;
+        }
+
+        var response = d.context.Response;
+        if (videoPath != path && Path.GetExtension(videoPath).Equals(".mov", StringComparison.OrdinalIgnoreCase)) {
+            response.ContentType = "video/quicktime";
+        }
+        var request = d.context.Request;
         long start = 0;
         long end = totalLength - 1;
 
         if (request.Headers["Range"] != null) {
-            var range = request.Headers["Range"];
-            var rangeValues = range.Replace("bytes=", "").Split('-');
-            start = long.Parse(rangeValues[0]);
-            if (rangeValues.Length > 1 && string.IsNullOrEmpty(rangeValues[1]) == false) {
-                end = long.Parse(rangeValues[1]);
+            if (TryParseSingleByteRange(request.Headers["Range"], totalLength, out start, out end) == false) {
+                response.StatusCode = (int)HttpStatusCode.RequestedRangeNotSatisfiable;
+                response.Headers.Add("Content-Range", $"bytes */{totalLength}");
+                response.ContentLength64 = 0;
+                return;
             }
 
             response.StatusCode = (int)HttpStatusCode.PartialContent;
@@ -80,32 +100,95 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
             response.StatusCode = (int)HttpStatusCode.OK;
         }
 
-        // 同一個 windowId + path 僅保留最後一次請求持續輸出，避免拖曳進度條時多個串流互相競爭
-        var key = windowId + path;
-        if (_streamingRequests.ContainsKey(key) == false) {
-            _streamingRequests.Add(key, 0);
+        // 同一個視窗與來源範圍只保留最新請求；鎖保護 HttpListener 並行回呼共用的狀態。
+        var key = new VideoStreamKey(windowId, Path.GetFullPath(videoPath), sourceOffset);
+        var (state, generation) = BeginStreamingRequest(key);
+        try {
+            response.SendChunked = true;
+            response.ContentLength64 = end - start + 1;
+            using var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            fileStream.Seek(sourceOffset + start, SeekOrigin.Begin);
+            var buffer = new byte[64 * 1024];
+            // Range 的 end 是包含端點；只讀取指定範圍內剩餘的位元組，避免多讀後續影片資料。
+            long remainingBytes = end - start + 1;
+            while (remainingBytes > 0 && response.OutputStream.CanWrite) {
+                if (IsCurrentStreamingRequest(key, state, generation) == false) { break; }
+
+                int readLength = (int)Math.Min(buffer.Length, remainingBytes);
+                int bytesRead = await fileStream.ReadAsync(buffer, 0, readLength);
+                if (bytesRead == 0) { break; }
+
+                await response.OutputStream.WriteAsync(buffer, 0, bytesRead);
+                remainingBytes -= bytesRead;
+            }
         }
-        _streamingRequests[key] += 1;
-        var nowKey = _streamingRequests[key];
-
-        response.ContentLength64 = end - start + 1;
-        using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-        fileStream.Seek(start, SeekOrigin.Begin);
-        var buffer = new byte[64 * 1024];
-        // Range 的 end 是包含端點；只讀取指定範圍內剩餘的位元組，避免多讀後續影片資料。
-        long remainingBytes = end - start + 1;
-        int bytesRead;
-        while (remainingBytes > 0 && response.OutputStream.CanWrite) {
-            if (nowKey != _streamingRequests[key]) { break; }
-
-            int readLength = (int)Math.Min(buffer.Length, remainingBytes);
-            bytesRead = await fileStream.ReadAsync(buffer, 0, readLength);
-            if (bytesRead == 0) { break; }
-
-            await response.OutputStream.WriteAsync(buffer, 0, bytesRead);
-            remainingBytes -= bytesRead;
+        finally {
+            EndStreamingRequest(key, state);
+            response.SendChunked = false;
         }
-        response.SendChunked = false;
+    }
+
+    private static bool TryParseSingleByteRange(string headerValue, long totalLength, out long start, out long end) {
+        start = 0;
+        end = totalLength - 1;
+        if (totalLength <= 0
+            || RangeHeaderValue.TryParse(headerValue, out RangeHeaderValue range) == false
+            || string.Equals(range.Unit, "bytes", StringComparison.OrdinalIgnoreCase) == false
+            || range.Ranges.Count != 1) {
+            return false;
+        }
+
+        RangeItemHeaderValue item = range.Ranges.First();
+        if (item.From.HasValue) {
+            start = item.From.Value;
+            end = item.To ?? totalLength - 1;
+        }
+        else if (item.To.HasValue && item.To.Value > 0) {
+            start = Math.Max(0, totalLength - item.To.Value);
+            end = totalLength - 1;
+        }
+        else {
+            return false;
+        }
+
+        if (start < 0 || start >= totalLength || end < start) return false;
+        end = Math.Min(end, totalLength - 1);
+        return true;
+    }
+
+    private (VideoStreamRequestState State, long Generation) BeginStreamingRequest(VideoStreamKey key) {
+        lock (_streamingRequestsLock) {
+            if (_streamingRequests.TryGetValue(key, out VideoStreamRequestState state) == false) {
+                state = new VideoStreamRequestState();
+                _streamingRequests.Add(key, state);
+            }
+
+            state.Generation++;
+            state.ActiveRequests++;
+            return (state, state.Generation);
+        }
+    }
+
+    private bool IsCurrentStreamingRequest(VideoStreamKey key, VideoStreamRequestState state, long generation) {
+        lock (_streamingRequestsLock) {
+            return _streamingRequests.TryGetValue(key, out VideoStreamRequestState currentState)
+                && ReferenceEquals(state, currentState)
+                && currentState.Generation == generation;
+        }
+    }
+
+    private void EndStreamingRequest(VideoStreamKey key, VideoStreamRequestState state) {
+        lock (_streamingRequestsLock) {
+            if (_streamingRequests.TryGetValue(key, out VideoStreamRequestState currentState) == false
+                || ReferenceEquals(state, currentState) == false) {
+                return;
+            }
+
+            state.ActiveRequests--;
+            if (state.ActiveRequests == 0) {
+                _streamingRequests.Remove(key);
+            }
+        }
     }
 
     /// <summary>

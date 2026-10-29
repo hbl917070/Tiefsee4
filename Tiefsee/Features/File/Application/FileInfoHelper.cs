@@ -11,7 +11,12 @@ public class FileInfoHelper {
     /// </summary>
     public static FileInfo2 GetFileInfo2(string path) {
 
+        string extension = Path.GetExtension(path);
         string hash = FileTypeHelper.FileToHash(path);
+        if (File.Exists(path)) {
+            // 原子替換常會保留大小與修改時間；加入建立時間降低快取命中舊 Motion Photo 標記的機會。
+            hash += "_" + File.GetCreationTimeUtc(path).Ticks;
+        }
         var lruData = _lruGetFileInfo2.Get(hash);
         if (lruData != null) { return lruData; }
 
@@ -24,6 +29,12 @@ public class FileInfoHelper {
             info.CreationTimeUtc = GetCreationTimeUtc(path);
             info.LastWriteTimeUtc = GetLastWriteTimeUtc(path);
             info.HexValue = FileTypeHelper.GetFileHeaderHex(path);
+            // 偵測只讀目前圖片內的標記，不在載入時搜尋 Apple 配對 MOV。
+            if (info.HexValue.StartsWith("FF D8 FF", StringComparison.Ordinal)
+                || extension.Equals(".heic", StringComparison.OrdinalIgnoreCase)
+                || extension.Equals(".heif", StringComparison.OrdinalIgnoreCase)) {
+                info.IsMotionPhoto = MotionPhotoHelper.HasMotionPhoto(path);
+            }
         }
         else if (Directory.Exists(path)) {
             info.Type = "dir";
