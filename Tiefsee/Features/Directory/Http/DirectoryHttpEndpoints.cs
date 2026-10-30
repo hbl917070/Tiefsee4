@@ -19,6 +19,7 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/siblings", GetSiblingDir);
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/files2", GetFiles2);
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/files", GetFiles);
+        HttpEndpointRegistrar.Map(WebServer, "/api/directories/archive-files", GetArchiveFiles);
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/children", GetDirectories);
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort", GetSort);
         HttpEndpointRegistrar.Map(WebServer, "/api/directories/sort2", GetSort2);
@@ -83,6 +84,36 @@ public sealed class DirectoryHttpEndpoints : HttpEndpointModuleBase {
                 .ToArray();
 
             return Task.FromResult(ret);
+        });
+    }
+
+    /// <summary>
+    /// 回傳資料夾內符合副檔名清單的檔案名稱，並在列舉時套用數量上限。
+    /// </summary>
+    private Task GetArchiveFiles(RequestData d) {
+        return ExecuteApi(d, () => {
+            var json = JsonDocument.Parse(d.postData);
+            string path = json.GetString("path");
+            string[] extensions = json.GetStringArray("extensions");
+            int maxCount = json.GetInt32("maxCount");
+
+            EnsureDirectoryExistsApi(path);
+
+            var extensionSet = extensions
+                .Select(extension => "." + extension.Trim().TrimStart('.'))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var enumerationOptions = new EnumerationOptions {
+                AttributesToSkip = FileAttributes.System,
+                IgnoreInaccessible = false,
+                MatchType = MatchType.Win32,
+            };
+            var files = Directory.EnumerateFiles(path, "*.*", enumerationOptions)
+                .Where(filePath => extensionSet.Contains(Path.GetExtension(filePath)))
+                .Take(maxCount < 0 ? int.MaxValue : maxCount)
+                .Select(filePath => filePath.Substring(path.Length))
+                .ToArray();
+
+            return Task.FromResult(files);
         });
     }
 

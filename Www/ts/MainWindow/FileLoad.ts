@@ -4,7 +4,7 @@ import { Lib } from "../Lib";
 import { Throttle } from "../Throttle";
 import { Toast } from "../Toast";
 import { WebAPI } from "../WebAPI";
-import { ArchiveApiError, ArchiveEntryItem, ArchiveSessionResponse, FileRef, getArchiveFileName, getArchiveLogicalPath, isSupportedArchivePath } from "../Archive/ArchiveTypes";
+import { ARCHIVE_EXTENSIONS, ArchiveApiError, ArchiveEntryItem, ArchiveSessionResponse, FileRef, getArchiveFileName, getArchiveLogicalPath, isSupportedArchivePath } from "../Archive/ArchiveTypes";
 import { ArchiveSourceManager } from "../Archive/ArchiveSource";
 import { ArchiveResolver } from "../Archive/ArchiveResolver";
 import { MainWindow } from "./MainWindow";
@@ -38,6 +38,10 @@ export class FileLoad {
     public resolveArchiveEntryPhysicalPath;
     /** 判斷指定路徑是否為目前 archive source 的 entry logical path。 */
     public isArchiveEntryPath;
+    /** 判斷指定路徑是否為資料夾預覽面板中的同層壓縮檔。 */
+    public isArchiveSiblingPath;
+    /** 判斷指定路徑是否為目前視窗正在使用的壓縮檔來源。 */
+    public isCurrentArchiveSourcePath;
     /** 取得目前預覽中的 archive entry 修改日期；沒有時間時回傳 0。 */
     public getArchiveLastWriteTimeUtc;
     public getFlagFile: () => number;
@@ -140,6 +144,8 @@ export class FileLoad {
             (await _archiveResolver.resolvePreviewFile(item)).fileInfo;
         this.resolveArchiveEntryPhysicalPath = resolveArchiveEntryPhysicalPath;
         this.isArchiveEntryPath = isArchiveEntryPath;
+        this.isArchiveSiblingPath = isArchiveSiblingPath;
+        this.isCurrentArchiveSourcePath = isCurrentArchiveSourcePath;
         this.getArchiveLastWriteTimeUtc = getArchiveLastWriteTimeUtc;
         this.getFlagFile = () => { return _flagFile; };
         this.setFlagFile = (n: number) => { _flagFile = n; };
@@ -206,6 +212,20 @@ export class FileLoad {
             return _dirPathNow;
         }
 
+        /** archive mode 只允許檔案面板操作清單中的同層壓縮檔。 */
+        function isArchiveSiblingPath(path: string | undefined): path is string {
+            return _isArchiveMode
+                && path !== undefined
+                && isSupportedArchivePath(path)
+                && _arDirKey.includes(path);
+        }
+
+        /** 開啟中的 archive source 仍被 session 使用，不允許在此直接改名或刪除。 */
+        function isCurrentArchiveSourcePath(path: string | undefined): boolean {
+            return path !== undefined
+                && _archiveSource.getCurrentSessions().some(session => session.archivePath === path);
+        }
+
         /** 取得目前預覽中的 archive entry 修改日期。 */
         async function getArchiveLastWriteTimeUtc(): Promise<number> {
             return _arArchiveItem[_flagFile]?.lastWriteTimeUtc ?? 0;
@@ -217,6 +237,13 @@ export class FileLoad {
         async function updateFlagDir(dirPath: string) {
 
             if (dirPath === undefined) { return; }
+
+            // archive mode 的清單 key 是壓縮檔路徑，不是資料夾路徑。
+            if (_isArchiveMode) {
+                const archiveIndex = _arDirKey.indexOf(dirPath);
+                if (archiveIndex !== -1) { _flagDir = archiveIndex; }
+                return;
+            }
 
             _flagDir = 0;
             for (let i = 0; i < _arDirKey.length; i++) {
@@ -336,12 +363,15 @@ export class FileLoad {
 
             let path = _arDirKey[_flagDir];
 
-            // archive mode 的資料夾面板只代表原始壓縮檔的上一層實體資料夾；
-            // 點擊唯一項目不能把目前來源切換成一般資料夾，否則 session 與 entry identity 會失效。
-            if (_isArchiveMode && _arDirKey.length === 1 && path === _dirPathNow) {
+            // archive mode 的資料夾面板列的是同層壓縮檔，點擊時切換 archive source。
+            if (_isArchiveMode) {
+                if (isSupportedArchivePath(path) === false) { return; }
                 await updateFlagDir(path);
                 M.mainDirList.select();
                 M.mainDirList.updateLocation();
+                _showDirThrottle.run = async () => {
+                    await loadArchiveFiles([path]);
+                };
                 return;
             }
 
@@ -487,47 +517,37 @@ export class FileLoad {
 
         }
 
-        /**
-         * archive mode 的資料夾面板只顯示壓縮檔上一層實體資料夾。
-         *
-         * MainDirList 仍沿用原本的縮圖元件，因此這裡只準備實體資料夾內的
-         * 圖片檔名，不把 archive entry 混入 `_arDir`，也不啟動一般資料夾 watcher。
-         */
+        /** archive mode 的資料夾面板列出原始壓縮檔所在資料夾的其他壓縮檔。 */
         async function loadArchiveParentDir(dirPath: string) {
             _dirPathNow = dirPath;
 
-            const arExt = M.config.allowFileType(GroupType.img).map(item => item["ext"]);
             const maxCount = M.config.settings.advanced.dirListMaxCount;
-            let arPath: string[] = [];
+            const currentArchivePath = _arArchiveItem[_flagFile]?.ref.archivePath;
+            let archivePaths: string[] = [];
 
             try {
-                const json = await WebAPI.Directory.getSiblingDir(dirPath, arExt, maxCount);
-                if (_isArchiveMode === false || _dirPathNow !== dirPath) { return; }
-                arPath = json[dirPath] ?? [];
+                archivePaths = await WebAPI.Directory.getFilesByExtensions(dirPath, ARCHIVE_EXTENSIONS, maxCount);
             }
             catch (error) {
-                // sibling directory 失敗時仍嘗試直接讀取目前資料夾，避免面板整個消失。
-                console.warn("[Archive] 讀取上一層資料夾縮圖清單失敗。", error);
+                console.warn("[Archive] 讀取同層壓縮檔清單失敗。", error);
             }
 
-            if (arPath.length === 0) {
-                try {
-                    const files = await WebAPI.Directory.getFiles(dirPath, "*.*");
-                    const extensionSet = new Set(arExt.map(ext => ext.toLocaleLowerCase().replace(/^\./, "")));
-                    arPath = files
-                        .filter(path => extensionSet.has(Lib.getExtension(path).replace(/^\./, "").toLocaleLowerCase()))
-                        .slice(0, maxCount)
-                        .map(path => Lib.getFileName(path));
-                }
-                catch (error) {
-                    console.warn("[Archive] 讀取上一層資料夾檔案清單失敗。", error);
-                }
+            // 目前開啟的壓縮檔即使超過面板上限，也必須保留在清單中。
+            if (currentArchivePath !== undefined && archivePaths.includes(currentArchivePath) === false) {
+                archivePaths.push(currentArchivePath);
             }
 
-            if (_isArchiveMode === false || _dirPathNow !== dirPath) { return; }
-            _arDir = { [dirPath]: arPath };
-            _arDirKey = [dirPath];
-            _flagDir = 0;
+            // 同層仍可能已切換至另一個 archive；避免較慢的舊請求覆蓋新清單選取狀態。
+            if (_isArchiveMode === false
+                || _dirPathNow !== dirPath
+                || _arArchiveItem[_flagFile]?.ref.archivePath !== currentArchivePath) { return; }
+            _arDir = Object.fromEntries(archivePaths.map(path => [path, []]));
+            _arDirKey = archivePaths;
+            _flagDir = currentArchivePath === undefined ? 0 : _arDirKey.indexOf(currentArchivePath);
+            if (_flagDir < 0) { _flagDir = 0; }
+            M.dirSort.readSortType(dirPath);
+            M.dirSort.updateMenu();
+            await M.dirSort.sort();
             M.mainDirList.init();
             M.mainDirList.setStartLocation();
         }
@@ -1790,11 +1810,11 @@ export class FileLoad {
         async function showDeleteFileMsg(type?: undefined | "delete" | "moveToRecycle", path?: string) {
 
             // archive entry 的 getFilePath 是 logical path，不能交給 Windows 刪除 API。
-            if (_isArchiveMode) {
+            if (_isArchiveMode && (isArchiveSiblingPath(path) === false || isCurrentArchiveSourcePath(path))) {
                 showArchiveUnsupportedOperationToast();
                 return;
             }
-            if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
+            if (_isArchiveMode === false && (_groupType === GroupType.none || _groupType === GroupType.welcome)) {
                 return;
             }
 
@@ -1824,7 +1844,10 @@ export class FileLoad {
                     M.msgbox.show({ txt: M.i18n.t("msg.fileDeletionFailed") + "\n" + err }); // 檔案刪除失敗
                 } else {
 
-                    if (path === getFilePath() && _isBulkView === false) {
+                    if (_isArchiveMode) {
+                        await loadArchiveParentDir(getDirPath());
+                    }
+                    else if (path === getFilePath() && _isBulkView === false) {
                         let index = _arFile.indexOf(path); // 從名單移除這筆資料
                         if (index !== -1) {
                             _arFile.splice(index, 1); // 刪除此筆
@@ -1834,7 +1857,7 @@ export class FileLoad {
                     }
 
                     // 如果是自定義名單，就主動觸發檔案變更的事件
-                    if (_fileLoadType === FileLoadType.userDefined) {
+                    if (_isArchiveMode === false && _fileLoadType === FileLoadType.userDefined) {
                         const fwd: FileWatcherData = {
                             Key: "fileList",
                             FullPath: path,
@@ -1979,11 +2002,11 @@ export class FileLoad {
         async function showRenameFileMsg(path?: string) {
 
             // archive entry 是唯讀來源，且目前 path 為 logical path。
-            if (_isArchiveMode) {
+            if (_isArchiveMode && (isArchiveSiblingPath(path) === false || isCurrentArchiveSourcePath(path))) {
                 showArchiveUnsupportedOperationToast();
                 return;
             }
-            if (_groupType === GroupType.none || _groupType === GroupType.welcome) {
+            if (_isArchiveMode === false && (_groupType === GroupType.none || _groupType === GroupType.welcome)) {
                 return;
             }
 
@@ -2033,8 +2056,11 @@ export class FileLoad {
                     }*/
                     // 檔案重新命名後會觸發fileWatcher，所以不需要處理
 
+                    if (_isArchiveMode) {
+                        await loadArchiveParentDir(getDirPath());
+                    }
                     // 如果是自定義名單，就主動觸發檔案變更的事件
-                    if (_fileLoadType === FileLoadType.userDefined) {
+                    else if (_fileLoadType === FileLoadType.userDefined) {
                         const fwd: FileWatcherData = {
                             Key: "fileList",
                             FullPath: newName,

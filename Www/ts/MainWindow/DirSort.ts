@@ -85,13 +85,13 @@ export class DirSort {
 
             await sort()
 
-            // 使用 父親資料夾 當做key來記錄排序
+            // 一般面板排序的是同層資料夾；壓縮檔模式排序的是目前目錄內的檔案。
             let dirPath = M.fileLoad.getDirPath()
-            let dirParentPath = Lib.getDirectoryName(dirPath)
-            if (dirParentPath === null) {
-                dirParentPath = dirPath;
+            let dirSortPath = dirPath;
+            if (M.fileLoad.getIsArchiveMode() === false) {
+                dirSortPath = Lib.getDirectoryName(dirPath) ?? dirPath;
             }
-            setDirSortType(dirParentPath, _sortType);
+            setDirSortType(dirSortPath, _sortType);
 
             M.fileLoad.updateTitle(); // 更新視窗標題
             M.mainDirList.init(); // 設定 檔案預覽視窗 目前選中的項目
@@ -153,6 +153,9 @@ export class DirSort {
             }
             let arDir = M.fileLoad.getWaitingDir();
             let arKey = M.fileLoad.getWaitingDirKey();
+            const selectedArchivePath = M.fileLoad.getIsArchiveMode()
+                ? arKey[M.fileLoad.getFlagDir()]
+                : undefined;
 
             if (arKey.length <= 1) { return; } // 只有1筆資料就不需要排序
 
@@ -177,7 +180,7 @@ export class DirSort {
             M.fileLoad.setWaitingDir(ar);
 
             // 更新 flagDir (目前在哪一個資料夾
-            await M.fileLoad.updateFlagDir(path);
+            await M.fileLoad.updateFlagDir(selectedArchivePath ?? path);
         }
 
         /**

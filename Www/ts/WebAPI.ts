@@ -72,6 +72,17 @@ export class WebAPI {
             return retAr;
         }
 
+        /** 回傳資料夾內符合副檔名清單的檔案，並由後端限制回傳數量。 */
+        static async getFilesByExtensions(path: string, extensions: readonly string[], maxCount: number) {
+            let url = APIURL + "/api/directories/archive-files";
+            let postData = { path: path, extensions: extensions, maxCount: maxCount };
+            let retAr: string[] = await WebAPI.sendApiResponsePost(url, postData);
+            for (let i = 0; i < retAr.length; i++) {
+                retAr[i] = path + retAr[i];
+            }
+            return retAr;
+        }
+
         /**
          * 回傳資料夾裡面的子資料夾
          */

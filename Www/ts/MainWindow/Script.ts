@@ -961,6 +961,20 @@ export class ScriptMenu {
         this.M = _M;
     }
 
+    /** 依路徑來源重設共用檔案選單的檔案修改項目，避免前一次選單狀態殘留。 */
+    private updateFileMutationActions(domFileBox: HTMLElement, path: string | null) {
+        const isArchiveMode = this.M.fileLoad.getIsArchiveMode();
+        const canModify = isArchiveMode === false
+            || (path !== null
+                && this.M.fileLoad.isArchiveSiblingPath(path)
+                && this.M.fileLoad.isCurrentArchiveSourcePath(path) === false);
+        const display = canModify ? "" : "none";
+        const renameAction = domFileBox.querySelector(".js-renameFile") as HTMLElement | null;
+        const deleteAction = domFileBox.querySelector(".js-showDeleteFileMsg") as HTMLElement | null;
+        if (renameAction !== null) { renameAction.style.display = display; }
+        if (deleteAction !== null) { deleteAction.style.display = display; }
+    }
+
     /** 關閉所有 menu */
     close(domMenu?: Element) {
         this.M.menu.close(domMenu);
@@ -1158,6 +1172,7 @@ export class ScriptMenu {
         let domMenu = document.querySelector("#menu-rightMenuBulkView") as HTMLElement;
         let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
         let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        this.updateFileMutationActions(domFileBox, path);
         if (path !== null) {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
@@ -1192,6 +1207,7 @@ export class ScriptMenu {
         let domMenu = document.querySelector("#menu-rightMenuFilePanel") as HTMLElement;
         let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
         let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        this.updateFileMutationActions(domFileBox, path);
         if (path !== null) {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
@@ -1222,6 +1238,7 @@ export class ScriptMenu {
         let domMenu = document.querySelector("#menu-rightMenuFile") as HTMLElement;
         let domFileBox = document.querySelector("#menu-fileBox") as HTMLElement;
         let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        this.updateFileMutationActions(domFileBox, path);
         if (path !== null) {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
@@ -1249,8 +1266,12 @@ export class ScriptMenu {
         }
 
         let domMenu = document.querySelector("#menu-rightMenuDirPanel") as HTMLElement;
-        let domFileBox = document.querySelector("#menu-dirBox") as HTMLElement;
+        const isArchiveFile = path !== null && this.M.fileLoad.getIsArchiveMode();
+        let domFileBox = document.querySelector(isArchiveFile ? "#menu-fileBox" : "#menu-dirBox") as HTMLElement;
+        const domOtherFileBox = document.querySelector(isArchiveFile ? "#menu-dirBox" : "#menu-fileBox") as HTMLElement;
         let domFileName = domFileBox.querySelector(".js-fileName") as HTMLInputElement;
+        domOtherFileBox.style.display = "none";
+        this.updateFileMutationActions(domFileBox, path);
         if (path !== null) {
             domFileBox.style.display = "";
             domMenu.appendChild(domFileBox);
@@ -1310,6 +1331,9 @@ export class ScriptOpen {
      */
     public async resolvePhysicalPath(path?: string): Promise<string | undefined> {
         if (this.M.fileLoad.getIsArchiveMode()) {
+            if (path !== undefined && this.M.fileLoad.isArchiveSiblingPath(path)) {
+                return path;
+            }
             try {
                 const physicalPath = await this.M.fileLoad.resolveArchiveEntryPhysicalPath(path);
                 if (physicalPath === undefined) {

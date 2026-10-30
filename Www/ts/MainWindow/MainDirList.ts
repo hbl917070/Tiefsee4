@@ -266,12 +266,13 @@ export class MainDirList {
 		 */
 		function newItem(n: number, dirPath: string, arPath: string[], noDelay = false) {
 
-			let len = arPath.length;
+			const isArchiveFile = M.fileLoad.getIsArchiveMode();
+			let len = isArchiveFile ? 1 : arPath.length;
 			if (len > _imgNumber) { len = _imgNumber; }
 
 			let htmlImgBox = "";
 			for (let i = 0; i < len; i++) {
-				const path = Lib.combine([dirPath, arPath[i]]);
+				const path = isArchiveFile ? dirPath : Lib.combine([dirPath, arPath[i]]);
 				let htmlImg = "";
 				if (_tempLoaded.indexOf(n + "-" + i) !== -1) { // 圖片已經載入過了，直接顯示
 					let imgUrl = getImgUrl(path);
@@ -317,12 +318,12 @@ export class MainDirList {
 				M.script.file.dragDropFile(dirPath);
 			})
 
-			if (arPath.length !== 0) {
+			if (len !== 0) {
 				if (noDelay === false) {
 					setTimeout(() => {
 						if (_domDirListData.contains(div) === false) { return; } // 如果物件不在網頁上，就不載入圖片
 						for (let i = 0; i < len; i++) {
-							const path = Lib.combine([dirPath, arPath[i]]);
+							const path = isArchiveFile ? dirPath : Lib.combine([dirPath, arPath[i]]);
 							if (_tempLoaded.indexOf(n + "-" + i) === -1) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
 								_tempLoaded.push(n + "-" + i); // 加到全域變數，表示已經載入過
 								const url = getImgUrl(path);
@@ -333,7 +334,7 @@ export class MainDirList {
 					}, 30);
 				} else {
 					for (let i = 0; i < len; i++) {
-						const path = Lib.combine([dirPath, arPath[i]]);
+						const path = isArchiveFile ? dirPath : Lib.combine([dirPath, arPath[i]]);
 						//if (temp_loaded.indexOf(n + "-" + i) === -1) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
 						_tempLoaded.push(n + "-" + i); // 加到全域變數，表示已經載入過
 						const url = getImgUrl(path);
