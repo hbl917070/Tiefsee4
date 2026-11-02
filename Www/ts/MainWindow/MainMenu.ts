@@ -99,6 +99,11 @@ export class MainMenu {
          */
         function showMenu(e: MouseEvent, x?: number, y?: number) {
 
+            const target = e.target instanceof HTMLElement
+                ? e.target.closest<HTMLInputElement | HTMLTextAreaElement>('input[type="text"], input[type="password"], textarea')
+                : null;
+            if (target && document.activeElement !== target) target.focus();
+
             if (Lib.isTextFocused()) { // 焦點在輸入框上
                 M.script.menu.showRightMenuTextbox(x, y);
                 return;
@@ -664,6 +669,11 @@ export class MainMenu {
                 M.script.setting.showSetting();
             });
 
+            dom.querySelector(".js-addFileToFavorites")?.addEventListener("click", () => {
+                M.script.menu.close();
+                void M.script.favorites.addFile();
+            });
+
             dom.querySelector(".js-copyFile")?.addEventListener("click", () => { // 複製檔案
                 M.script.menu.close();
                 M.script.copy.copyFile();
@@ -862,6 +872,11 @@ export class MainMenu {
                 M.script.fileLoad.showDeleteFileMsg(undefined, getPath());
             });
 
+            dom.querySelector(".js-addFileToFavorites")?.addEventListener("click", () => {
+                M.script.menu.close();
+                void M.script.favorites.addFile(getPath());
+            });
+
             dom.querySelector(".js-copyFile")?.addEventListener("click", () => { // 複製檔案
                 M.script.menu.close();
                 M.script.copy.copyFile(getPath());
@@ -929,6 +944,11 @@ export class MainMenu {
             dom.querySelector(".js-showDeleteDirMsg")?.addEventListener("click", () => { // 刪除資料夾
                 M.script.menu.close();
                 M.script.fileLoad.showDeleteDirMsg(undefined, getPath());
+            });
+
+            dom.querySelector(".js-addDirectoryToFavorites")?.addEventListener("click", () => {
+                M.script.menu.close();
+                void M.script.favorites.addDirectory(getPath());
             });
 
             dom.querySelector(".js-copyDirName")?.addEventListener("click", () => { // 複製資料夾名

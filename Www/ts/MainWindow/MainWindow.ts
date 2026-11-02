@@ -27,8 +27,10 @@ import { SelectionManager } from "../SelectionManager";
 import { FullScreen } from "./FullScreen";
 import { ToolbarBack } from "./ToolbarBack";
 import { TextEditor } from "./TextEditor";
+import { Favorites } from "./Favorites";
 import "../DateExtensions";
 import { HotkeyAction } from "../HotkeyDefinitions";
+import { RequestLimiter } from "../RequestLimiter";
 
 declare global {
     var mainWindow: MainWindow;
@@ -68,6 +70,8 @@ export class MainWindow {
     public toolbarBack;
     public fullScreen;
     public textEditor;
+    public favorites: Favorites;
+    public imageRequestLimiter: RequestLimiter;
     public updateDomVisibility;
 
     public applySetting;
@@ -97,6 +101,7 @@ export class MainWindow {
         this.domToolbar = _domToolbar;
         this.domMainL = _domMainL;
         this.domMainR = _domMainR;
+        this.imageRequestLimiter = new RequestLimiter(4);
 
         var _db: IndexedDBManager;
         const _config = this.config = new Config(baseWindow);
@@ -120,6 +125,7 @@ export class MainWindow {
         const _toolbarBack = this.toolbarBack = new ToolbarBack();
         const _fullScreen = this.fullScreen = new FullScreen(this);
         const _textEditor = this.textEditor = new TextEditor(this);
+        this.favorites = new Favorites(this);
 
         this.applySetting = applySetting;
         this.saveSetting = saveSetting;
@@ -1007,6 +1013,11 @@ export class MainWindow {
 
                 const dom_group = _domToolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
                 const arMainToolbar = _config.settings.mainToolbar[groupName];
+                // 舊設定沒有收藏按鈕時，新增至「檔案」按鈕前，並預設顯示。
+                if (!arMainToolbar.some(item => item.n === "favorites")) {
+                    const fileIndex = arMainToolbar.findIndex(item => item.n === "showMenuFile");
+                    arMainToolbar.splice(fileIndex < 0 ? 0 : fileIndex, 0, { n: "favorites", v: true });
+                }
                 for (let i = 0; i < arMainToolbar.length; i++) {
                     const item = arMainToolbar[i];
                     const dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;

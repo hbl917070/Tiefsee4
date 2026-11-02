@@ -302,6 +302,8 @@ export class Hotkey {
                 hotkeyActionKeys.copyFileTo,
                 hotkeyActionKeys.openClipboard,
                 hotkeyActionKeys.openWithSpecifiedApp,
+                hotkeyActionKeys.addFileToFavorites,
+                hotkeyActionKeys.addDirectoryToFavorites,
                 hotkeyActionKeys.copyFile,
                 hotkeyActionKeys.copyFileName,
                 hotkeyActionKeys.copyFilePath,

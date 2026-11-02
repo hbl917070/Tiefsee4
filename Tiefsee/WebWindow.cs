@@ -53,6 +53,7 @@ public class WebWindow : FormNone {
     public SystemWebViewBridge SystemBridge;
     public ExternalLauncherWebViewBridge RunAppBridge;
     public ImageWebViewBridge ImageBridge;
+    public FavoritesWebViewBridge FavoritesBridge;
 
     /// <summary>
     ///
@@ -436,6 +437,7 @@ public class WebWindow : FormNone {
         SystemBridge = new SystemWebViewBridge(this);
         RunAppBridge = new ExternalLauncherWebViewBridge(this);
         ImageBridge = new ImageWebViewBridge(this);
+        FavoritesBridge = new FavoritesWebViewBridge(this);
         _wv2.CoreWebView2.AddHostObjectToScript("WindowBridge", WindowBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("DirectoryBridge", DirectoryBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("FileBridge", FileBridge);
@@ -450,6 +452,7 @@ public class WebWindow : FormNone {
         _wv2.CoreWebView2.AddHostObjectToScript("WV_System", SystemBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("WV_RunApp", RunAppBridge);
         _wv2.CoreWebView2.AddHostObjectToScript("WV_Image", ImageBridge);
+        _wv2.CoreWebView2.AddHostObjectToScript("WV_Favorites", FavoritesBridge);
 
         // CoreWebView2.NavigationStarting 只涵蓋主 frame：允許 Tiefsee www 頁面，
         // 外部網址交給系統瀏覽器，其餘頂層導覽阻擋；iframe 導覽不受此規則影響。

@@ -263,21 +263,44 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
         int size = Int32.Parse(d.args["size"]);
         string path = Uri.UnescapeDataString(d.args["path"]);
 
-        if (await CheckFileExist(d, path) == false) { return; }
-        if (HeadersAdd304(d, path)) { return; }
+        if (File.Exists(path) == false && Directory.Exists(path) == false) {
+            await WriteError(d, 404, path);
+            return;
+        }
 
-        using Bitmap icon = _imageProcessingService.GetFileIcon(path, size, 3);
-        if (icon == null) {
-            await WriteError(d, 500, "圖示取得失敗");
+#if DEBUG
+        d.context.Response.Headers.Add("Cache-Control", "no-store");
+#else
+        if (File.Exists(path) && HeadersAdd304(d, path)) { return; }
+#endif
+
+        bool useDirectoryThumbnail = Directory.Exists(path)
+            && d.args.TryGetValue("directoryThumbnail", out string directoryThumbnail)
+            && directoryThumbnail == "1";
+        Bitmap icon;
+        try {
+            icon = useDirectoryThumbnail
+                ? _imageProcessingService.GetDirectoryThumbnail(path, size, 3)
+                : _imageProcessingService.GetFileIcon(path, size, 3);
+        }
+        catch (TimeoutException) {
+            await WriteError(d, 500, "圖示取得逾時，請稍後再試。");
             return;
         }
 
         try {
-            using var input = new MemoryStream();
-            icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
-            input.Position = 0;
-            d.context.Response.ContentType = "image/png";
-            await WriteStream(d, input);
+            using (icon) {
+                if (icon == null) {
+                    await WriteError(d, 500, "無法取得圖示。");
+                    return;
+                }
+
+                using var input = new MemoryStream();
+                icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+                input.Position = 0;
+                d.context.Response.ContentType = "image/png";
+                await WriteStream(d, input);
+            }
         }
         catch {
             await WriteError(d, 500, "圖示解析失敗");
@@ -396,20 +419,34 @@ public sealed class FileHttpEndpoints : HttpEndpointModuleBase {
             return;
         }
 
-        d.context.Response.ContentType = "image/png";
+#if DEBUG
+        d.context.Response.Headers.Add("Cache-Control", "no-store");
+#else
         if (HeadersAdd304(d, tempPath)) { return; }
+#endif
 
-        using Bitmap icon = _imageProcessingService.GetFileIcon(tempPath, size, 3);
-        if (icon == null) {
-            await WriteError(d, 500, "圖示取得失敗");
+        Bitmap icon;
+        try {
+            icon = _imageProcessingService.GetFileIcon(tempPath, size, 3);
+        }
+        catch (TimeoutException) {
+            await WriteError(d, 500, "圖示取得逾時，請稍後再試。");
             return;
         }
 
         try {
-            using Stream input = new MemoryStream();
-            icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
-            input.Position = 0;
-            await WriteStream(d, input);
+            using (icon) {
+                if (icon == null) {
+                    await WriteError(d, 500, "無法取得圖示。");
+                    return;
+                }
+
+                using Stream input = new MemoryStream();
+                icon.Save(input, System.Drawing.Imaging.ImageFormat.Png);
+                input.Position = 0;
+                d.context.Response.ContentType = "image/png";
+                await WriteStream(d, input);
+            }
         }
         catch {
             await WriteError(d, 500, "圖示解析失敗");

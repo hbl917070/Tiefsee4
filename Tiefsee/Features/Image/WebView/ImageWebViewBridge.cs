@@ -25,9 +25,14 @@ public class ImageWebViewBridge {
     /// </summary>
     /// <returns> Base64 </returns>
     public string GetFileIcon(string path, int size) {
-        using Bitmap icon = _imageProcessingService.GetFileIcon(path, size);
-        if (icon == null) { return ""; }
-        return BitmapToBase64(icon);
+        try {
+            using Bitmap icon = _imageProcessingService.GetFileIcon(path, size);
+            if (icon == null) { return ""; }
+            return BitmapToBase64(icon);
+        }
+        catch (TimeoutException) {
+            return "";
+        }
     }
 
     /// <summary>

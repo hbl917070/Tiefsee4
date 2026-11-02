@@ -20,6 +20,7 @@ export class Script {
     public setting: ScriptSetting;
     public window: ScriptWindow;
     public bulkView: ScriptBulkView;
+    public favorites: ScriptFavorites;
 
     constructor(M: MainWindow) {
         this.M = M;
@@ -33,6 +34,7 @@ export class Script {
         this.setting = new ScriptSetting(M);
         this.window = new ScriptWindow(M);
         this.bulkView = new ScriptBulkView(M);
+        this.favorites = new ScriptFavorites(M);
     }
 
     public async run(s: HotkeyAction, option?: {
@@ -213,6 +215,12 @@ export class Script {
             if (option.filePath !== undefined && option.filePath !== "") {
                 await this.open.openWithSpecifiedApp(option.filePath);
             }
+        }
+        else if (s === hotkeyActionKeys.addFileToFavorites) { // 將檔案加入收藏
+            await this.favorites.addFile();
+        }
+        else if (s === hotkeyActionKeys.addDirectoryToFavorites) { // 將資料夾加入收藏
+            await this.favorites.addDirectory();
         }
         // #endregion
 
@@ -973,6 +981,13 @@ export class ScriptMenu {
         const deleteAction = domFileBox.querySelector(".js-showDeleteFileMsg") as HTMLElement | null;
         if (renameAction !== null) { renameAction.style.display = display; }
         if (deleteAction !== null) { deleteAction.style.display = display; }
+        this.updateFileFavoritesAction(domFileBox, path);
+    }
+
+    private updateFileFavoritesAction(menu: HTMLElement, path: string | null) {
+        const display = path && this.M.fileLoad.isArchiveEntryPath(path) ? "none" : "";
+        menu.querySelectorAll<HTMLElement>(".js-addFileToFavorites, .js-favorites-separator")
+            .forEach(element => element.style.display = display);
     }
 
     /** 關閉所有 menu */
@@ -984,6 +999,8 @@ export class ScriptMenu {
     async showMenuFile(btn?: HTMLElement, path?: string, type?: "file" | "dir") {
         let domMenu = document.getElementById("menu-file") as HTMLElement;
         let domOpenFileBox = domMenu.querySelector(".js-openFileBox") as HTMLElement; // 載入檔案
+        const currentPath = path ?? this.M.fileLoad.getFilePath();
+        this.updateFileFavoritesAction(domMenu, currentPath);
 
         if (path !== undefined) { // 指定路徑
             domMenu.setAttribute("data-path", path);
@@ -1611,6 +1628,25 @@ export class ScriptOpen {
         Toast.show(this.M.i18n.t("msg.openWithSpecifiedAppFailed", { name: appName }), 1000 * 3);
     }
 
+}
+
+/** 收藏操作入口集中於 Script，供選單與日後快捷鍵共用。 */
+export class ScriptFavorites {
+    private M: MainWindow;
+
+    constructor(M: MainWindow) {
+        this.M = M;
+    }
+
+    public async addFile(path?: string) {
+        const filePath = path ?? this.M.fileLoad.getFilePath();
+        if (!filePath || this.M.fileLoad.isArchiveEntryPath(filePath)) return;
+        await this.M.favorites.quickAdd("file", filePath);
+    }
+
+    public async addDirectory(path?: string) {
+        await this.M.favorites.quickAdd("directory", path ?? this.M.fileLoad.getDirPath());
+    }
 }
 
 export class ScriptCopy {

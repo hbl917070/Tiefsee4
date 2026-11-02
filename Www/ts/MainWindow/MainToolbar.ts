@@ -79,6 +79,32 @@ export class MainToolbar {
             return _ar;
         }
 
+        /** 在各工具列群組中，將收藏放在檔案按鈕之前。 */
+        function addFavoritesButton(group: string) {
+            _ar.push({
+                type: "button", html: "",
+                i18n: "menu.favorites",
+                group,
+                name: "favorites",
+                icon: "tool-favorites.svg",
+                func: (btn) => {
+                    btn.classList.add("main-toolbar-favorites");
+                    btn.setAttribute("aria-label", "menu.favorites");
+                    btn.setAttribute("tabindex", "0");
+                    btn.setAttribute("aria-haspopup", "dialog");
+                    btn.setAttribute("aria-expanded", "false");
+                    btn.setAttribute("aria-controls", "favorites-panel");
+                    btn.addEventListener("click", () => { void M?.favorites?.toggle(btn); });
+                    btn.addEventListener("keydown", event => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            void M?.favorites?.toggle(btn);
+                        }
+                    });
+                },
+            });
+        }
+
         /**
          * 設定是否啟用
          * @param val 
@@ -125,6 +151,8 @@ export class MainToolbar {
                     });
                 },
             })
+
+            addFavoritesButton(GroupType.img);
 
             // 檔案
             _ar.push({
@@ -401,6 +429,7 @@ export class MainToolbar {
             })
 
             // 開啟檔案
+            addFavoritesButton(GroupType.pdf);
             _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
@@ -599,6 +628,8 @@ export class MainToolbar {
                 },
             })
 
+            addFavoritesButton(GroupType.txt);
+
             // 檔案
             _ar.push({
                 type: "button", html: "",
@@ -785,6 +816,8 @@ export class MainToolbar {
         */
         function initToolbarWelcome() {
 
+            addFavoritesButton(GroupType.welcome);
+
             // 顯示選單 開啟檔案
             _ar.push({
                 type: "button", html: "",
@@ -820,6 +853,7 @@ export class MainToolbar {
         function initBulkView() {
 
             // 開啟檔案
+            addFavoritesButton(GroupType.bulkView);
             _ar.push({
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",

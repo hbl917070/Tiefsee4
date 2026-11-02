@@ -22,11 +22,11 @@ public sealed class FileDragDropHelper {
             if (isFile && path == Path.GetFullPath(path)) {
                 var dataObject = DataObjectUtilities.GetFileDataObject(path);
                 int size = 92;
-                using Bitmap bitmap = _imageProcessingService.GetFileIcon(path, size);
-                if (bitmap == null) {
-                    throw new Exception("bitmap == null");
+                try {
+                    using Bitmap bitmap = _imageProcessingService.GetFileIcon(path, size);
+                    if (bitmap != null) DataObjectUtilities.AddPreviewImage(dataObject, bitmap);
                 }
-                DataObjectUtilities.AddPreviewImage(dataObject, bitmap);
+                catch { /* 無法取得預覽圖時仍可拖曳檔案。 */ }
                 window.DoDragDrop(dataObject, DragDropEffects.All);
                 return;
             }

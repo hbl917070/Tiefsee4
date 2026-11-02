@@ -29,6 +29,10 @@ public sealed class ImageProcessingService {
     private const long WebGLPreviewMaxPixels = 8L * 1024 * 1024;
     private const long VipsStreamThresholdBytes = 256L * 1024 * 1024;
     private const string VipsTileAlgorithmVersion = "source-region-v6-jpg100";
+    private const int ShellThumbnailMaxConcurrency = 4;
+    private static readonly SemaphoreSlim ShellThumbnailLimiter = new(
+        ShellThumbnailMaxConcurrency,
+        ShellThumbnailMaxConcurrency);
 
     private readonly string _tempDirImgProcessed;
     private readonly string _tempDirImgZoom;
@@ -75,19 +79,60 @@ public sealed class ImageProcessingService {
     /// <param name="waitSec"> 等待秒數 </param>
     /// <returns></returns>
     public Bitmap GetFileIcon(string path, int size, double waitSec = 1.5) {
-        if (File.Exists(path) == false) { return null; }
-
-        Bitmap icon = null;
+        bool isDirectory = Directory.Exists(path);
+        if (isDirectory == false && File.Exists(path) == false) { return null; }
 
         try {
-            AppScheduler.RunWithTimeout(waitSec, () => {
-                // 取得圖片在檔案總管的縮圖
-                icon = WindowsThumbnailProvider.GetThumbnail(path, size, size, ThumbnailOptions.ScaleUp);
-            });
+            return RunShellThumbnailWithTimeout(() => {
+                // 目錄要取 Shell 圖示；一般檔案維持既有的檔案總管縮圖流程。
+                ThumbnailOptions options = isDirectory
+                    ? ThumbnailOptions.IconOnly | ThumbnailOptions.ScaleUp
+                    : ThumbnailOptions.ScaleUp;
+                for (int retry = 0; ; retry++) {
+                    try {
+                        return WindowsThumbnailProvider.GetThumbnail(path, size, size, options);
+                    }
+                    catch (COMException ex) when (ex.HResult == unchecked((int)0x8000000A) && retry < 3) {
+                        // Shell 可能在首次載入時回報 E_PENDING，稍候再試。
+                        Thread.Sleep(100 * (retry + 1));
+                    }
+                }
+            }, waitSec);
         }
+        catch (TimeoutException) { throw; }
         catch { }
 
-        return icon;
+        return null;
+    }
+
+    /// <summary>
+    /// 取得資料夾在 Windows Shell 中的內容縮圖；Shell 沒有提供縮圖時回退至一般資料夾圖示。
+    /// </summary>
+    public Bitmap GetDirectoryThumbnail(string path, int size, double waitSec = 1.5) {
+        if (Directory.Exists(path) == false) { return null; }
+
+        try {
+            return RunShellThumbnailWithTimeout(() => {
+                try {
+                    return WindowsThumbnailProvider.GetThumbnail(
+                        path,
+                        size,
+                        size,
+                        ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.ScaleUp);
+                }
+                catch {
+                    return WindowsThumbnailProvider.GetThumbnail(
+                        path,
+                        size,
+                        size,
+                        ThumbnailOptions.IconOnly | ThumbnailOptions.ScaleUp);
+                }
+            }, waitSec);
+        }
+        catch (TimeoutException) { throw; }
+        catch { }
+
+        return null;
     }
 
     /// <summary>
@@ -95,22 +140,62 @@ public sealed class ImageProcessingService {
     /// 此方法與 GetFileIcon 分開，避免改變既有實體檔案縮圖流程。
     /// </summary>
     public Bitmap GetFileIconByExtension(string extension, int size, double waitSec = 1.5) {
-        Bitmap icon = null;
-
         try {
-            AppScheduler.RunWithTimeout(waitSec, () => {
+            return RunShellThumbnailWithTimeout(() => {
                 try {
-                    icon = WindowsThumbnailProvider.GetIconByExtension(extension, size);
+                    return WindowsThumbnailProvider.GetIconByExtension(extension, size);
                 }
                 catch {
                     // 沒有副檔名關聯時，改用 Windows 的一般檔案 icon。
-                    icon = WindowsThumbnailProvider.GetIconByExtension(".bin", size);
+                    return WindowsThumbnailProvider.GetIconByExtension(".bin", size);
+                }
+            }, waitSec);
+        }
+        catch (TimeoutException) { throw; }
+        catch { }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 限制同時執行的 Windows Shell 縮圖工作數。Shell 工作逾時後不會取消底層工作，名額由工作完成時釋放。
+    /// </summary>
+    private static Bitmap RunShellThumbnailWithTimeout(Func<Bitmap> action, double waitSec) {
+        if (ShellThumbnailLimiter.Wait(TimeSpan.FromSeconds(waitSec)) == false) {
+            throw new TimeoutException("等待 Windows Shell 圖示工作名額逾時。");
+        }
+
+        Task<Bitmap> shellTask;
+        try {
+            shellTask = Task.Run(() => {
+                try {
+                    return action();
+                }
+                finally {
+                    ShellThumbnailLimiter.Release();
                 }
             });
         }
-        catch { }
+        catch {
+            ShellThumbnailLimiter.Release();
+            throw;
+        }
 
-        return icon;
+        try {
+            return shellTask.WaitAsync(TimeSpan.FromSeconds(waitSec)).GetAwaiter().GetResult();
+        }
+        catch (TimeoutException) {
+            // 工作仍可能在 Shell 中卡住；若逾時後才取得 Bitmap，需由完成處釋放資源。
+            _ = shellTask.ContinueWith(task => {
+                if (task.Status == TaskStatus.RanToCompletion) {
+                    task.Result?.Dispose();
+                }
+                else {
+                    _ = task.Exception;
+                }
+            }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+            throw new TimeoutException("Windows Shell 圖示工作逾時。");
+        }
     }
 
     /// <summary>

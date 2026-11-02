@@ -2,6 +2,7 @@ import { MainWindow } from "./MainWindow";
 import { Dragbar } from "./Dragbar";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { Lib } from "../Lib";
+import { setImageErrorFallback } from "./ImageFallback";
 
 /**
  * 檔案預覽視窗
@@ -276,6 +277,7 @@ export class MainFileList {
             const name = item.displayName;
 
             let htmlImg = "";
+            const loadImageNow = _tempLoaded.indexOf(i) !== -1 || noDelay;
 
             if (_tempLoaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (item.key !== "") {
@@ -284,14 +286,16 @@ export class MainFileList {
 
                         _tempLoaded.push(i); // 加到全域變數，表示已經載入過
                         const domImg = div.getElementsByClassName("fileList-img")[0] as HTMLImageElement;
-                        domImg.innerHTML = `<img src="${item.iconUrl}" fetchpriority="low"/>`;
-                        setImageErrorFallback(domImg.querySelector("img"));
+                        domImg.innerHTML = `<img src="./img/transparent.svg" fetchpriority="low"/>`;
+                        const image = domImg.querySelector<HTMLImageElement>("img");
+                        setImageErrorFallback(image);
+                        if (image !== null) M.imageRequestLimiter.addRequest(image, item.iconUrl);
                     }, 30);
                 }
             } else {
 
                 // 圖片已經載入過了，直接顯示
-                htmlImg = `<img src="${item.iconUrl}" fetchpriority="low">`;
+                if (item.key !== "") htmlImg = `<img src="./img/transparent.svg" fetchpriority="low">`;
             }
 
             let htmlNo = ``;
@@ -311,7 +315,11 @@ export class MainFileList {
                     <div class="fileList-img"> ${htmlImg} </div>                                                            
                 </div>`);
             _domFileListData.append(div);
-            setImageErrorFallback(div.querySelector(".fileList-img img"));
+            setImageErrorFallback(div.querySelector<HTMLImageElement>(".fileList-img img"));
+            if (loadImageNow && item.key !== "") {
+                const image = div.querySelector<HTMLImageElement>(".fileList-img img");
+                if (image !== null) M.imageRequestLimiter.addRequest(image, item.iconUrl);
+            }
             div.setAttribute("aria-label", `${i + 1} ${name}`);
             div.setAttribute("data-key", item.key);
             if (item.path !== undefined) {
@@ -331,19 +339,6 @@ export class MainFileList {
             }
 
             return div;
-        }
-
-        /**
-         * 檔案列表縮圖載入失敗時顯示固定錯誤圖片。
-         * archive entry 的 entry-thumbnail 可能因單檔大小限制回傳 413，
-         * 此時必須保留列表項目，只替換該項目的圖片來源。
-         */
-        function setImageErrorFallback(domImg: Element | null): void {
-            if (!(domImg instanceof HTMLImageElement)) { return; }
-            domImg.addEventListener("error", () => {
-                domImg.onerror = null;
-                domImg.src = "./img/error.svg";
-            }, { once: true });
         }
 
         /**

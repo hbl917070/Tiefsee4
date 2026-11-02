@@ -251,6 +251,14 @@
                 margin: auto;
                 pointer-events: none;
             }
+            .image-error-fallback {
+                display: grid;
+                width: 64px;
+                height: 64px;
+                margin: auto;
+                place-items: center;
+                svg { width: 100%; height: 100%; }
+            }
         }
     }
 

@@ -6,8 +6,8 @@ import { GroupType } from "../Config";
 import { Toast } from "../Toast";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { Lib } from "../Lib";
-import { RequestLimiter } from "../RequestLimiter";
 import { AiParsingUtility } from "./AiParsingUtility/AiParsingUtility";
+import { setImageErrorFallback } from "./ImageFallback";
 
 export class MainExif {
 
@@ -48,6 +48,7 @@ export class MainExif {
 		const _relatedFileExtList = ["txt", "json", "xml", "info", "ini", "config"];
 		var _fileInfo2: FileInfo2;
 		let _videoDuration = 0;
+		let _loraPreviewRevision = 0;
 		let _domVideoDuration: HTMLElement | undefined;
 		let _collapseContentId = 0;
 
@@ -75,9 +76,6 @@ export class MainExif {
 		// 共用同一個 observer，避免每個預覽圖各自建立 callback 而導致 detached DOM 無法回收
 		let _imgIntersectionObserver: IntersectionObserver | null = null;
 		let _imgIntersectionObserverMap = new Map<Element, { img: HTMLImageElement, url: string }>();
-
-		/** 請求限制器 */
-		const _limiter = new RequestLimiter(1);
 
 		/** 取得目前使用的 Civitai 網域 */
 		function getCivitaiDomain() {
@@ -292,7 +290,7 @@ export class MainExif {
 
 					_imgIntersectionObserverMap.delete(entry.target);
 					_imgIntersectionObserver?.unobserve(entry.target);
-					_limiter.addRequest(data.img, data.url);
+					M.imageRequestLimiter.addRequest(data.img, data.url);
 				}
 			}, {
 				threshold: 0.1,
@@ -783,8 +781,12 @@ export class MainExif {
 					if (Lib.isTxtSelect()) { return; }
 
 					const name = dom.getAttribute("data-name") as string;
+					const previewRevision = ++_loraPreviewRevision;
 
 					domImg.style.backgroundImage = ``;
+					domImg.classList.remove("is-icon-error");
+					domImg.dataset.previewRevision = String(previewRevision);
+					domImg.replaceChildren();
 					domInfo.innerHTML = "";
 
 					let a1111Models = M.config.settings.layout.a1111Models;
@@ -813,6 +815,7 @@ export class MainExif {
 						"outputs",
 					];
 					const loraResource = await WebAPI.getA1111LoraResource(a1111Models.split("\n"), [name], excludeDirs);
+					if (previewRevision !== _loraPreviewRevision) return;
 					const files = loraResource[name].sort();
 
 					// 找不到檔案
@@ -840,12 +843,26 @@ export class MainExif {
 					}
 
 					const imgUrl = WebAPI.Img.fileIcon(img);
+					const previewImage = document.createElement("img");
+					previewImage.alt = "";
+					previewImage.hidden = true;
+					previewImage.addEventListener("load", () => {
+						if (domImg.dataset.previewRevision !== String(previewRevision)) return;
+						domImg.style.backgroundImage = `url(${imgUrl.replace(/\(/g, "\\(").replace(/\)/g, "\\)")})`;
+					}, { once: true });
+					previewImage.addEventListener("error", () => {
+						if (domImg.dataset.previewRevision !== String(previewRevision)) return;
+						domImg.classList.add("is-icon-error");
+						domImg.innerHTML = SvgList["error-file.svg"];
+					}, { once: true });
+					domImg.appendChild(previewImage);
+					M.imageRequestLimiter.addRequest(previewImage, imgUrl);
 
 					// 避免重複註冊
 					if (domImg.getAttribute("data-path") === null) {
 						Lib.addEventDblclick(domImg, () => {
-							const p = domImg.getAttribute("data-path") as string;
-							M.script.open.openNewWindow(p);
+							const path = domImg.getAttribute("data-path");
+							if (path !== null) M.script.open.openNewWindow(path);
 						});
 					}
 					domImg.setAttribute("data-path", img);
@@ -854,7 +871,6 @@ export class MainExif {
 					domImg.setAttribute("i18n", "script.doubleClickOpenNewWindow");
 					domImg.setAttribute("i18n-v", JSON.stringify(ariaLabelValues));
 					domImg.setAttribute("aria-label", M.i18n.t("script.doubleClickOpenNewWindow", ariaLabelValues));
-					domImg.style.backgroundImage = `url(${imgUrl.replace(/\(/g, "\\(").replace(/\)/g, "\\)")})`;
 
 					// 取得 .json
 					const jsonPath = files.find(x => x.toLowerCase().endsWith(".json"));
@@ -996,12 +1012,22 @@ export class MainExif {
 					}
 				}
 				_domTabContentRelated.appendChild(domBox);
+				queueRelatedImage(domBox);
 			}
 
 			if (json.length === 0) {
 				const btnNew = await getRelatedBtnAdd()
 				_domTabContentRelated.appendChild(btnNew);
 			}
+		}
+
+		function queueRelatedImage(domBox: HTMLElement) {
+			const image = domBox.querySelector<HTMLImageElement>("img[data-request-url]");
+			const url = image?.dataset.requestUrl;
+			if (image === null || image === undefined || !url) return;
+			delete image.dataset.requestUrl;
+			setImageErrorFallback(image);
+			M.imageRequestLimiter.addRequest(image, url);
 		}
 
 		/**
@@ -1341,7 +1367,7 @@ export class MainExif {
 
 								const imgItem = Lib.newDom(`
 								<div class="mainExifImgItem" role="button">
-										<img fetchpriority="low"/>
+										<img src="./img/transparent.svg" fetchpriority="low"/>
 									</div>
 								`);
 
@@ -1600,6 +1626,7 @@ export class MainExif {
 					M.textEditor.setOnSave(async (t: string) => { // 儲存時更新面板裡面的文字
 						let newItemDom = await getRelatedDom(itemPath, t);
 						domBox.insertAdjacentElement("afterend", newItemDom);
+						queueRelatedImage(newItemDom);
 						domBox.remove();
 					});
 				})
@@ -1629,7 +1656,7 @@ export class MainExif {
 				domContent = Lib.newDom(`
 					<div class="mainExifRelatedContent collapse-content">
 						<div class="mainExifRelatedImg">
-							<img src="${imgUrl}" fetchpriority="low"/>
+							<img src="./img/transparent.svg" data-request-url="${Lib.escape(imgUrl)}" fetchpriority="low"/>
 						</div>
 					</div>
 				`);

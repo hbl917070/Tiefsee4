@@ -1251,6 +1251,8 @@ class SettingWindow {
                     hotkeyActionKeys.fileToPermanentlyDelete,
                     hotkeyActionKeys.reloadAll,
                     hotkeyActionKeys.openClipboard,
+                    hotkeyActionKeys.addFileToFavorites,
+                    hotkeyActionKeys.addDirectoryToFavorites,
                 ],
                 "copy": [
                     hotkeyActionKeys.copyFile,

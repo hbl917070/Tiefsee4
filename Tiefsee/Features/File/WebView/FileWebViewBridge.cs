@@ -81,6 +81,11 @@ public class FileWebViewBridge {
         return _fileOpenDialogHelper.OpenFileDialog(Multiselect, Filter, Title);
     }
 
+    /// <summary>開啟資料夾選擇視窗。</summary>
+    public string SelectFolderDialog(string title) {
+        return _fileOpenDialogHelper.SelectFolderDialog(title);
+    }
+
     /// <summary>
     /// 快速拖曳 (拖出檔案
     /// </summary>

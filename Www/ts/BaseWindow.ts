@@ -11,6 +11,7 @@ declare global {
     var WV_System: WV_System;
     var WV_RunApp: WV_RunApp;
     var WV_Image: WV_Image;
+    var WV_Favorites: WV_Favorites;
     var WindowBridge: WV_Window;
     var DirectoryBridge: WV_Directory;
     var FileBridge: WV_File;
@@ -38,6 +39,7 @@ window.WV_Path = WV2.WV_Path;
 window.WV_System = WV2.WV_System;
 window.WV_RunApp = WV2.WV_RunApp;
 window.WV_Image = WV2.WV_Image;
+window.WV_Favorites = WV2.WV_Favorites;
 window.WindowBridge = WV2.WindowBridge;
 window.DirectoryBridge = WV2.DirectoryBridge;
 window.FileBridge = WV2.FileBridge;

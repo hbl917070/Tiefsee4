@@ -250,21 +250,37 @@ export class I18n {
             if (dom.getAttribute("i18n") === "") {
                 return;
             }
-            else if (dom.getAttribute("placeholder") !== null) { // 翻譯輸入框的提示文字
+
+            if (dom.getAttribute("title") !== null) dom.setAttribute("title", t);
+            if (dom.getAttribute("aria-label") !== null) dom.setAttribute("aria-label", t);
+
+            if (dom.getAttribute("placeholder") !== null) {
                 dom.setAttribute("placeholder", t);
+                return;
             }
-            else if (dom.tagName == "TD" && dom.getAttribute("data-th") !== null) { // 翻譯響應式table裡面的文字 data-th
+            else if (dom.tagName === "TD" && dom.getAttribute("data-th") !== null) {
                 dom.setAttribute("data-th", t);
+                return;
             }
-            else if (dom.tagName == "OPTGROUP") { // 翻譯響應式table裡面的文字 data-th
+            else if (dom.tagName === "OPTGROUP") {
                 dom.setAttribute("label", t);
+                return;
+            }
+
+            if (dom.hasAttribute("title")) {
+                return;
+            }
+            else if (dom.hasAttribute("aria-label")) {
+                // aria-label 只更新既有的直接文字節點，保留 SVG 等其他子內容。
+                // initNone 傳入空字串時保留文字，讓後續 setAll 還能找到並翻譯它。
+                if (t !== "") {
+                    const textNode = Array.from(dom.childNodes).find((node): node is Text =>
+                        node.nodeType === Node.TEXT_NODE && (node.textContent?.trim().length ?? 0) > 0);
+                    if (textNode) textNode.textContent = t;
+                }
             }
             else {
-                const hasTitle = dom.getAttribute("title") !== null;
-                const hasAriaLabel = dom.getAttribute("aria-label") !== null;
-                if (hasTitle) { dom.setAttribute("title", t); }
-                if (hasAriaLabel) { dom.setAttribute("aria-label", t); }
-                if (!hasTitle && !hasAriaLabel) { dom.innerHTML = t; }
+                dom.innerHTML = t;
             }
         }
 

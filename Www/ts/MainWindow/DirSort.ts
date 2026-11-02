@@ -10,6 +10,8 @@ export class DirSort {
     public readSortType;
     public updateMenu;
     public sort;
+    public sortPaths;
+    public getSortType;
 
     constructor(M: MainWindow) {
 
@@ -32,6 +34,8 @@ export class DirSort {
         // this.setDirSortType = setDirSortType;
         this.updateMenu = updateMenu;
         this.sort = sort;
+        this.sortPaths = sortPaths;
+        this.getSortType = getSortType;
 
         _domDirSort_name.addEventListener("click", () => {
             _sortType = DirSortType.name;
@@ -183,6 +187,51 @@ export class DirSort {
             await M.fileLoad.updateFlagDir(selectedArchivePath ?? path);
         }
 
+        /** 依指定資料夾的既有設定排序路徑，不改動目前檔案面板的清單與選取狀態。 */
+        async function sortPaths(paths: string[], parentPath: string): Promise<string[]> {
+            if (paths.length <= 1) return paths;
+            const sortType = getSortType(parentPath);
+            try {
+                return await WebAPI.sort2(paths, sortType);
+            } catch {
+                return paths.slice().sort((left, right) =>
+                    Lib.getFileName(left).localeCompare(Lib.getFileName(right), undefined, { numeric: true, sensitivity: "base" })
+                );
+            }
+        }
+
+        /** 讀取指定資料夾的排序設定；路徑比對採 Windows 不分大小寫並忽略結尾分隔符。 */
+        function getSortType(dirPath: string): string {
+            let sortType: string | undefined;
+            try {
+                const saved = JSON.parse(window.localStorage.getItem("sortDir") ?? "{}") as Record<string, unknown>;
+                sortType = typeof saved[dirPath] === "string" ? saved[dirPath] as string : undefined;
+                if (sortType === undefined) {
+                    const normalizedPath = normalizeSortPath(dirPath);
+                    const savedEntry = Object.entries(saved).find(([path, value]) =>
+                        typeof value === "string" && normalizeSortPath(path) === normalizedPath
+                    );
+                    if (savedEntry) sortType = savedEntry[1] as string;
+                }
+            } catch { }
+
+            if (sortType !== undefined && Object.values(DirSortType).includes(sortType as typeof DirSortType[keyof typeof DirSortType])) {
+                return sortType;
+            }
+            const defaultSort = M.config.settings.sort["dirSort"];
+            return Object.values(DirSortType).includes(defaultSort as typeof DirSortType[keyof typeof DirSortType])
+                ? defaultSort
+                : DirSortType.name;
+        }
+
+        function normalizeSortPath(path: string): string {
+            let normalized = path.replace(/\//g, "\\");
+            if (/^[a-zA-Z]:\\$/.test(normalized) === false) {
+                normalized = normalized.replace(/\\+$/, "");
+            }
+            return normalized.toLowerCase();
+        }
+
         /**
          * 設定該資料夾設定的檔案排序方式
          * @param dirPath 
@@ -209,20 +258,7 @@ export class DirSort {
          */
         function readSortType(dirPath: string) {
 
-            let t = window.localStorage.getItem("sortDir");
-
-            if (t === null) { t = "{}" } // 避免從來沒有儲存過
-            const json = JSON.parse(t);
-            let sortType = json[dirPath];
-            if (sortType !== undefined) {
-                _sortType = sortType;
-            } else {
-                let defaultSort = M.config.settings.sort["dirSort"];
-                if (Object.keys(DirSortType).indexOf(defaultSort) === -1) { //如果找不到
-                    defaultSort = DirSortType.name;
-                }
-                _sortType = defaultSort;
-            }
+            _sortType = getSortType(dirPath);
 
             if (_sortType.indexOf("Desc") !== -1) {
                 _orderbyType = DirOrderbyType.desc;

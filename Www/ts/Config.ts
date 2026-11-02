@@ -296,6 +296,7 @@ export class Config {
             img: [
                 { "n": "prevFile", "v": false },
                 { "n": "nextFile", "v": false },
+                { "n": "favorites", "v": true },
                 { "n": "showMenuFile", "v": true },
                 { "n": "prevDir", "v": false },
                 { "n": "nextDir", "v": false },
@@ -312,6 +313,7 @@ export class Config {
             pdf: [
                 { "n": "prevFile", "v": false },
                 { "n": "nextFile", "v": false },
+                { "n": "favorites", "v": true },
                 { "n": "showMenuFile", "v": true },
                 { "n": "prevDir", "v": false },
                 { "n": "nextDir", "v": false },
@@ -325,6 +327,7 @@ export class Config {
             txt: [
                 { "n": "prevFile", "v": false },
                 { "n": "nextFile", "v": false },
+                { "n": "favorites", "v": true },
                 { "n": "showMenuFile", "v": true },
                 { "n": "prevDir", "v": false },
                 { "n": "nextDir", "v": false },
@@ -336,6 +339,7 @@ export class Config {
                 { "n": "showSetting", "v": true }
             ],
             bulkView: [
+                { "n": "favorites", "v": true },
                 { "n": "showMenuFile", "v": true },
                 { "n": "prevDir", "v": true },
                 { "n": "nextDir", "v": true },
@@ -478,6 +482,7 @@ export class Config {
             { "key": hotkeyActionKeys.fileToPermanentlyDelete, "hotkey": "Shift + Delete" },
             { "key": hotkeyActionKeys.reloadAll, "hotkey": "F5" },
             { "key": hotkeyActionKeys.openClipboard, "hotkey": "Ctrl + V" },
+            { "key": hotkeyActionKeys.addFileToFavorites, "hotkey": "Ctrl + D" },
             { "key": hotkeyActionKeys.copyImage, "hotkey": "Ctrl + C" },
             { "key": hotkeyActionKeys.fullScreen, "hotkey": "F11" },
             { "key": hotkeyActionKeys.closeWindow, "hotkey": "Alt + F4" },

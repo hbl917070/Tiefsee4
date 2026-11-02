@@ -170,6 +170,26 @@ interface WV_Window {
     WindowDrag(type: ('CT' | 'RC' | 'CB' | 'LC' | 'LT' | 'RT' | 'LB' | 'RB' | 'move')): void;
 }
 
+/**
+ * 收藏面板
+ */
+interface WV_Favorites {
+    /**
+     * 每次開啟面板或快速新增前，讀取目前 AppData 收藏文件。
+     **/
+    ReadJson(): Promise<string>;
+    /**
+     * 驗證並正規化收藏資料後，寫回 AppData 收藏文件。
+     **/
+    SaveJson(json: string): Promise<void>;
+    /**
+     * 只檢查指定磁碟目標是否存在；UI 依 false 或例外決定提示內容。
+     **/
+    Exists(type: "file" | "directory", path: string): Promise<boolean>;
+    BrowseFile(title: string): Promise<string>;
+    BrowseDirectory(title: string): Promise<string>;
+}
+
 interface WindowBridge extends WV_Window { }
 
 interface WV_Directory {

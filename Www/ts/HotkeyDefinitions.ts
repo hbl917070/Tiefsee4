@@ -67,6 +67,8 @@ export const hotkeyDefinitions = [
             { key: "moveFileTo", inputs: ["hotkey"], subOptions: ["folderPath"] }, // 移動檔案至
             { key: "copyFileTo", inputs: ["hotkey"], subOptions: ["folderPath"] }, // 複製檔案至
             { key: "openWithSpecifiedApp", inputs: ["hotkey"], subOptions: ["filePath"] }, // 用指定程式開啟
+            { key: "addFileToFavorites", inputs: ["hotkey", "mouse"] }, // 將檔案加入收藏
+            { key: "addDirectoryToFavorites", inputs: ["hotkey", "mouse"] }, // 將資料夾加入收藏
         ]
     },
     {

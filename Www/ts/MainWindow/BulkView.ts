@@ -1,7 +1,6 @@
 import { HotkeyAction, hotkeyActionKeys } from "../HotkeyDefinitions";
 import { getExceptionMessage } from "../ApiResponse";
 import { Lib } from "../Lib";
-import { RequestLimiter } from "../RequestLimiter";
 import { Throttle } from "../Throttle";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { Toast } from "../Toast";
@@ -124,8 +123,6 @@ export class BulkView {
         /** 頁面重建／使用者捲動的版本，用來避免過期的底端定位覆寫新狀態 */
         let _scrollPositionRequestVersion = 0;
 
-        /** 請求限制器 */
-        const _limiter = new RequestLimiter(3);
         /** 每個圖片項目的尺寸監聽器 */
         const _itemResizeObservers = new Map<HTMLElement, ResizeObserver>();
 
@@ -1568,7 +1565,7 @@ export class BulkView {
             const div = Lib.newDom(/*html*/`
                 <div class="bulkView-item" role="button">
                     <div class="bulkView-center bulkView-loading">
-                        <img class="bulkView-img">
+                        <img class="bulkView-img" src="./img/transparent.svg">
                     </div>
                 </div>
             `);
@@ -1639,7 +1636,7 @@ export class BulkView {
                     <div class="bulkView-tag bulkView-lastWriteTime">${writeTime}</div>
                 </div>
                 <div class="bulkView-center">
-                    <img class="bulkView-img">
+                    <img class="bulkView-img" src="./img/transparent.svg">
                 </div>`;
 
                 div.setAttribute("data-width", width.toString());
@@ -1734,7 +1731,7 @@ export class BulkView {
                         }
                     }
 
-                    _limiter.addRequest(domImg, ret.url);
+                    M.imageRequestLimiter.addRequest(domImg, ret.url);
                     updateSize();
 
                 }, 300));

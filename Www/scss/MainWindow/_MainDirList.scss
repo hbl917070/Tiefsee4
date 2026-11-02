@@ -107,6 +107,13 @@
             pointer-events: none;
             user-select: none;
         }
+        .image-error-fallback {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            place-items: center;
+            svg { width: 100%; height: 100%; }
+        }
     }
     .dirList-img__1 {
         width: calc((var(--dirList-width) - 1 * 3px) / 1);

@@ -102,8 +102,9 @@ export class WebAPI {
         /**
          * 取得檔案圖示的網址
          */
-        static fileIcon(path: string) {
-            return APIURL + "/api/files/icon?size=256&path=" + encodeURIComponent(path);
+        static fileIcon(path: string, directoryThumbnail = false) {
+            const thumbnailOption = directoryThumbnail ? "&directoryThumbnail=1" : "";
+            return APIURL + "/api/files/icon?size=256&path=" + encodeURIComponent(path) + thumbnailOption;
         }
 
         /**

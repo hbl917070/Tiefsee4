@@ -129,19 +129,34 @@ public sealed class ArchiveHttpEndpoints : HttpEndpointModuleBase {
         }
 
         string path = await _archiveService.GetEntryPathAsync(sessionId, entryId);
-        if (HeadersAdd304(d, path)) { return; }
 
-        using Bitmap thumbnail = _imageProcessingService.GetFileIcon(path, size, 3);
-        if (thumbnail == null) {
-            await WriteError(d, 500, "縮圖取得失敗");
+#if DEBUG
+        d.context.Response.Headers.Add("Cache-Control", "no-store");
+#else
+        if (HeadersAdd304(d, path)) { return; }
+#endif
+
+        Bitmap thumbnail;
+        try {
+            thumbnail = _imageProcessingService.GetFileIcon(path, size, 3);
+        }
+        catch (TimeoutException) {
+            await WriteError(d, 500, "圖示取得逾時，請稍後再試。");
             return;
         }
 
-        using MemoryStream output = new();
-        thumbnail.Save(output, System.Drawing.Imaging.ImageFormat.Png);
-        output.Position = 0;
-        d.context.Response.ContentType = "image/png";
-        await WriteStream(d, output);
+        using (thumbnail) {
+            if (thumbnail == null) {
+                await WriteError(d, 500, "無法取得圖示。");
+                return;
+            }
+
+            using MemoryStream output = new();
+            thumbnail.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+            output.Position = 0;
+            d.context.Response.ContentType = "image/png";
+            await WriteStream(d, output);
+        }
     }
 
     /// <summary>
@@ -159,17 +174,31 @@ public sealed class ArchiveHttpEndpoints : HttpEndpointModuleBase {
 
         string extension = _archiveService.GetBlockedEntryExtension(sessionId, entryId);
 
-        using Bitmap icon = _imageProcessingService.GetFileIconByExtension(extension, size, 3);
-        if (icon == null) {
-            await WriteError(d, 500, "圖示取得失敗");
+#if DEBUG
+        d.context.Response.Headers.Add("Cache-Control", "no-store");
+#endif
+
+        Bitmap icon;
+        try {
+            icon = _imageProcessingService.GetFileIconByExtension(extension, size, 3);
+        }
+        catch (TimeoutException) {
+            await WriteError(d, 500, "圖示取得逾時，請稍後再試。");
             return;
         }
 
-        using MemoryStream output = new();
-        icon.Save(output, System.Drawing.Imaging.ImageFormat.Png);
-        output.Position = 0;
-        d.context.Response.ContentType = "image/png";
-        await WriteStream(d, output);
+        using (icon) {
+            if (icon == null) {
+                await WriteError(d, 500, "無法取得圖示。");
+                return;
+            }
+
+            using MemoryStream output = new();
+            icon.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+            output.Position = 0;
+            d.context.Response.ContentType = "image/png";
+            await WriteStream(d, output);
+        }
     }
 
     #region 參數檢查

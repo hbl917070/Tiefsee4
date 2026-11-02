@@ -256,6 +256,17 @@
 			background-size: cover;
 			background-position: center;
 			background-repeat: no-repeat;
+			&.is-icon-error {
+				display: grid;
+				place-items: center;
+				background-image: none !important;
+				svg {
+					width: 100%;
+					height: 100%;
+					// 讓雙擊事件以預覽區塊為 target，避免 SVG 子路徑改變 offsetX/Y 座標原點。
+					pointer-events: none;
+				}
+			}
 		}
 
 		.loraBox-l {

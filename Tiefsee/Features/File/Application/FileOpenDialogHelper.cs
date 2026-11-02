@@ -21,4 +21,14 @@ public sealed class FileOpenDialogHelper {
 
         return [];
     }
+
+    /// <summary>開啟資料夾選擇視窗。</summary>
+    public string SelectFolderDialog(string title) {
+        using var dialog = new FolderBrowserDialog {
+            Description = title,
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = false,
+        };
+        return dialog.ShowDialog() == DialogResult.OK ? dialog.SelectedPath : "";
+    }
 }
