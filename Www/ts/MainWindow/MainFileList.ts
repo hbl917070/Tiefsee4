@@ -277,7 +277,8 @@ export class MainFileList {
             const name = item.displayName;
 
             let htmlImg = "";
-            const loadImageNow = _tempLoaded.indexOf(i) !== -1 || noDelay;
+            const wasLoaded = _tempLoaded.indexOf(i) !== -1;
+            const loadImageNow = wasLoaded || noDelay;
 
             if (_tempLoaded.indexOf(i) === -1 && noDelay === false) { // 第一次載入圖片，延遲30毫秒，避免快速捲動時載入太多圖片
                 if (item.key !== "") {
@@ -295,7 +296,10 @@ export class MainFileList {
             } else {
 
                 // 圖片已經載入過了，直接顯示
-                if (item.key !== "") htmlImg = `<img src="./img/transparent.svg" fetchpriority="low">`;
+                if (item.key !== "") {
+                    if (noDelay && !wasLoaded) _tempLoaded.push(i);
+                    htmlImg = `<img src="${wasLoaded ? item.iconUrl : "./img/transparent.svg"}" fetchpriority="low">`;
+                }
             }
 
             let htmlNo = ``;
@@ -316,7 +320,7 @@ export class MainFileList {
                 </div>`);
             _domFileListData.append(div);
             setImageErrorFallback(div.querySelector<HTMLImageElement>(".fileList-img img"));
-            if (loadImageNow && item.key !== "") {
+            if (loadImageNow && !wasLoaded && item.key !== "") {
                 const image = div.querySelector<HTMLImageElement>(".fileList-img img");
                 if (image !== null) M.imageRequestLimiter.addRequest(image, item.iconUrl);
             }

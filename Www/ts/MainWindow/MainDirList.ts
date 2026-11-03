@@ -276,7 +276,7 @@ export class MainDirList {
 				const path = isArchiveFile ? dirPath : Lib.combine([dirPath, arPath[i]]);
 				let htmlImg = "";
 				if (_tempLoaded.indexOf(n + "-" + i) !== -1) { // 圖片已經載入過了，直接顯示
-					htmlImg = `<img src="./img/transparent.svg" fetchpriority="low"/>`;
+					htmlImg = `<img src="${getImgUrl(path)}" fetchpriority="low"/>`;
 				}
 				htmlImgBox += `<div class="dirList-img dirList-img__${_imgNumber}" data-imgid="${i}">${htmlImg}</div>`;
 			}
@@ -318,15 +318,7 @@ export class MainDirList {
 				M.script.file.dragDropFile(dirPath);
 			})
 
-			for (let i = 0; i < len; i++) {
-				if (_tempLoaded.indexOf(n + "-" + i) === -1) continue;
-				const path = isArchiveFile ? dirPath : Lib.combine([dirPath, arPath[i]]);
-				const image = div.querySelector<HTMLImageElement>(`.dirList-img[data-imgid="${i}"] img`);
-				if (image !== null) {
-					setImageErrorFallback(image);
-					M.imageRequestLimiter.addRequest(image, getImgUrl(path));
-				}
-			}
+			div.querySelectorAll<HTMLImageElement>(".dirList-img img").forEach(image => setImageErrorFallback(image));
 
 			if (len !== 0) {
 				if (noDelay === false) {
