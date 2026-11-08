@@ -97,13 +97,8 @@ class SettingWindow {
             const height = 600;
             await WV_Window.ShowWindowAtCenter(width, height); // 顯示視窗
 
-            // win11 指定視窗的大小是未乘以縮放比例的，所以網頁寬度與指定的寬度不同，就重新設定視窗大小
-            if (Math.abs(document.body.clientWidth - width) > 10) {
-                let ratio = window.devicePixelRatio; // 獲取瀏覽器的縮放比例，必須在視窗顯示後才能獲取
-                await WV_Window.SetSize(width * ratio, height * ratio);
-            }
-            const ratio = window.devicePixelRatio;
-            WV_Window.SetMinimumSize(800 * ratio, 300 * ratio); // 設定視窗最小寬度
+            // .NET 8+ PerMonitorV2 會依目前 DPI 縮放頂層 Form 的 MinimumSize，傳入邏輯像素即可。
+            WV_Window.SetMinimumSize(800, 300); // 設定視窗最小寬度
 
             WV_Window.Text = "Setting";
             let iconPath = Lib.combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);

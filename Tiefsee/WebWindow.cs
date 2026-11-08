@@ -619,17 +619,114 @@ public class WebWindow : FormNone {
 
         if (_isShow) { return; }
 
-        await ShowWindow(() => { });
-
-        // 取得螢幕縮放比例
-        float scale = _parentWindow.DeviceDpi / 96f;
-        int w = (int)((width * scale) - _parentWindow.Width);
-        int h = (int)((height * scale) - _parentWindow.Height);
-        int l = _parentWindow.Left - (w / 2);
-        int t = _parentWindow.Top - (h / 2);
-        SetPosition(l, t);
-        SetSize(width, height);
+        await ShowWindow(() => {
+            StartPosition = FormStartPosition.Manual;
+            SetWindowBoundsAtCenter(width, height);
+        });
     }
+
+    /// <summary>
+    /// 將 CSS pixel 尺寸換算為父視窗所在 DPI 的裝置像素，並以相同座標單位置中。
+    /// </summary>
+    private void SetWindowBoundsAtCenter(int width, int height) {
+        if (TryGetWindowCenterBounds(width, height, out _, out _,
+            out _, out int left, out int top, out int pixelWidth, out int pixelHeight) == false) { return; }
+
+        const uint SWP_NOZORDER = 0x0004;
+        const uint SWP_NOACTIVATE = 0x0010;
+        if (SetWindowPos(Handle, IntPtr.Zero, left, top, pixelWidth, pixelHeight,
+            SWP_NOZORDER | SWP_NOACTIVATE) == false) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+    }
+
+    private bool TryGetWindowCenterBounds(int width, int height, out NativeRect parentBounds, out NativeRect workArea,
+        out float scale, out int left, out int top, out int pixelWidth, out int pixelHeight) {
+        parentBounds = default;
+        workArea = default;
+        scale = 1;
+        left = top = pixelWidth = pixelHeight = 0;
+        if (_parentWindow == null) { return false; }
+
+        if (GetWindowRect(_parentWindow.Handle, out parentBounds) == false) {
+            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        // 讀取目前 HWND DPI，避免沿用 WinForms 尚未更新的快取值。
+        int parentDpi = GetDpiForWindow(_parentWindow.Handle);
+        if (parentDpi <= 0) { parentDpi = _parentWindow.DeviceDpi; }
+        scale = parentDpi / 96f;
+        pixelWidth = (int)Math.Round(width * scale);
+        pixelHeight = (int)Math.Round(height * scale);
+
+        bool hasWorkArea = TryGetParentMonitorWorkArea(out workArea);
+        if (hasWorkArea) {
+            int workWidth = workArea.Right - workArea.Left;
+            int workHeight = workArea.Bottom - workArea.Top;
+            pixelWidth = Math.Min(pixelWidth, workWidth);
+            pixelHeight = Math.Min(pixelHeight, workHeight);
+        }
+
+        left = parentBounds.Left + ((parentBounds.Right - parentBounds.Left) - pixelWidth) / 2;
+        top = parentBounds.Top + ((parentBounds.Bottom - parentBounds.Top) - pixelHeight) / 2;
+
+        if (hasWorkArea) {
+            // 將視窗限制在工作區範圍內，避免尺寸或座標超出目前螢幕。
+            left = Math.Clamp(left, workArea.Left, workArea.Right - pixelWidth);
+            top = Math.Clamp(top, workArea.Top, workArea.Bottom - pixelHeight);
+        }
+        return true;
+    }
+
+    private bool TryGetParentMonitorWorkArea(out NativeRect workArea) {
+        workArea = default;
+        const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+        IntPtr monitor = MonitorFromWindow(_parentWindow.Handle, MONITOR_DEFAULTTONEAREST);
+        if (monitor == IntPtr.Zero) { return false; }
+
+        NativeMonitorInfo monitorInfo = new() {
+            Size = Marshal.SizeOf<NativeMonitorInfo>()
+        };
+        if (GetMonitorInfo(monitor, ref monitorInfo) == false) { return false; }
+
+        workArea = monitorInfo.WorkArea;
+        return workArea.Right > workArea.Left && workArea.Bottom > workArea.Top;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRect {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeMonitorInfo {
+        public int Size;
+        public NativeRect MonitorArea;
+        public NativeRect WorkArea;
+        public uint Flags;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetWindowRect(IntPtr hWnd, out NativeRect rect);
+
+    [DllImport("user32.dll")]
+    private static extern int GetDpiForWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint flags);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref NativeMonitorInfo monitorInfo);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+        int x, int y, int width, int height, uint flags);
 
     /// <summary>
     /// 以 js 呼叫此函數後才會顯示視窗 (初始化 坐標 與 size
@@ -874,6 +971,7 @@ public class FormNone : Form {
 
     // 視窗初始化
     protected override void OnHandleCreated(EventArgs e) {
+        base.OnHandleCreated(e);
         ResetMaximumBound();
     }
 
