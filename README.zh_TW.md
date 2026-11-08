@@ -71,7 +71,7 @@ Tiefsee
 
  - 商店版與免安裝版功能上沒有差異
  - 商店版可以透過商店來進行更新，且刪除 Tiefsee 後不會留下任何資料
- - 免安裝版需要安裝 [.NET Desktop Runtime 8 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) 才能運行
+ - 免安裝版需要安裝 [.NET 10 Desktop Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) 才能運行
  - 免安裝版可以使用「便攜模式」 ，在 Tiefsee.exe 旁邊新建一個`PortableMode`資料夾，資料就都會儲存在裡面
 
 > 沒有特別需求的話，我推薦使用商店版
@@ -92,7 +92,7 @@ Tiefsee
 <br>
 
 ## 專案說明
-- 專案類型：C# WinForm (.NET 8)
+- 專案類型：C# WinForm (.NET 10)
 - 開發語言：C#、TypeScript
 - [專案建立步驟](Docs/zh-TW/building.md)
 

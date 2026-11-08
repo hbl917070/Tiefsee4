@@ -42,14 +42,14 @@ The project uses `/MT` to statically link the C/C++ runtime, so the target compu
 
 In addition to the C++ build tools above, a complete build requires:
 
-- .NET 8 SDK
+- .NET 10 SDK
 - Network access to restore NuGet packages
 - WebView2 SDK, provided through NuGet packages
 - Node.js, Gulp, Rust, `wasm32-unknown-unknown`, and `wasm-pack` (see the Www installation steps below)
 
 The project currently targets x64. MSIX packaging also requires Visual Studio's Windows App Packaging tools and a package signing environment.
 
-For the packaged MSIX build, the .NET runtime is included in the package. The portable build requires .NET 8 Desktop Runtime to be installed on the target computer. WebView2 Runtime is still required when the application creates its WebView2 windows.
+For the packaged MSIX build, the .NET runtime is included in the package. The portable build requires .NET 10 Desktop Runtime to be installed on the target computer. WebView2 Runtime is still required when the application creates its WebView2 windows.
 
 <br>
 

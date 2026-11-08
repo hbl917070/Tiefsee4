@@ -8,8 +8,8 @@ on:
 
 jobs:
   build:
-    # NativeHost uses the VS 2022 v143 toolset; avoid windows-latest moving to VS 2026.
-    runs-on: windows-2022
+    # .NET 10 requires VS 18. NativeHost pins the v143 toolset for VS 18.
+    runs-on: windows-2025
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

@@ -31,24 +31,28 @@ public class RJDropdownMenu : ContextMenuStrip {
     // saving control property changes in the designer at design time in Visual Studio.
     // If the problem I mention does not occur you can expose the properties and manipulate them from the toolbox.
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool IsMainMenu {
         get { return isMainMenu; }
         set { isMainMenu = value; }
     }
 
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int MenuItemHeight {
         get { return menuItemHeight; }
         set { menuItemHeight = value; }
     }
 
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Color MenuItemTextColor {
         get { return menuItemTextColor; }
         set { menuItemTextColor = value; }
     }
 
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Color PrimaryColor {
         get { return primaryColor; }
         set { primaryColor = value; }

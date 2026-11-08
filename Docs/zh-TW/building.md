@@ -42,14 +42,14 @@ Tiefsee4 包含以下 4 個子專案
 
 除了上述 C++ 編譯工具，完整編譯還需要：
 
-- .NET 8 SDK
+- .NET 10 SDK
 - NuGet 還原所需的網路連線與套件來源
 - WebView2 SDK（由 NuGet 套件提供）
 - Node.js、Gulp、Rust、`wasm32-unknown-unknown` 與 `wasm-pack`（請參考下方 Www 初始安裝）
 
 目前專案以 x64 為主要編譯目標。MSIX 打包還需要 Visual Studio 的 Windows App Packaging 工具與套件簽章環境。
 
-執行已打包的 MSIX 時，.NET runtime 會隨套件提供；免安裝版則需要電腦已安裝 .NET 8 Desktop Runtime。程式建立 WebView2 視窗時，仍需要系統已安裝 WebView2 Runtime。
+執行已打包的 MSIX 時，.NET runtime 會隨套件提供；免安裝版則需要電腦已安裝 .NET 10 Desktop Runtime。程式建立 WebView2 視窗時，仍需要系統已安裝 WebView2 Runtime。
 
 <br>
 

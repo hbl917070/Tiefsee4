@@ -4,7 +4,7 @@
 		<OutputType Condition="'$(RuntimeIdentifier)' == ''">WinExe</OutputType>
 		<!-- MSIX 的入口是 native host；發布 managed 專案時只需要 DLL，不要再產生第二個 apphost。 -->
 		<OutputType Condition="'$(RuntimeIdentifier)' != ''">Library</OutputType>
-		<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+		<TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
 		<UseAppHost Condition="'$(RuntimeIdentifier)' == ''">false</UseAppHost>
@@ -97,17 +97,11 @@
 	</Target>
 
 	<!-- C# 編譯完成後，以相同組態重新產生 native host，讓直接建置本專案也能更新 Tiefsee.exe -->
-	<Target Name="BuildNativeHostAfterTiefsee" AfterTargets="Build"
-		Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
-		<MSBuild
-			Projects="$(MSBuildThisFileDirectory)..\TiefseeNativeHost\TiefseeNativeHost.vcxproj"
-			Targets="Build"
-			BuildInParallel="false"
-			Properties="Configuration=$(Configuration);Platform=x64;BuildingNativeHost=true;VCTargetsPath=$(VCTargetsPath)" />
+	<Target Name="BuildNativeHostAfterTiefsee" AfterTargets="Build" Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
+		<MSBuild Projects="$(MSBuildThisFileDirectory)..\TiefseeNativeHost\TiefseeNativeHost.vcxproj" Targets="Build" BuildInParallel="false" Properties="Configuration=$(Configuration);Platform=x64;BuildingNativeHost=true;VCTargetsPath=$(VCTargetsPath)" />
 	</Target>
 
-	<Target Name="ReportNativeHostBuildSkipped" AfterTargets="Build"
-		Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and !Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
+	<Target Name="ReportNativeHostBuildSkipped" AfterTargets="Build" Condition="'$(BuildNativeHost)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(BuildingNativeHost)' != 'true' and !Exists('$(VCTargetsPath)\Microsoft.Cpp.Default.props')">
 		<Message Importance="High" Text="NativeHost 未重新編譯；請使用 Visual Studio MSBuild 或 BuildAll/InvokeMsBuild.ps1 產生 Tiefsee.exe。" />
 	</Target>
 
