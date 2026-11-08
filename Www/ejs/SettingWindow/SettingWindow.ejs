@@ -67,25 +67,18 @@
                 <div class="titlebar-text"></div>
 
                 <div class="titlebar-toolbar">
-                    <!-- <div class="titlebar-toolbar-btn titlebar-toolbar-menu" role="button" style="display:none;">
-                        <%- await readFile("./img/default/window-menu.svg"); %>
-                    </div>
-                    <div class="titlebar-toolbar-btn titlebar-toolbar-topmost" role="button">
-                        <%- await readFile("./img/default/window-topmost.svg"); %>
-                    </div> -->
                     <div class="titlebar-toolbar-btn titlebar-toolbar-minimized" role="button" i18n="script.minimizeWindow" title="">
-                        <%- await readFile("./img/default/window-minimized.svg"); %>
+                        <%- await readSvg("window_minimized.svg"); %>
                     </div>
                     <div class="titlebar-toolbar-btn titlebar-toolbar-normal" role="button" i18n="script.restoreWindow" title="" style="display:none;">
-                        <%- await readFile("./img/default/window-normal.svg"); %>
+                        <%- await readSvg("window_normal.svg"); %>
                     </div>
                     <div class="titlebar-toolbar-btn titlebar-toolbar-maximized" role="button" i18n="script.maximizeWindow" title="">
-                        <%- await readFile("./img/default/window-maximized.svg"); %>
+                        <%- await readSvg("window_maximized.svg"); %>
                     </div>
                     <div class="titlebar-toolbar-btn titlebar-toolbar-close" role="button" i18n="script.closeWindow" title="">
-                        <%- await readFile("./img/default/window-close.svg"); %>
+                        <%- await readSvg("window_close.svg"); %>
                     </div>
-
                 </div>
 
             </div>
@@ -110,7 +103,7 @@
                         <div class="text-title">
                             <span i18n="sw.imageSettings.imageSharpen"> 銳化圖片</span>
                             <div class="img-help" data-i18n="sw.imageSettings.imageSharpenTooltip">
-                                <%- await readFile("./img/default/tool-help.svg"); %>
+                                <%- await readSvg("question_circle_20_regular.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
@@ -210,7 +203,7 @@
                                 <div class="radioList-content">
                                     <span i18n="sw.startupMode.mode_1">直接啟動</span>
                                     <div class="img-help" data-i18n="sw.startupMode.tooltip_1">
-                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                        <%- await readSvg("question_circle_20_regular.svg"); %>
                                     </div>
                                 </div>
                             </label>
@@ -219,7 +212,7 @@
                                 <div class="radioList-content">
                                     <span i18n="sw.startupMode.mode_2">快速啟動</span>
                                     <div class="img-help" data-i18n="sw.startupMode.tooltip_2">
-                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                        <%- await readSvg("question_circle_20_regular.svg"); %>
                                     </div>
                                 </div>
                             </label>
@@ -228,7 +221,7 @@
                                 <div class="radioList-content">
                                     <span i18n="sw.startupMode.mode_3">快速啟動 + 常駐背景</span>
                                     <div class="img-help" data-i18n="sw.startupMode.tooltip_3">
-                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                        <%- await readSvg("question_circle_20_regular.svg"); %>
                                     </div>
                                 </div>
                             </label>
@@ -237,7 +230,7 @@
                                 <div class="radioList-content">
                                     <span i18n="sw.startupMode.mode_4">單一視窗</span>
                                     <div class="img-help" data-i18n="sw.startupMode.tooltip_4">
-                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                        <%- await readSvg("question_circle_20_regular.svg"); %>
                                     </div>
                                 </div>
                             </label>
@@ -246,7 +239,7 @@
                                 <div class="radioList-content">
                                     <span i18n="sw.startupMode.mode_5">單一視窗 + 常駐背景</span>
                                     <div class="img-help" data-i18n="sw.startupMode.tooltip_5">
-                                        <%- await readFile("./img/default/tool-help.svg"); %>
+                                        <%- await readSvg("question_circle_20_regular.svg"); %>
                                     </div>
                                 </div>
                             </label>
@@ -361,7 +354,7 @@
                         <div class="text-title">
                             <span i18n="sw.other.enableTouchpadGestures"> 啟用觸控板手勢 </span>
                             <div class="img-help" data-i18n="sw.other.enableTouchpadGesturesTooltip">
-                                <%- await readFile("./img/default/tool-help.svg"); %>
+                                <%- await readSvg("question_circle_20_regular.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
@@ -491,7 +484,7 @@
                         <div class="text-title">
                             <span i18n="sw.windowSetting.windowStyle"> 視窗效果 </span>
                             <div class="img-help" data-i18n="sw.windowSetting.tooltip">
-                                <%- await readFile("./img/default/tool-help.svg"); %>
+                                <%- await readSvg("question_circle_20_regular.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
@@ -538,13 +531,6 @@
                             </label>
                         </div>
 
-                        <div class="text-title" i18n="sw.mainToolbar.toolbarAlignment"> 工具列對齊 </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-mainToolbarAlign">
-                                <option value="left" i18n="sw.mainToolbar.left">靠左</option>
-                                <option value="center" i18n="sw.mainToolbar.center">置中</option>
-                            </select>
-                        </div>
                     </div>
 
 
@@ -642,7 +628,7 @@
                         <div class="text-title">
                             <span i18n="sw.informationPanel.relatedFiles"> 顯示相關檔案 </span>
                             <div class="img-help" data-i18n="sw.informationPanel.relatedFilesTooltip">
-                                <%- await readFile("./img/default/tool-help.svg"); %>
+                                <%- await readSvg("question_circle_20_regular.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
@@ -660,7 +646,7 @@
                         <div class="text-title" data-toDom="a1111Models">
                             <span i18n="sw.informationPanel.a1111Models"> A1111 models 路徑 </span>
                             <div class="img-help" data-i18n="sw.informationPanel.a1111ModelsTooltip">
-                                <%- await readFile("./img/default/tool-help.svg"); %>
+                                <%- await readSvg("question_circle_20_regular.svg"); %>
                             </div>
                         </div>
                         <div class="text-content">
@@ -761,24 +747,68 @@
                 <div class="page-tabsPage" id="tabsPage-toolbar" role="tabpanel" aria-labelledby="tabsBtn-toolbar">
                     <div class="page-title" i18n="sw.tabs.toolbar"> 工具列 </div>
                     <div class="box">
-                        <div class="box-title" i18n="sw.customToolbar.title"> 顯示與排序 </div>
+                        <div class="box-title" i18n="sw.customToolbar.title">工具列自訂</div>
+                        <div class="toolbar-customizer">
+                            <div class="toolbar-customizer-type">
+                                <label for="select-toolbarListType" i18n="sw.customToolbar.editToolbar">選擇要編輯的工具列</label>
+                                <select class="text-input" id="select-toolbarListType" aria-label="選擇要編輯的工具列">
+                                    <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
+                                    <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office 文件工具列</option>
+                                    <option value="txt" i18n="sw.customToolbar.textToolbar">文字工具列</option>
+                                    <option value="bulkView" i18n="sw.customToolbar.bulkViewToolbar">大量瀏覽模式工具列</option>
+                                    <option value="welcome" i18n="sw.customToolbar.welcomeToolbar">歡迎畫面工具列</option>
+                                </select>
+                            </div>
 
-                        <div class="text-title"> </div>
-                        <div class="text-content">
-                            <select class="text-input" id="select-toolbarListType" aria-labelledby="tabsBtn-toolbar" aria-label="" i18n="sw.tabs.toolbar">
-                                <!-- <option value="welcome"></option> -->
-                                <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
-                                <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office 文件工具列</option>
-                                <option value="txt" i18n="sw.customToolbar.textToolbar">文字工具列</option>
-                                <option value="bulkView" i18n="sw.customToolbar.bulkViewToolbar">大量瀏覽模式工具列</option>
-                            </select>
+                            <div class="toolbar-preview-window">
+                                <div class="toolbar-preview-scroll">
+                                    <div class="toolbar-preview-scroll-content">
+                                        <div class="toolbar-preview-titlebar">
+                                            <div class="toolbar-preview-titlebar-editable">
+                                                <div class="toolbar-preview-titlezone toolbar-preview-titlezone-left toolbar-dropzone" id="toolbar-zone-titlebar-left" role="list" aria-label="標題列靠左"></div>
+                                                <div class="toolbar-preview-title">Tiefsee</div>
+                                                <div class="toolbar-preview-titlezone toolbar-preview-titlezone-right toolbar-dropzone" id="toolbar-zone-titlebar-right" role="list" aria-label="標題列靠右"></div>
+                                            </div>
+                                            <div class="toolbar-preview-window-controls" aria-hidden="true">
+                                                <div><%- await readSvg("window_minimized.svg"); %></div>
+                                                <div><%- await readSvg("window_maximized.svg"); %></div>
+                                                <div><%- await readSvg("window_close.svg"); %></div>
+                                            </div>
+                                        </div>
+                                        <div class="toolbar-preview-toolbar">
+                                            <div class="toolbar-preview-align-wrap">
+                                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.leftZone">靠左</div>
+                                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-left" data-align="left" role="list" aria-label="靠左"></div>
+                                            </div>
+                                            <div class="toolbar-preview-align-wrap">
+                                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.centerZone">置中</div>
+                                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-center" data-align="center" role="list" aria-label="置中"></div>
+                                            </div>
+                                            <div class="toolbar-preview-align-wrap">
+                                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.rightZone">靠右</div>
+                                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-right" data-align="right" role="list" aria-label="靠右"></div>
+                                            </div>
+                                        </div>
+                                        <div class="toolbar-preview-canvas" aria-hidden="true"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toolbar-customizer-available-title" i18n="sw.customToolbar.available">可用項目</div>
+                            <div class="toolbarList toolbar-customizer-available" id="toolbarList-available" role="list" aria-label="可用項目"></div>
+                            <div class="settings-pageTips toolbar-customizer-tips">
+                                <div class="settings-pageTip settings-pageTip__title" i18n="sw.customToolbar.tipTitle">操作說明</div>
+                                <ul class="settings-pageTipsList">
+                                    <li class="settings-pageTip" i18n="sw.customToolbar.tipAdd">把下方項目拖到上方預覽的標題列，或工具列的靠左、置中、靠右區域。</li>
+                                    <li class="settings-pageTip" i18n="sw.customToolbar.tipMove">在上方預覽拖曳可調整順序；拖回下方可移除。</li>
+                                    <li class="settings-pageTip" i18n="sw.customToolbar.tipReusable">分隔線和空白可以重複加入。</li>
+                                    <li class="settings-pageTip" i18n="sw.customToolbar.tipToolbarSelect">用上方選單切換要編輯的工具列；各工具列分開設定。</li>
+                                </ul>
+                            </div>
+                            <div class="settings-pageFooter toolbar-customizer-footer">
+                                <button class="btn toolbar-customizer-reset" type="button" id="btn-resetToolbarCustomization">重設圖片工具列</button>
+                            </div>
                         </div>
-
-                        <div class="text-title" i18n="sw.customToolbar.adjustOrderByDragging">(可拖曳調整順序) </div>
-                        <div class="toolbarList" id="toolbarList-img" role="list" aria-labelledby="select-toolbarListType"> </div>
-                        <div class="toolbarList" id="toolbarList-pdf" role="list" aria-labelledby="select-toolbarListType"> </div>
-                        <div class="toolbarList" id="toolbarList-txt" role="list" aria-labelledby="select-toolbarListType"> </div>
-                        <div class="toolbarList" id="toolbarList-bulkView" role="list" aria-labelledby="select-toolbarListType"> </div>
                     </div>
                 </div>
 

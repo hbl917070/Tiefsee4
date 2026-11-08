@@ -716,7 +716,7 @@ async function touchGestureForWindow(windowId, kind, x, y, radius, value, steps 
   }
 }
 
-async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0, captureConsoleMs = 0, captureTrace = false) {
+async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0, captureConsoleMs = 0, captureTrace = false, captureScreenshotBeforeRelease = false) {
   if (![x1, y1, x2, y2].every(Number.isFinite)) {
     throw new Error("Drag coordinates must be finite numbers.");
   }
@@ -727,6 +727,7 @@ async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0
     throw new Error("captureConsoleMs must be an integer from 0 to 5000.");
   }
   if (typeof captureTrace !== "boolean") throw new Error("captureTrace must be a boolean.");
+  if (typeof captureScreenshotBeforeRelease !== "boolean") throw new Error("captureScreenshotBeforeRelease must be a boolean.");
 
   const { target, cdp } = await findWindowTarget(windowId);
   const consoleMessages = [];
@@ -738,6 +739,8 @@ async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0
   let traceCompletePromise = null;
   let tracingStarted = false;
   let mousePressed = false;
+  let dragScreenshot = null;
+  let dragPreview = null;
   const captureStartedAt = Date.now();
   try {
     if (captureConsoleMs > 0) {
@@ -786,6 +789,23 @@ async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0
         buttons: 1,
       });
       if (durationMs > 0) await new Promise(resolve => setTimeout(resolve, durationMs / steps));
+    }
+    if (captureScreenshotBeforeRelease) {
+      // Capture while the pointer is still pressed so the active drag mirror remains visible.
+      dragScreenshot = (await cdp.call("Page.captureScreenshot", { format: "png", fromSurface: true })).data;
+      await cdp.call("DOM.enable");
+      const document = await cdp.call("DOM.getDocument", { depth: 1, pierce: true });
+      const preview = await cdp.call("DOM.querySelector", {
+        nodeId: document.root.nodeId,
+        selector: ".toolbar-drag-fallback",
+      });
+      if (preview.nodeId) {
+        const [node, html] = await Promise.all([
+          cdp.call("DOM.describeNode", { nodeId: preview.nodeId, depth: 2 }),
+          cdp.call("DOM.getOuterHTML", { nodeId: preview.nodeId }),
+        ]);
+        dragPreview = { node: node.node, outerHTML: html.outerHTML };
+      }
     }
     await cdp.call("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
     mousePressed = false;
@@ -884,6 +904,8 @@ async function dragForWindow(windowId, x1, y1, x2, y2, steps = 1, durationMs = 0
     })));
     return {
       windowId, targetId: target.id, x1, y1, x2, y2, state: after,
+      ...(dragScreenshot ? { image: dragScreenshot } : {}),
+      ...(dragPreview ? { dragPreview } : {}),
       ...(captureConsoleMs > 0 ? { renderPerformance } : {}),
       ...(captureTrace ? { performanceTrace } : {}),
     };
@@ -1142,7 +1164,7 @@ const mcpTools = [
   { name: "tiefsee_resize_window", description: "將指定測試視窗調整為指定外框大小（400–3840 × 300–2160），用於重現小視窗版面。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, width: { type: "integer", minimum: 400, maximum: 3840 }, height: { type: "integer", minimum: 300, maximum: 2160 } }, required: ["windowId", "width", "height"], additionalProperties: false } },
   { name: "tiefsee_wheel", description: "向指定視窗送出滑鼠滾輪事件。deltaY 負值通常代表向上滾；captureScreenshot 可在輸入後擷取畫面，delayMs 可等候短暫視覺更新。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x: { type: "number" }, y: { type: "number" }, deltaY: { type: "number" }, deltaX: { type: "number" }, captureScreenshot: { type: "boolean" }, captureScreenshotDelayMs: { type: "integer", minimum: 0, maximum: 250 } }, required: ["windowId", "x", "y", "deltaY"], additionalProperties: false } },
   { name: "tiefsee_touch_gesture", description: "透過 CDP 真實多點觸控事件，在指定 WebView 視窗執行受限的雙指縮放或旋轉手勢。kind=pinch 時 value 是倍率；kind=rotate 時 value 是角度。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, kind: { type: "string", enum: ["pinch", "rotate"] }, x: { type: "number" }, y: { type: "number" }, radius: { type: "number", minimum: 20, maximum: 300 }, value: { type: "number" }, steps: { type: "integer", minimum: 2, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 } }, required: ["windowId", "kind", "x", "y", "radius", "value"], additionalProperties: false } },
-  { name: "tiefsee_drag", description: "在指定視窗內送出拖曳輸入。steps 與 durationMs 可控制移動點數和耗時；captureConsoleMs 可回傳 Renderer 摘要；captureTrace 可收集短時間 Chromium compositor／GPU trace。這些量測不執行頁面 JavaScript。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" }, steps: { type: "integer", minimum: 1, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 }, captureConsoleMs: { type: "integer", minimum: 0, maximum: 5000 }, captureTrace: { type: "boolean" } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
+  { name: "tiefsee_drag", description: "在指定視窗內送出拖曳輸入。steps 與 durationMs 可控制移動點數和耗時；captureScreenshotBeforeRelease 可在滑鼠釋放前擷取拖曳鏡像；captureConsoleMs 可回傳 Renderer 摘要；captureTrace 可收集短時間 Chromium compositor／GPU trace。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, x1: { type: "number" }, y1: { type: "number" }, x2: { type: "number" }, y2: { type: "number" }, steps: { type: "integer", minimum: 1, maximum: 60 }, durationMs: { type: "number", minimum: 0, maximum: 5000 }, captureConsoleMs: { type: "integer", minimum: 0, maximum: 5000 }, captureTrace: { type: "boolean" }, captureScreenshotBeforeRelease: { type: "boolean" } }, required: ["windowId", "x1", "y1", "x2", "y2"], additionalProperties: false } },
   { name: "tiefsee_wait", description: "等待指定視窗的 selector 可見／隱藏或文字出現；以狀態輪詢取代固定長時間 sleep。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, text: { type: "string" }, state: { type: "string", enum: ["visible", "hidden"] }, timeoutMs: { type: "integer", minimum: 0, maximum: 30000 } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_screenshot", description: "擷取指定 WebView 視窗畫面；只在需要確認視覺結果時使用。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
 ];
@@ -1207,7 +1229,7 @@ async function callMcpTool(name, args) {
     case "tiefsee_resize_window": return await resizeWindowForWindow(args.windowId, args.width, args.height);
     case "tiefsee_wheel": return await wheelForWindow(args.windowId, args.x, args.y, args.deltaY, args.deltaX ?? 0, args.captureScreenshot === true, args.captureScreenshotDelayMs ?? 0);
     case "tiefsee_touch_gesture": return await touchGestureForWindow(args.windowId, args.kind, args.x, args.y, args.radius, args.value, args.steps ?? 12, args.durationMs ?? 300);
-    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2, args.steps ?? 1, args.durationMs ?? 0, args.captureConsoleMs ?? 0, args.captureTrace ?? false);
+    case "tiefsee_drag": return await dragForWindow(args.windowId, args.x1, args.y1, args.x2, args.y2, args.steps ?? 1, args.durationMs ?? 0, args.captureConsoleMs ?? 0, args.captureTrace ?? false, args.captureScreenshotBeforeRelease ?? false);
     case "tiefsee_wait": return await waitForWindow(args.windowId, args);
     case "tiefsee_screenshot": {
       const { target, cdp } = await findWindowTarget(args.windowId);

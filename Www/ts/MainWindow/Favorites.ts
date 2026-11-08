@@ -87,7 +87,7 @@ export class Favorites {
                 <header class="favorites-header">
                     <h2 class="favorites-title"><span i18n="favorites.title">收藏</span><span class="favorites-count" aria-live="polite"></span></h2>
                     <div class="favorites-header-actions">
-                        <button class="favorites-add" type="button" data-action="add" i18n="favorites.add" aria-label="新增收藏" title="新增收藏">${SvgList["tool-zoomIn.svg"]}</button>
+                        <button class="favorites-add" type="button" data-action="add" i18n="favorites.add" aria-label="新增收藏" title="新增收藏">${SvgList["add_20_regular.svg"]}</button>
                     </div>
                 </header>
                 <div class="favorites-root-view">
@@ -97,7 +97,7 @@ export class Favorites {
             </section>
             <section class="favorites-folder-view" aria-label="收藏資料夾" hidden>
                 <header class="favorites-folder-header">
-                    <button class="favorites-folder-back" type="button" i18n="favorites.folderBack" aria-label="返回收藏" title="返回收藏">${SvgList["tool-back.svg"]}</button>
+                    <button class="favorites-folder-back" type="button" i18n="favorites.folderBack" aria-label="返回收藏" title="返回收藏">${SvgList["arrow_hook_up_left_20_regular.svg"]}</button>
                     <input class="favorites-folder-title" type="text" i18n="favorites.renameGroup" aria-label="收藏資料夾名稱" autocomplete="off" spellcheck="false">
                 </header>
                 <div class="favorites-grid favorites-folder-grid" role="list" aria-label="資料夾內的收藏項目"></div>
@@ -486,8 +486,8 @@ export class Favorites {
             fallback.className = `favorite-icon-fallback is-${kind}`;
             fallback.setAttribute("aria-hidden", "true");
             fallback.innerHTML = kind === "directory"
-                ? SvgList["error-folder.svg"]
-                : SvgList["error-file.svg"];
+                ? SvgList["folder_dismiss_20_regular.svg"]
+                : SvgList["document_dismiss_20_regular.svg"];
             image.replaceWith(fallback);
         }, { once: true }));
         return tile;

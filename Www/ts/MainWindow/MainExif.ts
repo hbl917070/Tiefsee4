@@ -407,7 +407,7 @@ export class MainExif {
 					const nameI18n = `exif.name.${name}`;
 					name = M.i18n.t(`exif.name.${name}`);
 
-					const domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}" aria-label="${M.i18n.t("menu.export")}" i18n="menu.export" role="button"> ${SvgList["tool-export.svg"]} </div><span>`);
+					const domValue = Lib.newDom(`<span>${value}<div class="btnExport" title="${M.i18n.t("menu.export")}" aria-label="${M.i18n.t("menu.export")}" i18n="menu.export" role="button"> ${SvgList["share_ios_20_regular.svg"]} </div><span>`);
 					const domBtn = domValue.querySelector(".btnExport") as HTMLElement;
 					domBtn.addEventListener("click", () => {
 						M.script.open.showFrames(path);
@@ -853,7 +853,7 @@ export class MainExif {
 					previewImage.addEventListener("error", () => {
 						if (domImg.dataset.previewRevision !== String(previewRevision)) return;
 						domImg.classList.add("is-icon-error");
-						domImg.innerHTML = SvgList["error-file.svg"];
+						domImg.innerHTML = SvgList["document_dismiss_20_regular.svg"];
 					}, { once: true });
 					domImg.appendChild(previewImage);
 					M.imageRequestLimiter.addRequest(previewImage, imgUrl);
@@ -1334,9 +1334,9 @@ export class MainExif {
 									</div>
 								</div>
 								<div class="mainExifBtns">
-									<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["expand.svg"]}</div>
-									<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["collapse.svg"]}</div>
-									<div class="btn mainExifBtnCivitai" role="button" title="Civitai">${SvgList["tool-civitai.svg"]}</div>
+									<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["chevron_up_down_20_regular.svg"]}</div>
+									<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["chevron_down_up_20_regular.svg"]}</div>
+									<div class="btn mainExifBtnCivitai" role="button" title="Civitai">${SvgList["civitai.svg"]}</div>
 								</div>
 							</div>`);
 						_domTabContentInfo.appendChild(newItem);
@@ -1610,7 +1610,7 @@ export class MainExif {
 				if (title.toLowerCase().endsWith(".civitai.info")) {
 					const civitaiUrl = await civitaiInfoToUrl(null, text);
 					if (civitaiUrl !== null) {
-						let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="Civitai">${SvgList["tool-civitai.svg"]}</div>`)
+						let btnCivitai = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="Civitai">${SvgList["civitai.svg"]}</div>`)
 						btnList.appendChild(btnCivitai);
 						btnCivitai.addEventListener("click", async () => {
 							WV_RunApp.OpenUrl(civitaiUrl);
@@ -1619,7 +1619,7 @@ export class MainExif {
 				}
 
 				// 按鈕 - 編輯
-				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.edit")}">${SvgList["tool-edit.svg"]}</div>`)
+				let btnEdit = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.edit")}">${SvgList["edit_20_regular.svg"]}</div>`)
 				btnList.appendChild(btnEdit);
 				btnEdit.addEventListener("click", async () => {
 					M.textEditor.show(domBox.getAttribute("data-path"));
@@ -1632,7 +1632,7 @@ export class MainExif {
 				})
 
 				// 按鈕 - 複製
-				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["tool-copy.svg"]}</div>`)
+				let btnCoyp = Lib.newDom(`<div class="mainExifRelatedTitleBtn" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["copy_20_regular.svg"]}</div>`)
 				btnList.appendChild(btnCoyp);
 				btnCoyp.addEventListener("click", async () => {
 					await WV_System.SetClipboard_Text(itemText ?? "");
@@ -1854,9 +1854,9 @@ export class MainExif {
 					<div class="mainExifName" i18n="${nameI18n}">${name}</div>
 					<div class="mainExifValue" i18n="${valueI18n}">${value}</div>
 					<div class="mainExifBtns">
-						<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["expand.svg"]}</div>
-						<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["collapse.svg"]}</div>
-						<div class="btn mainExifBtnCopy" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["tool-copy.svg"]}</div>
+						<div class="btn mainExifBtnExpand" role="button" title="${M.i18n.t("menu.expand")}" aria-label="${M.i18n.t("menu.expand")}" i18n="menu.expand">${SvgList["chevron_up_down_20_regular.svg"]}</div>
+						<div class="btn mainExifBtnCollapse" role="button" title="${M.i18n.t("menu.collapse")}" aria-label="${M.i18n.t("menu.collapse")}" i18n="menu.collapse">${SvgList["chevron_down_up_20_regular.svg"]}</div>
+						<div class="btn mainExifBtnCopy" role="button" title="${M.i18n.t("menu.copy")}" aria-label="${M.i18n.t("menu.copy")}" i18n="menu.copy">${SvgList["copy_20_regular.svg"]}</div>
 					</div>
 				</div>`
 			);

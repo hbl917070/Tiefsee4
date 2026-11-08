@@ -59,11 +59,16 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 35px;
+                height: 34px;
                 border-radius: 5px;
                 position: relative;
                 color: var(--color-white);
                 user-select: none;
+
+                svg {
+                    width: 20px;
+                    height: 20px;
+                }
 
                 &[active="true"] {
                     svg * {
@@ -80,19 +85,6 @@
 
                     background-color: var(--color-blue);
                 }
-                /*&[mark="true"] {
-          color: var(--color-white);
-        }
-        &[mark="true"]::before {
-          position: absolute;
-          content: "";
-          width: 4px;
-          height: 4px;
-          top: 5px;
-          right: 5px;
-          border-radius: 50%;
-          //background-color: var(--color-blue);
-        }*/
                 &:last-child {
                     border-right: none;
                 }
@@ -257,14 +249,17 @@
                 height: 64px;
                 margin: auto;
                 place-items: center;
-                svg { width: 100%; height: 100%; }
+                svg {
+                    width: 100%;
+                    height: 100%;
+                }
             }
         }
     }
 
     //按鈕 - 新增
     .mainExifRelatedBtnAdd {
-        height: 35px;
+        height: 34px;
         border-radius: 5px;
         margin: auto;
         color: var(--color-blue);
@@ -345,8 +340,8 @@
             background-color: var(--color-white30);
         }
         svg {
-            width: 25px;
-            height: 25px;
+            width: 20px;
+            height: 20px;
             pointer-events: none;
         }
     }
@@ -494,8 +489,8 @@
         }
         .btn svg {
             pointer-events: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
         }
     }
     // 移入整個項目時，顯示半透明的按鈕
@@ -527,7 +522,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    top: 35px;
+    top: 34px;
     transform: translateX(420px);
     transition: all 0.1s;
     pointer-events: none;
@@ -538,7 +533,7 @@
     }
 
     .textEditor-box {
-        top: 35px;
+        top: 34px;
         bottom: 5px;
         right: 5px;
         max-width: 400px;
@@ -562,8 +557,8 @@
         margin: 5px;
 
         .textEditor-toolbarItem {
-            height: 35px;
-            width: 35px;
+            height: 34px;
+            width: 34px;
             border-radius: 5px;
             display: flex;
             justify-content: center;
@@ -574,7 +569,8 @@
                 cursor: pointer;
             }
             svg {
-                width: 25px;
+                width: 20px;
+                height: 20px;
             }
         }
 

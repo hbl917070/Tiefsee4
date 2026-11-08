@@ -1118,7 +1118,7 @@ export class MainMenu {
          */
         function setMenuLayoutCheckState(dom: HTMLElement, bool: boolean) {
             if (bool) {
-                dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["yes.svg"];
+                dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = SvgList["checkmark_20_regular.svg"];
             } else {
                 dom.getElementsByClassName("menu-hor-icon")[0].innerHTML = "";
             }

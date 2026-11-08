@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+    <g style="fill:var(--color-white)">
+        <path d="M3 10.5 C3 10.22 3.22 10 3.5 10 L16.5 10 C16.776 10 17 10.224 17 10.5 C17 10.776 16.776 11 16.5 11 L3.5 11 C3.224 11 3 10.776 3 10.5"/>
+    </g>
+</svg>

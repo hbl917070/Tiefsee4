@@ -23,7 +23,7 @@ export class FileSort {
         const _domFileSortAsc = document.getElementById("menuitem-fileSort-asc") as HTMLInputElement;
         const _domFileSortDesc = document.getElementById("menuitem-fileSort-desc") as HTMLInputElement;
 
-        const _yesSvgTxt = SvgList["yes.svg"];
+        const _yesSvgTxt = SvgList["checkmark_20_regular.svg"];
         var _sortType = FileSortType.name; //排序方式
         var _orderbyType = FileOrderbyType.asc;
 

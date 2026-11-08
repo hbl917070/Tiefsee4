@@ -149,8 +149,8 @@ body {
         cursor: pointer;
     }
     .titlebar-toolbar-btn svg {
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
         pointer-events: none;
     }
 }
@@ -204,6 +204,10 @@ body {
     left: 0;
     top: 0;
     cursor: nw-resize;
+}
+.window.has-titlebar-left-custom-items .window-LT {
+    width: var(--window-border);
+    height: var(--window-border);
 }
 
 .window-RT {

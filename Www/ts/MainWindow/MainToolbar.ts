@@ -1,4 +1,4 @@
-import { GroupType } from "../Config";
+import { GroupType, ToolbarCustomization, ToolbarCustomizationItem } from "../Config";
 import { Lib } from "../Lib";
 import { MainWindow } from "./MainWindow";
 
@@ -6,6 +6,8 @@ export class MainToolbar {
 
     public setEnabled;
     public getArrray;
+    public applyCustomization;
+    public setActiveType;
 
     constructor(M: MainWindow | null) {
 
@@ -18,9 +20,12 @@ export class MainToolbar {
             html: string,
             func: (domBtn: HTMLElement) => void
         }[] = []
+        const _specialDom: { [key: string]: HTMLElement } = {};
 
         this.setEnabled = setEnabled;
         this.getArrray = getArrray;
+        this.applyCustomization = applyCustomization;
+        this.setActiveType = setActiveType;
 
         init();
 
@@ -69,6 +74,8 @@ export class MainToolbar {
                     })
                 }
             }
+
+            ensureTitlebarGroups();
         }
 
         /**
@@ -79,6 +86,142 @@ export class MainToolbar {
             return _ar;
         }
 
+        function ensureTitlebarGroups() {
+            if (M === null) { return; }
+            const roots = {
+                left: document.querySelector<HTMLElement>("#titlebar-custom-toolbar-left"),
+                right: document.querySelector<HTMLElement>("#titlebar-custom-toolbar-right"),
+            };
+            Object.values(roots).forEach(root => {
+                if (root === null) { return; }
+                [GroupType.img, GroupType.pdf, GroupType.txt, GroupType.bulkView, GroupType.welcome].forEach(group => {
+                    if (root.querySelector(`.titlebar-custom-group[data-name="${group}"]`) !== null) { return; }
+                    const dom = document.createElement("div");
+                    dom.className = "titlebar-custom-group";
+                    dom.setAttribute("data-name", group);
+                    root.appendChild(dom);
+                });
+            });
+        }
+
+        function updateLeftResizeCorner() {
+            const activeLeftGroup = document.querySelector<HTMLElement>('.titlebar-custom-toolbar-left .titlebar-custom-group[active="true"]');
+            const hasVisibleItems = activeLeftGroup !== null && Array.from(activeLeftGroup.children)
+                .some(item => getComputedStyle(item).display !== "none");
+            document.querySelector(".window")?.classList.toggle("has-titlebar-left-custom-items", hasVisibleItems);
+        }
+
+        function setActiveType(type: string) {
+            if (M === null) { return; }
+            const groups = document.querySelectorAll<HTMLElement>(".titlebar-custom-group");
+            groups.forEach(group => group.setAttribute("active", group.getAttribute("data-name") === type ? "true" : ""));
+            updateLeftResizeCorner();
+        }
+
+        function applyCustomization(customization: ToolbarCustomization) {
+            if (M === null || customization === null || typeof customization !== "object") { return; }
+
+            const types: (keyof ToolbarCustomization)[] = ["img", "pdf", "txt", "bulkView", "welcome"];
+            for (const type of types) {
+                const config = customization[type];
+                const toolbarGroup = M.domToolbar.querySelector<HTMLElement>(`.main-toolbar-group[data-name="${type}"]`);
+                const titlebarGroups = {
+                    left: document.querySelector<HTMLElement>(`#titlebar-custom-toolbar-left .titlebar-custom-group[data-name="${type}"]`),
+                    right: document.querySelector<HTMLElement>(`#titlebar-custom-toolbar-right .titlebar-custom-group[data-name="${type}"]`),
+                };
+                if (config === undefined || toolbarGroup === null || titlebarGroups.left === null || titlebarGroups.right === null) { continue; }
+
+                const currentSpecialKeys = new Set<string>();
+                [
+                    ...config.titlebar.left,
+                    ...config.titlebar.right,
+                    ...config.toolbar.left,
+                    ...config.toolbar.center,
+                    ...config.toolbar.right,
+                ].forEach(item => {
+                    if (item.type === "separator" || item.type === "spacer") {
+                        currentSpecialKeys.add(`${type}:${item.id}`);
+                    }
+                });
+                Object.keys(_specialDom).forEach(key => {
+                    if (key.startsWith(`${type}:`) && !currentSpecialKeys.has(key)) {
+                        _specialDom[key].remove();
+                        delete _specialDom[key];
+                    }
+                });
+
+                const elements = new Set<HTMLElement>();
+                toolbarGroup.querySelectorAll<HTMLElement>(".main-toolbar-alignment > [data-name], :scope > [data-name]").forEach(item => elements.add(item));
+                Object.values(titlebarGroups).forEach(group => {
+                    if (group === null) { return; }
+                    group.querySelectorAll<HTMLElement>(":scope > [data-name]").forEach(item => elements.add(item));
+                });
+                Object.keys(_specialDom).forEach(key => {
+                    if (key.startsWith(`${type}:`)) { elements.add(_specialDom[key]); }
+                });
+                const placed = new Set<HTMLElement>();
+
+                const appendItems = (target: HTMLElement, items: ToolbarCustomizationItem[], inTitlebar: boolean) => {
+                    if (!Array.isArray(items)) { return; }
+                    items.forEach((item, index) => {
+                        let dom: HTMLElement | undefined;
+                        if (item.type === "button" || item.type === "info") {
+                            dom = Array.from(elements).find(element => element.getAttribute("data-name") === item.name);
+                        } else if (item.type === "separator" || item.type === "spacer") {
+                            const key = `${type}:${item.id}`;
+                            dom = _specialDom[key];
+                            if (dom === undefined) {
+                                dom = document.createElement("div");
+                                dom.className = item.type === "separator" ? "main-toolbar-hr" : "main-toolbar-spacer";
+                                dom.setAttribute("data-toolbar-layout-item", item.id);
+                                dom.setAttribute("data-layout-type", item.type);
+                                dom.setAttribute("aria-hidden", "true");
+                                _specialDom[key] = dom;
+                                elements.add(dom);
+                            }
+                        }
+                        if (dom === undefined || placed.has(dom)) { return; }
+                        target.appendChild(dom);
+                        dom.style.display = "";
+                        dom.style.order = index.toString();
+                        dom.classList.toggle("titlebar-custom-item", inTitlebar);
+                        if (dom.classList.contains("main-toolbar-txt")) {
+                            if (inTitlebar) {
+                                dom.dataset.regularHtml ||= dom.innerHTML;
+                                const lineSeparator = dom.getAttribute("data-name") === "infoSize" ? "×" : " ";
+                                dom.innerHTML = dom.dataset.regularHtml.replace(/<br\s*\/?\s*>/gi, lineSeparator);
+                            } else if (dom.dataset.regularHtml !== undefined) {
+                                dom.innerHTML = dom.dataset.regularHtml;
+                            }
+                        }
+                        placed.add(dom);
+                    });
+                };
+
+                appendItems(titlebarGroups.left, config.titlebar.left, true);
+                appendItems(titlebarGroups.right, config.titlebar.right, true);
+
+                const alignments = ["left", "center", "right"] as const;
+                alignments.forEach(alignment => {
+                    const lane = toolbarGroup.querySelector<HTMLElement>(`.main-toolbar-alignment[data-align="${alignment}"]`);
+                    if (lane !== null) {
+                        appendItems(lane, config.toolbar[alignment] || [], false);
+                        const hasVisibleItem = Array.from(lane.children).some(child => (child as HTMLElement).style.display !== "none");
+                        lane.classList.toggle("is-empty", !hasVisibleItem);
+                    }
+                });
+
+                elements.forEach(element => {
+                    if (placed.has(element)) { return; }
+                    const center = toolbarGroup.querySelector<HTMLElement>('.main-toolbar-alignment[data-align="center"]');
+                    (center || toolbarGroup).appendChild(element);
+                    element.style.display = "none";
+                    element.classList.remove("titlebar-custom-item");
+                });
+            }
+            updateLeftResizeCorner();
+        }
+
         /** 在各工具列群組中，將收藏放在檔案按鈕之前。 */
         function addFavoritesButton(group: string) {
             _ar.push({
@@ -86,7 +229,7 @@ export class MainToolbar {
                 i18n: "menu.favorites",
                 group,
                 name: "favorites",
-                icon: "tool-favorites.svg",
+                icon: "star_line_horizontal_3_20_regular.svg",
                 func: (btn) => {
                     btn.classList.add("main-toolbar-favorites");
                     btn.setAttribute("aria-label", "menu.favorites");
@@ -101,6 +244,20 @@ export class MainToolbar {
                             void M?.favorites?.toggle(btn);
                         }
                     });
+                },
+            });
+        }
+
+        /** 新增可自訂的佈局按鈕。 */
+        function addLayoutButton(group: string) {
+            _ar.push({
+                type: "button", html: "",
+                i18n: "menu.layout",
+                group,
+                name: "layout",
+                icon: "panel_left_header_20_regular.svg",
+                func: (btn) => {
+                    btn.addEventListener("click", () => { M?.script.menu.showLayout(btn); });
                 },
             });
         }
@@ -124,13 +281,15 @@ export class MainToolbar {
          */
         function initToolbarImg() {
 
+            addBackButton(GroupType.img);
+
             // 上一個檔案
             _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.img,
                 name: "prevFile",
-                icon: "tool-prev.svg",
+                icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevFile();
@@ -144,7 +303,7 @@ export class MainToolbar {
                 i18n: "menu.nextFile",
                 group: GroupType.img,
                 name: "nextFile",
-                icon: "tool-next.svg",
+                icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextFile();
@@ -160,7 +319,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuFile",
                 group: GroupType.img,
                 name: "showMenuFile",
-                icon: "tool-open.svg",
+                icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuFile(btn);
@@ -174,7 +333,7 @@ export class MainToolbar {
                 i18n: "menu.prevDir",
                 group: GroupType.img,
                 name: "prevDir",
-                icon: "tool-prevDir.svg",
+                icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevDir();
@@ -188,7 +347,7 @@ export class MainToolbar {
                 i18n: "menu.nextDir",
                 group: GroupType.img,
                 name: "nextDir",
-                icon: "tool-nextDir.svg",
+                icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextDir();
@@ -202,7 +361,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuSort",
                 group: GroupType.img,
                 name: "showMenuSort",
-                icon: "tool-sort.svg",
+                icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuSort(btn);
@@ -216,7 +375,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuCopy",
                 group: GroupType.img,
                 name: "showMenuCopy",
-                icon: "tool-copy.svg",
+                icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuCopy(btn);
@@ -230,7 +389,7 @@ export class MainToolbar {
                 i18n: "menu.dragDropFile",
                 group: GroupType.img,
                 name: "dragDropFile",
-                icon: "tool-dragDropFile.svg",
+                icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
                         M?.script.file.dragDropFile();
@@ -250,7 +409,7 @@ export class MainToolbar {
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.img,
                 name: "showDeleteMsg",
-                icon: "tool-delete.svg",
+                icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.showDeleteMsg();
@@ -264,7 +423,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuImageSearch",
                 group: GroupType.img,
                 name: "showMenuImageSearch",
-                icon: "tool-search.svg",
+                icon: "search_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuImageSearch(btn);
@@ -278,7 +437,7 @@ export class MainToolbar {
                 i18n: "menu.bulkView",
                 group: GroupType.img,
                 name: "bulkView",
-                icon: "tool-bulkView.svg",
+                icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
                         M?.script.bulkView.show();
@@ -292,7 +451,7 @@ export class MainToolbar {
                 i18n: "menu.showSetting",
                 group: GroupType.img,
                 name: "showSetting",
-                icon: "tool-setting.svg",
+                icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.setting.showSetting();
@@ -306,7 +465,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuRotation",
                 group: GroupType.img,
                 name: "showMenuRotation",
-                icon: "tool-rotate.svg",
+                icon: "arrow_clockwise_dashes_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuRotation(btn);
@@ -320,7 +479,7 @@ export class MainToolbar {
                 i18n: "menu.zoomToFit",
                 group: GroupType.img,
                 name: "zoomToFit",
-                icon: "tool-full.svg",
+                icon: "arrow_expand_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.img.zoomToFit();
@@ -328,13 +487,15 @@ export class MainToolbar {
                 },
             })
 
+            addLayoutButton(GroupType.img);
+
             //----------------   
 
             // 縮放比例
             _ar.push({
                 type: "html",
                 html: `
-                    <div class="main-toolbar-btn js-noDrag" role="button">
+                    <div class="main-toolbar-btn js-noDrag" data-name="infoZoomRatio" role="button">
                         <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
@@ -400,13 +561,15 @@ export class MainToolbar {
         */
         function initToolbarPdf() {
 
+            addBackButton(GroupType.pdf);
+
             // 上一張
             _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.pdf,
                 name: "prevFile",
-                icon: "tool-prev.svg",
+                icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevFile();
@@ -420,7 +583,7 @@ export class MainToolbar {
                 i18n: "menu.nextFile",
                 group: GroupType.pdf,
                 name: "nextFile",
-                icon: "tool-next.svg",
+                icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextFile();
@@ -435,7 +598,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuFile",
                 group: GroupType.pdf,
                 name: "showMenuFile",
-                icon: "tool-open.svg",
+                icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuFile(btn);
@@ -449,7 +612,7 @@ export class MainToolbar {
                 i18n: "menu.prevDir",
                 group: GroupType.pdf,
                 name: "prevDir",
-                icon: "tool-prevDir.svg",
+                icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevDir();
@@ -463,7 +626,7 @@ export class MainToolbar {
                 i18n: "menu.nextDir",
                 group: GroupType.pdf,
                 name: "nextDir",
-                icon: "tool-nextDir.svg",
+                icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextDir();
@@ -477,7 +640,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuSort",
                 group: GroupType.pdf,
                 name: "showMenuSort",
-                icon: "tool-sort.svg",
+                icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuSort(btn);
@@ -491,7 +654,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuCopy",
                 group: GroupType.pdf,
                 name: "showMenuCopy",
-                icon: "tool-copy.svg",
+                icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuCopy(btn);
@@ -505,7 +668,7 @@ export class MainToolbar {
                 i18n: "menu.dragDropFile",
                 group: GroupType.pdf,
                 name: "dragDropFile",
-                icon: "tool-dragDropFile.svg",
+                icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
                         M?.script.file.dragDropFile();
@@ -525,7 +688,7 @@ export class MainToolbar {
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.pdf,
                 name: "showDeleteMsg",
-                icon: "tool-delete.svg",
+                icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.showDeleteMsg();
@@ -539,7 +702,7 @@ export class MainToolbar {
                 i18n: "menu.bulkView",
                 group: GroupType.pdf,
                 name: "bulkView",
-                icon: "tool-bulkView.svg",
+                icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
                         M?.script.bulkView.show();
@@ -553,13 +716,15 @@ export class MainToolbar {
                 i18n: "menu.showSetting",
                 group: GroupType.pdf,
                 name: "showSetting",
-                icon: "tool-setting.svg",
+                icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.setting.showSetting();
                     });
                 },
             })
+
+            addLayoutButton(GroupType.pdf);
 
 
             //----------------------------------
@@ -600,13 +765,15 @@ export class MainToolbar {
          */
         function initToolbarTxt() {
 
+            addBackButton(GroupType.txt);
+
             // 上一個檔案
             _ar.push({
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.txt,
                 name: "prevFile",
-                icon: "tool-prev.svg",
+                icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevFile();
@@ -620,7 +787,7 @@ export class MainToolbar {
                 i18n: "menu.nextFile",
                 group: GroupType.txt,
                 name: "nextFile",
-                icon: "tool-next.svg",
+                icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextFile();
@@ -636,7 +803,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuFile",
                 group: GroupType.txt,
                 name: "showMenuFile",
-                icon: "tool-open.svg",
+                icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuFile(btn);
@@ -650,7 +817,7 @@ export class MainToolbar {
                 i18n: "menu.showSave",
                 group: GroupType.txt,
                 name: "showSave",
-                icon: "tool-save.svg",
+                icon: "save_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.file.save(btn);
@@ -664,7 +831,7 @@ export class MainToolbar {
                 i18n: "menu.prevDir",
                 group: GroupType.txt,
                 name: "prevDir",
-                icon: "tool-prevDir.svg",
+                icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevDir();
@@ -678,7 +845,7 @@ export class MainToolbar {
                 i18n: "menu.nextDir",
                 group: GroupType.txt,
                 name: "nextDir",
-                icon: "tool-nextDir.svg",
+                icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextDir();
@@ -692,7 +859,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuSort",
                 group: GroupType.txt,
                 name: "showMenuSort",
-                icon: "tool-sort.svg",
+                icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuSort(btn);
@@ -706,7 +873,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuCopy",
                 group: GroupType.txt,
                 name: "showMenuCopy",
-                icon: "tool-copy.svg",
+                icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuCopy(btn);
@@ -720,7 +887,7 @@ export class MainToolbar {
                 i18n: "menu.dragDropFile",
                 group: GroupType.txt,
                 name: "dragDropFile",
-                icon: "tool-dragDropFile.svg",
+                icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
                         M?.script.file.dragDropFile();
@@ -740,7 +907,7 @@ export class MainToolbar {
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.txt,
                 name: "showDeleteMsg",
-                icon: "tool-delete.svg",
+                icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.showDeleteMsg();
@@ -754,7 +921,7 @@ export class MainToolbar {
                 i18n: "menu.bulkView",
                 group: GroupType.txt,
                 name: "bulkView",
-                icon: "tool-bulkView.svg",
+                icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
                         M?.script.bulkView.show();
@@ -768,13 +935,15 @@ export class MainToolbar {
                 i18n: "menu.showSetting",
                 group: GroupType.txt,
                 name: "showSetting",
-                icon: "tool-setting.svg",
+                icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.setting.showSetting();
                     });
                 },
             })
+
+            addLayoutButton(GroupType.txt);
 
 
             //---------------------
@@ -816,6 +985,8 @@ export class MainToolbar {
         */
         function initToolbarWelcome() {
 
+            addBackButton(GroupType.welcome);
+
             addFavoritesButton(GroupType.welcome);
 
             // 顯示選單 開啟檔案
@@ -824,7 +995,7 @@ export class MainToolbar {
                 i18n: "menu.openFile",
                 group: GroupType.welcome,
                 name: "openFile",
-                icon: "tool-open.svg",
+                icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuOpenFile(btn);
@@ -838,19 +1009,23 @@ export class MainToolbar {
                 i18n: "menu.showSetting",
                 group: GroupType.welcome,
                 name: "showSetting",
-                icon: "tool-setting.svg",
+                icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.setting.showSetting();
                     });
                 },
             })
+
+            addLayoutButton(GroupType.welcome);
         }
 
         /**
          * 初始化 工具列 BulkView
          */
         function initBulkView() {
+
+            addBackButton(GroupType.bulkView);
 
             // 開啟檔案
             addFavoritesButton(GroupType.bulkView);
@@ -859,7 +1034,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuFile",
                 group: GroupType.bulkView,
                 name: "showMenuFile",
-                icon: "tool-open.svg",
+                icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuFile(btn);
@@ -873,7 +1048,7 @@ export class MainToolbar {
                 i18n: "menu.prevDir",
                 group: GroupType.bulkView,
                 name: "prevDir",
-                icon: "tool-prevDir.svg",
+                icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.prevDir();
@@ -887,7 +1062,7 @@ export class MainToolbar {
                 i18n: "menu.nextDir",
                 group: GroupType.bulkView,
                 name: "nextDir",
-                icon: "tool-nextDir.svg",
+                icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.nextDir();
@@ -901,7 +1076,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuSort",
                 group: GroupType.bulkView,
                 name: "showMenuSort",
-                icon: "tool-sort.svg",
+                icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuSort(btn);
@@ -915,7 +1090,7 @@ export class MainToolbar {
                 i18n: "menu.showMenuCopy",
                 group: GroupType.bulkView,
                 name: "showMenuCopy",
-                icon: "tool-copy.svg",
+                icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.menu.showMenuCopy(btn);
@@ -929,7 +1104,7 @@ export class MainToolbar {
                 i18n: "menu.dragDropFile",
                 group: GroupType.bulkView,
                 name: "dragDropFile",
-                icon: "tool-dragDropFile.svg",
+                icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
                         M?.script.file.dragDropFile();
@@ -949,7 +1124,7 @@ export class MainToolbar {
                 i18n: "menu.showDeleteDirMsg",
                 group: GroupType.bulkView,
                 name: "showDeleteMsg",
-                icon: "tool-delete.svg",
+                icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.fileLoad.showDeleteMsg();
@@ -963,13 +1138,15 @@ export class MainToolbar {
                 i18n: "menu.showSetting",
                 group: GroupType.bulkView,
                 name: "showSetting",
-                icon: "tool-setting.svg",
+                icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
                         M?.script.setting.showSetting();
                     });
                 },
             })
+
+            addLayoutButton(GroupType.bulkView);
 
             // 檔案修改時間
             _ar.push({
@@ -992,7 +1169,7 @@ export class MainToolbar {
                 i18n: "menu.showBulkViewSetting",
                 group: GroupType.bulkView,
                 name: "showBulkViewSetting",
-                icon: "tool-setting2.svg",
+                icon: "options_20_regular.svg",
                 func: (btn) => {
                     btn.style.order = "2001"; // 靠右對齊
 
@@ -1004,6 +1181,29 @@ export class MainToolbar {
         }
 
         //---------------------
+
+        /** 新增可自訂的返回按鈕。各工具列類型保有自己的 DOM，避免切換類型時搬移同一節點。 */
+        function addBackButton(group: string) {
+            _ar.push({
+                type: "button", html: "",
+                i18n: "menu.back",
+                group,
+                name: "back",
+                icon: "arrow_hook_up_left_20_regular.svg",
+                func: (btn) => {
+                    btn.classList.add("main-toolbar-back");
+                    btn.setAttribute("aria-label", M?.i18n?.t("menu.back") || "Back");
+                    btn.setAttribute("tabindex", "0");
+                    btn.addEventListener("click", () => { M?.toolbarBack?.runEvent(); });
+                    btn.addEventListener("keydown", event => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            M?.toolbarBack?.runEvent();
+                        }
+                    });
+                },
+            });
+        }
 
         /**
          * 新增 html
@@ -1082,14 +1282,19 @@ export class MainToolbar {
             // 如果群組不存在，就先產生群組
             let domGroup = M.domToolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             if (domGroup === null) {
-                const div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">  </div>`);
+                const div = Lib.newDom(`<div class="main-toolbar-group" data-name="${item.group}">
+                    <div class="main-toolbar-alignment" data-align="left"></div>
+                    <div class="main-toolbar-alignment" data-align="center"></div>
+                    <div class="main-toolbar-alignment" data-align="right"></div>
+                </div>`);
                 M.domToolbar.querySelector("#toolbar-content")?.appendChild(div);
                 domGroup = M.domToolbar.querySelector(`.main-toolbar-group[data-name=${item.group}]`);
             }
 
             item.func(item.dom)
             if (domGroup !== null) {
-                domGroup.appendChild(item.dom);
+                const center = domGroup.querySelector<HTMLElement>('.main-toolbar-alignment[data-align="center"]');
+                (center || domGroup).appendChild(item.dom);
             }
         }
 

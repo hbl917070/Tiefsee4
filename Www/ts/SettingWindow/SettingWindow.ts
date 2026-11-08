@@ -1,5 +1,5 @@
 import { BaseWindow } from "../BaseWindow";
-import { Config } from "../Config";
+import { Config, cloneToolbarCustomization, restoreToolbarCustomization, ToolbarCustomizationGroup, ToolbarCustomizationItem, ToolbarPaletteItem } from "../Config";
 import { I18n } from "../I18n";
 import { Lib } from "../Lib";
 import { MainToolbar } from "../MainWindow/MainToolbar";
@@ -37,6 +37,7 @@ class SettingWindow {
 
         /** 初始設定 */
         const _defaultConfig = new Config(baseWindow).settings;
+        const _defaultToolbarCustomization = cloneToolbarCustomization(_defaultConfig.toolbarCustomization);
 
         const _loadEvent: (() => void)[] = [];
         /**
@@ -92,8 +93,8 @@ class SettingWindow {
             baseWindow.appInfo = json;
             _appInfo = json;
 
-            const width = 600;
-            const height = 450;
+            const width = 800;
+            const height = 600;
             await WV_Window.ShowWindowAtCenter(width, height); // 顯示視窗
 
             // win11 指定視窗的大小是未乘以縮放比例的，所以網頁寬度與指定的寬度不同，就重新設定視窗大小
@@ -102,7 +103,7 @@ class SettingWindow {
                 await WV_Window.SetSize(width * ratio, height * ratio);
             }
             const ratio = window.devicePixelRatio;
-            WV_Window.SetMinimumSize(400 * ratio, 300 * ratio); // 設定視窗最小 size
+            WV_Window.SetMinimumSize(800 * ratio, 300 * ratio); // 設定視窗最小寬度
 
             WV_Window.Text = "Setting";
             let iconPath = Lib.combine([await WV_Window.GetAppDirPath(), "Www\\img\\logo.ico"]);
@@ -173,6 +174,7 @@ class SettingWindow {
                 userSetting = JSON.parse(json.settingTxt);
             } catch (e) { }
             $.extend(true, _config.settings, userSetting);
+            restoreToolbarCustomization(_config.settings.toolbarCustomization, userSetting, _defaultToolbarCustomization);
 
             // 執行
             _loadEvent.forEach(func => {
@@ -208,137 +210,283 @@ class SettingWindow {
         addLoadEvent(() => {
 
             const mainToolbarArray = _mainToolbar.getArrray();
-
-            const arGroupName = ["img", "pdf", "txt", "bulkView"];
-            arGroupName.map((gn) => {
-
-                const groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
-                const dom_toolbarList = getDom(`#toolbarList-${groupName}`) as HTMLElement;
-
-                // 產生html
-                let html = "";
-                for (let i = 0; i < mainToolbarArray.length; i++) {
-                    const item = mainToolbarArray[i];
-
-                    if (item.type !== "button") { continue; }
-                    const h = `
-                        <div class="toolbarList-item" data-name="${item.name}" role="listitem">
-                            <input class="toolbarList-checkbox base-checkbox" type="checkbox" data-name="${item.name}" aria-label="${Lib.escape(_i18n.t(item.i18n))}" i18n="${item.i18n}" checked>
-                            ${SvgList[item.icon]}
-                            ${_i18n.tSpan(item.i18n)}
-                        </div>`;
-                    if (item.group == groupName) { html += h; }
-                }
-                dom_toolbarList.innerHTML = html;
-
-                // 初始化 排序
-                const arMainToolbar = _config.settings.mainToolbar[groupName];
-                for (let i = 0; i < arMainToolbar.length; i++) {
-                    const item = arMainToolbar[i];
-                    const ardomToolbarList = dom_toolbarList.querySelectorAll(".toolbarList-item");
-                    const d1 = ardomToolbarList[i];
-                    const d2 = dom_toolbarList.querySelector(`[data-name=${item.n}]`);
-                    if (d1 == undefined) { break; }
-                    if (d2 === null) { continue; }
-                    swapDom(d1, d2); // dom 交換順序
-                }
-
-                // 初始化 checkbox狀態
-                for (let i = 0; i < arMainToolbar.length; i++) {
-                    const item = arMainToolbar[i];
-                    const d2 = dom_toolbarList.querySelector(`[data-name=${item.n}]`);
-                    if (d2 === null) { continue; }
-                    const domCheckbox = d2.querySelector(".toolbarList-checkbox") as HTMLInputElement;
-                    domCheckbox.checked = item.v;
-                }
-
-                // 給每一個checkbox都註冊onchange
-                const domAr_checkbox = dom_toolbarList.querySelectorAll(".toolbarList-checkbox");
-                for (let i = 0; i < domAr_checkbox.length; i++) {
-                    const domCheckbox = domAr_checkbox[i] as HTMLInputElement;
-                    domCheckbox.onchange = () => {
-                        let data = getToolbarListData();
-                        _config.settings.mainToolbar = data;
-                        appleSettingOfMain();
-                    }
-                }
-
-                // 初始化拖曳功能
-                new Sortable(dom_toolbarList, {
-                    animation: 150,
-                    onEnd: (evt) => {
-                        let data = getToolbarListData();
-                        _config.settings.mainToolbar = data;
-                        appleSettingOfMain();
-                    }
-                });
-
-            })
-
-            /** 取得排序與顯示狀態 */
-            function getToolbarListData() {
-                function getItem(type: string) {
-                    const ar = [];
-                    const domToolbarList = getDom(`#toolbarList-${type}`) as HTMLElement;
-                    const domAr = domToolbarList.querySelectorAll(".toolbarList-checkbox");
-
-                    for (let i = 0; i < domAr.length; i++) {
-                        const domCheckbox = domAr[i] as HTMLInputElement;
-                        const name = domCheckbox.getAttribute("data-name") + "";
-                        const val = domCheckbox.checked;
-                        ar.push({
-                            n: name,
-                            v: val
-                        })
-                    }
-                    return ar;
-                }
-
-                return {
-                    img: getItem("img"),
-                    pdf: getItem("pdf"),
-                    txt: getItem("txt"),
-                    bulkView: getItem("bulkView"),
-                };
-            }
-
-            // ------------
-
-            // 切換下拉選單時，顯示對應的內容
             const select_toolbarListType = getDom("#select-toolbarListType") as HTMLSelectElement;
-            const dom_toolbarList_img = getDom("#toolbarList-img") as HTMLElement;
-            const dom_toolbarList_pdf = getDom("#toolbarList-pdf") as HTMLElement;
-            const dom_toolbarList_txt = getDom("#toolbarList-txt") as HTMLElement;
-            const dom_toolbarList_bulkView = getDom("#toolbarList-bulkView") as HTMLElement;
-            const eventChange = () => {
-                const val = select_toolbarListType.value;
-                if (val == "img") {
-                    dom_toolbarList_img.style.display = "block";
-                    dom_toolbarList_pdf.style.display = "none";
-                    dom_toolbarList_txt.style.display = "none";
-                    dom_toolbarList_bulkView.style.display = "none";
-                }
-                if (val == "pdf") {
-                    dom_toolbarList_img.style.display = "none";
-                    dom_toolbarList_pdf.style.display = "block";
-                    dom_toolbarList_txt.style.display = "none";
-                    dom_toolbarList_bulkView.style.display = "none";
-                }
-                if (val == "txt") {
-                    dom_toolbarList_img.style.display = "none";
-                    dom_toolbarList_pdf.style.display = "none";
-                    dom_toolbarList_txt.style.display = "block";
-                    dom_toolbarList_bulkView.style.display = "none";
-                }
-                if (val == "bulkView") {
-                    dom_toolbarList_img.style.display = "none";
-                    dom_toolbarList_pdf.style.display = "none";
-                    dom_toolbarList_txt.style.display = "none";
-                    dom_toolbarList_bulkView.style.display = "block";
-                }
+            const titlebarZones = {
+                left: getDom("#toolbar-zone-titlebar-left"),
+                right: getDom("#toolbar-zone-titlebar-right"),
+            };
+            const toolbarZones = {
+                left: getDom("#toolbar-zone-left"),
+                center: getDom("#toolbar-zone-center"),
+                right: getDom("#toolbar-zone-right"),
+            };
+            const availableZone = getDom("#toolbarList-available");
+            const resetToolbarButton = getDom("#btn-resetToolbarCustomization") as HTMLButtonElement;
+            const customizer = getDom(".toolbar-customizer");
+            titlebarZones.left.setAttribute("aria-label", `${_i18n.t("sw.customToolbar.titlebarZone")} ${_i18n.t("sw.customToolbar.leftZone")}`);
+            titlebarZones.right.setAttribute("aria-label", `${_i18n.t("sw.customToolbar.titlebarZone")} ${_i18n.t("sw.customToolbar.rightZone")}`);
+            toolbarZones.left.setAttribute("aria-label", _i18n.t("sw.customToolbar.leftZone"));
+            toolbarZones.center.setAttribute("aria-label", _i18n.t("sw.customToolbar.centerZone"));
+            toolbarZones.right.setAttribute("aria-label", _i18n.t("sw.customToolbar.rightZone"));
+            availableZone.setAttribute("aria-label", _i18n.t("sw.customToolbar.available"));
+            const types: (keyof typeof _config.settings.toolbarCustomization)[] = ["img", "pdf", "txt", "bulkView", "welcome"];
+            let specialId = 0;
+
+            function getGroup(type: string) {
+                return _config.settings.toolbarCustomization[type as keyof typeof _config.settings.toolbarCustomization] as ToolbarCustomizationGroup;
             }
-            select_toolbarListType.onchange = eventChange;
-            eventChange();
+
+            function updateResetToolbarLabel() {
+                const selectedOption = select_toolbarListType.selectedOptions[0];
+                resetToolbarButton.textContent = `${_i18n.t("sw.customToolbar.resetToolbarPrefix")}${selectedOption?.textContent || ""}`;
+            }
+
+            function getDefinition(name: string, type: string) {
+                return mainToolbarArray.find(item => item.name === name && item.group === type);
+            }
+
+            function createPreviewItem(item: ToolbarCustomizationItem, type: string, isTitlebar: boolean) {
+                const dom = document.createElement("div");
+                dom.className = "toolbar-preview-item";
+                dom.setAttribute("role", "button");
+                dom.tabIndex = 0;
+
+                if (item.type === "separator" || item.type === "spacer") {
+                    dom.classList.add(item.type === "separator" ? "toolbar-preview-separator" : "toolbar-preview-spacer");
+                    dom.setAttribute("data-kind", item.type);
+                    dom.setAttribute("data-id", item.id);
+                    dom.setAttribute("aria-label", _i18n.t(item.type === "separator" ? "sw.customToolbar.separator" : "sw.customToolbar.spacer"));
+                    dom.title = _i18n.t(item.type === "separator" ? "sw.customToolbar.separator" : "sw.customToolbar.spacer");
+                    return dom;
+                }
+
+                const definition = getDefinition(item.name, type);
+                if (definition === undefined) { return null; }
+                const label = _i18n.t(definition.i18n);
+                dom.setAttribute("data-kind", item.type);
+                dom.setAttribute("data-name", item.name);
+                dom.setAttribute("aria-label", label);
+                dom.title = label;
+
+                if (item.type === "button" && definition.icon !== "") {
+                    dom.innerHTML = SvgList[definition.icon] || "";
+                } else {
+                    dom.classList.add("toolbar-preview-info");
+                    const values: { [key: string]: string } = {
+                        infoZoomRatio: "28%",
+                        infoSize: "300×600",
+                        infoType: "JPG 6.3MB",
+                        infoWriteTime: "2026-11-04 14:01:03",
+                    };
+                    dom.textContent = values[item.name] || label;
+                    if (isTitlebar) { dom.title = `${label}: ${dom.textContent}`; }
+                }
+                return dom;
+            }
+
+            function createAvailableItem(item: ToolbarPaletteItem, type: string) {
+                const dom = document.createElement("div");
+                dom.className = "toolbarList-item";
+                dom.setAttribute("role", "button");
+                dom.tabIndex = 0;
+
+                if (item.type === "separatorTemplate" || item.type === "spacerTemplate") {
+                    const isSeparator = item.type === "separatorTemplate";
+                    const label = _i18n.t(isSeparator ? "sw.customToolbar.separator" : "sw.customToolbar.spacer");
+                    dom.classList.add("toolbar-special-item");
+                    dom.setAttribute("data-kind", item.type);
+                    dom.setAttribute("data-template", "true");
+                    dom.setAttribute("aria-label", label);
+                    const i18nKey = isSeparator ? "sw.customToolbar.separator" : "sw.customToolbar.spacer";
+                    dom.innerHTML = `<span class="toolbar-special-glyph ${isSeparator ? "" : "spacer"}"></span><span i18n="${i18nKey}">${Lib.escape(label)}</span>`;
+                    return dom;
+                }
+
+                const definition = getDefinition(item.name, type);
+                if (definition === undefined) { return null; }
+                const label = _i18n.t(definition.i18n);
+                dom.setAttribute("data-kind", item.type);
+                dom.setAttribute("data-name", item.name);
+                dom.setAttribute("aria-label", label);
+                if (item.type === "button" && definition.icon !== "") {
+                    dom.innerHTML = `${SvgList[definition.icon] || ""}<span i18n="${definition.i18n}">${Lib.escape(label)}</span>`;
+                } else {
+                    dom.innerHTML = `<span class="toolbar-info-symbol">T</span><span i18n="${definition.i18n}">${Lib.escape(label)}</span>`;
+                }
+                return dom;
+            }
+
+            function renderType(type: keyof typeof _config.settings.toolbarCustomization) {
+                const group = getGroup(type);
+                customizer.setAttribute("data-customized", String(group.customized));
+                select_toolbarListType.setAttribute("aria-label", _i18n.t("sw.customToolbar.editToolbar"));
+                availableZone.setAttribute("aria-label", _i18n.t("sw.customToolbar.available"));
+                updateResetToolbarLabel();
+                Object.values(titlebarZones).forEach(zone => zone.replaceChildren());
+                Object.values(toolbarZones).forEach(zone => zone.replaceChildren());
+                availableZone.replaceChildren();
+
+                (["left", "right"] as const).forEach(alignment => {
+                    group.titlebar[alignment].forEach(item => {
+                        const dom = createPreviewItem(item, type, true);
+                        if (dom !== null) { titlebarZones[alignment].appendChild(dom); }
+                    });
+                });
+                (Object.keys(toolbarZones) as (keyof typeof toolbarZones)[]).forEach(alignment => {
+                    (group.toolbar?.[alignment] || []).forEach(item => {
+                        const dom = createPreviewItem(item, type, false);
+                        if (dom !== null) { toolbarZones[alignment].appendChild(dom); }
+                    });
+                });
+                group.available.forEach(item => {
+                    const dom = createAvailableItem(item, type);
+                    if (dom !== null) { availableZone.appendChild(dom); }
+                });
+            }
+
+            function readLayoutItems(zone: HTMLElement): ToolbarCustomizationItem[] {
+                return Array.from(zone.children).map(child => {
+                    const dom = child as HTMLElement;
+                    const kind = dom.getAttribute("data-kind") || "";
+                    if (kind === "separator" || kind === "spacer") {
+                        return { type: kind, id: dom.getAttribute("data-id") || `custom-${++specialId}` } as ToolbarCustomizationItem;
+                    }
+                    return { type: kind as "button" | "info", name: dom.getAttribute("data-name") || "" };
+                }).filter(item => item.type === "button" || item.type === "info" || item.type === "separator" || item.type === "spacer");
+            }
+
+            function readAvailableItems(): ToolbarPaletteItem[] {
+                return Array.from(availableZone.children).map(child => {
+                    const dom = child as HTMLElement;
+                    const kind = dom.getAttribute("data-kind") || "";
+                    if (kind === "separatorTemplate" || kind === "spacerTemplate") { return { type: kind } as ToolbarPaletteItem; }
+                    return { type: kind as "button" | "info", name: dom.getAttribute("data-name") || "" };
+                }).filter(item => item.type === "button" || item.type === "info" || item.type === "separatorTemplate" || item.type === "spacerTemplate");
+            }
+
+            function saveLayout(isChanged: boolean) {
+                const type = select_toolbarListType.value as keyof typeof _config.settings.toolbarCustomization;
+                const group = getGroup(type);
+                group.titlebar = {
+                    left: readLayoutItems(titlebarZones.left),
+                    right: readLayoutItems(titlebarZones.right),
+                };
+                group.toolbar = {
+                    left: readLayoutItems(toolbarZones.left),
+                    center: readLayoutItems(toolbarZones.center),
+                    right: readLayoutItems(toolbarZones.right),
+                };
+                group.available = readAvailableItems();
+                if (isChanged) { group.customized = true; }
+                appleSettingOfMain();
+                renderType(type);
+            }
+
+            const sortableGroup = {
+                name: "toolbar-customization",
+                pull: (_to: Sortable, _from: Sortable, dragEl: HTMLElement) => dragEl.getAttribute("data-template") === "true" ? "clone" : true,
+                put: true,
+            };
+            [...Object.values(titlebarZones), ...Object.values(toolbarZones), availableZone].forEach(zone => {
+                new Sortable(zone, {
+                    group: sortableGroup,
+                    animation: 150,
+                    forceFallback: true,
+                    fallbackOnBody: true,
+                    fallbackClass: "toolbar-drag-fallback",
+                    dragClass: "toolbar-dragging",
+                    onStart: event => {
+                        // Sortable 的 fallback clone 會複製整張可用按鈕卡片；直接重建成單一圖示，
+                        // 不依賴 clone 的文字與 flex 樣式是否正確套用。
+                        const dragPreview = document.querySelector<HTMLElement>(".toolbar-drag-fallback");
+                        if (dragPreview !== null) {
+                            const sourceGlyph = event.item.querySelector<SVGElement | HTMLElement>("svg, .toolbar-info-symbol, .toolbar-special-glyph");
+                            const glyph = sourceGlyph?.cloneNode(true) as HTMLElement | undefined;
+                            if (glyph !== undefined) {
+                                dragPreview.replaceChildren(glyph);
+                                glyph.style.setProperty("margin", "0", "important");
+                                glyph.style.setProperty("flex", "0 0 22px", "important");
+                                if (glyph instanceof SVGElement) {
+                                    glyph.style.setProperty("width", "22px", "important");
+                                    glyph.style.setProperty("height", "22px", "important");
+                                }
+                            } else if (event.item.getAttribute("data-kind") === "info") {
+                                const infoGlyph = document.createElement("span");
+                                infoGlyph.className = "toolbar-info-symbol";
+                                infoGlyph.textContent = "T";
+                                dragPreview.replaceChildren(infoGlyph);
+                            } else {
+                                dragPreview.replaceChildren();
+                            }
+
+                            ["width", "min-width", "max-width"].forEach(property => dragPreview.style.setProperty(property, "34px", "important"));
+                            ["height", "min-height", "max-height"].forEach(property => dragPreview.style.setProperty(property, "34px", "important"));
+                            dragPreview.style.setProperty("padding", "0", "important");
+                            dragPreview.style.setProperty("margin", "0", "important");
+                            dragPreview.style.setProperty("font-size", "0", "important");
+                            dragPreview.style.setProperty("line-height", "0", "important");
+                            dragPreview.style.setProperty("overflow", "hidden", "important");
+                        }
+                        Object.values(titlebarZones).forEach(titlebarZone => titlebarZone.classList.add("toolbar-drop-active"));
+                        Object.values(toolbarZones).forEach(toolbarZone => toolbarZone.classList.add("toolbar-drop-active"));
+                        availableZone.classList.add("toolbar-drop-active");
+                    },
+                    onAdd: event => {
+                        const item = event.item as HTMLElement;
+                        const kind = item.getAttribute("data-kind");
+                        if (event.to === availableZone && (kind === "separator" || kind === "spacer")) {
+                            item.remove();
+                            return;
+                        }
+                        if (item.getAttribute("data-template") === "true") {
+                            const type = kind === "separatorTemplate" ? "separator" : "spacer";
+                            item.setAttribute("data-kind", type);
+                            item.setAttribute("data-id", `custom-${Date.now().toString(36)}-${++specialId}`);
+                            item.removeAttribute("data-template");
+                            item.classList.remove("toolbar-special-item");
+                            item.className = `toolbar-preview-item toolbar-preview-${type}`;
+                            item.replaceChildren();
+                            item.setAttribute("aria-label", _i18n.t(type === "separator" ? "sw.customToolbar.separator" : "sw.customToolbar.spacer"));
+                            item.title = _i18n.t(type === "separator" ? "sw.customToolbar.separator" : "sw.customToolbar.spacer");
+                        } else if (event.from === availableZone && event.to !== availableZone && (kind === "button" || kind === "info")) {
+                            const previewItem = createPreviewItem({
+                                type: kind,
+                                name: item.getAttribute("data-name") || "",
+                            }, select_toolbarListType.value, event.to === titlebarZones.left || event.to === titlebarZones.right);
+                            if (previewItem !== null) { item.replaceWith(previewItem); }
+                        }
+                    },
+                    onEnd: event => {
+                        Object.values(titlebarZones).forEach(titlebarZone => titlebarZone.classList.remove("toolbar-drop-active"));
+                        Object.values(toolbarZones).forEach(toolbarZone => toolbarZone.classList.remove("toolbar-drop-active"));
+                        availableZone.classList.remove("toolbar-drop-active");
+                        saveLayout(event.from !== event.to || event.oldIndex !== event.newIndex);
+                    },
+                });
+            });
+
+            resetToolbarButton.addEventListener("click", () => {
+                _msgbox.show({
+                    txt: _i18n.t("msg.toolbarReset"),
+                    funcYes: (domMsg: HTMLElement) => {
+                        _msgbox.close(domMsg);
+                        const type = select_toolbarListType.value as keyof typeof _config.settings.toolbarCustomization;
+                        const defaultGroup = cloneToolbarCustomization(_defaultToolbarCustomization)[type];
+                        _config.settings.toolbarCustomization[type] = defaultGroup;
+                        appleSettingOfMain();
+                        renderType(type);
+                    },
+                });
+            });
+
+            select_toolbarListType.addEventListener("change", () => renderType(select_toolbarListType.value as keyof typeof _config.settings.toolbarCustomization));
+            const previousI18nEvent = _i18n.getEventRun();
+            _i18n.setEventRun((lang: string) => {
+                previousI18nEvent(lang);
+                renderType(select_toolbarListType.value as keyof typeof _config.settings.toolbarCustomization);
+                return {};
+            });
+            renderType(select_toolbarListType.value as keyof typeof _config.settings.toolbarCustomization);
         });
 
         // 快速鍵
@@ -395,8 +543,8 @@ class SettingWindow {
                                 <div class="hotkey-title">
                                     <span class="hotkey-name" i18n="${titleI18n}"></span>
                                     <div class="btns">
-                                        <div class="btn hotkey-iconBtn js-reset" role="button" title="${resetTitle}" i18n="sw.hotkey.restoreDefaultValue" aria-label="${resetTitle}">${SvgList["tool-rotateCw.svg"]}</div>
-                                        <div class="btn hotkey-iconBtn js-add" role="button" title="${addTitle}" i18n="sw.hotkey.add" aria-label="${addTitle}">${SvgList["tool-zoomIn.svg"]}</div>
+                                        <div class="btn hotkey-iconBtn js-reset" role="button" title="${resetTitle}" i18n="sw.hotkey.restoreDefaultValue" aria-label="${resetTitle}">${SvgList["arrow_sync_20_regular.svg"]}</div>
+                                        <div class="btn hotkey-iconBtn js-add" role="button" title="${addTitle}" i18n="sw.hotkey.add" aria-label="${addTitle}">${SvgList["add_20_regular.svg"]}</div>
                                     </div>
                                 </div>
                                 <div class="js-list">
@@ -452,7 +600,7 @@ class SettingWindow {
                                     ${subHtml}
                                     ${keyBindingHtml}
                                     <div class="btn hotkey-iconBtn hotkey-deleteBtn js-delete" role="button" title="${deleteTitle}" i18n="sw.hotkey.delete" aria-label="${deleteTitle}">
-                                        ${SvgList["no.svg"]}
+                                        ${SvgList["dismiss_20_regular.svg"]}
                                     </div>
                                 </div>`);
 
@@ -1152,10 +1300,8 @@ class SettingWindow {
         // 工具列
         addLoadEvent(() => {
             const switch_mainToolbarEnabled = getDom("#switch-mainToolbarEnabled") as HTMLInputElement;
-            const select_mainToolbarAlign = getDom("#select-mainToolbarAlign") as HTMLInputElement;
 
             switch_mainToolbarEnabled.checked = _config.settings["layout"]["mainToolbarEnabled"]; // 顯示工具列
-            select_mainToolbarAlign.value = _config.settings["layout"]["mainToolbarAlign"]; // 工具列對齊
 
             switch_mainToolbarEnabled.addEventListener("change", () => { // 顯示工具列
                 const val = switch_mainToolbarEnabled.checked;
@@ -1163,11 +1309,6 @@ class SettingWindow {
                 appleSettingOfMain();
             });
 
-            select_mainToolbarAlign.addEventListener("change", () => { // 工具列對齊
-                const val = select_mainToolbarAlign.value;
-                _config.settings["layout"]["mainToolbarAlign"] = val;
-                appleSettingOfMain();
-            });
         })
 
         // 滑鼠按鍵 + 滑鼠滾輪

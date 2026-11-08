@@ -1,9 +1,9 @@
 /* #region main-toolbar 工具列 */
 
 .main-toolbar {
-    height: 35px;
+    height: 34px;
     color: var(--color-white);
-    overflow-x: visible;
+    overflow-x: hidden;
     overflow-y: hidden;
     margin-bottom: 3px;
 }
@@ -11,6 +11,7 @@
     display: flex;
     position: absolute;
     left: 0;
+    width: max-content;
     min-width: 100%;
 }
 
@@ -76,13 +77,39 @@
 
 .main-toolbar-group {
     display: none;
-    margin-left: 3px;
     margin-bottom: 3px;
-    flex: 1;
+    flex: 0 0 auto;
+    width: max-content;
+    min-width: 100%;
 }
 .main-toolbar-group[active="true"] {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    align-items: center;
+}
+.main-toolbar-alignment {
     display: flex;
     align-items: center;
+    height: 34px;
+    min-width: 0;
+}
+.main-toolbar-alignment.is-empty {
+    display: contents;
+}
+.main-toolbar-alignment[data-align="left"] {
+    grid-column: 1;
+    justify-self: start;
+    width: max-content;
+}
+.main-toolbar-alignment[data-align="center"] {
+    grid-column: 2;
+    justify-self: center;
+    width: max-content;
+}
+.main-toolbar-alignment[data-align="right"] {
+    grid-column: 3;
+    justify-self: end;
+    width: max-content;
 }
 
 // ----------
@@ -103,36 +130,24 @@
 
 // 純文字資訊
 .main-toolbar-txt {
-    height: 35px;
+    height: 34px;
     font-size: 15px;
     line-height: 17px;
     display: flex;
     align-items: center;
     user-select: none;
     white-space: nowrap;
-    padding-right: 5px;
-    margin-left: 12px;
+    padding: 0 5px;
+    margin: 0;
+    box-sizing: border-box;
     position: relative;
 }
-// 純文字資訊-左邊的垂直線
-.main-toolbar-txt::after {
-    position: absolute;
-    content: "";
-    background-color: var(--color-white20);
-    height: 29px;
-    width: 1px;
-    top: 0;
-    bottom: 0;
-    left: -9px;
-    margin: auto;
-}
-
 // ----------
 
 // 按鈕
 .main-toolbar-btn {
-    min-width: 35px;
-    height: 35px;
+    min-width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,8 +164,8 @@
     }
     svg,
     img {
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
         pointer-events: none;
     }
 }
@@ -161,20 +176,6 @@
 }
 
 // ----------
-
-// 置中
-#main-toolbar[toolbarAlign="center"] .main-toolbar-group::before {
-    content: "";
-    margin-left: auto;
-    display: block;
-    order: -1;
-}
-.main-toolbar-group::after {
-    content: "";
-    margin-left: auto;
-    display: block;
-    order: 2000;
-}
 
 // ----------
 
@@ -189,17 +190,12 @@
     display: flex;
 }
 
-// 返回按鈕-右邊的垂直線
-.main-toolbar-back::after {
-    position: absolute;
-    content: "";
-    background-color: var(--color-white20);
-    height: 29px;
-    width: 1px;
-    top: 0;
-    bottom: 0;
-    right: -4px;
-    margin: auto;
+.main-toolbar-spacer {
+    width: 16px;
+    min-width: 16px;
+    height: 1px;
+    flex: 0 0 16px;
 }
 
+// 返回按鈕-右邊的垂直線
 /* #endregion */

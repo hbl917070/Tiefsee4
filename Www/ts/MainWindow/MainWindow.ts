@@ -19,7 +19,7 @@ import { Hotkey } from "./Hotkey";
 import { TiefseeScroll } from "../TiefseeScroll";
 import { I18n } from "../I18n";
 import { WebAPI } from "../WebAPI";
-import { Config } from "../Config";
+import { Config, cloneToolbarCustomization, restoreToolbarCustomization } from "../Config";
 import { Msgbox } from "../Msgbox";
 import { Toast } from "../Toast";
 import { Lib } from "../Lib";
@@ -88,7 +88,6 @@ export class MainWindow {
         const _domToolbar = document.getElementById("main-toolbar") as HTMLElement; // 工具列
         const _domMainL = document.getElementById("main-L") as HTMLElement; // 左邊區域
         const _domMainR = document.getElementById("main-R") as HTMLElement; // 左邊區域
-        const _btnLayout = document.querySelector(".titlebar-toolbar-layout") as HTMLDivElement; // 開啟layout選單
 
         let _firstRun = true; // 用於判斷是否為第一次執行
         let _startType = 0; // 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
@@ -191,11 +190,6 @@ export class MainWindow {
                 WV_Window.SetIcon(path);
             }
             initIcon();
-
-            // 開啟layout選單
-            _btnLayout.addEventListener("click", (e) => {
-                _script.menu.showLayout(_btnLayout);
-            })
 
             // 封鎖原生右鍵選單
             document.addEventListener("contextmenu", (e) => {
@@ -857,11 +851,13 @@ export class MainWindow {
          * 初始 讀取設定
          */
         function initSetting(settingTxt: string) {
+            const defaultToolbarCustomization = cloneToolbarCustomization(_config.settings.toolbarCustomization);
             let userSetting = {};
             try {
                 userSetting = JSON.parse(settingTxt);
             } catch (e) { }
             $.extend(true, _config.settings, userSetting);
+            restoreToolbarCustomization(_config.settings.toolbarCustomization, userSetting, defaultToolbarCustomization);
             applySetting(_config.settings, true);
         }
 
@@ -985,7 +981,7 @@ export class MainWindow {
             // -----------
 
             _mainToolbar.setEnabled(_config.settings.layout.mainToolbarEnabled); // 工具列
-            _domToolbar.setAttribute("toolbarAlign", _config.settings.layout.mainToolbarAlign); // 工具列對齊
+            _mainToolbar.applyCustomization(_config.settings.toolbarCustomization); // 工具列與標題列項目
 
             _mainFileList.setEnabled(_config.settings.layout.fileListEnabled); // 檔案預覽視窗
             _mainFileList.setShowNo(_config.settings.layout.fileListShowNo);
@@ -1003,31 +999,6 @@ export class MainWindow {
             cssRoot.style.setProperty("--mainExifMaxLine", _config.settings.layout.mainExifMaxLine + ""); // 顯示的最大行數(1~1000)
             _mainExif.setHorizontal(_config.settings.layout.mainExifHorizontal); // 寬度足夠時，橫向排列
             _mainExif.setRelatedFilesEnabled(_config.settings.layout.relatedFilesEnabled); // 顯示相關檔案
-
-            // -----------
-
-            // 工具列順序與是否顯示
-            const arGroupName = ["img", "pdf", "txt", "bulkView"];
-            arGroupName.map((gn) => {
-                const groupName = gn as ("img" | "pdf" | "txt" | "bulkView");
-
-                const dom_group = _domToolbar.querySelector(`.main-toolbar-group[data-name=${groupName}]`) as HTMLElement;
-                const arMainToolbar = _config.settings.mainToolbar[groupName];
-                // 舊設定沒有收藏按鈕時，新增至「檔案」按鈕前，並預設顯示。
-                if (!arMainToolbar.some(item => item.n === "favorites")) {
-                    const fileIndex = arMainToolbar.findIndex(item => item.n === "showMenuFile");
-                    arMainToolbar.splice(fileIndex < 0 ? 0 : fileIndex, 0, { n: "favorites", v: true });
-                }
-                for (let i = 0; i < arMainToolbar.length; i++) {
-                    const item = arMainToolbar[i];
-                    const dom_btn = dom_group.querySelector(`[data-name="${item.n}"]`) as HTMLElement;
-                    if (dom_btn === null) { continue; }
-                    if (dom_btn.getAttribute("data-name") == "showBulkViewSetting") { continue; } // 大量瀏覽模式設定
-
-                    dom_btn.style.order = i + ""; // 排序
-                    dom_btn.style.display = (item.v) ? "" : "none"; // 顯示或隱藏
-                }
-            })
 
             // -----------
 

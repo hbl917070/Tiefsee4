@@ -7,8 +7,8 @@ export function setImageErrorFallback(image: HTMLImageElement | null, kind: "fil
         fallback.className = "image-error-fallback";
         fallback.setAttribute("aria-hidden", "true");
         fallback.innerHTML = kind === "directory"
-            ? SvgList["error-folder.svg"]
-            : SvgList["error-file.svg"];
+            ? SvgList["folder_dismiss_20_regular.svg"]
+            : SvgList["document_dismiss_20_regular.svg"];
         image.replaceWith(fallback);
     }, { once: true });
 }

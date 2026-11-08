@@ -24,7 +24,7 @@ export class DirSort {
         const _domDirSortAsc = document.getElementById("menuitem-dirSort-asc") as HTMLInputElement;
         const _domDirSortDesc = document.getElementById("menuitem-dirSort-desc") as HTMLInputElement;
 
-        const _yesSvgTxt = SvgList["yes.svg"];
+        const _yesSvgTxt = SvgList["checkmark_20_regular.svg"];
         var _sortType = DirSortType.name; // 排序方式
         var _orderbyType = DirOrderbyType.asc;
 

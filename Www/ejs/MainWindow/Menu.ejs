@@ -4,11 +4,15 @@
 
         <div class="menu-box js-openFileBox">
             <div class="menu-hor-item js-openFile" role="button">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readSvg("open_folder_20_regular.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.openFile">載入檔案</div>
             </div>
             <div class="menu-hor-item js-openClipboard" role="button">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readSvg("clipboard_paste_20_regular.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.openClipboard">載入剪貼簿內容</div>
             </div>
         </div>
@@ -17,7 +21,7 @@
 
             <div class="menu-hor-item js-openNewWindow" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+                    <%- await readSvg("window_new_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
             </div>
@@ -25,25 +29,25 @@
 
             <div class="menu-hor-item js-revealInFileExplorer" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-dir.svg"); %>
+                    <%- await readSvg("folder_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item js-systemContextMenu" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                    <%- await readSvg("apps_list_detail_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenu">系統選單</div>
             </div>
             <div class="menu-hor-item js-renameFile" role="button" show-not="bulkView,">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                    <%- await readSvg("rename_a_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
             </div>
             <div class="menu-hor-item js-renameDir" role="button" show-only="bulkView,">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                    <%- await readSvg("rename_a_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
             </div>
@@ -51,11 +55,15 @@
             <div class="menu-hor-hr" show-not="bulkView,"></div>
 
             <div class="menu-hor-item js-print" role="button" show-not="bulkView,">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readSvg("print_20_regular.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.print">列印</div>
             </div>
             <div class="menu-hor-item js-setAsDesktop" role="button" show-only="img,">
-                <div class="menu-hor-icon"></div>
+                <div class="menu-hor-icon">
+                    <%- await readSvg("desktop_wallpaper_20_regular.svg"); %>
+                </div>
                 <div class="menu-hor-txt" i18n="menu.setAsDesktop">設成桌布</div>
             </div>
 
@@ -64,6 +72,7 @@
         <div class="menu-box" show-not="bulkView,">
             <div class="menu-hor-item js-openWith" role="button">
                 <div class="menu-hor-icon">
+                    <%- await readSvg("open_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.openWith">用其他程式開啟</div>
             </div>
@@ -150,13 +159,13 @@
         <div class="menu-box">
             <div class="menu-hor-item" role="button" id="menuitem-img-rotateCw">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rotateCw.svg"); %>
+                    <%- await readSvg("arrow_rotate_clockwise_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.rotateCw">順時針90°</div>
             </div>
             <div class="menu-hor-item" role="button" id="menuitem-img-rotateCcw">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rotateCcw.svg"); %>
+                    <%- await readSvg("arrow_rotate_counterclockwise_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.rotateCcw">逆時針90°</div>
             </div>
@@ -165,13 +174,13 @@
 
             <div class="menu-hor-item" role="button" id="menuitem-img-mirroringH">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-mirroringH.svg"); %>
+                    <%- await readSvg("flip_horizontal_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.flipHorizontal">水平鏡像</div>
             </div>
             <div class="menu-hor-item" role="button" id="menuitem-img-mirroringV">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-mirroringV.svg"); %>
+                    <%- await readSvg("flip_vertical_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.flipVertical">垂直鏡像</div>
             </div>
@@ -180,7 +189,7 @@
 
             <div class="menu-hor-item" role="button" id="menuitem-img-initRotate">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-initRotate.svg"); %>
+                    <%- await readSvg("broom_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.initialRotation">初始化旋轉</div>
             </div>
@@ -200,7 +209,7 @@
 
             <div class="menu-hor-item" role="button" id="menuitem-fileSort-name" aria-labelledby="menu-sort-file-title menuitem-fileSort-name-label">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/yes.svg"); %>
+                    <%- await readSvg("checkmark_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" id="menuitem-fileSort-name-label" i18n="menu.name">檔名</div>
             </div>
@@ -444,37 +453,37 @@
         <div class="menu-box" style="width:200px">
             <div class="menu-grid">
                 <div class="menu-grid-item js-bulkView" title="" i18n="menu.bulkView" role="button">
-                    <%- await readFile("./img/default/tool-bulkView.svg"); %>
+                    <%- await readSvg("app_folder_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-prev" title="" i18n="menu.prevFile" role="button">
-                    <%- await readFile("./img/default/tool-prev.svg"); %>
+                    <%- await readSvg("arrow_left_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-next" title="" i18n="menu.nextFile" role="button">
-                    <%- await readFile("./img/default/tool-next.svg"); %>
+                    <%- await readSvg("arrow_right_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-prevDir" title="" i18n="menu.prevDir" role="button">
-                    <%- await readFile("./img/default/tool-prevDir.svg"); %>
+                    <%- await readSvg("previous_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-nextDir" title="" i18n="menu.nextDir" role="button">
-                    <%- await readFile("./img/default/tool-nextDir.svg"); %>
+                    <%- await readSvg("next_20_regular.svg"); %>
                 </div>
             </div>
 
             <div class="menu-grid">
                 <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
-                    <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                    <%- await readSvg("cursor_hover_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile" role="button">
-                    <%- await readFile("./img/default/tool-open.svg"); %>
+                    <%- await readSvg("folder_open_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy" role="button">
-                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                    <%- await readSvg("copy_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuSort" title="" i18n="menu.showMenuSort" role="button">
-                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                    <%- await readSvg("arrow_sort_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuImageSearch" title="" i18n="menu.showMenuImageSearch" show-only="img,imgs,video," role="button">
-                    <%- await readFile("./img/default/tool-search.svg"); %>
+                    <%- await readSvg("search_20_regular.svg"); %>
                 </div>
             </div>
 
@@ -483,16 +492,16 @@
         <div class="menu-box">
             <div class="menu-grid" show-only="img,imgs,video,">
                 <div class="menu-grid-item js-rotate" title="" i18n="menu.showMenuRotation" role="button">
-                    <%- await readFile("./img/default/tool-rotate.svg"); %>
+                    <%- await readSvg("arrow_clockwise_dashes_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-zoomIn" title="" i18n="menu.zoomIn" role="button">
-                    <%- await readFile("./img/default/tool-zoomIn.svg"); %>
+                    <%- await readSvg("add_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-zoomOut" title="" i18n="menu.zoomOut" role="button">
-                    <%- await readFile("./img/default/tool-zoomOut.svg"); %>
+                    <%- await readSvg("subtract_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-full" title="" i18n="menu.zoomToFit" role="button">
-                    <%- await readFile("./img/default/tool-full.svg"); %>
+                    <%- await readSvg("arrow_expand_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-zoomRatio" title="" i18n="menu.infoZoomRatio" role="button">
                     <div class="menu-grid-txt js-zoomRatioTxt">
@@ -505,31 +514,31 @@
 
             <div class="menu-hor-item js-openNewWindow" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+                    <%- await readSvg("window_new_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
             </div>
             <div class="menu-hor-item js-revealInFileExplorer" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-dir.svg"); %>
+                    <%- await readSvg("folder_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorer">在檔案總管中顯示</div>
             </div>
             <div class="menu-hor-item js-systemContextMenu" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                    <%- await readSvg("apps_list_detail_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenu">系統選單</div>
             </div>
             <div class="menu-hor-item js-renameFile" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                    <%- await readSvg("rename_a_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.renameFile">重新命名</div>
             </div>
             <div class="menu-hor-item js-showDeleteFileMsg" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-delete.svg"); %>
+                    <%- await readSvg("delete_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.deleteFile">刪除檔案</div>
             </div>
@@ -538,7 +547,7 @@
 
             <div class="menu-hor-item js-setting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                    <%- await readSvg("settings_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
@@ -546,7 +555,7 @@
             <div class="menu-hor-hr"></div>
 
             <div class="menu-hor-item js-addFileToFavorites" role="button">
-                <div class="menu-hor-icon"><%- await readFile("./img/default/tool-favorites.svg"); %></div>
+                <div class="menu-hor-icon"><%- await readSvg("star_20_regular.svg"); %></div>
                 <div class="menu-hor-txt" i18n="menu.addToFavorites">加入收藏</div>
             </div>
 
@@ -585,19 +594,19 @@
         <div class="menu-box">
             <div class="menu-hor-item js-open" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-open.svg"); %>
+                    <%- await readSvg("folder_open_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.openFile">載入檔案</div>
             </div>
             <div class="menu-hor-item js-setting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                    <%- await readSvg("settings_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
             <div class="menu-hor-item js-help" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-help.svg"); %>
+                    <%- await readSvg("question_circle_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.help">說明</div>
             </div>
@@ -606,7 +615,7 @@
 
             <div class="menu-hor-item js-close" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/no.svg"); %>
+                    <%- await readSvg("dismiss_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.exit">關閉程式</div>
             </div>
@@ -623,26 +632,26 @@
 
             <div class="menu-grid">
                 <div class="menu-grid-item js-back" title="" i18n="menu.back" role="button">
-                    <%- await readFile("./img/default/tool-back.svg"); %>
+                    <%- await readSvg("arrow_hook_up_left_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-hr"></div>
                 <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
-                    <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                    <%- await readSvg("cursor_hover_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile" role="button">
-                    <%- await readFile("./img/default/tool-open.svg"); %>
+                    <%- await readSvg("folder_open_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy" role="button">
-                    <%- await readFile("./img/default/tool-copy.svg"); %>
+                    <%- await readSvg("copy_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-showMenuSort" title="" i18n="menu.showMenuSort" role="button">
-                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                    <%- await readSvg("arrow_sort_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-prevDir" title="" i18n="menu.prevDir" role="button">
-                    <%- await readFile("./img/default/tool-prevDir.svg"); %>
+                    <%- await readSvg("previous_20_regular.svg"); %>
                 </div>
                 <div class="menu-grid-item js-nextDir" title="" i18n="menu.nextDir" role="button">
-                    <%- await readFile("./img/default/tool-nextDir.svg"); %>
+                    <%- await readSvg("next_20_regular.svg"); %>
                 </div>
             </div>
 
@@ -650,7 +659,7 @@
 
             <div class="menu-hor-item js-showBulkViewSetting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting2.svg"); %>
+                    <%- await readSvg("options_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.showBulkViewSetting"> 大量瀏覽模式設定 </div>
             </div>
@@ -659,25 +668,25 @@
 
             <!-- <div class="menu-hor-item js-revealInFileExplorer" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-dir.svg"); %>
+                    <%- await readSvg("folder_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.revealInFileExplorerDir">在檔案總管中顯示資料夾</div>
             </div> -->
             <!-- <div class="menu-hor-item js-systemContextMenu" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                    <%- await readSvg("apps_list_detail_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.systemContextMenuDir">資料夾系統選單</div>
             </div> -->
             <!-- <div class="menu-hor-item js-showRenameDirMsg" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rename.svg"); %>
+                    <%- await readSvg("rename_a_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
             </div> -->
             <!-- <div class="menu-hor-item js-showDeleteDirMsg" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-delete.svg"); %>
+                    <%- await readSvg("delete_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.deleteDir">刪除資料夾</div>
             </div> -->
@@ -697,7 +706,7 @@
 
             <div class="menu-hor-item js-setting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                    <%- await readSvg("settings_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
@@ -715,21 +724,21 @@
 
             <div class="menu-hor-item js-reload" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rotateCw.svg"); %>
+                    <%- await readSvg("arrow_sync_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.reload">重新載入</div>
             </div>
 
             <div class="menu-hor-item js-showMenuSort" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                    <%- await readSvg("arrow_sort_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.showMenuSort">排序</div>
             </div>
 
             <div class="menu-hor-item js-setting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                    <%- await readSvg("settings_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
@@ -747,21 +756,21 @@
 
             <div class="menu-hor-item js-reload" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-rotateCw.svg"); %>
+                    <%- await readSvg("arrow_sync_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.reload">重新載入</div>
             </div>
 
             <div class="menu-hor-item js-showMenuSort" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-sort.svg"); %>
+                    <%- await readSvg("arrow_sort_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.showMenuSort">排序</div>
             </div>
 
             <div class="menu-hor-item js-setting" role="button">
                 <div class="menu-hor-icon">
-                    <%- await readFile("./img/default/tool-setting.svg"); %>
+                    <%- await readSvg("settings_20_regular.svg"); %>
                 </div>
                 <div class="menu-hor-txt" i18n="menu.setting">設定</div>
             </div>
@@ -789,48 +798,48 @@
 
         <div class="menu-grid">
             <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
-                <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                <%- await readSvg("cursor_hover_20_regular.svg"); %>
             </div>
             <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile" role="button">
-                <%- await readFile("./img/default/tool-open.svg"); %>
+                <%- await readSvg("folder_open_20_regular.svg"); %>
             </div>
 
             <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy" role="button">
-                <%- await readFile("./img/default/tool-copy.svg"); %>
+                <%- await readSvg("copy_20_regular.svg"); %>
             </div>
             <div class="menu-grid-item js-showMenuImageSearch" title="" i18n="menu.showMenuImageSearch" role="button">
-                <%- await readFile("./img/default/tool-search.svg"); %>
+                <%- await readSvg("search_20_regular.svg"); %>
             </div>
         </div>
         <div class="menu-hor-hr"></div>
 
         <div class="menu-hor-item js-openNewWindow" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-openNewWindow.svg"); %>
+                <%- await readSvg("window_new_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.openNewWindow">另開視窗</div>
         </div>
         <div class="menu-hor-item js-revealInFileExplorer" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-dir.svg"); %>
+                <%- await readSvg("folder_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.revealInFileExplorerFile">在檔案總管中顯示檔案</div>
         </div>
         <div class="menu-hor-item js-systemContextMenu" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                <%- await readSvg("apps_list_detail_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.systemContextMenuFile">檔案系統選單</div>
         </div>
         <div class="menu-hor-item js-renameFile" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-rename.svg"); %>
+                <%- await readSvg("rename_a_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.renameFile">重新命名檔案</div>
         </div>
         <div class="menu-hor-item js-showDeleteFileMsg" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-delete.svg"); %>
+                <%- await readSvg("delete_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.deleteFile">刪除檔案</div>
         </div>
@@ -838,7 +847,7 @@
         <div class="menu-hor-hr"></div>
 
         <div class="menu-hor-item js-addFileToFavorites" role="button">
-            <div class="menu-hor-icon"><%- await readFile("./img/default/tool-favorites.svg"); %></div>
+            <div class="menu-hor-icon"><%- await readSvg("star_20_regular.svg"); %></div>
             <div class="menu-hor-txt" i18n="menu.addToFavorites">加入收藏</div>
         </div>
 
@@ -875,39 +884,39 @@
 
         <div class="menu-grid">
             <div class="menu-grid-item js-dragDropFile" title="" i18n="menu.dragDropFile">
-                <%- await readFile("./img/default/tool-dragDropFile.svg"); %>
+                <%- await readSvg("cursor_hover_20_regular.svg"); %>
             </div>
             <div class="menu-grid-item js-showMenuFile" title="" i18n="menu.showMenuFile" role="button">
-                <%- await readFile("./img/default/tool-open.svg"); %>
+                <%- await readSvg("folder_open_20_regular.svg"); %>
             </div>
 
             <div class="menu-grid-item js-showMenuCopy" title="" i18n="menu.showMenuCopy" role="button">
-                <%- await readFile("./img/default/tool-copy.svg"); %>
+                <%- await readSvg("copy_20_regular.svg"); %>
             </div>
         </div>
         <div class="menu-hor-hr"></div>
 
         <div class="menu-hor-item js-revealInFileExplorer" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-dir.svg"); %>
+                <%- await readSvg("folder_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.revealInFileExplorerDir">在檔案總管中顯示資料夾</div>
         </div>
         <div class="menu-hor-item js-systemContextMenu" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-rightMenu.svg"); %>
+                <%- await readSvg("apps_list_detail_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.systemContextMenuDir">資料夾系統選單</div>
         </div>
         <div class="menu-hor-item js-renameDir" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-rename.svg"); %>
+                <%- await readSvg("rename_a_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.renameDir">重新命名資料夾</div>
         </div>
         <div class="menu-hor-item js-showDeleteDirMsg" role="button">
             <div class="menu-hor-icon">
-                <%- await readFile("./img/default/tool-delete.svg"); %>
+                <%- await readSvg("delete_20_regular.svg"); %>
             </div>
             <div class="menu-hor-txt" i18n="menu.deleteDir">刪除資料夾</div>
         </div>
@@ -915,7 +924,7 @@
         <div class="menu-hor-hr"></div>
 
         <div class="menu-hor-item js-addDirectoryToFavorites" role="button">
-            <div class="menu-hor-icon"><%- await readFile("./img/default/tool-favorites.svg"); %></div>
+            <div class="menu-hor-icon"><%- await readSvg("star_20_regular.svg"); %></div>
             <div class="menu-hor-txt" i18n="menu.addToFavorites">加入收藏</div>
         </div>
 
@@ -983,10 +992,10 @@
                 <div class="img js-img" role="button" aria-label=""></div>
                 <div class="btns">
                     <div class="btn svg-box js-file" title="" i18n="menu.showMenuFile" role="button">
-                        <%- await readFile("./img/default/tool-open.svg"); %>
+                        <%- await readSvg("folder_open_20_regular.svg"); %>
                     </div>
                     <div class="btn svg-box js-civitai" title="Civitai" role="button">
-                        <%- await readFile("./img/default/tool-civitai.svg"); %>
+                        <%- await readSvg("civitai.svg"); %>
                     </div>
                 </div>
             </div>
@@ -1053,11 +1062,11 @@
         <div class="menu-box video-toolbar-rate-menu">
             <div class="video-toolbar-rate-range-row">
                 <button class="video-toolbar-rate-step video-toolbar-rate-decrease" type="button" title="降低播放速度" i18n="videoToolbar.decreaseSpeed">
-                    <%- await readFile("./img/default/icon-minus.svg"); %>
+                    <%- await readSvg("subtract_20_regular.svg"); %>
                 </button>
                 <input class="video-toolbar-rate-input" type="range" min="0.25" max="3" step="0.05" value="1" title="播放速率" i18n="videoToolbar.playbackSpeed">
                 <button class="video-toolbar-rate-step video-toolbar-rate-increase" type="button" title="提高播放速度" i18n="videoToolbar.increaseSpeed">
-                    <%- await readFile("./img/default/icon-plus.svg"); %>
+                    <%- await readSvg("add_20_regular.svg"); %>
                 </button>
             </div>
             <div class="video-toolbar-rate-presets">

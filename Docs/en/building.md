@@ -122,27 +122,30 @@ It uses Gulp to bundle and compile EJS, TypeScript, SCSS, and Rust, then outputs
 
 
 ### SVG Icon Usage Instructions
-Tiefsee has the function of switching themes. In order to make the icons switch colors, all icons use SVG.  
-After executing `gulp build`, the SVG files in `Www/img/default` will all be packaged into one js, output to `Output/Www/js/SvgList.js`  
+Tiefsee UI icons use Fluent System Icons and project-specific SVGs. The official icon source is [microsoft/fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons), which is MIT licensed. The official SVG assets currently included in the project come from `@fluentui/svg-icons@1.1.345`.
 
-- In SVG, you can use `var(--color-white)` to get the main color of the current theme, for example
+- `Www/img/fluent` contains the official Fluent SVGs, retaining package filenames such as `add_20_regular.svg`.
+- `Www/img/fluent-overrides` contains modified Fluent icons and project-specific icons included in the same registry. When a filename exists in both directories, the `fluent-overrides` version takes precedence.
+- Put theme fill directly in each monochrome SVG source file using `var(--color-white)`, for example:
 	```svg
-	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
-		<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+		<g style="fill:var(--color-white)">
+			<path d="..." />
+		</g>
 	</svg>
 	```
-
-- In ts, you can get the text of SVG through `SvgList["svg name"]`, for example
+	Remove or replace any hard-coded child `fill` value, or it will override the group fill. Keep `fill="none"` when a transparent shape is required. The source SVG is the same content inserted into the page; Gulp does not rewrite SVGs during the build.
+- `gulp svg` combines both directories into `Output/Www/js/SvgList.js`, keyed by filename. A same-name icon from `fluent-overrides` replaces the one from `fluent`. TypeScript can retrieve an icon with `SvgList["add_20_regular.svg"]`:
 	```javascript
-	var svgText = SvgList["window-menu.svg"];
+	const svgText = SvgList["add_20_regular.svg"];
 	```
-
-- In ejs, you can get the text of SVG through `<%- await readFile("./img/default/"); %>`, for example
-	```html
+- EJS uses the `readSvg` helper to retrieve an icon from the same merged registry. Do not include the source directory in the template path:
+	```ejs
 	<div>
-		<%- await readFile("./img/default/tool-rotateCcw.svg"); %>
+		<%- await readSvg("app_folder_20_regular.svg") %>
 	</div>
 	```
+	EJS compilation reports an error if the icon is missing or the filename is invalid. Use `readFile` for non-SVG files.
 	
 ## Supplement
 

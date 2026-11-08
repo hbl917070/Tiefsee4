@@ -124,27 +124,30 @@ Web 專案，程式主要的核心邏輯都在這裡。<br>
 
 
 ### SVG 圖示使用說明
-Tiefsee 具有切換主題的功能，為了讓圖示具有切換顏色的功能，因此所有圖示皆使用 SVG。  
-執行 `gulp build` 後， `Www/img/default` 裡面的 SVG 檔案會全部封裝成一個 js，輸出到 `Output/Www/js/SvgList.js`  
+Tiefsee 的介面圖示使用 Fluent System Icons 與專案自訂 SVG。官方圖示來源是 [microsoft/fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons)，授權為 MIT；目前收錄的官方 SVG 來自 `@fluentui/svg-icons@1.1.345`。
 
-- 在 SVG 裡面可以用 `var(--color-white)` 來取得當前主題的主顏色，例如
+- `Www/img/fluent` 放官方 Fluent SVG，保留套件檔名，例如 `add_20_regular.svg`。
+- `Www/img/fluent-overrides` 放修改過的 Fluent 圖示及需要加入同一圖示表的專案圖示。若與 `fluent` 有相同檔名，`fluent-overrides` 版本會優先使用。
+- 單色 SVG 的填色直接寫在來源檔中，使用 `var(--color-white)`，例如：
 	```svg
-	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25">
-		<rect style="fill:var(--color-white)" x="7" y="12" width="11" height="1"/>
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+		<g style="fill:var(--color-white)">
+			<path d="..." />
+		</g>
 	</svg>
 	```
-
-- 在 ts 裡面可以透過 `SvgList["svg name"]` 來取得 SVG 的文字，例如
+	子元素若有寫死的 `fill` 顏色，需移除或改用主題變數，否則會蓋過群組填色。需要保留透明區域時可保留 `fill="none"`。SVG 來源檔就是實際插入網頁的內容；gulp 不會再於建置時改寫 SVG。
+- `gulp svg` 將上述兩個資料夾合併成 `Output/Www/js/SvgList.js`，以檔名作為 key；同名圖示由 `fluent-overrides` 覆蓋。TypeScript 可用 `SvgList["add_20_regular.svg"]` 取得內容：
 	```javascript
-	var svgText = SvgList["window-menu.svg"];
+	const svgText = SvgList["add_20_regular.svg"];
 	```
-
-- 在 ejs 裡面可以透過 `<%- await readFile("./img/default/"); %>` 來取得 SVG 的文字，例如
-	```html
+- EJS 使用 `readSvg` helper 取得同一份合併後的圖示；不要在模板中指定圖示資料夾路徑：
+	```ejs
 	<div>
-		<%- await readFile("./img/default/tool-rotateCcw.svg"); %>
+		<%- await readSvg("app_folder_20_regular.svg") %>
 	</div>
 	```
+	找不到圖示或檔名格式錯誤時，EJS 建置會報錯。一般非 SVG 檔案仍使用 `readFile`。
 
 ## 補充
 

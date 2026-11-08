@@ -1064,11 +1064,17 @@ var langData = {
 
         //顯示與排序
         customToolbar: {
+            resetToolbarPrefix: {
+                "zh-TW": "重設",
+                "zh-CN": "重置",
+                "en": "Reset ",
+                "ja": "リセット：",
+            },
             title: {
-                "zh-TW": "顯示與排序",
-                "zh-CN": "显示与排序",
-                "en": "Display and Sort",
-                "ja": "表示とソート",
+                "zh-TW": "工具列自訂",
+                "zh-CN": "工具栏自定义",
+                "en": "Customize Toolbar",
+                "ja": "ツールバーのカスタマイズ",
             },
             imageToolbar: {
                 "zh-TW": "圖片工具列",
@@ -1093,6 +1099,96 @@ var langData = {
                 "zh-CN": "批量浏览模式工具条",
                 "en": "Bulk View Toolbar",
                 "ja": "バルクビューツールバー",
+            },
+            welcomeToolbar: {
+                "zh-TW": "歡迎畫面工具列",
+                "zh-CN": "欢迎界面工具栏",
+                "en": "Welcome Toolbar",
+                "ja": "ウェルカム画面ツールバー",
+            },
+            editToolbar: {
+                "zh-TW": "選擇要編輯的工具列",
+                "zh-CN": "选择要编辑的工具栏",
+                "en": "Choose a toolbar to edit",
+                "ja": "編集するツールバーを選択",
+            },
+            available: {
+                "zh-TW": "可用項目",
+                "zh-CN": "可用项目",
+                "en": "Available items",
+                "ja": "使用可能な項目",
+            },
+            tipTitle: {
+                "zh-TW": "操作說明",
+                "zh-CN": "操作说明",
+                "en": "Instructions",
+                "ja": "操作方法",
+            },
+            tipAdd: {
+                "zh-TW": "把下方項目拖到上方預覽的標題列，或工具列的靠左、置中、靠右區域。",
+                "zh-CN": "把下方项目拖到上方预览的标题栏，或工具栏的靠左、居中、靠右区域。",
+                "en": "Drag an item from below into the title bar or one of the toolbar's Left, Center, or Right areas.",
+                "ja": "下の項目を上のプレビューにドラッグし、タイトルバーまたはツールバーの左・中央・右のエリアに配置します。",
+            },
+            tipMove: {
+                "zh-TW": "在上方預覽拖曳可調整順序；拖回下方可移除。",
+                "zh-CN": "在上方预览中拖拽可调整顺序；拖回下方可移除。",
+                "en": "Drag an item in the preview to reorder it. Drag it back below to remove it.",
+                "ja": "プレビュー内でドラッグすると順序を変更できます。下の項目一覧に戻すと削除できます。",
+            },
+            tipReusable: {
+                "zh-TW": "分隔線和空白可以重複加入。",
+                "zh-CN": "分隔线和空白可以重复添加。",
+                "en": "Separators and spaces can be added more than once.",
+                "ja": "区切り線と空白は何度でも追加できます。",
+            },
+            tipToolbarSelect: {
+                "zh-TW": "用上方選單切換要編輯的工具列；各工具列分開設定。",
+                "zh-CN": "用上方菜单切换要编辑的工具栏；各工具栏分别设置。",
+                "en": "Choose a toolbar from the menu above. Each toolbar has its own layout.",
+                "ja": "上のメニューからツールバーを選択して編集します。設定はツールバーごとに保存されます。",
+            },
+            titlebarZone: {
+                "zh-TW": "標題列自訂按鈕",
+                "zh-CN": "标题栏自定义按钮",
+                "en": "Title bar buttons",
+                "ja": "タイトルバーのボタン",
+            },
+            toolbarZone: {
+                "zh-TW": "主工具列按鈕",
+                "zh-CN": "主工具栏按钮",
+                "en": "Main toolbar buttons",
+                "ja": "メインツールバーのボタン",
+            },
+            leftZone: {
+                "zh-TW": "靠左",
+                "zh-CN": "靠左",
+                "en": "Left",
+                "ja": "左寄せ",
+            },
+            centerZone: {
+                "zh-TW": "置中",
+                "zh-CN": "居中",
+                "en": "Center",
+                "ja": "中央",
+            },
+            rightZone: {
+                "zh-TW": "靠右",
+                "zh-CN": "靠右",
+                "en": "Right",
+                "ja": "右寄せ",
+            },
+            separator: {
+                "zh-TW": "分隔線",
+                "zh-CN": "分隔线",
+                "en": "Separator",
+                "ja": "区切り線",
+            },
+            spacer: {
+                "zh-TW": "空白",
+                "zh-CN": "空白",
+                "en": "Space",
+                "ja": "空白",
             },
             adjustOrderByDragging: {
                 "zh-TW": "(可拖曳調整順序)",
@@ -3180,6 +3276,12 @@ var langData = {
             "zh-CN": "确定要将所有快捷键恢复成初始设置吗？\n(只会影响快捷键，不会变更其他设置)",
             "en": "Are you sure you want to restore all hotkeys to their default settings?\n(Only hotkeys will be changed.)",
             "ja": "すべてのホットキーを初期設定に戻してもよろしいですか？\n（変更されるのはホットキーのみです）",
+        },
+        toolbarReset: {
+            "zh-TW": "確定要將目前選取的工具列恢復成預設排列嗎？\n（只會重設此工具列）",
+            "zh-CN": "确定要将当前选中的工具栏恢复为默认排列吗？\n（只会重置此工具栏）",
+            "en": "Restore the selected toolbar to its default layout?\n(Only this toolbar will be reset.)",
+            "ja": "選択中のツールバーを初期配置に戻しますか？\n（このツールバーのみリセットされます）",
         },
         mouseResetAll: {
             "zh-TW": "確定要將所有滑鼠設定恢復成初始設定嗎？\n(只會影響滑鼠設定，不會變更其他設定)",

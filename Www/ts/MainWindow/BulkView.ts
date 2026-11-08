@@ -1427,7 +1427,7 @@ export class BulkView {
                         let domCenter = domItem.querySelector(".bulkView-center");
                         if (domCenter === null) { return; }
 
-                        let div = Lib.newDom(`<div class="bulkView-reload">${SvgList["tool-rotateCw.svg"]}</div>`);
+                        let div = Lib.newDom(`<div class="bulkView-reload">${SvgList["arrow_sync_20_regular.svg"]}</div>`);
                         domCenter.appendChild(div);
                         domItem.setAttribute("data-reload", "true");
                     } else {

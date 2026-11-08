@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">
-  <path d="M10 27a7 7 0 0 1 7-7h24l10 11h28a7 7 0 0 1 7 7v29a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8V27Z"
-    fill="var(--color-black20, rgba(0,0,0,.2))"
-    stroke="var(--color-white, #fff)" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M12 39h72" stroke="var(--color-white80, rgba(255,255,255,.8))" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="70" cy="70" r="16" fill="var(--color-window-background, #1f272b)"
-    stroke="var(--color-blue, #00c8ff)" stroke-width="4"/>
-  <path d="m64 64 12 12m0-12L64 76" stroke="var(--color-blue, #00c8ff)" stroke-width="4" stroke-linecap="round"/>
-</svg>

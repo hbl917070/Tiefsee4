@@ -10,7 +10,7 @@ export class ToolbarBack {
 
     constructor() {
 
-        const _btn = document.querySelector("#toolbar-back") as HTMLElement;
+        const _buttons = document.querySelectorAll<HTMLElement>(".main-toolbar-back");
         var _clickEvent: () => void = () => { }
         var _active = false;
 
@@ -19,21 +19,16 @@ export class ToolbarBack {
         this.setEvent = setEvent;
         this.runEvent = runEvent;
 
-        _btn.addEventListener("click", () => {
+        _buttons.forEach(button => button.addEventListener("click", () => {
             _clickEvent();
-        })
+        }));
 
         /** 
          * 設定顯示或隱藏dom
          */
         function visible(val: boolean) {
-            if (val === true) {
-                _btn.setAttribute("active", "true");
-                _active = true;
-            } else {
-                _btn.setAttribute("active", "");
-                _active = false;
-            }
+            _buttons.forEach(button => button.setAttribute("active", val ? "true" : ""));
+            _active = val;
         }
 
         function getVisible() {
