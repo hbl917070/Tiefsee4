@@ -1,4 +1,4 @@
-export type Locale = "zh-TW" | "zh-CN" | "en" | "ja";
+export type Locale = "zh-TW" | "zh-CN" | "en" | "ja" | "ru";
 export type LanguageNamespace =
     | "sw"
     | "motionPhoto"
