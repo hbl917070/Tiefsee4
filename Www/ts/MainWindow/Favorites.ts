@@ -584,7 +584,16 @@ export class Favorites {
         drag.proxy.style.left = `${Math.max(0, Math.min(event.clientX - drag.width / 2, maxLeft))}px`;
         drag.proxy.style.top = `${Math.max(0, Math.min(event.clientY - drag.height / 2, maxTop))}px`;
         const hit = this.getDropHit(event.clientX, event.clientY);
-        if (!hit) { this.clearIntent(); return; }
+        if (!hit) {
+            this.clearIntent();
+            if (drag.from === this.folderGrid && drag.list !== this.folderGrid && !this.folderView.hidden
+                && this.isPointWithinRect(event.clientX, event.clientY, this.folderView.getBoundingClientRect())) {
+                const group = this.activeGroupId ? this.findItem(this.activeGroupId) : undefined;
+                const index = group?.type === "group" ? group.items.findIndex(item => item.id === drag.id) : 0;
+                this.applyPlaceholderSlot(this.folderGrid, Math.max(0, index));
+            }
+            return;
+        }
         if (hit.list !== drag.list) {
             drag.list = hit.list;
             hit.list.append(drag.placeholder);
@@ -608,6 +617,9 @@ export class Favorites {
             if (drag.item.type === "group") return null;
             return { target: this.folderView, list: this.rootGrid, mode: "into", position: null, edge: null, end: false };
         }
+        // 資料夾覆蓋在外層網格上，資料夾範圍內不能命中後方的排序位置。
+        const insideFolder = !this.folderView.hidden && this.isPointWithinRect(clientX, clientY, this.folderView.getBoundingClientRect());
+        if (insideFolder && !this.isPointWithinRect(clientX, clientY, this.folderGrid.getBoundingClientRect())) return null;
         const placeholder = element?.closest<HTMLElement>(".favorite-tile-placeholder");
         if (placeholder) {
             const list = placeholder.parentElement === this.rootGrid || placeholder.parentElement === this.folderGrid ? placeholder.parentElement : drag.list;
@@ -631,8 +643,8 @@ export class Favorites {
             const slot = this.slotForTile(list, tile, clientX);
             return { target: tile, list, mode: "reorder", position: slot.position, edge: slot.edge, end: slot.position >= this.tilesIn(list).length };
         }
-        const list = this.isPointWithinRect(clientX, clientY, this.rootGrid.getBoundingClientRect()) ? this.rootGrid
-            : !this.folderView.hidden && this.isPointWithinRect(clientX, clientY, this.folderGrid.getBoundingClientRect()) ? this.folderGrid : null;
+        const list = insideFolder ? this.folderGrid
+            : this.isPointWithinRect(clientX, clientY, this.rootGrid.getBoundingClientRect()) ? this.rootGrid : null;
         if (!list) return null;
         if (list === this.folderGrid && drag.from === this.rootGrid && this.activeGroupId && drag.item.type !== "group") {
             return { target: this.folderView, list: this.rootGrid, mode: "into", position: null, edge: null, end: false };
@@ -786,15 +798,16 @@ export class Favorites {
             await this.moveIntoGroup(drag.id, groupId);
             return;
         }
-        const releasedInsideFolderGrid = this.folderGrid.contains(document.elementFromPoint(event.clientX, event.clientY));
+        const releasedInsideFolder = !this.folderView.hidden && this.isPointWithinRect(event.clientX, event.clientY, this.folderView.getBoundingClientRect());
         // 從資料夾拖出但未落在有效排序格位時，預設追加到收藏最後。
         if (!canceled && drag.started && !valid && sourceList === this.folderGrid && this.activeGroupId
-            && !releasedInsideFolderGrid) {
+            && !releasedInsideFolder) {
             this.restoreDraggedTile(drag);
             await this.moveOutOfGroup(drag.id, this.readOrder(this.rootGrid).length);
             return;
         }
         this.restoreDraggedTile(drag);
+        if (!valid && sourceList !== destinationList) this.render();
         if (valid && intent?.mode === "reorder" && intent.position !== null) {
             if (sourceList === this.folderGrid && destinationList === this.rootGrid) {
                 await this.moveOutOfGroup(drag.id, intent.position);
