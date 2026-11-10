@@ -120,6 +120,7 @@ gulp.task("ts", async () => {
         { path: "./ts/Tiefseeview/TiefseeviewWorkerSub.ts", bundle: true },
         { path: "./ts/Tiefseeview/TiefseeviewImageWorker.ts", bundle: true },
         { path: "./ts/LibIframe.ts", bundle: true },
+        { path: "./ts/lang/langData.ts", bundle: true, outDir: output + "/lang", format: "iife", charset: "utf8" },
     ];
 
     const streams = fileMappings.map(file => {
@@ -128,10 +129,12 @@ gulp.task("ts", async () => {
                 .pipe(gulpEsbuild({
                     outfile: path.basename(file.path, ".ts") + ".js",
                     bundle: file.bundle,
+                    format: file.format,
+                    charset: file.charset,
                     loader: { ".wgsl": "text" },
                 }))
                 .on("error", reject)
-                .pipe(gulp.dest(output + "/js"))
+                .pipe(gulp.dest(file.outDir || output + "/js"))
                 .on("end", resolve);
         });
     });
