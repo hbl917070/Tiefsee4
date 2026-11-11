@@ -345,7 +345,7 @@ export class Favorites {
         folderTitle.addEventListener("blur", () => {
             const group = this.activeGroupId ? this.findItem(this.activeGroupId) : undefined;
             if (group?.type !== "group") return;
-            group.name = folderTitle.value.trim() || "資料夾";
+            group.name = folderTitle.value.trim() || this.M.i18n.t("favorites.directory");
             folderTitle.value = group.name;
             void this.save().then(() => this.render());
         });
@@ -357,7 +357,7 @@ export class Favorites {
             } else if (event.key === "Escape") {
                 event.preventDefault();
                 const group = this.activeGroupId ? this.findItem(this.activeGroupId) : undefined;
-                if (group?.type === "group") folderTitle.value = group.name || "資料夾";
+                if (group?.type === "group") folderTitle.value = group.name || this.M.i18n.t("favorites.directory");
                 folderTitle.blur();
             }
         });
@@ -441,7 +441,7 @@ export class Favorites {
                 this.folderView.dataset.id = group.id;
                 this.folderGrid.replaceChildren(...group.items.map(getTile));
                 const title = this.host.querySelector<HTMLInputElement>(".favorites-folder-title")!;
-                if (document.activeElement !== title) title.value = group.name || "資料夾";
+                if (document.activeElement !== title) title.value = group.name || this.M.i18n.t("favorites.directory");
                 this.host.querySelector<HTMLElement>(".favorites-folder-empty")!.hidden = group.items.length > 0;
             } else {
                 this.activeGroupId = null;
@@ -478,7 +478,7 @@ export class Favorites {
             : `<img class="favorite-icon" src="./img/transparent.svg" alt="" data-kind="${item.type}" data-request-url="${Lib.escape(WebAPI.Img.fileIcon(item.path, item.type === "directory"))}" loading="lazy">`;
         const path = item.type === "group" ? "" : item.path;
         const defaultName = path ? Lib.getFileName(path.replace(/[\\/]+$/, "")) : "";
-        tile.innerHTML = `${icon}<span class="favorite-name${item.type === "group" ? " favorite-group-name" : ""}" title="${Lib.escape(path || item.name)}">${Lib.escape(item.name || defaultName || "資料夾")}</span>
+        tile.innerHTML = `${icon}<span class="favorite-name${item.type === "group" ? " favorite-group-name" : ""}" title="${Lib.escape(path || item.name)}">${Lib.escape(item.name || defaultName || this.M.i18n.t("favorites.directory"))}</span>
             <button type="button" class="favorite-item-menu" data-action="item-menu" aria-label="${this.M.i18n.t("favorites.itemActions")}">⋯</button>`;
         tile.querySelectorAll<HTMLImageElement>("img").forEach(image => image.addEventListener("error", () => {
             const fallback = document.createElement("span");
@@ -930,7 +930,7 @@ export class Favorites {
         const dragged = this.items[draggedIndex];
         const target = this.items[targetIndex];
         if (dragged.type === "group" || target.type === "group") return;
-        const group: FavoriteGroup = { id: this.randomId(), type: "group", name: "資料夾", items: [target, dragged] };
+        const group: FavoriteGroup = { id: this.randomId(), type: "group", name: this.M.i18n.t("favorites.directory"), items: [target, dragged] };
         const insertAt = targetIndex - (draggedIndex < targetIndex ? 1 : 0);
         this.items = this.items.filter(item => item.id !== draggedId && item.id !== targetId);
         this.items.splice(insertAt, 0, group);
@@ -1143,7 +1143,7 @@ export class Favorites {
         input.focus();
         input.select();
         const save = () => {
-            item.name = input.value.trim() || "資料夾";
+            item.name = input.value.trim() || this.M.i18n.t("favorites.directory");
             void this.save().then(() => this.render());
         };
         input.addEventListener("blur", save, { once: true });
@@ -1208,7 +1208,7 @@ export class Favorites {
             return {
                 id: value.id,
                 type: "group",
-                name: value.name || "資料夾",
+                name: value.name || this.M.i18n.t("favorites.directory"),
                 items: items.filter((item): item is FavoriteLeaf => item.type !== "group"),
             };
         }
