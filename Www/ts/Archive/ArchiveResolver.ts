@@ -99,10 +99,11 @@ export class ArchiveResolver {
             throw new ArchiveApiError("entryNotFound", "解壓縮後的檔案不存在。", 404, item.ref.archivePath);
         }
 
-        // viewer 依 Path 讀取實體檔案；FullPath、大小與修改日期則使用 archive 語意。
+        // viewer 依 Path 讀取實體檔案；顯示資訊使用 archive entry 語意。
         fileInfo.Path = physicalPath;
         fileInfo.FullPath = getArchiveLogicalPath(item);
         fileInfo.Lenght = item.size;
+        fileInfo.CreationTimeUtc = item.creationTimeUtc;
         fileInfo.LastWriteTimeUtc = item.lastWriteTimeUtc;
 
         console.debug("[Archive] entry materialized", {

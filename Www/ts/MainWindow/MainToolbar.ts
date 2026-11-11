@@ -276,6 +276,16 @@ export class MainToolbar {
             M.config.settings.layout.mainToolbarEnabled = val;
         }
 
+        function addFileInfoItems(group: string) {
+            for (const name of ["infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+                _ar.push({
+                    type: "html", group, name, i18n: `menu.${name}`, icon: "",
+                    html: `<div class="main-toolbar-txt" data-name="${name}"></div>`,
+                    func: () => { },
+                });
+            }
+        }
+
         /**
          * 初始化 工具列 圖片
          */
@@ -525,35 +535,8 @@ export class MainToolbar {
                 func: (btn) => { },
             })
 
-            // 檔案類型、檔案大小
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoType">
-                        <!-- JPG<br>123.4MB -->
-                    </div>
-                `,
-                i18n: "menu.infoType",
-                group: GroupType.img,
-                name: "infoType",
-                icon: "",
-                func: (btn) => { },
-            })
+            addFileInfoItems(GroupType.img);
 
-            // 檔案修改時間
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoWriteTime">
-                        <!--2022-05-02<br>01:19:49 -->
-                    </div>
-                `,
-                i18n: "menu.infoWriteTime",
-                group: GroupType.img,
-                name: "infoWriteTime",
-                icon: "",
-                func: (btn) => { },
-            })
         }
 
         /**
@@ -729,35 +712,8 @@ export class MainToolbar {
 
             //----------------------------------
 
-            // 檔案類型、檔案大小
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoType">
-                        <!-- JPG<br>123.4MB -->
-                    </div>
-                `,
-                i18n: "menu.infoType",
-                group: GroupType.pdf,
-                name: "infoType",
-                icon: "",
-                func: (btn) => { },
-            })
+            addFileInfoItems(GroupType.pdf);
 
-            // 檔案修改時間
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoWriteTime">
-                        <!--2022-05-02<br>01:19:49 -->
-                    </div>
-                `,
-                i18n: "menu.infoWriteTime",
-                group: GroupType.pdf,
-                name: "infoWriteTime",
-                icon: "",
-                func: (btn) => { },
-            })
         }
 
         /**
@@ -948,35 +904,7 @@ export class MainToolbar {
 
             //---------------------
 
-            // 檔案類型、檔案大小
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoType">
-                        <!-- JPG<br>123.4MB -->
-                    </div>
-                `,
-                i18n: "menu.infoType",
-                group: GroupType.txt,
-                name: "infoType",
-                icon: "",
-                func: (btn) => { },
-            })
-
-            // 檔案修改時間
-            _ar.push({
-                type: "html",
-                html: `
-                    <div class="main-toolbar-txt" data-name="infoWriteTime">
-                        <!--2022-05-02<br>01:19:49 -->
-                    </div>
-                `,
-                i18n: "menu.infoWriteTime",
-                group: GroupType.txt,
-                name: "infoWriteTime",
-                icon: "",
-                func: (btn) => { },
-            })
+            addFileInfoItems(GroupType.txt);
 
         }
 

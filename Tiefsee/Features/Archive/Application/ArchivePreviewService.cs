@@ -762,6 +762,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
         Directory.CreateDirectory(_tempDirectory);
 
         try {
+            DateTime metadataStartUtc = DateTime.UtcNow;
             bool archiveSignatureValidated = CreateExtractor();
             // 7z 啟用加密檔頭時，SharpSevenZip 會在讀取 metadata 時拋出例外，
             // 這和真正的空壓縮檔不同，空壓縮檔會回傳非 null 的空集合。
@@ -781,6 +782,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
                 // 轉成前端可處理的密碼狀態。
                 throw CreatePasswordException(ex);
             }
+            DateTime metadataEndUtc = DateTime.UtcNow;
             if (archiveFiles.Length > MaxEntryCount) {
                 throw new ArchivePreviewException("entryCountLimitExceeded", "壓縮檔內的 entry 數量超過限制。", 413);
             }
@@ -790,7 +792,7 @@ internal sealed class ArchivePreviewSession : IDisposable {
             long totalSize = 0;
             HashSet<string> logicalNames = new(StringComparer.OrdinalIgnoreCase);
             foreach (ArchiveFileInfo archiveFile in archiveFiles) {
-                ArchiveFileEntry entry = ArchiveFileEntry.Create(archiveFile);
+                ArchiveFileEntry entry = ArchiveFileEntry.Create(archiveFile, metadataStartUtc, metadataEndUtc);
                 ValidateEntry(entry, logicalNames);
                 _entriesById.Add(entry.EntryId, entry);
                 if (entry.IsDirectory == false) {
@@ -1595,6 +1597,9 @@ internal sealed class ArchiveFileEntry {
     /// </summary>
     public long LastWriteTimeUtc { get; private set; }
 
+    /// <summary>entry 建立時間；無法確定時為 0。</summary>
+    public long CreationTimeUtc { get; private set; }
+
     /// <summary> 是否為資料夾 entry。 </summary>
     public bool IsDirectory { get; private set; }
 
@@ -1611,14 +1616,23 @@ internal sealed class ArchiveFileEntry {
     /// </summary>
     /// <param name="file">SharpSevenZip 回傳的 entry metadata。</param>
     /// <returns>服務內部使用的 entry 模型。</returns>
-    public static ArchiveFileEntry Create(ArchiveFileInfo file) {
+    public static ArchiveFileEntry Create(ArchiveFileInfo file, DateTime metadataStartUtc, DateTime metadataEndUtc) {
         string extension = GetSafeExtension(file.FileName);
         long size = file.Size > (ulong)long.MaxValue ? long.MaxValue : (long)file.Size;
+        long earliest = new DateTimeOffset(metadataStartUtc.AddSeconds(-1)).ToUnixTimeMilliseconds();
+        long latest = new DateTimeOffset(metadataEndUtc.AddSeconds(1)).ToUnixTimeMilliseconds();
+        // SharpSevenZip substitutes DateTime.Now for missing timestamps. This
+        // temporary heuristic can also hide a genuine recent timestamp.
+        long TimeOrUnknown(DateTime time) {
+            long value = ToUnixMilliseconds(time);
+            return value >= earliest && value <= latest ? 0 : value;
+        }
         return new ArchiveFileEntry {
             EntryId = file.Index,
             Name = file.FileName ?? "",
             Size = size,
-            LastWriteTimeUtc = ToUnixMilliseconds(file.LastWriteTime),
+            LastWriteTimeUtc = TimeOrUnknown(file.LastWriteTime),
+            CreationTimeUtc = TimeOrUnknown(file.CreationTime),
             IsDirectory = file.IsDirectory,
             IsEncrypted = file.Encrypted,
             IsHighRisk = ArchivePreviewService.ArchiveRiskPolicy.IsHighRiskExtension(extension)
@@ -1639,7 +1653,7 @@ internal sealed class ArchiveFileEntry {
 
     /// <summary>
     /// 將 SharpSevenZip 的 entry 時間轉成前端既有的 Unix milliseconds UTC 格式。
-    /// SharpSevenZip 對沒有時間的 entry 會回傳 default DateTime，統一以 0 表示。
+    /// default DateTime 與 Unix epoch 以前的時間統一以 0 表示。
     /// </summary>
     private static long ToUnixMilliseconds(DateTime time) {
         if (time == default) {
@@ -1662,6 +1676,7 @@ internal sealed class ArchiveFileEntry {
             name = Name,
             size = Size,
             lastWriteTimeUtc = LastWriteTimeUtc,
+            creationTimeUtc = CreationTimeUtc,
             isDirectory = IsDirectory,
             isHighRisk = IsHighRisk
         };

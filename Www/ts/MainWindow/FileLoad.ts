@@ -1368,6 +1368,19 @@ export class FileLoad {
             await showFileUpdataImg(fileInfo2);
         }
 
+        /** 建立高風險項目或錯誤畫面使用的 archive 顯示資訊。 */
+        function getArchiveDisplayFileInfo(item: ArchiveEntryItem, path: string): FileInfo2 {
+            return {
+                Type: "file",
+                Path: path,
+                FullPath: getArchiveLogicalPath(item),
+                Lenght: item.size,
+                CreationTimeUtc: item.creationTimeUtc,
+                LastWriteTimeUtc: item.lastWriteTimeUtc,
+                HexValue: "",
+            };
+        }
+
         /**
          * 解析並顯示目前的 archive entry。
          *
@@ -1383,15 +1396,7 @@ export class FileLoad {
             await showFileUpdataUI();
             try {
                 if (item.isHighRisk) {
-                    const fileInfo: FileInfo2 = {
-                        Type: "file",
-                        Path: _archiveResolver.getThumbnailUrl(item),
-                        FullPath: getArchiveLogicalPath(item),
-                        Lenght: item.size,
-                        CreationTimeUtc: 0,
-                        LastWriteTimeUtc: item.lastWriteTimeUtc,
-                        HexValue: "",
-                    };
+                    const fileInfo = getArchiveDisplayFileInfo(item, _archiveResolver.getThumbnailUrl(item));
                     _groupType = GroupType.img;
                     // 高風險 entry 不會經過一般 materialize preview 流程，
                     // 仍需初始化 MainExif，讓 archive mode 隱藏「相關檔案」頁籤。
@@ -1451,8 +1456,7 @@ export class FileLoad {
             _groupType = GroupType.unknown;
             try {
                 if (isCurrentArchiveItem(item)) {
-                    const archiveInfo = await WebAPI.getFileInfo2(item.ref.archivePath);
-                    await M.fileShow.openErrorImage(archiveInfo.Type === "none" ? undefined : archiveInfo);
+                    await M.fileShow.openErrorImage(getArchiveDisplayFileInfo(item, "./img/error.svg"));
                 }
             }
             catch (iconError) {

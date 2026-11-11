@@ -28,6 +28,9 @@ public sealed class ArchiveEntryInfoResult {
     /// </summary>
     public long size { get; set; }
 
+    /// <summary>entry 建立時間的 Unix milliseconds UTC；無法確定時為 0。</summary>
+    public long creationTimeUtc { get; set; }
+
     /// <summary>
     /// entry 的最後修改時間，使用 Unix milliseconds UTC；壓縮檔沒有提供時間時為 0。
     /// </summary>

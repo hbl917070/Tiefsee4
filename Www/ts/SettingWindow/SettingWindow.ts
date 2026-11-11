@@ -267,14 +267,7 @@ class SettingWindow {
                     dom.innerHTML = SvgList[definition.icon] || "";
                 } else {
                     dom.classList.add("toolbar-preview-info");
-                    const values: { [key: string]: string } = {
-                        infoZoomRatio: "28%",
-                        infoSize: "300×600",
-                        infoType: "JPG 6.3MB",
-                        infoWriteTime: "2026-11-04 14:01:03",
-                    };
-                    dom.textContent = values[item.name] || label;
-                    if (isTitlebar) { dom.title = `${label}: ${dom.textContent}`; }
+                    dom.textContent = item.name === "infoZoomRatio" ? "28%" : label;
                 }
                 return dom;
             }

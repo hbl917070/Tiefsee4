@@ -1469,7 +1469,7 @@ export class BulkView {
                 Path: logicalPath,
                 FullPath: logicalPath,
                 Lenght: archiveItem.size,
-                CreationTimeUtc: 0,
+                CreationTimeUtc: archiveItem.creationTimeUtc,
                 LastWriteTimeUtc: lastWriteTimeUtc,
                 HexValue: "",
             };
@@ -1619,9 +1619,9 @@ export class BulkView {
                 const hasLastWriteTime = Number.isFinite(LastWriteTimeUtc) && LastWriteTimeUtc > 0;
                 const LastWriteTime = hasLastWriteTime
                     ? new Date(LastWriteTimeUtc).format("yyyy-MM-dd hh:mm:ss")
-                    : "0000-00-00 00:00:00";
-                const writeDate = hasLastWriteTime ? LastWriteTime.substring(0, 10) : "0000-00-00";
-                const writeTime = hasLastWriteTime ? LastWriteTime.substring(11) : "00:00:00";
+                    : "—";
+                const writeDate = hasLastWriteTime ? LastWriteTime.substring(0, 10) : "—";
+                const writeTime = hasLastWriteTime ? LastWriteTime.substring(11) : "—";
                 const fileSize = Lib.getFileLength(fileInfo2.Lenght);
 
                 div.innerHTML = /*html*/`

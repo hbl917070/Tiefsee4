@@ -39,6 +39,8 @@ export interface ArchiveEntryMetadata {
     name: string;
     /** entry 解壓後的大小，單位為 bytes。 */
     size: number;
+    /** entry 建立時間的 Unix milliseconds UTC；無法確定時為 0。 */
+    creationTimeUtc: number;
     /** entry 最後修改時間的 Unix milliseconds UTC；壓縮檔沒有提供時間時為 0。 */
     lastWriteTimeUtc: number;
     /** 是否為資料夾；資料夾只保留在 metadata，不加入預覽列表。 */
@@ -101,6 +103,8 @@ export interface ArchiveEntryItem {
     isHighRisk: boolean;
     /** entry 解壓後大小。 */
     size: number;
+    /** entry 建立時間的 Unix milliseconds UTC；無法確定時為 0。 */
+    creationTimeUtc: number;
     /** entry 最後修改時間的 Unix milliseconds UTC；壓縮檔沒有提供時間時為 0。 */
     lastWriteTimeUtc: number;
     /** 是否為資料夾。 */
@@ -220,6 +224,7 @@ export function createArchiveEntryItem(
         isHighRisk: entry.isHighRisk,
         size: entry.size,
         lastWriteTimeUtc: entry.lastWriteTimeUtc,
+        creationTimeUtc: entry.creationTimeUtc,
         isDirectory: entry.isDirectory,
     };
 }

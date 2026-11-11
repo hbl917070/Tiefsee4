@@ -1166,6 +1166,13 @@ input::-webkit-inner-spin-button {
         margin-right: 6px;
     }
 }
+.toolbar-customizer-available .toolbarList-item[data-kind="info"] {
+    border: 1px solid rgba(170, 133, 225, 0.65);
+    background-color: rgba(135, 94, 190, 0.22);
+}
+.toolbar-customizer-available .toolbarList-item[data-kind="info"]:hover {
+    background-color: rgba(135, 94, 190, 0.38);
+}
 .toolbar-customizer-available .toolbar-special-item {
     min-width: 90px;
     justify-content: center;

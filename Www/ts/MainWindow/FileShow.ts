@@ -104,10 +104,10 @@ export class FileShow {
          */
         function getGroupType() { return _groupType }
 
-        /** 將缺少修改時間的 archive entry 顯示為固定的空日期。 */
+        /** 無法取得時間時顯示破折號。 */
         function formatLastWriteTime(timeUtc: number): string {
             if (Number.isFinite(timeUtc) === false || timeUtc <= 0) {
-                return "0000-00-00<br>00:00:00";
+                return "—";
             }
             return new Date(timeUtc).format("yyyy-MM-dd<br>hh:mm:ss");
         }
@@ -258,6 +258,23 @@ export class FileShow {
                 dom.innerHTML = regularHtml.replace(/<br\s*\/?\s*>/gi, lineSeparator);
             } else {
                 dom.innerHTML = regularHtml;
+            }
+        }
+
+        function updateFileToolbarInfo(group: string, file: FileInfo2) {
+            // The extension may come from an archive entry name, so it is not HTML.
+            const type = Lib.escape(Lib.getFileType(file).toLocaleUpperCase());
+            const size = Lib.getFileLength(file.Lenght);
+            const writeTime = formatLastWriteTime(file.LastWriteTimeUtc);
+            const creationTime = formatLastWriteTime(file.CreationTimeUtc);
+            const values: Record<string, string> = {
+                infoType: type, infoFileSize: size, infoTypeSize: `${type}<br>${size}`,
+                infoWriteTime: writeTime, infoWriteDate: writeTime.split("<br>")[0],
+                infoCreationTime: creationTime, infoCreationDate: creationTime.split("<br>")[0],
+            };
+            for (const [name, value] of Object.entries(values)) {
+                const dom = getToolbarItemDom(group, name);
+                if (dom !== null) { setToolbarInfoContent(dom, value); }
             }
         }
 
@@ -514,21 +531,7 @@ export class FileShow {
                 setToolbarInfoContent(dom_size, `${_tiefseeview.getOriginalWidth()}<br>${_tiefseeview.getOriginalHeight()}`);
             }
 
-            // 檔案類型
-            const dom_type = getToolbarItemDom(GroupType.img, "infoType");
-            if (dom_type != null) {
-                let fileType = Lib.getFileType(fileInfo2);
-                let fileLength = Lib.getFileLength(fileInfo2.Lenght);
-                setToolbarInfoContent(dom_type, `${fileType}<br>${fileLength}`);
-            }
-
-            // 檔案修改時間
-            const dom_writeTime = getToolbarItemDom(GroupType.img, "infoWriteTime");
-            if (dom_writeTime != null) {
-                let timeUtc = fileInfo2.LastWriteTimeUtc;
-                let time = formatLastWriteTime(timeUtc);
-                setToolbarInfoContent(dom_writeTime, time);
-            }
+            updateFileToolbarInfo(GroupType.img, fileInfo2);
         }
 
         /**
@@ -556,21 +559,7 @@ export class FileShow {
                 await _iframes.pdfTronWebviewer.loadFile(path);
             }
 
-            // 檔案類型
-            const domType = getToolbarItemDom(GroupType.pdf, "infoType");
-            if (domType != null) {
-                const fileType = Lib.getFileType(fileInfo2).toLocaleUpperCase();
-                const fileLength = Lib.getFileLength(fileInfo2.Lenght);
-                setToolbarInfoContent(domType, `${fileType}<br>${fileLength}`);
-            }
-
-            // 檔案修改時間
-            const domWriteTime = getToolbarItemDom(GroupType.pdf, "infoWriteTime");
-            if (domWriteTime != null) {
-                const timeUtc = fileInfo2.LastWriteTimeUtc;
-                const time = formatLastWriteTime(timeUtc);
-                setToolbarInfoContent(domWriteTime, time);
-            }
+            updateFileToolbarInfo(GroupType.pdf, fileInfo2);
         }
 
         /**
@@ -616,22 +605,7 @@ export class FileShow {
                 _iframes.textView.loadText(txt);
             }
 
-            // 檔案類型
-            const domType = getToolbarItemDom(GroupType.txt, "infoType");
-            if (domType != null) {
-                const fileType = Lib.getFileType(fileInfo2).toLocaleUpperCase();
-                const fileLength = Lib.getFileLength(fileInfo2.Lenght);
-                setToolbarInfoContent(domType, `${fileType}<br>${fileLength}`);
-            }
-
-            // 檔案修改時間
-            const domWriteTime = getToolbarItemDom(GroupType.txt, "infoWriteTime");
-            if (domWriteTime != null) {
-                const timeUtc = fileInfo2.LastWriteTimeUtc;
-                const time = formatLastWriteTime(timeUtc);
-                setToolbarInfoContent(domWriteTime, time);
-            }
-
+            updateFileToolbarInfo(GroupType.txt, fileInfo2);
         }
 
         /**
@@ -654,12 +628,10 @@ export class FileShow {
             M.fileLoad.stopFileWatcher();
 
             _tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal);
-            let dom_size = getToolbarItemDom(GroupType.img, "infoSize"); // 圖片長寬
-            let dom_type = getToolbarItemDom(GroupType.img, "infoType"); // 檔案類型
-            let dom_writeTime = getToolbarItemDom(GroupType.img, "infoWriteTime"); // 檔案修改時間
-            if (dom_size) { setToolbarInfoContent(dom_size, ""); }
-            if (dom_type) { setToolbarInfoContent(dom_type, ""); }
-            if (dom_writeTime) { setToolbarInfoContent(dom_writeTime, ""); }
+            for (const name of ["infoSize", "infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+                const dom = getToolbarItemDom(GroupType.img, name);
+                if (dom !== null) { setToolbarInfoContent(dom, ""); }
+            }
         }
 
         /**

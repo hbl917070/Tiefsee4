@@ -485,12 +485,13 @@ export class Config {
                     toolbarButton("dragDropFile"), toolbarButton("showDeleteMsg"), toolbarButton("showMenuImageSearch"),
                     toolbarButton("showMenuRotation"), toolbarButton("zoomToFit"), toolbarInfo("infoZoomRatio"),
                     toolbarSeparator("img-info-size"), toolbarInfo("infoSize"),
-                    toolbarSeparator("img-info-type"), toolbarInfo("infoType"),
+                    toolbarSeparator("img-info-type"), toolbarInfo("infoTypeSize"),
                     toolbarSeparator("img-info-write-time"), toolbarInfo("infoWriteTime"),
                 ], right: [toolbarButton("favorites"), toolbarButton("showSetting")] },
                 [
                     toolbarAvailableButton("prevFile"), toolbarAvailableButton("nextFile"),
                     toolbarAvailableButton("prevDir"), toolbarAvailableButton("nextDir"),
+                    ...["infoType", "infoFileSize", "infoWriteDate", "infoCreationTime", "infoCreationDate"].map(name => ({ type: "info" as const, name })),
                 ]
             ),
             pdf: toolbarLayout(
@@ -501,12 +502,13 @@ export class Config {
                 { left: [], center: [
                     toolbarButton("showMenuFile"), toolbarButton("showMenuSort"), toolbarButton("showMenuCopy"),
                     toolbarButton("dragDropFile"), toolbarButton("showDeleteMsg"),
-                    toolbarSeparator("pdf-info-type"), toolbarInfo("infoType"),
+                    toolbarSeparator("pdf-info-type"), toolbarInfo("infoTypeSize"),
                     toolbarSeparator("pdf-info-write-time"), toolbarInfo("infoWriteTime"),
                 ], right: [toolbarButton("favorites"), toolbarButton("showSetting")] },
                 [
                     toolbarAvailableButton("prevFile"), toolbarAvailableButton("nextFile"),
                     toolbarAvailableButton("prevDir"), toolbarAvailableButton("nextDir"),
+                    ...["infoType", "infoFileSize", "infoWriteDate", "infoCreationTime", "infoCreationDate"].map(name => ({ type: "info" as const, name })),
                 ]
             ),
             txt: toolbarLayout(
@@ -517,12 +519,13 @@ export class Config {
                 { left: [], center: [
                     toolbarButton("showMenuFile"), toolbarButton("showSave"), toolbarButton("showMenuSort"),
                     toolbarButton("showMenuCopy"), toolbarButton("dragDropFile"), toolbarButton("showDeleteMsg"),
-                    toolbarSeparator("txt-info-type"), toolbarInfo("infoType"),
+                    toolbarSeparator("txt-info-type"), toolbarInfo("infoTypeSize"),
                     toolbarSeparator("txt-info-write-time"), toolbarInfo("infoWriteTime"),
                 ], right: [toolbarButton("favorites"), toolbarButton("showSetting")] },
                 [
                     toolbarAvailableButton("prevFile"), toolbarAvailableButton("nextFile"),
                     toolbarAvailableButton("prevDir"), toolbarAvailableButton("nextDir"),
+                    ...["infoType", "infoFileSize", "infoWriteDate", "infoCreationTime", "infoCreationDate"].map(name => ({ type: "info" as const, name })),
                 ]
             ),
             bulkView: toolbarLayout(
