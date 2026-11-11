@@ -29,7 +29,7 @@ Tiefsee
 
 > 運行需求：64位元的 Windows 10 或 Windows 11
 
-### 當前版本 Tiefsee 4.3.2
+### 當前版本 Tiefsee 4.3.3
 
  - <a href="https://apps.microsoft.com/store/detail/9N04QDXBNMCQ?launch=true&mode=full">
 	<img src="https://get.microsoft.com/images/zh-tw%20dark.svg"/></a>
@@ -51,7 +51,7 @@ Tiefsee
 - 大量瀏覽模式：一次載入多張圖片，以垂直捲動的方式查看圖片
 - QuickLook：長按空白鍵預覽在桌面或資料夾選中的檔案
 - 其他附加功能：PDF閱讀器、MD編輯器、文字檔編輯器、docx 與 pptx 閱讀器
-- 界面語言：English、中文
+- 界面語言：English、中文、简体中文、日本語、Русский
  
 <br>
 
