@@ -15,6 +15,7 @@ public class StartWindow : Form {
     private string desktopDir;
     /// <summary> 接收 Native host 啟動命令的 Pipe server </summary>
     private InstancePipeServer instancePipeServer;
+    private Form hideIconConfirmForm;
 
     public StartWindow() {
 
@@ -210,7 +211,7 @@ public class StartWindow : Form {
 
         ToolStripMenuItem item2 = new ToolStripMenuItem("Hide Icon");
         item2.Click += (sender2, e2) => {
-            nIcon.Visible = false;
+            ShowHideIconConfirmation(nIcon);
         };
         cm.Items.Add(item2);
 
@@ -223,6 +224,66 @@ public class StartWindow : Form {
         cm.Items.Add(item3);
 
         nIcon.ContextMenuStrip = cm;
+    }
+
+    /// <summary>
+    /// 顯示隱藏通知區圖示的確認對話框
+    /// </summary>
+    private void ShowHideIconConfirmation(NotifyIcon nIcon) {
+        if (hideIconConfirmForm != null && hideIconConfirmForm.IsDisposed == false) {
+            hideIconConfirmForm.BringToFront();
+            hideIconConfirmForm.Activate();
+            return;
+        }
+
+        Form confirmForm = new() {
+            Text = "Hide Tiefsee icon?",
+            Font = new Font("Segoe UI", 11F),
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            StartPosition = FormStartPosition.CenterScreen,
+            ClientSize = new Size(390, 142),
+            ShowIcon = false,
+            ShowInTaskbar = false,
+            MaximizeBox = false,
+            MinimizeBox = false
+        };
+
+        Label message = new() {
+            AutoSize = false,
+            Location = new Point(18, 18),
+            Size = new Size(354, 44),
+            Text = "The icon will disappear from the notification area.\nTiefsee will keep running in the background."
+        };
+
+        Button keepIconButton = new() {
+            Text = "Keep Icon",
+            Location = new Point(174, 92),
+            Size = new Size(96, 30),
+            TabIndex = 0
+        };
+        keepIconButton.Click += (sender, e) => confirmForm.Close();
+
+        Button hideIconButton = new() {
+            Text = "Hide Icon",
+            Location = new Point(276, 92),
+            Size = new Size(96, 30),
+            TabIndex = 1
+        };
+        hideIconButton.Click += (sender, e) => {
+            nIcon.Visible = false;
+            confirmForm.Close();
+        };
+
+        confirmForm.Controls.Add(message);
+        confirmForm.Controls.Add(keepIconButton);
+        confirmForm.Controls.Add(hideIconButton);
+        confirmForm.AcceptButton = keepIconButton;
+        confirmForm.CancelButton = keepIconButton;
+        confirmForm.FormClosed += (sender, e) => hideIconConfirmForm = null;
+
+        hideIconConfirmForm = confirmForm;
+        confirmForm.Show();
+        confirmForm.Activate();
     }
 
     /// <summary>
