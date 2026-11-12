@@ -57,7 +57,7 @@ export class TiefseeviewPositionController {
     }
 
     async setXY(left: number | undefined, top: number | undefined, animationDuration: number): Promise<void> {
-        const { container, data } = this.options;
+        const { container } = this.options;
         if (top === undefined) { top = this.options.toNumber(container.style.top); }
         if (left === undefined) { left = this.options.toNumber(container.style.left); }
         this.options.onChangeXY(left, top);
@@ -71,11 +71,8 @@ export class TiefseeviewPositionController {
                 $(container).animate(
                     { top, left },
                     {
-                        step: () => {
-                            // @ts-ignore
-                            const position: { left: number; top: number } = $(data).animate()[0];
-                            container.style.top = position.top + "px";
-                            container.style.left = position.left + "px";
+                        // step 在各屬性寫入前呼叫；progress 則在本幀兩個座標都更新後呼叫。
+                        progress: () => {
                             this.options.draw();
                             this.initScroll();
                         },

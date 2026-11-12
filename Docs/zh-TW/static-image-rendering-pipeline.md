@@ -46,7 +46,9 @@ WebGPU Lanczos3 將來源重採樣到 viewport backing-buffer 尺寸，結果與
 
 ### 平移 overscan 快取與首次顯示
 
-WebGL backing canvas 在 viewport 四周各多繪 **50 CSS px**，CSS canvas 起點設為 `(-50, -50)`；Lanczos 輸出 canvas 仍保持 viewport 尺寸。Renderer 記錄上次完整繪製的 ViewState。圖片、顯示尺寸、viewport、DPR、render DPI、旋轉、鏡像及矩陣線性部分相同，且平移方向確實有溢位時，若相對快取基準的 x/y 位移都在 50 px 內，就以 CSS `translate3d` 移動現有 canvas，不清畫布或重送 WebGL draw。任一條件不符或超出邊界便完整重繪並建立新的快取基準；視窗 resize 和來源更換會清除基準。高畫質 tile 可視範圍也包含這 50 px overscan，讓快取移動期間有足夠解析度。
+WebGL backing canvas 在 viewport 四周各多繪 **256 CSS px**，CSS canvas 起點設為 `(-256, -256)`；Lanczos 輸出 canvas 仍保持 viewport 尺寸。Renderer 記錄上次完整繪製的 ViewState。圖片、顯示尺寸、viewport、DPR、render DPI、旋轉、鏡像及矩陣線性部分相同，且平移方向確實有溢位時，以 CSS `translate3d` 移動現有 canvas。相對快取基準的 x/y 位移任一超過 128 px 時便排程重繪，保留其餘 128 px 讓畫面在等待重繪期間繼續移動。視窗 resize 和來源更換會清除基準。高畫質 tile 可視範圍也包含這 256 px overscan，讓快取移動期間有足夠解析度；較大畫布會增加 GPU 記憶體及繪製範圍。
+
+純平移已有重繪排程時仍持續更新位移，避免畫面停留在舊位置；若重繪前移動超出快取，邊緣仍可能短暫露空。圖片、尺寸或旋轉等狀態改變時不套用此做法。
 
 首次載入來源時，`FileShow` 等待圖片 transform 初始化，再套用縮放與對齊，最後呼叫 `showWebGLImage()`。Renderer 在此之前不顯示 WebGL 預覽；一般平滑模式先以預覽 bitmap 產生 Lanczos3 首幀，等待期間排程中的 WebGL draw 不得搶先揭露。像素模式或 Lanczos3 不適用時，才以 WebGL 最近點取樣繪製首幀並顯示。新來源取代舊來源時，舊畫面會保留到新來源完成顯示切換；首幀繪製失敗時不會顯示未確認完成的 WebGL backing canvas，後續成功的 Renderer 繪製可完成顯示。
 

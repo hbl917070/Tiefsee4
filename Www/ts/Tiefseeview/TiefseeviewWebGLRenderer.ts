@@ -38,8 +38,8 @@ interface WebGLDisjointTimerQueryExtension {
 /** 固定 viewport 的 WebGL 2 靜態圖片 Renderer；不操作 Tiefseeview 的 DOM 變形層。 */
 export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private readonly idleQualityDelayMs = 100;
-    /** 預先多繪 viewport 周圍區域；在這個距離內平移只移動合成器圖層。 */
-    private readonly panOverscanCss = 50;
+    /** 預先多繪 viewport 周圍區域，並保留一半距離供排程重繪時移動。 */
+    private readonly panOverscanCss = 256;
     private readonly gl: WebGL2RenderingContext;
     private readonly program: WebGLProgram;
     private readonly buffer: WebGLBuffer;
@@ -188,10 +188,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             this.canvas.style.visibility = "visible";
         }
         const panOffset = this.getCachedPanOffset(state);
-        if (!this.sourceRevealPending && panOffset !== null && this.renderFrame === 0 && !this.canvasSizeDirty) {
+        if (!this.sourceRevealPending && panOffset !== null && !this.canvasSizeDirty) {
+            // 即使超出快取或已有重繪排程，也先讓舊畫面跟上位置；邊緣可暫時露空。
             this.canvas.style.transform = `translate3d(${panOffset.x}px, ${panOffset.y}px, 0)`;
-            if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
-            return;
+            if (Math.abs(panOffset.x) <= this.panOverscanCss / 2 && Math.abs(panOffset.y) <= this.panOverscanCss / 2 &&
+                this.renderFrame === 0) {
+                if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
+                return;
+            }
         }
         if (!this.hasPanOverflow(state)) {
             // 圖片縮到可完整置中時，舊平移快取的 layer offset 不再代表控制器的位置。
@@ -1328,7 +1332,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if ((!overflow.x && Math.abs(deltaX) > 1e-6) || (!overflow.y && Math.abs(deltaY) > 1e-6)) return null;
         const x = overflow.x ? deltaX : 0;
         const y = overflow.y ? deltaY : 0;
-        return Math.abs(x) <= this.panOverscanCss && Math.abs(y) <= this.panOverscanCss ? { x, y } : null;
+        return { x, y };
     }
 
     private getPanOverflow(state: TiefseeviewViewState): { x: boolean; y: boolean } {
