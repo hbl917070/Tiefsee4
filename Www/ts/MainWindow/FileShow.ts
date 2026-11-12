@@ -6,6 +6,7 @@ import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
 import { VideoToolbar } from "./VideoToolbar";
 import { TiefseeviewWebGPUUnsupportedError } from "../Tiefseeview/TiefseeviewLanczosRenderer";
+import { isRenderDiagnosticsEnabled } from "../Tiefseeview/TiefseeviewDiagnostics";
 
 export class FileShow {
 
@@ -362,7 +363,7 @@ export class FileShow {
                         ...imgData.tileOnlyScales.map(scale => ({ scale }))
                     ];
                     const imageSource = new TiefseeviewUrlImageSource(width, height, sourceLevels, getTileUrl);
-                    console.info("[Tiefseeview Renderer] 使用 WebGL", {
+                    if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview Renderer] 使用 WebGL", {
                         width,
                         height,
                         levelScales: sourceLevels.map(item => item.scale),
@@ -391,7 +392,7 @@ export class FileShow {
                         }
                     }
                 } else {
-                    console.info("[Tiefseeview Renderer] 使用 Canvas", {
+                    if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview Renderer] 使用 Canvas", {
                         width,
                         height,
                         levelScales: arUrl.map(item => item.scale)

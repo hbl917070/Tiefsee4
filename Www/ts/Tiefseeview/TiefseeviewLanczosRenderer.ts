@@ -1,4 +1,5 @@
 import type { TiefseeviewViewState } from "./TiefseeviewTypes";
+import { isRenderDiagnosticsEnabled } from "./TiefseeviewDiagnostics";
 import lanczosShader from "./shaders/lanczos3.wgsl";
 import displayShader from "./shaders/display.wgsl";
 
@@ -139,7 +140,7 @@ export class TiefseeviewLanczosRenderer {
         else if (effectiveScale < 0.25 || !Number.isFinite(effectiveScale)) skipReason = "來源倍率過高，Lanczos 取樣範圍過大";
         else if (matrix.a * matrix.d - matrix.b * matrix.c === 0) skipReason = "ViewState 矩陣不可逆";
         if (skipReason !== null) {
-            console.info("[Tiefseeview WebGL] 略過 Lanczos3 viewport 重採樣", { reason: skipReason, targetScale, sourceScale, effectiveScale });
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過 Lanczos3 viewport 重採樣", { reason: skipReason, targetScale, sourceScale, effectiveScale });
             this.hide();
             return false;
         }

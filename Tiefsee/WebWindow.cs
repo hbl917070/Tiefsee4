@@ -269,6 +269,7 @@ public class WebWindow : FormNone {
             settingPath = Program.runtimeContext.AppDataSetting,
             quickLookRunType = quickLookRunType,
             isWin11 = _systemEnvironmentHelper.IsWindows11(),
+            renderDiagnostics = Environment.GetEnvironmentVariable("TIEFSEE_RENDER_DIAGNOSTICS") == "1",
             isStoreApp = Program.runtimeContext.IsStoreApp
         };
 

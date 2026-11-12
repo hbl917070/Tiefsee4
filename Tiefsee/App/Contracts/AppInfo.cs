@@ -29,6 +29,8 @@ public class AppInfo {
     public bool isStoreApp { get; set; }
     /// <summary> 是否為 win11 </summary>
     public bool isWin11 { get; set; }
+    /// <summary> 是否啟用圖片渲染診斷 </summary>
+    public bool renderDiagnostics { get; set; }
     /// <summary> 哪些擴充是有啟用的 </summary>
     public PluginAvailability plugin { get; set; } = PluginRegistry.pluginAvailability;
 }

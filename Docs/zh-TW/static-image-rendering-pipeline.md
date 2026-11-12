@@ -56,7 +56,7 @@ WebGL backing canvas 在 viewport 四周各多繪 **256 CSS px**，CSS canvas �
 
 ### 平移效能診斷
 
-Canvas 與 WebGL Renderer 在偵測到純平移並停止 350 ms 後，各輸出一筆 `[Tiefsee render performance] pan` 摘要。摘要包含 ViewState 更新數、Renderer 呼叫數、Renderer 呼叫經過時間分位數、Renderer 自行取樣的 `requestAnimationFrame` 間隔，以及 Canvas 重繪數或 WebGL draw call 和可用時的 GPU timer query。Canvas 的 `drawElapsedMs` 涵蓋非同步 `createImageBitmap` 工作，不等同純 JavaScript CPU 時間；WebGL GPU query 非同步讀取，只涵蓋 GPU 命令執行時間。Renderer 的 RAF 間隔不等於螢幕實際呈現影格。
+僅在啟用渲染診斷時，Canvas 與 WebGL Renderer 才會取樣，並在偵測到純平移停止 350 ms 後輸出 `[Tiefsee render performance] pan` 摘要；啟用方式見 [AI 自動化測試](ai-automated-testing.md#啟用渲染診斷)。摘要包含 ViewState 更新數、Renderer 呼叫數、Renderer 呼叫經過時間分位數、Renderer 自行取樣的 `requestAnimationFrame` 間隔，以及 Canvas 重繪數或 WebGL draw call 和可用時的 GPU timer query。Canvas 的 `drawElapsedMs` 涵蓋非同步 `createImageBitmap` 工作，不等同純 JavaScript CPU 時間；WebGL GPU query 非同步讀取，只涵蓋 GPU 命令執行時間。Renderer 的 RAF 間隔不等於螢幕實際呈現影格。
 
 ## Tile 產生與座標
 

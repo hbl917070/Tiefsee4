@@ -1,4 +1,5 @@
 import type { TiefseeviewViewState } from "./TiefseeviewTypes";
+import { isRenderDiagnosticsEnabled } from "./TiefseeviewDiagnostics";
 
 /** 暫存診斷：聚合純平移期間的 Renderer 時間，避免逐幀輸出影響量測。 */
 export class TiefseeviewRenderPerformanceMonitor {
@@ -30,6 +31,7 @@ export class TiefseeviewRenderPerformanceMonitor {
     }
 
     public setViewState(state: TiefseeviewViewState): void {
+        if (!isRenderDiagnosticsEnabled()) return;
         const previous = this.previousState;
         this.previousState = state;
         if (previous === null || !previous.image.isReady || !state.image.isReady) return;

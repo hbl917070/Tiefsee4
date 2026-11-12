@@ -628,6 +628,9 @@ interface AppInfo {
     /** 是否為 win11 */
     isWin11: boolean;
 
+    /** 是否啟用圖片渲染診斷 */
+    renderDiagnostics: boolean;
+
     /** 判斷哪些擴充有啟用 */
     plugin: AppInfoPlugin;
 }

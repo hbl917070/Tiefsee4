@@ -22,6 +22,16 @@
 
 `Tests/WebView2TestAutomation` 是隨專案提交的測試基礎設施，不是產品執行相依。`CdpTest.mjs` 提供多視窗定向、DOM 檢查與 CDP 輸入；`Start-DebugWithCdp.ps1` 啟動隔離的 Debug apphost，並可傳入圖片路徑。
 
+### 啟用渲染診斷
+
+一般啟動及隔離測試版預設不輸出渲染流程日誌，也不執行平移效能取樣。要取得 `tiefsee_drag` 的 `renderPerformance` 或 `qualityEvents`，建置後使用 `-RenderDiagnostics` 啟動隔離測試版：
+
+```powershell
+./Tests/WebView2TestAutomation/Start-DebugWithCdp.ps1 -RenderDiagnostics "C:\path\to\test-image.jpg"
+```
+
+此參數只為該測試程序設定 `TIEFSEE_RENDER_DIAGNOSTICS=1`，與開啟 CDP 的 `TIEFSEE_ENABLE_TEST_CDP` 相互獨立。要在其他啟動方式啟用時，在啟動 Tiefsee 的程序環境中設定 `TIEFSEE_RENDER_DIAGNOSTICS=1`；只有值為 `1` 才啟用。開關在程序啟動時決定，已執行的單一實例不會因後續啟動命令而改變，需先結束該實例。診斷不會啟用 CDP；錯誤及異常警告不受此開關影響。
+
 MCP server 會在同一個 AI 工作階段中重用仍有效的本機 CDP WebSocket，並在每次操作時重新讀取目前的 DevTools port 和頁面清單，再依 `windowId` 確認目標。視窗關閉或 WebView2 連線中斷後，舊連線會移除並於下次操作重新建立。`CdpTest.mjs call` 是一次性 CLI 呼叫，每次命令結束就會關閉連線；連續操作時優先使用 MCP，避免每個命令都重新建立 Node 程序與 WebSocket。
 
 ## 一次性設定 MCP

@@ -62,9 +62,9 @@ export class TiefseeviewCanvasRenderer implements TiefseeviewRenderer {
 
     /** Renderer 合約入口；舊 Canvas 繼續使用既有 DOM 與繪製演算法。 */
     public async render(isImmediatelyRun?: boolean): Promise<void> {
-        const startedAt = performance.now();
+        const startedAt = this.performanceMonitor.isPanActive ? performance.now() : 0;
         await this.draw(isImmediatelyRun);
-        this.performanceMonitor.recordFrame(performance.now() - startedAt);
+        if (startedAt !== 0) this.performanceMonitor.recordFrame(performance.now() - startedAt);
     }
 
     /** 此相容 Renderer 不持有獨立資源；快取與 Worker 仍由 CanvasCache 管理。 */

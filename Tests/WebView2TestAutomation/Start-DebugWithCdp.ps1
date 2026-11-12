@@ -1,4 +1,5 @@
 param(
+    [switch]$RenderDiagnostics,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$AppArgs
 )
@@ -41,6 +42,7 @@ $startInfo.FileName = $appPath
 $startInfo.WorkingDirectory = $repoRoot
 $startInfo.UseShellExecute = $false
 $startInfo.Environment["TIEFSEE_ENABLE_TEST_CDP"] = "1"
+$startInfo.Environment["TIEFSEE_RENDER_DIAGNOSTICS"] = if ($RenderDiagnostics) { "1" } else { "0" }
 $startInfo.Environment["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--remote-debugging-port=0"
 foreach ($argument in $AppArgs) {
     $startInfo.ArgumentList.Add($argument)

@@ -1,5 +1,6 @@
 import type { TiefseeviewImageSource, TiefseeviewImageSourceRegion } from "./TiefseeviewImageSource";
 import { TiefseeviewRenderPerformanceMonitor } from "./TiefseeviewRenderPerformanceMonitor";
+import { isRenderDiagnosticsEnabled } from "./TiefseeviewDiagnostics";
 import type { TiefseeviewImageRenderer, TiefseeviewViewState } from "./TiefseeviewTypes";
 import { TiefseeviewLanczosRenderer, TiefseeviewWebGPUUnsupportedError } from "./TiefseeviewLanczosRenderer";
 
@@ -172,7 +173,9 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.clearColor(0, 0, 0, 0);
         this.textureLimit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-        this.gpuTimerExtension = gl.getExtension("EXT_disjoint_timer_query_webgl2") as WebGLDisjointTimerQueryExtension | null;
+        this.gpuTimerExtension = isRenderDiagnosticsEnabled()
+            ? gl.getExtension("EXT_disjoint_timer_query_webgl2") as WebGLDisjointTimerQueryExtension | null
+            : null;
         this.performanceMonitor.setGpuTimerSupported(this.gpuTimerExtension !== null);
         canvas.style.pointerEvents = "none";
         canvas.style.display = "none";
@@ -290,7 +293,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                 : bitmap === null ? "沒有預覽 bitmap"
                     : sourceScale === null ? "沒有預覽倍率"
                         : "Lanczos3 不適用或未完成";
-        console.info("[Tiefseeview WebGL] 首幀渲染策略", {
+        if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 首幀渲染策略", {
             strategy: useLanczos ? "等待 Lanczos3" : "WebGL fallback",
             fallbackReason: useLanczos ? null : fallbackReason,
             sourceScale,
@@ -307,14 +310,14 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                     renderer.show();
                     this.sourceVisible = true;
                     this.sourceRevealPending = false;
-                    console.info("[Tiefseeview WebGL] 首幀已由 Lanczos3 顯示", { sourceScale });
+                    if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 首幀已由 Lanczos3 顯示", { sourceScale });
                     this.scheduleIdleQualityUpdate("預覽顯示後");
                     return;
                 }
             }
 
             // 只有確認 Lanczos3 無法提供有效首幀後，才允許 WebGL render 揭露畫面。
-            console.info("[Tiefseeview WebGL] 首幀改用 WebGL fallback", { reason: fallbackReason });
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 首幀改用 WebGL fallback", { reason: fallbackReason });
             this.sourceRevealPending = true;
             await this.render();
             if (!this.isCurrentSource(source, revision)) return;
@@ -396,7 +399,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             return;
         }
         const level = this.selectPreviewLevel(source);
-        console.info("[Tiefseeview WebGL] 載入預覽層", {
+        if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 載入預覽層", {
             width: source.width,
             height: source.height,
             targetScale: this.getTargetScale(),
@@ -511,22 +514,22 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private async loadBestLevel(): Promise<void> {
         const source = this.source;
         if (source === null) {
-            console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有圖片來源");
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有圖片來源");
             return;
         }
         // 預覽尚未上傳時不能啟動高品質請求，否則它可能中止唯一的完整圖片載入。
         if (this.activeLevelScale === null || this.tiles.length === 0) {
-            console.info("[Tiefseeview WebGL] 略過高畫質更新：完整預覽尚未就緒");
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過高畫質更新：完整預覽尚未就緒");
             return;
         }
         const targetScale = this.getTargetScale();
         // 選足以覆蓋螢幕倍率的最小來源層；nearest 會在原圖層存在時仍選到模糊的低解析縮圖。
         const level = this.selectSourceLevel(source.levels, targetScale);
         if (level === undefined) {
-            console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有可用層級");
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有可用層級");
             return;
         }
-        console.info("[Tiefseeview WebGL] 閒置後檢查高畫質層", {
+        if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 閒置後檢查高畫質層", {
             targetScale,
             previewScale: this.activeLevelScale,
             qualityScale: level.scale,
@@ -541,7 +544,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             if (this.activeQualityScale !== null) source.releaseLevel?.(this.activeQualityScale);
             this.activeQualityScale = null;
             this.scheduleRender();
-            console.info("[Tiefseeview WebGL] 目前來源層已符合目標倍率", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 目前來源層已符合目標倍率", {
                 sourceScale: this.activeLevelScale,
                 targetScale
             });
@@ -553,7 +556,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         const canLoadCompleteLevel = level.url !== undefined && levelWidth <= this.textureLimit &&
             levelHeight <= this.textureLimit && levelPixels <= this.maxSourcePixels;
         if (canLoadCompleteLevel) {
-            console.info("[Tiefseeview WebGL] 使用符合預算的完整來源層", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 使用符合預算的完整來源層", {
                 scale: level.scale,
                 width: levelWidth,
                 height: levelHeight,
@@ -565,7 +568,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             return;
         }
         if (source.supportsRegionalRequests !== true || source.requestTile === undefined) {
-            console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有符合資源限制的完整層或 tile 來源", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過高畫質更新：沒有符合資源限制的完整層或 tile 來源", {
                 scale: level.scale,
                 width: levelWidth,
                 height: levelHeight,
@@ -576,7 +579,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         }
         const rect = this.getVisibleImageRect(source);
         if (rect === null) {
-            console.info("[Tiefseeview WebGL] 略過 tile：無法計算可見圖片區域", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過 tile：無法計算可見圖片區域", {
                 viewportWidth: this.widthCss,
                 viewportHeight: this.heightCss,
                 viewState: this.viewState
@@ -600,7 +603,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             }
         }
         if (tileRequests.length === 0 || tileRequests.length > 32) {
-            console.info("[Tiefseeview WebGL] 略過 tile：可見 tile 數量不在允許範圍", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過 tile：可見 tile 數量不在允許範圍", {
                 rect,
                 tileCount: tileRequests.length
             });
@@ -609,7 +612,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         const regionKey = `${level.scale}:${tileRequests.map(tile => `${tile.tileX},${tile.tileY}`).join(";")}`;
         if (regionKey === this.qualityRegionKey &&
             (this.isPixelatedRendering(this.viewState) || this.qualityLanczosRegionKey === regionKey)) {
-            console.info("[Tiefseeview WebGL] 略過 tile：可見區域與上次相同", { regionKey });
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 略過 tile：可見區域與上次相同", { regionKey });
             return;
         }
         this.clearQualityLanczosSource();
@@ -649,10 +652,10 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             this.qualityRegionKey = regionKey;
             this.qualityLanczosRegionKey = !this.isPixelatedRendering(this.viewState) ? regionKey : "";
             this.scheduleRender();
-            console.info("[Tiefseeview WebGL] 可見高畫質 tile 已在快取", { regionKey });
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 可見高畫質 tile 已在快取", { regionKey });
             return;
         }
-        console.info("[Tiefseeview WebGL] 請求高畫質 tile", {
+        if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 請求高畫質 tile", {
             scale: level.scale,
             rect,
             requestCount: workRequests.length,
@@ -747,7 +750,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             this.activeQualityScale = level.scale;
             this.qualityRegionKey = regionKey;
             this.scheduleRender();
-            console.info("[Tiefseeview WebGL] 高畫質 tile 已載入", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 高畫質 tile 已載入", {
                 scale: level.scale,
                 tileCount: loadedTileCount,
                 lanczosAtlas: this.qualityLanczosBitmap === null ? "unavailable" : {
@@ -875,7 +878,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private scheduleIdleQualityUpdate(reason: string): void {
         window.clearTimeout(this.qualityTimer);
         this.qualityTimer = window.setTimeout(() => {
-            console.info(`[Tiefseeview WebGL] 閒置 ${this.idleQualityDelayMs} ms 後開始高品質更新`, { reason });
+            if (isRenderDiagnosticsEnabled()) console.info(`[Tiefseeview WebGL] 閒置 ${this.idleQualityDelayMs} ms 後開始高品質更新`, { reason });
             void this.loadIdleQuality().catch(error => {
                 if (!(error instanceof DOMException && error.name === "AbortError")) {
                     console.warn("WebGL 停止操作後更新圖片品質失敗。", error);
@@ -913,7 +916,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         const hasLanczosTiles = !pixelated && qualityScale !== null && qualityScale >= targetScale && this.qualityTiles.length > 0;
 
         if (lanczosBitmap === null && sharpenValue <= 0) {
-            console.info("[Tiefseeview WebGL] 閒置品質來源已就緒", {
+            if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 閒置品質來源已就緒", {
                 qualityPath: hasLanczosTiles ? "後端 Lanczos3 tile" : "保留 WebGL 即時畫面",
                 rendering: this.getImageRendering(),
                 pixelated,
@@ -950,7 +953,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
             this.canvas.style.visibility = "hidden";
             renderer.show();
             if (usedLanczos) {
-                console.info("[Tiefseeview WebGL] 閒置後完成 Lanczos3 viewport 重採樣", {
+                if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 閒置後完成 Lanczos3 viewport 重採樣", {
                     rendering: this.getImageRendering(),
                     pixelated,
                     previewScale: sourceScale,
@@ -966,7 +969,7 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                     lanczosCanvasVisibility: this.lanczosCanvas.style.visibility
                 });
             } else {
-                console.info("[Tiefseeview WebGL] 閒置後完成 viewport 銳化", {
+                if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 閒置後完成 viewport 銳化", {
                     rendering: this.getImageRendering(),
                     pixelated,
                     sourceScale,
@@ -991,13 +994,13 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
                     return null;
                 }
                 this.lanczosRenderer = renderer;
-                if (renderer === null) console.info("[Tiefseeview WebGL] 此 WebView 不支援 WebGPU，保留 WebGL 預覽");
+                if (renderer === null && isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 此 WebView 不支援 WebGPU，保留 WebGL 預覽");
                 return renderer;
             })
             .catch(error => {
                 this.lanczosRendererInitError = error;
                 if (error instanceof TiefseeviewWebGPUUnsupportedError) {
-                    console.info("[Tiefseeview WebGL] 此 WebView 不支援 WebGPU", error);
+                    if (isRenderDiagnosticsEnabled()) console.info("[Tiefseeview WebGL] 此 WebView 不支援 WebGPU", error);
                 } else {
                     console.warn("WebGPU Lanczos3 初始化失敗。", error);
                 }
@@ -1256,12 +1259,12 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         if (this.disposed || this.isReplacingSource || this.renderFrame !== 0) return;
         this.renderFrame = requestAnimationFrame(() => {
             this.renderFrame = 0;
-            const startedAt = performance.now();
+            const startedAt = this.performanceMonitor.isPanActive ? performance.now() : 0;
             const gpuQuery = this.beginGpuTimerQuery();
             try {
                 if (this.canvasSizeDirty) this.resizeCanvases();
                 this.draw();
-                this.performanceMonitor.recordFrame(performance.now() - startedAt, this.frameDrawCalls);
+                if (startedAt !== 0) this.performanceMonitor.recordFrame(performance.now() - startedAt, this.frameDrawCalls);
                 if (this.sourceRevealPending && this.source !== null && this.viewState !== null &&
                     (this.tiles.length > 0 || this.qualityTiles.length > 0) && this.widthCss > 0 && this.heightCss > 0) {
                     this.sourceRevealPending = false;
