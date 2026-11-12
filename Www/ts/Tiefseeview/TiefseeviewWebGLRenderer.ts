@@ -59,6 +59,8 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     private readonly vertexData = new Float32Array(16);
     private source: TiefseeviewImageSource | null = null;
     private viewState: TiefseeviewViewState | null = null;
+    private viewRendering: number | null = null;
+    private viewSharpenValue: number | null = null;
     private cachedViewState: TiefseeviewViewState | null = null;
     private widthCss = 0;
     private heightCss = 0;
@@ -178,7 +180,17 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
     }
 
     public setViewState(state: TiefseeviewViewState): void {
+        const previous = this.viewState;
+        const rendering = this.getImageRendering();
+        const sharpenValue = this.getSharpenValue();
+        if (!this.isReplacingSource && previous !== null && this.viewRendering === rendering &&
+            this.viewSharpenValue === sharpenValue && this.isSameViewState(previous, state)) {
+            // 保留同一個狀態物件，讓進行中的非同步高品質更新仍然有效。
+            return;
+        }
         this.viewState = state;
+        this.viewRendering = rendering;
+        this.viewSharpenValue = sharpenValue;
         if (this.isReplacingSource) return;
         this.performanceMonitor.setViewState(state);
         this.cancelPendingQualityRequest();
@@ -203,6 +215,19 @@ export class TiefseeviewWebGLRenderer implements TiefseeviewImageRenderer {
         }
         this.scheduleRender();
         if (this.source !== null) this.scheduleIdleQualityUpdate("操作停止後");
+    }
+
+    private isSameViewState(a: TiefseeviewViewState, b: TiefseeviewViewState): boolean {
+        return a.image.width === b.image.width && a.image.height === b.image.height &&
+            a.image.displayWidthCss === b.image.displayWidthCss && a.image.displayHeightCss === b.image.displayHeightCss &&
+            a.image.isReady === b.image.isReady && a.viewport.widthCss === b.viewport.widthCss &&
+            a.viewport.heightCss === b.viewport.heightCss && a.viewport.devicePixelRatio === b.viewport.devicePixelRatio &&
+            a.viewport.renderDpiZoom === b.viewport.renderDpiZoom && a.container.leftCss === b.container.leftCss &&
+            a.container.topCss === b.container.topCss && a.transform.rotationDeg === b.transform.rotationDeg &&
+            a.transform.mirrorHorizontal === b.transform.mirrorHorizontal && a.transform.mirrorVertical === b.transform.mirrorVertical &&
+            a.imageToViewport.a === b.imageToViewport.a && a.imageToViewport.b === b.imageToViewport.b &&
+            a.imageToViewport.c === b.imageToViewport.c && a.imageToViewport.d === b.imageToViewport.d &&
+            a.imageToViewport.e === b.imageToViewport.e && a.imageToViewport.f === b.imageToViewport.f;
     }
 
     public render(_isImmediatelyRun?: boolean): Promise<void> {
