@@ -1,6 +1,5 @@
 using System.IO;
 using System.Windows.Input;
-using Windows.UI.StartScreen;
 
 namespace Tiefsee;
 
@@ -16,6 +15,8 @@ public class StartWindow : Form {
     /// <summary> 接收 Native host 啟動命令的 Pipe server </summary>
     private InstancePipeServer instancePipeServer;
     private Form hideIconConfirmForm;
+    private System.Windows.Shell.JumpList jumpList;
+    private System.Windows.Shell.JumpTask closeAllWindowsJumpTask;
 
     public StartWindow() {
 
@@ -289,23 +290,28 @@ public class StartWindow : Form {
     /// <summary>
     /// 
     /// </summary>
-    public async void InitJumpTask() {
-
-        // 獲取默認的 JumpList
-        var jumpList = await Windows.UI.StartScreen.JumpList.LoadCurrentAsync();
-
-        // 清除默認的 JumpList
-        jumpList.Items.Clear();
+    public void InitJumpTask() {
+        jumpList = new System.Windows.Shell.JumpList {
+            ShowRecentCategory = false,
+            ShowFrequentCategory = false
+        };
 
         if (Program.startType != StartMode.SingleInstance && Program.startType != StartMode.SingleInstanceResident) {
-            var item = JumpListItem.CreateWithArguments("closeAll", "Close All Tiefsee Windows");
-            // item.Description = "Close all Tiefsee";
-            // item.Logo = new Uri("ms-appx:///t1.ico");
-            jumpList.Items.Add(item);
+            closeAllWindowsJumpTask = new System.Windows.Shell.JumpTask {
+                Title = "Close All Tiefsee Windows",
+                Arguments = "closeAll",
+                ApplicationPath = Environment.ProcessPath,
+                IconResourcePath = Path.Combine(Program.runtimeContext.BaseDirectory, "Assets", "close-all-windows.ico"),
+                IconResourceIndex = 0,
+                WorkingDirectory = Program.runtimeContext.BaseDirectory
+            };
+            jumpList.JumpItems.Add(closeAllWindowsJumpTask);
         }
 
-        // 保存 JumpList
-        await jumpList.SaveAsync();
+        var wpfApplication = System.Windows.Application.Current ?? new System.Windows.Application {
+            ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown
+        };
+        System.Windows.Shell.JumpList.SetJumpList(wpfApplication, jumpList);
     }
 
     /// <summary>

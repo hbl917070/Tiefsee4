@@ -18,7 +18,7 @@
 		<Copyright>Copyright © 2021-2026 hbl917070</Copyright>
 		<PackageProjectUrl>https://github.com/hbl917070/Tiefsee4</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/hbl917070/Tiefsee4</RepositoryUrl>
-		<ApplicationIcon>logo.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\logo.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -49,10 +49,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="logo.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q8-OpenMP-x64" Version="15.1.0" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.3" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
@@ -61,6 +57,12 @@
 		<PackageReference Include="Sdcb.LibRaw" Version="0.21.1.7" />
 		<PackageReference Include="Sdcb.LibRaw.runtime.win64" Version="0.21.1" />
 		<PackageReference Include="SharpSevenZip" Version="2.0.130" GeneratePathProperty="true" />
+	</ItemGroup>
+
+	<!-- Assets 依用途分別映射到輸出目錄，不整個資料夾複製。 -->
+	<ItemGroup>
+		<Content Include="Assets\close-all-windows.ico" Link="Assets\close-all-windows.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+		<Content Include="Assets\sqlite3.dll" Link="sqlite3.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<!-- 手動複製 x64 7z.dll 到輸出目錄 -->
@@ -72,14 +74,6 @@
 		<None Update="ReadMe.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<!-- 把 /Data/sqlite3.dll 複製到 輸出根目錄 裡面 -->
-		<Content Include="Data\sqlite3.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>sqlite3.dll</Link>
-		</Content>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -50,6 +50,9 @@
     <Content Include="..\Output\Www\**\*">
       <Link>Tiefsee\Www\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
+    <Content Include="..\Output\Assets\close-all-windows.ico">
+      <Link>Tiefsee\Assets\close-all-windows.ico</Link>
+    </Content>
     <Content Include="Images\BadgeLogo.scale-100.png" />
     <Content Include="Images\BadgeLogo.scale-125.png" />
     <Content Include="Images\BadgeLogo.scale-150.png" />
