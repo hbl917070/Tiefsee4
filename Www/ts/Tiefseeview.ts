@@ -33,6 +33,8 @@ export class Tiefseeview {
     public loadWebGLImage;
     public showWebGLImage;
     public loadVideo;
+    /** 顯示內建錯誤圖，不變更來源檔案資訊。 */
+    public showError: (isCurrent?: () => boolean) => Promise<void>;
     /** 同步釋放目前的影片來源並清除 WebGL 來源。 */
     public clearSource;
     public loadNone; // 載入空白圖片
@@ -370,6 +372,7 @@ export class Tiefseeview {
         this.loadWebGLImage = loadWebGLImage;
         this.showWebGLImage = () => webglRenderer?.showSource();
         this.loadVideo = loadVideo;
+        this.showError = showError;
         this.clearSource = clearMediaSource;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
@@ -630,6 +633,10 @@ export class Tiefseeview {
         // 將 QuickLook 的取消訊號一路傳到原生 video loader。
         function loadVideo(url: string, signal?: AbortSignal) { clearMediaSource(); return mediaLoader.loadVideo(url, signal); }
         function loadImg(url: string) { clearMediaSource(); return mediaLoader.loadImg(url); }
+        function showError(isCurrent?: () => boolean) {
+            clearMediaSource();
+            return mediaLoader.showError(isCurrent);
+        }
         function loadBigimg(url: string) { clearMediaSource(); return mediaLoader.loadBigimg(url); }
         function loadBigimgscale(images: { scale: number, url: string }[], width: number, height: number, zoomType: TiefseeviewZoomType, zoomValue: number) {
             clearMediaSource();

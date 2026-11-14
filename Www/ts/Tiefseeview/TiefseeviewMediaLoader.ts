@@ -169,10 +169,7 @@ export class TiefseeviewMediaLoader {
         video.load();
         this.options.setVideoDuration(-1);
         this.options.setOriginalSize(1, 1);
-        this.options.mediaRenderer.setDataType("img");
-        const errorUrl = this.options.getErrorUrl();
-        await this.preloadImg(errorUrl);
-        this.options.domImg.src = errorUrl;
+        await this.showError(() => this.options.getUrl() === url);
         return false;
     }
 
@@ -182,9 +179,7 @@ export class TiefseeviewMediaLoader {
         const loaded = await this.preloadImg(url);
         this.options.mediaRenderer.setDataType("img");
         if (loaded === false) {
-            const errorUrl = this.options.getErrorUrl();
-            await this.preloadImg(errorUrl);
-            this.options.domImg.src = errorUrl;
+            await this.showError(() => this.options.getUrl() === url);
             return false;
         }
 
@@ -195,6 +190,20 @@ export class TiefseeviewMediaLoader {
         return true;
     }
 
+    /** 顯示內建錯誤圖並使用錯誤圖的顯示尺寸，不改動來源 URL。 */
+    public async showError(isCurrent: () => boolean = () => true): Promise<void> {
+        const errorUrl = this.options.getErrorUrl();
+        await this.preloadImg(errorUrl, false);
+        if (isCurrent() === false) return;
+        const errorImage = this.tempImg;
+        if (errorImage !== undefined && errorImage.naturalWidth > 0 && errorImage.naturalHeight > 0) {
+            this.options.setOriginalSize(errorImage.naturalWidth, errorImage.naturalHeight);
+        }
+        this.options.mediaRenderer.setDataType("img");
+        this.options.domImg.src = errorUrl;
+        this.options.clipFull();
+    }
+
     public async loadBigimg(url: string): Promise<boolean> {
         this.cancelVideoLoad();
         this.options.setUrl(url);
@@ -202,10 +211,7 @@ export class TiefseeviewMediaLoader {
         const loaded = await this.preloadImg(url);
         this.options.mediaRenderer.setDataType("bigimg");
         if (loaded === false) {
-            this.options.mediaRenderer.setDataType("img");
-            const errorUrl = this.options.getErrorUrl();
-            await this.preloadImg(errorUrl);
-            this.options.domImg.src = errorUrl;
+            await this.showError(() => this.options.getUrl() === url);
             return false;
         }
 
@@ -237,10 +243,7 @@ export class TiefseeviewMediaLoader {
         this.options.mediaRenderer.setDataType("bigimgscale");
         const loaded = await this.preloadImg(imageItem.url, false);
         if (loaded === false) {
-            this.options.mediaRenderer.setDataType("img");
-            const errorUrl = this.options.getErrorUrl();
-            await this.preloadImg(errorUrl);
-            this.options.domImg.src = errorUrl;
+            await this.showError(() => this.options.getUrl() === url);
             return false;
         }
 

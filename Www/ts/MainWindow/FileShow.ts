@@ -50,6 +50,7 @@ export class FileShow {
             if (_groupType !== GroupType.video || activeVideoErrorRevision !== viewLoadRevision) return;
             const error = _domVideo.error;
             console.warn("Video playback failed", { code: error?.code, message: error?.message });
+            const videoDuration = _domVideo.duration;
             activeVideoErrorRevision = null;
             _isLoaded = false;
             _videoToolbar.setVisible(false);
@@ -57,7 +58,7 @@ export class FileShow {
             if (_motionPhotoFileInfo !== null) {
                 void openImage(_motionPhotoFileInfo);
             } else {
-                void openErrorImage();
+                void openVideoPlaybackError(videoDuration);
             }
         });
 
@@ -279,6 +280,13 @@ export class FileShow {
             }
         }
 
+        function clearFileToolbarInfo(group: string) {
+            for (const name of ["infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+                const dom = getToolbarItemDom(group, name);
+                if (dom !== null) { setToolbarInfoContent(dom, ""); }
+            }
+        }
+
         /**
          * 更換工具列
          * @param type 
@@ -433,24 +441,34 @@ export class FileShow {
          * 顯示檔案載入失敗時使用的固定錯誤圖片，可供一般檔案與 archive entry 共用。
          *
          * 這裡不能呼叫 openImage，因為 openImage 會依傳入的 FileInfo2
-         * 取得原始檔案的內容或 icon；錯誤 fallback 必須直接載入前端資源，
-         * 才能確保畫面顯示 ./img/error.svg。
+         * 取得原始檔案的內容或 icon；錯誤 fallback 透過 Tiefseeview 內建入口顯示，
+         * 並且不把錯誤圖片尺寸或格式當成來源檔案資訊。
          */
         async function openErrorImage(displayFileInfo2?: FileInfo2) {
             _isLoaded = false;
             setShowType(GroupType.img);
+            const requestRevision = viewLoadRevision;
             _tiefseeview.setLoading(true, 200);
-            await _tiefseeview.loadImg("./img/error.svg");
-            await initTiefseeview(displayFileInfo2 ?? {
-                Type: "file",
-                Path: "./img/error.svg",
-                Lenght: 0,
-                CreationTimeUtc: 0,
-                LastWriteTimeUtc: 0,
-                HexValue: "",
-                FullPath: "./img/error.svg",
-            });
+            await _tiefseeview.showError(() => requestRevision === viewLoadRevision);
+            if (requestRevision !== viewLoadRevision) return;
+            await initErrorTiefseeview(displayFileInfo2, () => requestRevision === viewLoadRevision);
+            if (requestRevision !== viewLoadRevision) return;
             _isLoaded = true;
+        }
+
+        /** 播放期間解碼失敗時只替換畫面，保留已更新的檔案與尺寸資訊。 */
+        async function openVideoPlaybackError(duration: number) {
+            _isLoaded = false;
+            setShowType(GroupType.img);
+            const requestRevision = viewLoadRevision;
+            _tiefseeview.setLoading(true, 200);
+            await _tiefseeview.showError(() => requestRevision === viewLoadRevision);
+            if (requestRevision !== viewLoadRevision) return;
+            if (await initTiefseeviewDisplay(() => requestRevision === viewLoadRevision) === false) return;
+            _isLoaded = true;
+            if (Number.isFinite(duration) && duration > 0) {
+                M.mainExif.updateVideoDuration(duration);
+            }
         }
 
         /**
@@ -495,7 +513,11 @@ export class FileShow {
                 return;
             }
 
-            await initTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
+            if (isVideoLoaded === true) {
+                await initTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
+            } else {
+                await initErrorTiefseeview(fileInfo2, () => requestRevision === viewLoadRevision);
+            }
             if (requestRevision !== viewLoadRevision) return;
             _videoToolbar.setVisible(isVideoLoaded === true);
             _isLoaded = true;
@@ -505,8 +527,30 @@ export class FileShow {
          * 
          */
         async function initTiefseeview(fileInfo2: FileInfo2, isCurrent: () => boolean = () => true) {
+            if (await initTiefseeviewDisplay(isCurrent) === false) return;
+
+            const domSize = getToolbarItemDom(GroupType.img, "infoSize");
+            if (domSize !== null) {
+                setToolbarInfoContent(domSize, `${_tiefseeview.getOriginalWidth()}<br>${_tiefseeview.getOriginalHeight()}`);
+            }
+            updateFileToolbarInfo(GroupType.img, fileInfo2);
+        }
+
+        async function initErrorTiefseeview(fileInfo2?: FileInfo2, isCurrent: () => boolean = () => true) {
+            if (await initTiefseeviewDisplay(isCurrent) === false) return;
+
+            const domSize = getToolbarItemDom(GroupType.img, "infoSize");
+            if (domSize !== null) { setToolbarInfoContent(domSize, "—"); }
+            if (fileInfo2 !== undefined) {
+                updateFileToolbarInfo(GroupType.img, fileInfo2);
+            } else {
+                clearFileToolbarInfo(GroupType.img);
+            }
+        }
+
+        async function initTiefseeviewDisplay(isCurrent: () => boolean = () => true): Promise<boolean> {
             await _tiefseeview.transformRefresh(false); // 初始化 旋轉、鏡像
-            if (isCurrent() === false) return;
+            if (isCurrent() === false) return false;
             _tiefseeview.setLoading(false);
             _tiefseeview.setEventChangeZoom(((ratio: number) => {
                 const txt = (ratio * 100).toFixed(0) + "%"
@@ -526,14 +570,7 @@ export class FileShow {
             _tiefseeview.zoomFull(zoomType, zoomVal);
             _tiefseeview.setAlign(alignType);
             _tiefseeview.showWebGLImage();
-
-            // 圖片長寬
-            const dom_size = getToolbarItemDom(GroupType.img, "infoSize");
-            if (dom_size != null) {
-                setToolbarInfoContent(dom_size, `${_tiefseeview.getOriginalWidth()}<br>${_tiefseeview.getOriginalHeight()}`);
-            }
-
-            updateFileToolbarInfo(GroupType.img, fileInfo2);
+            return true;
         }
 
         /**
