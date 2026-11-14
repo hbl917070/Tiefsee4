@@ -87,12 +87,14 @@ export class TiefseeviewMediaLoader {
         }
     }
 
-    public async loadVideo(url: string): Promise<boolean | undefined> {
+    public async loadVideo(url: string, signal?: AbortSignal): Promise<boolean | undefined> {
+        if (signal?.aborted) return;
         this.cancelVideoLoad();
         const video = this.options.domVideo;
         this.options.setUrl(url);
         video.onloadedmetadata = () => {
-            if (video.videoWidth > 0 && video.videoHeight > 0) {
+            // metadata 可能在放開空白鍵後才到；已取消的工作不得呼叫 play()。
+            if (signal?.aborted !== true && video.videoWidth > 0 && video.videoHeight > 0) {
                 void video.play().catch(() => { });
             }
         };
@@ -101,9 +103,11 @@ export class TiefseeviewMediaLoader {
             let isSettled = false;
             let timeoutId: number | null = null;
             let cancelLoad: () => void;
+            let onAbort: (() => void) | null = null;
             const clearEvent = () => {
                 video.removeEventListener("loadeddata", onLoadedData);
                 video.removeEventListener("error", onError);
+                if (onAbort !== null) signal?.removeEventListener("abort", onAbort);
                 if (timeoutId !== null) {
                     window.clearTimeout(timeoutId);
                     timeoutId = null;
@@ -119,6 +123,8 @@ export class TiefseeviewMediaLoader {
                 resolve(result);
             };
             cancelLoad = () => finish(undefined);
+            // cancelVideoLoad 同時結束等待、暫停影片並移除來源。
+            onAbort = () => this.cancelVideoLoad();
             const onLoadedData = () => {
                 // 音訊軌可能可播放，但若沒有成功辨識出影像軌，影片區會是黑畫面。
                 const hasVideoFrame = video.videoWidth > 0 && video.videoHeight > 0;
@@ -139,6 +145,7 @@ export class TiefseeviewMediaLoader {
                 finish(false);
             };
             this.pendingVideoLoadCancel = cancelLoad;
+            signal?.addEventListener("abort", onAbort, { once: true });
             video.addEventListener("loadeddata", onLoadedData, { once: true });
             video.addEventListener("error", onError, { once: true });
             timeoutId = window.setTimeout(() => {

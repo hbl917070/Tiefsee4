@@ -94,6 +94,8 @@ export class MainWindow {
 
         /** 是否為快速預覽 */
         var _isQuickLook = false;
+        /** 讓同一次 QuickLook 的定位、檔案載入與影片播放共用取消狀態。 */
+        let _quickLookController: AbortController | null = null;
         // 網址下載與瀏覽器拖曳的圖片共用相同的 50 MB 上限（十進位 bytes）
         const maxImageFileSize = 50 * 1000 * 1000;
 
@@ -690,15 +692,18 @@ export class MainWindow {
 
                 if ((isKeyboardSpace && _config.settings.quickLook.keyboardSpaceRun) ||
                     (isMouseMiddle && _config.settings.quickLook.mouseMiddleRun)) {
-
                     if (_startType == 4 || _startType == 5) { // 單純開啟圖片(用於 單一執行個體)
                         WV_Window.ShowWindow(); // 顯示視窗 
                         initLoad(json.args); // 初始載入檔案
                     } else {
+                        _quickLookController?.abort();
+                        const controller = _quickLookController = new AbortController();
                         _isQuickLook = true;
                         _fileShow.openNone(); // 避免卡在上一張圖片
-                        await initQuickLookPosition(); // 初始 快速啟動的坐標   
-                        initLoad(json.args); // 初始 載入檔案
+                        await initQuickLookPosition(controller.signal); // 初始 快速啟動的坐標
+                        // 定位期間可能已放開按鍵；不要再啟動檔案載入。
+                        if (controller.signal.aborted) return;
+                        initLoad(json.args, controller.signal); // 初始 載入檔案
                     }
                     checkDownKey();
                 }
@@ -719,11 +724,17 @@ export class MainWindow {
         async function quickLookUp() {
             // 如果是單一執行個體，就不關閉視窗
             if (_startType === 2 || _startType === 3) {
+                const closingController = _quickLookController;
+                closingController?.abort();
                 // 密碼視窗可能正等待 Promise；先取消並等待 archive 載入流程清理，避免下一次開啟永遠卡在 loading。
                 await _fileLoad.cancelArchivePasswordInput();
+                if (_quickLookController !== closingController) return;
                 // QuickLook 只是隱藏視窗，不會觸發 FormClosed；隱藏前要先釋放 archive session，避免 7z 持續鎖住來源檔。
                 await _fileLoad.leaveArchiveMode();
+                // 等待清理期間可能已開始下一次預覽；舊的關閉流程不能把新視窗藏掉。
+                if (_quickLookController !== closingController) return;
                 _fileShow.openNone();
+                _quickLookController = null;
                 await WV_Window.Hide();
             }
             // console.log("關閉 快速預覽")
@@ -732,11 +743,13 @@ export class MainWindow {
         /** 
          * 初始 快速預覽的視窗坐標
          */
-        async function initQuickLookPosition() {
+        async function initQuickLookPosition(signal: AbortSignal) {
 
             // 取得滑鼠所在的螢幕資訊
             const mousePosition = await WV_System.GetMousePosition();
+            if (signal.aborted) return;
             const screen = await WV_System.GetScreenFromPoint(mousePosition[0], mousePosition[1]);
+            if (signal.aborted) return;
             const screenX = screen[0];
             const screenY = screen[1];
             const screenW = screen[2];
@@ -750,7 +763,9 @@ export class MainWindow {
             const left = screenX + ((screenW - width) / 2);
             const top = screenY + ((screenH - height) / 2);
 
-            await WV_Window.ShowWindowAtPosition(left, top, width, height, "Normal"); // 顯示視窗 
+            // 放開按鍵後不能讓仍在等待定位的 QuickLook 又把視窗顯示出來。
+            if (signal.aborted) return;
+            await WV_Window.ShowWindowAtPosition(left, top, width, height, "Normal"); // 顯示視窗
         }
 
         /** 
@@ -788,7 +803,9 @@ export class MainWindow {
         /** 
          * 初始 載入檔案
          */
-        async function initLoad(args: string[]) {
+        async function initLoad(args: string[], signal?: AbortSignal) {
+            // 一般開檔不傳 signal；QuickLook 傳入同一個工作階段的取消訊號。
+            if (signal?.aborted) return;
             _msgbox.closeAll(); // 關閉所有訊息視窗
             _menu.close();
 
@@ -805,14 +822,17 @@ export class MainWindow {
                 args.shift(); // 把陣列的第一個元素從其中刪除
                 try {
                     const dirPath = await WebAPI.extractFrames(args[0]);
-                    _script.bulkView.show();
-                    await _fileLoad.loadFile(dirPath); // 載入單張圖片
+                    if (signal?.aborted !== true) {
+                        _script.bulkView.show();
+                        await _fileLoad.loadFile(dirPath, undefined, false, 0, signal); // 載入單張圖片
+                    }
                 } catch {
+                    if (signal?.aborted) return;
                     _fileShow.openWelcome();
                     Toast.show(_i18n.t("msg.imageAnalysisFailed"), 1000 * 3); // 圖片解析失敗
+                } finally {
+                    _script.window.enabledLoading(false);
                 }
-
-                _script.window.enabledLoading(false);
                 return;
             }
 
@@ -823,16 +843,18 @@ export class MainWindow {
                 if (args[0] === "") {
                     _fileShow.openWelcome();
                 } else {
-                    await _fileLoad.loadFile(args[0]); // 載入單張圖片
+                    await _fileLoad.loadFile(args[0], undefined, false, 0, signal); // 載入單張圖片
                 }
 
             } else {
 
                 try {
                     const arPath = await WebAPI.Directory.getFiles2(args);
+                    if (signal?.aborted) return;
                     await _fileLoad.loadFiles(arPath); // 載入多張圖片
                 }
                 catch (error) {
+                    if (signal?.aborted) return;
                     // 多檔案來源解析失敗時不進入部分載入狀態，直接回到歡迎頁並提示使用者。
                     console.error("[MainWindow] 多檔案載入失敗。", error);
                     await _fileShow.openWelcome();

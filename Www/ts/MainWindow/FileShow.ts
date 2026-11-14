@@ -456,7 +456,7 @@ export class FileShow {
         /**
          * 載入影片
          */
-        async function openVideo(fileInfo2: FileInfo2) {
+        async function openVideo(fileInfo2: FileInfo2, signal?: AbortSignal) {
 
             _isLoaded = false;
             activeVideoErrorRevision = null;
@@ -476,10 +476,11 @@ export class FileShow {
                 imgurl = await WebAPI.getVideo(path);
             }
 
-            if (requestRevision !== viewLoadRevision) return;
+            // 取得影片 URL 期間可能已放開空白鍵；過期工作不可再建立 video source。
+            if (signal?.aborted || requestRevision !== viewLoadRevision) return;
             _tiefseeview.setLoading(true, 200);
-            const isVideoLoaded = await _tiefseeview.loadVideo(imgurl);
-            if (requestRevision !== viewLoadRevision) return;
+            const isVideoLoaded = await _tiefseeview.loadVideo(imgurl, signal);
+            if (signal?.aborted || requestRevision !== viewLoadRevision) return;
             if (isVideoLoaded === true) {
                 activeVideoErrorRevision = requestRevision;
             }
@@ -626,6 +627,8 @@ export class FileShow {
             baseWindow.setTitle("Tiefsee 4");
             M.fileLoad.setGroupType(GroupType.none);
             setShowType(GroupType.none); // 改變顯示類型
+            // CSS 隱藏影片不會停止播放；清空來源以暫停並釋放影片資源。
+            _tiefseeview.clearSource();
             M.fileLoad.stopFileWatcher();
 
             _tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal);

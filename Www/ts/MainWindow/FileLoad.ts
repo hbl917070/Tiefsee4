@@ -854,14 +854,30 @@ export class FileLoad {
          * @param dirGroupType 
          * @param noLoad true 表示不重新載入圖片，單純更新列表
          * @param flagFile 載入資料夾內的第幾個檔案(僅在載入資料夾時使用)
+         * @param signal 一般檔案載入的可選取消訊號；archive session 由其生命週期另外清理
          */
-        async function loadFile(path: string, dirGroupType?: string, noLoad = false, flagFile: number = 0) {
-
+        async function loadFile(path: string, dirGroupType?: string, noLoad = false, flagFile: number = 0, signal?: AbortSignal) {
+            if (signal?.aborted) return;
             if (_isLoadFileFinish === false) {
                 console.log("loadFile處理中");
                 return;
             }
             _isLoadFileFinish = false;
+            let fileWatcherStarted = false;
+            // Bridge/API 呼叫本身不可取消；在每個等待點檢查，並清理這次載入建立的 watcher。
+            const stopIfAborted = async () => {
+                if (signal?.aborted !== true) return false;
+                if (fileWatcherStarted) {
+                    try {
+                        await stopFileWatcher();
+                    }
+                    catch (error) {
+                        console.warn("QuickLook 取消後停止檔案監控失敗。", error);
+                    }
+                }
+                _isLoadFileFinish = true;
+                return true;
+            };
 
             // 單一支援格式檔案直接進入 archive mode；後端會再驗證檔案內容是否真的是壓縮檔。
             if (isSupportedArchivePath(path)) {
@@ -872,9 +888,13 @@ export class FileLoad {
             _fileLoadType = FileLoadType.dir; // 名單類型，資料夾內的檔案
 
             await leaveArchiveMode();
+            if (signal?.aborted === true && await stopIfAborted()) return;
             // 尚未建立可用清單時，檔案資訊失敗只能清理狀態並返回歡迎頁。
             let fileInfo2: FileInfo2 | undefined = await WebAPI.getFileInfo2(path)
-                .catch(error => showFileLoadFailure(error, "msg.fileReadFailed").then(() => undefined));
+                .catch(error => signal?.aborted === true
+                    ? undefined
+                    : showFileLoadFailure(error, "msg.fileReadFailed").then(() => undefined));
+            if (signal?.aborted === true && await stopIfAborted()) return;
             if (fileInfo2 === undefined) {
                 return;
             }
@@ -891,11 +911,16 @@ export class FileLoad {
 
                 _dirPathNow = path;
                 try {
-                    _arFile = await WebAPI.Directory.getFiles(path, "*.*"); // 取得資料夾內所有檔案
+                    const files = await WebAPI.Directory.getFiles(path, "*.*"); // 取得資料夾內所有檔案
+                    if (signal?.aborted === true && await stopIfAborted()) return;
+                    _arFile = files;
 
                     await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
+                    fileWatcherStarted = true;
+                    if (signal?.aborted === true && await stopIfAborted()) return;
                 }
                 catch (error) {
+                    if (signal?.aborted === true && await stopIfAborted()) return;
                     // 直接開啟資料夾時清單 API 失敗，沒有可保留的目標檔案，返回歡迎頁。
                     await showFileLoadFailure(error, "msg.directoryReadFailed");
                     return;
@@ -905,6 +930,7 @@ export class FileLoad {
                 M.fileSort.updateMenu(); // 更新menu選單
                 // 排序 API 失敗時由 FileSort 改用檔名排序，這裡維持資料夾正常載入流程。
                 _arFile = await M.fileSort.sort(_arFile);
+                if (signal?.aborted === true && await stopIfAborted()) return;
 
                 if (dirGroupType === undefined) {
                     _groupType = GroupType.img;
@@ -915,6 +941,7 @@ export class FileLoad {
                 _atLoadingGroupType = _groupType;
 
                 const filteredFiles = await filter(_atLoadingExt);
+                if (signal?.aborted === true && await stopIfAborted()) return;
 
                 // 如果資料夾內沒有圖片，就直接當成「自訂名單」，然後載入所有檔案
                 if (filteredFiles.length !== 0) {
@@ -946,20 +973,27 @@ export class FileLoad {
                 _flagFile = 0;
                 //M.mainFileList.init(); // 檔案預覽視窗 初始化
                 if (_isBulkView === false && noLoad === false) { // 在讀取完資料夾名單前，先顯示圖片
-                    await showFileUpdataImg(fileInfo2);
+                    await showFileUpdataImg(fileInfo2, signal);
+                    if (signal?.aborted === true && await stopIfAborted()) return;
                     M.mainExif.init(fileInfo2, true); // 初始化exif
                 }
 
                 try {
                     await WV_System.NewFileWatcher("fileList", _dirPathNow); // 偵測檔案變化
-                    _arFile = await WebAPI.Directory.getFiles(_dirPathNow, "*.*");
+                    fileWatcherStarted = true;
+                    if (signal?.aborted === true && await stopIfAborted()) return;
+                    const files = await WebAPI.Directory.getFiles(_dirPathNow, "*.*");
+                    if (signal?.aborted === true && await stopIfAborted()) return;
+                    _arFile = files;
                 }
                 catch (error) {
+                    if (signal?.aborted === true && await stopIfAborted()) return;
                     // 目標檔案已取得資訊；同層清單失敗時改成只保留目標檔案。
                     await showSingleFileFallback(path, fileInfo2, error, "msg.fileListReadFailed", noLoad);
                     return;
                 }
                 _arFile = await filter(Lib.getExtension(path));
+                if (signal?.aborted === true && await stopIfAborted()) return;
                 if (_arFile.indexOf(path) === -1) {
                     _arFile.splice(0, 0, path);
                 }
@@ -968,6 +1002,7 @@ export class FileLoad {
                 M.fileSort.updateMenu(); // 更新menu選單
                 // 排序 API 失敗時由 FileSort 改用檔名排序，保留完整的已讀取清單。
                 _arFile = await M.fileSort.sort(_arFile);
+                if (signal?.aborted === true && await stopIfAborted()) return;
 
                 _flagFile = _arFile.indexOf(path);
 
@@ -977,6 +1012,7 @@ export class FileLoad {
                 return;
             }
 
+            if (signal?.aborted === true && await stopIfAborted()) return;
             _isLoadFileFinish = true;
             M.mainFileList.setHide(false); // 顯示檔案預覽視窗(必須顯示出物件才能計算高度)
             M.mainFileList.init(); // 檔案預覽視窗 初始化
@@ -1474,7 +1510,7 @@ export class FileLoad {
             M.mainFileList.updateLocation(); // 檔案預覽視窗 自動捲動到選中項目的地方
         }
         /** 更新 圖片 */
-        async function showFileUpdataImg(fileInfo2: FileInfo2) {
+        async function showFileUpdataImg(fileInfo2: FileInfo2, signal?: AbortSignal) {
 
             if (fileInfo2.Type === "none") { // 如果檔案不存在
                 _arFile.splice(_flagFile, 1); // 刪除此筆
@@ -1491,7 +1527,10 @@ export class FileLoad {
             }
 
             const loadingPath = _isArchiveMode ? undefined : getFilePath();
-            _showFileThrottle.run = async () => {
+            const run = async () => {
+                // 節流工作會晚於呼叫端執行，因此執行時仍須確認 QuickLook 工作階段有效。
+                signal?.removeEventListener("abort", clearPending);
+                if (signal?.aborted) return;
                 const handleLoadError = async (error: unknown) => {
                     if (_isArchiveMode) {
                         // archive entry 維持既有處理方式，只記錄失敗，避免清掉整個 archive session。
@@ -1514,16 +1553,18 @@ export class FileLoad {
                             fileInfo2.Path = await WV_Path.GetShortPath(fileInfo2.Path);
                         }
                         catch (error) {
+                            if (signal?.aborted) return;
                             await handleLoadError(error);
                             return;
                         }
                     }
+                    if (signal?.aborted) return;
 
                     if (_groupType === GroupType.img || _groupType === GroupType.unknown) {
                         await loadViewer(M.fileShow.openImage(fileInfo2));
                     }
                     if (_groupType === GroupType.video) {
-                        await loadViewer(M.fileShow.openVideo(fileInfo2));
+                        await loadViewer(M.fileShow.openVideo(fileInfo2, signal));
                     }
                     if (_groupType === GroupType.pdf) {
                         await loadViewer(M.fileShow.openPdf(fileInfo2));
@@ -1535,7 +1576,12 @@ export class FileLoad {
                         console.error(`${path}  ${getFilePath()}`);
                     }*/
                 }
-            }
+            };
+            const clearPending = () => {
+                if (_showFileThrottle.run === run) _showFileThrottle.run = undefined;
+            };
+            signal?.addEventListener("abort", clearPending, { once: true });
+            _showFileThrottle.run = run;
         }
 
         /**

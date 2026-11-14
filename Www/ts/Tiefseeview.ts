@@ -33,6 +33,8 @@ export class Tiefseeview {
     public loadWebGLImage;
     public showWebGLImage;
     public loadVideo;
+    /** 同步釋放目前的影片來源並清除 WebGL 來源。 */
+    public clearSource;
     public loadNone; // 載入空白圖片
     public setLoading; // 顯示或隱藏 loading
     public getMargin; // 取得 外距
@@ -368,6 +370,7 @@ export class Tiefseeview {
         this.loadWebGLImage = loadWebGLImage;
         this.showWebGLImage = () => webglRenderer?.showSource();
         this.loadVideo = loadVideo;
+        this.clearSource = clearMediaSource;
         this.loadNone = loadNone;
         this.setLoading = setLoading;
         this.getRendering = getRendering;
@@ -616,19 +619,20 @@ export class Tiefseeview {
         //#region 載入圖片(入口)
 
         function preloadImg(url: string, isInitSize: undefined | boolean = true) { return mediaLoader.preloadImg(url, isInitSize); }
-        function clearWebGLSource() {
+        function clearMediaSource() {
             mediaLoader.cancelVideoLoad();
             webglLoadRevision++;
             webglSource?.dispose();
             webglSource = null;
             if (webglRenderer !== null) void webglRenderer.setSource(null);
         }
-        function loadNone() { clearWebGLSource(); return mediaLoader.loadNone(); }
-        function loadVideo(url: string) { clearWebGLSource(); return mediaLoader.loadVideo(url); }
-        function loadImg(url: string) { clearWebGLSource(); return mediaLoader.loadImg(url); }
-        function loadBigimg(url: string) { clearWebGLSource(); return mediaLoader.loadBigimg(url); }
+        function loadNone() { clearMediaSource(); return mediaLoader.loadNone(); }
+        // 將 QuickLook 的取消訊號一路傳到原生 video loader。
+        function loadVideo(url: string, signal?: AbortSignal) { clearMediaSource(); return mediaLoader.loadVideo(url, signal); }
+        function loadImg(url: string) { clearMediaSource(); return mediaLoader.loadImg(url); }
+        function loadBigimg(url: string) { clearMediaSource(); return mediaLoader.loadBigimg(url); }
         function loadBigimgscale(images: { scale: number, url: string }[], width: number, height: number, zoomType: TiefseeviewZoomType, zoomValue: number) {
-            clearWebGLSource();
+            clearMediaSource();
             return mediaLoader.loadBigimgscale(images, width, height, zoomType, zoomValue);
         }
         async function loadWebGLImage(source: TiefseeviewImageSource, zoomType: TiefseeviewZoomType, zoomValue: number): Promise<void> {
