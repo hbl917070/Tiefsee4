@@ -315,7 +315,6 @@ class SettingWindow {
             tabs.add(getDom("#tabsBtn-layout"), getDom("#tabsPage-layout"), () => { goTop() }); // 版面
             tabs.add(getDom("#tabsBtn-toolbar"), getDom("#tabsPage-toolbar"), () => { goTop() }); // 工具列
             tabs.add(getDom("#tabsBtn-mouse"), getDom("#tabsPage-mouse"), () => { goTop() }); // 滑鼠
-            // tabs.add(getDom("#tabsBtn-image"), getDom("#tabsPage-image"), () => { goTop() });
             tabs.add(getDom("#tabsBtn-hotkey"), getDom("#tabsPage-hotkey"), () => { goTop() }); // 快速鍵
             tabs.add(getDom("#tabsBtn-extension"), getDom("#tabsPage-extension"), () => { goTop() }); // 設為預設程式
             tabs.add(getDom("#tabsBtn-advanced"), getDom("#tabsPage-advanced"), () => { goTop() }); // 進階設定

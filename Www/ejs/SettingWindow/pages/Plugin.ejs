@@ -1,0 +1,95 @@
+<!-- 擴充套件 -->
+<div class="page-tabsPage" id="tabsPage-plugin" role="tabpanel" aria-labelledby="tabsBtn-plugin">
+    <div class="page-title" i18n="sw.tabs.plugin"> 擴充套件 </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.plugin.pluginList"> 擴充套件清單 </div>
+
+        <div class="pluginLiet">
+            <div class="pluginLiet-item">
+                <div class="pluginLiet-L">
+                    <div class="pluginLiet-title">QuickLook</div>
+                    <div class="pluginLiet-text" i18n="sw.plugin.quickLook">在桌面或資料夾選中任一檔案，然後長按空白鍵，即可預覽檔案
+                    </div>
+                </div>
+                <div class="pluginLiet-R" id="pluginLiet-QuickLook">
+                    <div class="pluginLiet-status pluginLiet-status__no">Not Installed</div>
+                </div>
+            </div>
+            <div class="pluginLiet-item">
+                <div class="pluginLiet-L">
+                    <div class="pluginLiet-title">monaco-editor</div>
+                    <div class="pluginLiet-text" i18n="sw.plugin.monacoEditor">讓Tiefsee使用 monaco-editor
+                        來載入文字檔。常用於閱讀與編輯程式碼</div>
+                </div>
+                <div class="pluginLiet-R" id="pluginLiet-MonacoEditor">
+                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                </div>
+            </div>
+            <div class="pluginLiet-item">
+                <div class="pluginLiet-L">
+                    <div class="pluginLiet-title">WebViewer</div>
+                    <div class="pluginLiet-text" i18n="sw.plugin.webviewer">讓Tiefsee支援 doc、docx、ppt、pptx
+                    </div>
+                </div>
+                <div class="pluginLiet-R" id="pluginLiet-PDFTronWebviewer">
+                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                </div>
+            </div>
+            <div class="pluginLiet-item">
+                <div class="pluginLiet-L">
+                    <div class="pluginLiet-title">hdrfix</div>
+                    <div class="pluginLiet-text" i18n="sw.plugin.hdrfix">
+                        讓 JPEG XR (.jxr) 的 HDR 色彩更好的顯示 <br>
+                        (將 HDR 色彩空間以 Hable 算法處理成 SDR 色彩空間)
+                    </div>
+                </div>
+                <div class="pluginLiet-R" id="pluginLiet-hdrfix">
+                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                </div>
+            </div>
+            <!-- <div class="pluginLiet-item">
+                <div class="pluginLiet-L">
+                    <div class="pluginLiet-title">NConvert</div>
+                    <div class="pluginLiet-text" i18n="sw.plugin.nConvert">讓Tiefsee支援「Clip Studio
+                        Paint」產生的「clip檔」</div>
+                </div>
+                <div class="pluginLiet-R" id="pluginLiet-NConvert">
+                    <div class="pluginLiet-status pluginLiet-status__ok">Installed</div>
+                </div>
+            </div> -->
+
+        </div>
+
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.plugin.installationSteps"> 安裝步驟 </div>
+
+        <div class="text-title" i18n="sw.plugin.step1">
+            1、在「Tiefsee Plugin」的網頁下載擴充套件
+        </div>
+        <div class="btn" role="button" id="btn-openPluginDownload" i18n="sw.plugin.openPluginWebpage">開啟「Tiefsee
+            Plugin」網頁</div>
+        <div style="height:20px"></div>
+
+        <div class="text-title" i18n="sw.plugin.step2">
+            2、把ZIP解壓縮，然後放到「Plugin」資料夾內
+        </div>
+        <div class="btn" role="button" id="btn-openPluginDir" i18n="sw.plugin.openPluginDir">開啟「Plugin」資料夾</div>
+        <div style="height:20px"></div>
+
+        <div class="text-title" i18n="sw.plugin.step3">
+            3、重新啟動Tiefsee
+        </div>
+        <div class="text-content">
+            <div class="btn" role="button" id="btn-plugin-restart" i18n="sw.plugin.restartTiefsee"> 重新啟動 Tiefsee</div>
+        </div>
+        <div style="height:20px"></div>
+
+        <div class="text-title" i18n="sw.plugin.example"> (示意圖) </div>
+        <img src="./img/SettingWindow/plugin-1.png" style="max-width:100%;">
+
+    </div>
+
+</div>

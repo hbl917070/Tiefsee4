@@ -1,0 +1,110 @@
+<!-- 進階設定 -->
+<div class="page-tabsPage" id="tabsPage-advanced" role="tabpanel" aria-labelledby="tabsBtn-advanced">
+    <div class="page-title" i18n="sw.tabs.advanced"> 進階設定 </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.clearTempData.title"> 清理暫存資料 </div>
+
+        <div class="text-title"> </div>
+        <div class="text-content">
+            <div class="btn" role="button" id="btn-clearBrowserCache" i18n="sw.clearTempData.clear">清理</div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.performance.title"> 效能 </div>
+
+        <div class="text-title" i18n="sw.performance.webglRenderer"> 以 WebGL 渲染圖片 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-webglRenderer">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.performance.disabledDirectoryPanel"> 資料夾數量太多時，禁用「資料夾預覽面板」
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-dirListMaxCount">
+                <option value="0" i18n="sw.performance.alwaysDisable">一律停用</option>
+                <option value="5000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":5000}'>
+                    大於5000時禁用</option>
+                <option value="10000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":10000}'>
+                    大於10000時禁用</option>
+                <option value="30000" i18n="sw.performance.disableWhenGreaterThan" i18n-v='{"v":30000}'>
+                    大於30000時禁用</option>
+                <option value="-1" i18n="sw.performance.alwaysEnable">一律啟用</option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.performance.useCreateImageBitmap">
+            圖片面積過大時，停用高品質縮放
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-highQualityLimit">
+                <option value="0" i18n="sw.performance.alwaysDisable">一律停用</option>
+                <option value="2000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":2000}'> 大於2000*2000時停用 </option>
+                <option value="3000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":3000}'>大於3000*3000時停用</option>
+                <option value="4000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":4000}'>大於4000*4000時停用</option>
+                <option value="5000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":5000}'>大於5000*5000時停用</option>
+                <option value="6000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":6000}'>大於6000*6000時停用</option>
+                <option value="7000" i18n="sw.performance.disableWhenGreaterThanSquare" i18n-v='{"v":7000}'>大於7000*7000時停用</option>
+                <option value="-1" i18n="sw.performance.alwaysEnable">一律啟用</option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.performance.useLibvips">
+            圖片縮放閾值：當圖片縮小至特定比例以下，就重新處理圖片以確保品質。(設定值愈高，圖片品質愈好，但處理時間也會相對增加)
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-tiefseeviewBigimgscaleRatio">
+                <option value="0.9">90%^n (90、81、72、65...</option>
+                <option value="0.85">85%^n (85、72、61、52...</option>
+                <option value="0.8">80%^n (80、64、51、40...</option>
+                <option value="0.75">75%^n (75、56、42、31...</option>
+                <option value="0.7">70%^n (70、49、34、24...</option>
+                <option value="0.65">65%^n (65、42、27、17...</option>
+                <option value="0.6">60%^n (60、36、21、12...</option>
+                <option value="0.55">55%^n (55、30、16、9...</option>
+                <option value="0.5">50%^n (50、25、12、6...</option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.performance.bulkViewImgMaxCount">
+            大量瀏覽模式一頁顯示的圖片數量 (範圍:1~300，預設:100，設定太高可能造成卡頓)
+        </div>
+        <div class="text-content">
+            <input type="number" class="text-input" id="text-bulkViewImgMaxCount">
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title"> Tiefsee Localhost Server </div>
+
+        <div class="text-title" i18n="sw.localhostServer.port"> Port (如果已經被使用，則會使用下一個號碼 </div>
+        <div class="text-content">
+            <input class="text-input" type="number" id="text-startPort">
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.reset.resetSettings"> 重設設定 </div>
+
+        <div class="text-title" i18n="sw.reset.restoreDefaultSettings"> 將設定還原為其預設值 </div>
+        <div class="text-content">
+            <div class="btn" role="button" id="btn-resetSettings" i18n="sw.reset.resetSettings"> 重設設定 </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.relatedSettings.title"> 相關路徑 </div>
+        <div class="">
+            <div class="text-title"> </div>
+            <div class="link" id="btn-openAppData" role="link" i18n="sw.relatedSettings.appData">AppData(使用者資料)
+            </div>
+            <div class="link" id="btn-openWww" role="link" i18n="sw.relatedSettings.www">www(原始碼)</div>
+            <div class="link" id="btn-openTemp" role="link" i18n="sw.relatedSettings.temporaryDirectory">暫存資料夾</div>
+        </div>
+    </div>
+
+</div>

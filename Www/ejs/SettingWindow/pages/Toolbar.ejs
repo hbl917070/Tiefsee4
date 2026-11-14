@@ -1,0 +1,68 @@
+<!-- 工具列 -->
+<div class="page-tabsPage" id="tabsPage-toolbar" role="tabpanel" aria-labelledby="tabsBtn-toolbar">
+    <div class="page-title" i18n="sw.tabs.toolbar"> 工具列 </div>
+    <div class="box">
+        <div class="box-title" i18n="sw.customToolbar.title">工具列自訂</div>
+        <div class="toolbar-customizer">
+            <div class="toolbar-customizer-type">
+                <label for="select-toolbarListType" i18n="sw.customToolbar.editToolbar">選擇要編輯的工具列</label>
+                <select class="text-input" id="select-toolbarListType" aria-label="選擇要編輯的工具列">
+                    <option value="img" i18n="sw.customToolbar.imageToolbar">圖片工具列</option>
+                    <option value="pdf" i18n="sw.customToolbar.officeToolbar">Office 文件工具列</option>
+                    <option value="txt" i18n="sw.customToolbar.textToolbar">文字工具列</option>
+                    <option value="bulkView" i18n="sw.customToolbar.bulkViewToolbar">大量瀏覽模式工具列</option>
+                    <option value="welcome" i18n="sw.customToolbar.welcomeToolbar">歡迎畫面工具列</option>
+                </select>
+            </div>
+
+            <div class="toolbar-preview-window">
+                <div class="toolbar-preview-scroll">
+                    <div class="toolbar-preview-scroll-content">
+                        <div class="toolbar-preview-titlebar">
+                            <div class="toolbar-preview-titlebar-editable">
+                                <div class="toolbar-preview-titlezone toolbar-preview-titlezone-left toolbar-dropzone" id="toolbar-zone-titlebar-left" role="list" aria-label="標題列靠左"></div>
+                                <div class="toolbar-preview-title">Tiefsee</div>
+                                <div class="toolbar-preview-titlezone toolbar-preview-titlezone-right toolbar-dropzone" id="toolbar-zone-titlebar-right" role="list" aria-label="標題列靠右"></div>
+                            </div>
+                            <div class="toolbar-preview-window-controls" aria-hidden="true">
+                                <div><%- await readSvg("window_minimized.svg"); %></div>
+                                <div><%- await readSvg("window_maximized.svg"); %></div>
+                                <div><%- await readSvg("window_close.svg"); %></div>
+                            </div>
+                        </div>
+                        <div class="toolbar-preview-toolbar">
+                            <div class="toolbar-preview-align-wrap">
+                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.leftZone">靠左</div>
+                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-left" data-align="left" role="list" aria-label="靠左"></div>
+                            </div>
+                            <div class="toolbar-preview-align-wrap">
+                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.centerZone">置中</div>
+                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-center" data-align="center" role="list" aria-label="置中"></div>
+                            </div>
+                            <div class="toolbar-preview-align-wrap">
+                                <div class="toolbar-preview-align-label" i18n="sw.customToolbar.rightZone">靠右</div>
+                                <div class="toolbar-preview-align toolbar-dropzone" id="toolbar-zone-right" data-align="right" role="list" aria-label="靠右"></div>
+                            </div>
+                        </div>
+                        <div class="toolbar-preview-canvas" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar-customizer-available-title" i18n="sw.customToolbar.available">可用項目</div>
+            <div class="toolbarList toolbar-customizer-available" id="toolbarList-available" role="list" aria-label="可用項目"></div>
+            <div class="settings-pageTips toolbar-customizer-tips">
+                <div class="settings-pageTip settings-pageTip__title" i18n="sw.customToolbar.tipTitle">操作說明</div>
+                <ul class="settings-pageTipsList">
+                    <li class="settings-pageTip" i18n="sw.customToolbar.tipAdd">把下方項目拖到上方預覽的標題列，或工具列的靠左、置中、靠右區域。</li>
+                    <li class="settings-pageTip" i18n="sw.customToolbar.tipMove">在上方預覽拖曳可調整順序；拖回下方可移除。</li>
+                    <li class="settings-pageTip" i18n="sw.customToolbar.tipReusable">分隔線和空白可以重複加入。</li>
+                    <li class="settings-pageTip" i18n="sw.customToolbar.tipToolbarSelect">用上方選單切換要編輯的工具列；各工具列分開設定。</li>
+                </ul>
+            </div>
+            <div class="settings-pageFooter toolbar-customizer-footer">
+                <button class="btn toolbar-customizer-reset" type="button" id="btn-resetToolbarCustomization">重設圖片工具列</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<!-- 關於 -->
+<div class="page-tabsPage" id="tabsPage-about" role="tabpanel" aria-labelledby="tabsBtn-about">
+    <div class="page-title" i18n="sw.tabs.about"> 關於 </div>
+
+    <div class="box">
+
+        <div class="logobox">
+            <img class="logobox-img" src="./img/logo.svg">
+            <div class="logobox-text">
+                <div class="logobox-text-title">Tiefsee</div>
+                <div class="logobox-text-subtitle">4.3.4</div>
+            </div>
+        </div>
+
+        <div class="box-title">
+            <span i18n="sw.about.softwareUpdates">軟體更新:</span>
+            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('ms-windows-store://pdp/?productid=9N04QDXBNMCQ')">
+                Microsoft Store
+            </span>
+        </div>
+
+        <div class="page-hr"></div>
+
+        <div class="box-title">
+            <span i18n="sw.about.developer">開發者:</span>
+            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('https://home.gamer.com.tw/homeindex.php?owner=hbl917070')">hbl917070(深海異音)</span>
+        </div>
+        <div class="box-title">
+            <span i18n="sw.about.repository">儲存庫:</span>
+            <span class="link" role="link" onclick="WV_RunApp.OpenUrl('https://github.com/hbl917070/Tiefsee4')">GitHub</span>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <div class="text-title text-title__60">
+                <span style="margin-right:3px;">WebView2: </span>
+                <span id="span-webViewVersion"></span>
+            </div>
+            <div class="text-title text-title__60">
+                <span style="margin-right:3px;">Server Port: </span>
+                <span id="span-serverPort"></span>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,224 @@
+<!-- 版面 -->
+<div class="page-tabsPage" id="tabsPage-layout" role="tabpanel" aria-labelledby="tabsBtn-layout">
+    <div class="page-title" i18n="sw.tabs.layout"> 版面 </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.mainToolbar.title"> 工具列 </div>
+        <div class="text-title"> </div>
+
+        <div class="text-title" i18n="sw.mainToolbar.displayPanel"> 顯示工具列 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-mainToolbarEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+
+
+    <div class="box" data-toDom="dirPanel">
+        <div class="box-title" id="dirPanel-title" i18n="sw.directoryPanel.title"> 資料夾預覽視窗 </div>
+        <div class="text-title"> </div>
+
+        <div class="text-title" i18n="sw.directoryPanel.displayPanel"> 顯示資料夾預覽視窗</div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-dirListEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" id="dirPanel-displayNumber-label" i18n="sw.directoryPanel.displayNumber"> 顯示編號</div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-dirListShowNo" aria-labelledby="dirPanel-title dirPanel-displayNumber-label">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.directoryPanel.displayName"> 顯示資料夾名</div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-dirListShowName">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" id="dirPanel-numberImages-label" i18n="sw.directoryPanel.numberOfImages"> 圖片數量 </div>
+        <div class="text-content">
+            <select class="text-input" id="select-dirListImgNumber" aria-labelledby="dirPanel-title dirPanel-numberImages-label">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="box" data-toDom="filePanel">
+        <div class="box-title" id="filePanel-title" i18n="sw.filePanel.title"> 檔案預覽面板 </div>
+        <div class="text-title"> </div>
+
+        <div class="text-title" i18n="sw.filePanel.displayPanel"> 顯示檔案預覽面板</div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-fileListEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" id="filePanel-displayNumber-label" i18n="sw.filePanel.displayNumber"> 顯示編號 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-fileListShowNo" aria-labelledby="filePanel-title filePanel-displayNumber-label">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.filePanel.displayName"> 顯示檔名 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-fileListShowName">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+
+
+    <div class="box">
+        <div class="box-title" id="infoPanel-title" i18n="sw.informationPanel.title"> 詳細資料面板 </div>
+        <div class="text-title"> </div>
+
+        <div class="text-title" i18n="sw.informationPanel.displayPanel"> 顯示詳細資料面板 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-mainExifEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.informationPanel.horizontal"> 寬度足夠時，橫向排列 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-mainExifHorizontal">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title">
+            <span i18n="sw.informationPanel.relatedFiles"> 顯示相關檔案 </span>
+            <div class="img-help" data-i18n="sw.informationPanel.relatedFilesTooltip">
+                <%- await readSvg("question_circle_20_regular.svg"); %>
+            </div>
+        </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-relatedFilesEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.informationPanel.maxLine"> 顯示的最大行數 (1~1000) </div>
+        <div class="text-content">
+            <input class="text-input" type="number" id="text-mainExifMaxLine">
+        </div>
+
+        <div class="text-title" data-toDom="a1111Models">
+            <span i18n="sw.informationPanel.a1111Models"> A1111 models 路徑 </span>
+            <div class="img-help" data-i18n="sw.informationPanel.a1111ModelsTooltip">
+                <%- await readSvg("question_circle_20_regular.svg"); %>
+            </div>
+        </div>
+        <div class="text-content">
+            <textarea class="text-input" rows="2" id="text-a1111Models"></textarea>
+        </div>
+
+        <!-- Civitai Resources -->
+        <div class="text-title" i18n="sw.informationPanel.civitaiResourcesEnabled"> 顯示 Civitai Resources </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-civitaiResourcesEnabled">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div id="civitaiBox" class="collapseBox">
+            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesDefault"> 圖片預設狀態 </div>
+            <div class="text-content">
+                <select class="text-input" id="select-civitaiResourcesDefault">
+                    <option value="true" i18n="menu.expand"> 展開 </option>
+                    <option value="false" i18n="menu.collapse"> 折疊 </option>
+                </select>
+            </div>
+
+            <div class="text-title" id="infoPanel-resourcesImgNumber-label" i18n="sw.informationPanel.civitaiResourcesImgNumber"> 圖片數量 </div>
+            <div class="text-content">
+                <select class="text-input" id="select-civitaiResourcesImgNumber" aria-labelledby="infoPanel-title infoPanel-resourcesImgNumber-label">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+
+            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesDomain"> Civitai 網域 </div>
+            <div class="text-content">
+                <select class="text-input" id="select-civitaiResourcesDomain">
+                    <option value="civitai.red">civitai.red</option>
+                    <option value="civitai.com">civitai.com</option>
+                </select>
+            </div>
+
+            <div class="text-title" i18n="sw.informationPanel.civitaiResourcesNsfwLevel"> 允許 NSFW 圖片 </div>
+            <div class="text-content">
+                <label class="switch">
+                    <input type="checkbox" id="switch-civitaiResourcesNsfwLevel">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.largeBtn.title"> 大型選擇按鈕 </div>
+        <div class="text-title"> </div>
+
+        <div class="text-title"> </div>
+        <div class="">
+            <div class="radioList-h" id="largeBtn-group">
+                <label class="radioList-item">
+                    <input class="base-radio" type="radio" name="largeBtn" value="none">
+                    <img src="./img/SettingWindow/largeBtn-none.svg">
+                    <span i18n="sw.largeBtn.noDisplay">不顯示</span>
+                </label>
+                <label class="radioList-item">
+                    <input class="base-radio" type="radio" name="largeBtn" value="bottom">
+                    <img src="./img/SettingWindow/largeBtn-bottom.svg">
+                    <span i18n="sw.largeBtn.bottom">底部</span>
+                </label>
+                <label class="radioList-item">
+                    <input class="base-radio" type="radio" name="largeBtn" value="leftRight">
+                    <img src="./img/SettingWindow/largeBtn-leftRight.svg">
+                    <span i18n="sw.largeBtn.bothSides">左右兩側</span>
+                </label>
+                <label class="radioList-item">
+                    <input class="base-radio" type="radio" name="largeBtn" value="leftRight2">
+                    <img src="./img/SettingWindow/largeBtn-leftRight2.svg">
+                    <span i18n="sw.largeBtn.bothSidesContraction">左右兩側(內縮)</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.layoutOrder.title"> 佈局順序 </div>
+        <div class="text-title" i18n="sw.customToolbar.adjustOrderByDragging">(可拖曳調整順序)</div>
+        <div id="layoutOrder-list" class="layoutOrder-list">
+            <div class="layoutOrder-item"></div>
+            <div class="layoutOrder-item"></div>
+            <div class="layoutOrder-item"></div>
+            <div class="layoutOrder-item"></div>
+        </div>
+    </div>
+
+</div>

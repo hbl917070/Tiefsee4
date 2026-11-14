@@ -1,0 +1,307 @@
+<!-- 一般 -->
+<div class="page-tabsPage" id="tabsPage-general" role="tabpanel" aria-labelledby="tabsBtn-general">
+    <div class="page-title" i18n="sw.tabs.general"> 一般 </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.imageSettings.title"> 圖片設定 </div>
+
+        <div class="text-title" i18n="sw.imageSettings.imageShowPixels"> 圖片縮放比例大於 100% 時，呈現像素 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-imageShowPixels">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title">
+            <span i18n="sw.imageSettings.imageSharpen"> 銳化圖片</span>
+            <div class="img-help" data-i18n="sw.imageSettings.imageSharpenTooltip">
+                <%- await readSvg("question_circle_20_regular.svg"); %>
+            </div>
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-sharpen">
+                <option value="0" i18n="sw.disable"> 停用 </option>
+                <option value="0.3">1</option>
+                <option value="0.35">2</option>
+                <option value="0.4">3</option>
+                <option value="0.45">4</option>
+                <option value="0.5">5</option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.zoomMode.title"> 圖片預設縮放模式 </div>
+        <div class="text-content">
+            <select class="text-input" id="select-tiefseeviewZoomType">
+                <option value="fitWindowOrImageOriginal" i18n="sw.zoomMode.fitWindowOrImageOriginal">
+                    縮放至適合視窗 或 圖片原始大小
+                </option>
+                <option value="fitWindow" i18n="sw.zoomMode.fitWindow">縮放至適合視窗</option>
+                <option value="imageOriginal" i18n="sw.zoomMode.imageOriginal">圖片原始大小</option>
+                <option value="imageWidthPx" i18n="sw.zoomMode.imageWidthPx">圖片寬度(px)</option>
+                <option value="imageHeightPx" i18n="sw.zoomMode.imageHeightPx">圖片高度(px)</option>
+                <option value="windowWidthRatio" i18n="sw.zoomMode.windowWidthRatio">視窗寬度(%)</option>
+                <option value="windowHeightRatio" i18n="sw.zoomMode.windowHeightRatio">視窗高度(%)</option>
+            </select>
+            <input class="text-input" id="text-tiefseeviewZoomValue" style="width:60px; margin-left:5px; flex:0;" type="number">
+        </div>
+
+        <div class="text-title" i18n="sw.imageAlign.title"> 圖片預設對齊位置 </div>
+        <div class="text-content">
+            <select class="text-input" id="select-tiefseeviewAlignType">
+                <option value="center" i18n="sw.imageAlign.center">中央</option>
+                <option value="topLeft" i18n="sw.imageAlign.topLeft">左上</option>
+                <option value="top" i18n="sw.imageAlign.top">上</option>
+                <option value="topRight" i18n="sw.imageAlign.topRight">右上</option>
+                <option value="right" i18n="sw.imageAlign.right">右</option>
+                <option value="bottomRight" i18n="sw.imageAlign.bottomRight">右下</option>
+                <option value="bottom" i18n="sw.imageAlign.bottom">下</option>
+                <option value="bottomLeft" i18n="sw.imageAlign.bottomLeft">左下</option>
+                <option value="left" i18n="sw.imageAlign.left">左</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="box">
+        <div class="box-title" i18n="sw.sortMode.title"> 預設排序 </div>
+
+        <div class="text-title" i18n="sw.sortMode.fileDefaultSort"> 檔案預設排序 </div>
+        <div class="text-content">
+            <select class="text-input" id="select-fileSort">
+                <option value="name" i18n="sw.sortMode.name">檔名</option>
+                <option value="nameDesc" i18n="sw.sortMode.nameDesc">檔名(遞減)</option>
+                <option value="lastWriteTime" i18n="sw.sortMode.lastWriteTime">修改日期</option>
+                <option value="lastWriteTimeDesc" i18n="sw.sortMode.lastWriteTimeDesc">修改日期(遞減)
+                </option>
+                <option value="lastAccessTime" i18n="sw.sortMode.lastAccessTime">存取日期</option>
+                <option value="lastAccessTimeDesc" i18n="sw.sortMode.lastAccessTimeDesc">存取日期(遞減)
+                </option>
+                <option value="creationTime" i18n="sw.sortMode.creationTime">建立日期</option>
+                <option value="creationTimeDesc" i18n="sw.sortMode.creationTimeDesc">建立日期(遞減)
+                </option>
+                <option value="length" i18n="sw.sortMode.length">檔案大小</option>
+                <option value="lengthDesc" i18n="sw.sortMode.lengthDesc">檔案大小(遞減)</option>
+                <option value="random" i18n="sw.sortMode.random">隨機</option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.sortMode.directoryDefaultSort"> 資料夾預設排序 </div>
+        <div class="text-content">
+            <select class="text-input" id="select-dirSort">
+                <option value="name" i18n="sw.sortMode.name">檔名</option>
+                <option value="nameDesc" i18n="sw.sortMode.nameDesc">檔名(遞減)</option>
+                <option value="lastWriteTime" i18n="sw.sortMode.lastWriteTime">修改日期</option>
+                <option value="lastWriteTimeDesc" i18n="sw.sortMode.lastWriteTimeDesc">修改日期(遞減)
+                </option>
+                <option value="lastAccessTime" i18n="sw.sortMode.lastAccessTime">存取日期</option>
+                <option value="lastAccessTimeDesc" i18n="sw.sortMode.lastAccessTimeDesc">存取日期(遞減)
+                </option>
+                <option value="creationTime" i18n="sw.sortMode.creationTime">建立日期</option>
+                <option value="creationTimeDesc" i18n="sw.sortMode.creationTimeDesc">建立日期(遞減)
+                </option>
+                <option value="random" i18n="sw.sortMode.random">隨機</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.startupMode.title"> 啟動模式 </div>
+
+        <!-- <div class="text-title">(修改後需重啟程式) </div> -->
+
+        <div class="radioList-v">
+            <label>
+                <input class="base-radio" type="radio" name="radio-startType" value="1">
+                <div class="radioList-content">
+                    <span i18n="sw.startupMode.mode_1">直接啟動</span>
+                    <div class="img-help" data-i18n="sw.startupMode.tooltip_1">
+                        <%- await readSvg("question_circle_20_regular.svg"); %>
+                    </div>
+                </div>
+            </label>
+            <label>
+                <input class="base-radio" type="radio" name="radio-startType" value="2">
+                <div class="radioList-content">
+                    <span i18n="sw.startupMode.mode_2">快速啟動</span>
+                    <div class="img-help" data-i18n="sw.startupMode.tooltip_2">
+                        <%- await readSvg("question_circle_20_regular.svg"); %>
+                    </div>
+                </div>
+            </label>
+            <label>
+                <input class="base-radio" type="radio" name="radio-startType" value="3">
+                <div class="radioList-content">
+                    <span i18n="sw.startupMode.mode_3">快速啟動 + 常駐背景</span>
+                    <div class="img-help" data-i18n="sw.startupMode.tooltip_3">
+                        <%- await readSvg("question_circle_20_regular.svg"); %>
+                    </div>
+                </div>
+            </label>
+            <label>
+                <input class="base-radio" type="radio" name="radio-startType" value="4">
+                <div class="radioList-content">
+                    <span i18n="sw.startupMode.mode_4">單一視窗</span>
+                    <div class="img-help" data-i18n="sw.startupMode.tooltip_4">
+                        <%- await readSvg("question_circle_20_regular.svg"); %>
+                    </div>
+                </div>
+            </label>
+            <label>
+                <input class="base-radio" type="radio" name="radio-startType" value="5">
+                <div class="radioList-content">
+                    <span i18n="sw.startupMode.mode_5">單一視窗 + 常駐背景</span>
+                    <div class="img-help" data-i18n="sw.startupMode.tooltip_5">
+                        <%- await readSvg("question_circle_20_regular.svg"); %>
+                    </div>
+                </div>
+            </label>
+        </div>
+
+        <div class="text-content">
+            <div class="btn" role="button" id="btn-startupMode-restart" i18n="sw.reloadRequired"> 重新啟動 Tiefsee</div>
+        </div>
+    </div>
+
+
+    <div class="box">
+        <div class="box-title" i18n="sw.startupRunTiefsee.title"> 開機後自動啟動 </div>
+
+        <div class="text-title" i18n="sw.startupRunTiefsee.subtitle"> 電腦開機後，讓 Tiefsee 常駐在背景 </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-autoStart">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <!-- <div class="text-title"> 相關路徑 </div> -->
+        <div style="height:10px" show-not="storeApp"></div>
+        <div class="text-content" show-not="storeApp">
+            <div class="link" id="btn-openStartup" role="link" i18n="sw.startupRunTiefsee.openStartup">
+                Windows的「啟動資料夾」
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title" i18n="sw.other.title"> 其他 </div>
+
+        <div class="text-title" i18n="sw.other.checkerboardBackground">
+            使用格子背景
+        </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-checkerboardBackground">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.other.rawImageThumbnail">
+            開啟 RAW 圖片時，顯示內嵌的預覽圖
+        </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-rawImageThumbnail">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.other.archiveLoadMode">
+            載入壓縮檔時
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-archiveLoadMode">
+                <option value="imageOnly" i18n="sw.other.archiveLoadModeImageOnly"> 僅瀏覽圖片 </option>
+                <option value="allFiles" i18n="sw.other.archiveLoadModeAllFiles"> 瀏覽所有檔案 </option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.other.displayDeleteConfirmationDialog">
+            檔案刪除前顯示確認視窗
+        </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-fileDeletingShowCheckMsg">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.other.whenInsertingFile">
+            偵測到檔案新增時，插入於
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-whenInsertingFile">
+                <option value="auto" i18n="sw.other.auto"> 自動 </option>
+                <option value="start" i18n="sw.other.start"> 最前面 </option>
+                <option value="end" i18n="sw.other.end"> 最後面 </option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.other.reachLastFile">
+            到達最後一個檔案時
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-reachLastFile">
+                <option value="none" i18n="sw.other.doNothing"> 不做任何事情 </option>
+                <option value="firstFile" i18n="sw.other.firstFile"> 回到第一個檔案 </option>
+                <option value="nextDir" i18n="sw.other.nextDir"> 前往下一個資料夾 </option>
+                <option value="noneWithPrompt" i18n="sw.other.noneWithPrompt"> 不做任何事情，並顯示提示 </option>
+                <option value="firstFileWithPrompt" i18n="sw.other.firstFileWithPrompt"> 回到第一個檔案，並顯示提示 </option>
+                <option value="nextDirWithPrompt" i18n="sw.other.nextDirWithPrompt"> 前往下一個資料夾，並顯示提示 </option>
+            </select>
+        </div>
+
+        <div class="text-title" i18n="sw.other.reachLastDir">
+            到達最後一個資料夾時
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-reachLastDir">
+                <option value="none" i18n="sw.other.doNothing"> 不做任何事情 </option>
+                <option value="firstDir" i18n="sw.other.firstDir"> 回到第一個資料夾 </option>
+                <option value="noneWithPrompt" i18n="sw.other.noneWithPrompt"> 不做任何事情，並顯示提示 </option>
+                <option value="firstDirWithPrompt" i18n="sw.other.firstDirWithPrompt"> 回到第一個資料夾，並顯示提示 </option>
+            </select>
+        </div>
+
+        <div class="text-title">
+            <span i18n="sw.other.enableTouchpadGestures"> 啟用觸控板手勢 </span>
+            <div class="img-help" data-i18n="sw.other.enableTouchpadGesturesTooltip">
+                <%- await readSvg("question_circle_20_regular.svg"); %>
+            </div>
+        </div>
+        <div class="text-content">
+            <label class="switch">
+                <input type="checkbox" id="switch-enableTouchpadGestures">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="text-title" i18n="sw.other.filePanelMouseWheel">
+            在檔案預覽面板透過滑鼠滾輪切換圖片
+        </div>
+        <div class="text-content">
+            <select class="text-input" id="select-filePanelMouseWheel">
+                <option value="none" i18n="sw.other.filePanelMouseWheelNone"> 不啟用 </option>
+                <option value="enable" i18n="sw.other.filePanelMouseWheelEnable"> 啟用 </option>
+                <option value="reverse" i18n="sw.other.filePanelMouseWheelReverse"> 啟用（反向） </option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="box">
+        <div class="box-title" id="select-lang-title"> Language </div>
+        <div class="text-title"> </div>
+        <div class="text-content">
+            <select class="text-input" id="select-lang" aria-labelledby="select-lang-title" aria-label="Language">
+                <option value="en">English</option>
+                <option value="zh-TW">中文</option>
+                <option value="zh-CN">简体中文</option>
+                <option value="ja">日本語</option>
+                <option value="ru">Русский</option>
+            </select>
+        </div>
+    </div>
+
+</div>
