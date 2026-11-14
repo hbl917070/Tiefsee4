@@ -1,4 +1,6 @@
-import { GroupType, ToolbarCustomization, ToolbarCustomizationItem } from "../Config";
+import { GroupType } from "../Config";
+import { ToolbarCustomization, ToolbarCustomizationItem } from "../Toolbar/ToolbarCustomization";
+import { ToolbarButtonName, ToolbarInfoName, toolbarButtonKeys, toolbarInfoKeys } from "../Toolbar/ToolbarDefinitions";
 import { Lib } from "../Lib";
 import { MainWindow } from "./MainWindow";
 
@@ -15,7 +17,7 @@ export class MainToolbar {
             type: ("button" | "html" | "hr"),
             group: string,
             i18n: string,
-            name: string,
+            name: ToolbarButtonName | ToolbarInfoName,
             icon: string,
             html: string,
             func: (domBtn: HTMLElement) => void
@@ -188,7 +190,7 @@ export class MainToolbar {
                         if (dom.classList.contains("main-toolbar-txt")) {
                             if (inTitlebar) {
                                 dom.dataset.regularHtml ||= dom.innerHTML;
-                                const lineSeparator = dom.getAttribute("data-name") === "infoSize" ? "×" : " ";
+                                const lineSeparator = dom.getAttribute("data-name") === toolbarInfoKeys.infoSize ? "×" : " ";
                                 dom.innerHTML = dom.dataset.regularHtml.replace(/<br\s*\/?\s*>/gi, lineSeparator);
                             } else if (dom.dataset.regularHtml !== undefined) {
                                 dom.innerHTML = dom.dataset.regularHtml;
@@ -228,7 +230,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.favorites",
                 group,
-                name: "favorites",
+                name: toolbarButtonKeys.favorites,
                 icon: "star_line_horizontal_3_20_regular.svg",
                 func: (btn) => {
                     btn.classList.add("main-toolbar-favorites");
@@ -254,7 +256,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.layout",
                 group,
-                name: "layout",
+                name: toolbarButtonKeys.layout,
                 icon: "panel_left_header_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => { M?.script.menu.showLayout(btn); });
@@ -277,7 +279,7 @@ export class MainToolbar {
         }
 
         function addFileInfoItems(group: string) {
-            for (const name of ["infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+            for (const name of [toolbarInfoKeys.infoType, toolbarInfoKeys.infoFileSize, toolbarInfoKeys.infoTypeSize, toolbarInfoKeys.infoWriteTime, toolbarInfoKeys.infoWriteDate, toolbarInfoKeys.infoCreationTime, toolbarInfoKeys.infoCreationDate]) {
                 _ar.push({
                     type: "html", group, name, i18n: `menu.${name}`, icon: "",
                     html: `<div class="main-toolbar-txt" data-name="${name}"></div>`,
@@ -298,7 +300,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.img,
-                name: "prevFile",
+                name: toolbarButtonKeys.prevFile,
                 icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -312,7 +314,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.img,
-                name: "nextFile",
+                name: toolbarButtonKeys.nextFile,
                 icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -328,7 +330,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.img,
-                name: "showMenuFile",
+                name: toolbarButtonKeys.showMenuFile,
                 icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -342,7 +344,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.img,
-                name: "prevDir",
+                name: toolbarButtonKeys.prevDir,
                 icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -356,7 +358,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.img,
-                name: "nextDir",
+                name: toolbarButtonKeys.nextDir,
                 icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -370,7 +372,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.img,
-                name: "showMenuSort",
+                name: toolbarButtonKeys.showMenuSort,
                 icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -384,7 +386,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.img,
-                name: "showMenuCopy",
+                name: toolbarButtonKeys.showMenuCopy,
                 icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -398,7 +400,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.img,
-                name: "dragDropFile",
+                name: toolbarButtonKeys.dragDropFile,
                 icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
@@ -418,7 +420,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.img,
-                name: "showDeleteMsg",
+                name: toolbarButtonKeys.showDeleteMsg,
                 icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -432,7 +434,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuImageSearch",
                 group: GroupType.img,
-                name: "showMenuImageSearch",
+                name: toolbarButtonKeys.showMenuImageSearch,
                 icon: "search_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -446,7 +448,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.img,
-                name: "bulkView",
+                name: toolbarButtonKeys.bulkView,
                 icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
@@ -460,7 +462,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.img,
-                name: "showSetting",
+                name: toolbarButtonKeys.showSetting,
                 icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -474,7 +476,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuRotation",
                 group: GroupType.img,
-                name: "showMenuRotation",
+                name: toolbarButtonKeys.showMenuRotation,
                 icon: "arrow_clockwise_dashes_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -488,7 +490,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.zoomToFit",
                 group: GroupType.img,
-                name: "zoomToFit",
+                name: toolbarButtonKeys.zoomToFit,
                 icon: "arrow_expand_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -505,13 +507,13 @@ export class MainToolbar {
             _ar.push({
                 type: "html",
                 html: `
-                    <div class="main-toolbar-btn js-noDrag" data-name="infoZoomRatio" role="button">
+                    <div class="main-toolbar-btn js-noDrag" data-name="${toolbarInfoKeys.infoZoomRatio}" role="button">
                         <div style="margin:0 3px; user-select:none; pointer-events:none;" data-name="btnScale">100%</div>
                     </div>
                 `,
                 i18n: "menu.infoZoomRatio",
                 group: GroupType.img,
-                name: "infoZoomRatio",
+                name: toolbarInfoKeys.infoZoomRatio,
                 icon: "",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -524,13 +526,13 @@ export class MainToolbar {
             _ar.push({
                 type: "html",
                 html: `
-                    <div class="main-toolbar-txt" data-name="infoSize">
+                    <div class="main-toolbar-txt" data-name="${toolbarInfoKeys.infoSize}">
                         <!-- 100<br>200 -->
                     </div>
                 `,
                 i18n: "menu.infoSize",
                 group: GroupType.img,
-                name: "infoSize",
+                name: toolbarInfoKeys.infoSize,
                 icon: "",
                 func: (btn) => { },
             })
@@ -551,7 +553,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.pdf,
-                name: "prevFile",
+                name: toolbarButtonKeys.prevFile,
                 icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -565,7 +567,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.pdf,
-                name: "nextFile",
+                name: toolbarButtonKeys.nextFile,
                 icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -580,7 +582,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.pdf,
-                name: "showMenuFile",
+                name: toolbarButtonKeys.showMenuFile,
                 icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -594,7 +596,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.pdf,
-                name: "prevDir",
+                name: toolbarButtonKeys.prevDir,
                 icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -608,7 +610,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.pdf,
-                name: "nextDir",
+                name: toolbarButtonKeys.nextDir,
                 icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -622,7 +624,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.pdf,
-                name: "showMenuSort",
+                name: toolbarButtonKeys.showMenuSort,
                 icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -636,7 +638,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.pdf,
-                name: "showMenuCopy",
+                name: toolbarButtonKeys.showMenuCopy,
                 icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -650,7 +652,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.pdf,
-                name: "dragDropFile",
+                name: toolbarButtonKeys.dragDropFile,
                 icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
@@ -670,7 +672,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.pdf,
-                name: "showDeleteMsg",
+                name: toolbarButtonKeys.showDeleteMsg,
                 icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -684,7 +686,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.pdf,
-                name: "bulkView",
+                name: toolbarButtonKeys.bulkView,
                 icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
@@ -698,7 +700,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.pdf,
-                name: "showSetting",
+                name: toolbarButtonKeys.showSetting,
                 icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -728,7 +730,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevFile",
                 group: GroupType.txt,
-                name: "prevFile",
+                name: toolbarButtonKeys.prevFile,
                 icon: "arrow_left_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -742,7 +744,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextFile",
                 group: GroupType.txt,
-                name: "nextFile",
+                name: toolbarButtonKeys.nextFile,
                 icon: "arrow_right_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -758,7 +760,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.txt,
-                name: "showMenuFile",
+                name: toolbarButtonKeys.showMenuFile,
                 icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -772,7 +774,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSave",
                 group: GroupType.txt,
-                name: "showSave",
+                name: toolbarButtonKeys.showSave,
                 icon: "save_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -786,7 +788,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.txt,
-                name: "prevDir",
+                name: toolbarButtonKeys.prevDir,
                 icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -800,7 +802,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.txt,
-                name: "nextDir",
+                name: toolbarButtonKeys.nextDir,
                 icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -814,7 +816,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.txt,
-                name: "showMenuSort",
+                name: toolbarButtonKeys.showMenuSort,
                 icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -828,7 +830,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.txt,
-                name: "showMenuCopy",
+                name: toolbarButtonKeys.showMenuCopy,
                 icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -842,7 +844,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.txt,
-                name: "dragDropFile",
+                name: toolbarButtonKeys.dragDropFile,
                 icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
@@ -862,7 +864,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showDeleteFileMsg",
                 group: GroupType.txt,
-                name: "showDeleteMsg",
+                name: toolbarButtonKeys.showDeleteMsg,
                 icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -876,7 +878,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.bulkView",
                 group: GroupType.txt,
-                name: "bulkView",
+                name: toolbarButtonKeys.bulkView,
                 icon: "app_folder_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", async () => {
@@ -890,7 +892,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.txt,
-                name: "showSetting",
+                name: toolbarButtonKeys.showSetting,
                 icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -922,7 +924,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.openFile",
                 group: GroupType.welcome,
-                name: "openFile",
+                name: toolbarButtonKeys.openFile,
                 icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -936,7 +938,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.welcome,
-                name: "showSetting",
+                name: toolbarButtonKeys.showSetting,
                 icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -961,7 +963,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuFile",
                 group: GroupType.bulkView,
-                name: "showMenuFile",
+                name: toolbarButtonKeys.showMenuFile,
                 icon: "folder_open_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -975,7 +977,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.prevDir",
                 group: GroupType.bulkView,
-                name: "prevDir",
+                name: toolbarButtonKeys.prevDir,
                 icon: "previous_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -989,7 +991,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.nextDir",
                 group: GroupType.bulkView,
-                name: "nextDir",
+                name: toolbarButtonKeys.nextDir,
                 icon: "next_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -1003,7 +1005,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuSort",
                 group: GroupType.bulkView,
-                name: "showMenuSort",
+                name: toolbarButtonKeys.showMenuSort,
                 icon: "arrow_sort_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -1017,7 +1019,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showMenuCopy",
                 group: GroupType.bulkView,
-                name: "showMenuCopy",
+                name: toolbarButtonKeys.showMenuCopy,
                 icon: "copy_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -1031,7 +1033,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.dragDropFile",
                 group: GroupType.bulkView,
-                name: "dragDropFile",
+                name: toolbarButtonKeys.dragDropFile,
                 icon: "cursor_hover_20_regular.svg",
                 func: (btn) => {
                     Lib.addDragThresholdListener(btn, 3, () => {
@@ -1051,7 +1053,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showDeleteDirMsg",
                 group: GroupType.bulkView,
-                name: "showDeleteMsg",
+                name: toolbarButtonKeys.showDeleteMsg,
                 icon: "delete_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -1065,7 +1067,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showSetting",
                 group: GroupType.bulkView,
-                name: "showSetting",
+                name: toolbarButtonKeys.showSetting,
                 icon: "settings_20_regular.svg",
                 func: (btn) => {
                     btn.addEventListener("click", () => {
@@ -1080,13 +1082,13 @@ export class MainToolbar {
             _ar.push({
                 type: "html",
                 html: `
-                    <div class="main-toolbar-txt" data-name="infoWriteTime">
+                    <div class="main-toolbar-txt" data-name="${toolbarInfoKeys.infoWriteTime}">
                         <!--2022-05-02<br>01:19:49 -->
                     </div>
                 `,
                 i18n: "menu.infoWriteTime",
                 group: GroupType.bulkView,
-                name: "infoWriteTime",
+                name: toolbarInfoKeys.infoWriteTime,
                 icon: "",
                 func: (btn) => { },
             })
@@ -1096,7 +1098,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.showBulkViewSetting",
                 group: GroupType.bulkView,
-                name: "showBulkViewSetting",
+                name: toolbarButtonKeys.showBulkViewSetting,
                 icon: "options_20_regular.svg",
                 func: (btn) => {
                     btn.style.order = "2001"; // 靠右對齊
@@ -1116,7 +1118,7 @@ export class MainToolbar {
                 type: "button", html: "",
                 i18n: "menu.back",
                 group,
-                name: "back",
+                name: toolbarButtonKeys.back,
                 icon: "arrow_hook_up_left_20_regular.svg",
                 func: (btn) => {
                     btn.classList.add("main-toolbar-back");

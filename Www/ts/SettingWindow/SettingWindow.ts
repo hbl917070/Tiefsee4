@@ -1,5 +1,7 @@
 import { BaseWindow } from "../BaseWindow";
-import { Config, cloneToolbarCustomization, restoreToolbarCustomization, ToolbarCustomizationGroup, ToolbarCustomizationItem, ToolbarPaletteItem } from "../Config";
+import { Config } from "../Config";
+import { cloneToolbarCustomization, restoreToolbarCustomization, ToolbarCustomizationGroup, ToolbarCustomizationItem, ToolbarPaletteItem } from "../Toolbar/ToolbarCustomization";
+import { toolbarInfoKeys } from "../Toolbar/ToolbarDefinitions";
 import { I18n } from "../I18n";
 import { Lib } from "../Lib";
 import { MainToolbar } from "../MainWindow/MainToolbar";
@@ -267,7 +269,7 @@ class SettingWindow {
                     dom.innerHTML = SvgList[definition.icon] || "";
                 } else {
                     dom.classList.add("toolbar-preview-info");
-                    dom.textContent = item.name === "infoZoomRatio" ? "28%" : label;
+                    dom.textContent = item.name === toolbarInfoKeys.infoZoomRatio ? "28%" : label;
                 }
                 return dom;
             }

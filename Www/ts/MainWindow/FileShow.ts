@@ -2,6 +2,7 @@ import { MainWindow } from "./MainWindow";
 import { Iframes } from "./Iframes";
 import { Tiefseeview, TiefseeviewAlignType, TiefseeviewUrlImageSource, TiefseeviewZoomType } from "../Tiefseeview";
 import { GroupType } from "../Config";
+import { ToolbarInfoName, toolbarInfoKeys } from "../Toolbar/ToolbarDefinitions";
 import { WebAPI } from "../WebAPI";
 import { Lib } from "../Lib";
 import { VideoToolbar } from "./VideoToolbar";
@@ -247,7 +248,7 @@ export class FileShow {
             return M.domToolbar.querySelector(`.main-toolbar-group[data-name="${type}"]`);
         }
 
-        function getToolbarItemDom(type: string, name: string): HTMLElement | null {
+        function getToolbarItemDom(type: string, name: ToolbarInfoName): HTMLElement | null {
             const selector = `[data-name="${name}"]`;
             return getToolbarDom(type)?.querySelector<HTMLElement>(selector)
                 || document.querySelector<HTMLElement>(`.titlebar-custom-group[data-name="${type}"] > ${selector}`);
@@ -256,7 +257,7 @@ export class FileShow {
         function setToolbarInfoContent(dom: HTMLElement, regularHtml: string) {
             dom.dataset.regularHtml = regularHtml;
             if (dom.classList.contains("titlebar-custom-item")) {
-                const lineSeparator = dom.getAttribute("data-name") === "infoSize" ? "×" : " ";
+                const lineSeparator = dom.getAttribute("data-name") === toolbarInfoKeys.infoSize ? "×" : " ";
                 dom.innerHTML = regularHtml.replace(/<br\s*\/?\s*>/gi, lineSeparator);
             } else {
                 dom.innerHTML = regularHtml;
@@ -269,19 +270,20 @@ export class FileShow {
             const size = Lib.getFileLength(file.Lenght);
             const writeTime = formatLastWriteTime(file.LastWriteTimeUtc);
             const creationTime = formatLastWriteTime(file.CreationTimeUtc);
-            const values: Record<string, string> = {
-                infoType: type, infoFileSize: size, infoTypeSize: `${type}<br>${size}`,
-                infoWriteTime: writeTime, infoWriteDate: writeTime.split("<br>")[0],
-                infoCreationTime: creationTime, infoCreationDate: creationTime.split("<br>")[0],
+            const values = {
+                [toolbarInfoKeys.infoType]: type, [toolbarInfoKeys.infoFileSize]: size, [toolbarInfoKeys.infoTypeSize]: `${type}<br>${size}`,
+                [toolbarInfoKeys.infoWriteTime]: writeTime, [toolbarInfoKeys.infoWriteDate]: writeTime.split("<br>")[0],
+                [toolbarInfoKeys.infoCreationTime]: creationTime, [toolbarInfoKeys.infoCreationDate]: creationTime.split("<br>")[0],
             };
-            for (const [name, value] of Object.entries(values)) {
+            for (const name of Object.keys(values) as (keyof typeof values)[]) {
+                const value = values[name];
                 const dom = getToolbarItemDom(group, name);
                 if (dom !== null) { setToolbarInfoContent(dom, value); }
             }
         }
 
         function clearFileToolbarInfo(group: string) {
-            for (const name of ["infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+            for (const name of [toolbarInfoKeys.infoType, toolbarInfoKeys.infoFileSize, toolbarInfoKeys.infoTypeSize, toolbarInfoKeys.infoWriteTime, toolbarInfoKeys.infoWriteDate, toolbarInfoKeys.infoCreationTime, toolbarInfoKeys.infoCreationDate]) {
                 const dom = getToolbarItemDom(group, name);
                 if (dom !== null) { setToolbarInfoContent(dom, ""); }
             }
@@ -529,7 +531,7 @@ export class FileShow {
         async function initTiefseeview(fileInfo2: FileInfo2, isCurrent: () => boolean = () => true) {
             if (await initTiefseeviewDisplay(isCurrent) === false) return;
 
-            const domSize = getToolbarItemDom(GroupType.img, "infoSize");
+            const domSize = getToolbarItemDom(GroupType.img, toolbarInfoKeys.infoSize);
             if (domSize !== null) {
                 setToolbarInfoContent(domSize, `${_tiefseeview.getOriginalWidth()}<br>${_tiefseeview.getOriginalHeight()}`);
             }
@@ -539,7 +541,7 @@ export class FileShow {
         async function initErrorTiefseeview(fileInfo2?: FileInfo2, isCurrent: () => boolean = () => true) {
             if (await initTiefseeviewDisplay(isCurrent) === false) return;
 
-            const domSize = getToolbarItemDom(GroupType.img, "infoSize");
+            const domSize = getToolbarItemDom(GroupType.img, toolbarInfoKeys.infoSize);
             if (domSize !== null) { setToolbarInfoContent(domSize, "—"); }
             if (fileInfo2 !== undefined) {
                 updateFileToolbarInfo(GroupType.img, fileInfo2);
@@ -555,7 +557,7 @@ export class FileShow {
             _tiefseeview.setEventChangeZoom(((ratio: number) => {
                 const txt = (ratio * 100).toFixed(0) + "%"
 
-                const domBtnScale = getToolbarItemDom(GroupType.img, "infoZoomRatio")?.querySelector(`[data-name="btnScale"]`); // 工具列或標題列
+                const domBtnScale = getToolbarItemDom(GroupType.img, toolbarInfoKeys.infoZoomRatio)?.querySelector(`[data-name="btnScale"]`); // 工具列或標題列
                 if (domBtnScale != null) { domBtnScale.innerHTML = txt; }
 
                 M.mainMenu.updateRightMenuImageZoomRatioTxt(txt); // 更新 右鍵選單的圖片縮放比例
@@ -669,7 +671,7 @@ export class FileShow {
             M.fileLoad.stopFileWatcher();
 
             _tiefseeview.zoomFull(TiefseeviewZoomType.imageOriginal);
-            for (const name of ["infoSize", "infoType", "infoFileSize", "infoTypeSize", "infoWriteTime", "infoWriteDate", "infoCreationTime", "infoCreationDate"]) {
+            for (const name of [toolbarInfoKeys.infoSize, toolbarInfoKeys.infoType, toolbarInfoKeys.infoFileSize, toolbarInfoKeys.infoTypeSize, toolbarInfoKeys.infoWriteTime, toolbarInfoKeys.infoWriteDate, toolbarInfoKeys.infoCreationTime, toolbarInfoKeys.infoCreationDate]) {
                 const dom = getToolbarItemDom(GroupType.img, name);
                 if (dom !== null) { setToolbarInfoContent(dom, ""); }
             }
@@ -691,7 +693,7 @@ export class FileShow {
                 let fileInfo2 = await WebAPI.getFileInfo2(dir);
                 timeUtc = fileInfo2.LastWriteTimeUtc;
             }
-            let dom_writeTime = getToolbarItemDom(GroupType.bulkView, "infoWriteTime");
+            let dom_writeTime = getToolbarItemDom(GroupType.bulkView, toolbarInfoKeys.infoWriteTime);
             if (dom_writeTime != null) {
                 let time = formatLastWriteTime(timeUtc);
                 setToolbarInfoContent(dom_writeTime, time);
