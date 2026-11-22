@@ -325,8 +325,13 @@
         //justify-content: center;
         cursor: pointer;
         opacity: 1;
-        background-color: var(--color-white10);
-        // border: 1px solid var(--color-white10);
+        background-color: var(--button-hover-bg);
+    }
+
+    .bulkView-pagination-prev:active,
+    .bulkView-pagination-next:active,
+    .bulkView-pagination-select:active {
+        background-color: var(--button-pressed-bg);
     }
 
     //無法點擊的狀態

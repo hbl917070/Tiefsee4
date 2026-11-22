@@ -8,38 +8,37 @@
 
 .mainExif {
     display: none;
+    position: relative;
     //display: flex;
     width: var(--mainExif-width);
     height: 100%;
     flex-direction: column;
 
-    .mainExifTop {
+    // 保留捲動條到面板邊緣的命中範圍，將可見的滑塊移到框線內。
+    .base-scrollbar::-webkit-scrollbar {
+        width: 10px;
+    }
+    .base-scrollbar::-webkit-scrollbar-thumb {
+        border-right-width: 3px;
+    }
+
+    .mainExifTabsBar {
         width: 100%;
         display: flex;
         align-items: center;
 
-        // 上面的頁籤按鈕
+        // 面板底部的頁籤按鈕
         .mainExifTabs {
             flex: 1;
             width: 100%;
-            height: 38px;
-            margin-bottom: -3px;
-            justify-content: center;
-            overflow-x: visible;
+            height: 40px;
+            margin-bottom: 0;
+            padding: 0 12px;
+            justify-content: flex-start;
+            overflow-x: auto;
             overflow-y: hidden;
             position: relative;
             display: none;
-
-            // 頁籤按鈕下面的水平線
-            &::before {
-                content: "";
-                position: absolute;
-                bottom: 3px;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background-color: var(--color-blue20);
-            }
 
             &[active="true"] {
                 display: flex;
@@ -48,49 +47,42 @@
             .mainExifTabsContent {
                 display: flex;
                 flex-direction: row;
+                gap: 4px;
+                align-items: center;
+                width: max-content;
+                flex: 1;
+                justify-content: center;
             }
-            position: relative;
 
             .mainExifTabsItem {
-                flex-shrink: 1;
-                //flex: 1;
-                padding: 0 10px;
+                flex-shrink: 0;
+                gap: 6px;
                 white-space: nowrap;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 34px;
-                border-radius: 5px;
+                height: 30px;
+                width: 34px;
+                border-radius: 6px;
                 position: relative;
                 color: var(--color-white);
                 user-select: none;
 
                 svg {
+                    flex-shrink: 0;
                     width: 20px;
                     height: 20px;
                 }
 
-                &[active="true"] {
-                    svg * {
-                        stroke: var(--color-blue) !important;
-                        fill: var(--color-blue) !important;
-                    }
-                }
-                &[active="true"]::after {
-                    position: absolute;
-                    content: "";
-                    width: 100%;
-                    height: 3px;
-                    bottom: 0px;
-
-                    background-color: var(--color-blue);
-                }
-                &:last-child {
-                    border-right: none;
-                }
                 &:hover {
                     cursor: pointer;
-                    background-color: var(--color-white10);
+                    background-color: var(--button-hover-bg);
+                }
+                &[active="true"] {
+                    background-color: var(--button-selected-bg);
+                }
+                &:active {
+                    background-color: var(--button-pressed-bg);
                 }
             }
         }
@@ -98,11 +90,13 @@
 
     // 相關檔案
     .mainExifRelated {
-        padding: 0 5px;
+        // 右側包含 10px 捲動條空間；配合標題左右的外距對齊邊界。
+        padding: 0 3px 0 12px;
         margin-top: 5px;
         padding-bottom: 20px;
         overflow-y: auto;
         overflow-x: hidden;
+        scrollbar-gutter: stable;
         flex: 1;
 
         // 用於 contenteditable 的調整
@@ -118,15 +112,13 @@
     // 標題
     .mainExifRelatedTitle {
         color: var(--color-blue);
-
-        //height: 35px;
         border: 1px solid var(--color-blue40);
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 5px;
-
         margin-top: 5px;
         margin-bottom: 5px;
-
+        margin-left: 1px;
+        margin-right: 0px;
         display: flex;
         align-items: center;
         justify-content: end;
@@ -134,12 +126,10 @@
         cursor: pointer;
         position: relative;
         user-select: none;
-
         word-wrap: break-word;
         word-break: break-all;
 
         span {
-            //position: absolute;
             margin-left: 25px;
             pointer-events: none;
             flex: 1;
@@ -154,35 +144,7 @@
         display: flex;
     }
     .mainExifRelatedTitleBtn {
-        width: 24px;
-        height: 24px;
-        background-color: var(--color-black80);
-        border: 1px solid var(--color-blue40);
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: 0s opacity;
         z-index: 1;
-
-        // 移入按鈕時，顯示按鈕
-        &:hover {
-            cursor: pointer;
-            transition: 0s opacity !important;
-            opacity: 1 !important;
-        }
-        & svg {
-            width: 18px;
-            height: 18px;
-            pointer-events: none;
-            user-select: none;
-        }
-    }
-    // 移入整個項目時，顯示半透明的按鈕
-    .mainExifRelatedBox:hover .mainExifRelatedTitleBtn {
-        opacity: 0.3;
-        transition: 0.3s opacity;
     }
 
     .mainExifRelatedBox .mainExifRelatedTitle::after {
@@ -271,15 +233,20 @@
         margin-top: 5px;
         user-select: none;
         cursor: pointer;
+
+        &:hover {
+            background-color: var(--color-blue10);
+        }
+        &:active {
+            background-color: var(--color-blue20);
+        }
     }
     /* #endregion */
 
     //資訊
     .mainExifList {
-        padding-left: 5px;
+        padding-top: 2px;
         padding-bottom: 20px;
-        overflow-y: auto;
-        overflow-x: hidden;
         flex: 1;
 
         // 用於 contenteditable 的調整
@@ -288,38 +255,44 @@
         img::selection {
             background: transparent;
         }
+
+        // 只有外層資訊面板負責捲動與面板邊距，折疊內容共用項目樣式。
+        &.base-scrollbar {
+            padding-left: 12px;
+            padding-right: 2px; // 加上 10px 捲動條空間，與左側邊距對齊。
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+        }
     }
+
     .mainExifItem {
         flex-wrap: wrap;
         flex-direction: row;
         align-items: center;
-        padding: 3px 0;
-
-        // 水平線
-        &::before {
-            content: "";
-            height: 1px;
-            background-color: var(--color-blue20);
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 5px;
-        }
-        // 第一個項目不顯示水平線
-        &:first-child::before {
-            display: none;
-        }
+        padding: 7px 0;
+        line-height: 1.45;
 
         word-wrap: break-word;
         //word-break: break-all;
         font-size: 14px;
         position: relative;
+
+        &:not(:first-child)::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 2px;
+            right: 1px;
+            height: 1px;
+            background-color: var(--color-white10);
+        }
     }
 
     // 匯出
     .btnExport {
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
         position: absolute;
         top: 0;
         bottom: 0;
@@ -330,14 +303,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid var(--color-blue20);
+        background-color: var(--filled-button-bg);
 
         &:hover {
             cursor: pointer;
-            background-color: var(--color-white10);
+            background-color: var(--filled-button-hover-bg);
         }
         &:active {
-            background-color: var(--color-white30);
+            background-color: var(--filled-button-pressed-bg);
         }
         svg {
             width: 20px;
@@ -349,8 +322,9 @@
     .mainExifName {
         flex: 1;
         min-width: 100px; //寬度不足100時，會自動換行
-        color: var(--color-blue);
+        color: var(--color-white60);
         margin-right: 3px;
+        font-size: 13px;
         font-weight: var(--fontWeightBold);
     }
     .mainExifValue {
@@ -468,35 +442,43 @@
         right: 0;
         display: flex;
         flex-direction: row;
+    }
 
-        .btn {
-            width: 24px;
-            height: 24px;
-            background-color: var(--color-black80);
-            border: 1px solid var(--color-blue40);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: 0s opacity;
+    // 浮動操作按鈕可能覆蓋文字，底色需保持不透明。
+    .mainExifRelatedTitleBtn,
+    .mainExifBtns .btn {
+        width: 24px;
+        height: 24px;
+        background-color: var(--color-black);
+        border: 1px solid var(--color-white20);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        cursor: pointer;
+
+        &:hover {
+            border-color: var(--color-blue);
+            background-image: linear-gradient(var(--button-hover-bg), var(--button-hover-bg));
         }
-        // 移入按鈕時，顯示按鈕
-        .btn:hover {
-            cursor: pointer;
-            transition: 0s opacity !important;
-            opacity: 1 !important;
+        &:active {
+            background-image: linear-gradient(var(--button-pressed-bg), var(--button-pressed-bg));
         }
-        .btn svg {
-            pointer-events: none;
+        svg {
             width: 20px;
             height: 20px;
+            pointer-events: none;
+            user-select: none;
         }
     }
-    // 移入整個項目時，顯示半透明的按鈕
+    .mainExifRelatedBox:hover .mainExifRelatedTitleBtn,
     .mainExifItem:hover .mainExifBtns .btn {
-        opacity: 0.3;
-        transition: 0.3s opacity;
+        opacity: 0.6;
+    }
+    .mainExifRelatedBox:hover .mainExifRelatedTitleBtn:hover,
+    .mainExifItem:hover .mainExifBtns .btn:hover {
+        opacity: 1;
     }
 }
 
@@ -565,8 +547,11 @@
             align-items: center;
             user-select: none;
             &:hover {
-                background-color: var(--color-white10);
+                background-color: var(--button-hover-bg);
                 cursor: pointer;
+            }
+            &:active {
+                background-color: var(--button-pressed-bg);
             }
             svg {
                 width: 20px;

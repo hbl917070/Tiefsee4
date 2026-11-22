@@ -1,6 +1,58 @@
 import { Lib } from "../Lib";
 import { MainWindow } from "./MainWindow";
 
+const entranceAnimations = new WeakMap<HTMLElement, Animation>();
+
+/** 選單從來源方向短距離移入。 */
+export function animateMenuEntrance(element: HTMLElement, anchor?: HTMLElement, origin?: { x: number; y: number }) {
+    cancelMenuEntrance(element);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const boxes = Array.from(element.querySelectorAll<HTMLElement>(":scope > .menu-box"));
+    const box = boxes.find(item => item.getClientRects().length > 0) ?? element;
+    const rect = box.getBoundingClientRect();
+    const anchorRect = anchor?.isConnected ? anchor.getBoundingClientRect() : undefined;
+    let startTransform: string;
+    let duration: number;
+    let easing: string;
+    if (anchorRect) {
+        if (rect.top >= anchorRect.bottom) startTransform = "translateY(-5px)";
+        else if (rect.bottom <= anchorRect.top) startTransform = "translateY(5px)";
+        else if (rect.left >= anchorRect.right) startTransform = "translateX(-5px)";
+        else if (rect.right <= anchorRect.left) startTransform = "translateX(5px)";
+        else {
+            // 邊界調整造成重疊時，依中心位置選擇最接近來源的方向。
+            const dx = rect.left + rect.width / 2 - (anchorRect.left + anchorRect.width / 2);
+            const dy = rect.top + rect.height / 2 - (anchorRect.top + anchorRect.height / 2);
+            startTransform = Math.abs(dx) > Math.abs(dy)
+                ? `translateX(${dx >= 0 ? -5 : 5}px)`
+                : `translateY(${dy >= 0 ? -5 : 5}px)`;
+        }
+        duration = 100;
+        easing = "ease";
+    } else {
+        // 右鍵選單可能因視窗邊界而改向，以實際顯示位置判斷移動方向。
+        const x = origin?.x ?? rect.left + rect.width / 2;
+        const dx = rect.left + rect.width / 2 >= x ? -5 : 5;
+        startTransform = `translateX(${dx}px)`;
+        duration = 100;
+        easing = "ease";
+    }
+    const animation = element.animate(
+        [{ transform: startTransform }, { transform: "none" }],
+        { duration, easing },
+    );
+    entranceAnimations.set(element, animation);
+    animation.finished.then(() => {
+        if (entranceAnimations.get(element) === animation) entranceAnimations.delete(element);
+    }).catch(() => {});
+}
+
+export function cancelMenuEntrance(element: HTMLElement) {
+    entranceAnimations.get(element)?.cancel();
+    entranceAnimations.delete(element);
+}
+
 export class Menu {
 
     public openAtButton;
@@ -65,7 +117,7 @@ export class Menu {
          * @param onMenuClose 關閉時呼叫的函數
          * @returns 
          */
-        function openBase(domMenu: HTMLElement | null, setMenuPosition: () => void, onMenuClose: () => void) {
+        function openBase(domMenu: HTMLElement | null, setMenuPosition: () => void, onMenuClose: () => void, anchor?: HTMLElement, origin?: { x: number; y: number }, animate = true) {
 
             if (domMenu === null) { return; }
 
@@ -86,8 +138,10 @@ export class Menu {
             domMenu.style.top = "0px";
 
             setMenuPosition();
+            if (animate) animateMenuEntrance(domMenu, anchor, origin);
 
             const funcClose = () => {
+                cancelMenuEntrance(domMenu);
                 domMenuBg.setAttribute("active", ""); // 關閉menu
                 _tempCloseList = _tempCloseList.filter((item) => {
                     return item.closeEvent !== funcClose;
@@ -178,7 +232,7 @@ export class Menu {
                 domBtn.classList.remove(css);
                 onMenuClose();
             };
-            openBase(domMenu, funcPosition, funcClose);
+            openBase(domMenu, funcPosition, funcClose, domBtn);
         }
 
         /**
@@ -217,7 +271,7 @@ export class Menu {
                 domMenu.style.bottom = "0";
             };
             let funcClose = () => { };
-            openBase(domMenu, funcPosition, funcClose);
+            openBase(domMenu, funcPosition, funcClose, undefined, { x: _mouseX, y: _mouseY });
         }
 
         /**
@@ -256,13 +310,13 @@ export class Menu {
                 domMenu.style.bottom = "0";
             };
             let funcClose = () => { };
-            openBase(domMenu, funcPosition, funcClose);
+            openBase(domMenu, funcPosition, funcClose, undefined, { x: X, y: Y });
         }
 
         /**
-         * 開啟 - 原地
+         * 開啟 - 原地（用於取代已關閉的選單，預設不播放進場動畫）
          */
-        function openAtOrigin(domMenu: HTMLElement | null, offsetX = 0, offsetY = 0) {
+        function openAtOrigin(domMenu: HTMLElement | null, offsetX = 0, offsetY = 0, animate = false) {
 
             if (domMenu === null) { return; }
 
@@ -292,7 +346,7 @@ export class Menu {
                 domMenu.style.bottom = "0";
             };
             let funcClose = () => { };
-            openBase(domMenu, funcPosition, funcClose);
+            openBase(domMenu, funcPosition, funcClose, undefined, { x: _mouseX, y: _mouseY }, animate);
         }
 
     }

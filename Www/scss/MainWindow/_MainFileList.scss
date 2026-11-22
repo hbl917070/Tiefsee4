@@ -1,4 +1,5 @@
 @use "../BaseStyle";
+@use "./PreviewItem";
 
 /* #region 檔案預覽視窗 */
 
@@ -14,84 +15,67 @@
 
     .main-fileListBody {
         overflow: hidden;
-        padding-top: 3px;
+        padding-top: 7px;
     }
 
     .fileList-item {
-        padding-left: 6px;
-        margin-right: 6px;
-        user-select: none;
-        margin-bottom: 6px;
-        white-space: nowrap;
-        position: relative;
-        cursor: pointer;
+        @include PreviewItem.item(".fileList-title", 7px, 4px);
     }
 
-    .fileList-item:hover::before {
-        position: absolute;
-        top: -3px;
-        left: 3px;
-        right: -3px;
-        bottom: -3px;
-        border: 2px solid var(--color-white40);
-        pointer-events: none;
-        z-index: 1;
-        content: "";
-        border-radius: 7px;
+    // 裁切縮圖邊緣，讓選取框與圖片之間露出面板背景。
+    .fileList-item[active="true"] .fileList-img {
+        clip-path: inset(1px round 4px);
     }
 
-    //選中
-    .fileList-item[active="true"]::before {
-        position: absolute;
-        top: -3px;
-        left: 3px;
-        right: -3px;
-        bottom: -3px;
-        border: 2px solid var(--color-blue);
-        pointer-events: none;
-        z-index: 1;
-        content: "";
-        border-radius: 7px;
+    // 裁切縮圖邊緣，當標題存在時，就不裁切底部。
+    .fileList-item[active="true"]:has(.fileList-title > *) .fileList-img {
+        clip-path: inset(1px 1px 0 round 4px);
     }
 
     .fileList-title {
         display: flex;
         flex-direction: row;
-        font-size: 14px;
+        order: 2;
+        padding-top: 3px;
+        font-size: 13px;
+    }
+
+    .fileList-title:not(:has(> *)) {
+        display: none;
     }
 
     //編號
     .fileList-no {
-        margin-bottom: 2px;
-        line-height: 14px;
-        height: 14px;
-        overflow: hidden;
-        font-weight: var(--fontWeightBold);
-        color: var(--color-blue);
+        @include BaseStyle.number-badge;
+        margin-bottom: 0;
         margin-right: 3px;
+        margin-left: 1px;
+        overflow: hidden;
     }
 
     //檔名
     .fileList-name {
-        margin-bottom: 2px;
+        min-width: 0;
+        margin-bottom: 0;
         line-height: 14px;
         height: 14px;
         overflow: hidden;
-        text-align: center;
+        text-align: left;
         flex: 1;
         white-space: nowrap;
+        text-overflow: ellipsis;
         color: var(--color-white);
     }
 
     //圖片
     .fileList-img {
-        width: calc(var(--fileList-width) - 12px);
-        height: calc(var(--fileList-width) - 12px);
+        width: calc(var(--fileList-width) - 15px);
+        height: calc(var(--fileList-width) - 15px);
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
         overflow: hidden;
-        border-radius: 4px;
+        border-radius: 6px;
         img {
             width: 100%;
             height: 100%;
@@ -104,7 +88,10 @@
             width: 100%;
             height: 100%;
             place-items: center;
-            svg { width: 100%; height: 100%; }
+            svg {
+                width: 100%;
+                height: 100%;
+            }
         }
     }
 }
@@ -148,7 +135,7 @@
         top: 0;
         bottom: 0;
         opacity: 0;
-        
+
         @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
     }

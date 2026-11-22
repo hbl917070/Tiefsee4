@@ -219,22 +219,13 @@ class LibIframe {
 
         const theme = JSON.parse(strTheme);
 
-        // 用背景色判斷是淺色還是深色主題
-        function getTheme(): "light" | "dark" {
-            let bg = theme["--color-window-background"];
-            // 判斷顏色接近黑色還是白色
-            let n = ((bg.r > 127) ? 1 : 0) + ((bg.g > 127) ? 1 : 0) + ((bg.b > 127) ? 1 : 0);
-            if (n >= 2) { return "light"; }
-            return "dark";
-        }
-
         theme["windowBackground"] = theme["--color-window-background"];
         theme["windowBorder"] = theme["--color-window-border"];
         theme["white"] = theme["--color-white"];
         theme["black"] = theme["--color-black"];
         theme["blue"] = theme["--color-blue"];
         theme["grey"] = theme["--color-grey"];
-        theme["theme"] = getTheme();
+        theme["theme"] = Lib.isDarkBackground(theme["--color-window-background"]) ? "dark" : "light";
 
         this._theme = theme;
         return theme;

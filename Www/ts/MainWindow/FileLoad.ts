@@ -1714,7 +1714,7 @@ export class FileLoad {
                 if (item === undefined) { return; }
                 const archiveName = getArchiveFileName(item.ref.archivePath);
                 const logicalPath = getArchiveLogicalPath(item);
-                baseWindow.setTitle(`${archiveName} / ${item.displayName}`, logicalPath);
+                baseWindow.setTitle(item.displayName, logicalPath, { context: archiveName, name: item.displayName });
                 return;
             }
             if (_isBulkView) {
@@ -1726,8 +1726,9 @@ export class FileLoad {
             } else {
                 const filePath = getFilePath();
                 if (filePath === undefined) { return; }
-                const text = `「${_flagFile + 1}/${_arFile.length}」 ${Lib.getFileName(filePath)}`;
-                baseWindow.setTitle(text, filePath);
+                const context = `${_flagFile + 1} / ${_arFile.length}`;
+                const name = Lib.getFileName(filePath);
+                baseWindow.setTitle(name, filePath, { context, name });
             }
         }
 

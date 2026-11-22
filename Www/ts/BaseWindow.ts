@@ -199,16 +199,31 @@ class BaseWindow {
 
     /**
      * 設定視窗標題
+     * @param text 視窗標題文字
+     * @param title 標題列的 title 屬性文字
+     * @param parts 標題列的額外部分，包括 context 和 name
      */
-    public async setTitle(text: string, title?: string) {
+    public async setTitle(text: string, title?: string, parts?: { context: string; name: string }) {
         WV_Window.Text = text;
         if (typeof title !== "string" || title === "") {
             title = "";
         }
-        const span = Lib.newDom(`<span>${text}</span>`);
-        span.setAttribute("title", title);
-        this.domTitlebarText.innerHTML = "";
-        this.domTitlebarText.appendChild(span);
+        const name = document.createElement("span");
+        name.className = "titlebar-name";
+        name.textContent = parts?.name ?? text;
+        this.domTitlebarText.replaceChildren();
+        this.domTitlebarText.title = title;
+        this.domTitlebarText.setAttribute("aria-label", parts ? `${parts.context} ${parts.name}` : text);
+        if (parts) {
+            const context = document.createElement("span");
+            context.className = "titlebar-context";
+            context.textContent = parts.context;
+            const separator = document.createElement("span");
+            separator.className = "titlebar-separator";
+            separator.setAttribute("aria-hidden", "true");
+            this.domTitlebarText.append(context, separator);
+        }
+        this.domTitlebarText.append(name);
     }
 
     /**

@@ -1,5 +1,10 @@
 export class Lib {
 
+    /** 依背景色的加權亮度判斷明暗；透明度不參與判斷。 */
+    public static isDarkBackground(color: { r: number; g: number; b: number }): boolean {
+        return color.r * 0.299 + color.g * 0.587 + color.b * 0.114 <= 128;
+    }
+
     /**
      * 將鍵盤事件轉成顯示用的快速鍵字串
      */

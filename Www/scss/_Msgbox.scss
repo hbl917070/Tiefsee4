@@ -41,6 +41,12 @@
 .msgbox-box[active="true"] {
     transform: translateY(0);
 }
+@media (prefers-reduced-motion: reduce) {
+    .msgbox-box {
+        transition: none;
+        transform: none;
+    }
+}
 
 .msgbox-txt {
     //display: flex;
@@ -84,15 +90,18 @@
     align-items: center;
     justify-content: center;
     color: var(--color-white);
-    background-color: var(--color-white20);
+    background-color: var(--filled-button-bg);
     border: none;
     height: 34px;
     border-radius: 5px;
     user-select: none;
 }
 .msgbox-btn:hover {
-    background-color: var(--color-white30);
+    background-color: var(--filled-button-hover-bg);
     cursor: pointer;
+}
+.msgbox-btn:active {
+    background-color: var(--filled-button-pressed-bg);
 }
 
 /*右上角的 X */
@@ -108,8 +117,11 @@
 }
 
 .msgbox-close:hover {
-    background-color: var(--color-white10);
+    background-color: var(--button-hover-bg);
     cursor: pointer;
+}
+.msgbox-close:active {
+    background-color: var(--button-pressed-bg);
 }
 
 .msgbox-close::after {
@@ -146,7 +158,10 @@
 }
 .msgbox-radio:hover {
     cursor: pointer;
-    background-color: var(--color-white10);
+    background-color: var(--button-hover-bg);
+}
+.msgbox-radio:active {
+    background-color: var(--button-pressed-bg);
 }
 
 //標題

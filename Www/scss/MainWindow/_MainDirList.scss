@@ -1,3 +1,6 @@
+@use "../BaseStyle";
+@use "./PreviewItem";
+
 /* #region 資料夾預覽視窗 */
 
 :root {
@@ -12,79 +15,56 @@
 
     .main-dirListBody {
         overflow: hidden;
-        padding-top: 3px;
+        padding-top: 7px;
     }
 
     .dirList-item {
-        padding-left: 6px;
-        margin-right: 6px;
-        user-select: none;
-        margin-bottom: 6px;
-        white-space: nowrap;
-        position: relative;
-        cursor: pointer;
+        @include PreviewItem.item(".dirList-title", 8px, 5px);
     }
 
-    .dirList-item:hover::before {
-        //outline: 2px solid var(--color-white40);
-        //outline-offset: 2px;
-        position: absolute;
-        top: -3px;
-        left: 3px;
-        right: -3px;
-        bottom: -3px;
-        border: 2px solid var(--color-white40);
-        pointer-events: none;
-        z-index: 1;
-        content: "";
-        border-radius: 7px;
+    // 整組縮圖一起裁切，保留各圖片之間原有的間距。
+    .dirList-item[active="true"] .dirList-imgbox {
+        clip-path: inset(3px round 4px);
     }
 
-    //選中
-    .dirList-item[active="true"]::before {
-        //outline: 2px solid var(--color-blue);
-        //outline-offset: 2px;
-        position: absolute;
-        top: -3px;
-        left: 3px;
-        right: -3px;
-        bottom: -3px;
-        border: 2px solid var(--color-blue);
-        pointer-events: none;
-        z-index: 1;
-        content: "";
-        border-radius: 7px;
+    .dirList-item[active="true"]:has(.dirList-title > *) .dirList-imgbox {
+        clip-path: inset(3px 3px 0 round 4px);
     }
 
     //
     .dirList-title {
         display: flex;
         flex-direction: row;
-        font-size: 14px;
+        order: 2;
+        padding-top: 2px;
+        font-size: 13px;
     }
 
-    //編號
-    .dirList-no {
-        margin-bottom: 2px;
-        line-height: 14px;
-        height: 14px;
+    .dirList-title:not(:has(> *)) {
+        display: none;
+    }
 
-        overflow: hidden;
-        font-weight: var(--fontWeightBold);
-        color: var(--color-blue);
+    // 編號
+    .dirList-no {
+        @include BaseStyle.number-badge;
+        margin-bottom: 0;
+        margin-left: 1px;
         margin-right: 3px;
+        overflow: hidden;
     }
 
     //檔名
     .dirList-name {
-        margin-bottom: 2px;
+        min-width: 0;
+        margin-bottom: 0;
         line-height: 14px;
         height: 14px;
 
         overflow: hidden;
-        text-align: center;
+        text-align: left;
         flex: 1;
         white-space: nowrap;
+        text-overflow: ellipsis;
         color: var(--color-white);
     }
 
@@ -99,7 +79,8 @@
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
-        border-radius: 4px;
+        border-radius: 6px;
+        overflow: hidden;
         img {
             width: 100%;
             height: 100%;
@@ -112,28 +93,31 @@
             width: 100%;
             height: 100%;
             place-items: center;
-            svg { width: 100%; height: 100%; }
+            svg {
+                width: 100%;
+                height: 100%;
+            }
         }
     }
     .dirList-img__1 {
-        width: calc((var(--dirList-width) - 1 * 3px) / 1);
-        height: calc((var(--dirList-width) - 1 * 3px) / 1);
+        width: calc((var(--dirList-width) - 16px - 0 * 3px) / 1);
+        height: calc((var(--dirList-width) - 16px - 0 * 3px) / 1);
     }
     .dirList-img__2 {
-        width: calc((var(--dirList-width) - 2 * 3px) / 2);
-        height: calc((var(--dirList-width) - 2 * 3px) / 2);
+        width: calc((var(--dirList-width) - 16px - 1 * 3px) / 2);
+        height: calc((var(--dirList-width) - 16px - 1 * 3px) / 2);
     }
     .dirList-img__3 {
-        width: calc((var(--dirList-width) - 3 * 3px) / 3);
-        height: calc((var(--dirList-width) - 3 * 3px) / 3);
+        width: calc((var(--dirList-width) - 16px - 2 * 3px) / 3);
+        height: calc((var(--dirList-width) - 16px - 2 * 3px) / 3);
     }
     .dirList-img__4 {
-        width: calc((var(--dirList-width) - 4 * 3px) / 4);
-        height: calc((var(--dirList-width) - 4 * 3px) / 4);
+        width: calc((var(--dirList-width) - 16px - 3 * 3px) / 4);
+        height: calc((var(--dirList-width) - 16px - 3 * 3px) / 4);
     }
     .dirList-img__5 {
-        width: calc((var(--dirList-width) - 5 * 3px) / 5);
-        height: calc((var(--dirList-width) - 5 * 3px) / 5);
+        width: calc((var(--dirList-width) - 16px - 4 * 3px) / 5);
+        height: calc((var(--dirList-width) - 16px - 4 * 3px) / 5);
     }
 
     .dirList-img:last-child {

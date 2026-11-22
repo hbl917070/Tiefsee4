@@ -1,3 +1,16 @@
+// 數字徽章：用於清單編號及收藏數量。
+@mixin number-badge {
+    flex-shrink: 0;
+    height: 14px;
+    padding: 0 2px;
+    border-radius: 3px;
+    outline: 1px solid var(--color-white40);
+    color: var(--color-white60);
+    font-size: 13px;
+    font-weight: var(--fontWeightBold);
+    line-height: 14px;
+}
+
 body,
 input,
 textarea,
@@ -29,6 +42,12 @@ div:focus {
 .base-scrollbar::-webkit-scrollbar {
     width: 10px;
     height: 10px;
+    background: transparent;
+}
+
+// 不使用瀏覽器預設的捲動軌道底色。
+.base-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 //滾動條軌道(移入時

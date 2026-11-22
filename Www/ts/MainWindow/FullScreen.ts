@@ -9,28 +9,22 @@ export class FullScreen {
 
     /** 是否啟用全螢幕 */
     private enabled = false;
-    /** 當前是否顯示標題列 */
+    /** 當前是否顯示標題列與工具列 */
     private showTitlebar = false;
-    /** 標題列 */
     private domTitleBar = document.querySelector("#window-titlebar") as HTMLDivElement;
-    /** 工具列 */
-    private domMainT = document.querySelector("#main-T") as HTMLDivElement;
     /** 標題列 - 離開全螢幕 */
     private btnExitFullScreen = document.querySelector(".titlebar-toolbar-exitFullScreen") as HTMLDivElement;
 
-    /** 滑鼠移到視窗頂端時，顯示標題列與工具列 */
+    /** 滑鼠移到視窗頂端時，顯示標題列與工具列。 */
     private mousemoveEvent = (e: MouseEvent) => {
-        // if (this.M.menu.getIsShow()) { return; }
-        if (this.showTitlebar === false && e.clientY <= 5) {
+        if (!this.showTitlebar && e.clientY <= 5) {
             this.showTitlebar = true;
-            document.body.setAttribute("showTitlebar", "true");
-        } else if (this.showTitlebar === true && e.clientY < this.domTitleBar.offsetHeight + 10) {
+        } else if (this.showTitlebar && e.clientY < this.domTitleBar.offsetHeight + 10) {
             this.showTitlebar = true;
-            document.body.setAttribute("showTitlebar", "true");
         } else {
             this.showTitlebar = false;
-            document.body.setAttribute("showTitlebar", "false");
         }
+        document.body.setAttribute("showTitlebar", String(this.showTitlebar));
     };
 
     /** 視窗化後就結束全螢幕 */
@@ -73,12 +67,16 @@ export class FullScreen {
         await WV_Window.SetFullScreen(val);
 
         if (val) {
+            this.showTitlebar = false;
+            document.body.removeAttribute("showTitlebar");
             document.body.setAttribute("fullScreen", "true");
             document.addEventListener("mousemove", this.mousemoveEvent);
             baseWindow.sizeChangeEvents.push(this.exitEvent);
         } else {
             document.body.setAttribute("fullScreen", "false");
             document.removeEventListener("mousemove", this.mousemoveEvent);
+            this.showTitlebar = false;
+            document.body.removeAttribute("showTitlebar");
             // 移除事件
             const index = baseWindow.sizeChangeEvents.indexOf(this.exitEvent);
             if (index > -1) {

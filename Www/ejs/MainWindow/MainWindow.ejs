@@ -174,12 +174,15 @@
                         <!-- exif 視窗 -->
                         <div class="mainExif" id="mainExif">
 
-                            <div class="mainExifTop">
+                            <div class="mainExifList base-scrollbar js-tabContent-info" id="mainExif-tabpanel-info" role="tabpanel" aria-labelledby="mainExif-tab-info"> </div>
+                            <div class="mainExifRelated base-scrollbar js-tabContent-related" id="mainExif-tabpanel-related" role="tabpanel" aria-labelledby="mainExif-tab-related"> </div>
+
+                            <div class="mainExifTabsBar">
                                 <div class="mainExifTabs js-tabBtns main-toolbar__scrollbar " role="tablist" aria-label="" i18n="menu.information" aria-orientation="horizontal">
                                     <div class="mainExifTabsContent">
                                         <!-- 資訊 -->
                                         <div class="mainExifTabsItem js-tabBtn-info svg-box" mark="true" i18n="menu.information" title="" role="tab" aria-selected="true" id="mainExif-tab-info" aria-controls="mainExif-tabpanel-info">
-                                            <%- await readSvg("data_usage_20_regular.svg"); %>
+                                            <%- await readSvg("textbox_20_regular.svg"); %>
                                         </div>
                                         <!-- 相關檔案 -->
                                         <div class="mainExifTabsItem js-tabBtn-related svg-box" mark="true" i18n="menu.relatedFiles" title="" role="tab" aria-selected="false" id="mainExif-tab-related" aria-controls="mainExif-tabpanel-related">
@@ -189,8 +192,6 @@
                                 </div>
                             </div>
 
-                            <div class="mainExifList base-scrollbar js-tabContent-info" id="mainExif-tabpanel-info" role="tabpanel" aria-labelledby="mainExif-tab-info"> </div>
-                            <div class="mainExifRelated base-scrollbar js-tabContent-related" id="mainExif-tabpanel-related" role="tabpanel" aria-labelledby="mainExif-tab-related"> </div>
                         </div>
                     </div>
 

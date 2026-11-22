@@ -1053,6 +1053,13 @@ export class MainWindow {
             initColor("--color-white");
             initColor("--color-black");
             initColor("--color-blue");
+            const isDarkBackground = Lib.isDarkBackground(_config.settings.theme["--color-window-background"]);
+            cssRoot.style.setProperty("--button-hover-bg", `var(--color-white${isDarkBackground ? 10 : 5})`);
+            cssRoot.style.setProperty("--button-selected-bg", `var(--color-white${isDarkBackground ? 15 : 10})`);
+            cssRoot.style.setProperty("--button-pressed-bg", `var(--color-white${isDarkBackground ? 20 : 15})`);
+            cssRoot.style.setProperty("--filled-button-bg", `var(--color-white${isDarkBackground ? 20 : 10})`);
+            cssRoot.style.setProperty("--filled-button-hover-bg", `var(--color-white${isDarkBackground ? 25 : 15})`);
+            cssRoot.style.setProperty("--filled-button-pressed-bg", `var(--color-white${isDarkBackground ? 30 : 20})`);
             // initColor("--color-grey");
             function initColor(name: string, opacity: boolean = false) {
                 // @ts-ignore
@@ -1064,6 +1071,9 @@ export class MainWindow {
                     for (let i = 1; i < 9; i++) {
                         cssRoot.style.setProperty(name + `${i}0`, `rgba(${c.r}, ${c.g}, ${c.b}, ${(i / 10)} )`)
                     }
+                    cssRoot.style.setProperty(name + `5`, `rgba(${c.r}, ${c.g}, ${c.b}, 0.05 )`);
+                    cssRoot.style.setProperty(name + `15`, `rgba(${c.r}, ${c.g}, ${c.b}, 0.15 )`);
+                    cssRoot.style.setProperty(name + `25`, `rgba(${c.r}, ${c.g}, ${c.b}, 0.25 )`);
                     cssRoot.style.setProperty(name, `rgba(${c.r}, ${c.g}, ${c.b}, 1 )`);
                 }
             }
@@ -1094,6 +1104,9 @@ export class MainWindow {
             filePanel.style.order = filePanelOrder.toString();
             imagePanel.style.order = imagePanelOrder.toString();
             infoPanel.style.order = infoPanelOrder.toString();
+            dirPanel.dataset.panelSide = dirPanelOrder > imagePanelOrder ? "right" : "left";
+            filePanel.dataset.panelSide = filePanelOrder > imagePanelOrder ? "right" : "left";
+            infoPanel.dataset.panelSide = infoPanelOrder > imagePanelOrder ? "right" : "left";
             // 更新拖曳條的位置
             _mainFileList.dragbar.setType((filePanelOrder > imagePanelOrder) ? "left" : "right");
             _mainDirList.dragbar.setType((dirPanelOrder > imagePanelOrder) ? "left" : "right");

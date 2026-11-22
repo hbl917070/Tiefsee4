@@ -233,7 +233,7 @@ export class MainDirList {
 
 			// 重新計算整體的高度
 			if (_tempItemHeight !== _itemHeight) {
-				_domDirListBody.style.height = (arDirKey.length * _itemHeight) + 4 + "px";
+				_domDirListBody.style.height = (arDirKey.length * _itemHeight) + 16 + "px";
 			}
 			_tempItemHeight = _itemHeight;
 

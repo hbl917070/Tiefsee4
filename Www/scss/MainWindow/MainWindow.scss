@@ -18,6 +18,10 @@
 :root {
     //圖示粗細
     --svgWeight: 0px;
+    --window-titlebar-height: 30px;
+    --main-toolbar-height: 42px;
+    --main-toolbar-bottom-gap: 3px;
+    --main-toolbar-extent: calc(var(--main-toolbar-height) + var(--main-toolbar-bottom-gap));
 }
 
 .titlebar-toolbar-btn svg,
@@ -31,9 +35,15 @@
 
 //-------------------------------
 
-// 標題列按鈕展開下拉選單時
-.titlebar-toolbar-btn.menuActive {
-    background-color: var(--color-white20);
+// 標題列按鈕的互動狀態
+.window-titlebar .titlebar-toolbar-btn:hover {
+    background-color: var(--button-hover-bg);
+}
+.window-titlebar .titlebar-toolbar-btn.menuActive {
+    background-color: var(--button-selected-bg);
+}
+.window-titlebar .titlebar-toolbar-btn:active {
+    background-color: var(--button-pressed-bg);
 }
 
 .titlebar-custom-toolbar {
@@ -54,6 +64,20 @@
 }
 .window-titlebar .titlebar-text {
     min-width: 0;
+}
+.window-titlebar .titlebar-context {
+    flex: 0 1 auto;
+    max-width: 45%;
+}
+.window-titlebar .titlebar-name {
+    min-width: 0;
+    flex: 0 1 auto;
+}
+.window-titlebar .titlebar-separator {
+    flex: 0 0 1px;
+    height: 18px;
+    margin: 0 8px;
+    background-color: var(--color-white20);
 }
 .window-titlebar .titlebar-toolbar {
     flex: 0 1 auto;
@@ -83,7 +107,9 @@
     border-radius: 4px;
     color: var(--color-white);
 }
-.titlebar-custom-toolbar-left .titlebar-custom-group[active="true"] > .titlebar-custom-item.main-toolbar-btn:first-child {
+.titlebar-custom-toolbar-left
+    .titlebar-custom-group[active="true"]
+    > .titlebar-custom-item.main-toolbar-btn:first-child {
     border-top-left-radius: 0;
 }
 .titlebar-custom-item.main-toolbar-btn[data-name="infoZoomRatio"] {
@@ -147,6 +173,7 @@
 
 //容器 - 上
 .main-T {
+    position: relative;
 }
 
 //容器 - 下
@@ -171,6 +198,41 @@
 .main-R {
     height: 100%;
     position: relative;
+}
+
+// 不改變面板的命中範圍；分隔線依面板相對於圖片的位置放置。
+.main-L:has(.main-dirList[active="true"]:not([hide="true"]))::after,
+.main-L2:has(.main-fileList[active="true"]:not([hide="true"]))::after,
+.main-R:has(.mainExif[active="true"]:not([hide="true"]))::after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: 1px;
+    background: var(--color-white10);
+    pointer-events: none;
+    z-index: 2;
+}
+.main-L[data-panel-side="left"]::after,
+.main-L2[data-panel-side="left"]::after,
+.main-R[data-panel-side="left"]::after {
+    right: 0;
+}
+.main-L[data-panel-side="right"]::after,
+.main-L2[data-panel-side="right"]::after,
+.main-R[data-panel-side="right"]::after {
+    left: 0;
+}
+
+.main-T::after {
+    content: "";
+    position: absolute;
+    height: 1px;
+    bottom: 0;
+    left: 0px;
+    right: 0px;
+    background: var(--color-white5);
+    pointer-events: none;
 }
 
 //容器 - 中 (用於顯示主內容)
@@ -273,24 +335,31 @@
 body[fullScreen="true"] {
     .window-titlebar {
         position: fixed;
-        top: -70px;
+        top: calc(-1 * (var(--window-titlebar-height) + var(--main-toolbar-extent)));
         left: 0;
         right: 0;
         transition: top 0.3s;
         z-index: 100;
         background-color: var(--color-black);
 
-        // 讓背景延伸到工具列
-        height: 70px;
-        padding-bottom: 40px;
+        // 背景涵蓋標題列與 42px 工具列及其 3px 下方間距。
+        height: calc(var(--window-titlebar-height) + var(--main-toolbar-extent));
+        padding-bottom: var(--main-toolbar-extent);
     }
     .main-T {
         position: fixed;
-        top: -40px;
+        top: calc(-1 * var(--main-toolbar-extent));
         left: 0;
         right: 0;
         transition: top 0.3s;
         z-index: 100;
+    }
+    // 展開頂部區塊時一律顯示工具列，不更動使用者設定。
+    .main-toolbar {
+        display: block !important;
+    }
+    .main-T::after {
+        display: none;
     }
     .titlebar-text {
         app-region: no-drag; //讓視窗不允許拖曳
@@ -308,12 +377,12 @@ body[fullScreen="true"] {
         display: none !important;
     }
 }
-//滑鼠移動到最上面時，顯示標題列與工具列
+// 滑鼠移到視窗頂端時展開標題列與工具列。
 body[fullScreen="true"][showTitlebar="true"] {
     .window-titlebar {
         top: 0px;
     }
     .main-T {
-        top: 30px;
+        top: var(--window-titlebar-height);
     }
 }

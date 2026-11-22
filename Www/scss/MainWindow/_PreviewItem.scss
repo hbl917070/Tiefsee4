@@ -1,0 +1,37 @@
+// Shared layout and interaction states for the two thumbnail panels.
+@mixin item($title, $left-padding, $border-left) {
+    display: flex;
+    flex-direction: column;
+    padding-left: $left-padding;
+    padding-bottom: 3px;
+    margin-right: 8px;
+    margin-bottom: 6px;
+    user-select: none;
+    white-space: nowrap;
+    position: relative;
+    cursor: pointer;
+
+    > * { position: relative; z-index: 1; }
+    &:has(#{$title} > *) { padding-bottom: 5px; }
+
+    &:hover::before, &[active="true"]::before {
+        position: absolute;
+        top: -3px;
+        left: $border-left;
+        right: -3px;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 0;
+        content: "";
+    }
+    &:hover::before {
+        border: 1px solid var(--color-white20);
+        background-color: var(--button-hover-bg);
+        border-radius: 7px;
+    }
+    &[active="true"]::before {
+        border: 2px solid var(--color-blue);
+        background-color: transparent;
+        border-radius: 6px;
+    }
+}

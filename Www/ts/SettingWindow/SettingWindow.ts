@@ -385,10 +385,7 @@ class SettingWindow {
          * @returns true=深色模式 false=淺色模式
          */
         function isDarkMode(bg: any) {
-            // 判斷顏色接近黑色還是白色
-            const n = ((bg.r > 127) ? 1 : 0) + ((bg.g > 127) ? 1 : 0) + ((bg.b > 127) ? 1 : 0);
-            if (n >= 2) { return false; }
-            return true;
+            return Lib.isDarkBackground(bg);
         }
 
         /**

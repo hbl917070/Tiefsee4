@@ -3,6 +3,7 @@ import { getExceptionMessage } from "../ApiResponse";
 import { WebAPI } from "../WebAPI";
 import { Toast } from "../Toast";
 import { MainWindow } from "./MainWindow";
+import { animateMenuEntrance, cancelMenuEntrance } from "./Menu";
 
 type FavoriteLoadContent = "firstFile" | "firstDirectory";
 
@@ -74,6 +75,7 @@ export class Favorites {
     private drag: FavoritesDragState | null = null;
     private suppressClick = false;
     private folderMotion: Animation | null = null;
+    private folderClosing = false;
     private editingItemId: string | null = null;
     private activeMenuItemId: string | null = null;
     private imageObserver: IntersectionObserver;
@@ -184,6 +186,7 @@ export class Favorites {
             addCurrentDirectory.disabled = !currentDirectory;
             this.render();
             this.positionPanel(button);
+            animateMenuEntrance(this.panel, button);
         } catch (error) {
             console.error("[Favorites] 無法讀取收藏資料。", error);
             this.M.msgbox.show({ txt: `${this.M.i18n.t("favorites.readFailed")}\n${String(error)}` });
@@ -193,6 +196,7 @@ export class Favorites {
     public close() {
         if (this.editing) return;
         this.closeFolder(false);
+        cancelMenuEntrance(this.panel);
         this.opened = false;
         this.panel.hidden = true;
         this.panel.setAttribute("aria-hidden", "true");
@@ -270,7 +274,7 @@ export class Favorites {
             if (action === "browse") { void this.browsePath(); return; }
             if (action === "cancel-edit") { this.closeEditor(); return; }
             if (action === "save-edit") { event.preventDefault(); void this.saveEditor(); return; }
-            if (action === "folder-back") { this.closeFolder(true); return; }
+            if (action === "folder-back") { this.closeFolder(); return; }
             if (action === "open-new-window") {
                 const item = this.findItem(this.activeMenuItemId ?? "");
                 this.M.menu.close(this.itemMenu);
@@ -303,9 +307,9 @@ export class Favorites {
             }
 
             const groupBack = target.closest(".favorites-folder-back");
-            if (groupBack) { this.closeFolder(true); return; }
+            if (groupBack) { this.closeFolder(); return; }
             if (this.activeGroupId && !this.folderView.contains(target)) {
-                this.closeFolder(true);
+                this.closeFolder();
                 return;
             }
             const tile = target.closest<HTMLElement>(".favorite-tile");
@@ -368,7 +372,7 @@ export class Favorites {
             const keyboardEvent = event as KeyboardEvent;
             if (keyboardEvent.key === "Escape") {
                 if (this.editing) { this.closeEditor(); keyboardEvent.stopPropagation(); }
-                else if (this.activeGroupId) this.closeFolder(true);
+                else if (this.activeGroupId) this.closeFolder();
                 else this.close();
             }
         });
@@ -984,6 +988,8 @@ export class Favorites {
     private async openFolder(group: FavoriteGroup, tile: HTMLElement) {
         if (group.type !== "group") return;
         this.folderMotion?.cancel();
+        this.folderMotion = null;
+        this.folderClosing = false;
         this.resetFolderMotionStyles();
         const rect = tile.getBoundingClientRect();
         this.activeGroupId = group.id;
@@ -1005,15 +1011,16 @@ export class Favorites {
         this.folderView.style.height = `${view.height}px`;
         this.folderView.style.transform = "none";
         this.folderView.style.transformOrigin = "top left";
-        this.folderMotion = this.folderView.animate([
-            {
-                opacity: .7,
-                transform: `translate3d(${rect.left - view.left}px, ${rect.top - view.top}px, 0) scale(${scaleX}, ${scaleY})`,
-                borderRadius: "10px",
-            },
-            { opacity: 1, transform: "translate3d(0, 0, 0) scale(1, 1)", borderRadius: "12px" },
-        ], { duration: 260, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
-        this.folderMotion.finished.catch(() => {});
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            this.folderMotion = this.folderView.animate([
+                {
+                    transform: `translate3d(${rect.left - view.left}px, ${rect.top - view.top}px, 0) scale(${scaleX}, ${scaleY})`,
+                    borderRadius: "10px",
+                },
+                { transform: "translate3d(0, 0, 0) scale(1, 1)", borderRadius: "8px" },
+            ], { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" });
+            this.folderMotion.finished.catch(() => {});
+        }
         this.folderView.hidden = false;
         this.folderView.querySelector<HTMLButtonElement>(".favorites-folder-back")?.focus();
     }
@@ -1024,8 +1031,9 @@ export class Favorites {
         return Math.min(max, Math.max(min, center));
     }
 
-    private closeFolder(animate: boolean) {
+    private closeFolder(animate = true) {
         if (!this.activeGroupId) return;
+        if (animate && this.folderClosing) return;
         const title = this.host.querySelector<HTMLInputElement>(".favorites-folder-title");
         if (title && document.activeElement === title) title.blur();
         const finish = () => {
@@ -1033,13 +1041,36 @@ export class Favorites {
             this.resetFolderMotionStyles();
             this.activeGroupId = null;
             this.folderMotion = null;
+            this.folderClosing = false;
             this.render();
         };
-        if (animate && this.folderMotion) {
-            this.folderMotion.playbackRate = 1.5;
-            this.folderMotion.reverse();
-            this.folderMotion.finished.then(finish).catch(() => {});
-        } else finish();
+        const tile = Array.from(this.rootGrid.querySelectorAll<HTMLElement>(".favorite-tile"))
+            .find(item => item.dataset.id === this.activeGroupId);
+        if (animate && this.folderMotion && tile?.isConnected) {
+            // The grid can be reordered while the folder is open. Measure the
+            // current tile instead of reversing the opening animation's old target.
+            const target = tile.getBoundingClientRect();
+            const left = parseFloat(this.folderView.style.left);
+            const top = parseFloat(this.folderView.style.top);
+            const width = parseFloat(this.folderView.style.width);
+            const height = parseFloat(this.folderView.style.height);
+            const currentTransform = getComputedStyle(this.folderView).transform;
+            this.folderMotion.cancel();
+            const motion = this.folderView.animate([
+                { transform: currentTransform, borderRadius: "8px" },
+                {
+                    transform: `translate3d(${target.left - left}px, ${target.top - top}px, 0) scale(${target.width / width}, ${target.height / height})`,
+                    borderRadius: "10px",
+                },
+            ], { duration: 120, easing: "cubic-bezier(.8,0,.8,.2)", fill: "both" });
+            this.folderMotion = motion;
+            this.folderClosing = true;
+            motion.finished.then(() => {
+                if (this.folderMotion === motion && this.folderClosing) finish();
+            }).catch(() => {});
+        } else {
+            finish();
+        }
     }
 
     private resetFolderMotionStyles() {

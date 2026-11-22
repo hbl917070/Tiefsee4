@@ -86,7 +86,7 @@ export function initThemeSettings({ _config, _i18n, getDom, isDarkMode, appleSet
         { r: 255, g: 255, b: 255, a: 0.97 },
         { r: 112, g: 112, b: 112, a: 0.25 },
         { r: 0, g: 0, b: 0, },
-        { r: 238, g: 238, b: 238, },
+        { r: 255, g: 255, b: 255, },
         { r: 0, g: 135, b: 220, },
     )
 

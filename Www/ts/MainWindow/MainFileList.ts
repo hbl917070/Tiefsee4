@@ -234,7 +234,7 @@ export class MainFileList {
             // 重新計算整體的高度
             if (_tempItemHeight !== _itemHeight) {
                 const arWaitingFile = M.fileLoad.getFileListItems();
-                _domFileListBody.style.height = (arWaitingFile.length * _itemHeight) + 4 + "px";
+                _domFileListBody.style.height = (arWaitingFile.length * _itemHeight) + 16 + "px";
             }
             _tempItemHeight = _itemHeight;
 

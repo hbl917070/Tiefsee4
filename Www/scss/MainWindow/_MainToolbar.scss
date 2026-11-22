@@ -1,11 +1,11 @@
 /* #region main-toolbar 工具列 */
 
 .main-toolbar {
-    height: 34px;
+    height: var(--main-toolbar-height);
     color: var(--color-white);
     overflow-x: hidden;
     overflow-y: hidden;
-    margin-bottom: 3px;
+    margin-bottom: var(--main-toolbar-bottom-gap);
 }
 .toolbar-content {
     display: flex;
@@ -90,7 +90,7 @@
 .main-toolbar-alignment {
     display: flex;
     align-items: center;
-    height: 34px;
+    height: var(--main-toolbar-height);
     min-width: 0;
 }
 .main-toolbar-alignment.is-empty {
@@ -118,12 +118,12 @@
 .main-toolbar-hr {
     width: 1px;
     min-width: 1px;
-    height: 29px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--color-white20);
-    margin: 0 3px;
+    margin: 0 6px;
 }
 
 // ----------
@@ -151,16 +151,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 15px;
     user-select: none;
     flex-shrink: 0; // 避免壓縮
     &:hover {
         cursor: pointer;
-        background-color: var(--color-white10);
+        background-color: var(--button-hover-bg);
     }
     &:active {
-        background-color: var(--color-white30);
+        background-color: var(--button-pressed-bg);
     }
     svg,
     img {
@@ -172,7 +172,10 @@
 
 // 開啟選單時
 .main-toolbar-btn.menuActive {
-    background-color: var(--color-white20) !important;
+    background-color: var(--button-selected-bg);
+}
+.main-toolbar-btn.menuActive:active {
+    background-color: var(--button-pressed-bg);
 }
 
 // ----------
