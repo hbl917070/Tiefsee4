@@ -1,5 +1,7 @@
 @use "./BaseStyle";
 
+.toastList.base-scrollbar { @include BaseStyle.native-scrollbar($always: true); }
+
 .toastList {
     position: fixed;
     bottom: 0;

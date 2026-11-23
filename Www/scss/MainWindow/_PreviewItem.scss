@@ -3,7 +3,8 @@
     display: flex;
     flex-direction: column;
     padding-left: $left-padding;
-    padding-bottom: 3px;
+    // 沒有標題時與 6px 外距合計 8px。
+    padding-bottom: 2px;
     margin-right: 8px;
     margin-bottom: 6px;
     user-select: none;

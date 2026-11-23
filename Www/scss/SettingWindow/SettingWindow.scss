@@ -1,4 +1,5 @@
 @use "../BaseWindow";
+@use "../BaseStyle";
 @use "../Msgbox";
 
 :root {
@@ -53,6 +54,11 @@ input::-webkit-inner-spin-button {
     flex: 1;
     position: relative;
     // background-color: var(--color-black20);
+}
+
+// 設定內容、頁籤及副檔名文字框共用詳細資料面板的捲動條樣式。
+:is(#window-body, .pagetab, #text-extension, #text-disassociate) {
+    @include BaseStyle.native-scrollbar;
 }
 
 .pagetab {
@@ -750,24 +756,8 @@ input::-webkit-inner-spin-button {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-color: var(--color-white40) var(--color-black20);
-    scrollbar-width: thin;
 }
-.toolbar-preview-scroll::-webkit-scrollbar {
-    height: 10px;
-}
-.toolbar-preview-scroll::-webkit-scrollbar-track {
-    background-color: var(--color-black20);
-}
-.toolbar-preview-scroll::-webkit-scrollbar-thumb {
-    border: 2px solid transparent;
-    border-radius: 6px;
-    background-color: var(--color-white40);
-    background-clip: padding-box;
-}
-.toolbar-preview-scroll::-webkit-scrollbar-button {
-    display: none;
-}
+.toolbar-preview-scroll { @include BaseStyle.native-scrollbar($axis: horizontal); }
 .toolbar-preview-scroll-content {
     display: flex;
     flex-direction: column;

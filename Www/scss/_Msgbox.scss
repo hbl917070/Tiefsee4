@@ -57,6 +57,7 @@
     overflow-y: auto;
     max-height: 100px;
 }
+.msgbox-txt.base-scrollbar { @include BaseStyle.native-scrollbar($always: true); }
 
 /*文字輸入框*/
 .msgbox-input {

@@ -99,7 +99,7 @@
 
 // 垂直滾動條
 .tiefseeview .scroll-y {
-    width: 20px;
+    width: 12px;
     position: absolute;
     right: 0px;
     top: 0px;
@@ -109,7 +109,7 @@
     // 背景
     .scroll-bg {
         height: 100%;
-        width: 10px;
+        width: 12px;
         
         right: 0;
         top: 0;
@@ -118,16 +118,14 @@
         
         @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
+        border-radius: 6px;
     }
 
     // 拖曳區域
     .scroll-box {
-        width: 10px;
-        background-color: var(--color-white40);
+        width: 4px;
         position: absolute;
-        right: 0;
-        border: 3px solid rgba(0, 0, 0, 0);
-        background-clip: content-box;
+        right: 4px;
     }
 
     &:hover {
@@ -140,11 +138,10 @@
         opacity: 1;
     }
 
-    // 移入與拖曳時-拖曳區域
     &:hover .scroll-box,
     &[action="true"] .scroll-box {
-        // background-color: rgba(255, 255, 255, 0.8);
-        // transform: scaleX(1);
+        width: 6px;
+        right: 3px;
     }
 }
 
@@ -152,7 +149,7 @@
 
 // 水平滾動條
 .tiefseeview .scroll-x {
-    height: 20px;
+    height: 12px;
     position: absolute;
     right: 0px;
     left: 0px;
@@ -161,7 +158,7 @@
 
     // 背景
     .scroll-bg {
-        height: 10px;
+        height: 12px;
         width: 100%;
  
         margin: auto;
@@ -172,16 +169,14 @@
 
         @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
+        border-radius: 6px;
     }
 
     // 拖曳區域
     .scroll-box {
-        height: 10px;
-        background-color: var(--color-white40);
+        height: 4px;
         position: absolute;
-        bottom: 0px;
-        border: 3px solid rgba(0, 0, 0, 0);
-        background-clip: content-box;
+        bottom: 4px;
     }
 
     &:hover {
@@ -194,12 +189,49 @@
         opacity: 1;
     }
 
-    // 移入與拖曳時-拖曳區域
     &:hover .scroll-box,
     &[action="true"] .scroll-box {
-        // background-color: rgba(255, 255, 255, 0.8);
-        // transform: scaleY(1);
+        height: 6px;
+        bottom: 3px;
     }
+}
+
+// 箭頭空間與滑塊外觀不影響 TiefseeScroll 計算位置的元素尺寸。
+.tiefseeview .scroll-y,
+.tiefseeview .scroll-x {
+    .scroll-box::before {
+        content: "";
+        position: absolute;
+        border-radius: 3px;
+        background: var(--color-white40);
+    }
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        background: var(--color-white40);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 2;
+    }
+    &:hover::before,
+    &:hover::after,
+    &[action="true"]::before,
+    &[action="true"]::after {
+        opacity: 1;
+    }
+}
+.tiefseeview .scroll-y {
+    .scroll-box::before { inset: 12px 0; }
+    &::before, &::after { right: 2px; width: 8px; height: 6px; }
+    &::before { top: 3px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+    &::after { bottom: 3px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+}
+.tiefseeview .scroll-x {
+    .scroll-box::before { inset: 0 12px; }
+    &::before, &::after { bottom: 2px; width: 6px; height: 8px; }
+    &::before { left: 3px; clip-path: polygon(0 50%, 100% 0, 100% 100%); }
+    &::after { right: 3px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
 }
 
 // --------

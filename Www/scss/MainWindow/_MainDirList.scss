@@ -28,7 +28,7 @@
     }
 
     .dirList-item[active="true"]:has(.dirList-title > *) .dirList-imgbox {
-        clip-path: inset(3px 3px 0 round 4px);
+        clip-path: inset(1px 1px 0 round 4px);
     }
 
     //

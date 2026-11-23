@@ -152,6 +152,12 @@
 .favorites-folder-grid { min-width: 0; flex: 1 1 auto; overflow-x: hidden; overflow-y: auto; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); grid-auto-rows: 106px; }
 .favorites-folder-out-hint { padding: 8px 2px 2px; color: var(--color-white60); font-size: 10px; text-align: center; }
 
+// 收藏和資料夾使用同一組原生捲動條外觀。
+.favorites-root-view,
+.favorites-folder-grid {
+    @include BaseStyle.native-scrollbar;
+}
+
 .favorites-editor-layer { position: absolute; z-index: 501; inset: 0; display: grid; place-items: center; padding: 14px; pointer-events: auto; }
 .favorites-editor {
     @include BaseStyle.blur-base();

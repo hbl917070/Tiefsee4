@@ -90,6 +90,21 @@ export class MainWindow {
         const _domMainL = document.getElementById("main-L") as HTMLElement; // 左邊區域
         const _domMainR = document.getElementById("main-R") as HTMLElement; // 左邊區域
 
+        // 面板可重新排序或暫時隱藏，依可見順序只在相鄰面板間繪製分隔線。
+        const panelContainers = Array.from(document.querySelectorAll<HTMLElement>(".main-C > div"));
+        function updatePanelDividers() {
+            const visiblePanels = panelContainers.filter(panel => {
+                const content = panel.querySelector<HTMLElement>(":scope > .main-item");
+                return !content || (content.getAttribute("active") === "true" && content.getAttribute("hide") !== "true");
+            }).sort((a, b) => Number(a.style.order) - Number(b.style.order));
+            panelContainers.forEach(panel => panel.classList.toggle("panel-divider", visiblePanels.includes(panel) && panel !== visiblePanels[visiblePanels.length - 1]));
+        }
+        const panelVisibilityObserver = new MutationObserver(updatePanelDividers);
+        panelContainers.forEach(panel => {
+            const content = panel.querySelector<HTMLElement>(":scope > .main-item");
+            if (content) panelVisibilityObserver.observe(content, { attributes: true, attributeFilter: ["active", "hide"] });
+        });
+
         let _firstRun = true; // 用於判斷是否為第一次執行
         let _startType = 0; // 1=直接啟動  2=快速啟動  3=快速啟動+常駐  4=單一執行個體  5=單一執行個體+常駐
 
@@ -1106,7 +1121,7 @@ export class MainWindow {
             infoPanel.style.order = infoPanelOrder.toString();
             dirPanel.dataset.panelSide = dirPanelOrder > imagePanelOrder ? "right" : "left";
             filePanel.dataset.panelSide = filePanelOrder > imagePanelOrder ? "right" : "left";
-            infoPanel.dataset.panelSide = infoPanelOrder > imagePanelOrder ? "right" : "left";
+            updatePanelDividers();
             // 更新拖曳條的位置
             _mainFileList.dragbar.setType((filePanelOrder > imagePanelOrder) ? "left" : "right");
             _mainDirList.dragbar.setType((dirPanelOrder > imagePanelOrder) ? "left" : "right");

@@ -1,4 +1,5 @@
 @use "../BaseWindow";
+@use "../BaseStyle";
 @use "../Menu";
 @use "../Msgbox";
 @use "../Toast";
@@ -200,28 +201,9 @@
     position: relative;
 }
 
-// 不改變面板的命中範圍；分隔線依面板相對於圖片的位置放置。
-.main-L:has(.main-dirList[active="true"]:not([hide="true"]))::after,
-.main-L2:has(.main-fileList[active="true"]:not([hide="true"]))::after,
-.main-R:has(.mainExif[active="true"]:not([hide="true"]))::after {
-    content: "";
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    width: 1px;
-    background: var(--color-white10);
-    pointer-events: none;
-    z-index: 2;
-}
-.main-L[data-panel-side="left"]::after,
-.main-L2[data-panel-side="left"]::after,
-.main-R[data-panel-side="left"]::after {
-    right: 0;
-}
-.main-L[data-panel-side="right"]::after,
-.main-L2[data-panel-side="right"]::after,
-.main-R[data-panel-side="right"]::after {
-    left: 0;
+// 只在可見面板之間保留 1px 分隔線。
+.main-C > .panel-divider {
+    border-right: 1px solid var(--color-white10);
 }
 
 .main-T::after {
@@ -271,6 +253,11 @@
     padding: 10px;
     outline: none;
     resize: none; //右下角的拖曳方塊
+}
+
+// 文字檔與側邊編輯器使用相同的原生捲動條外觀。
+:is(.mView-text, .textEditor-textarea) {
+    @include BaseStyle.native-scrollbar($axis: both);
 }
 
 //-------------------------------

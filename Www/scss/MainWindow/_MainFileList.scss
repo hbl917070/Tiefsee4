@@ -19,7 +19,7 @@
     }
 
     .fileList-item {
-        @include PreviewItem.item(".fileList-title", 7px, 4px);
+        @include PreviewItem.item(".fileList-title", 8px, 5px);
     }
 
     // 裁切縮圖邊緣，讓選取框與圖片之間露出面板背景。
@@ -49,6 +49,7 @@
         @include BaseStyle.number-badge;
         margin-bottom: 0;
         margin-right: 3px;
+        // 徽章的 1px outline 也要算進與選取框的間距。
         margin-left: 1px;
         overflow: hidden;
     }
@@ -69,8 +70,8 @@
 
     //圖片
     .fileList-img {
-        width: calc(var(--fileList-width) - 15px);
-        height: calc(var(--fileList-width) - 15px);
+        width: calc(var(--fileList-width) - 16px);
+        height: calc(var(--fileList-width) - 16px);
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
@@ -109,7 +110,7 @@
 
 // ----------------------------------------------------------------
 
-// 滾動條樣式  (小型、用於檔案預覽視窗
+// 檔案及資料夾預覽面板共用的捲動條。
 
 .base-scrollbar-mini {
     position: relative;
@@ -120,7 +121,7 @@
 
     /*垂直滾動條*/
     .scroll-y {
-        width: 10px;
+        width: 12px;
         position: absolute;
         right: 0px;
         z-index: 1;
@@ -129,12 +130,13 @@
     /*背景*/
     .scroll-y .scroll-bg {
         height: 100%;
-        width: 10px;
+        width: 12px;
 
         right: 0;
         top: 0;
         bottom: 0;
         opacity: 0;
+        border-radius: 6px;
 
         @include BaseStyle.blur-base(var(--color-black60));
         position: absolute;
@@ -142,13 +144,11 @@
 
     /*拖曳區域*/
     .scroll-y .scroll-box {
-        width: 3px;
-        background-color: var(--color-white40);
+        width: 4px;
+        background: transparent;
         position: absolute;
         right: 0;
-        border-top: 3px solid rgba(0, 0, 0, 0);
-        border-bottom: 3px solid rgba(0, 0, 0, 0);
-        background-clip: content-box;
+        border: 0;
     }
 
     .scroll-y:hover {
@@ -161,9 +161,45 @@
         opacity: 1;
     }
 
-    /*移入與拖曳時-拖曳區域*/
+    // 箭頭空間始終保留，避免滑塊在滑鼠移入時改變長度。
+    .scroll-y .scroll-box::before {
+        content: "";
+        position: absolute;
+        inset: 12px 0;
+        border-radius: 3px;
+        background: var(--color-white40);
+    }
+
+    // 箭頭只作視覺提示，輸入仍由捲動條本身處理。
+    .scroll-y::before,
+    .scroll-y::after {
+        content: "";
+        position: absolute;
+        right: 2px;
+        width: 8px;
+        height: 6px;
+        background: var(--color-white40);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 2;
+    }
+    .scroll-y::before {
+        top: 3px;
+        clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+    .scroll-y::after {
+        bottom: 3px;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+    .scroll-y:hover::before,
+    .scroll-y:hover::after,
+    .scroll-y[action="true"]::before,
+    .scroll-y[action="true"]::after {
+        opacity: 1;
+    }
     .scroll-y:hover .scroll-box,
     .scroll-y[action="true"] .scroll-box {
-        width: 7px !important;
+        width: 6px !important;
+        right: 3px;
     }
 }

@@ -11,6 +11,16 @@
     transform: translate(-2px, -1px); //讓拖曳條在中間
     transition: background-color 0.2s;
 }
+
+// 預覽面板的捲動條位於右緣，調整寬度的命中區放在面板外側。
+#dragbar-mainFileList,
+#dragbar-mainDirList {
+    transform: translate(0, -1px);
+}
+.window:has(.main-L2[data-panel-side="right"]) #dragbar-mainFileList,
+.window:has(.main-L[data-panel-side="right"]) #dragbar-mainDirList {
+    transform: translate(-4px, -1px);
+}
 //滑鼠移入時
 .dragbar-v:hover {
     background-color: var(--color-blue);

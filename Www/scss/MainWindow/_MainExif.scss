@@ -14,13 +14,7 @@
     height: 100%;
     flex-direction: column;
 
-    // 保留捲動條到面板邊緣的命中範圍，將可見的滑塊移到框線內。
-    .base-scrollbar::-webkit-scrollbar {
-        width: 10px;
-    }
-    .base-scrollbar::-webkit-scrollbar-thumb {
-        border-right-width: 3px;
-    }
+    .base-scrollbar { @include BaseStyle.native-scrollbar; }
 
     .mainExifTabsBar {
         width: 100%;
@@ -259,7 +253,7 @@
         // 只有外層資訊面板負責捲動與面板邊距，折疊內容共用項目樣式。
         &.base-scrollbar {
             padding-left: 12px;
-            padding-right: 2px; // 加上 10px 捲動條空間，與左側邊距對齊。
+            padding-right: 1px; // 加上 12px 捲動條空間，讓水平線距兩側各為 13px。
             overflow-y: auto;
             overflow-x: hidden;
             scrollbar-gutter: stable;
@@ -282,8 +276,8 @@
             content: "";
             position: absolute;
             top: 0;
-            left: 2px;
-            right: 1px;
+            left: 1px;
+            right: 0px;
             height: 1px;
             background-color: var(--color-white10);
         }
