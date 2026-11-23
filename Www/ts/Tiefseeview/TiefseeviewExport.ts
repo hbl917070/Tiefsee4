@@ -3,8 +3,7 @@ import type { TiefseeviewMediaType } from "./TiefseeviewDomMediaRenderer";
 export type TiefseeviewExportQuality = "high" | "low" | "medium";
 
 export interface TiefseeviewExportOptions {
-    getCanvas: () => Promise<HTMLCanvasElement | null>;
-    getCanvasZoom: (image: HTMLCanvasElement | HTMLImageElement | ImageBitmap, zoom: number, quality: TiefseeviewExportQuality) => HTMLCanvasElement;
+    getCanvas: (zoom: number, quality: TiefseeviewExportQuality) => Promise<HTMLCanvasElement | null>;
     getDataType: () => TiefseeviewMediaType;
 }
 
@@ -19,11 +18,9 @@ export class TiefseeviewExport {
     }
 
     public async getCanvasBlob(zoom: number, quality: TiefseeviewExportQuality, type = "png", q = 0.8): Promise<Blob | null> {
-        const sourceCanvas = await this.options.getCanvas();
+        const sourceCanvas = await this.options.getCanvas(zoom, quality);
         if (sourceCanvas == null) return null;
-        let exportCanvas = zoom < 1
-            ? this.options.getCanvasZoom(sourceCanvas, zoom, quality)
-            : sourceCanvas;
+        let exportCanvas: HTMLCanvasElement = sourceCanvas;
 
         let blob: Blob | null = null;
         await new Promise(resolve => {

@@ -292,8 +292,7 @@ export class Tiefseeview {
             draw: bigimgDraw
         });
         const exportService = new TiefseeviewExport({
-            getCanvas,
-            getCanvasZoom: (img, zoom, quality) => canvasCache.getCanvasZoom(img, zoom, quality),
+            getCanvas: getExportCanvas,
             getDataType: () => domMediaRenderer.getDataType()
         });
         const positionController = new TiefseeviewPositionController({
@@ -1049,7 +1048,7 @@ export class Tiefseeview {
             if (domMediaRenderer.getDataType() === "webgl" && webglSource !== null) {
                 // 匯出仍需要完整 Canvas；避免在主畫面改為 tile 後，匯出意外解碼超大原圖。
                 if (webglSource.width * webglSource.height > 16 * 1024 * 1024) return null;
-                const level = webglSource.levels.find(item => item.scale === 1);
+                const level = webglSource.levels.find(item => item.scale === 1 && item.url !== undefined);
                 if (level === undefined) return null;
                 const region = await webglSource.requestRegion({
                     rect: { x: 0, y: 0, width: webglSource.width, height: webglSource.height },
@@ -1105,6 +1104,37 @@ export class Tiefseeview {
             }
 
             return null;
+        }
+
+        async function getExportCanvas(zoom: number, quality: "high" | "low" | "medium"): Promise<HTMLCanvasElement | null> {
+            const source = webglSource;
+            if (zoom < 1 && domMediaRenderer.getDataType() === "webgl" && source !== null) {
+                // 選擇足以輸出目標尺寸的最小完整層級，避免解碼或建立原尺寸的超大 Canvas。
+                const levels = source.levels.filter(level => level.url !== undefined &&
+                    Math.round(source.width * level.scale) * Math.round(source.height * level.scale) <= 16 * 1024 * 1024
+                ).sort((a, b) => a.scale - b.scale);
+                const level = levels.find(item => item.scale >= zoom) ?? levels.at(-1);
+                if (level === undefined) return null;
+                const region = await source.requestRegion({
+                    rect: { x: 0, y: 0, width: source.width, height: source.height },
+                    scale: level.scale
+                });
+                try {
+                    if (source !== webglSource) throw new DOMException("圖片已切換", "AbortError");
+                    const canvas = document.createElement("canvas");
+                    canvas.width = Math.max(1, Math.floor(source.width * zoom));
+                    canvas.height = Math.max(1, Math.floor(source.height * zoom));
+                    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+                    ctx.imageSmoothingQuality = quality;
+                    ctx.drawImage(region.source, 0, 0, canvas.width, canvas.height);
+                    return canvas;
+                } finally {
+                    region.source.close();
+                }
+            }
+            const canvas = await getCanvas();
+            if (canvas === null) return null;
+            return zoom < 1 ? canvasCache.getCanvasZoom(canvas, zoom, quality) : canvas;
         }
 
         /**

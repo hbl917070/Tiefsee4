@@ -1,6 +1,7 @@
 import { Lib } from "../Lib";
 import { WebAPI } from "../WebAPI";
 import { MainWindow } from "./MainWindow";
+import { Toast } from "../Toast";
 
 export class ImgSearch {
 
@@ -45,22 +46,38 @@ export class ImgSearch {
                     // if (await WV_File.Exists(filePath) === false) { return; }
                     M.menu.close();
 
-                    if (url == "googleSearch") {
-                        const imgSearchUrl = await googleSearch(getPath());
-                        if (imgSearchUrl === "") {
-                            M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); // 圖片搜尋失敗
-                            return;
-                        }
-                        WV_RunApp.OpenUrl(imgSearchUrl);
+                    const path = getPath();
+                    if (!M.fileLoad.getIsBulkView() && path === M.fileLoad.getFilePath() &&
+                        !M.fileLoad.isCurrentViewerReady(path)) {
+                        Toast.show(M.i18n.t("msg.imageSearchWaitForImage"), 3000);
+                        return;
+                    }
 
-                    } else {
-                        const imgUrl = await getWebUrl(getPath());
-                        if (imgUrl === "") {
-                            M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") }); // 圖片搜尋失敗
-                            return;
+                    try {
+                        if (url == "googleSearch") {
+                            const imgSearchUrl = await googleSearch(path);
+                            if (imgSearchUrl === "") {
+                                M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") });
+                                return;
+                            }
+                            WV_RunApp.OpenUrl(imgSearchUrl);
+
+                        } else {
+                            const imgUrl = await getWebUrl(path);
+                            if (imgUrl === "") {
+                                M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") });
+                                return;
+                            }
+                            const imgSearchUrl = url.replace("{url}", imgUrl);
+                            WV_RunApp.OpenUrl(imgSearchUrl);
                         }
-                        const imgSearchUrl = url.replace("{url}", imgUrl);
-                        WV_RunApp.OpenUrl(imgSearchUrl);
+                    } catch (error) {
+                        if (error instanceof DOMException && error.name === "AbortError") {
+                            Toast.show(M.i18n.t("msg.imageSearchCancelled"), 3000);
+                        } else {
+                            console.error("Image search failed", error);
+                            M.msgbox.show({ txt: M.i18n.t("msg.imageSearchFailed") });
+                        }
                     }
                 };
                 domMenuList?.append(dom);

@@ -486,6 +486,20 @@ export const msg = {
         //#endregion
 
         //#region 搜圖
+        imageSearchWaitForImage: ({
+            "zh-TW": "請等圖片載入完成後再搜圖",
+            "zh-CN": "请等待图片加载完成后再搜图",
+            "en": "Wait for the image to finish loading before searching",
+            "ru": "Дождитесь загрузки изображения перед поиском",
+            "ja": "画像の読み込みが完了してから検索してください",
+        } satisfies LocalizedText),
+        imageSearchCancelled: ({
+            "zh-TW": "圖片已切換，搜圖已取消",
+            "zh-CN": "图片已切换，搜索已取消",
+            "en": "Image search cancelled because the image changed",
+            "ru": "Поиск отменён, поскольку изображение изменилось",
+            "ja": "画像が切り替わったため、画像検索をキャンセルしました",
+        } satisfies LocalizedText),
         imageSearchFailed: ({
             "zh-TW": "圖片搜尋失敗",
             "zh-CN": "图片搜索失败",

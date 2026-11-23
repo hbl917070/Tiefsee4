@@ -68,6 +68,7 @@ export class FileLoad {
     public prevFile;
     public showFile;
     public getFilePath;
+    public isCurrentViewerReady: (path: string) => boolean;
     public getFileShortPath;
     public getGroupType;
     public setGroupType;
@@ -106,6 +107,9 @@ export class FileLoad {
         var _flagFile: number;
         /** loadFile是否正在處理中 */
         var _isLoadFileFinish = true;
+        let viewerFilePath = "";
+        this.isCurrentViewerReady = (path: string) =>
+            path !== "" && path === getFilePath() && path === viewerFilePath && M.fileShow.getIsLoaded();
         /** 當前是否為 大量瀏覽模式 */
         var _isBulkView = false;
         /** 當前是否為 大量瀏覽模式子視窗 */
@@ -1443,6 +1447,7 @@ export class FileLoad {
                         await M.fileShow.openBulkView();
                         return;
                     }
+                    viewerFilePath = fileInfo.FullPath;
                     await M.fileShow.openIconImage(fileInfo.Path, fileInfo, () => isCurrentArchiveItem(item));
                     return;
                 }
@@ -1527,6 +1532,7 @@ export class FileLoad {
             }
 
             const loadingPath = _isArchiveMode ? undefined : getFilePath();
+            const viewerPath = _isArchiveMode ? fileInfo2.FullPath : fileInfo2.Path;
             const run = async () => {
                 // 節流工作會晚於呼叫端執行，因此執行時仍須確認 QuickLook 工作階段有效。
                 signal?.removeEventListener("abort", clearPending);
@@ -1561,9 +1567,11 @@ export class FileLoad {
                     if (signal?.aborted) return;
 
                     if (_groupType === GroupType.img || _groupType === GroupType.unknown) {
+                        viewerFilePath = viewerPath;
                         await loadViewer(M.fileShow.openImage(fileInfo2));
                     }
                     if (_groupType === GroupType.video) {
+                        viewerFilePath = viewerPath;
                         await loadViewer(M.fileShow.openVideo(fileInfo2, signal));
                     }
                     if (_groupType === GroupType.pdf) {
