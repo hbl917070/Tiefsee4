@@ -89,7 +89,7 @@ export class MainFileList {
 
         // 拖曳改變size
         const _dragbar = this.dragbar = new Dragbar();
-        _dragbar.init("right", _domFileList, _domDragbarMainFileList, M.domMainL);
+        _dragbar.init("right", _domFileList, _domDragbarMainFileList);
         // 拖曳開始
         _dragbar.setEventStart(() => { })
         // 拖曳

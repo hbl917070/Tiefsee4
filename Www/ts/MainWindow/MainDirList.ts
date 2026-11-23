@@ -58,7 +58,7 @@ export class MainDirList {
 
 		// 拖曳改變 size
 		const _dragbar = this.dragbar = new Dragbar();
-		_dragbar.init("right", _domDirList, _domDragbarMainDirList, M.domMainL);
+		_dragbar.init("right", _domDirList, _domDragbarMainDirList);
 		// 拖曳開始
 		_dragbar.setEventStart(() => { })
 		// 拖曳

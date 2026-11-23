@@ -20,13 +20,13 @@ export class Dragbar {
         const _domWindowBody = document.getElementById("window-body") as HTMLElement;
         let _domBox: HTMLElement; // 螢幕看得到的區域
         let _domDragbar: HTMLElement;
-        let _domObserve: HTMLElement;
         let _tempVal = 0;
         let _tempWidth = 0;
         let _hammerDragbar: HammerManager;
         let _type: ("left" | "right") = "right";
         let _enable = true;
         let _tempBoxRect: DOMRect = new DOMRect();
+        let _positionFrame = 0;
 
         let _eventStart = () => { };
         let _eventMove = (val: number) => { };
@@ -70,6 +70,7 @@ export class Dragbar {
          */
         this.setType = (type: ("left" | "right")) => {
             _type = type;
+            _tempBoxRect = new DOMRect();
             updatePosition();
         }
 
@@ -78,16 +79,19 @@ export class Dragbar {
          * @param domBox 要被修改 size 的物件
          * @param domDragbar 拖曳條
          */
-        this.init = (type: ("left" | "right"), domBox: HTMLElement, domDragbar: HTMLElement, domObserve: HTMLElement) => {
+        this.init = (type: ("left" | "right"), domBox: HTMLElement, domDragbar: HTMLElement) => {
             _type = type;
             _domBox = domBox;
             _domDragbar = domDragbar;
-            _domObserve = domObserve;
             _hammerDragbar = new Hammer(_domDragbar);
 
-            // 區塊 或 body 改變大小時，更新拖曳條的坐標
-            new ResizeObserver(updatePosition).observe(_domObserve);
-            new ResizeObserver(updatePosition).observe(document.body);
+            // 相鄰面板改變大小時，此面板可能只移動而不改變尺寸。
+            const observer = new ResizeObserver(updatePosition);
+            const panelContainer = _domBox.parentElement!.parentElement!;
+            for (const panel of panelContainer.children) {
+                observer.observe(panel, { box: "border-box" });
+            }
+            observer.observe(document.body);
 
             // 拖曳開始
             _domDragbar.addEventListener("pointerdown", (ev) => { // mousedown + touchstart
@@ -138,25 +142,24 @@ export class Dragbar {
          * 更新拖曳條的坐標
          */
         function updatePosition() {
-
+            cancelAnimationFrame(_positionFrame);
             if (_enable === false) {
                 _tempBoxRect = new DOMRect();
                 return;
             }
+            _positionFrame = requestAnimationFrame(() => {
+                const rect = _domBox.getBoundingClientRect();
 
-            const rect = _domBox.getBoundingClientRect();
+                // 如果位置沒有改變，就不更新
+                if (rect.left === _tempBoxRect.left &&
+                    rect.top === _tempBoxRect.top &&
+                    rect.width === _tempBoxRect.width &&
+                    rect.height === _tempBoxRect.height
+                ) {
+                    return;
+                }
+                _tempBoxRect = rect;
 
-            // 如果位置沒有改變，就不更新
-            if (rect.left === _tempBoxRect.left &&
-                rect.top === _tempBoxRect.top &&
-                rect.width === _tempBoxRect.width &&
-                rect.height === _tempBoxRect.height
-            ) {
-                return;
-            }
-            _tempBoxRect = rect;
-
-            requestAnimationFrame(() => {
                 if (_type === "left") {
                     _domDragbar.style.top = rect.top + "px"
                     _domDragbar.style.left = rect.left + "px"

@@ -147,7 +147,7 @@ export class MainExif {
 
 		// 拖曳改變 size
 		const _dragbar = this.dragbar = new Dragbar();
-		_dragbar.init("left", _domMainExif, _domDragbarMainFileList, M.domMainR);
+		_dragbar.init("left", _domMainExif, _domDragbarMainFileList);
 		// 拖曳開始
 		_dragbar.setEventStart(() => { })
 		// 拖曳
