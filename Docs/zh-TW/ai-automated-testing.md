@@ -169,6 +169,7 @@ Debug 測試版把 `AppData`、設定檔、暫存資料和 WebView2 user data �
 | `tiefsee_state` | 讀取指定視窗標題、檔案參數與頁面文字 |
 | `tiefsee_snapshot` | 讀取互動 DOM、可讀名稱、文字和元素座標；回報原生 checkbox／radio 的 checked，以及自訂 ARIA 控件的 role、名稱、`aria-checked`、`aria-disabled`、`aria-labelledby`、`aria-selected`、`aria-expanded` 與 `aria-controls` 狀態；套用自訂樣式而隱藏的 input 會回報關聯標籤 selector |
 | `tiefsee_inspect` | 依 CSS selector 檢查元素名稱、可見性、焦點、值、checkbox／radio 狀態、ARIA 狀態與座標；文字欄位會回報選取起訖位置和選取文字，並回報頁面目前反白選取的文字；隱藏 input 會回報可見關聯標籤 selector |
+| `tiefsee_measure_webview_bounds` | 只讀取隔離 Debug 視窗的原生 WebView2／Form 實體 bounds、DPI、縮放與頁面尺寸，用於 DPI 邊緣裁切研究；此資訊不包含實際螢幕合成結果 |
 | `tiefsee_click` | 只在 selector 唯一且可見時，送出真實 CDP 滑鼠點擊；多行 inline 元素會以實際排版片段定位，避免點到行間空白；`button` 可指定 `left`、`right` 或 `middle`；`clickCount: 2` 可送出雙擊，預設為 1；`includeSnapshot: true` 可在同一回覆取得點擊後狀態 |
 | `tiefsee_click_at` | 依 DOM 檢查所得的 viewport CSS 座標送出真實 CDP 滑鼠點擊；座標超出視窗時會拒絕 |
 | `tiefsee_click_text` | 依唯一可見的精確文字定位互動項目並送出真實 CDP 左鍵點擊；適合快照能看到選單文字、但沒有 selector 的情況；可用 `includeSnapshot: true` 合併操作後驗證 |

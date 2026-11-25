@@ -77,14 +77,12 @@ body {
 
 /* 視窗本體 */
 .window {
-    /* transition: transform 0.2s;
-  transform: translateY(10px) scale(0.98); */
     flex: 1;
     position: fixed;
     top: 0px;
     left: 0px;
-    right: 1.5px;
-    bottom: 1.5px;
+    width: calc(100% - var(--window-physical-inset-x, 1px));
+    height: calc(100% - var(--window-physical-inset-y, 1px));
     overflow: hidden;
     background-color: var(--color-window-background);
     border-radius: var(--window-border-radius);
@@ -98,8 +96,8 @@ body {
 
 // 視窗最大化時
 .window.maximized {
-    right: 0px !important;
-    bottom: 0px !important;
+    width: 100%;
+    height: 100%;
     border: none;
     border-radius: 0px;
 }
@@ -108,11 +106,16 @@ body {
 }
 // win11 圓角
 .window.windowRoundedCorners {
-    right: 0.5px;
-    bottom: 0.5px;
     border: none;
     border-radius: 0px;
 }
+
+// 100% 螢幕縮放時，原生圓角邊框已與 WebView2 邊緣貼合。
+.window.windowRoundedCorners[data-screen-dpi-100] {
+    width: 100%;
+    height: 100%;
+}
+
 /*---------------------------*/
 
 /* #region window-titlebar 標題列*/

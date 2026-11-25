@@ -39,6 +39,9 @@ interface WebWindow {
 
 interface WV_Window {
 
+    /** 取得 WebView2 視窗的實體像素尺寸（JSON）。 */
+    GetWebViewPixelSize(): string;
+
     /** 開啟開發人員工具 */
     OpenDevTools(): void;
 

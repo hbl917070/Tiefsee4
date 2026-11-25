@@ -23,6 +23,64 @@ public class WindowWebViewBridge {
         this.M = m;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DiagnosticRect { public int Left, Top, Right, Bottom; }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr handle, out DiagnosticRect rect);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DiagnosticPoint { public int X, Y; }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetClientRect(IntPtr handle, out DiagnosticRect rect);
+
+    [DllImport("user32.dll")]
+    private static extern bool ClientToScreen(IntPtr handle, ref DiagnosticPoint point);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(IntPtr handle);
+
+    /// <summary>取得 WebView2 視窗的實體像素尺寸，供網頁換算邊緣內縮。</summary>
+    public string GetWebViewPixelSize() {
+        if (!GetWindowRect(M.Wv2.Handle, out var rect) ||
+            !GetClientRect(M.Handle, out var client)) {
+            throw new InvalidOperationException("Unable to read WebView2 bounds.");
+        }
+        var clientOrigin = new DiagnosticPoint { X = client.Left, Y = client.Top };
+        if (!ClientToScreen(M.Handle, ref clientOrigin)) {
+            throw new InvalidOperationException("Unable to read window client position.");
+        }
+        var clientRight = clientOrigin.X + client.Right - client.Left;
+        var clientBottom = clientOrigin.Y + client.Bottom - client.Top;
+        return System.Text.Json.JsonSerializer.Serialize(new {
+            width = rect.Right - rect.Left, height = rect.Bottom - rect.Top,
+            rightClip = Math.Max(0, rect.Right - clientRight),
+            bottomClip = Math.Max(0, rect.Bottom - clientBottom),
+            dpi = GetDpiForWindow(M.Handle)
+        });
+    }
+
+#if DEBUG
+    /// <summary>隔離 CDP 測試專用：讀取原生控制項實體尺寸。</summary>
+    public string GetWebViewBoundsForTest() {
+        if (Environment.GetEnvironmentVariable("TIEFSEE_ENABLE_TEST_CDP") != "1") {
+            throw new InvalidOperationException("Test CDP is not enabled.");
+        }
+        if (!GetWindowRect(M.Wv2.Handle, out var webRect) || !GetWindowRect(M.Handle, out var formRect)) {
+            throw new InvalidOperationException("Unable to read window bounds.");
+        }
+        return System.Text.Json.JsonSerializer.Serialize(new {
+            webLeft = webRect.Left, webTop = webRect.Top,
+            webWidth = webRect.Right - webRect.Left, webHeight = webRect.Bottom - webRect.Top,
+            formLeft = formRect.Left, formTop = formRect.Top,
+            formWidth = formRect.Right - formRect.Left, formHeight = formRect.Bottom - formRect.Top,
+            dpi = M.DeviceDpi, zoom = M.Wv2.ZoomFactor,
+            windowState = M.WindowState.ToString()
+        });
+    }
+#endif
+
     /// <summary>
     /// 清理 webview2 的暫存
     /// </summary>

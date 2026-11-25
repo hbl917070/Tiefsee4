@@ -77,6 +77,8 @@ class BaseWindow {
     public sizeChangeEvents: (() => void)[] = []; // sizeChange 時執行的 function
     public fileWatcherEvents: ((data: FileWatcherData[]) => void)[] = []; // 檔案發生變化時時執行的 function
     public touchDrop = new TouchDrop(this);
+    /** 原生 WebView2 bounds 改變時重新計算邊緣內縮。 */
+    public onWebViewPixelSizeChanged: () => void = () => { };
 
     public get windowId(): string {
         if (this.appInfo?.windowId) {
@@ -100,6 +102,81 @@ class BaseWindow {
         this.btnMaximized = _btnMaximized;
         this.btnClose = _btnClose;
         this.domTitlebarText = _domTitlebarText;
+
+        // 比對原生 WebView2 與網頁的實體尺寸，分別計算右邊和下邊的內縮。
+        let resolutionQuery: MediaQueryList | undefined;
+        let revision = 0;
+        let timer: number | undefined;
+        let inFlight = false;
+        let disposed = false;
+        const updatePhysicalInset = () => {
+            if (disposed) { return; }
+            const request = ++revision;
+            const dpr = window.devicePixelRatio || 1;
+            // 等待原生尺寸穩定期間採用保守值；這仍不是所有環境的保證。
+            const fallbackPixels = 1 + Math.ceil(dpr);
+            _domWindow.style.setProperty("--window-physical-inset-x", `${fallbackPixels / dpr}px`);
+            _domWindow.style.setProperty("--window-physical-inset-y", `${fallbackPixels / dpr}px`);
+            window.clearTimeout(timer);
+            const readSize = async (attempt: number) => {
+                if (disposed || request !== revision) { return; }
+                if (inFlight) { return; }
+                inFlight = true;
+                let retry = false;
+                try {
+                    const before = document.body.getBoundingClientRect();
+                    const native: { width: number; height: number; rightClip: number; bottomClip: number; dpi: number } = JSON.parse(await WV_Window.GetWebViewPixelSize());
+                    const after = document.body.getBoundingClientRect();
+                    if (disposed || request !== revision) { return; }
+                    if (dpr !== window.devicePixelRatio || before.width !== after.width || before.height !== after.height) {
+                        retry = true;
+                        return;
+                    }
+                    // 圓角視窗的 100% 特例依螢幕 DPI 判斷，不受網頁縮放影響。
+                    _domWindow.toggleAttribute("data-screen-dpi-100", native.dpi === 96);
+                    const extraX = Math.round(after.width * dpr) - native.width;
+                    const extraY = Math.round(after.height * dpr) - native.height;
+                    // 表面超出控制項的部分及控制項超出窗體 client 的部分分開計算。
+                    // 基本 1px 是既有對齊／系統邊框的保守補償，不是所有環境的保證。
+                    if (native.width > 0 && extraX >= 0 && extraX < native.width && native.rightClip >= 0 && native.rightClip <= native.width) {
+                        _domWindow.style.setProperty("--window-physical-inset-x", `${(Math.max(1, native.rightClip) + extraX) / dpr}px`);
+                    } else {
+                        retry = true;
+                    }
+                    if (native.height > 0 && extraY >= 0 && extraY < native.height && native.bottomClip >= 0 && native.bottomClip <= native.height) {
+                        _domWindow.style.setProperty("--window-physical-inset-y", `${(Math.max(1, native.bottomClip) + extraY) / dpr}px`);
+                    } else {
+                        retry = true;
+                    }
+                } catch (error) {
+                    console.warn("Unable to calculate window inset", error);
+                    retry = true;
+                } finally {
+                    inFlight = false;
+                    if (!disposed && request !== revision) {
+                        updatePhysicalInset();
+                    } else if (!disposed && retry && attempt < 2) {
+                        timer = window.setTimeout(() => { void readSize(attempt + 1); }, 200 * (attempt + 1));
+                    }
+                }
+            };
+            timer = window.setTimeout(() => { void readSize(0); }, 80);
+        };
+        const updateResolution = () => {
+            resolutionQuery?.removeEventListener("change", updateResolution);
+            resolutionQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+            resolutionQuery.addEventListener("change", updateResolution);
+            updatePhysicalInset();
+        };
+        this.onWebViewPixelSizeChanged = updatePhysicalInset;
+        window.addEventListener("resize", updatePhysicalInset);
+        window.addEventListener("pagehide", (event) => {
+            if (event.persisted) { return; }
+            disposed = true;
+            window.clearTimeout(timer);
+            resolutionQuery?.removeEventListener("change", updateResolution);
+        });
+        updateResolution();
 
         (async () => {
             // 判斷目前的狀態是視窗化還是最大化
@@ -323,6 +400,7 @@ class BaseWindow {
         this.height = height;
         this.windowState = windowState;
 
+        this.onWebViewPixelSizeChanged();
         this.updateWindowState();
 
         for (let i = 0; i < this.sizeChangeEvents.length; i++) {

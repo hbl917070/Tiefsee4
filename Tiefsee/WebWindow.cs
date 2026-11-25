@@ -329,9 +329,29 @@ public class WebWindow : FormNone {
     public async Task Init() {
 
         _wv2 = new WebView2();
+        bool webViewSizeNotificationPending = false;
+        _wv2.SizeChanged += (sender, e) => {
+            if (webViewSizeNotificationPending || _wv2.CoreWebView2 == null || !IsHandleCreated || IsDisposed) { return; }
+            webViewSizeNotificationPending = true;
+            BeginInvoke((Action)(() => {
+                webViewSizeNotificationPending = false;
+                if (!IsDisposed && !_wv2.IsDisposed && _wv2.CoreWebView2 != null) {
+                    RunJs("if (window.baseWindow) baseWindow.onWebViewPixelSizeChanged();");
+                }
+            }));
+        };
         _wv2.ZoomFactor = 1;
         _wv2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
         this.Controls.Add(_wv2);
+
+        // WebView2 有時在跨螢幕後仍使用舊的 DPI，直到控制項尺寸改變。
+        // 等 WinForms 處理完 DPI 變更後短暫更新尺寸，使 WebView2 重新計算縮放。
+        DpiChanged += (_, _) => BeginInvoke((Action)(() => {
+            if (IsDisposed || _wv2.IsDisposed) { return; }
+            var size = _wv2.Size;
+            _wv2.Size = new Size(size.Width + 1, size.Height);
+            _wv2.Size = size;
+        }));
 
         var panel = new Panel();
         panel.Dock = DockStyle.Fill;

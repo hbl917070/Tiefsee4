@@ -1156,7 +1156,34 @@ async function benchmarkImageForWindow(windowId, path, renderer) {
   } finally { cdp.close(); }
 }
 
+async function measureWebViewBoundsForWindow(windowId) {
+  const { cdp } = await findWindowTarget(windowId);
+  try {
+    const result = await cdp.call("Runtime.evaluate", {
+      expression: `(async () => {
+        const native = JSON.parse(await chrome.webview.hostObjects.WV_Window.GetWebViewBoundsForTest());
+        const client = JSON.parse(await chrome.webview.hostObjects.WV_Window.GetWebViewPixelSize());
+        const body = document.body.getBoundingClientRect();
+        const frameElement = document.querySelector('.window');
+        const frame = frameElement.getBoundingClientRect();
+        const style = getComputedStyle(frameElement);
+        return {native, client, dpr: window.devicePixelRatio,
+          body: {width: body.width, height: body.height},
+          frame: {width: frame.width, height: frame.height,
+            borderTop: style.borderTopWidth, borderRight: style.borderRightWidth,
+            borderBottom: style.borderBottomWidth, borderLeft: style.borderLeftWidth,
+            insetX: frameElement.style.getPropertyValue('--window-physical-inset-x'),
+            insetY: frameElement.style.getPropertyValue('--window-physical-inset-y')}};
+      })()`,
+      returnByValue: true, awaitPromise: true,
+    });
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description ?? result.exceptionDetails.text);
+    return result.result?.value;
+  } finally { cdp.close(); }
+}
+
 const mcpTools = [
+  { name: "tiefsee_measure_webview_bounds", description: "讀取隔離 Debug 視窗的原生 WebView2 尺寸與頁面尺寸，供 DPI 裁切研究。", inputSchema: { type: "object", properties: { windowId: { type: "string" } }, required: ["windowId"], additionalProperties: false } },
   { name: "tiefsee_benchmark_image", description: "針對指定圖片量測 Tiefsee 本機 API 傳輸、ImageBitmap 解碼與離畫面 Canvas 或 WebGL 繪製。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, path: { type: "string" }, renderer: { type: "string", enum: ["canvas", "webgl"] } }, required: ["windowId", "path", "renderer"], additionalProperties: false } },
   { name: "tiefsee_measure_image_switch", description: "以真實滑鼠切圖，量測直到工具列顯示指定圖片尺寸的時間。", inputSchema: { type: "object", properties: { windowId: { type: "string" }, selector: { type: "string" }, path: { type: "string" }, width: { type: "integer", minimum: 1 }, height: { type: "integer", minimum: 1 } }, required: ["windowId", "selector", "path", "width", "height"], additionalProperties: false } },
   { name: "tiefsee_pages", description: "列出目前 Debug 測試版的 WebView 視窗。以 windowId 區分視窗；null 是尚未初始化的預載頁。", inputSchema: { type: "object", properties: {}, additionalProperties: false } },
@@ -1217,6 +1244,7 @@ async function callMcpTool(name, args) {
   }
 
   switch (name) {
+    case "tiefsee_measure_webview_bounds": return await measureWebViewBoundsForWindow(args.windowId);
     case "tiefsee_benchmark_image": return await benchmarkImageForWindow(args.windowId, args.path, args.renderer);
     case "tiefsee_measure_image_switch": return await measureImageSwitch(args.windowId, args.selector, args.path, args.width, args.height);
     case "tiefsee_pages": return await listWindows();
