@@ -238,7 +238,7 @@ export function initWindowStyleSettings({ _config, getDom, isDarkMode, appleSett
             "micaAltDark", "micaAltLight"
         ];
     } else {
-        options = ["none", "aero", "acrylic"];
+        options = ["none", "aero"];
     }
 
     // 隱藏不支援的選項
@@ -252,6 +252,7 @@ export function initWindowStyleSettings({ _config, getDom, isDarkMode, appleSett
     // 如果選擇的選項不在支援的名單中，就指定為 None
     if (options.indexOf(switchWindowStyle.value) === -1) {
         switchWindowStyle.value = "none";
+        _config.settings["theme"]["windowStyle"] = "none";
     }
 
     const btnRestart = getDom("#btn-windowStyle-restart") as HTMLButtonElement;
